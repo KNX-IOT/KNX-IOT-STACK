@@ -179,7 +179,7 @@ main(int argc, char *argv[])
 
   otSetStateChangedCallback(ot_instance, ot_state_changed, NULL);
 
-  // init iotivity
+  // init the stack
 
   static const oc_handler_t handler = { .init = app_init,
                                         .signal_event_loop = signal_event_loop,
