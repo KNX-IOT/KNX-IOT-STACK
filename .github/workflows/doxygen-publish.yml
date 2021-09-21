@@ -21,31 +21,31 @@ jobs:
       
       - uses: webfactory/ssh-agent@v0.5.3
         with:
-          ssh-private-key: ${{ secrets.IOTIVITY_LITE_SSH_KEY }}
+          ssh-private-key: ${{ secrets.KNX-IOT-STACK_SSH_KEY }}
         
       - name: doxygen_build_documentation
         run: |
           sudo apt-get update -y
           sudo apt-get install doxygen
           doxygen --version
-          cd ${{ github.workspace }}/iotivity-lite/tools
+          cd ${{ github.workspace }}KNX-IOT-STACK/tools
           ./build_doc.sh
           
       - name: doxygen_copy-docs
         run: |
           cd ~/work
-          git clone git@github.com:iotivity/iotivity-lite-doxygen.git
-          cd iotivity-lite-doxygen
+          git clone git@github.com:KNX-IOT/KNX-IOT-STACK-doxygen.git
+          cd KNX-IOT-STACK-doxygen
           rm -rf docs
-          cp -r ${{ github.workspace }}/iotivity-lite/tools/html .
+          cp -r ${{ github.workspace }}/KNX-IOT-STACK/tools/html .
           #Rename to "docs"
           mv html docs
           
       - name: doxygen_push-changes
         run: |
-          cd ~/work/iotivity-lite-doxygen
-          git config --global user.name 'IoTivity Bot'
-          git config --global user.email 'github@iotivity.com'
+          cd ~/work//KNX-IOT-STACK-doxygen
+          git config --global user.name 'KNX Bot'
+          git config --global user.email 'github@knx.com'
           git add .
-          git diff-index --quiet HEAD || git commit -m "Automatic publish from github.com/iotivity/iotivity-lite"
+          git diff-index --quiet HEAD || git commit -m "Automatic publish from github.com/KNX-IOT/KNX-IOT-STACK"
           git push
