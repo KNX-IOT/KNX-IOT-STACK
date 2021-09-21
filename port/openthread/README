@@ -10,7 +10,7 @@
 
 3) Perform the build:
     make 
-    Add DEBUG=1 to include debug output from IoTivity-Lite.
+    Add DEBUG=1 to include debug output from the stack
 
 4) Launch the demo:
     ./server 1

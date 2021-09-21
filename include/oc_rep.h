@@ -37,7 +37,7 @@ extern int g_err;
 /**
  * Initialize the buffer used to hold the cbor encoded data
  *
- * Unlikely to be used by outside the IoTivity-lite library.
+ * Unlikely to be used by outside the stack library.
  *
  * @param[in] payload  pointer to payload buffer
  * @param[in] size     size of the payload buffer
@@ -63,7 +63,7 @@ int oc_rep_get_encoded_payload_size(void);
  *
  * This is used when parsing the encoded cbor data to an oc_rep_t. It is
  * unlikely
- * to be used outside the IoTivity-lite library.
+ * to be used outside the stack library.
  *
  * @return pointer to the start of the cbor encoded buffer
  *
@@ -259,7 +259,7 @@ void oc_rep_encode_raw(const uint8_t *data, size_t len);
 #define oc_rep_start_array(parent, name) oc_rep_begin_array(parent, name)
 
 /**
- * This macro is unlikely to be used by outside the IoTivity-lite library.
+ * This macro is unlikely to be used by outside the library.
  *
  * Begin a cbor array object with `name` belonging to `parent` object.  Items
  * can then be added to the array till oc_rep_end_array is called.

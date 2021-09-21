@@ -84,7 +84,7 @@ else
   echo "Please update the files formatting."
   echo ""
   echo "This can be done automatically by running the following commands from"
-  echo "the top directory of iotivity-lite project"
+  echo "the top directory of the project"
   echo ""
   echo "    cp tools/_clang-format _clang-format"
   for f in $fail_filelist; do

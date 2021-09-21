@@ -132,7 +132,7 @@ typedef void (*oc_obt_device_status_cb_t)(oc_uuid_t *uuid, int status,
 typedef void (*oc_obt_status_cb_t)(int status, void *data);
 
 /**
- * Initialize the IoTivity stack so it can be used as an onboarding tool (OBT)
+ * Initialize the stack so it can be used as an onboarding tool (OBT)
  *
  * Call once at startup for OBT initialization
  *
@@ -678,7 +678,7 @@ int oc_obt_provision_server_group_oscore_context(oc_uuid_t *uuid,
 /**
  * Provision identity certificates
  *
- * To provision identity certificates the IoTivity stack must be built with
+ * To provision identity certificates the stack must be built with
  * OC_PKI defined.
  *
  * Example:

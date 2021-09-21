@@ -17,7 +17,7 @@ exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@
 
-Name: iotivity-lite-server
+Name: knx-iot-stack-server
 Description: KNX IOT Stack server library
 Version: @version@
 Libs.private: -lm -pthread

@@ -1,6 +1,6 @@
 # Linux port
 
-This folder contains the linux implementation of the IoTivity porting layer.
+This folder contains the linux implementation of the porting layer.
 It also contains the makefile to build natively on a linux machine.
 
 ## make
