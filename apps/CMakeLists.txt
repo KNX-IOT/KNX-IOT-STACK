@@ -65,4 +65,4 @@ add_custom_target(copy-pki-certs ALL
     ${PROJECT_BINARY_DIR}/pki_certs
 )
 
-add_dependencies(knx-iot-stack-port copy-pki-credentials)
+add_dependencies(kis-port copy-pki-credentials)
