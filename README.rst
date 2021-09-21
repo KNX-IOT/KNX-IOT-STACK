@@ -27,7 +27,7 @@ KNX-IOT is an open-source, reference implementation of the KNX standards for the
 Specifically, the stack realizes all the functionalities of the KNX-IOT specification.
 
 
-.. image:: Architecture.png
+.. image:: ../images/knxstack-v1.png
    :scale: 100%
    :alt: Architecture
    :align: center
@@ -43,7 +43,7 @@ Stack features
 
 - **OS agnostic:** The  device stack and modules work cross-platform (pure C code) and execute in an event-driven style. The stack interacts with lower level OS/hardware platform-specific functionality through a set of abstract interfaces. This decoupling of the common OCF standards related functionality from platform adaptation code promotes ease of long-term maintenance and evolution of the stack through successive releases of the OCF specifications.
 
-.. image:: Porting.png
+.. image:: ../images/porting.png
    :scale: 100%
    :alt: PortingLayer
    :align: center
