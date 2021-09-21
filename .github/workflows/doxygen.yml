@@ -19,7 +19,7 @@ jobs:
       
       - uses: webfactory/ssh-agent@v0.5.3
         with:
-          ssh-private-key: ${{ secrets.KNX-IOT-STACK_SSH_KEY }}
+          ssh-private-key: ${{ secrets.KNX_IOT_STACK_SSH_KEY }}
         
       - name: build_documentation
         run: |
