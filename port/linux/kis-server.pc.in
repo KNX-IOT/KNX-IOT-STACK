@@ -17,9 +17,9 @@ exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@
 
-Name: iotivity-lite-client-server
-Description: Iotivity lite client and server library
+Name: iotivity-lite-server
+Description: KNX IOT Stack server library
 Version: @version@
 Libs.private: -lm -pthread
-Cflags: -I${includedir}/iotivity-lite -DOC_CLIENT -DOC_SERVER @extra_cflags@
-Libs: -L${libdir} -liotivity-lite-client-server
+Cflags: -I${includedir}/kis -DOC_SERVER @extra_cflags@
+Libs: -L${libdir} -lkis-server
