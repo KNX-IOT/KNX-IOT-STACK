@@ -93,7 +93,7 @@ if(MSVC)
 endif()
 
 target_sources(kis-common INTERFACE
-    # Utilities that are used deep within Iotivity
+    # Utilities that are used deep within the stack
     ${PROJECT_SOURCE_DIR}/util/oc_etimer.c
     ${PROJECT_SOURCE_DIR}/util/oc_list.c
     ${PROJECT_SOURCE_DIR}/util/oc_memb.c
@@ -135,7 +135,7 @@ target_include_directories(kis-common INTERFACE
 
 target_link_libraries(kis-common INTERFACE kis-port mbedtls tinycbor-master)
 
-# Iotivity's implementation of CoAP
+# stack implementation of CoAP
 add_library(kis-coap INTERFACE)
 
 target_sources(kis-coap INTERFACE
