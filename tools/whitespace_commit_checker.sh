@@ -17,9 +17,9 @@
 # Usage instructions
 #------------------------------------------------------------------------------
 # This script is specifically designed to be run by the CI build. It can be run
-# locally by copying this file to top directory of the iotivity-lite project.
+# locally by copying this file to top directory of the project.
 # The `_clang-format` file must also be copied to the top directory of the
-# iotivity-lite project.
+# project.
 #
 #    cp tools/_clang-format _clang-format
 #    cp tools/whitespace_commit_checker.sh whitespace_commit_checker.sh
