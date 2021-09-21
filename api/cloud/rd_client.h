@@ -18,7 +18,7 @@
  ****************************************************************************/
 
 /**
-  @brief Resource Directory API of IoTivity-Lite for RD clients.
+  @brief Cloud Resource Directory API for RD clients.
   @file
 */
 
