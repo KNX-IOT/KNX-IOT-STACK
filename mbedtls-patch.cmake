@@ -23,7 +23,7 @@ if(EXISTS "${MBEDTLS_SRC_DIR}/.git")
 	message("mbedtls cleaned")
 endif()
 
-execute_process(COMMAND ${GIT_EXECUTABLE} -C ${IOTIVITY_SRC_DIR} submodule update --init)
+execute_process(COMMAND ${GIT_EXECUTABLE} -C ${STACK_SRC_DIR} submodule update --init)
 
 message("submodules initialised")
 
