@@ -1,11 +1,25 @@
-.. image:: https://gitlab.iotivity.org/iotivity/iotivity-lite/badges/master/pipeline.svg
-   :target: https://gitlab.iotivity.org/iotivity/iotivity-lite/-/pipelines
+.. image:: https://github.com/KNX-IOT/KNX_IOT_STACK/actions/workflows/build.yml/badge.svg
+   :target: https://github.com/KNX-IOT/KNX_IOT_STACK/actions/workflows/build.yml
 
-.. image:: https://img.shields.io/badge/works%20with-plgd%2Fcloud-success.svg
-   :target: https://github.com/plgd-dev/cloud
+   
+.. image:: https://github.com/KNX-IOT/KNX_IOT_STACK/actions/workflows/cmake-linux.yml/badge.svg
+   :target: https://github.com/iKNX-IOT/KNX_IOT_STACK/actions/workflows/cmake-linux.yml
+   
+.. image:: https://github.com/KNX-IOT/KNX_IOT_STACK/actions/workflows/cmake-windows.yml/badge.svg
+   :target: https://github.com/KNX-IOT/KNX_IOT_STACK/actions/workflows/cmake-windows.yml
+   
+.. image:: https://github.com/KNX-IOT/KNX_IOT_STACK/actions/workflows/unittest.yml/badge.svg
+   :target: https://github.com/KNX-IOT/KNX_IOT_STACK/actions/workflows/unittest.yml
+   
+.. image:: https://github.com/KNX-IOT/KNX_IOT_STACK/actions/workflows/doxygen.yml/badge.svg
+   :target: https://github.com/KNX-IOT/KNX_IOT_STACK/actions/workflows/doxygen.yml
 
-.. image:: https://badges.gitter.im/ocfcloud/Lobby.svg
-   :target: https://gitter.im/ocfcloud/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge
+.. image:: https://github.com/KNX-IOT/KNX_IOT_STACK/actions/workflows/check-format.yml/badge.svg
+   :target: https://github.com/KNX-IOT/KNX_IOT_STACK/actions/workflows/check-format.yml
+   
+.. image:: https://img.shields.io/github/v/release/KNX-IOT/KNX_IOT_STACK
+   :target: https://github.com/KNX-IOT/KNX_IOT_STACK/releases
+
 
 Introduction
 ------------
@@ -111,24 +125,10 @@ Please check here for build instructions:
 
 
 
-  - Type ``2`` **Enter** to ``Discover owned devices`` the server and client should be listed
-
-(Step 3) Pair Server and Client
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  - Start the client and server samples
-  - Type ``12`` **Enter** to ``Provision pair-wise credentials``
-  - Type ``0`` **Enter** ``1`` **Enter** to pair the client and server. If you have multiple owned
-    devices you will have to select the correct devices from the list.
-
-(Step 4) Restart and Test
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-The samples should be onboarded and provisioned. Restart the server and then the client they should
-discover each other and run without difficulty.
-
 Send Feedback
 -------------------------------------------------
 Questions
-`IoTivity-Lite Developer Mailing List <https://iotivity.groups.io/g/iotivity-dev>`_
+`Wiki <https://github.com/KNX-IOT/KNX-IOT-STACK/wiki>`_
 
 Bugs
-`Gitlab issues <https://gitlab.iotivity.org/iotivity/iotivity-lite/issues>`_
+`Github issues <https://github.com/KNX-IOT/KNX-IOT-STACK/issues>`_
