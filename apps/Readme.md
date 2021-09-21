@@ -16,10 +16,6 @@ naming convention:
 
 ## Example applications
 
-### Arduino.cpp
-
-Server example application explaining how to use IoTivity on an Arduino.
-e.g. how to use IoTivity code in conjunction with the Arduino main loop.
 
 ### client_block_linux.c
 
