@@ -1,4 +1,4 @@
-project(iotivity-deps)
+project(knx-iot-stack-deps)
 
 add_library(tinycbor-master
     ${PROJECT_SOURCE_DIR}/tinycbor/src/cborerrorstrings.c

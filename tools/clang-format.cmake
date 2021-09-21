@@ -1,9 +1,9 @@
 cmake_minimum_required (VERSION 3.11)
 
 # Create list of all source files
-file(GLOB_RECURSE iotivity_allsource *.c *.cpp *.h *.hpp)
+file(GLOB_RECURSE knx-iot-stack_allsource *.c *.cpp *.h *.hpp)
 # Remove third party code
-list(FILTER iotivity_allsource EXCLUDE REGEX "deps/")
+list(FILTER knx-iot-stack_allsource EXCLUDE REGEX "deps/")
 
 # Find clang-format
 find_program(
@@ -32,6 +32,6 @@ endif()
 list(LENGTH iotivity_allsource LIST_LEN)
 math(EXPR LIST_LEN "${LIST_LEN} - 1")
 foreach(INDEX RANGE 0 ${LIST_LEN} 8)
-	list(SUBLIST iotivity_allsource ${INDEX} 8 TMP_PATH)
+	list(SUBLIST knx-iot-stack_allsource ${INDEX} 8 TMP_PATH)
 	execute_process(COMMAND ${CLANG_FORMAT_EXE} -i ${TMP_PATH})
 endforeach()

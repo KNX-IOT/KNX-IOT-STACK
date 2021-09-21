@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.10)
-project(iotivity-lite)
+project(knx-iot-stack)
 
 # Patch mbedtls
 set(OC_REAPPLY_MBEDTLS_PATCHES ON CACHE BOOL "")
@@ -40,10 +40,10 @@ if(TARGET mbedcrypto-plat)
 endif()
 
 
-# Iotivity API
-add_library(iotivity-api INTERFACE)
+# API
+add_library(kis-api INTERFACE)
 
-target_sources(iotivity-api INTERFACE
+target_sources(kis-api INTERFACE
     ${PROJECT_SOURCE_DIR}/api/oc_base64.c
     ${PROJECT_SOURCE_DIR}/api/oc_blockwise.c
     ${PROJECT_SOURCE_DIR}/api/oc_buffer.c
@@ -72,15 +72,15 @@ target_sources(iotivity-api INTERFACE
     ${PROJECT_SOURCE_DIR}/api/c-timestamp/timestamp_valid.c
 )
 
-target_include_directories(iotivity-api INTERFACE
+target_include_directories(kis-api INTERFACE
     ${PROJECT_SOURCE_DIR}/
     ${PROJECT_SOURCE_DIR}/api
     ${PROJECT_SOURCE_DIR}/api/c-timestamp
     ${PROJECT_SOURCE_DIR}/include
 )
 
-# Core functions used by Iotivity
-add_library(iotivity-common INTERFACE)
+# Core functions used by the stack
+add_library(kis-common INTERFACE)
 
 
 # do not treat warnings as errors on Windows
@@ -89,10 +89,10 @@ if(MSVC)
     target_compile_options(mbedtls PRIVATE /W1 /WX-)
     target_compile_options(mbedx509 PRIVATE /W1 /WX-)
     target_compile_options(mbedcrypto PRIVATE /W1 /WX-)
-    target_compile_options(iotivity-api INTERFACE /W1 /WX-)
+    target_compile_options(kis-api INTERFACE /W1 /WX-)
 endif()
 
-target_sources(iotivity-common INTERFACE
+target_sources(kis-common INTERFACE
     # Utilities that are used deep within Iotivity
     ${PROJECT_SOURCE_DIR}/util/oc_etimer.c
     ${PROJECT_SOURCE_DIR}/util/oc_list.c
@@ -126,19 +126,19 @@ target_sources(iotivity-common INTERFACE
 
 )
 
-target_include_directories(iotivity-common INTERFACE
+target_include_directories(kis-common INTERFACE
     ${PROJECT_SOURCE_DIR}/
     ${PROJECT_SOURCE_DIR}/include
     ${PROJECT_SOURCE_DIR}/deps/tinycbor/src
     ${PROJECT_SOURCE_DIR}/security
 )
 
-target_link_libraries(iotivity-common INTERFACE iotivity-port mbedtls tinycbor-master)
+target_link_libraries(kis-common INTERFACE kis-port mbedtls tinycbor-master)
 
 # Iotivity's implementation of CoAP
-add_library(iotivity-coap INTERFACE)
+add_library(kis-coap INTERFACE)
 
-target_sources(iotivity-coap INTERFACE
+target_sources(kis-coap INTERFACE
     ${PROJECT_SOURCE_DIR}/messaging/coap/coap.c
     ${PROJECT_SOURCE_DIR}/messaging/coap/coap_signal.c
     ${PROJECT_SOURCE_DIR}/messaging/coap/engine.c
@@ -147,11 +147,11 @@ target_sources(iotivity-coap INTERFACE
     ${PROJECT_SOURCE_DIR}/messaging/coap/transactions.c
 )
 
-target_include_directories(iotivity-coap INTERFACE
+target_include_directories(kis-coap INTERFACE
     ${PROJECT_SOURCE_DIR}/messaging/coap/
 )
 
-target_link_libraries(iotivity-coap INTERFACE iotivity-port)
+target_link_libraries(kis-coap INTERFACE kis-port)
 
 if(OC_DYNAMIC_ALLOCATION_ENABLED)
     target_compile_definitions(mbedcrypto PUBLIC OC_DYNAMIC_ALLOCATION)
@@ -166,42 +166,42 @@ if(OC_PKI_ENABLED)
 endif()
 
 if(OC_DEBUG_ENABLED)
-    target_compile_definitions(iotivity-common INTERFACE OC_DEBUG)
+    target_compile_definitions(kis-common INTERFACE OC_DEBUG)
     target_compile_definitions(mbedcrypto PUBLIC OC_DEBUG)
 endif()
 
 if(OC_CLOUD_ENABLED)
-    target_compile_definitions(iotivity-common INTERFACE OC_CLOUD)
+    target_compile_definitions(kis-common INTERFACE OC_CLOUD)
 endif()
 
 if(OC_IDD_API_ENABLED)
-    target_compile_definitions(iotivity-common INTERFACE OC_IDD_API)
+    target_compile_definitions(kis-common INTERFACE OC_IDD_API)
 endif()
 
-# Client and server versions of Iotivity
-add_library(iotivity-client)
-target_compile_definitions(iotivity-client PUBLIC OC_CLIENT)
-target_link_libraries(iotivity-client PRIVATE
-    iotivity-coap
-    iotivity-api
+# Client and server versions
+add_library(kis-client)
+target_compile_definitions(kis-client PUBLIC OC_CLIENT)
+target_link_libraries(kis-client PRIVATE
+    kis-coap
+    kis-api
 )
-target_link_libraries(iotivity-client PUBLIC iotivity-common)
+target_link_libraries(kis-client PUBLIC kis-common)
 
-add_library(iotivity-server)
-target_compile_definitions(iotivity-server PUBLIC OC_SERVER)
-target_link_libraries(iotivity-server PRIVATE
-    iotivity-coap
-    iotivity-api
+add_library(kis-server)
+target_compile_definitions(kis-server PUBLIC OC_SERVER)
+target_link_libraries(kis-server PRIVATE
+    kis-coap
+    kis-api
 )
-target_link_libraries(iotivity-server PUBLIC iotivity-common)
+target_link_libraries(kis-server PUBLIC kis-common)
 
-add_library(iotivity-server-client)
-target_compile_definitions(iotivity-server-client PUBLIC OC_SERVER OC_CLIENT)
-target_link_libraries(iotivity-server-client PRIVATE
-    iotivity-coap
-    iotivity-api
+add_library(kis-server-client)
+target_compile_definitions(kis-server-client PUBLIC OC_SERVER OC_CLIENT)
+target_link_libraries(kis-server-client PRIVATE
+    kis-coap
+    kis-api
 )
-target_link_libraries(iotivity-server-client PUBLIC iotivity-common)
+target_link_libraries(kis-server-client PUBLIC kis-common)
 
 
 if(PROJECT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
@@ -214,5 +214,4 @@ endif()
 
 add_subdirectory(port)
 add_subdirectory(apps)
-add_subdirectory(onboarding_tool)
 add_subdirectory(deps)

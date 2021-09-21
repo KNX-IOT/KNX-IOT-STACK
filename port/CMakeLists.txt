@@ -1,6 +1,6 @@
 # This CMakeLists can only build the port for Linux & Windows
 if(UNIX OR WIN32)
-	project(iotivity-lite-port)
+	project(knx-iot-stack-port)
 
 	# Detect the platform and pick the right port
 	if(UNIX)
@@ -10,9 +10,9 @@ if(UNIX OR WIN32)
 	endif()
 
 
-    add_library(iotivity-port INTERFACE)
+    add_library(kis-port INTERFACE)
 
-    target_include_directories(iotivity-port INTERFACE 
+    target_include_directories(kis-port INTERFACE 
         ${PORT_DIR}
         ${PROJECT_SOURCE_DIR}
     )
@@ -22,7 +22,7 @@ if(UNIX OR WIN32)
         ${PROJECT_SOURCE_DIR}
     )
     
-    target_sources(iotivity-port INTERFACE
+    target_sources(kis-port INTERFACE
         ${PORT_DIR}/abort.c
         ${PORT_DIR}/clock.c
         ${PORT_DIR}/ipadapter.c
@@ -32,16 +32,16 @@ if(UNIX OR WIN32)
     )
     
     if(WIN32)
-        target_sources(iotivity-port INTERFACE
+        target_sources(kis-port INTERFACE
             ${PORT_DIR}/mutex.c
             ${PORT_DIR}/network_addresses.c
         )
-        target_compile_definitions(iotivity-port INTERFACE OC_IPV4)
+        target_compile_definitions(kis-port INTERFACE OC_IPV4)
     endif()
     
     if(UNIX)
-        target_link_libraries(iotivity-port INTERFACE pthread m)
+        target_link_libraries(kis-port INTERFACE pthread m)
     elseif(WIN32)
-        target_link_libraries(iotivity-port INTERFACE bcrypt iphlpapi)
+        target_link_libraries(kis-port INTERFACE bcrypt iphlpapi)
     endif()
 endif()
