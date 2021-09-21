@@ -220,12 +220,12 @@ endif
 
 SAMPLES_CREDS = $(addsuffix _creds, ${SAMPLES} )
 
-CONSTRAINED_LIBS = libknxiot-lite-server.a libknxiot-lite-client.a \
-		   libknxiot-lite-server.so libknxiot-lite-client.so \
-		   libknxiot-lite-client-server.so libknxiot-lite-client-server.a
+CONSTRAINED_LIBS = libkis-server.a libkis-client.a \
+		   libkis-server.so libkis-client.so \
+		   libkis-client-server.so libkis-client-server.a
 
-PC = knxiot-lite-client.pc knxiot-lite-server.pc \
-     knxiot-lite-client-server.pc
+PC = kis-client.pc kis-server.pc \
+     kis-client-server.pc
 
 all: $(CONSTRAINED_LIBS) $(SAMPLES) $(PC) $(UNIT_TESTS) $(SWIG)
 
@@ -244,36 +244,36 @@ $(API_TEST_OBJ_DIR)/%.o: $(API_TEST_DIR)/%.cpp
 	@mkdir -p ${@D}
 	$(CXX) $(GTEST_CPPFLAGS) $(TEST_CXXFLAGS) $(EXTRA_CFLAGS) $(HEADER_DIR) -I$(ROOT_DIR)/deps/tinycbor/src -c $< -o $@
 
-apitest: $(API_TEST_OBJ_FILES) libknxiot-lite-client-server.a | $(GTEST)
-	$(CXX) $^ -o $@ $(GTEST_CPPFLAGS) $(TEST_CXXFLAGS) $(EXTRA_CFLAGS) $(HEADER_DIR) -L$(OUT_DIR) -L$(GTEST_DIR)/make -l:gtest_main.a -lknxiot-lite-client-server -lpthread
+apitest: $(API_TEST_OBJ_FILES) libkis-client-server.a | $(GTEST)
+	$(CXX) $^ -o $@ $(GTEST_CPPFLAGS) $(TEST_CXXFLAGS) $(EXTRA_CFLAGS) $(HEADER_DIR) -L$(OUT_DIR) -L$(GTEST_DIR)/make -l:gtest_main.a -lkis-client-server -lpthread
 
 $(SECURITY_TEST_OBJ_DIR)/%.o: $(SECURITY_TEST_DIR)/%.cpp
 	@mkdir -p ${@D}
 	$(CXX) $< -o $@ $(GTEST_CPPFLAGS) $(TEST_CXXFLAGS) $(EXTRA_CFLAGS) $(HEADER_DIR) $(SECURITY_HEADERS) -c
 
-securitytest: $(SECURITY_TEST_OBJ_FILES) libknxiot-lite-client-server.a | $(GTEST)
-	$(CXX) $(GTEST_CPPFLAGS) $(TEST_CXXFLAGS) $(EXTRA_CFLAGS)  $(HEADER_DIR) -l:gtest_main.a -lknxiot-lite-client-server -L$(OUT_DIR) -L$(GTEST_DIR)/make -lpthread $^ -o $@
+securitytest: $(SECURITY_TEST_OBJ_FILES) libkis-client-server.a | $(GTEST)
+	$(CXX) $(GTEST_CPPFLAGS) $(TEST_CXXFLAGS) $(EXTRA_CFLAGS)  $(HEADER_DIR) -l:gtest_main.a -lkis-client-server -L$(OUT_DIR) -L$(GTEST_DIR)/make -lpthread $^ -o $@
 
 $(PLATFORM_TEST_OBJ_DIR)/%.o: $(PLATFORM_TEST_DIR)/%.cpp
 	@mkdir -p ${@D}
 	$(CXX) $< -o $@ $(GTEST_CPPFLAGS) $(TEST_CXXFLAGS) $(EXTRA_CFLAGS) $(HEADER_DIR) -I$(ROOT_DIR)/deps/tinycbor/src -c
 
-platformtest: $(PLATFORM_TEST_OBJ_FILES) libknxiot-lite-client-server.a | $(GTEST)
-	$(CXX) $(GTEST_CPPFLAGS) $(TEST_CXXFLAGS) $(EXTRA_CFLAGS) $(HEADER_DIR) -l:gtest_main.a -lknxiot-lite-client-server -L$(OUT_DIR) -L$(GTEST_DIR)/make -lpthread $^ -o $@
+platformtest: $(PLATFORM_TEST_OBJ_FILES) libkis-client-server.a | $(GTEST)
+	$(CXX) $(GTEST_CPPFLAGS) $(TEST_CXXFLAGS) $(EXTRA_CFLAGS) $(HEADER_DIR) -l:gtest_main.a -lkis-client-server -L$(OUT_DIR) -L$(GTEST_DIR)/make -lpthread $^ -o $@
 
 $(CLOUD_TEST_OBJ_DIR)/%.o: $(CLOUD_TEST_DIR)/%.cpp
 	@mkdir -p ${@D}
 	$(CXX) $(GTEST_CPPFLAGS) $(TEST_CXXFLAGS) $(EXTRA_CFLAGS) $(HEADER_DIR) $(CFLAGS_CLOUD) -I$(ROOT_DIR)/service/cloud/src -I$(ROOT_DIR)/deps/tinycbor/src -c $< -o $@
 
-cloudtest: $(CLOUD_TEST_OBJ_FILES) libknxiot-lite-client-server.a | $(GTEST)
-	$(CXX) $(GTEST_CPPFLAGS) $(TEST_CXXFLAGS) $(EXTRA_CFLAGS) $(HEADER_DIR) $(CFLAGS_CLOUD) -l:gtest_main.a -lknxiot-lite-client-server -L$(OUT_DIR) -L$(GTEST_DIR)/make -lpthread $^ -o $@
+cloudtest: $(CLOUD_TEST_OBJ_FILES) libkis-client-server.a | $(GTEST)
+	$(CXX) $(GTEST_CPPFLAGS) $(TEST_CXXFLAGS) $(EXTRA_CFLAGS) $(HEADER_DIR) $(CFLAGS_CLOUD) -l:gtest_main.a -lkis-client-server -L$(OUT_DIR) -L$(GTEST_DIR)/make -lpthread $^ -o $@
 
 $(MESSAGING_TEST_OBJ_DIR)/%.o: $(MESSAGING_TEST_DIR)/%.cpp
 	@mkdir -p ${@D}
 	$(CXX) $(GTEST_CPPFLAGS) $(TEST_CXXFLAGS) $(EXTRA_CFLAGS) $(HEADER_DIR) $(MESSAGING_HEADERS) -c $< -o $@
 
-messagingtest: $(MESSAGING_TEST_OBJ_FILES) libknxiot-lite-client-server.a | $(GTEST)
-	$(CXX) $(GTEST_CPPFLAGS) $(TEST_CXXFLAGS) $(EXTRA_CFLAGS)  $(HEADER_DIR) -l:gtest_main.a -lknxiot-lite-client-server -L$(OUT_DIR) -L$(GTEST_DIR)/make -lpthread $^ -o $@
+messagingtest: $(MESSAGING_TEST_OBJ_FILES) libkis-client-server.a | $(GTEST)
+	$(CXX) $(GTEST_CPPFLAGS) $(TEST_CXXFLAGS) $(EXTRA_CFLAGS)  $(HEADER_DIR) -l:gtest_main.a -lkis-client-server -L$(OUT_DIR) -L$(GTEST_DIR)/make -lpthread $^ -o $@
 
 copy_pki_certs:
 	@mkdir -p pki_certs
@@ -308,134 +308,134 @@ obj/server/oc_introspection.o: ../../include/server_introspection.dat.h
 obj/client/oc_introspection.o: ../../include/server_introspection.dat.h
 obj/client_server/oc_introspection.o: ../../include/server_introspection.dat.h
 
-libknxiot-lite-server.a: $(OBJ_COMMON) $(OBJ_SERVER)
+libkis-server.a: $(OBJ_COMMON) $(OBJ_SERVER)
 	$(AR) -rcs $@ $(OBJ_COMMON) $(OBJ_SERVER)
 
-libknxiot-lite-server.so: $(OBJ_COMMON) $(OBJ_SERVER)
+libkis-server.so: $(OBJ_COMMON) $(OBJ_SERVER)
 	$(CC) -shared -o $@ $(OBJ_COMMON) $(OBJ_SERVER) $(LIBS)
 
-libknxiot-lite-client.a: $(OBJ_COMMON) $(OBJ_CLIENT)
+libkis-client.a: $(OBJ_COMMON) $(OBJ_CLIENT)
 	$(AR) -rcs $@ $(OBJ_COMMON) $(OBJ_CLIENT)
 
-libknxiot-lite-client.so: $(OBJ_COMMON) $(OBJ_CLIENT)
+libkis-client.so: $(OBJ_COMMON) $(OBJ_CLIENT)
 	$(CC) -shared -o $@ $(OBJ_COMMON) $(OBJ_CLIENT) $(LIBS)
 
-libknxiot-lite-client-server.a: $(OBJ_COMMON) $(OBJ_CLIENT_SERVER) $(OBJ_CLOUD)
+libkis-client-server.a: $(OBJ_COMMON) $(OBJ_CLIENT_SERVER) $(OBJ_CLOUD)
 	$(AR) -rcs $@ $(OBJ_COMMON) $(OBJ_CLIENT_SERVER) $(OBJ_CLOUD)
 
-libknxiot-lite-client-server.so: $(OBJ_COMMON) $(OBJ_CLIENT_SERVER) $(OBJ_CLOUD)
+libkis-client-server.so: $(OBJ_COMMON) $(OBJ_CLIENT_SERVER) $(OBJ_CLOUD)
 	$(CC) -shared -o $@ $(OBJ_COMMON) $(OBJ_CLIENT_SERVER) $(OBJ_CLOUD) $(LIBS)
 
-server: libknxiot-lite-server.a $(ROOT_DIR)/apps/server_linux.c
+server: libkis-server.a $(ROOT_DIR)/apps/server_linux.c
 	@mkdir -p $@_creds
-	${CC} -o $@ ../../apps/server_linux.c libknxiot-lite-server.a -DOC_SERVER ${CFLAGS} ${LIBS}
+	${CC} -o $@ ../../apps/server_linux.c libkis-server.a -DOC_SERVER ${CFLAGS} ${LIBS}
 
-client: libknxiot-lite-client.a $(ROOT_DIR)/apps/client_linux.c
+client: libkis-client.a $(ROOT_DIR)/apps/client_linux.c
 	@mkdir -p $@_creds
-	${CC} -o $@ ../../apps/client_linux.c libknxiot-lite-client.a -DOC_CLIENT ${CFLAGS} ${LIBS}
+	${CC} -o $@ ../../apps/client_linux.c libkis-client.a -DOC_CLIENT ${CFLAGS} ${LIBS}
 
-smart_lock: libknxiot-lite-client.a $(ROOT_DIR)/apps/smart_lock_linux.c
+smart_lock: libkis-client.a $(ROOT_DIR)/apps/smart_lock_linux.c
 	@mkdir -p $@_creds
-	${CC} -o $@ ../../apps/smart_lock_linux.c libknxiot-lite-client.a -DOC_CLIENT ${CFLAGS} ${LIBS}
+	${CC} -o $@ ../../apps/smart_lock_linux.c libkis-client.a -DOC_CLIENT ${CFLAGS} ${LIBS}
 
-client_certification_tests: libknxiot-lite-client-server.a $(ROOT_DIR)/apps/client_certification_tests.c copy_idd_files
+client_certification_tests: libkis-client-server.a $(ROOT_DIR)/apps/client_certification_tests.c copy_idd_files
 	@mkdir -p $@_creds
-	${CC} -o $@ ../../apps/client_certification_tests.c libknxiot-lite-client-server.a -DOC_CLIENT -DOC_SERVER ${CFLAGS} ${LIBS}
+	${CC} -o $@ ../../apps/client_certification_tests.c libkis-client-server.a -DOC_CLIENT -DOC_SERVER ${CFLAGS} ${LIBS}
 
-temp_sensor: libknxiot-lite-client.a $(ROOT_DIR)/apps/temp_sensor_client_linux.c
+temp_sensor: libkis-client.a $(ROOT_DIR)/apps/temp_sensor_client_linux.c
 	@mkdir -p $@_creds
-	${CC} -o $@ ../../apps/temp_sensor_client_linux.c libknxiot-lite-client.a -DOC_CLIENT ${CFLAGS} ${LIBS}
+	${CC} -o $@ ../../apps/temp_sensor_client_linux.c libkis-client.a -DOC_CLIENT ${CFLAGS} ${LIBS}
 
-simpleserver: libknxiot-lite-server.a $(ROOT_DIR)/apps/simpleserver.c
+simpleserver: libkis-server.a $(ROOT_DIR)/apps/simpleserver.c
 	@mkdir -p $@_creds
-	${CC} -o $@ ../../apps/simpleserver.c libknxiot-lite-server.a -DOC_SERVER ${CFLAGS}  ${LIBS}
+	${CC} -o $@ ../../apps/simpleserver.c libkis-server.a -DOC_SERVER ${CFLAGS}  ${LIBS}
 
-secure_mcast_server1: libknxiot-lite-server.a $(ROOT_DIR)/apps/secure_mcast_server1.c
+secure_mcast_server1: libkis-server.a $(ROOT_DIR)/apps/secure_mcast_server1.c
 	@mkdir -p $@_creds
-	${CC} -o $@ ../../apps/secure_mcast_server1.c libknxiot-lite-server.a -DOC_SERVER ${CFLAGS}  ${LIBS}
+	${CC} -o $@ ../../apps/secure_mcast_server1.c libkis-server.a -DOC_SERVER ${CFLAGS}  ${LIBS}
 
-secure_mcast_server2: libknxiot-lite-server.a $(ROOT_DIR)/apps/secure_mcast_server2.c
+secure_mcast_server2: libkis-server.a $(ROOT_DIR)/apps/secure_mcast_server2.c
 	@mkdir -p $@_creds
-	${CC} -o $@ ../../apps/secure_mcast_server2.c libknxiot-lite-server.a -DOC_SERVER ${CFLAGS}  ${LIBS}
+	${CC} -o $@ ../../apps/secure_mcast_server2.c libkis-server.a -DOC_SERVER ${CFLAGS}  ${LIBS}
 
-simpleserver_pki: libknxiot-lite-server.a $(ROOT_DIR)/apps/simpleserver_pki.c
+simpleserver_pki: libkis-server.a $(ROOT_DIR)/apps/simpleserver_pki.c
 	@mkdir -p $@_creds
-	${CC} -o $@ ../../apps/simpleserver_pki.c libknxiot-lite-server.a -DOC_SERVER ${CFLAGS}  ${LIBS}
+	${CC} -o $@ ../../apps/simpleserver_pki.c libkis-server.a -DOC_SERVER ${CFLAGS}  ${LIBS}
 
-simpleclient: libknxiot-lite-client.a $(ROOT_DIR)/apps/simpleclient.c
+simpleclient: libkis-client.a $(ROOT_DIR)/apps/simpleclient.c
 	@mkdir -p $@_creds
-	${CC} -o $@ ../../apps/simpleclient.c libknxiot-lite-client.a -DOC_CLIENT ${CFLAGS}  ${LIBS}
+	${CC} -o $@ ../../apps/simpleclient.c libkis-client.a -DOC_CLIENT ${CFLAGS}  ${LIBS}
 
-secure_mcast_client: libknxiot-lite-client.a $(ROOT_DIR)/apps/secure_mcast_client.c
+secure_mcast_client: libkis-client.a $(ROOT_DIR)/apps/secure_mcast_client.c
 	@mkdir -p $@_creds
-	${CC} -o $@ ../../apps/secure_mcast_client.c libknxiot-lite-client.a -DOC_CLIENT ${CFLAGS}  ${LIBS}
+	${CC} -o $@ ../../apps/secure_mcast_client.c libkis-client.a -DOC_CLIENT ${CFLAGS}  ${LIBS}
 
-introspectionclient: libknxiot-lite-client.a $(ROOT_DIR)/apps/introspectionclient.c
+introspectionclient: libkis-client.a $(ROOT_DIR)/apps/introspectionclient.c
 	@mkdir -p $@_creds
-	${CC} -o $@ ../../apps/introspectionclient.c libknxiot-lite-client.a -DOC_CLIENT ${CFLAGS}  ${LIBS}
+	${CC} -o $@ ../../apps/introspectionclient.c libkis-client.a -DOC_CLIENT ${CFLAGS}  ${LIBS}
 
-client_collections_linux: libknxiot-lite-client.a $(ROOT_DIR)/apps/client_collections_linux.c
+client_collections_linux: libkis-client.a $(ROOT_DIR)/apps/client_collections_linux.c
 	@mkdir -p $@_creds
-	${CC} -o $@ ../../apps/client_collections_linux.c libknxiot-lite-client.a -DOC_CLIENT ${CFLAGS}  ${LIBS}
+	${CC} -o $@ ../../apps/client_collections_linux.c libkis-client.a -DOC_CLIENT ${CFLAGS}  ${LIBS}
 
-server_collections_linux: libknxiot-lite-server.a $(ROOT_DIR)/apps/server_collections_linux.c
+server_collections_linux: libkis-server.a $(ROOT_DIR)/apps/server_collections_linux.c
 	@mkdir -p $@_creds
-	${CC} -o $@ ../../apps/server_collections_linux.c libknxiot-lite-server.a -DOC_SERVER ${CFLAGS} ${LIBS}
+	${CC} -o $@ ../../apps/server_collections_linux.c libkis-server.a -DOC_SERVER ${CFLAGS} ${LIBS}
 
-client_block_linux: libknxiot-lite-client.a $(ROOT_DIR)/apps/client_block_linux.c
-	${CC} -o $@ ../../apps/client_block_linux.c libknxiot-lite-client.a -DOC_CLIENT ${CFLAGS}  ${LIBS}
+client_block_linux: libkis-client.a $(ROOT_DIR)/apps/client_block_linux.c
+	${CC} -o $@ ../../apps/client_block_linux.c libkis-client.a -DOC_CLIENT ${CFLAGS}  ${LIBS}
 
-server_block_linux: libknxiot-lite-server.a $(ROOT_DIR)/apps/server_block_linux.c
-	${CC} -o $@ ../../apps/server_block_linux.c libknxiot-lite-server.a -DOC_SERVER ${CFLAGS} ${LIBS}
+server_block_linux: libkis-server.a $(ROOT_DIR)/apps/server_block_linux.c
+	${CC} -o $@ ../../apps/server_block_linux.c libkis-server.a -DOC_SERVER ${CFLAGS} ${LIBS}
 
-server_rules: libknxiot-lite-server.a $(ROOT_DIR)/apps/server_rules.c
+server_rules: libkis-server.a $(ROOT_DIR)/apps/server_rules.c
 	@mkdir -p $@_creds
-	${CC} -o $@ ../../apps/server_rules.c libknxiot-lite-server.a -DOC_SERVER ${CFLAGS} ${LIBS}
+	${CC} -o $@ ../../apps/server_rules.c libkis-server.a -DOC_SERVER ${CFLAGS} ${LIBS}
 
-server_certification_tests: libknxiot-lite-server.a $(ROOT_DIR)/apps/server_certification_tests.c copy_pki_certs copy_idd_files
+server_certification_tests: libkis-server.a $(ROOT_DIR)/apps/server_certification_tests.c copy_pki_certs copy_idd_files
 	@mkdir -p $@_creds
-	${CC} -o $@ ../../apps/server_certification_tests.c libknxiot-lite-client-server.a -DOC_CLIENT -DOC_SERVER ${CFLAGS} ${CFLAGS_CLOUD} ${LIBS}
+	${CC} -o $@ ../../apps/server_certification_tests.c libkis-client-server.a -DOC_CLIENT -DOC_SERVER ${CFLAGS} ${CFLAGS_CLOUD} ${LIBS}
 
-smart_home_server_linux: libknxiot-lite-server.a $(ROOT_DIR)/apps/smart_home_server_linux.c copy_pki_certs copy_idd_files
+smart_home_server_linux: libkis-server.a $(ROOT_DIR)/apps/smart_home_server_linux.c copy_pki_certs copy_idd_files
 	@mkdir -p $@_creds
-	${CC} -o $@ ../../apps/smart_home_server_linux.c libknxiot-lite-server.a -DOC_SERVER ${CFLAGS} ${LIBS}
+	${CC} -o $@ ../../apps/smart_home_server_linux.c libkis-server.a -DOC_SERVER ${CFLAGS} ${LIBS}
 
-smart_home_server_with_mock_swupdate: libknxiot-lite-server.a $(ROOT_DIR)/apps/smart_home_server_with_mock_swupdate.cpp
+smart_home_server_with_mock_swupdate: libkis-server.a $(ROOT_DIR)/apps/smart_home_server_with_mock_swupdate.cpp
 	@mkdir -p $@_creds
 	# old implemenation with boost
-	#${CXX} -o $@ ../../apps/smart_home_server_with_mock_swupdate.cpp libknxiot-lite-server.a -DOC_SERVER ${CXXFLAGS} ${LIBS} -lboost_system -lcppnetlib-uri
-	${CXX} -o $@ ../../apps/smart_home_server_with_mock_swupdate.cpp libknxiot-lite-server.a -DOC_SERVER ${CXXFLAGS} ${LIBS}
+	#${CXX} -o $@ ../../apps/smart_home_server_with_mock_swupdate.cpp libkis-server.a -DOC_SERVER ${CXXFLAGS} ${LIBS} -lboost_system -lcppnetlib-uri
+	${CXX} -o $@ ../../apps/smart_home_server_with_mock_swupdate.cpp libkis-server.a -DOC_SERVER ${CXXFLAGS} ${LIBS}
 
-multi_device_server: libknxiot-lite-server.a $(ROOT_DIR)/apps/multi_device_server_linux.c
+multi_device_server: libkis-server.a $(ROOT_DIR)/apps/multi_device_server_linux.c
 	@mkdir -p $@_creds
-	${CC} -o $@ ../../apps/multi_device_server_linux.c libknxiot-lite-server.a -DOC_SERVER ${CFLAGS} ${LIBS}
+	${CC} -o $@ ../../apps/multi_device_server_linux.c libkis-server.a -DOC_SERVER ${CFLAGS} ${LIBS}
 
-multi_device_client: libknxiot-lite-client.a $(ROOT_DIR)/apps/multi_device_client_linux.c
+multi_device_client: libkis-client.a $(ROOT_DIR)/apps/multi_device_client_linux.c
 	@mkdir -p $@_creds
-	${CC} -o $@ ../../apps/multi_device_client_linux.c libknxiot-lite-client.a -DOC_CLIENT ${CFLAGS}  ${LIBS}
+	${CC} -o $@ ../../apps/multi_device_client_linux.c libkis-client.a -DOC_CLIENT ${CFLAGS}  ${LIBS}
 
-cloud_server: libknxiot-lite-client-server.a $(ROOT_DIR)/apps/cloud_server.c copy_pki_certs
+cloud_server: libkis-client-server.a $(ROOT_DIR)/apps/cloud_server.c copy_pki_certs
 	@mkdir -p $@_creds
-	${CC} -o $@ ../../apps/cloud_server.c libknxiot-lite-client-server.a -DOC_CLIENT -DOC_SERVER ${CFLAGS} ${CFLAGS_CLOUD}  ${LIBS}
+	${CC} -o $@ ../../apps/cloud_server.c libkis-client-server.a -DOC_CLIENT -DOC_SERVER ${CFLAGS} ${CFLAGS_CLOUD}  ${LIBS}
 
-cloud_client: libknxiot-lite-client-server.a $(ROOT_DIR)/apps/cloud_client.c copy_pki_certs
+cloud_client: libkis-client-server.a $(ROOT_DIR)/apps/cloud_client.c copy_pki_certs
 	@mkdir -p $@_creds
-	${CC} -o $@ ../../apps/cloud_client.c libknxiot-lite-client-server.a -DOC_CLIENT -DOC_SERVER ${CFLAGS} ${CFLAGS_CLOUD}  ${LIBS}
+	${CC} -o $@ ../../apps/cloud_client.c libkis-client-server.a -DOC_CLIENT -DOC_SERVER ${CFLAGS} ${CFLAGS_CLOUD}  ${LIBS}
 
-cloud_tests: libknxiot-lite-client-server.a $(ROOT_DIR)/apps/cloud_certification_tests.c
+cloud_tests: libkis-client-server.a $(ROOT_DIR)/apps/cloud_certification_tests.c
 	@mkdir -p $@_creds
-	${CC} -o $@ ../../apps/cloud_certification_tests.c libknxiot-lite-client-server.a -DOC_CLIENT -DOC_SERVER ${CFLAGS} ${CFLAGS_CLOUD} ${LIBS}
+	${CC} -o $@ ../../apps/cloud_certification_tests.c libkis-client-server.a -DOC_CLIENT -DOC_SERVER ${CFLAGS} ${CFLAGS_CLOUD} ${LIBS}
 
 
-server_multithread_linux: libknxiot-lite-server.a $(ROOT_DIR)/apps/server_multithread_linux.c
+server_multithread_linux: libkis-server.a $(ROOT_DIR)/apps/server_multithread_linux.c
 	@mkdir -p $@_creds
-	${CC} -o $@ ../../apps/server_multithread_linux.c libknxiot-lite-server.a -DOC_SERVER ${CFLAGS} ${LIBS}
+	${CC} -o $@ ../../apps/server_multithread_linux.c libkis-server.a -DOC_SERVER ${CFLAGS} ${LIBS}
 
-client_multithread_linux: libknxiot-lite-client.a $(ROOT_DIR)/apps/client_multithread_linux.c
+client_multithread_linux: libkis-client.a $(ROOT_DIR)/apps/client_multithread_linux.c
 	@mkdir -p $@_creds
-	${CC} -o $@ ../../apps/client_multithread_linux.c libknxiot-lite-client.a -DOC_CLIENT ${CFLAGS}  ${LIBS}
+	${CC} -o $@ ../../apps/client_multithread_linux.c libkis-client.a -DOC_CLIENT ${CFLAGS}  ${LIBS}
 
-knxiot-lite-server.pc: knxiot-lite-server.pc.in
+kis-server.pc: kis-server.pc.in
 	$(SED) > $@ < $< \
 		-e 's,@prefix@,$(prefix),' \
 		-e 's,@exec_prefix@,$(exec_prefix),' \
@@ -444,7 +444,7 @@ knxiot-lite-server.pc: knxiot-lite-server.pc.in
 		-e 's,@version@,$(VERSION),' \
 		-e 's,@extra_cflags@,$(EXTRA_CFLAGS),'
 
-knxiot-lite-client.pc: knxiot-lite-client.pc.in
+kis-client.pc: kis-client.pc.in
 	$(SED) > $@ < $< \
 		-e 's,@prefix@,$(prefix),' \
 		-e 's,@exec_prefix@,$(exec_prefix),' \
@@ -453,7 +453,7 @@ knxiot-lite-client.pc: knxiot-lite-client.pc.in
 		-e 's,@version@,$(VERSION),' \
 		-e 's,@extra_cflags@,$(EXTRA_CFLAGS),'
 
-knxiot-lite-client-server.pc: knxiot-lite-client-server.pc.in
+kis-client-server.pc: kis-client-server.pc.in
 	$(SED) > $@ < $< \
 		-e 's,@prefix@,$(prefix),' \
 		-e 's,@exec_prefix@,$(exec_prefix),' \
@@ -498,19 +498,19 @@ distclean: cleanall
 install: $(SAMPLES) $(PC) $(CONSTRAINED_LIBS)
 	$(INSTALL) -d $(bindir)
 	$(INSTALL) -d $(libdir)
-	$(INSTALL) -d $(includedir)/knxiot-lite
-	$(INSTALL) -d $(includedir)/knxiot-lite/port
-	$(INSTALL) -d $(includedir)/knxiot-lite/util
-	$(INSTALL) -d $(includedir)/knxiot-lite/util/pt
-	$(INSTALL) -d $(includedir)/knxiot-lite/messaging/coap
-	$(INSTALL) -d $(includedir)/knxiot-lite/deps/tinycbor/src/
+	$(INSTALL) -d $(includedir)/kis
+	$(INSTALL) -d $(includedir)/kis/port
+	$(INSTALL) -d $(includedir)/kis/util
+	$(INSTALL) -d $(includedir)/kis/util/pt
+	$(INSTALL) -d $(includedir)/kis/messaging/coap
+	$(INSTALL) -d $(includedir)/kis/deps/tinycbor/src/
 	$(INSTALL) -d $(pkgconfigdir)
-	$(INSTALL) -m 644 $(HEADERS) $(includedir)/knxiot-lite/
-	$(INSTALL) -m 644 $(HEADERS_PORT) $(includedir)/knxiot-lite/port
-	$(INSTALL) -m 644 $(HEADERS_UTIL) $(includedir)/knxiot-lite/util
-	$(INSTALL) -m 644 $(HEADERS_UTIL_PT) $(includedir)/knxiot-lite/util/pt
-	$(INSTALL) -m 644 $(HEADERS_COAP) $(includedir)/knxiot-lite/messaging/coap
-	$(INSTALL) -m 644 $(HEADERS_TINYCBOR) $(includedir)/knxiot-lite/deps/tinycbor/src
+	$(INSTALL) -m 644 $(HEADERS) $(includedir)/kis/
+	$(INSTALL) -m 644 $(HEADERS_PORT) $(includedir)/kis/port
+	$(INSTALL) -m 644 $(HEADERS_UTIL) $(includedir)/kis/util
+	$(INSTALL) -m 644 $(HEADERS_UTIL_PT) $(includedir)/kis/util/pt
+	$(INSTALL) -m 644 $(HEADERS_COAP) $(includedir)/kis/messaging/coap
+	$(INSTALL) -m 644 $(HEADERS_TINYCBOR) $(includedir)/kis/deps/tinycbor/src
 	$(INSTALL) -m 644 $(PC) $(pkgconfigdir)
 	$(INSTALL) -m 644 $(CONSTRAINED_LIBS) $(libdir)
 # Installing the samples
@@ -523,22 +523,22 @@ TESTS = \
 	tests/server_init_linux_test \
 	tests/client_get_linux_test
 
-tests/client_init_linux_test: libknxiot-lite-client.a
+tests/client_init_linux_test: libkis-client.a
 	@mkdir -p $(@D)
 	$(CC) -o $@ ../../tests/client_init_linux.c \
-		libknxiot-lite-client.a \
+		libkis-client.a \
 		-DOC_CLIENT $(CFLAGS) $(LIBS)
 
-tests/server_init_linux_test: libknxiot-lite-server.a
+tests/server_init_linux_test: libkis-server.a
 	@mkdir -p $(@D)
 	$(CC) -o $@ ../../tests/server_init_linux.c \
-		libknxiot-lite-server.a \
+		libkis-server.a \
 		-DOC_SERVER $(CFLAGS) $(LIBS)
 
-tests/client_get_linux_test: libknxiot-lite-client-server.a
+tests/client_get_linux_test: libkis-client-server.a
 	@mkdir -p $(@D)
 	$(CC) -o $@ ../../tests/client_get_linux.c \
-		libknxiot-lite-client-server.a -DOC_SERVER \
+		libkis-client-server.a -DOC_SERVER \
 		-DOC_CLIENT $(CFLAGS) $(LIBS)
 
 check: $(TESTS)
