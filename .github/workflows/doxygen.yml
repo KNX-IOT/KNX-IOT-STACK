@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          path: iotivity-lite
+          path: KNX-IOT-STACK
       
 
         

@@ -17,7 +17,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          path: iotivity-lite
+          path: KNX-IOT-STACK
       
       - uses: webfactory/ssh-agent@v0.5.3
         with:
