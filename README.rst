@@ -1,24 +1,23 @@
-.. image:: https://github.com/KNX-IOT/KNX_IOT_STACK/actions/workflows/build.yml/badge.svg
-   :target: https://github.com/KNX-IOT/KNX_IOT_STACK/actions/workflows/build.yml
+.. image:: https://github.com/KNX-IOT/KNX-IOT-STACK/actions/workflows/build.yml/badge.svg
+   :target: https://github.com/KNX-IOT/KNX-IOT-STACK/actions/workflows/build.yml
+   
+.. image:: https://github.com/KNX-IOT/KNX-IOT-STACK/actions/workflows/cmake-linux.yml/badge.svg
+   :target: https://github.com/iKNX-IOT/KNX-IOT-STACK/actions/workflows/cmake-linux.yml
+   
+.. image:: https://github.com/KNX-IOT/KNX-IOT-STACK/actions/workflows/cmake-windows.yml/badge.svg
+   :target: https://github.com/KNX-IOT/KNX-IOT-STACK/actions/workflows/cmake-windows.yml
+   
+.. image:: https://github.com/KNX-IOT/KNX-IOT-STACK/actions/workflows/unittest.yml/badge.svg
+   :target: https://github.com/KNX-IOT/KNX-IOT-STACK/actions/workflows/unittest.yml
+   
+.. image:: https://github.com/KNX-IOT/KNX-IOT-STACK/actions/workflows/doxygen.yml/badge.svg
+   :target: https://github.com/KNX-IOT/KNX-IOT-STACK/actions/workflows/doxygen.yml
 
-   
-.. image:: https://github.com/KNX-IOT/KNX_IOT_STACK/actions/workflows/cmake-linux.yml/badge.svg
-   :target: https://github.com/iKNX-IOT/KNX_IOT_STACK/actions/workflows/cmake-linux.yml
-   
-.. image:: https://github.com/KNX-IOT/KNX_IOT_STACK/actions/workflows/cmake-windows.yml/badge.svg
-   :target: https://github.com/KNX-IOT/KNX_IOT_STACK/actions/workflows/cmake-windows.yml
-   
-.. image:: https://github.com/KNX-IOT/KNX_IOT_STACK/actions/workflows/unittest.yml/badge.svg
-   :target: https://github.com/KNX-IOT/KNX_IOT_STACK/actions/workflows/unittest.yml
-   
-.. image:: https://github.com/KNX-IOT/KNX_IOT_STACK/actions/workflows/doxygen.yml/badge.svg
-   :target: https://github.com/KNX-IOT/KNX_IOT_STACK/actions/workflows/doxygen.yml
-
-.. image:: https://github.com/KNX-IOT/KNX_IOT_STACK/actions/workflows/check-format.yml/badge.svg
-   :target: https://github.com/KNX-IOT/KNX_IOT_STACK/actions/workflows/check-format.yml
+.. image:: https://github.com/KNX-IOT/KNX-IOT-STACK/actions/workflows/check-format.yml/badge.svg
+   :target: https://github.com/KNX-IOT/KNX-IOT-STACK/actions/workflows/check-format.yml
    
 .. image:: https://img.shields.io/github/v/release/KNX-IOT/KNX_IOT_STACK
-   :target: https://github.com/KNX-IOT/KNX_IOT_STACK/releases
+   :target: https://github.com/KNX-IOT/KNX-IOT-STACK/releases
 
 
 Introduction
