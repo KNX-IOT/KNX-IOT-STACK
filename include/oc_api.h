@@ -15,15 +15,15 @@
 */
 
 /**
-  @brief Main API of IoTivity-Lite for client and server.
+  @brief Main API of the stack for client and server.
   @file
 */
 
 /**
-  \mainpage IoTivity-Lite API
+  \mainpage API
 
   The file \link oc_api.h \endlink is the main entry for all
-  server and client related OCF functions.
+  server and client related stack functions.
 */
 
 #ifndef OC_API_H
@@ -223,9 +223,9 @@ typedef void (*oc_add_device_cb_t)(void *data);
 
 /**
  * Register and call handler functions responsible for controlling the
- * IoTivity-lite stack.
+ * stack.
  *
- * This will initialize the IoTivity-lite stack.
+ * This will initialize the stack.
  *
  * Before initializing the stack, a few setup functions may need to be called
  * before calling oc_main_init those functions are:
@@ -239,7 +239,7 @@ typedef void (*oc_add_device_cb_t)(void *data);
  * Not all of the listed functions must be called before calling oc_main_init.
  *
  * @param[in] handler struct containing pointers callback handler functions
- *                    responsible for controlling the IoTivity-lite application
+ *                    responsible for controlling the application
  * @return
  *  - `0` if stack has been initialized successfully
  *  - a negative number if there is an error in stack initialization
@@ -1199,7 +1199,7 @@ void oc_resource_set_properties_cbs(oc_resource_t *resource,
 void oc_resource_set_secure_mcast(oc_resource_t *resource, bool supported);
 
 /**
- * Add a resource to the IoTivity stack.
+ * Add a resource to the stack.
  *
  * The resource will be validated then added to the stack.
  *
@@ -1212,7 +1212,7 @@ void oc_resource_set_secure_mcast(oc_resource_t *resource, bool supported);
 bool oc_add_resource(oc_resource_t *resource);
 
 /**
- * Remove a resource from the IoTivity stack and delete the resource.
+ * Remove a resource from the stack and delete the resource.
  *
  * Any resource observers will automatically be removed.
  *
