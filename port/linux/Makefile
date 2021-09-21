@@ -149,7 +149,7 @@ ifeq ($(CLOUD),1)
 	CFLAGS += -DOC_CLOUD
 	TCP=1
 	IPV4=1
-	SAMPLES += cloud_client cloud_server cloud_tests cloud_proxy
+	SAMPLES += 
 endif
 
 
@@ -280,11 +280,7 @@ copy_pki_certs:
 	@cp ../../apps/pki_certs/*.pem pki_certs/
 
 copy_idd_files:
-	@cp ../../apps/smart_home_server_linux_IDD.cbor .
-	@cp ../../apps/server_certification_tests_IDD.cbor .
-	@cp ../../apps/client_certification_tests_IDD.cbor .
-	@cp ../../apps/server_rules_IDD.cbor .
-	@cp ../../apps/cloud_proxy_IDD.cbor .
+	
 
 ${SRC} ${SRC_COMMON}: $(MBEDTLS_PATCH_FILE)
 
@@ -429,10 +425,6 @@ cloud_client: libknxiot-lite-client-server.a $(ROOT_DIR)/apps/cloud_client.c cop
 cloud_tests: libknxiot-lite-client-server.a $(ROOT_DIR)/apps/cloud_certification_tests.c
 	@mkdir -p $@_creds
 	${CC} -o $@ ../../apps/cloud_certification_tests.c libknxiot-lite-client-server.a -DOC_CLIENT -DOC_SERVER ${CFLAGS} ${CFLAGS_CLOUD} ${LIBS}
-
-cloud_proxy: libknxiot-lite-client-server.a $(ROOT_DIR)/apps/cloud_proxy.c copy_pki_certs copy_idd_files
-	@mkdir -p $@_creds
-	${CC} -o $@ ../../apps/cloud_proxy.c libknxiot-lite-client-server.a -DOC_CLIENT -DOC_SERVER ${CFLAGS} ${CFLAGS_CLOUD}  ${LIBS}
 
 
 server_multithread_linux: libknxiot-lite-server.a $(ROOT_DIR)/apps/server_multithread_linux.c
