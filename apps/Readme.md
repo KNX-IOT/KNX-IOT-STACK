@@ -1,11 +1,10 @@
 # Introduction
 
-This folder contains code examples using IoTivity.
+This folder contains code examples.
 The apps are intended to use in pairs, e.g. they are not full fledged applications.
 
-The intention of the examples is to explain certain aspects of the Iotivity stack.
+The intention of the examples is to explain certain aspects of the stack.
 
-To create an OCF compliant server or client please visit: https://iotivity.org/getting-started
 
 naming convention:
 
