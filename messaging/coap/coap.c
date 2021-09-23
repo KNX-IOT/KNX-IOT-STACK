@@ -710,15 +710,9 @@ coap_oscore_parse_options(void *packet, uint8_t *data, uint32_t data_len,
         (uint16_t)coap_parse_int_option(current_option, option_length);
       OC_DBG("  Accept [%u]", coap_pkt->accept);
       if (coap_pkt->accept != APPLICATION_VND_OCF_CBOR
-#ifdef OC_SPEC_VER_OIC
-          && coap_pkt->accept != APPLICATION_CBOR
-#endif /* OC_SPEC_VER_OIC */
-#ifdef OC_WKCORE
-          && coap_pkt->accept != APPLICATION_LINK_FORMAT
-#endif /* OC_SPEC_VER_OIC */
-#ifdef OC_CBOR
-          && coap_pkt->accept != APPLICATION_CBOR
-#endif /* OC_SPEC_VER_OIC */
+          && coap_pkt->accept != APPLICATION_CBOR 
+          && coap_pkt->accept != APPLICATION_LINK_FORMAT 
+          && coap_pkt->accept != APPLICATION_JSON
       )
         return NOT_ACCEPTABLE_4_06;
       break;

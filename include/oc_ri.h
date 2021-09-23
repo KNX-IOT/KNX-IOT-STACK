@@ -160,6 +160,7 @@ typedef struct oc_response_t
   oc_response_buffer_t *response_buffer;     ///< response buffer
 } oc_response_t;
 
+
 /**
  * @brief interface masks
  *
@@ -176,19 +177,34 @@ typedef enum {
   OC_IF_CREATE = 1 << 8,         ///< oic.if.create
   OC_IF_W = 1 << 9,              ///< oic.if.w
   OC_IF_STARTUP = 1 << 10,       ///< oic.if.startup
-  OC_IF_STARTUP_REVERT = 1 << 11 ///< oic.if.startup.revert
+  OC_IF_STARTUP_REVERT = 1 << 11, ///< oic.if.startup.revert
+  OC_IF_I = 1 << 12,             ///< if.i
+  OC_IF_O = 1 << 13,             ///< if.o
+  OC_IF_G = 1 << 14,             ///< if.g.s.[ga]
+  OC_IF_C = 1 << 15,             ///< if.c
+  OC_IF_P = 1 << 16,             ///< if.p
+  OC_IF_D = 1 << 17,             ///< if.d
+  OC_IF_AC = 1 << 18,            ///< if.a
+  OC_IF_SE = 1 << 19,            ///< if.s
+  OC_IF_LIL = 1 << 20,           ///< if.ll
+  OC_IF_BA = 1 << 21,            ///< if.b
+  OC_IF_SEC = 1 << 22,           ///< if.sec
+  OC_IF_SWU = 1 << 23,           ///< if.swu
+  OC_IF_PM = 1 << 24             ///< if.pm
+
 } oc_interface_mask_t;
+
+const char *get_interface_string(oc_interface_mask_t mask);
 
 typedef enum {
   OCF_P = 0,
+  OC_KNX,
   /* List of resources on a logical device: start */
   /* List of Device Configuration Resources (DCRs): start */
   OCF_CON,
   OCF_INTROSPECTION_WK,
   OCF_INTROSPECTION_DATA,
-#ifdef OC_WKCORE
   WELLKNOWNCORE,
-#endif
   OCF_RES,
 #ifdef OC_MNT
   OCF_MNT,

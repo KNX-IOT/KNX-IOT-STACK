@@ -144,7 +144,67 @@ set_mpro_status_codes(void)
   /* INTERNAL_SERVER_ERROR_500 */
   oc_coap_status_codes[OC_STATUS_PROXYING_NOT_SUPPORTED] =
     PROXYING_NOT_SUPPORTED_5_05;
+};
+
+static const char *interface_strings[] = { 
+  "oic.if.baseline",
+  "oic.if.ll",
+  "oic.if.b",
+  "oic.if.r",
+  "oic.if.rw",       
+  "oic.if.a",
+  "oic.if.s",     
+  "oic.if.create",  
+  "oic.if.w", 
+  "oic.if.startup", 
+  "oic.if.startup.revert",
+  "if.i",
+  "if.o",
+  "if.g.s.[ga]",
+  "if.c",
+  "if.p",
+  "if.d",
+  "if.a",
+  "if.s",
+  "if.ll",
+  "if.b",
+  "if.sec",
+  "if.swu",
+  "if.pm"
+};
+
+const char *get_interface_string(oc_interface_mask_t mask) {
+  if (mask & OC_IF_I)
+    return interface_strings[11];
+  if (mask & OC_IF_O)
+    return interface_strings[12];
+  if (mask & OC_IF_G)
+    return interface_strings[13];
+  if (mask & OC_IF_C)
+    return interface_strings[14];
+  if (mask & OC_IF_P)
+    return interface_strings[15];
+  if (mask & OC_IF_D)
+    return interface_strings[16];
+  if (mask & OC_IF_AC)
+    return interface_strings[17];
+  if (mask & OC_IF_SE)
+    return interface_strings[18];
+  if (mask & OC_IF_LIL)
+    return interface_strings[19];
+  if (mask & OC_IF_BA)
+    return interface_strings[20];
+  if (mask & OC_IF_SEC)
+    return interface_strings[21];
+  if (mask & OC_IF_SWU)
+    return interface_strings[22];
+  if (mask & OC_IF_PM)
+    return interface_strings[23];
+  return "";
 }
+
+
+
 
 #ifdef OC_SERVER
 oc_resource_t *
@@ -216,11 +276,12 @@ oc_ri_get_query_nth_key_value(const char *query, size_t query_len, char **key,
     current = memchr(start, '&', end - start);
     if (current == NULL) {
       current = end;
+      *key_len = 0;
+    } else {
+      /* there is no value */
+      *key = start;
+      *key_len = (current - start);
     }
-    /* there is no value */
-    *key = start;
-    *key_len = (current - start);
-    next_pos = *key_len + 1;
   }
 
   return next_pos;
@@ -744,6 +805,34 @@ oc_ri_get_interface_mask(char *iface, size_t if_len)
     iface_mask |= OC_IF_STARTUP_REVERT;
   if (8 == if_len && strncmp(iface, "oic.if.w", if_len) == 0)
     iface_mask |= OC_IF_W;
+
+  if (4 == if_len && strncmp(iface, "if.i", if_len) == 0)
+    iface_mask |= OC_IF_I;
+  if (4 == if_len && strncmp(iface, "if.o", if_len) == 0)
+    iface_mask |= OC_IF_I;
+  if (if_len > 8  && strncmp(iface, "if.g.s.", if_len) == 0)
+    iface_mask |= OC_IF_G;
+  if (4 == if_len && strncmp(iface, "if.c", if_len) == 0)
+    iface_mask |= OC_IF_C;
+  if (4 == if_len && strncmp(iface, "if.p", if_len) == 0)
+    iface_mask |= OC_IF_P;
+  if (4 == if_len && strncmp(iface, "if.d", if_len) == 0)
+    iface_mask |= OC_IF_D;
+  if (4 == if_len && strncmp(iface, "if.a", if_len) == 0)
+    iface_mask |= OC_IF_AC;
+  if (4 == if_len && strncmp(iface, "if.s", if_len) == 0)
+    iface_mask |= OC_IF_SE;
+  if (5 == if_len && strncmp(iface, "if.ll", if_len) == 0)
+    iface_mask |= OC_IF_LIL;
+  if (4 == if_len && strncmp(iface, "if.b", if_len) == 0)
+    iface_mask |= OC_IF_BA;
+  if (6 == if_len && strncmp(iface, "if.sec", if_len) == 0)
+    iface_mask |= OC_IF_SEC;
+  if (6 == if_len && strncmp(iface, "if.swu", if_len) == 0)
+    iface_mask |= OC_IF_SWU;
+  if (5 == if_len && strncmp(iface, "if.pm", if_len) == 0)
+    iface_mask |= OC_IF_PM;
+
   return iface_mask;
 }
 
@@ -916,7 +1005,9 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
 
   /* Read the accept CoAP option in the request */
   oc_content_format_t accept = 0;
-  coap_get_header_accept(request, &accept);
+  int accept_i = 0;
+  coap_get_header_accept(request, &accept_i);
+  accept = (oc_content_format_t) accept_i;
 
   if (uri_query_len) {
     request_obj.query = uri_query;
