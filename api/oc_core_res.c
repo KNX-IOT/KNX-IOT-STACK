@@ -567,7 +567,7 @@ oc_core_add_device(const char *name, const char *version, const char *base,
   oc_gen_uuid(&oc_device_info[device_count].di);
 
   /* Construct device resource */
-  int properties = OC_DISCOVERABLE;
+  //int properties = OC_DISCOVERABLE;
 
   oc_gen_uuid(&oc_device_info[device_count].piid);
 
