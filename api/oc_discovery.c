@@ -526,6 +526,7 @@ oc_core_discovery_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   }
 }
 
+#ifdef OC_SERVER
 
 static void
 oc_wkcore_discovery_handler(oc_request_t *request,
@@ -628,6 +629,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   }
 }
 
+#endif /* OC_SERVER */
 
 static void
 oc_core_knx_get_handler( oc_request_t *request,
