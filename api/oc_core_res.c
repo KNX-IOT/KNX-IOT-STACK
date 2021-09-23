@@ -960,7 +960,7 @@ oc_filter_resource_by_if(oc_resource_t *resource, oc_request_t *request)
       }
 
       match = false;
-      char* resource_interface = get_interface_string(resource->interfaces);
+      const char* resource_interface = get_interface_string(resource->interfaces);
       // the value contains urn:knx:if.xxx
       if (strncmp (resource_interface, value + 8, value_len - 8 ) == 0) {
         return true;
