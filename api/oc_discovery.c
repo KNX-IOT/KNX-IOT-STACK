@@ -924,7 +924,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   char *rt_request = 0;
   int rt_len = 0;
   const char *rt_device = 0;
-  //int rt_devlen;
+  int rt_devlen;
   size_t key_len;
 
   char *ep_request = 0;
@@ -974,11 +974,12 @@ oc_wkcore_discovery_handler(oc_request_t *request,
       /* take the first oic.d.xxx in the oic/d of the list of resource/device
        * types */
       rt_device = t;
-      //rt_devlen = size;
+      rt_devlen = size;
     }
   }
 
   if (rt_request != 0 && rt_device != 0 &&
+      rt_devlen == rt_len &&
       strncmp(rt_request, rt_device, rt_len) == 0) {
     /* request for specific device type */
     matches = 1;
