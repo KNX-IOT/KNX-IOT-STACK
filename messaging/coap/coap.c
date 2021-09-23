@@ -709,11 +709,10 @@ coap_oscore_parse_options(void *packet, uint8_t *data, uint32_t data_len,
       coap_pkt->accept =
         (uint16_t)coap_parse_int_option(current_option, option_length);
       OC_DBG("  Accept [%u]", coap_pkt->accept);
-      if (coap_pkt->accept != APPLICATION_VND_OCF_CBOR
-          && coap_pkt->accept != APPLICATION_CBOR 
-          && coap_pkt->accept != APPLICATION_LINK_FORMAT 
-          && coap_pkt->accept != APPLICATION_JSON
-      )
+      if (coap_pkt->accept != APPLICATION_VND_OCF_CBOR &&
+          coap_pkt->accept != APPLICATION_CBOR &&
+          coap_pkt->accept != APPLICATION_LINK_FORMAT &&
+          coap_pkt->accept != APPLICATION_JSON)
         return NOT_ACCEPTABLE_4_06;
       break;
     case COAP_OPTION_PROXY_URI:

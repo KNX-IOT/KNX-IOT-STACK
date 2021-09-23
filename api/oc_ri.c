@@ -146,34 +146,34 @@ set_mpro_status_codes(void)
     PROXYING_NOT_SUPPORTED_5_05;
 }
 
-static const char *interface_strings[] = { 
-  "oic.if.baseline",
-  "oic.if.ll",
-  "oic.if.b",
-  "oic.if.r",
-  "oic.if.rw",       
-  "oic.if.a",
-  "oic.if.s",     
-  "oic.if.create",  
-  "oic.if.w", 
-  "oic.if.startup", 
-  "oic.if.startup.revert",
-  "if.i",
-  "if.o",
-  "if.g.s.[ga]",
-  "if.c",
-  "if.p",
-  "if.d",
-  "if.a",
-  "if.s",
-  "if.ll",
-  "if.b",
-  "if.sec",
-  "if.swu",
-  "if.pm"
-};
+static const char *interface_strings[] = { "oic.if.baseline",
+                                           "oic.if.ll",
+                                           "oic.if.b",
+                                           "oic.if.r",
+                                           "oic.if.rw",
+                                           "oic.if.a",
+                                           "oic.if.s",
+                                           "oic.if.create",
+                                           "oic.if.w",
+                                           "oic.if.startup",
+                                           "oic.if.startup.revert",
+                                           "if.i",
+                                           "if.o",
+                                           "if.g.s.[ga]",
+                                           "if.c",
+                                           "if.p",
+                                           "if.d",
+                                           "if.a",
+                                           "if.s",
+                                           "if.ll",
+                                           "if.b",
+                                           "if.sec",
+                                           "if.swu",
+                                           "if.pm" };
 
-const char *get_interface_string(oc_interface_mask_t mask) {
+const char *
+get_interface_string(oc_interface_mask_t mask)
+{
   if (mask & OC_IF_I)
     return interface_strings[11];
   if (mask & OC_IF_O)
@@ -202,9 +202,6 @@ const char *get_interface_string(oc_interface_mask_t mask) {
     return interface_strings[23];
   return "";
 }
-
-
-
 
 #ifdef OC_SERVER
 oc_resource_t *
@@ -810,7 +807,7 @@ oc_ri_get_interface_mask(char *iface, size_t if_len)
     iface_mask |= OC_IF_I;
   if (4 == if_len && strncmp(iface, "if.o", if_len) == 0)
     iface_mask |= OC_IF_I;
-  if (if_len > 8  && strncmp(iface, "if.g.s.", if_len) == 0)
+  if (if_len > 8 && strncmp(iface, "if.g.s.", if_len) == 0)
     iface_mask |= OC_IF_G;
   if (4 == if_len && strncmp(iface, "if.c", if_len) == 0)
     iface_mask |= OC_IF_C;
@@ -868,7 +865,6 @@ does_interface_support_method(oc_interface_mask_t iface_mask,
   case OC_IF_STARTUP_REVERT:
   case OC_IF_W:
 
-    
   case OC_IF_I:
   case OC_IF_O:
   case OC_IF_G:
@@ -1023,7 +1019,7 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
   oc_content_format_t accept = 0;
   unsigned int accept_i = 0;
   coap_get_header_accept(request, &accept_i);
-  accept = (oc_content_format_t) accept_i;
+  accept = (oc_content_format_t)accept_i;
 
   if (uri_query_len) {
     request_obj.query = uri_query;

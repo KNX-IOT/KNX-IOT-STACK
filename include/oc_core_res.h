@@ -108,13 +108,10 @@ oc_device_info_t *oc_core_add_new_device(const char *uri, const char *rt,
                                          oc_core_add_device_cb_t add_device_cb,
                                          void *data);
 
-
-
 oc_device_info_t *oc_core_add_device(const char *name, const char *version,
-                                 const char *base,
-                                 oc_core_add_device_cb_t add_device_cb,
-                                 void *data);
-
+                                     const char *base,
+                                     oc_core_add_device_cb_t add_device_cb,
+                                     void *data);
 
 /**
  * @brief retrieve the amount of devices
@@ -231,7 +228,6 @@ bool oc_filter_resource_by_rt(oc_resource_t *resource, oc_request_t *request);
  * @return false interface type of the resource is not in the request
  */
 bool oc_filter_resource_by_if(oc_resource_t *resource, oc_request_t *request);
-
 
 int oc_get_interfaces_mask(oc_interface_mask_t iface_mask);
 

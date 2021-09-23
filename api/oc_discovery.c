@@ -57,10 +57,9 @@ clf_add_line_size_to_buffer(const char *line, int len)
   return len;
 }
 
-
 static bool
 oc_filter_resource(oc_resource_t *resource, oc_request_t *request,
-                   size_t device_index, size_t* response_length, int matches)
+                   size_t device_index, size_t *response_length, int matches)
 {
   (void)device_index; /* variable not used */
 
@@ -107,13 +106,13 @@ oc_filter_resource(oc_resource_t *resource, oc_request_t *request,
   *response_length += length;
   length = clf_add_line_to_buffer("rt=");
   *response_length += length;
-  //length = clf_add_line_to_buffer(oc_string(resource->types));
+  // length = clf_add_line_to_buffer(oc_string(resource->types));
 
   int i;
   int numberofresourcetypes =
     (int)oc_string_array_get_allocated_size(resource->types);
 
-    for (i = 0; i < numberofresourcetypes; i++) {
+  for (i = 0; i < numberofresourcetypes; i++) {
     size_t size = oc_string_array_get_item_size(resource->types, i);
     const char *t = (const char *)oc_string_array_get_item(resource->types, i);
     if (size > 0) {
@@ -138,7 +137,6 @@ oc_filter_resource(oc_resource_t *resource, oc_request_t *request,
 
   return true;
 }
-
 
 static bool
 filter_resource(oc_resource_t *resource, oc_request_t *request,
@@ -291,11 +289,9 @@ filter_resource(oc_resource_t *resource, oc_request_t *request,
   return true;
 }
 
-
-
 int
 oc_process_resources(oc_request_t *request, size_t device_index,
-                                         size_t *response_length)
+                     size_t *response_length)
 {
   int matches = 0;
 
@@ -305,14 +301,14 @@ oc_process_resources(oc_request_t *request, size_t device_index,
         !(resource->properties & OC_DISCOVERABLE))
       continue;
 
-    if (oc_filter_resource(resource, request, device_index, response_length, matches)) {
+    if (oc_filter_resource(resource, request, device_index, response_length,
+                           matches)) {
       matches++;
     }
   }
 
   return matches;
 }
-
 
 int
 process_device_resources(CborEncoder *links, oc_request_t *request,
@@ -438,7 +434,6 @@ process_device_resources(CborEncoder *links, oc_request_t *request,
   return matches;
 }
 
-
 static void
 oc_core_discovery_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
                           void *data)
@@ -545,7 +540,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   }
 
   char *value = NULL;
-  size_t value_len ;
+  size_t value_len;
   char *key;
   char *rt_request = 0;
   int rt_len = 0;
@@ -585,9 +580,9 @@ oc_wkcore_discovery_handler(oc_request_t *request,
     matches = 1;
   }
 
-  //if (rt_request != 0 && strncmp(rt_request, "urn:knx:dpa:*", rt_len) == 0) {
-    /* request for all devices via resource type*/
-    matches = 1;
+  // if (rt_request != 0 && strncmp(rt_request, "urn:knx:dpa:*", rt_len) == 0) {
+  /* request for all devices via resource type*/
+  matches = 1;
   //}
   size_t device = request->resource->device;
   oc_resource_t *resource = oc_core_get_resource_by_uri("oic/d", device);
@@ -604,8 +599,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
     }
   }
 
-  if (rt_request != 0 && rt_device != 0 &&
-      rt_devlen == rt_len &&
+  if (rt_request != 0 && rt_device != 0 && rt_devlen == rt_len &&
       strncmp(rt_request, rt_device, rt_len) == 0) {
     /* request for specific device type */
     matches = 1;
@@ -616,7 +610,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   // oic.d.sensor";if="oic.if.11 oic.if.baseline"
 
   matches = oc_process_resources(request, device, &response_length);
- 
+
   request->response->response_buffer->content_format = APPLICATION_LINK_FORMAT;
   if (matches && response_length > 0) {
     request->response->response_buffer->response_length = response_length;
@@ -632,8 +626,8 @@ oc_wkcore_discovery_handler(oc_request_t *request,
 #endif /* OC_SERVER */
 
 static void
-oc_core_knx_get_handler( oc_request_t *request,
-                         oc_interface_mask_t iface_mask, void *data)
+oc_core_knx_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
+                        void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -654,21 +648,18 @@ oc_core_knx_get_handler( oc_request_t *request,
 
   length = clf_add_line_to_buffer("\"base\": \"/ \"}");
   response_length += length;
-  
+
   length = clf_add_line_to_buffer("}");
   response_length += length;
-
 
   request->response->response_buffer->content_format = APPLICATION_JSON;
   request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
   request->response->response_buffer->response_length = response_length;
-
 }
-
 
 static void
 oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
-                        void *data)
+                         void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -702,7 +693,6 @@ void
 oc_create_discovery_resource(int resource_idx, size_t device)
 {
 
-
 #ifdef OC_SERVER
   if (resource_idx == WELLKNOWNCORE) {
 
@@ -724,16 +714,14 @@ oc_create_discovery_resource(int resource_idx, size_t device)
                             "oic.wk.res");
 }
 
-
 void
 oc_create_knx_resource(int resource_idx, size_t device)
 {
 
   oc_core_populate_resource(resource_idx, device, "/.well-known/knx",
-                            OC_IF_LL | OC_IF_BASELINE,
-                            OC_IF_LL, OC_DISCOVERABLE, oc_core_knx_get_handler, 0,
-                            oc_core_knx_post_handler, 0, 0,
-                            "");
+                            OC_IF_LL | OC_IF_BASELINE, OC_IF_LL,
+                            OC_DISCOVERABLE, oc_core_knx_get_handler, 0,
+                            oc_core_knx_post_handler, 0, 0, "");
 }
 
 #ifdef OC_CLIENT

@@ -201,7 +201,6 @@ oc_core_encode_interfaces_mask(CborEncoder *parent,
   oc_rep_end_array((parent), if);
 }
 
-
 int
 oc_get_interfaces_mask(oc_interface_mask_t iface_mask)
 {
@@ -216,7 +215,7 @@ oc_get_interfaces_mask(oc_interface_mask_t iface_mask)
     total_size += 4;
   }
   if (iface_mask & OC_IF_G) {
-    oc_rep_encode_raw((uint8_t *) "if.g.s", 5);
+    oc_rep_encode_raw((uint8_t *)"if.g.s", 5);
     // TODO note: this must be extended with a number...
     total_size += 5;
   }
@@ -532,10 +531,9 @@ oc_core_add_new_device(const char *uri, const char *rt, const char *name,
   return &oc_device_info[device_count - 1];
 }
 
-
 oc_device_info_t *
 oc_core_add_device(const char *name, const char *version, const char *base,
-               oc_core_add_device_cb_t add_device_cb, void *data)
+                   oc_core_add_device_cb_t add_device_cb, void *data)
 {
   (void)data;
 #ifndef OC_DYNAMIC_ALLOCATION
@@ -567,15 +565,13 @@ oc_core_add_device(const char *name, const char *version, const char *base,
   oc_gen_uuid(&oc_device_info[device_count].di);
 
   /* Construct device resource */
-  //int properties = OC_DISCOVERABLE;
+  // int properties = OC_DISCOVERABLE;
 
   oc_gen_uuid(&oc_device_info[device_count].piid);
 
   oc_new_string(&oc_device_info[device_count].name, name, strlen(name));
-  oc_new_string(&oc_device_info[device_count].icv, version,
-                strlen(version));
-  oc_new_string(&oc_device_info[device_count].dmv, base,
-                strlen(base));
+  oc_new_string(&oc_device_info[device_count].icv, version, strlen(version));
+  oc_new_string(&oc_device_info[device_count].dmv, base, strlen(base));
   oc_device_info[device_count].add_device_cb = add_device_cb;
 
   oc_create_discovery_resource(WELLKNOWNCORE, device_count);
@@ -589,9 +585,7 @@ oc_core_add_device(const char *name, const char *version, const char *base,
   device_count++;
 
   return &oc_device_info[device_count - 1];
-
 }
-
 
 static void
 oc_device_bind_rt(size_t device_index, const char *rt)
@@ -938,7 +932,6 @@ oc_filter_resource_by_rt(oc_resource_t *resource, oc_request_t *request)
   return match;
 }
 
-
 bool
 oc_filter_resource_by_if(oc_resource_t *resource, oc_request_t *request)
 {
@@ -960,9 +953,10 @@ oc_filter_resource_by_if(oc_resource_t *resource, oc_request_t *request)
       }
 
       match = false;
-      const char* resource_interface = get_interface_string(resource->interfaces);
+      const char *resource_interface =
+        get_interface_string(resource->interfaces);
       // the value contains urn:knx:if.xxx
-      if (strncmp (resource_interface, value + 8, value_len - 8 ) == 0) {
+      if (strncmp(resource_interface, value + 8, value_len - 8) == 0) {
         return true;
       }
     }

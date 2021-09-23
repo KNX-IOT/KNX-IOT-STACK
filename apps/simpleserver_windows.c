@@ -138,8 +138,6 @@ STATIC CRITICAL_SECTION cs;   /**< event loop variable */
 volatile int quit = 0;          /**< stop variable, used by handle_signal */
 STATIC const size_t DEVICE = 0; /**< default device index */
 
-
-
 /**
  * function to set up the device.
  *
@@ -158,9 +156,7 @@ app_init(void)
      can be ocf.2.2.0 (or even higher)
      supplied values are for ocf.2.2.3 */
 
- 
   ret |= ock_add_device("blah", "1.0", "//", NULL, NULL);
-
 
   return ret;
 }
@@ -209,7 +205,7 @@ check_on_readonly_common_resource_properties(oc_string_t name, bool error_state)
  */
 STATIC void
 get_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
-                 void *user_data)
+            void *user_data)
 {
   (void)user_data; /* variable not used */
   /* TODO: SENSOR add here the code to talk to the HW if one implements a
@@ -220,7 +216,6 @@ get_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
   bool error_state = false; /**< the error state, the generated code */
   int oc_status_code = OC_STATUS_OK;
 
-
   PRINT("-- Begin get_dpa_352: interface %d\n", interfaces);
   oc_rep_start_root_object();
   switch (interfaces) {
@@ -229,16 +224,16 @@ get_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
     oc_process_baseline_interface(request->resource);
 
     /* property (boolean) 'value' */
- //   oc_rep_set_boolean(root, value, g_binaryswitch_value);
- //   PRINT("   %s : %s\n", g_binaryswitch_RESOURCE_PROPERTY_NAME_value,
-//          (char *)btoa(g_binaryswitch_value));
+    //   oc_rep_set_boolean(root, value, g_binaryswitch_value);
+    //   PRINT("   %s : %s\n", g_binaryswitch_RESOURCE_PROPERTY_NAME_value,
+    //          (char *)btoa(g_binaryswitch_value));
     break;
   case OC_IF_A:
 
     /* property (boolean) 'value' */
- //   oc_rep_set_boolean(root, value, g_binaryswitch_value);
- //   PRINT("   %s : %s\n", g_binaryswitch_RESOURCE_PROPERTY_NAME_value,
- //         (char *)btoa(g_binaryswitch_value));
+    //   oc_rep_set_boolean(root, value, g_binaryswitch_value);
+    //   PRINT("   %s : %s\n", g_binaryswitch_RESOURCE_PROPERTY_NAME_value,
+    //         (char *)btoa(g_binaryswitch_value));
     break;
   default:
     break;
@@ -251,7 +246,6 @@ get_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
   }
   PRINT("-- End get_dpa_352\n");
 }
-
 
 /**
  * get method for "/b" resource.
@@ -267,7 +261,7 @@ get_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
  */
 STATIC void
 get_dpa_352b(oc_request_t *request, oc_interface_mask_t interfaces,
-            void *user_data)
+             void *user_data)
 {
   (void)user_data; /* variable not used */
   /* TODO: SENSOR add here the code to talk to the HW if one implements a
@@ -323,7 +317,7 @@ get_dpa_352b(oc_request_t *request, oc_interface_mask_t interfaces,
  */
 STATIC void
 get_dpa_353(oc_request_t *request, oc_interface_mask_t interfaces,
-             void *user_data)
+            void *user_data)
 {
   (void)user_data; /* variable not used */
   /* TODO: SENSOR add here the code to talk to the HW if one implements a
@@ -365,7 +359,6 @@ get_dpa_353(oc_request_t *request, oc_interface_mask_t interfaces,
   PRINT("-- End get_dpa_353\n");
 }
 
-
 /**
  * post method for "/a" resource.
  * The function has as input the request body, which are the input values of the
@@ -382,7 +375,7 @@ get_dpa_353(oc_request_t *request, oc_interface_mask_t interfaces,
  */
 STATIC void
 post_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
-                  void *user_data)
+             void *user_data)
 {
   (void)interfaces;
   (void)user_data;
@@ -394,13 +387,13 @@ post_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
    * all required input fields are present */
   bool var_in_request = false;
   rep = request->request_payload;
-//  while (rep != NULL) {
-//    if (strcmp(oc_string(rep->name),
-//               g_binaryswitch_RESOURCE_PROPERTY_NAME_value) == 0) {
-//      var_in_request = true;
-//    }
-//    rep = rep->next;
-//  }
+  //  while (rep != NULL) {
+  //    if (strcmp(oc_string(rep->name),
+  //               g_binaryswitch_RESOURCE_PROPERTY_NAME_value) == 0) {
+  //      var_in_request = true;
+  //    }
+  //    rep = rep->next;
+  //  }
   if (var_in_request == false) {
     error_state = true;
     PRINT(" required property: 'value' not in request\n");
@@ -420,9 +413,9 @@ post_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
       PRINT("Set response \n");
       oc_rep_start_root_object();
       /*oc_process_baseline_interface(request->resource); */
-     // PRINT("   %s : %s", g_binaryswitch_RESOURCE_PROPERTY_NAME_value,
-    //        (char *)btoa(g_binaryswitch_value));
-    //  oc_rep_set_boolean(root, value, g_binaryswitch_value);
+      // PRINT("   %s : %s", g_binaryswitch_RESOURCE_PROPERTY_NAME_value,
+      //        (char *)btoa(g_binaryswitch_value));
+      //  oc_rep_set_boolean(root, value, g_binaryswitch_value);
 
       oc_rep_end_root_object();
       /* TODO: ACTUATOR add here the code to talk to the HW if one implements an
@@ -440,7 +433,6 @@ post_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
   PRINT("-- End post_dpa_352\n");
 }
 
-
 /**
  * post method for "/b" resource.
  * The function has as input the request body, which are the input values of the
@@ -457,7 +449,7 @@ post_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
  */
 STATIC void
 post_dpa_352b(oc_request_t *request, oc_interface_mask_t interfaces,
-             void *user_data)
+              void *user_data)
 {
   (void)interfaces;
   (void)user_data;
@@ -531,7 +523,7 @@ post_dpa_352b(oc_request_t *request, oc_interface_mask_t interfaces,
  */
 STATIC void
 post_dpa_353(oc_request_t *request, oc_interface_mask_t interfaces,
-              void *user_data)
+             void *user_data)
 {
   (void)interfaces;
   (void)user_data;
@@ -607,8 +599,7 @@ register_resources(void)
 {
 
   PRINT("Register Resource with local path \"/a\"\n");
-  oc_resource_t *res_352 =
-    oc_new_resource("myname", "a", 1, 0);
+  oc_resource_t *res_352 = oc_new_resource("myname", "a", 1, 0);
   oc_resource_bind_resource_type(res_352, "urn:knx:dpa.352.51");
   oc_resource_bind_resource_interface(res_352, OC_IF_AC); /* if.a */
   oc_resource_set_discoverable(res_352, true);
@@ -621,10 +612,8 @@ register_resources(void)
     called. this function must be called when the value changes, preferable on
     an interrupt when something is read from the hardware. */
   /*oc_resource_set_observable(res_352, true); */
-  oc_resource_set_request_handler(res_352, OC_GET, get_dpa_352,
-                                  NULL);
-  oc_resource_set_request_handler(res_352, OC_POST, post_dpa_352,
-                                  NULL);
+  oc_resource_set_request_handler(res_352, OC_GET, get_dpa_352, NULL);
+  oc_resource_set_request_handler(res_352, OC_POST, post_dpa_352, NULL);
   oc_add_resource(res_352);
 
   PRINT("Register Resource with local path \"/b\"\n");
@@ -645,7 +634,6 @@ register_resources(void)
   oc_resource_set_request_handler(res_352b, OC_POST, post_dpa_352b, NULL);
   oc_add_resource(res_352b);
 
-  
   PRINT("Register Resource with local path \"/c\"\n");
   oc_resource_t *res_353 = oc_new_resource("myname_c", "c", 1, 0);
   oc_resource_bind_resource_type(res_353, "urn:knx:dpa.353.52");
@@ -663,7 +651,6 @@ register_resources(void)
   oc_resource_set_request_handler(res_353, OC_GET, get_dpa_353, NULL);
   oc_resource_set_request_handler(res_353, OC_POST, post_dpa_353, NULL);
   oc_add_resource(res_353);
-
 }
 
 #ifdef OC_SECURITY
@@ -700,8 +687,8 @@ void
 initialize_variables(void)
 {
   /* initialize global variables for resource "/binaryswitch" */
- // g_binaryswitch_value =
-//    false; /* current value of property "value" The status of the switch. */
+  // g_binaryswitch_value =
+  //    false; /* current value of property "value" The status of the switch. */
 
   /* set the flag for NO oic/con resource. */
   oc_set_con_res_announced(false);

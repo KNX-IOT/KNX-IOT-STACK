@@ -54,13 +54,11 @@ oc_add_device(const char *uri, const char *rt, const char *name,
   return 0;
 }
 
-
 int
 ock_add_device(const char *name, const char *version, const char *base,
                oc_add_device_cb_t add_device_cb, void *data)
 {
-  if (!oc_core_add_device(name, version, base,
-                              add_device_cb, data))
+  if (!oc_core_add_device(name, version, base, add_device_cb, data))
     return -1;
   return 0;
 }

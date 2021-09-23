@@ -414,7 +414,6 @@ int oc_add_device(const char *uri, const char *rt, const char *name,
                   const char *spec_version, const char *data_model_version,
                   oc_add_device_cb_t add_device_cb, void *data);
 
-
 /**
  * Add an ocf device to the the stack.
  *
@@ -460,10 +459,8 @@ int oc_add_device(const char *uri, const char *rt, const char *name,
  *
  * @see init
  */
-int ock_add_device(const char *name,
-                  const char *version, const char *base,
-                  oc_add_device_cb_t add_device_cb, void *data);
-
+int ock_add_device(const char *name, const char *version, const char *base,
+                   oc_add_device_cb_t add_device_cb, void *data);
 
 /**
  * Set custom device property
