@@ -702,6 +702,8 @@ void
 oc_create_discovery_resource(int resource_idx, size_t device)
 {
 
+
+#ifdef OC_SERVER
   if (resource_idx == WELLKNOWNCORE) {
 
     oc_core_populate_resource(resource_idx, device, "/.well-known/core", 0, 0,
@@ -710,7 +712,7 @@ oc_create_discovery_resource(int resource_idx, size_t device)
 
     return;
   }
-
+#endif /* OC_SERVER*/
 
   oc_core_populate_resource(resource_idx, device, "oic/res",
 #ifdef OC_RES_BATCH_SUPPORT
