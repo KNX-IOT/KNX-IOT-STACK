@@ -293,7 +293,7 @@ filter_resource(oc_resource_t *resource, oc_request_t *request,
 
 
 
-static int
+int
 oc_process_resources(oc_request_t *request, size_t device_index,
                                          size_t *response_length)
 {
@@ -314,7 +314,7 @@ oc_process_resources(oc_request_t *request, size_t device_index,
 }
 
 
-static int
+int
 process_device_resources(CborEncoder *links, oc_request_t *request,
                          size_t device_index)
 {
