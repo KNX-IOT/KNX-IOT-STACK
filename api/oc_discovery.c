@@ -802,6 +802,9 @@ process_batch_request(CborEncoder *links_array, oc_endpoint_t *endpoint,
 }
 #endif /* OC_RES_BATCH_SUPPORT */
 
+
+#ifdef OC_SERVER
+
 static void
 oc_core_discovery_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
                           void *data)
@@ -901,6 +904,7 @@ oc_core_discovery_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     request->response->response_buffer->code = OC_IGNORE;
   }
 }
+
 
 static void
 oc_wkcore_discovery_handler(oc_request_t *request,
@@ -1071,7 +1075,6 @@ oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   request->response->response_buffer->response_length = response_length;
 }
 
-#ifdef OC_SERVER
 void
 oc_create_discovery_resource(int resource_idx, size_t device)
 {
