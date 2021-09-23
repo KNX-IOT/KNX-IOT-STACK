@@ -745,8 +745,6 @@ oc_create_knx_resource(int resource_idx, size_t device)
                             "");
 }
 
-#endif /* OC_SERVER */
-
 #ifdef OC_CLIENT
 oc_discovery_flags_t
 oc_ri_process_discovery_payload(uint8_t *payload, int len,
