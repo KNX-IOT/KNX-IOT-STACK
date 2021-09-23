@@ -1108,7 +1108,7 @@ oc_create_knx_resource(int resource_idx, size_t device)
                             "");
 }
 
-#endif OC_SERVER
+#endif /* OC_SERVER */
 
 #ifdef OC_CLIENT
 oc_discovery_flags_t
