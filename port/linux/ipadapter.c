@@ -68,7 +68,6 @@ static const uint8_t ALL_COAP_NODES_RL[] = { 0xff, 0x03, 0, 0, 0, 0, 0, 0,
 static const uint8_t ALL_COAP_NODES_SL[] = { 0xff, 0x05, 0, 0, 0, 0, 0, 0,
                                              0,    0,    0, 0, 0, 0, 0, 0xFD };
 
-
 #define ALL_COAP_NODES_V4 0xe00001bb
 
 static pthread_mutex_t mutex;
@@ -327,7 +326,6 @@ add_mcast_sock_to_ipv6_mcast_group(int mcast_sock, int interface_index)
     OC_ERR("joining site-local IPv6 multicast group %d", errno);
     return -1;
   }
-
 
   OC_DBG("Adding all CoAP Nodes");
   /* Link-local scope ALL COAP NODES */

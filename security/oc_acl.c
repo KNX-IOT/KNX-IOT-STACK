@@ -322,7 +322,7 @@ oc_sec_check_acl(oc_method_t method, oc_resource_t *resource,
 #endif /* OC_DEBUG */
 
   // TODO: HACK: ingore the security stuff
-   return true;
+  return true;
 
   bool is_DCR = oc_core_is_DCR(resource, resource->device);
   bool is_SVR = oc_core_is_SVR(resource, resource->device);

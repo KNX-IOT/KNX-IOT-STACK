@@ -51,7 +51,6 @@ static const uint8_t ALL_OCF_NODES_SL[] = {
   0xff, 0x05, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x01, 0x58
 };
 
-
 static const uint8_t ALL_COAP_NODES_LL[] = { 0xff, 0x02, 0, 0, 0, 0, 0, 0,
                                              0,    0,    0, 0, 0, 0, 0, 0xFD };
 static const uint8_t ALL_COAP_NODES_RL[] = { 0xff, 0x03, 0, 0, 0, 0, 0, 0,
@@ -289,7 +288,6 @@ add_mcast_sock_to_ipv6_mcast_group(SOCKET mcast_sock, DWORD if_index)
     OC_ERR("joining site-local IPv6 multicast group %d", WSAGetLastError());
     return -1;
   }
-
 
   OC_DBG("Adding all CoAP Nodes");
   /* Link-local scope ALL COAP NODES */
