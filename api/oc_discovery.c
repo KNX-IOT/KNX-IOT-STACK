@@ -488,19 +488,6 @@ oc_core_discovery_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     matches += process_device_resources(oc_rep_array(links), request, device);
     oc_rep_end_links_array();
   } break;
-#ifdef OC_RES_BATCH_SUPPORT
-  case OC_IF_B: {
-    if (request->origin && request->origin->flags & SECURED) {
-      CborEncoder encoder;
-      oc_rep_start_links_array();
-      memcpy(&encoder, &g_encoder, sizeof(CborEncoder));
-      process_batch_request(&links_array, request->origin, device);
-      memcpy(&g_encoder, &encoder, sizeof(CborEncoder));
-      oc_rep_end_links_array();
-      matches++;
-    }
-  } break;
-#endif /* #ifdef OC_RES_BATCH_SUPPORT */
   case OC_IF_BASELINE: {
     oc_rep_start_links_array();
     oc_rep_start_object(oc_rep_array(links), props);
