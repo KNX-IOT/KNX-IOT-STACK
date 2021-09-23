@@ -62,6 +62,8 @@ static bool
 oc_filter_resource(oc_resource_t *resource, oc_request_t *request,
                    size_t device_index, size_t* response_length, int matches)
 {
+  (void)device_index; /* variable not used */
+
   int length;
   if (!oc_filter_resource_by_rt(resource, request)) {
     return false;
@@ -922,7 +924,6 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   char *rt_request = 0;
   int rt_len = 0;
   const char *rt_device = 0;
-  int rt_devlen = 0;
   size_t key_len;
 
   char *ep_request = 0;
@@ -1008,7 +1009,6 @@ oc_core_knx_get_handler( oc_request_t *request,
   (void)data;
   (void)iface_mask;
   size_t response_length = 0;
-  int matches = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_JSON) {
@@ -1044,7 +1044,6 @@ oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   (void)data;
   (void)iface_mask;
   size_t response_length = 0;
-  int matches = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_JSON) {
