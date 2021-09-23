@@ -178,3 +178,49 @@ TEST_F(TestOcRi, RIQueryExists_P)
                        << "key2";
   }
 }
+
+
+TEST_F(TestOcRi, RIinterfacestring_P)
+{
+  const char * interface;
+  
+  interface = get_interface_string(OC_IF_I);
+  EXPECT_EQ("if.i", interface);
+  
+  interface = get_interface_string(OC_IF_O);
+  EXPECT_EQ("if.o", interface);
+  
+  //interface = get_interface_string(OC_IF_G);
+  //EXPECT_EQ("if.i", interface);
+  
+  interface = get_interface_string(OC_IF_C);
+  EXPECT_EQ("if.c", interface);
+    
+  interface = get_interface_string(OC_IF_P);
+  EXPECT_EQ("if.p", interface);  
+  
+  interface = get_interface_string(OC_IF_D);
+  EXPECT_EQ("if.d", interface);
+  
+  interface = get_interface_string(OC_IF_AC);
+  EXPECT_EQ("if.a", interface);
+  
+  interface = get_interface_string(OC_IF_SE);
+  EXPECT_EQ("if.s", interface);
+  
+  interface = get_interface_string(OC_IF_LIL);
+  EXPECT_EQ("if.ll", interface);
+  
+  interface = get_interface_string(OC_IF_BA);
+  EXPECT_EQ("if.b", interface);
+  
+  interface = get_interface_string(OC_IF_SEC);
+  EXPECT_EQ("if.sec", interface);
+  
+  interface = get_interface_string(OC_IF_SWU);
+  EXPECT_EQ("if.swu", interface);
+  
+  interface = get_interface_string(OC_IF_PM);
+  EXPECT_EQ("if.pm", interface);
+  
+}

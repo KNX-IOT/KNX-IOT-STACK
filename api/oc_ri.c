@@ -144,7 +144,7 @@ set_mpro_status_codes(void)
   /* INTERNAL_SERVER_ERROR_500 */
   oc_coap_status_codes[OC_STATUS_PROXYING_NOT_SUPPORTED] =
     PROXYING_NOT_SUPPORTED_5_05;
-};
+}
 
 static const char *interface_strings[] = { 
   "oic.if.baseline",
@@ -867,6 +867,22 @@ does_interface_support_method(oc_interface_mask_t iface_mask,
   case OC_IF_STARTUP:
   case OC_IF_STARTUP_REVERT:
   case OC_IF_W:
+
+    
+  case OC_IF_I:
+  case OC_IF_O:
+  case OC_IF_G:
+  case OC_IF_C:
+  case OC_IF_P:
+  case OC_IF_D:
+  case OC_IF_AC:
+  case OC_IF_SE:
+  case OC_IF_LIL:
+  case OC_IF_BA:
+  case OC_IF_SEC:
+  case OC_IF_SWU:
+  case OC_IF_PM:
+
     break;
   }
   return supported;
@@ -1005,7 +1021,7 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
 
   /* Read the accept CoAP option in the request */
   oc_content_format_t accept = 0;
-  int accept_i = 0;
+  unsigned int accept_i = 0;
   coap_get_header_accept(request, &accept_i);
   accept = (oc_content_format_t) accept_i;
 
