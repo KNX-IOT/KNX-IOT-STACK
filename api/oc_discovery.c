@@ -1071,6 +1071,7 @@ oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   request->response->response_buffer->response_length = response_length;
 }
 
+#ifdef OC_SERVER
 void
 oc_create_discovery_resource(int resource_idx, size_t device)
 {
@@ -1106,6 +1107,8 @@ oc_create_knx_resource(int resource_idx, size_t device)
                             oc_core_knx_post_handler, 0, 0,
                             "");
 }
+
+#endif OC_SERVER
 
 #ifdef OC_CLIENT
 oc_discovery_flags_t
