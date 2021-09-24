@@ -16,7 +16,6 @@
 
 #ifdef OC_SECURITY
 #include "oc_pstat.h"
-#include "api/cloud/oc_cloud_internal.h"
 #include "api/oc_main.h"
 #include "messaging/coap/observe.h"
 #include "oc_acl_internal.h"
@@ -158,9 +157,6 @@ oc_pstat_handle_state(oc_sec_pstat_t *ps, size_t device, bool from_storage,
     ps->sm = 4;
 #ifdef OC_SERVER
 #ifdef OC_CLIENT
-#ifdef OC_CLOUD
-    oc_cloud_reset_context(device);
-#endif /* OC_CLOUD */
 #endif /* OC_CLIENT */
 #endif /* OC_SERVER */
     memset(ps->rowneruuid.id, 0, 16);

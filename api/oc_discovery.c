@@ -341,6 +341,7 @@ process_device_resources(CborEncoder *links, oc_request_t *request,
       filter_resource(oc_core_get_resource_by_index(OCF_CON, device_index),
                       request, oc_string(anchor), links, device_index))
     matches++;
+
 #ifdef OC_SOFTWARE_UPDATE
   if (filter_resource(
         oc_core_get_resource_by_index(OCF_SW_UPDATE, device_index), request,
@@ -390,13 +391,6 @@ process_device_resources(CborEncoder *links, oc_request_t *request,
     matches++;
 
 #endif /* OC_SECURITY */
-
-#if defined(OC_CLIENT) && defined(OC_SERVER) && defined(OC_CLOUD)
-  if (filter_resource(
-        oc_core_get_resource_by_index(OCF_COAPCLOUDCONF, device_index), request,
-        oc_string(anchor), links, device_index))
-    matches++;
-#endif /* OC_CLIENT && OC_SERVER && OC_CLOUD */
 
 #ifdef OC_SERVER
   oc_resource_t *resource = oc_ri_get_app_resources();

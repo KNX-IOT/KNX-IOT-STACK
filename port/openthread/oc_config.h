@@ -71,9 +71,6 @@ typedef uint64_t oc_clock_time_t;
 #ifdef OC_IDD_API
 #define OC_STORAGE
 #endif
-#ifdef OC_CLOUD
-#define OC_STORAGE
-#endif
 #ifdef OC_SOFTWARE_UPDATE
 #define OC_STORAGE
 #endif
