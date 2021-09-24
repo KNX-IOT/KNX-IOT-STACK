@@ -61,6 +61,7 @@ typedef struct oc_device_info_t
   oc_string_t name;                      ///< name of the device
   oc_string_t icv;                       ///< specification version
   oc_string_t dmv;                       ///< data model version
+  oc_string_t hwt;                       ///< knx hwt
   oc_core_add_device_cb_t add_device_cb; ///< callback when device is changed
   void *data;                            ///< user data
 } oc_device_info_t;
@@ -112,6 +113,10 @@ oc_device_info_t *oc_core_add_device(const char *name, const char *version,
                                      const char *base,
                                      oc_core_add_device_cb_t add_device_cb,
                                      void *data);
+
+
+
+int oc_core_add_device_hwt(int device_index, const char *hwt);
 
 /**
  * @brief retrieve the amount of devices

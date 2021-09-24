@@ -198,6 +198,7 @@ const char *get_interface_string(oc_interface_mask_t mask);
 typedef enum {
   OCF_P = 0,
   OC_KNX,
+  OC_DEVHWT,
   /* List of resources on a logical device: start */
   /* List of Device Configuration Resources (DCRs): start */
   OCF_CON,

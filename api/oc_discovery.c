@@ -614,69 +614,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
 
 #endif /* OC_SERVER */
 
-static void
-oc_core_knx_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
-                        void *data)
-{
-  (void)data;
-  (void)iface_mask;
-  size_t response_length = 0;
 
-  /* check if the accept header is cbor-format */
-  if (request->accept != APPLICATION_JSON) {
-    request->response->response_buffer->code =
-      oc_status_code(OC_STATUS_BAD_REQUEST);
-    return;
-  }
-
-  int length = clf_add_line_to_buffer("{");
-  response_length += length;
-
-  length = clf_add_line_to_buffer("\"api\": { \"version\": \"1.0\",");
-  response_length += length;
-
-  length = clf_add_line_to_buffer("\"base\": \"/ \"}");
-  response_length += length;
-
-  length = clf_add_line_to_buffer("}");
-  response_length += length;
-
-  request->response->response_buffer->content_format = APPLICATION_JSON;
-  request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
-  request->response->response_buffer->response_length = response_length;
-}
-
-static void
-oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
-                         void *data)
-{
-  (void)data;
-  (void)iface_mask;
-  size_t response_length = 0;
-
-  /* check if the accept header is cbor-format */
-  if (request->accept != APPLICATION_JSON) {
-    request->response->response_buffer->code =
-      oc_status_code(OC_STATUS_BAD_REQUEST);
-    return;
-  }
-
-  int length = clf_add_line_to_buffer("{");
-  response_length += length;
-
-  length = clf_add_line_to_buffer("\"api\": { \"version\": \"1.0\",");
-  response_length += length;
-
-  length = clf_add_line_to_buffer("\"base\": \"/ \"}");
-  response_length += length;
-
-  length = clf_add_line_to_buffer("}");
-  response_length += length;
-
-  request->response->response_buffer->content_format = APPLICATION_JSON;
-  request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
-  request->response->response_buffer->response_length = response_length;
-}
 
 void
 oc_create_discovery_resource(int resource_idx, size_t device)
@@ -703,15 +641,6 @@ oc_create_discovery_resource(int resource_idx, size_t device)
                             "oic.wk.res");
 }
 
-void
-oc_create_knx_resource(int resource_idx, size_t device)
-{
-
-  oc_core_populate_resource(resource_idx, device, "/.well-known/knx",
-                            OC_IF_LL | OC_IF_BASELINE, OC_IF_LL,
-                            OC_DISCOVERABLE, oc_core_knx_get_handler, 0,
-                            oc_core_knx_post_handler, 0, 0, "");
-}
 
 #ifdef OC_CLIENT
 oc_discovery_flags_t

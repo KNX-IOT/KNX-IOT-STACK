@@ -149,6 +149,8 @@ app_init(void)
 
   ret |= ock_add_device("blah", "1.0", "//", NULL, NULL);
 
+  oc_core_add_device_hwt(0, "123456");
+
   return ret;
 }
 
