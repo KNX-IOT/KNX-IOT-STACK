@@ -31,7 +31,6 @@
 
 #include "messaging/coap/oc_coap.h"
 #include "oc_buffer_settings.h"
-#include "oc_cloud.h"
 #include "oc_rep.h"
 #include "oc_ri.h"
 #include "oc_signal_event_loop.h"
