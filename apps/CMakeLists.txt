@@ -7,7 +7,7 @@ add_executable(simpleserver_all
 target_link_libraries(simpleserver_all
         kis-server-client
     )
-    file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/simpleserver_all)
+    file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/simpleserver_all_creds)
 
 if(UNIX)
     add_executable(simpleserver
