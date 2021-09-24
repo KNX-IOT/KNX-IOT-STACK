@@ -21,6 +21,8 @@
 #include "oc_introspection_internal.h"
 #include "oc_rep.h"
 
+#include "oc_knx_dev.h"
+
 #ifdef OC_SECURITY
 #include "security/oc_doxm.h"
 #include "security/oc_pstat.h"
@@ -76,6 +78,8 @@ oc_core_free_device_info_properties(oc_device_info_t *oc_device_info_item)
     oc_free_string(&(oc_device_info_item->name));
     oc_free_string(&(oc_device_info_item->icv));
     oc_free_string(&(oc_device_info_item->dmv));
+    // KNX
+    oc_free_string(&(oc_device_info_item->hwt));
   }
 }
 
@@ -417,6 +421,13 @@ oc_set_con_res_announced(bool announce)
   announce_con_res = announce;
 }
 
+int
+oc_core_add_device_hwt(int device_index, const char *hwt)
+{
+  oc_new_string(&oc_device_info[device_index].hwt, hwt, strlen(hwt));
+  return 0;
+}
+
 oc_device_info_t *
 oc_core_add_new_device(const char *uri, const char *rt, const char *name,
                        const char *spec_version, const char *data_model_version,
@@ -485,9 +496,7 @@ oc_core_add_new_device(const char *uri, const char *rt, const char *name,
 
   oc_create_discovery_resource(OCF_RES, device_count);
 
-#ifdef OC_WKCORE
   oc_create_discovery_resource(WELLKNOWNCORE, device_count);
-#endif
 
   oc_create_introspection_resource(device_count);
 
@@ -546,6 +555,8 @@ oc_core_add_device(const char *name, const char *version, const char *base,
   oc_device_info[device_count].add_device_cb = add_device_cb;
 
   oc_create_discovery_resource(WELLKNOWNCORE, device_count);
+
+  oc_create_knx_device_resources(device_count);
 
   oc_device_info[device_count].data = data;
 
@@ -675,9 +686,11 @@ oc_core_populate_resource(int core_resource, size_t device_index,
   va_list rt_list;
   int i;
   va_start(rt_list, num_resource_types);
-  oc_new_string_array(&r->types, num_resource_types);
-  for (i = 0; i < num_resource_types; i++) {
-    oc_string_array_add_item(r->types, va_arg(rt_list, const char *));
+  if (num_resource_types > 0) {
+    oc_new_string_array(&r->types, num_resource_types);
+    for (i = 0; i < num_resource_types; i++) {
+      oc_string_array_add_item(r->types, va_arg(rt_list, const char *));
+    }
   }
   va_end(rt_list);
   r->interfaces = iface_mask;

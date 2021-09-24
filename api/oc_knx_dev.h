@@ -14,8 +14,8 @@
 // limitations under the License.
 */
 
-#ifndef OC_MNT_INTERNAL_H
-#define OC_MNT_INTERNAL_H
+#ifndef OC_KNXDEV_INTERNAL_H
+#define OC_KNXDEV_INTERNAL_H
 
 #include <stddef.h>
 
@@ -24,14 +24,14 @@ extern "C" {
 #endif
 
 /**
-@brief Creation of the oic.wk.mnt resource.
+@brief Creation of the knx device resources.
 
 @param device index of the device to which the resource is to be created
 */
-void oc_create_maintenance_resource(size_t device);
+void oc_create_knx_device_resources(size_t device);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* OC_MNT_INTERNAL_H */
+#endif /* OC_KNXDEV_INTERNAL_H */

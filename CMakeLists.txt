@@ -63,6 +63,7 @@ target_sources(kis-api INTERFACE
     ${PROJECT_SOURCE_DIR}/api/oc_session_events.c
     ${PROJECT_SOURCE_DIR}/api/oc_swupdate.c
     ${PROJECT_SOURCE_DIR}/api/oc_uuid.c
+    ${PROJECT_SOURCE_DIR}/api/oc_knx_dev.c
     ${PROJECT_SOURCE_DIR}/api/c-timestamp/timestamp_compare.c
     ${PROJECT_SOURCE_DIR}/api/c-timestamp/timestamp_format.c
     ${PROJECT_SOURCE_DIR}/api/c-timestamp/timestamp_parse.c
