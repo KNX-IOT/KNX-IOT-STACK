@@ -85,7 +85,6 @@ oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   request->response->response_buffer->response_length = response_length;
 }
 
-
 void
 oc_create_knx_resource(int resource_idx, size_t device)
 {
@@ -95,8 +94,6 @@ oc_create_knx_resource(int resource_idx, size_t device)
                             OC_DISCOVERABLE, oc_core_knx_get_handler, 0,
                             oc_core_knx_post_handler, 0, 0, "");
 }
-
-
 
 static void
 oc_core_dev_hwt_get_handler(oc_request_t *request,
@@ -112,9 +109,7 @@ oc_core_dev_hwt_get_handler(oc_request_t *request,
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
-  //size_t device_index = request->resource->device;
-  
-
+  // size_t device_index = request->resource->device;
 
   request->response->response_buffer->content_format = APPLICATION_CBOR;
   request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
@@ -138,4 +133,3 @@ oc_create_knx_device_resources(size_t device)
   oc_create_knx_resource(OC_KNX, device);
   oc_create_dev_hwt_resource(OC_DEVHWT, device);
 }
-

@@ -614,8 +614,6 @@ oc_wkcore_discovery_handler(oc_request_t *request,
 
 #endif /* OC_SERVER */
 
-
-
 void
 oc_create_discovery_resource(int resource_idx, size_t device)
 {
@@ -640,7 +638,6 @@ oc_create_discovery_resource(int resource_idx, size_t device)
                             oc_core_discovery_handler, 0, 0, 0, 1,
                             "oic.wk.res");
 }
-
 
 #ifdef OC_CLIENT
 oc_discovery_flags_t

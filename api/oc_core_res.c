@@ -78,7 +78,7 @@ oc_core_free_device_info_properties(oc_device_info_t *oc_device_info_item)
     oc_free_string(&(oc_device_info_item->name));
     oc_free_string(&(oc_device_info_item->icv));
     oc_free_string(&(oc_device_info_item->dmv));
-    // KNX 
+    // KNX
     oc_free_string(&(oc_device_info_item->hwt));
   }
 }
@@ -424,8 +424,7 @@ oc_set_con_res_announced(bool announce)
 int
 oc_core_add_device_hwt(int device_index, const char *hwt)
 {
-  oc_new_string(&oc_device_info[device_index].hwt, hwt,
-                strlen(hwt));
+  oc_new_string(&oc_device_info[device_index].hwt, hwt, strlen(hwt));
   return 0;
 }
 

@@ -114,8 +114,6 @@ oc_device_info_t *oc_core_add_device(const char *name, const char *version,
                                      oc_core_add_device_cb_t add_device_cb,
                                      void *data);
 
-
-
 int oc_core_add_device_hwt(int device_index, const char *hwt);
 
 /**
