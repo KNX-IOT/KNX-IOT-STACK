@@ -10,8 +10,6 @@ naming convention:
 
 - [filename]**_linux** has code specific for linux OS
 - [filename]**_windows** has code specific for windows OS
-- [filename]**_zephyr** has code specific for zypher OS
-- [filename]**_arduino** has code specific for usage on an Arduino platform
 - [filename]**_openthread** has code specific for usage on an openthread based platform
 
 ## Example applications
@@ -44,9 +42,7 @@ Client example on linux implementing multiple threads.
 
 Client example on openthread.
 
-### client_zephyr.c
 
-Client example on zypher.
 
 ### cloud_certification_tests.c
 
@@ -56,13 +52,6 @@ Cloud certification example.
 
 Client example with cloud API.
 
-### cloud_proxy.c
-
-Cloud proxy example.
-
-- uses cloud_proxy_IDD.cbor as introspection data.
-
-works on Windows & Linux.
 
 ### cloud_server.c
 
@@ -100,14 +89,6 @@ Server example implementing simple secure multicast.
 Works on Linux only.
 use in combination with secure_mcast_client.c.
 
-### sensor_interrupt_server_zephyr.c
-
-Server example implementing a sensor on zypher, showing how to use interupts.
-
-### server_arduino.cpp
-
-Server example on Arduino.
-
 ### server_block_linux.c
 
 Client and server example on linux.
@@ -118,10 +99,6 @@ Server example for certification tests.
 
 - runs on Linux only.
 - uses server_certification_tests_IDD.cbor as introspection data.
-
-### server_collections_linux.c
-
-Server example implementing collections.
 
 ### server_linux.c
 
@@ -142,9 +119,6 @@ Server example implementing rules.
 - runs on Linux only.
 - uses server_certification_tests_IDD.cbor as introspection data.
 
-### server_zephyr.c
-
-Client example on zypher.
 
 ### simpleclient.c
 

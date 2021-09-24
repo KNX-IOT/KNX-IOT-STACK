@@ -114,7 +114,7 @@ VPATH=../../messaging/coap/:../../util/:../../api/:../../deps/tinycbor/src/:../.
 LIBS?= -lm -pthread -lrt
 
 SAMPLES = server client temp_sensor simpleserver simpleserver_pki simpleclient  \
-	server_block_linux client_block_linux server_certification_tests smart_home_server_linux multi_device_server multi_device_client smart_lock server_multithread_linux client_multithread_linux client_certification_tests  secure_mcast_client secure_mcast_server1 secure_mcast_server2
+	server_block_linux client_block_linux server_certification_tests smart_home_server_linux multi_device_server multi_device_client server_multithread_linux client_multithread_linux client_certification_tests  secure_mcast_client secure_mcast_server1 secure_mcast_server2
 
 ifeq ($(V6DNS),1)
 	EXTRA_CFLAGS += -DOC_DNS_LOOKUP_IPV6
