@@ -37,9 +37,6 @@ port/linux/multi_device_server
 port/linux/onboarding_tool
 port/linux/server_multithread_linux
 port/linux/client_multithread_linux
-port/linux/cloud_server
-port/linux/cloud_tests
-port/linux/cloud_server_creds/
 port/linux/libiotivity-lite-client.*
 port/linux/libiotivity-lite-server.*
 port/linux/libiotivity-lite-client-server.*
@@ -81,7 +78,6 @@ whitespace_commit_checker.sh
 port/linux/platformtest
 port/linux/storage_test
 port/linux/apitest
-port/linux/cloudaccesstest
 port/linux/messagingtest
 port/linux/rdclienttest
 port/linux/securitytest
@@ -103,7 +99,6 @@ port/linux/server_multithread_linux_creds
 port/linux/client_multithread_linux_creds
 
 #service
-service/cloud-access/unittest/obj
 service/resource-directory/client/unittest/obj
 
 #vscode setting files

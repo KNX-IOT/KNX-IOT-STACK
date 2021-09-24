@@ -57,7 +57,6 @@
  *      enable use of PKI, note onboarding is enabled by means of run time code
  *    - OC_SECURITY_PIN
  *      enables Random PIN onboarding,
- *    enables cloud access
  *  - OC_IDD_API
  *    IDD via API, otherwise use header file to define the IDD
  * - __linux__
@@ -792,10 +791,7 @@ main(void)
 
   /*
    The storage folder depends on the build system
-   for Windows the projects simpleserver and cloud_server are overwritten, hence
-   the folders should be the same as those targets. for Linux (as default) the
-   folder is created in the makefile, with $target as name with _cred as post
-   fix.
+   the folder is created in the makefile, with $target as name with _cred as post fix.
   */
   PRINT("\tstorage at './simpleserver_all_creds' \n");
   oc_storage_config("./simpleserver_all_creds");

@@ -51,9 +51,6 @@
 #include "security/oc_sdi.h"
 #endif /* OC_SECURITY */
 
-#ifdef OC_CLOUD
-#include "api/cloud/oc_cloud_internal.h"
-#endif /* OC_CLOUD */
 
 #ifdef OC_SOFTWARE_UPDATE
 #include "oc_swupdate_internal.h"
@@ -279,14 +276,7 @@ oc_main_init(const oc_handler_t *handler)
   }
 #endif
 
-#if defined(OC_CLIENT) && defined(OC_SERVER) && defined(OC_CLOUD)
-  // initialize cloud after load pstat
-  oc_cloud_init();
-  OC_DBG("oc_main_init(): loading cloud");
-#endif /* OC_CLIENT && OC_SERVER && OC_CLOUD */
-
 #ifdef OC_SERVER
-  // initialize after cloud because their can be registered to cloud.
   if (app_callbacks->register_resources)
     app_callbacks->register_resources();
 #endif
@@ -329,9 +319,6 @@ oc_main_shutdown(void)
 
   initialized = false;
 
-#if defined(OC_CLIENT) && defined(OC_SERVER) && defined(OC_CLOUD)
-  oc_cloud_shutdown();
-#endif /* OC_CLIENT && OC_SERVER && OC_CLOUD */
 #if defined(OC_COLLECTIONS) && defined(OC_SERVER) &&                           \
   defined(OC_COLLECTIONS_IF_CREATE)
   oc_collections_free_rt_factories();
