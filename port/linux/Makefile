@@ -113,8 +113,8 @@ OBJ_CLIENT_SERVER=$(addprefix obj/client_server/,$(notdir $(SRC:.c=.o)))
 VPATH=../../messaging/coap/:../../util/:../../api/:../../deps/tinycbor/src/:../../deps/mbedtls/library:../../api/c-timestamp:../../service/cloud/src/:../../service/resource-directory/client/src/:
 LIBS?= -lm -pthread -lrt
 
-SAMPLES = server client temp_sensor simpleserver simpleserver_pki simpleclient client_collections_linux introspectionclient\
-	  server_collections_linux server_block_linux client_block_linux server_certification_tests smart_home_server_linux multi_device_server multi_device_client smart_lock server_multithread_linux client_multithread_linux client_certification_tests server_rules secure_mcast_client secure_mcast_server1 secure_mcast_server2
+SAMPLES = server client temp_sensor simpleserver simpleserver_pki simpleclient  \
+	server_block_linux client_block_linux server_certification_tests smart_home_server_linux multi_device_server multi_device_client smart_lock server_multithread_linux client_multithread_linux client_certification_tests  secure_mcast_client secure_mcast_server1 secure_mcast_server2
 
 ifeq ($(V6DNS),1)
 	EXTRA_CFLAGS += -DOC_DNS_LOOKUP_IPV6
@@ -334,10 +334,6 @@ client: libkis-client.a $(ROOT_DIR)/apps/client_linux.c
 	@mkdir -p $@_creds
 	${CC} -o $@ ../../apps/client_linux.c libkis-client.a -DOC_CLIENT ${CFLAGS} ${LIBS}
 
-smart_lock: libkis-client.a $(ROOT_DIR)/apps/smart_lock_linux.c
-	@mkdir -p $@_creds
-	${CC} -o $@ ../../apps/smart_lock_linux.c libkis-client.a -DOC_CLIENT ${CFLAGS} ${LIBS}
-
 client_certification_tests: libkis-client-server.a $(ROOT_DIR)/apps/client_certification_tests.c copy_idd_files
 	@mkdir -p $@_creds
 	${CC} -o $@ ../../apps/client_certification_tests.c libkis-client-server.a -DOC_CLIENT -DOC_SERVER ${CFLAGS} ${LIBS}
@@ -370,27 +366,12 @@ secure_mcast_client: libkis-client.a $(ROOT_DIR)/apps/secure_mcast_client.c
 	@mkdir -p $@_creds
 	${CC} -o $@ ../../apps/secure_mcast_client.c libkis-client.a -DOC_CLIENT ${CFLAGS}  ${LIBS}
 
-introspectionclient: libkis-client.a $(ROOT_DIR)/apps/introspectionclient.c
-	@mkdir -p $@_creds
-	${CC} -o $@ ../../apps/introspectionclient.c libkis-client.a -DOC_CLIENT ${CFLAGS}  ${LIBS}
-
-client_collections_linux: libkis-client.a $(ROOT_DIR)/apps/client_collections_linux.c
-	@mkdir -p $@_creds
-	${CC} -o $@ ../../apps/client_collections_linux.c libkis-client.a -DOC_CLIENT ${CFLAGS}  ${LIBS}
-
-server_collections_linux: libkis-server.a $(ROOT_DIR)/apps/server_collections_linux.c
-	@mkdir -p $@_creds
-	${CC} -o $@ ../../apps/server_collections_linux.c libkis-server.a -DOC_SERVER ${CFLAGS} ${LIBS}
 
 client_block_linux: libkis-client.a $(ROOT_DIR)/apps/client_block_linux.c
 	${CC} -o $@ ../../apps/client_block_linux.c libkis-client.a -DOC_CLIENT ${CFLAGS}  ${LIBS}
 
 server_block_linux: libkis-server.a $(ROOT_DIR)/apps/server_block_linux.c
 	${CC} -o $@ ../../apps/server_block_linux.c libkis-server.a -DOC_SERVER ${CFLAGS} ${LIBS}
-
-server_rules: libkis-server.a $(ROOT_DIR)/apps/server_rules.c
-	@mkdir -p $@_creds
-	${CC} -o $@ ../../apps/server_rules.c libkis-server.a -DOC_SERVER ${CFLAGS} ${LIBS}
 
 server_certification_tests: libkis-server.a $(ROOT_DIR)/apps/server_certification_tests.c copy_pki_certs copy_idd_files
 	@mkdir -p $@_creds

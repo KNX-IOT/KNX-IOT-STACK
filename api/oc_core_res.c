@@ -17,9 +17,6 @@
 #include "oc_core_res.h"
 #include "api/cloud/oc_cloud_internal.h"
 #include "oc_api.h"
-#ifdef OC_MNT
-#include "api/oc_mnt.h"
-#endif /* OC_MNT */
 #include "messaging/coap/oc_coap.h"
 #include "oc_discovery.h"
 #include "oc_introspection_internal.h"
@@ -513,9 +510,7 @@ oc_core_add_new_device(const char *uri, const char *rt, const char *name,
 
   oc_create_introspection_resource(device_count);
 
-#ifdef OC_MNT
-  oc_create_maintenance_resource(device_count);
-#endif /* OC_MNT */
+
 #if defined(OC_CLIENT) && defined(OC_SERVER) && defined(OC_CLOUD)
   oc_create_cloudconf_resource(device_count);
 #endif /* OC_CLIENT && OC_SERVER && OC_CLOUD */
@@ -838,11 +833,7 @@ oc_core_get_resource_by_uri(const char *uri, size_t device)
              memcmp(uri + skip, "oc/introspection", 16) == 0) {
     type = OCF_INTROSPECTION_DATA;
   }
-#ifdef OC_MNT
-  else if ((strlen(uri) - skip) == 7 && memcmp(uri + skip, "oic/mnt", 7) == 0) {
-    type = OCF_MNT;
-  }
-#endif /* OC_MNT */
+
 #ifdef OC_CLOUD
   else if ((strlen(uri) - skip) == 19 &&
            memcmp(uri + skip, "CoapCloudConfResURI", 19) == 0) {
