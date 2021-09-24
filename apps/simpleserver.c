@@ -33,8 +33,6 @@ oc_string_t name;
 static int
 app_init(void)
 {
-
-  PRINT("xxxx")
   int ret = oc_init_platform("Intel", NULL, NULL);
   ret |= oc_add_device("/oic/d", "oic.d.light", "Lamp", "ocf.1.0.0",
                        "ocf.res.1.0.0", NULL, NULL);
@@ -151,8 +149,6 @@ main(void)
   sa.sa_flags = 0;
   sa.sa_handler = handle_signal;
   sigaction(SIGINT, &sa, NULL);
-
-  PRINT("sdfsfasdfasdf")
 
   static const oc_handler_t handler = { .init = app_init,
                                         .signal_event_loop = signal_event_loop,
