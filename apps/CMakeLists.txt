@@ -1,7 +1,7 @@
 project(knx-iot-stack-apps)
 
 add_executable(simpleserver_all
-    ${PROJECT_SOURCE_DIR}/simpleserver_windows.c
+    ${PROJECT_SOURCE_DIR}/simpleserver_all.c
     ${PROJECT_SOURCE_DIR}/../api/oc_introspection.c
 )
 target_link_libraries(simpleserver_all
