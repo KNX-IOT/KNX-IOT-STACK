@@ -33,6 +33,7 @@
 #include "oc_buffer_settings.h"
 #include "oc_rep.h"
 #include "oc_ri.h"
+#include "oc_client_state.h"
 #include "oc_signal_event_loop.h"
 #include "port/oc_storage.h"
 
