@@ -510,7 +510,6 @@ oc_core_add_new_device(const char *uri, const char *rt, const char *name,
 
   oc_create_introspection_resource(device_count);
 
-
 #if defined(OC_CLIENT) && defined(OC_SERVER) && defined(OC_CLOUD)
   oc_create_cloudconf_resource(device_count);
 #endif /* OC_CLIENT && OC_SERVER && OC_CLOUD */
