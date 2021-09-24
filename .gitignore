@@ -1,3 +1,6 @@
+out/*
+.vs/*
+
 port/android/client
 port/android/server
 port/android/temp_sensor

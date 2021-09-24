@@ -415,6 +415,54 @@ int oc_add_device(const char *uri, const char *rt, const char *name,
                   oc_add_device_cb_t add_device_cb, void *data);
 
 /**
+ * Add an ocf device to the the stack.
+ *
+ * This function is typically called as part of the stack initialization
+ * process from inside the `init` callback handler.
+ *
+ * The `oc_add_device` function may be called as many times as needed.
+ * Each call will add a new device to the stack with its own port address.
+ * Each device is automatically assigned a number starting with zero and
+ * incremented by one each time the function is called. This number is not
+ * returned therefore it is important to know the order devices are added.
+ *
+ * Example:
+ * ```
+ * //app_init is an instance of the `init` callback handler.
+ * static int app_init(void)
+ * {
+ *   int ret = oc_init_platform("Refrigerator", NULL, NULL);
+ *   ret |= oc_add_device("/oic/d", "oic.d.refrigeration", "My fridge",
+ *                        "ocf.2.0.5", "ocf.res.1.0.0,ocf.sh.1.0.0",
+ *                        NULL, NULL);
+ *   ret |= oc_add_device("/oic/d", "oic.d.thermostat", "My thermostat",
+ *                        "ocf.2.0.5", "ocf.res.1.0.0,ocf.sh.1.0.0",
+ *                        NULL, NULL);
+ *   return ret;
+ * }
+ * ```
+ *
+
+ * @param[in] name the user readable name of the device
+ * @param[in] version The api version e.g. "1.0"
+ * @param[in] base the base url e.g. "/"
+ * specifications to which this device data model is implemtned. This is the
+ * "dmv" device property
+ * @param[in] add_device_cb callback function invoked during oc_add_device().
+ * The purpose is to add additional device properties that are not supplied to
+ * oc_add_device() function call.
+ * @param[in] data context pointer that is passed to the oc_add_device_cb_t
+ *
+ * @return
+ *   - `0` on success
+ *   - `-1` on failure
+ *
+ * @see init
+ */
+int ock_add_device(const char *name, const char *version, const char *base,
+                   oc_add_device_cb_t add_device_cb, void *data);
+
+/**
  * Set custom device property
  *
  * The purpose is to add additional device properties that are not supplied to

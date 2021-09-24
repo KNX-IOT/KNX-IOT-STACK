@@ -108,6 +108,11 @@ oc_device_info_t *oc_core_add_new_device(const char *uri, const char *rt,
                                          oc_core_add_device_cb_t add_device_cb,
                                          void *data);
 
+oc_device_info_t *oc_core_add_device(const char *name, const char *version,
+                                     const char *base,
+                                     oc_core_add_device_cb_t add_device_cb,
+                                     void *data);
+
 /**
  * @brief retrieve the amount of devices
  *
@@ -203,13 +208,28 @@ void oc_core_populate_resource(int core_resource, size_t device_index,
 /**
  * @brief filter if the query param of the request contains the resource
  * (determined by resource type "rt")
+ * including wildcarts
  *
  * @param resource the resource to look for
  * @param request the request to scan
- * @return true resource is in the request
- * @return false resource is not in the request
+ * @return true resource type (or wild card) is in the request
+ * @return false resource type is not in the request
  */
 bool oc_filter_resource_by_rt(oc_resource_t *resource, oc_request_t *request);
+
+/**
+ * @brief filter if the query param of the request contains the resource
+ * (determined by resource type "if")
+ * including wildcarts
+ *
+ * @param resource the resource to look for
+ * @param request the request to scan
+ * @return true interface type of the resource is in the request
+ * @return false interface type of the resource is not in the request
+ */
+bool oc_filter_resource_by_if(oc_resource_t *resource, oc_request_t *request);
+
+int oc_get_interfaces_mask(oc_interface_mask_t iface_mask);
 
 /**
  * @brief determine if a resource is a Device Configuration Resource

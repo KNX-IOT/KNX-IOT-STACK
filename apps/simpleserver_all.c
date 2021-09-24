@@ -838,26 +838,15 @@ main(void)
     PRINT("Current working dir: %s\n", buff);
   }
 
-/*
- The storage folder depends on the build system
- for Windows the projects simpleserver and cloud_server are overwritten, hence
- the folders should be the same as those targets. for Linux (as default) the
- folder is created in the makefile, with $target as name with _cred as post fix.
-*/
-#ifdef OC_SECURITY
-  PRINT("Intialize Secure Resources\n");
-#ifdef WIN32
-#ifdef OC_CLOUD
-  PRINT("\tstorage at './cloudserver_creds' \n");
-  oc_storage_config("./cloudserver_creds");
-#else
-  PRINT("\tstorage at './simpleserver_creds' \n");
-  oc_storage_config("./simpleserver_creds/");
-#endif
-#else
-  PRINT("\tstorage at './device_builder_server_creds' \n");
-  oc_storage_config("./device_builder_server_creds");
-#endif
+  /*
+   The storage folder depends on the build system
+   for Windows the projects simpleserver and cloud_server are overwritten, hence
+   the folders should be the same as those targets. for Linux (as default) the
+   folder is created in the makefile, with $target as name with _cred as post
+   fix.
+  */
+  PRINT("\tstorage at './simpleserver_all_creds' \n");
+  oc_storage_config("./simpleserver_all_creds");
 
   /*intialize the variables */
   initialize_variables();

@@ -56,7 +56,6 @@ target_sources(kis-api INTERFACE
     ${PROJECT_SOURCE_DIR}/api/oc_enums.c
     ${PROJECT_SOURCE_DIR}/api/oc_helpers.c
     ${PROJECT_SOURCE_DIR}/api/oc_main.c
-    ${PROJECT_SOURCE_DIR}/api/oc_mnt.c
     ${PROJECT_SOURCE_DIR}/api/oc_network_events.c
     ${PROJECT_SOURCE_DIR}/api/oc_rep.c
     ${PROJECT_SOURCE_DIR}/api/oc_resource_factory.c

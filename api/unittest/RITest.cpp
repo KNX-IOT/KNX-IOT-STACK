@@ -136,9 +136,9 @@ TEST_F(TestOcRi, RiAddResource_P)
 
 TEST_F(TestOcRi, RIGetQueryValue_P)
 {
-  const char *input[] = { "key=1",          "data=1&key=2",     "key=2&data=3",
-                          "x&key=2&data=3", "y&x&key=2&data=3", "y&x&key=2",
-                          "y&x&key=2&y" };
+  const char *input[] = { "key=1",        "data=1&key=2", "key=2&data=3",
+                          "key=2&data=3", "key=2&data=3", "key=2",
+                          "key=2&y" };
   int ret;
   char *value;
 
@@ -177,4 +177,48 @@ TEST_F(TestOcRi, RIQueryExists_P)
     EXPECT_EQ(-1, ret) << "N input[" << i << "] " << input[i] << " "
                        << "key2";
   }
+}
+
+TEST_F(TestOcRi, RIinterfacestring_P)
+{
+  const char *interface;
+
+  interface = get_interface_string(OC_IF_I);
+  EXPECT_STREQ("if.i", interface);
+
+  interface = get_interface_string(OC_IF_O);
+  EXPECT_STREQ("if.o", interface);
+
+  // interface = get_interface_string(OC_IF_G);
+  // EXPECT_EQ("if.i", interface);
+
+  interface = get_interface_string(OC_IF_C);
+  EXPECT_STREQ("if.c", interface);
+
+  interface = get_interface_string(OC_IF_P);
+  EXPECT_STREQ("if.p", interface);
+
+  interface = get_interface_string(OC_IF_D);
+  EXPECT_STREQ("if.d", interface);
+
+  interface = get_interface_string(OC_IF_AC);
+  EXPECT_STREQ("if.a", interface);
+
+  interface = get_interface_string(OC_IF_SE);
+  EXPECT_STREQ("if.s", interface);
+
+  interface = get_interface_string(OC_IF_LIL);
+  EXPECT_STREQ("if.ll", interface);
+
+  interface = get_interface_string(OC_IF_BA);
+  EXPECT_STREQ("if.b", interface);
+
+  interface = get_interface_string(OC_IF_SEC);
+  EXPECT_STREQ("if.sec", interface);
+
+  interface = get_interface_string(OC_IF_SWU);
+  EXPECT_STREQ("if.swu", interface);
+
+  interface = get_interface_string(OC_IF_PM);
+  EXPECT_STREQ("if.pm", interface);
 }

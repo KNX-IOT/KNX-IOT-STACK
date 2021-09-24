@@ -1,5 +1,14 @@
 project(knx-iot-stack-apps)
 
+add_executable(simpleserver_all
+    ${PROJECT_SOURCE_DIR}/simpleserver_windows.c
+    ${PROJECT_SOURCE_DIR}/../api/oc_introspection.c
+)
+target_link_libraries(simpleserver_all
+        kis-server-client
+    )
+    file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/simpleserver_all_creds)
+
 if(UNIX)
     add_executable(simpleserver
         ${PROJECT_SOURCE_DIR}/simpleserver.c
@@ -38,6 +47,8 @@ if(UNIX)
         )
         file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/device_builder_server_creds)
     endif()
+
+
 elseif(WIN32)
     add_executable(simpleserver
         ${PROJECT_SOURCE_DIR}/simpleserver_windows.c
