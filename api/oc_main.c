@@ -51,7 +51,6 @@
 #include "security/oc_sdi.h"
 #endif /* OC_SECURITY */
 
-
 #ifdef OC_SOFTWARE_UPDATE
 #include "oc_swupdate_internal.h"
 #endif /* OC_SOFTWARE_UPDATE */

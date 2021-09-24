@@ -791,7 +791,8 @@ main(void)
 
   /*
    The storage folder depends on the build system
-   the folder is created in the makefile, with $target as name with _cred as post fix.
+   the folder is created in the makefile, with $target as name with _cred as
+   post fix.
   */
   PRINT("\tstorage at './simpleserver_all_creds' \n");
   oc_storage_config("./simpleserver_all_creds");
@@ -830,7 +831,6 @@ main(void)
     PRINT("oc_main_init failed %d, exiting.\n", init);
     return init;
   }
-
 
   /* print out the current DI of the device */
   char uuid[37] = { 0 };

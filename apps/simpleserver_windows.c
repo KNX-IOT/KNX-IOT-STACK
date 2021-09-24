@@ -728,7 +728,6 @@ handle_signal(int signal)
   quit = 1;
 }
 
-
 /**
  * oc_ownership_status_cb callback implementation
  * handler to print out the DI after onboarding
@@ -792,7 +791,8 @@ main(void)
 
 /*
  The storage folder depends on the build system
- the folder is created in the makefile, with $target as name with _cred as post fix.
+ the folder is created in the makefile, with $target as name with _cred as post
+ fix.
 */
 #ifdef OC_SECURITY
   PRINT("Intialize Secure Resources\n");
@@ -838,7 +838,6 @@ main(void)
     PRINT("oc_main_init failed %d, exiting.\n", init);
     return init;
   }
-
 
   /* print out the current DI of the device */
   char uuid[37] = { 0 };

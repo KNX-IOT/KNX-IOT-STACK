@@ -392,7 +392,6 @@ process_device_resources(CborEncoder *links, oc_request_t *request,
 
 #endif /* OC_SECURITY */
 
-
 #ifdef OC_SERVER
   oc_resource_t *resource = oc_ri_get_app_resources();
   for (; resource; resource = resource->next) {

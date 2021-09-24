@@ -135,7 +135,6 @@ perform_upgrade(size_t device, const char *url)
 }
 #endif /* OC_SOFTWARE_UPDATE */
 
-
 oc_define_interrupt_handler(toggle_switch)
 {
   if (bswitch) {

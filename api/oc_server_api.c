@@ -19,7 +19,6 @@
 #include "messaging/coap/separate.h"
 #include "oc_api.h"
 
-
 #ifdef OC_SECURITY
 #include "security/oc_store.h"
 #endif /* OC_SECURITY */
@@ -491,7 +490,6 @@ oc_delete_resource(oc_resource_t *resource)
 {
   return oc_ri_delete_resource(resource);
 }
-
 
 static oc_event_callback_retval_t
 oc_delayed_delete_resource_cb(void *data)
