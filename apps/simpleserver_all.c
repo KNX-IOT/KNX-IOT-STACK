@@ -1,6 +1,6 @@
 /*
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
- Copyright 2017-2021 Open Connectivity Foundation
+ Copyright 2021 Cascoda
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 
 /**
  * @file
- *  Generated Code
+ *  Example code
  */
 /**
  * ## Application Design
@@ -55,8 +55,6 @@
       enable security
  *    - OC_PKI
  *      enable use of PKI, note onboarding is enabled by means of run time code
- *    - OC_SECURITY_PIN
- *      enables Random PIN onboarding,
  *  - OC_IDD_API
  *    IDD via API, otherwise use header file to define the IDD
  * - __linux__
@@ -106,15 +104,13 @@ static struct timespec ts;
 #endif /* NO_MAIN */
 #endif
 
+#include <stdio.h> /* defines FILENAME_MAX */
+
 #ifdef WIN32
 /** windows specific code */
 #include <windows.h>
 STATIC CONDITION_VARIABLE cv; /**< event loop variable */
 STATIC CRITICAL_SECTION cs;   /**< event loop variable */
-#endif
-
-#include <stdio.h> /* defines FILENAME_MAX */
-#ifdef WIN32
 #include <direct.h>
 #define GetCurrentDir _getcwd
 #else
@@ -648,19 +644,6 @@ register_resources(void)
   oc_add_resource(res_353);
 }
 
-#ifdef OC_SECURITY
-#ifdef OC_SECURITY_PIN
-void
-random_pin_cb(const unsigned char *pin, size_t pin_len, void *data)
-{
-  (void)data;
-  PRINT("\n====================\n");
-  PRINT("Random PIN: %.*s\n", (int)pin_len, pin);
-  PRINT("====================\n");
-}
-#endif /* OC_SECURITY_PIN */
-#endif /* OC_SECURITY */
-
 /**
  * initiate preset for device
  *
@@ -800,8 +783,6 @@ main(void)
   /*intialize the variables */
   initialize_variables();
 
-#endif /* OC_SECURITY */
-
   /* initializes the handlers structure */
   STATIC const oc_handler_t handler = { .init = app_init,
                                         .signal_event_loop = signal_event_loop,
@@ -811,16 +792,6 @@ main(void)
                                         .requests_entry = 0
 #endif
   };
-#ifdef OC_SECURITY
-#ifdef OC_SECURITY_PIN
-  /* please enable OC_SECURITY_PIN
-    - have display capabilities to display the PIN value
-    - server require to implement RANDOM PIN (oic.sec.doxm.rdp) onboarding
-    mechanism
-  */
-  oc_set_random_pin_callback(random_pin_cb, NULL);
-#endif /* OC_SECURITY_PIN */
-#endif /* OC_SECURITY */
 
   oc_set_factory_presets_cb(factory_presets_cb, NULL);
 
