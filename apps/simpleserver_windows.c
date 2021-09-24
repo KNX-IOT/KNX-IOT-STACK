@@ -57,7 +57,6 @@
  *      enable use of PKI, note onboarding is enabled by means of run time code
  *    - OC_SECURITY_PIN
  *      enables Random PIN onboarding,
- *  - OC_CLOUD
  *    enables cloud access
  *  - OC_IDD_API
  *    IDD via API, otherwise use header file to define the IDD
@@ -88,9 +87,6 @@
 #include "port/oc_clock.h"
 #include <signal.h>
 
-#ifdef OC_CLOUD
-#include "oc_cloud.h"
-#endif
 #if defined(OC_IDD_API)
 #include "oc_introspection.h"
 #endif
@@ -733,49 +729,6 @@ handle_signal(int signal)
   quit = 1;
 }
 
-#ifdef OC_CLOUD
-/**
- * cloud status handler.
- * handler to print out the status of the cloud connection
- *
- * @param ctx the cloud context
- * @param status the status of the cloud connection
- * @param data the supplied user data.
- */
-STATIC void
-cloud_status_handler(oc_cloud_context_t *ctx, oc_cloud_status_t status,
-                     void *data)
-{
-  (void)data;
-  PRINT("\nCloud Manager Status:\n");
-  if (status & OC_CLOUD_REGISTERED) {
-    PRINT("\t\t-Registered\n");
-  }
-  if (status & OC_CLOUD_TOKEN_EXPIRY) {
-    PRINT("\t\t-Token Expiry: ");
-    if (ctx) {
-      PRINT("%d\n", oc_cloud_get_token_expiry(ctx));
-    } else {
-      PRINT("\n");
-    }
-  }
-  if (status & OC_CLOUD_FAILURE) {
-    PRINT("\t\t-Failure\n");
-  }
-  if (status & OC_CLOUD_LOGGED_IN) {
-    PRINT("\t\t-Logged In\n");
-  }
-  if (status & OC_CLOUD_LOGGED_OUT) {
-    PRINT("\t\t-Logged Out\n");
-  }
-  if (status & OC_CLOUD_DEREGISTERED) {
-    PRINT("\t\t-DeRegistered\n");
-  }
-  if (status & OC_CLOUD_REFRESHED_TOKEN) {
-    PRINT("\t\t-Refreshed Token\n");
-  }
-}
-#endif /* OC_CLOUD */
 
 /**
  * oc_ownership_status_cb callback implementation
@@ -847,13 +800,8 @@ main(void)
 #ifdef OC_SECURITY
   PRINT("Intialize Secure Resources\n");
 #ifdef WIN32
-#ifdef OC_CLOUD
-  PRINT("\tstorage at './cloudserver_creds' \n");
-  oc_storage_config("./cloudserver_creds");
-#else
   PRINT("\tstorage at './simpleserver_creds' \n");
   oc_storage_config("./simpleserver_creds/");
-#endif
 #else
   PRINT("\tstorage at './device_builder_server_creds' \n");
   oc_storage_config("./device_builder_server_creds");
@@ -894,14 +842,6 @@ main(void)
     return init;
   }
 
-#ifdef OC_CLOUD
-  /* get the cloud context and start the cloud */
-  PRINT("Start Cloud Manager\n");
-  oc_cloud_context_t *ctx = oc_cloud_get_context(0);
-  if (ctx) {
-    oc_cloud_manager_start(ctx, cloud_status_handler, NULL);
-  }
-#endif
 
   /* print out the current DI of the device */
   char uuid[37] = { 0 };
@@ -945,10 +885,6 @@ main(void)
 #endif
 
   /* shut down the stack */
-#ifdef OC_CLOUD
-  PRINT("Stop Cloud Manager\n");
-  oc_cloud_manager_stop(ctx);
-#endif
   oc_main_shutdown();
   return 0;
 }

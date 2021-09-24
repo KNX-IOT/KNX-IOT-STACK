@@ -15,7 +15,6 @@
  */
 
 #include "oc_core_res.h"
-#include "api/cloud/oc_cloud_internal.h"
 #include "oc_api.h"
 #include "messaging/coap/oc_coap.h"
 #include "oc_discovery.h"
@@ -328,15 +327,6 @@ oc_core_con_handler_get(oc_request_t *request, oc_interface_mask_t iface_mask,
   oc_send_response(request, OC_STATUS_OK);
 }
 
-#if defined(OC_SERVER) && defined(OC_CLOUD)
-static oc_event_callback_retval_t
-oc_core_con_notify_observers_delayed(void *data)
-{
-  oc_notify_observers((oc_resource_t *)data);
-  return OC_EVENT_DONE;
-}
-#endif /* OC_SERVER && OC_CLOUD */
-
 static void
 oc_core_con_handler_post(oc_request_t *request, oc_interface_mask_t iface_mask,
                          void *data)
@@ -359,13 +349,6 @@ oc_core_con_handler_post(oc_request_t *request, oc_interface_mask_t iface_mask,
       oc_rep_start_root_object();
       oc_rep_set_text_string(root, n, oc_string(oc_device_info[device].name));
       oc_rep_end_root_object();
-
-#if defined(OC_SERVER) && defined(OC_CLOUD)
-      oc_resource_t *device_resource =
-        oc_core_get_resource_by_index(OCF_D, device);
-      oc_set_delayed_callback(device_resource,
-                              oc_core_con_notify_observers_delayed, 0);
-#endif /* OC_SERVER && OC_CLOUD */
 
       changed = true;
       break;
@@ -470,9 +453,7 @@ oc_core_add_new_device(const char *uri, const char *rt, const char *name,
 
   /* Construct device resource */
   int properties = OC_DISCOVERABLE;
-#ifdef OC_CLOUD
-  properties |= OC_OBSERVABLE;
-#endif /* OC_CLOUD */
+
   if (strlen(rt) == 8 && strncmp(rt, "oic.wk.d", 8) == 0) {
     oc_core_populate_resource(OCF_D, device_count, uri,
                               OC_IF_R | OC_IF_BASELINE, OC_IF_R, properties,
@@ -509,10 +490,6 @@ oc_core_add_new_device(const char *uri, const char *rt, const char *name,
 #endif
 
   oc_create_introspection_resource(device_count);
-
-#if defined(OC_CLIENT) && defined(OC_SERVER) && defined(OC_CLOUD)
-  oc_create_cloudconf_resource(device_count);
-#endif /* OC_CLIENT && OC_SERVER && OC_CLOUD */
 
   oc_device_info[device_count].data = data;
 
@@ -651,9 +628,7 @@ oc_core_init_platform(const char *mfg_name, oc_core_init_platform_cb_t init_cb,
 
   /* Populating resource object */
   int properties = OC_DISCOVERABLE;
-#ifdef OC_CLOUD
-  properties |= OC_OBSERVABLE;
-#endif /* OC_CLOUD */
+
   oc_core_populate_resource(OCF_P, 0, "oic/p", OC_IF_R | OC_IF_BASELINE,
                             OC_IF_R, properties, oc_core_platform_handler, 0, 0,
                             0, 1, "oic.wk.p");
@@ -833,12 +808,6 @@ oc_core_get_resource_by_uri(const char *uri, size_t device)
     type = OCF_INTROSPECTION_DATA;
   }
 
-#ifdef OC_CLOUD
-  else if ((strlen(uri) - skip) == 19 &&
-           memcmp(uri + skip, "CoapCloudConfResURI", 19) == 0) {
-    type = OCF_COAPCLOUDCONF;
-  }
-#endif /* OC_CLOUD */
 #ifdef OC_SECURITY
   else if ((strlen(uri) - skip) == 12) {
     if (memcmp(uri + skip, "oic/sec/doxm", 12) == 0) {

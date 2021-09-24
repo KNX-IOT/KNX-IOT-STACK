@@ -18,7 +18,6 @@ option(ENABLE_TESTING "Build mbed TLS tests." OFF)
 set(OC_DYNAMIC_ALLOCATION_ENABLED ON CACHE BOOL "Enable dynamic memory allocation within the OCF stack and MBedtls.")
 set(OC_SECURITY_ENABLED ON CACHE BOOL "Enable security")
 set(OC_PKI_ENABLED ON CACHE BOOL "Enable PKI security")
-set(OC_CLOUD_ENABLED OFF CACHE BOOL "Enable cloud communications")
 set(OC_DEBUG_ENABLED OFF CACHE BOOL "Enable debug messages")
 set(OC_IDD_API_ENABLED ON CACHE BOOL "Enable the Introspection Device Data API")
 
@@ -167,10 +166,6 @@ endif()
 if(OC_DEBUG_ENABLED)
     target_compile_definitions(kis-common INTERFACE OC_DEBUG)
     target_compile_definitions(mbedcrypto PUBLIC OC_DEBUG)
-endif()
-
-if(OC_CLOUD_ENABLED)
-    target_compile_definitions(kis-common INTERFACE OC_CLOUD)
 endif()
 
 if(OC_IDD_API_ENABLED)

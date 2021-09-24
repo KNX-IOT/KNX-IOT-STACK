@@ -43,20 +43,6 @@ Client example on linux implementing multiple threads.
 Client example on openthread.
 
 
-
-### cloud_certification_tests.c
-
-Cloud certification example.
-
-### cloud_client.c
-
-Client example with cloud API.
-
-
-### cloud_server.c
-
-Server example with Cloud API.
-
 ### introspectionclient.c
 
 Client example of retrieving introspection device data.
