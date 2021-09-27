@@ -149,6 +149,9 @@ app_init(void)
 
   ret |= ock_add_device("blah", "1.0", "//", "012346", NULL, NULL);
 
+  oc_device_info_t *device = oc_core_get_device_info(0);
+  PRINT("Serial Number: %s\n", oc_string(device->serialnumber));
+
   oc_core_add_device_hwt(0, "123456");
 
   return ret;

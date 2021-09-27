@@ -538,18 +538,18 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   size_t value_len;
   char *key;
   size_t key_len;
-  char *rt_request = 0;
+  //char *rt_request = 0;
   int rt_len = 0;
   char *ep_request = 0;
   int ep_len = 0;
-  char *if_request = 0;
+  //char *if_request = 0;
   int if_len = 0;
 
   value_len = -1;
   oc_init_query_iterator();
   while (oc_iterate_query(request, &key, &key_len, &value, &value_len) > 0) {
     if (strncmp(key, "rt", key_len) == 0) {
-      rt_request = value;
+      //rt_request = value;
       rt_len = (int)value_len;
     }
     if (strncmp(key, "ep", key_len) == 0) {
@@ -557,7 +557,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
       ep_len = (int)value_len;
     }
     if (strncmp(key, "if", key_len) == 0) {
-      if_request = value;
+      //if_request = value;
       if_len = (int)value_len;
     }
   }
