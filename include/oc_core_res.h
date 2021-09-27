@@ -21,6 +21,7 @@
 #define OC_CORE_RES_H
 
 #include "oc_ri.h"
+#include "oc_device_mode.h"
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -38,6 +39,9 @@ typedef void (*oc_core_init_platform_cb_t)(void *data);
  *
  */
 typedef void (*oc_core_add_device_cb_t)(void *data);
+
+
+
 
 /**
  * @brief platform information
@@ -64,6 +68,7 @@ typedef struct oc_device_info_t
   oc_string_t dmv;                       ///< data model version
   oc_string_t hwt;                       ///< knx hwt
   oc_string_t serialnumber;              ///< knx serial number
+  oc_device_mode_t device_mode;          ///< device mode (programming, normal operatino)
   oc_core_add_device_cb_t add_device_cb; ///< callback when device is changed
   void *data;                            ///< user data
 } oc_device_info_t;

@@ -38,6 +38,8 @@
 #include "oc_signal_event_loop.h"
 #include "port/oc_storage.h"
 
+#include "oc_programming_mode.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

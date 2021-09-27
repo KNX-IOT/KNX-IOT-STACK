@@ -133,19 +133,15 @@ STATIC const size_t DEVICE = 0; /**< default device index */
  * function to set up the device.
  *
  * sets the:
- * - OCF device_type
+ * - serial number
  * - friendly device name
- * - OCF version
- * - introspection device data
+ * - spec version
  *
  */
 int
 app_init(void)
 {
-  int ret = oc_init_platform("ocf", NULL, NULL);
-  /* the settings determine the appearance of the device on the network
-     can be ocf.2.2.0 (or even higher)
-     supplied values are for ocf.2.2.3 */
+  int ret = oc_init_platform("Cascoda", NULL, NULL);
 
   ret |= ock_add_device("blah", "1.0", "//", "012346", NULL, NULL);
 
@@ -153,6 +149,8 @@ app_init(void)
   PRINT("Serial Number: %s\n", oc_string(device->serialnumber));
 
   oc_core_add_device_hwt(0, "123456");
+
+  oc_device_mode_display(0);
 
   return ret;
 }
@@ -814,7 +812,7 @@ main(void)
   PRINT(" DI: '%s'\n", uuid);
   oc_add_ownership_status_cb(oc_ownership_status_cb, NULL);
 
-  PRINT("OCF server \"server_1599\" running, waiting on incoming "
+  PRINT("Server \"server_1599\" running, waiting on incoming "
         "connections.\n");
 
 #ifdef WIN32

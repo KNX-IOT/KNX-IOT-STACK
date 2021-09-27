@@ -542,7 +542,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   int rt_len = 0;
   char *ep_request = 0;
   int ep_len = 0;
-  // char *if_request = 0;
+  char *if_request = 0;
   int if_len = 0;
 
   value_len = -1;
@@ -557,19 +557,31 @@ oc_wkcore_discovery_handler(oc_request_t *request,
       ep_len = (int)value_len;
     }
     if (strncmp(key, "if", key_len) == 0) {
-      // if_request = value;
+      if_request = value;
       if_len = (int)value_len;
     }
   }
 
+  // get the device structure from the request.
+  size_t device_index = request->resource->device;
+  oc_device_info_t *device = oc_core_get_device_info(device_index);
+
+  if (oc_is_device_mode_in_programming(device_index)) {
+    // add only the serial number when the interface is if.pm && device is in programming mode
+    if (if_len == 13 && strncmp(if_request, "urn:knx:if.pm", 13) == 0) {
+      int size = clf_add_line_to_buffer("<>;ep=urn:knx:sn.");
+      response_length = response_length + size;
+      size = clf_add_line_to_buffer(oc_string(device->serialnumber));
+      response_length = response_length + size;
+      matches = 1;
+    }
+  }
+
   if (ep_request != 0 && ep_len > 11 &&
-      strncmp(ep_request, "urn:knx:sn:", 11) == 0) {
+      strncmp(ep_request, "urn:knx:sn.", 11) == 0) {
     /* request for all devices via serial number wildcard*/
     char *ep_serialnumber = ep_request + 11;
     bool frame_ep = false;
-
-    size_t device_index = request->resource->device;
-    oc_device_info_t *device = oc_core_get_device_info(device_index);
 
     if (strncmp(ep_serialnumber, "*", 1) == 0) {
       /* matches wild card*/
