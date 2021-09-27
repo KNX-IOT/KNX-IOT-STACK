@@ -538,18 +538,18 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   size_t value_len;
   char *key;
   size_t key_len;
-  //char *rt_request = 0;
+  // char *rt_request = 0;
   int rt_len = 0;
   char *ep_request = 0;
   int ep_len = 0;
-  //char *if_request = 0;
+  // char *if_request = 0;
   int if_len = 0;
 
   value_len = -1;
   oc_init_query_iterator();
   while (oc_iterate_query(request, &key, &key_len, &value, &value_len) > 0) {
     if (strncmp(key, "rt", key_len) == 0) {
-      //rt_request = value;
+      // rt_request = value;
       rt_len = (int)value_len;
     }
     if (strncmp(key, "ep", key_len) == 0) {
@@ -557,12 +557,13 @@ oc_wkcore_discovery_handler(oc_request_t *request,
       ep_len = (int)value_len;
     }
     if (strncmp(key, "if", key_len) == 0) {
-      //if_request = value;
+      // if_request = value;
       if_len = (int)value_len;
     }
   }
 
-  if (ep_request != 0 && ep_len > 11 && strncmp(ep_request, "urn:knx:sn:", 11) == 0) {
+  if (ep_request != 0 && ep_len > 11 &&
+      strncmp(ep_request, "urn:knx:sn:", 11) == 0) {
     /* request for all devices via serial number wildcard*/
     char *ep_serialnumber = ep_request + 11;
     bool frame_ep = false;
@@ -570,7 +571,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
     size_t device_index = request->resource->device;
     oc_device_info_t *device = oc_core_get_device_info(device_index);
 
-    if (strncmp (ep_serialnumber, "*", 1) ==0) {
+    if (strncmp(ep_serialnumber, "*", 1) == 0) {
       /* matches wild card*/
       frame_ep = true;
     }

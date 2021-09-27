@@ -48,12 +48,13 @@ oc_add_device(const char *uri, const char *rt, const char *name,
 
 int
 ock_add_device(const char *name, const char *version, const char *base,
-               const char* serialnumber,
-               oc_add_device_cb_t add_device_cb, void *data)
+               const char *serialnumber, oc_add_device_cb_t add_device_cb,
+               void *data)
 {
-  if (!oc_core_add_device(name, version, base, serialnumber, add_device_cb, data))
+  if (!oc_core_add_device(name, version, base, serialnumber, add_device_cb,
+                          data))
     return -1;
-  
+
   return 0;
 }
 
