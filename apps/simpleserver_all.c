@@ -1,6 +1,6 @@
 /*
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
- Copyright 2021 Cascoda
+ Copyright (c) 2021 Cascoda Ltd
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -147,7 +147,10 @@ app_init(void)
      can be ocf.2.2.0 (or even higher)
      supplied values are for ocf.2.2.3 */
 
-  ret |= ock_add_device("blah", "1.0", "//", NULL, NULL);
+  ret |= ock_add_device("blah", "1.0", "//", "012346", NULL, NULL);
+
+  oc_device_info_t *device = oc_core_get_device_info(0);
+  PRINT("Serial Number: %s\n", oc_string(device->serialnumber));
 
   oc_core_add_device_hwt(0, "123456");
 

@@ -1,5 +1,6 @@
 /*
 // Copyright (c) 2016 Intel Corporation
+// Copyright (c) 2021 Cascoda Ltd
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -295,6 +296,11 @@ oc_process_resources(oc_request_t *request, size_t device_index,
 {
   int matches = 0;
 
+  if (*response_length > 0) {
+    /* frame the trailing comma */
+    matches = 1;
+  }
+
   oc_resource_t *resource = oc_ri_get_app_resources();
   for (; resource; resource = resource->next) {
     if (resource->device != device_index ||
@@ -531,23 +537,19 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   char *value = NULL;
   size_t value_len;
   char *key;
-  char *rt_request = 0;
-  int rt_len = 0;
-  const char *rt_device = 0;
-  int rt_devlen;
   size_t key_len;
-
+  // char *rt_request = 0;
+  int rt_len = 0;
   char *ep_request = 0;
   int ep_len = 0;
-
-  char *if_request = 0;
+  // char *if_request = 0;
   int if_len = 0;
 
   value_len = -1;
   oc_init_query_iterator();
   while (oc_iterate_query(request, &key, &key_len, &value, &value_len) > 0) {
     if (strncmp(key, "rt", key_len) == 0) {
-      rt_request = value;
+      // rt_request = value;
       rt_len = (int)value_len;
     }
     if (strncmp(key, "ep", key_len) == 0) {
@@ -555,53 +557,44 @@ oc_wkcore_discovery_handler(oc_request_t *request,
       ep_len = (int)value_len;
     }
     if (strncmp(key, "if", key_len) == 0) {
-      if_request = value;
+      // if_request = value;
       if_len = (int)value_len;
     }
   }
 
-  if (ep_request != 0 && strncmp(ep_request, "urn:knx:sn:*", ep_len) == 0) {
+  if (ep_request != 0 && ep_len > 11 &&
+      strncmp(ep_request, "urn:knx:sn:", 11) == 0) {
     /* request for all devices via serial number wildcard*/
-    matches = 1;
-  }
-  if (if_request != 0 && strncmp(if_request, "urn:knx:if.*", if_len) == 0) {
-    /* request for all devices via interface wildcard */
-    matches = 1;
-  }
+    char *ep_serialnumber = ep_request + 11;
+    bool frame_ep = false;
 
-  // if (rt_request != 0 && strncmp(rt_request, "urn:knx:dpa:*", rt_len) == 0) {
-  /* request for all devices via resource type*/
-  matches = 1;
-  //}
-  size_t device = request->resource->device;
-  oc_resource_t *resource = oc_core_get_resource_by_uri("oic/d", device);
-  int i;
-  for (i = 0; i < (int)oc_string_array_get_allocated_size(resource->types);
-       i++) {
-    size_t size = oc_string_array_get_item_size(resource->types, i);
-    const char *t = (const char *)oc_string_array_get_item(resource->types, i);
-    if (strncmp(t, "oic.d", 5) == 0) {
-      /* take the first oic.d.xxx in the oic/d of the list of resource/device
-       * types */
-      rt_device = t;
-      rt_devlen = size;
+    size_t device_index = request->resource->device;
+    oc_device_info_t *device = oc_core_get_device_info(device_index);
+
+    if (strncmp(ep_serialnumber, "*", 1) == 0) {
+      /* matches wild card*/
+      frame_ep = true;
+    }
+    if (strncmp(oc_string(device->serialnumber), ep_serialnumber,
+                strlen(oc_string(device->serialnumber))) == 0) {
+      frame_ep = true;
+    }
+    if (frame_ep) {
+      /* return <>; ep=”urn:knx:sn.<serial-number>”*/
+      int size = clf_add_line_to_buffer("<>;ep=urn:knx:sn.");
+      response_length = response_length + size;
+      size = clf_add_line_to_buffer(oc_string(device->serialnumber));
+      response_length = response_length + size;
+      matches = 1;
     }
   }
 
-  if (rt_request != 0 && rt_device != 0 && rt_devlen == rt_len &&
-      strncmp(rt_request, rt_device, rt_len) == 0) {
-    /* request for specific device type */
-    matches = 1;
+  if (rt_len > 0 || if_len > 0) {
+    size_t device = request->resource->device;
+    matches = oc_process_resources(request, device, &response_length);
   }
-
-  // create the following example line per resouce:
-  // <coap://[fe80::b1d6]:1111/oic/res>;ct=10000;rt="oic.wk.res
-  // oic.d.sensor";if="oic.if.11 oic.if.baseline"
-
-  matches = oc_process_resources(request, device, &response_length);
-
   request->response->response_buffer->content_format = APPLICATION_LINK_FORMAT;
-  if (matches && response_length > 0) {
+  if (matches > 0 && response_length > 0) {
     request->response->response_buffer->response_length = response_length;
     request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
   } else if (request->origin && (request->origin->flags & MULTICAST) == 0) {
