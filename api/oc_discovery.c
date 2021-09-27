@@ -537,15 +537,11 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   char *value = NULL;
   size_t value_len;
   char *key;
+  size_t key_len;
   char *rt_request = 0;
   int rt_len = 0;
-  const char *rt_device = 0;
-  int rt_devlen;
-  size_t key_len;
-
   char *ep_request = 0;
   int ep_len = 0;
-
   char *if_request = 0;
   int if_len = 0;
 
@@ -566,7 +562,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
     }
   }
 
-  if (ep_request != 0 && strncmp(ep_request, "urn:knx:sn:", 11) == 0) {
+  if (ep_request != 0 && ep_len > 11 && strncmp(ep_request, "urn:knx:sn:", 11) == 0) {
     /* request for all devices via serial number wildcard*/
     char *ep_serialnumber = ep_request + 11;
     bool frame_ep = false;
@@ -588,43 +584,16 @@ oc_wkcore_discovery_handler(oc_request_t *request,
       response_length = response_length + size;
       size = clf_add_line_to_buffer(oc_string(device->serialnumber));
       response_length = response_length + size;
+      matches = 1;
     }
   }
-
-  if (if_request != 0 && strncmp(if_request, "urn:knx:if.*", if_len) == 0) {
-    /* request for all devices via interface wildcard */
-    matches = 1;
-  }
-
-  size_t device = request->resource->device;
-  oc_resource_t *resource = oc_core_get_resource_by_uri("oic/d", device);
-  int i;
-  for (i = 0; i < (int)oc_string_array_get_allocated_size(resource->types);
-       i++) {
-    size_t size = oc_string_array_get_item_size(resource->types, i);
-    const char *t = (const char *)oc_string_array_get_item(resource->types, i);
-    if (strncmp(t, "oic.d", 5) == 0) {
-      /* take the first oic.d.xxx in the oic/d of the list of resource/device
-       * types */
-      rt_device = t;
-      rt_devlen = size;
-    }
-  }
-  if (rt_request != 0 && rt_device != 0 && rt_devlen == rt_len &&
-      strncmp(rt_request, rt_device, rt_len) == 0) {
-    /* request for specific resource type */
-    matches = 1;
-  }
-
-  // create the following example line per resouce:
-  // <coap://[fe80::b1d6]:1111/oic/res>;ct=10000;rt="oic.wk.res
-  // oic.d.sensor";if="oic.if.11 oic.if.baseline"
 
   if (rt_len > 0 || if_len > 0) {
+    size_t device = request->resource->device;
     matches = oc_process_resources(request, device, &response_length);
   }
   request->response->response_buffer->content_format = APPLICATION_LINK_FORMAT;
-  if (response_length > 0) {
+  if (matches > 0 && response_length > 0) {
     request->response->response_buffer->response_length = response_length;
     request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
   } else if (request->origin && (request->origin->flags & MULTICAST) == 0) {
