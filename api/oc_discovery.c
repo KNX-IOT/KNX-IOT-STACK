@@ -567,7 +567,8 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   oc_device_info_t *device = oc_core_get_device_info(device_index);
 
   if (oc_is_device_mode_in_programming(device_index)) {
-    // add only the serial number when the interface is if.pm && device is in programming mode
+    // add only the serial number when the interface is if.pm && device is in
+    // programming mode
     if (if_len == 13 && strncmp(if_request, "urn:knx:if.pm", 13) == 0) {
       int size = clf_add_line_to_buffer("<>;ep=urn:knx:sn.");
       response_length = response_length + size;

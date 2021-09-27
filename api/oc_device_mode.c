@@ -16,15 +16,12 @@
 
 #include "oc_api.h"
 
-
 #include "oc_core_res.h"
 
 #include <ctype.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
-
-
 
 bool
 is_device_in_mode(int device_index, oc_device_mode_t mode)
@@ -41,7 +38,9 @@ is_device_in_mode(int device_index, oc_device_mode_t mode)
   return false;
 }
 
-bool oc_is_device_mode_in_programming(int device_index) {
+bool
+oc_is_device_mode_in_programming(int device_index)
+{
   return is_device_in_mode(device_index, OC_PROGRAMMING_MODE);
 }
 
@@ -62,7 +61,6 @@ oc_device_mode_set_mode(int device_index, oc_device_mode_t mode)
   device->device_mode = mode;
   return 0;
 }
-
 
 int
 oc_device_mode_display(int device_index)

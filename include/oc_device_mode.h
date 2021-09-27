@@ -28,18 +28,13 @@
 extern "C" {
 #endif
 
-
-
 typedef enum oc_device_mode_t {
-	
-  OC_PROGRAMMING_MODE = 0,   ///< device is in programming mode
-  OC_NORMAL_OPERATION        ///< device is in normal operation
+
+  OC_PROGRAMMING_MODE = 0, ///< device is in programming mode
+  OC_NORMAL_OPERATION      ///< device is in normal operation
 } oc_device_mode_t;
 
-
 bool is_device_in_programming_mode(int device_index);
-
-
 
 #ifdef __cplusplus
 }
