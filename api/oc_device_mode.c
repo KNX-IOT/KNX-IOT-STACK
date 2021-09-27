@@ -74,6 +74,5 @@ oc_device_mode_display(int device_index)
     PRINT(" Device is in normal operation mode\n");
   }
 
-
-
+  return 0;
 }
