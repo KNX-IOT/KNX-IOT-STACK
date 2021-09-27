@@ -63,6 +63,7 @@ typedef struct oc_device_info_t
   oc_string_t icv;                       ///< specification version
   oc_string_t dmv;                       ///< data model version
   oc_string_t hwt;                       ///< knx hwt
+  oc_string_t serialnumber;              ///< knx serial number
   oc_core_add_device_cb_t add_device_cb; ///< callback when device is changed
   void *data;                            ///< user data
 } oc_device_info_t;
@@ -111,7 +112,7 @@ oc_device_info_t *oc_core_add_new_device(const char *uri, const char *rt,
                                          void *data);
 
 oc_device_info_t *oc_core_add_device(const char *name, const char *version,
-                                     const char *base,
+                                     const char *base, const char *serialnumber,
                                      oc_core_add_device_cb_t add_device_cb,
                                      void *data);
 

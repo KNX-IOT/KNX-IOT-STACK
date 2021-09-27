@@ -81,6 +81,7 @@ oc_core_free_device_info_properties(oc_device_info_t *oc_device_info_item)
     oc_free_string(&(oc_device_info_item->dmv));
     // KNX
     oc_free_string(&(oc_device_info_item->hwt));
+    oc_free_string(&(oc_device_info_item->serialnumber));
   }
 }
 
@@ -514,6 +515,7 @@ oc_core_add_new_device(const char *uri, const char *rt, const char *name,
 
 oc_device_info_t *
 oc_core_add_device(const char *name, const char *version, const char *base,
+                   const char *serialnumber,
                    oc_core_add_device_cb_t add_device_cb, void *data)
 {
   (void)data;
@@ -553,6 +555,8 @@ oc_core_add_device(const char *name, const char *version, const char *base,
   oc_new_string(&oc_device_info[device_count].name, name, strlen(name));
   oc_new_string(&oc_device_info[device_count].icv, version, strlen(version));
   oc_new_string(&oc_device_info[device_count].dmv, base, strlen(base));
+  oc_new_string(&oc_device_info[device_count].serialnumber, serialnumber,
+                strlen(serialnumber));
   oc_device_info[device_count].add_device_cb = add_device_cb;
 
   oc_create_discovery_resource(WELLKNOWNCORE, device_count);

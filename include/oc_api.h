@@ -447,8 +447,7 @@ int oc_add_device(const char *uri, const char *rt, const char *name,
  * @param[in] name the user readable name of the device
  * @param[in] version The api version e.g. "1.0"
  * @param[in] base the base url e.g. "/"
- * specifications to which this device data model is implemtned. This is the
- * "dmv" device property
+ * @param[in] serialnumber the serial number of the device
  * @param[in] add_device_cb callback function invoked during oc_add_device().
  * The purpose is to add additional device properties that are not supplied to
  * oc_add_device() function call.
@@ -461,6 +460,7 @@ int oc_add_device(const char *uri, const char *rt, const char *name,
  * @see init
  */
 int ock_add_device(const char *name, const char *version, const char *base,
+                   const char *serialnumber,
                    oc_add_device_cb_t add_device_cb, void *data);
 
 /**

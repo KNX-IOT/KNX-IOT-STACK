@@ -151,7 +151,7 @@ app_init(void)
      can be ocf.2.2.0 (or even higher)
      supplied values are for ocf.2.2.3 */
 
-  ret |= ock_add_device("blah", "1.0", "//", NULL, NULL);
+  ret |= ock_add_device("blah", "1.0", "//", "012346", NULL, NULL);
 
   return ret;
 }
