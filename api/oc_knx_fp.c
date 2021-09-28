@@ -19,7 +19,6 @@
 #include "oc_core_res.h"
 #include <stdio.h>
 
-
 static void
 oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
                           void *data)
@@ -50,10 +49,9 @@ oc_create_fp_g_resource(int resource_idx, size_t device)
                             0, 1, "urn:knx:if.c");
 }
 
-
 static void
-oc_core_fp_p_post_handler(oc_request_t *request,
-                               oc_interface_mask_t iface_mask, void *data)
+oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
+                          void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -76,9 +74,9 @@ void
 oc_create_fp_p_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_fp_p_resource\n");
-  oc_core_populate_resource(
-    resource_idx, device, "/fp/p", OC_IF_D, OC_IF_D, OC_DISCOVERABLE,
-    0, oc_core_fp_p_post_handler, 0, 0, 0, 1, "urn:knx:if.c");
+  oc_core_populate_resource(resource_idx, device, "/fp/p", OC_IF_D, OC_IF_D,
+                            OC_DISCOVERABLE, 0, oc_core_fp_p_post_handler, 0, 0,
+                            0, 1, "urn:knx:if.c");
 }
 
 static void
@@ -112,8 +110,8 @@ oc_create_fp_r_resource(int resource_idx, size_t device)
 }
 
 static void
-oc_core_p_get_handler(oc_request_t *request,
-                            oc_interface_mask_t iface_mask, void *data)
+oc_core_p_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
+                      void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -145,8 +143,8 @@ oc_core_p_get_handler(oc_request_t *request,
 }
 
 static void
-oc_core_p_post_handler(oc_request_t *request,
-                             oc_interface_mask_t iface_mask, void *data)
+oc_core_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
+                       void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -181,12 +179,10 @@ static void
 oc_create_p_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_p_resource\n");
-  oc_core_populate_resource(resource_idx, device, "/p",
-                            OC_IF_LL, OC_IF_NONE,
+  oc_core_populate_resource(resource_idx, device, "/p", OC_IF_LL, OC_IF_NONE,
                             OC_DISCOVERABLE, oc_core_p_get_handler, 0,
                             oc_core_p_post_handler, 0, 1, "urn:knx:if.c");
 }
-
 
 /*
 void
@@ -203,10 +199,10 @@ void
 oc_create_knx_fp_resources(size_t device_index)
 {
   OC_DBG("oc_create_knx_fp_resources");
-  
+
   oc_create_fp_g_resource(OC_KNX_FP_G, device_index);
   oc_create_fp_p_resource(OC_KNX_FP_P, device_index);
   oc_create_fp_r_resource(OC_KNX_FP_R, device_index);
   oc_create_p_resource(OC_KNX_P, device_index);
-  //oc_create_fp_resource(OC_KNX_FP, device_index);
+  // oc_create_fp_resource(OC_KNX_FP, device_index);
 }

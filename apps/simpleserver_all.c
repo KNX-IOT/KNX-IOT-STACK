@@ -820,7 +820,6 @@ main(void)
   PRINT("Security - Disabled\n");
 #endif /* OC_SECURITY */
 
-
   PRINT("Server \"server_1599\" running, waiting on incoming "
         "connections.\n");
 
