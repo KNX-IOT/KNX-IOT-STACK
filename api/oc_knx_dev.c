@@ -45,9 +45,8 @@ oc_create_dev_sn_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_dev_sn_resource\n");
   oc_core_populate_resource(
-    resource_idx, device, "/dev/sn", OC_IF_D, OC_IF_NONE,
-                            OC_DISCOVERABLE, oc_core_dev_sn_get_handler, 0, 0,
-                            0, 0, 1, "urn:knx:dpt.a[n]");
+    resource_idx, device, "/dev/sn", OC_IF_D, OC_IF_NONE, OC_DISCOVERABLE,
+    oc_core_dev_sn_get_handler, 0, 0, 0, 0, 1, "urn:knx:dpt.a[n]");
 }
 
 static void
@@ -76,9 +75,8 @@ oc_create_dev_hwv_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_dev_hwv_resource\n");
   oc_core_populate_resource(
-    resource_idx, device, "/dev/hwv", OC_IF_D, OC_IF_NONE,
-                            OC_DISCOVERABLE, oc_core_dev_hwv_get_handler, 0, 0,
-                            0, 0, 1, ":dpt.version");
+    resource_idx, device, "/dev/hwv", OC_IF_D, OC_IF_NONE, OC_DISCOVERABLE,
+    oc_core_dev_hwv_get_handler, 0, 0, 0, 0, 1, ":dpt.version");
 }
 
 static void
@@ -107,9 +105,8 @@ oc_create_dev_fwv_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_dev_fwv_resource\n");
   oc_core_populate_resource(
-    resource_idx, device, "/dev/fwv", OC_IF_D, OC_IF_NONE,
-                            OC_DISCOVERABLE, oc_core_dev_fwv_get_handler, 0, 0,
-                            0, 0, 1, ":dpt.version");
+    resource_idx, device, "/dev/fwv", OC_IF_D, OC_IF_NONE, OC_DISCOVERABLE,
+    oc_core_dev_fwv_get_handler, 0, 0, 0, 0, 1, ":dpt.version");
 }
 
 static void
@@ -138,9 +135,8 @@ oc_create_dev_hwt_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_dev_hwt_resource\n");
   oc_core_populate_resource(
-    resource_idx, device, "/dev/hwt", OC_IF_D, OC_IF_NONE,
-                            OC_DISCOVERABLE, oc_core_dev_hwt_get_handler, 0, 0,
-                            0, 0, 1, ":dpt.Version");
+    resource_idx, device, "/dev/hwt", OC_IF_D, OC_IF_NONE, OC_DISCOVERABLE,
+    oc_core_dev_hwt_get_handler, 0, 0, 0, 0, 1, ":dpt.Version");
 }
 
 static void
@@ -199,9 +195,8 @@ oc_create_dev_name_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_dev_name_resource\n");
   oc_core_populate_resource(
-    resource_idx, device, "/dev/name", OC_IF_D, OC_IF_NONE,
-                            OC_DISCOVERABLE, oc_core_dev_name_get_handler, 0, 0,
-                            0, 0, 1, ":dpt.a[n]");
+    resource_idx, device, "/dev/name", OC_IF_D, OC_IF_NONE, OC_DISCOVERABLE,
+    oc_core_dev_name_get_handler, 0, 0, 0, 0, 1, ":dpt.a[n]");
 }
 
 static void
@@ -281,10 +276,9 @@ oc_create_dev_ia_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_dev_ia_resource\n");
   oc_core_populate_resource(
-    resource_idx, device, "/dev/ia", OC_IF_D, OC_IF_NONE,
-                            OC_DISCOVERABLE, oc_core_dev_ia_get_handler,
-                            oc_core_dev_ia_put_handler, 0, 0, 0, 1,
-                            "urn:knx:ia");
+    resource_idx, device, "/dev/ia", OC_IF_D, OC_IF_NONE, OC_DISCOVERABLE,
+    oc_core_dev_ia_get_handler, oc_core_dev_ia_put_handler, 0, 0, 0, 1,
+    "urn:knx:ia");
 }
 
 static void
@@ -385,10 +379,9 @@ oc_create_dev_iid_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_dev_iid_resource\n");
   oc_core_populate_resource(
-    resource_idx, device, "/dev/iid", OC_IF_D, OC_IF_NONE,
-                            OC_DISCOVERABLE, oc_core_dev_iid_get_handler,
-                            oc_core_dev_iid_put_handler, 0, 0, 0, 1,
-                            ":dpt.a[5]");
+    resource_idx, device, "/dev/iid", OC_IF_D, OC_IF_NONE, OC_DISCOVERABLE,
+    oc_core_dev_iid_get_handler, oc_core_dev_iid_put_handler, 0, 0, 0, 1,
+    ":dpt.a[5]");
 }
 
 static void
@@ -416,8 +409,7 @@ oc_create_dev_dev_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_dev_dev_resource\n");
   oc_core_populate_resource(resource_idx, device, "/dev", OC_IF_D, OC_IF_NONE,
-                            0,
-                            oc_core_dev_dev_get_handler, 0, 0, 0, 0, 0, "");
+                            0, oc_core_dev_dev_get_handler, 0, 0, 0, 0, 0, "");
 }
 
 void

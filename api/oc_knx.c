@@ -132,8 +132,8 @@ void
 oc_create_knx_reset_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_reset_resource\n");
-  oc_core_populate_resource(
-    resource_idx, device, "/.well-known/knx/reset", OC_IF_LL | OC_IF_BASELINE, OC_IF_NONE,
+  oc_core_populate_resource(resource_idx, device, "/.well-known/knx/reset",
+                            OC_IF_LL | OC_IF_BASELINE, OC_IF_NONE,
                             OC_DISCOVERABLE, 0, 0,
                             oc_core_knx_reset_post_handler, 0, 0, "");
 }
@@ -421,8 +421,8 @@ oc_create_knx_spake_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_spake_resource\n");
   oc_core_populate_resource(resource_idx, device, "/.well-known/knx/spake",
-                            OC_IF_LL, OC_IF_NONE,
-                            OC_DISCOVERABLE, oc_core_knx_spake_get_handler, 0,
+                            OC_IF_LL, OC_IF_NONE, OC_DISCOVERABLE,
+                            oc_core_knx_spake_get_handler, 0,
                             oc_core_knx_spake_post_handler, 0, 0, "");
 }
 

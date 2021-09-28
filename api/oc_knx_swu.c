@@ -90,14 +90,14 @@ oc_create_knx_swu_protocol_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_swu_protocol_resource\n");
   oc_core_populate_resource(
-    resource_idx, device, "/swu/protocol", OC_IF_LL | OC_IF_BASELINE, OC_IF_NONE,
-    OC_DISCOVERABLE, oc_knx_swu_protocol_get_handler,
+    resource_idx, device, "/swu/protocol", OC_IF_LL | OC_IF_BASELINE,
+    OC_IF_NONE, OC_DISCOVERABLE, oc_knx_swu_protocol_get_handler,
     oc_knx_swu_protocol_put_handler, 0, 0, 1, "urn:knx:dpt.value1UCount");
 }
 
 static void
 oc_knx_swu_maxdefer_get_handler(oc_request_t *request,
-                              oc_interface_mask_t iface_mask, void *data)
+                                oc_interface_mask_t iface_mask, void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -130,7 +130,7 @@ oc_knx_swu_maxdefer_get_handler(oc_request_t *request,
 
 static void
 oc_knx_swu_maxdefer_put_handler(oc_request_t *request,
-                              oc_interface_mask_t iface_mask, void *data)
+                                oc_interface_mask_t iface_mask, void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -166,14 +166,14 @@ oc_create_knx_swu_maxdefer_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_swu_maxdefer_resource\n");
   oc_core_populate_resource(
-    resource_idx, device, "/swu/maxdefer", OC_IF_LL | OC_IF_BASELINE, OC_IF_NONE,
-    OC_DISCOVERABLE, oc_knx_swu_maxdefer_get_handler,
+    resource_idx, device, "/swu/maxdefer", OC_IF_LL | OC_IF_BASELINE,
+    OC_IF_NONE, OC_DISCOVERABLE, oc_knx_swu_maxdefer_get_handler,
     oc_knx_swu_maxdefer_put_handler, 0, 0, 1, "urn:knx:dpt.value1UCount");
 }
 
 static void
 oc_knx_swu_method_get_handler(oc_request_t *request,
-                                  oc_interface_mask_t iface_mask, void *data)
+                              oc_interface_mask_t iface_mask, void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -241,15 +241,15 @@ void
 oc_create_knx_swu_method_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_swu_method_resource\n");
-  oc_core_populate_resource(resource_idx, device, "/swu/method",
-                            OC_IF_LL | OC_IF_BASELINE, OC_IF_NONE,
-                            OC_DISCOVERABLE, oc_knx_swu_method_get_handler,
+  oc_core_populate_resource(
+    resource_idx, device, "/swu/method", OC_IF_LL | OC_IF_BASELINE, OC_IF_NONE,
+    OC_DISCOVERABLE, oc_knx_swu_method_get_handler,
     oc_knx_swu_method_put_handler, 0, 0, 1, "urn:knx:dpt.value1UCount");
 }
 
 static void
 oc_knx_swu_lastupdate_get_handler(oc_request_t *request,
-                              oc_interface_mask_t iface_mask, void *data)
+                                  oc_interface_mask_t iface_mask, void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -286,8 +286,8 @@ oc_create_knx_swu_lastupdate_resource(int resource_idx, size_t device)
   OC_DBG("oc_create_knx_swu_lastupdate_resource\n");
   oc_core_populate_resource(resource_idx, device, "/swu/lastupdate",
                             OC_IF_LL | OC_IF_BASELINE, OC_IF_NONE,
-                            OC_DISCOVERABLE, oc_knx_swu_lastupdate_get_handler, 0,
-                            0, 0, 1, "urn:knx:dpt.value1UCount");
+                            OC_DISCOVERABLE, oc_knx_swu_lastupdate_get_handler,
+                            0, 0, 0, 1, "urn:knx:dpt.value1UCount");
 }
 
 static void
@@ -335,7 +335,7 @@ oc_create_knx_swu_result_resource(int resource_idx, size_t device)
 
 static void
 oc_knx_swu_state_get_handler(oc_request_t *request,
-                            oc_interface_mask_t iface_mask, void *data)
+                             oc_interface_mask_t iface_mask, void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -370,14 +370,15 @@ void
 oc_create_knx_swu_state_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_swu_state_resource\n");
-  oc_core_populate_resource(
-    resource_idx, device, "/swu/state", OC_IF_LL | OC_IF_BASELINE, OC_IF_NONE,
-    OC_DISCOVERABLE, oc_knx_swu_state_get_handler, 0, 0, 0, 1, "urn:knx:dpt.value1UCount");
+  oc_core_populate_resource(resource_idx, device, "/swu/state",
+                            OC_IF_LL | OC_IF_BASELINE, OC_IF_NONE,
+                            OC_DISCOVERABLE, oc_knx_swu_state_get_handler, 0, 0,
+                            0, 1, "urn:knx:dpt.value1UCount");
 }
 
 static void
 oc_knx_swu_update_put_handler(oc_request_t *request,
-                            oc_interface_mask_t iface_mask, void *data)
+                              oc_interface_mask_t iface_mask, void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -419,8 +420,7 @@ oc_create_knx_swu_update_resource(int resource_idx, size_t device)
 
 static void
 oc_knx_swu_pkgv_get_handler(oc_request_t *request,
-                            oc_interface_mask_t iface_mask,
-                        void *data)
+                            oc_interface_mask_t iface_mask, void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -455,9 +455,9 @@ void
 oc_create_knx_swu_pkgv_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_swu_pkgv_resource\n");
-  oc_core_populate_resource(resource_idx, device, "/swu/pkgv", OC_IF_LL | OC_IF_BASELINE, OC_IF_NONE,
-                            OC_DISCOVERABLE, oc_knx_swu_pkgv_get_handler, 0,
-                            0, 0, 1, "dpt.version");
+  oc_core_populate_resource(
+    resource_idx, device, "/swu/pkgv", OC_IF_LL | OC_IF_BASELINE, OC_IF_NONE,
+    OC_DISCOVERABLE, oc_knx_swu_pkgv_get_handler, 0, 0, 0, 1, "dpt.version");
 }
 
 static void
@@ -498,13 +498,13 @@ oc_create_knx_swu_pkgcmd_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_reset_resource\n");
   oc_core_populate_resource(resource_idx, device, "/swu/pkgcmd", OC_IF_NONE,
-                            OC_IF_NONE,
-    OC_DISCOVERABLE, 0, 0, oc_knx_swu_pkgcmd_post_handler, 0, 0, "");
+                            OC_IF_NONE, OC_DISCOVERABLE, 0, 0,
+                            oc_knx_swu_pkgcmd_post_handler, 0, 0, "");
 }
 
 static void
 oc_knx_swu_bytes_get_handler(oc_request_t *request,
-                            oc_interface_mask_t iface_mask, void *data)
+                             oc_interface_mask_t iface_mask, void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -539,15 +539,14 @@ void
 oc_create_knx_swu_pkgbytes_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_swu_pkgbytes_resource\n");
-  oc_core_populate_resource(resource_idx, device, "/swu/bytes",
-                            OC_IF_NONE, OC_IF_NONE,
-                            OC_DISCOVERABLE, oc_knx_swu_bytes_get_handler, 0,
-                            0, 0, 1, "urn:knx:dpt.value4UCount");
+  oc_core_populate_resource(
+    resource_idx, device, "/swu/bytes", OC_IF_NONE, OC_IF_NONE, OC_DISCOVERABLE,
+    oc_knx_swu_bytes_get_handler, 0, 0, 0, 1, "urn:knx:dpt.value4UCount");
 }
 
 static void
 oc_knx_swu_pkgqurl_get_handler(oc_request_t *request,
-                            oc_interface_mask_t iface_mask, void *data)
+                               oc_interface_mask_t iface_mask, void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -580,7 +579,7 @@ oc_knx_swu_pkgqurl_get_handler(oc_request_t *request,
 
 static void
 oc_knx_swu_pkgqurl_put_handler(oc_request_t *request,
-                             oc_interface_mask_t iface_mask, void *data)
+                               oc_interface_mask_t iface_mask, void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -617,14 +616,13 @@ oc_create_knx_swu_pkgqurl_resource(int resource_idx, size_t device)
   OC_DBG("oc_create_knx_swu_pkgqurl_resource\n");
   oc_core_populate_resource(resource_idx, device, "/swu/pkgqurl",
                             OC_IF_LL | OC_IF_BASELINE, OC_IF_LL,
-    OC_DISCOVERABLE, oc_knx_swu_pkgqurl_get_handler,
-    oc_knx_swu_pkgqurl_put_handler, 0,
-                             0, 0, "");
+                            OC_DISCOVERABLE, oc_knx_swu_pkgqurl_get_handler,
+                            oc_knx_swu_pkgqurl_put_handler, 0, 0, 0, "");
 }
 
 static void
 oc_knx_swu_pkgnames_get_handler(oc_request_t *request,
-                               oc_interface_mask_t iface_mask, void *data)
+                                oc_interface_mask_t iface_mask, void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -654,7 +652,7 @@ oc_create_knx_swu_pkgnames_resource(int resource_idx, size_t device)
 
 static void
 oc_knx_swu_pkg_put_handler(oc_request_t *request,
-                               oc_interface_mask_t iface_mask, void *data)
+                           oc_interface_mask_t iface_mask, void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -678,13 +676,13 @@ oc_create_knx_swu_pkg_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_swu_pkg_resource\n");
   oc_core_populate_resource(
-    resource_idx, device, "/dev/idevid", OC_IF_D, OC_IF_D, OC_DISCOVERABLE,
-    0, oc_knx_swu_pkg_put_handler, 0, 0, 0, 1, ":dpt.a[n]");
+    resource_idx, device, "/dev/idevid", OC_IF_D, OC_IF_D, OC_DISCOVERABLE, 0,
+    oc_knx_swu_pkg_put_handler, 0, 0, 0, 1, ":dpt.a[n]");
 }
 
 static void
 oc_core_knx_swu_get_handler(oc_request_t *request,
-                              oc_interface_mask_t iface_mask, void *data)
+                            oc_interface_mask_t iface_mask, void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -715,22 +713,20 @@ oc_core_knx_swu_get_handler(oc_request_t *request,
   request->response->response_buffer->response_length = response_length;
 }
 
-
 void
 oc_create_knx_swu_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_swu_resource\n");
-  oc_core_populate_resource(resource_idx, device, "/swu",
-                            OC_IF_LL , OC_IF_NONE,
-                            OC_DISCOVERABLE, oc_core_knx_swu_get_handler, 0,
-                            0, 0, 1, "urn:knx:fbswu");
+  oc_core_populate_resource(resource_idx, device, "/swu", OC_IF_LL, OC_IF_NONE,
+                            OC_DISCOVERABLE, oc_core_knx_swu_get_handler, 0, 0,
+                            0, 1, "urn:knx:fbswu");
 }
 
 void
 oc_create_knx_swu_resources(size_t device_index)
 {
   OC_DBG("oc_create_knx_swu_resources");
-  
+
   oc_create_knx_swu_protocol_resource(OC_KNX_SWU_PROTOCOL, device_index);
   oc_create_knx_swu_maxdefer_resource(OC_KNX_SWU_MAXDEFER, device_index);
   oc_create_knx_swu_method_resource(OC_KNX_SWU_METHOD, device_index);
