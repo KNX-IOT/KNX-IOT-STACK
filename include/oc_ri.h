@@ -200,21 +200,22 @@ typedef enum {
   OC_DEV_SN,  ///< Device serial number
   OC_DEV_HWV, ///< Hardware version
   OC_DEV_FWV, /// Firmware version
-  OC_DEV_HWT, ///< The hardware type is a manufacture specific id for a device type (MaC uses this id for compatibility checks)
+  OC_DEV_HWT, ///< The hardware type is a manufacture specific id for a device
+              ///< type (MaC uses this id for compatibility checks)
   OC_DEV_MACADDRESS, ///< MAC address
-  OC_DEV_NAME, ///< Device name. Name may can be changed w/ MaC.
-  OC_DEV_MODEL, ///< Device model
-  OC_DEV_IA,       ///< Device individual address
-  OC_DEV_HOSTNAME, ///< Device hostname for DNS resolution.
-  OC_DEV_IID,   ///< KNX installation ID
-  OC_DEV, ///< core link
-  OC_KNX_SPAKE,     ///< spake
+  OC_DEV_NAME,       ///< Device name. Name may can be changed w/ MaC.
+  OC_DEV_MODEL,      ///< Device model
+  OC_DEV_IA,         ///< Device individual address
+  OC_DEV_HOSTNAME,   ///< Device hostname for DNS resolution.
+  OC_DEV_IID,        ///< KNX installation ID
+  OC_DEV,            ///< core link
+  OC_KNX_SPAKE,      ///< spake
   OC_KNX_IDEVID,     ///< IDevID
   OC_KNX_LDEVID,     ///< LDevID
   OC_KNX_RESET,      ///< reset the device
-  OC_KNX_LSM,    ///< load state machine
-  OC_KNX_CRC,   ///< CRC value of loaded contents
-  OC_KNX,        ///< well-known/knx
+  OC_KNX_LSM,        ///< load state machine
+  OC_KNX_CRC,        ///< CRC value of loaded contents
+  OC_KNX,            ///< well-known/knx
   /* List of resources on a logical device: start */
   /* List of Device Configuration Resources (DCRs): start */
   OCF_CON,

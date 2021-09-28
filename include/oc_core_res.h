@@ -66,7 +66,8 @@ typedef struct oc_device_info_t
   oc_string_t hwt;              ///< knx hwt
   oc_string_t serialnumber;     ///< knx serial number
   oc_device_mode_t device_mode; ///< device mode (programming, normal operation)
-  int individual_address;       ///< the individual address of the device, 0 == not assigned
+  int individual_address; ///< the individual address of the device, 0 == not
+                          ///< assigned
   oc_core_add_device_cb_t add_device_cb; ///< callback when device is changed
   void *data;                            ///< user data
 } oc_device_info_t;

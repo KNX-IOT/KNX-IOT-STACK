@@ -95,10 +95,9 @@ oc_create_knx_resource(int resource_idx, size_t device)
                             oc_core_knx_post_handler, 0, 0, "");
 }
 
-
 static void
-oc_core_knx_reset_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
-                         void *data)
+oc_core_knx_reset_post_handler(oc_request_t *request,
+                               oc_interface_mask_t iface_mask, void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -133,15 +132,14 @@ void
 oc_create_knx_reset_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_reset_resource\n");
-  oc_core_populate_resource(resource_idx, device, "/.well-known/knx/reset",
-                            OC_IF_LL | OC_IF_BASELINE, OC_IF_LL,
-                            OC_DISCOVERABLE, 0, 0,
-                            oc_core_knx_reset_post_handler, 0, 0, "");
+  oc_core_populate_resource(
+    resource_idx, device, "/.well-known/knx/reset", OC_IF_LL | OC_IF_BASELINE,
+    OC_IF_LL, OC_DISCOVERABLE, 0, 0, oc_core_knx_reset_post_handler, 0, 0, "");
 }
 
 static void
-oc_core_knx_lsm_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
-                         void *data)
+oc_core_knx_lsm_get_handler(oc_request_t *request,
+                            oc_interface_mask_t iface_mask, void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -173,8 +171,8 @@ oc_core_knx_lsm_get_handler(oc_request_t *request, oc_interface_mask_t iface_mas
 }
 
 static void
-oc_core_knx_lsm_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
-                         void *data)
+oc_core_knx_lsm_post_handler(oc_request_t *request,
+                             oc_interface_mask_t iface_mask, void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -216,8 +214,8 @@ oc_create_knx_lsm_resource(int resource_idx, size_t device)
 }
 
 static void
-oc_core_knx_crc_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
-                         void *data)
+oc_core_knx_crc_get_handler(oc_request_t *request,
+                            oc_interface_mask_t iface_mask, void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -249,8 +247,8 @@ oc_core_knx_crc_get_handler(oc_request_t *request, oc_interface_mask_t iface_mas
 }
 
 static void
-oc_core_knx_crc_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
-                         void *data)
+oc_core_knx_crc_post_handler(oc_request_t *request,
+                             oc_interface_mask_t iface_mask, void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -291,10 +289,9 @@ oc_create_knx_crc_resource(int resource_idx, size_t device)
                             oc_core_knx_crc_post_handler, 0, 0, "");
 }
 
-
 static void
 oc_core_knx_ldevid_get_handler(oc_request_t *request,
-                            oc_interface_mask_t iface_mask, void *data)
+                               oc_interface_mask_t iface_mask, void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -317,10 +314,9 @@ void
 oc_create_knx_ldevid_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_dev_iid_resource\n");
-  oc_core_populate_resource(resource_idx, device, "/dev/ldevid", OC_IF_D, OC_IF_D,
-                            OC_DISCOVERABLE, oc_core_knx_ldevid_get_handler,
-                            0, 0, 0, 0, 1,
-                            ":dpt.a[n]");
+  oc_core_populate_resource(
+    resource_idx, device, "/dev/ldevid", OC_IF_D, OC_IF_D, OC_DISCOVERABLE,
+    oc_core_knx_ldevid_get_handler, 0, 0, 0, 0, 1, ":dpt.a[n]");
 }
 
 static void
@@ -355,7 +351,7 @@ oc_create_knx_idevid_resource(int resource_idx, size_t device)
 
 static void
 oc_core_knx_spake_get_handler(oc_request_t *request,
-                            oc_interface_mask_t iface_mask, void *data)
+                              oc_interface_mask_t iface_mask, void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -388,7 +384,7 @@ oc_core_knx_spake_get_handler(oc_request_t *request,
 
 static void
 oc_core_knx_spake_post_handler(oc_request_t *request,
-                             oc_interface_mask_t iface_mask, void *data)
+                               oc_interface_mask_t iface_mask, void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -433,7 +429,7 @@ void
 oc_create_knx_resources(size_t device_index)
 {
   OC_DBG("oc_create_knx_resources");
-  
+
   oc_create_knx_reset_resource(OC_KNX, device_index);
   oc_create_knx_resource(OC_KNX_RESET, device_index);
   oc_create_knx_lsm_resource(OC_KNX_LSM, device_index);

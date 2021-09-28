@@ -154,7 +154,6 @@ app_init(void)
 
   oc_device_mode_display(0);
 
-
   return ret;
 }
 
