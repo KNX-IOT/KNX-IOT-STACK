@@ -878,7 +878,7 @@ does_interface_support_method(oc_interface_mask_t iface_mask,
   case OC_IF_SEC:
   case OC_IF_SWU:
   case OC_IF_PM:
-
+  case OC_IF_NONE:
     break;
   }
   return supported;
