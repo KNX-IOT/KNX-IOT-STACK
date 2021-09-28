@@ -139,7 +139,7 @@ oc_create_knx_reset_resource(int resource_idx, size_t device)
                             oc_core_knx_reset_post_handler, 0, 0, "");
 }
 
-
+static void
 oc_core_knx_lsm_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
                          void *data)
 {
@@ -172,6 +172,7 @@ oc_core_knx_lsm_get_handler(oc_request_t *request, oc_interface_mask_t iface_mas
   request->response->response_buffer->response_length = response_length;
 }
 
+static void
 oc_core_knx_lsm_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
                          void *data)
 {
@@ -214,6 +215,7 @@ oc_create_knx_lsm_resource(int resource_idx, size_t device)
                             oc_core_knx_lsm_post_handler, 0, 0, "");
 }
 
+static void
 oc_core_knx_crc_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
                          void *data)
 {
@@ -246,6 +248,7 @@ oc_core_knx_crc_get_handler(oc_request_t *request, oc_interface_mask_t iface_mas
   request->response->response_buffer->response_length = response_length;
 }
 
+static void
 oc_core_knx_crc_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
                          void *data)
 {
