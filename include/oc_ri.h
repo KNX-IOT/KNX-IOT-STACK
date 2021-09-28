@@ -216,6 +216,11 @@ typedef enum {
   OC_KNX_LSM,        ///< load state machine
   OC_KNX_CRC,        ///< CRC value of loaded contents
   OC_KNX,            ///< well-known/knx
+  OC_KNX_FP_G,       ///< FP/G
+  OC_KNX_FP_P,       ///< FP/G
+  OC_KNX_FP_R,       ///< FP/G
+  OC_KNX_P,          ///< FP/G
+
   /* List of resources on a logical device: start */
   /* List of Device Configuration Resources (DCRs): start */
   OCF_CON,
