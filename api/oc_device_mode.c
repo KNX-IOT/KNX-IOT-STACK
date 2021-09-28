@@ -58,6 +58,12 @@ oc_device_mode_set_mode(int device_index, oc_device_mode_t mode)
     OC_DBG("ERROR in retrieving the device");
     return -1;
   }
+
+  if (mode != OC_PROGRAMMING_MODE && device->individual_address == 0) {
+    OC_DBG("oc_device_mode_set_mode: individual adress = 0, which means that it is not set");
+    return -1;
+  }
+
   device->device_mode = mode;
   return 0;
 }
