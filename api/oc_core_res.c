@@ -23,6 +23,7 @@
 #include "oc_rep.h"
 
 #include "oc_knx_dev.h"
+#include "oc_knx.h"
 
 #ifdef OC_SECURITY
 #include "security/oc_doxm.h"
@@ -424,9 +425,16 @@ oc_set_con_res_announced(bool announce)
 }
 
 int
-oc_core_add_device_hwt(int device_index, const char *hwt)
+oc_core_set_device_hwt(int device_index, const char *hwt)
 {
   oc_new_string(&oc_device_info[device_index].hwt, hwt, strlen(hwt));
+  return 0;
+}
+
+int
+oc_core_set_device_ia(int device_index, int ia)
+{
+  oc_device_info[device_index].individual_address = ia;
   return 0;
 }
 
@@ -562,6 +570,7 @@ oc_core_add_device(const char *name, const char *version, const char *base,
   oc_create_discovery_resource(WELLKNOWNCORE, device_count);
 
   oc_create_knx_device_resources(device_count);
+  oc_create_knx_resources(device_count);
 
   oc_device_info[device_count].data = data;
 

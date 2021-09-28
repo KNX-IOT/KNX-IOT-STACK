@@ -14,8 +14,8 @@
 // limitations under the License.
 */
 
-#ifndef OC_KNX_DEV_INTERNAL_H
-#define OC_KNX_DEV_INTERNAL_H
+#ifndef OC_KNX_INTERNAL_H
+#define OC_KNX_INTERNAL_H
 
 #include <stddef.h>
 
@@ -28,10 +28,10 @@ extern "C" {
 
 @param device index of the device to which the resource is to be created
 */
-void oc_create_knx_device_resources(size_t device);
+void oc_create_knx_resources(size_t device);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* OC_KNX_DEV_INTERNAL_H */
+#endif /* OC_KNX_INTERNAL_H */
