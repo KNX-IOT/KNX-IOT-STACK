@@ -44,7 +44,7 @@ void
 oc_create_fp_g_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_fp_g_resource\n");
-  oc_core_populate_resource(resource_idx, device, "/fp/g", OC_IF_D, OC_IF_D,
+  oc_core_populate_resource(resource_idx, device, "/fp/g", OC_IF_D, OC_IF_NONE,
                             OC_DISCOVERABLE, 0, oc_core_fp_g_post_handler, 0, 0,
                             0, 1, "urn:knx:if.c");
 }
@@ -74,7 +74,7 @@ void
 oc_create_fp_p_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_fp_p_resource\n");
-  oc_core_populate_resource(resource_idx, device, "/fp/p", OC_IF_D, OC_IF_D,
+  oc_core_populate_resource(resource_idx, device, "/fp/p", OC_IF_D, OC_IF_NONE,
                             OC_DISCOVERABLE, 0, oc_core_fp_p_post_handler, 0, 0,
                             0, 1, "urn:knx:if.c");
 }
@@ -104,7 +104,7 @@ void
 oc_create_fp_r_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_fp_r_resource\n");
-  oc_core_populate_resource(resource_idx, device, "/fp/r", OC_IF_D, OC_IF_D,
+  oc_core_populate_resource(resource_idx, device, "/fp/r", OC_IF_D, OC_IF_NONE,
                             OC_DISCOVERABLE, 0, oc_core_fp_r_post_handler, 0, 0,
                             0, 1, "urn:knx:if.c");
 }
