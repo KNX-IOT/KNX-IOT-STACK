@@ -288,6 +288,68 @@ oc_create_knx_crc_resource(int resource_idx, size_t device)
                             oc_core_knx_crc_post_handler, 0, 0, "");
 }
 
+
+static void
+oc_core_knx_ldevid_get_handler(oc_request_t *request,
+                            oc_interface_mask_t iface_mask, void *data)
+{
+  (void)data;
+  (void)iface_mask;
+  size_t response_length = 0;
+
+  /* check if the accept header is cbor-format */
+  if (request->accept != APPLICATION_CBOR) {
+    request->response->response_buffer->code =
+      oc_status_code(OC_STATUS_BAD_REQUEST);
+    return;
+  }
+  // size_t device_index = request->resource->device;
+
+  request->response->response_buffer->content_format = APPLICATION_CBOR;
+  request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
+  request->response->response_buffer->response_length = response_length;
+}
+
+void
+oc_create_knx_ldevid_resource(int resource_idx, size_t device)
+{
+  OC_DBG("oc_create_dev_iid_resource\n");
+  oc_core_populate_resource(resource_idx, device, "/dev/ldevid", OC_IF_D, OC_IF_D,
+                            OC_DISCOVERABLE, oc_core_knx_ldevid_get_handler,
+                            0, 0, 0, 0, 1,
+                            ":dpt.a[n]");
+}
+
+static void
+oc_core_knx_idevid_get_handler(oc_request_t *request,
+                               oc_interface_mask_t iface_mask, void *data)
+{
+  (void)data;
+  (void)iface_mask;
+  size_t response_length = 0;
+
+  /* check if the accept header is cbor-format */
+  if (request->accept != APPLICATION_CBOR) {
+    request->response->response_buffer->code =
+      oc_status_code(OC_STATUS_BAD_REQUEST);
+    return;
+  }
+  // size_t device_index = request->resource->device;
+
+  request->response->response_buffer->content_format = APPLICATION_CBOR;
+  request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
+  request->response->response_buffer->response_length = response_length;
+}
+
+void
+oc_create_knx_idevid_resource(int resource_idx, size_t device)
+{
+  OC_DBG("oc_create_dev_iid_resource\n");
+  oc_core_populate_resource(
+    resource_idx, device, "/dev/idevid", OC_IF_D, OC_IF_D, OC_DISCOVERABLE,
+    oc_core_knx_idevid_get_handler, 0, 0, 0, 0, 1, ":dpt.a[n]");
+}
+
 void
 oc_create_knx_resources(size_t device_index)
 {
@@ -296,5 +358,7 @@ oc_create_knx_resources(size_t device_index)
   oc_create_knx_reset_resource(OC_KNX, device_index);
   oc_create_knx_resource(OC_KNX_RESET, device_index);
   oc_create_knx_lsm_resource(OC_KNX_LSM, device_index);
-  oc_create_knx_lsm_resource(OC_KNX_CRC, device_index);
+  oc_create_knx_crc_resource(OC_KNX_CRC, device_index);
+  oc_create_knx_ldevid_resource(OC_KNX_LDEVID, device_index);
+  oc_create_knx_idevid_resource(OC_KNX_IDEVID, device_index);
 }

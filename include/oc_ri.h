@@ -208,8 +208,9 @@ typedef enum {
   OC_DEV_HOSTNAME, ///< Device hostname for DNS resolution.
   OC_DEV_IID,   ///< KNX installation ID
   OC_DEV, ///< core link
-
-  OC_KNX_RESET,  ///< reset the device
+  OC_KNX_IDEVID,     ///< IDevID
+  OC_KNX_LDEVID,     ///< LDevID
+  OC_KNX_RESET,      ///< reset the device
   OC_KNX_LSM,    ///< load state machine
   OC_KNX_CRC,   ///< CRC value of loaded contents
   OC_KNX,        ///< well-known/knx

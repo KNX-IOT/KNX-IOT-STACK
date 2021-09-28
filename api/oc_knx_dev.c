@@ -358,6 +358,7 @@ oc_core_dev_iid_put_handler(oc_request_t *request,
   request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
   request->response->response_buffer->response_length = response_length;
 }
+
 static void
 oc_core_dev_iid_get_handler(oc_request_t *request,
                                  oc_interface_mask_t iface_mask, void *data)
