@@ -1,5 +1,5 @@
 /*
-// Copyright (c) 2019 Intel Corporation
+// Copyright (c) 2021 Cascoda Ltd
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
 // limitations under the License.
 */
 
-#ifndef OC_KNXDEV_INTERNAL_H
-#define OC_KNXDEV_INTERNAL_H
+#ifndef OC_KNX_DEV_INTERNAL_H
+#define OC_KNX_DEV_INTERNAL_H
 
 #include <stddef.h>
 
@@ -34,4 +34,4 @@ void oc_create_knx_device_resources(size_t device);
 }
 #endif
 
-#endif /* OC_KNXDEV_INTERNAL_H */
+#endif /* OC_KNX_DEV_INTERNAL_H */
