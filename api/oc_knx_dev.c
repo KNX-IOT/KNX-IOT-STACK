@@ -427,7 +427,7 @@ oc_create_knx_device_resources(size_t device_index)
 
   oc_create_dev_sn_resource(OC_DEV_SN, device_index);
   oc_create_dev_hwv_resource(OC_DEV_HWV, device_index);
-  oc_create_dev_fwv_resource(OC_DEV_HWV, device_index);
+  oc_create_dev_fwv_resource(OC_DEV_FWV, device_index);
   oc_create_dev_hwt_resource(OC_DEV_HWT, device_index);
   oc_create_dev_macaddr_resource(OC_DEV_MACADDRESS, device_index);
   oc_create_dev_name_resource(OC_DEV_NAME, device_index);
