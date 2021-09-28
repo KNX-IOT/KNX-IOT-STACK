@@ -414,10 +414,10 @@ void
 oc_create_dev_dev_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_dev_dev_resource\n");
-  oc_core_populate_resource(resource_idx, device, "/dev", OC_IF_D, OC_IF_D,
-                            0, oc_core_dev_ia_get_handler,
-                            oc_core_dev_ia_put_handler, 0, 0, 0, 1,
-                            "urn:knx:fb.0");
+  oc_core_populate_resource(resource_idx, device, "/dev", OC_IF_D, OC_IF_D, 0,
+                            oc_core_dev_dev_get_handler,
+                            0, 0, 0, 0, 0,
+                            "");
 }
 
 void
