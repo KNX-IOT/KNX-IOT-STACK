@@ -444,7 +444,7 @@ void oc_ri_remove_timed_event_callback(void *cb_data,
 int oc_status_code(oc_status_t key);
 
 /**
- * @brief retrieve the resource by uri and device indes
+ * @brief retrieve the resource by uri and device index
  *
  * @param uri the uri of the resource
  * @param uri_len the lenght of the uri
@@ -463,7 +463,7 @@ oc_resource_t *oc_ri_get_app_resources(void);
 
 #ifdef OC_SERVER
 /**
- * @brief allocate a resource strucutre
+ * @brief allocate a resource structure
  *
  * @return oc_resource_t*
  */
