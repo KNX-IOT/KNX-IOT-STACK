@@ -353,6 +353,82 @@ oc_create_knx_idevid_resource(int resource_idx, size_t device)
     oc_core_knx_idevid_get_handler, 0, 0, 0, 0, 1, ":dpt.a[n]");
 }
 
+static void
+oc_core_knx_spake_get_handler(oc_request_t *request,
+                            oc_interface_mask_t iface_mask, void *data)
+{
+  (void)data;
+  (void)iface_mask;
+  size_t response_length = 0;
+
+  /* check if the accept header is cbor-format */
+  if (request->accept != APPLICATION_JSON) {
+    request->response->response_buffer->code =
+      oc_status_code(OC_STATUS_BAD_REQUEST);
+    return;
+  }
+  /*
+  int length = clf_add_line_to_buffer("{");
+  response_length += length;
+
+  length = clf_add_line_to_buffer("\"api\": { \"version\": \"1.0\",");
+  response_length += length;
+
+  length = clf_add_line_to_buffer("\"base\": \"/ \"}");
+  response_length += length;
+
+  length = clf_add_line_to_buffer("}");
+  response_length += length;
+  */
+
+  request->response->response_buffer->content_format = APPLICATION_JSON;
+  request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
+  request->response->response_buffer->response_length = response_length;
+}
+
+static void
+oc_core_knx_spake_post_handler(oc_request_t *request,
+                             oc_interface_mask_t iface_mask, void *data)
+{
+  (void)data;
+  (void)iface_mask;
+  size_t response_length = 0;
+
+  /* check if the accept header is cbor-format */
+  if (request->accept != APPLICATION_JSON) {
+    request->response->response_buffer->code =
+      oc_status_code(OC_STATUS_BAD_REQUEST);
+    return;
+  }
+  /*
+  int length = clf_add_line_to_buffer("{");
+  response_length += length;
+
+  length = clf_add_line_to_buffer("\"api\": { \"version\": \"1.0\",");
+  response_length += length;
+
+  length = clf_add_line_to_buffer("\"base\": \"/ \"}");
+  response_length += length;
+
+  length = clf_add_line_to_buffer("}");
+  response_length += length;
+  */
+
+  request->response->response_buffer->content_format = APPLICATION_JSON;
+  request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
+  request->response->response_buffer->response_length = response_length;
+}
+
+void
+oc_create_knx_spake_resource(int resource_idx, size_t device)
+{
+  OC_DBG("oc_create_knx_spake_resource\n");
+  oc_core_populate_resource(resource_idx, device, "/.well-known/knx/spake",
+                            OC_IF_LL | OC_IF_BASELINE, OC_IF_LL,
+                            OC_DISCOVERABLE, oc_core_knx_spake_get_handler, 0,
+                            oc_core_knx_spake_post_handler, 0, 0, "");
+}
+
 void
 oc_create_knx_resources(size_t device_index)
 {
@@ -364,4 +440,5 @@ oc_create_knx_resources(size_t device_index)
   oc_create_knx_crc_resource(OC_KNX_CRC, device_index);
   oc_create_knx_ldevid_resource(OC_KNX_LDEVID, device_index);
   oc_create_knx_idevid_resource(OC_KNX_IDEVID, device_index);
+  oc_create_knx_spake_resource(OC_KNX_SPAKE, device_index);
 }
