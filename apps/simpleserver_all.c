@@ -814,6 +814,12 @@ main(void)
   PRINT(" DI: '%s'\n", uuid);
   oc_add_ownership_status_cb(oc_ownership_status_cb, NULL);
 
+#ifdef OC_SECURITY
+  PRINT("Security - Enabled\n");
+#else
+  PRINT("Security - Disabled\n");
+#endif /* OC_SECURITY */
+
   PRINT("Server \"server_1599\" running, waiting on incoming "
         "connections.\n");
 
