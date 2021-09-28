@@ -220,6 +220,20 @@ typedef enum {
   OC_KNX_FP_P,       ///< FP/G
   OC_KNX_FP_R,       ///< FP/G
   OC_KNX_P,          ///< FP/G
+  OC_KNX_SWU_PROTOCOL,
+  OC_KNX_SWU_MAXDEFER,
+  OC_KNX_SWU_METHOD,
+  OC_KNX_LASTUPDATE,
+  OC_KNX_SWU_RESULT,
+  OC_KNX_SWU_STATE,
+  OC_KNX_SWU_UPDATE,
+  OC_KNX_SWU_PKGV,
+  OC_KNX_SWU_PKGCMD,
+  OC_KNX_SWU_PKGBYTES,
+  OC_KNX_SWU_PKGQURL,
+  OC_KNX_SWU_PKGNAMES,
+  OC_KNX_SWU_PKG,
+  OC_KNX_SWU,
 
   /* List of resources on a logical device: start */
   /* List of Device Configuration Resources (DCRs): start */
