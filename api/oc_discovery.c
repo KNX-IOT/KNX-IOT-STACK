@@ -89,7 +89,11 @@ oc_filter_resource(oc_resource_t *resource, oc_request_t *request,
   oc_string_t ep, uri;
   memset(&uri, 0, sizeof(oc_string_t));
   while (eps != NULL) {
+#ifdef OC_SECURITY
     if (eps->flags & SECURED) {
+#else
+    if ((eps->flags & SECURED) == 0) {
+#endif /* OC_SECURITY */
       if (oc_endpoint_to_string(eps, &ep) == 0) {
         length = clf_add_line_to_buffer(oc_string(ep));
         *response_length += length;
