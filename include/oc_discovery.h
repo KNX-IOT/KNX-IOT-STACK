@@ -33,7 +33,6 @@ extern "C" {
  */
 void oc_create_discovery_resource(int resource_idx, size_t device);
 
-
 bool oc_filter_resource(oc_resource_t *resource, oc_request_t *request,
                         size_t device_index, size_t *response_length,
                         int matches);
