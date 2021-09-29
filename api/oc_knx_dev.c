@@ -17,6 +17,7 @@
 #include "oc_api.h"
 #include "api/oc_knx_dev.h"
 #include "oc_core_res.h"
+#include "oc_discovery.h"
 #include <stdio.h>
 
 static void
@@ -391,6 +392,8 @@ oc_core_dev_dev_get_handler(oc_request_t *request,
   (void)data;
   (void)iface_mask;
   size_t response_length = 0;
+  int i;
+  int matches = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_LINK_FORMAT) {
@@ -399,7 +402,17 @@ oc_core_dev_dev_get_handler(oc_request_t *request,
     return;
   }
 
-  request->response->response_buffer->content_format = APPLICATION_CBOR;
+  size_t device_index = request->resource->device;
+
+  for (i = (int)OC_DEV_SN; i < (int)OC_DEV; i++) {
+    oc_resource_t *resource = oc_core_get_resource_by_index(i, device_index);
+    if (oc_filter_resource(resource, request, device_index, &response_length,
+                           matches)) {
+      matches++;
+    }
+  }
+
+  request->response->response_buffer->content_format = APPLICATION_LINK_FORMAT;
   request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
   request->response->response_buffer->response_length = response_length;
 }

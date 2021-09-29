@@ -26,12 +26,16 @@ extern "C" {
 #endif
 
 /**
- * @brief create a resource that is discoverable (e.g. listed in oic/res)
+ * @brief create a resource that is discoverable.
  *
  * @param resource_idx the resource index
  * @param device the device to which the resource belongs
  */
 void oc_create_discovery_resource(int resource_idx, size_t device);
+
+bool oc_filter_resource(oc_resource_t *resource, oc_request_t *request,
+                        size_t device_index, size_t *response_length,
+                        int matches);
 
 #ifdef __cplusplus
 }

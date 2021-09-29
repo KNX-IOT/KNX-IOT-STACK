@@ -58,7 +58,7 @@ clf_add_line_size_to_buffer(const char *line, int len)
   return len;
 }
 
-static bool
+bool
 oc_filter_resource(oc_resource_t *resource, oc_request_t *request,
                    size_t device_index, size_t *response_length, int matches)
 {
