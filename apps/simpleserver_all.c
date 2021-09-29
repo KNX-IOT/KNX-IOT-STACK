@@ -716,6 +716,7 @@ handle_signal(int signal)
   quit = 1;
 }
 
+#ifdef OC_SECURITY
 /**
  * oc_ownership_status_cb callback implementation
  * handler to print out the DI after onboarding
@@ -737,6 +738,7 @@ oc_ownership_status_cb(const oc_uuid_t *device_uuid, size_t device_index,
   oc_uuid_to_str(device_uuid, uuid, OC_UUID_LEN);
   PRINT(" oc_ownership_status_cb: DI: '%s'\n", uuid);
 }
+#endif /* OC_SECURITY * /
 
 /**
  * main application.
@@ -808,11 +810,13 @@ main(void)
     return init;
   }
 
+#ifdef OC_SECURITY
   /* print out the current DI of the device */
   char uuid[37] = { 0 };
   oc_uuid_to_str(oc_core_get_device_id(0), uuid, OC_UUID_LEN);
   PRINT(" DI: '%s'\n", uuid);
   oc_add_ownership_status_cb(oc_ownership_status_cb, NULL);
+#endif /* OC_SECURITY */
 
 #ifdef OC_SECURITY
   PRINT("Security - Enabled\n");

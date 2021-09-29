@@ -839,11 +839,13 @@ main(void)
     return init;
   }
 
+#ifdef OC_SECURITY
   /* print out the current DI of the device */
   char uuid[37] = { 0 };
   oc_uuid_to_str(oc_core_get_device_id(0), uuid, OC_UUID_LEN);
   PRINT(" DI: '%s'\n", uuid);
   oc_add_ownership_status_cb(oc_ownership_status_cb, NULL);
+#endif /* OC_SECURITY */
 
   PRINT("OCF server \"server_1599\" running, waiting on incoming "
         "connections.\n");
