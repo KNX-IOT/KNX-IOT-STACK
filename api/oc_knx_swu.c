@@ -16,6 +16,7 @@
 
 #include "oc_api.h"
 #include "api/oc_knx_swu.h"
+#include "oc_discovery.h"
 #include "oc_core_res.h"
 #include <stdio.h>
 
