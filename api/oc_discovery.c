@@ -109,25 +109,28 @@ oc_filter_resource(oc_resource_t *resource, oc_request_t *request,
 
   length = clf_add_line_to_buffer(">;");
   *response_length += length;
-  length = clf_add_line_to_buffer("rt=");
-  *response_length += length;
-  // length = clf_add_line_to_buffer(oc_string(resource->types));
 
   int i;
   int numberofresourcetypes =
     (int)oc_string_array_get_allocated_size(resource->types);
 
-  for (i = 0; i < numberofresourcetypes; i++) {
-    size_t size = oc_string_array_get_item_size(resource->types, i);
-    const char *t = (const char *)oc_string_array_get_item(resource->types, i);
-    if (size > 0) {
-      length = clf_add_line_size_to_buffer(t, size);
-      *response_length += length;
-    }
-  }
+  if (numberofresourcetypes > 0) {
+    length = clf_add_line_to_buffer("rt=\"");
+    *response_length += length;
 
-  length = clf_add_line_to_buffer(";");
-  *response_length += length;
+    for (i = 0; i < numberofresourcetypes; i++) {
+      size_t size = oc_string_array_get_item_size(resource->types, i);
+      const char *t =
+        (const char *)oc_string_array_get_item(resource->types, i);
+      if (size > 0) {
+        length = clf_add_line_size_to_buffer(t, size);
+        *response_length += length;
+      }
+    }
+
+    length = clf_add_line_to_buffer("\";");
+    *response_length += length;
+  }
 
   length = clf_add_line_to_buffer("if=");
   *response_length += length;

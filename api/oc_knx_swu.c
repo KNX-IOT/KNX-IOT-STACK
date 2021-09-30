@@ -16,6 +16,7 @@
 
 #include "oc_api.h"
 #include "api/oc_knx_swu.h"
+#include "oc_discovery.h"
 #include "oc_core_res.h"
 #include <stdio.h>
 
@@ -25,7 +26,7 @@ oc_knx_swu_protocol_get_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  size_t response_length = 0;
+  // size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_JSON) {
@@ -47,9 +48,7 @@ oc_knx_swu_protocol_get_handler(oc_request_t *request,
   response_length += length;
   */
 
-  request->response->response_buffer->content_format = APPLICATION_JSON;
-  request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
-  request->response->response_buffer->response_length = response_length;
+  oc_send_json_response(request, OC_STATUS_OK);
 }
 
 static void
@@ -58,7 +57,7 @@ oc_knx_swu_protocol_put_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  size_t response_length = 0;
+  // size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_JSON) {
@@ -79,10 +78,7 @@ oc_knx_swu_protocol_put_handler(oc_request_t *request,
   length = clf_add_line_to_buffer("}");
   response_length += length;
   */
-
-  request->response->response_buffer->content_format = APPLICATION_JSON;
-  request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
-  request->response->response_buffer->response_length = response_length;
+  oc_send_json_response(request, OC_STATUS_OK);
 }
 
 void
@@ -101,7 +97,7 @@ oc_knx_swu_maxdefer_get_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  size_t response_length = 0;
+  // size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_JSON) {
@@ -123,9 +119,7 @@ oc_knx_swu_maxdefer_get_handler(oc_request_t *request,
   response_length += length;
   */
 
-  request->response->response_buffer->content_format = APPLICATION_JSON;
-  request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
-  request->response->response_buffer->response_length = response_length;
+  oc_send_json_response(request, OC_STATUS_OK);
 }
 
 static void
@@ -134,7 +128,7 @@ oc_knx_swu_maxdefer_put_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  size_t response_length = 0;
+  // size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_JSON) {
@@ -156,9 +150,7 @@ oc_knx_swu_maxdefer_put_handler(oc_request_t *request,
   response_length += length;
   */
 
-  request->response->response_buffer->content_format = APPLICATION_JSON;
-  request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
-  request->response->response_buffer->response_length = response_length;
+  oc_send_json_response(request, OC_STATUS_OK);
 }
 
 void
@@ -177,7 +169,7 @@ oc_knx_swu_method_get_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  size_t response_length = 0;
+  // size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_JSON) {
@@ -199,9 +191,7 @@ oc_knx_swu_method_get_handler(oc_request_t *request,
   response_length += length;
   */
 
-  request->response->response_buffer->content_format = APPLICATION_JSON;
-  request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
-  request->response->response_buffer->response_length = response_length;
+  oc_send_json_response(request, OC_STATUS_OK);
 }
 
 static void
@@ -210,7 +200,7 @@ oc_knx_swu_method_put_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  size_t response_length = 0;
+  // size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_JSON) {
@@ -232,9 +222,7 @@ oc_knx_swu_method_put_handler(oc_request_t *request,
   response_length += length;
   */
 
-  request->response->response_buffer->content_format = APPLICATION_JSON;
-  request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
-  request->response->response_buffer->response_length = response_length;
+  oc_send_json_response(request, OC_STATUS_OK);
 }
 
 void
@@ -253,7 +241,7 @@ oc_knx_swu_lastupdate_get_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  size_t response_length = 0;
+  // size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_JSON) {
@@ -275,9 +263,7 @@ oc_knx_swu_lastupdate_get_handler(oc_request_t *request,
   response_length += length;
   */
 
-  request->response->response_buffer->content_format = APPLICATION_JSON;
-  request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
-  request->response->response_buffer->response_length = response_length;
+  oc_send_json_response(request, OC_STATUS_OK);
 }
 
 void
@@ -296,7 +282,7 @@ oc_knx_swu_result_get_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  size_t response_length = 0;
+  // size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_JSON) {
@@ -318,9 +304,7 @@ oc_knx_swu_result_get_handler(oc_request_t *request,
   response_length += length;
   */
 
-  request->response->response_buffer->content_format = APPLICATION_JSON;
-  request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
-  request->response->response_buffer->response_length = response_length;
+  oc_send_json_response(request, OC_STATUS_OK);
 }
 
 void
@@ -339,7 +323,7 @@ oc_knx_swu_state_get_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  size_t response_length = 0;
+  // size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_JSON) {
@@ -360,10 +344,7 @@ oc_knx_swu_state_get_handler(oc_request_t *request,
   length = clf_add_line_to_buffer("}");
   response_length += length;
   */
-
-  request->response->response_buffer->content_format = APPLICATION_JSON;
-  request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
-  request->response->response_buffer->response_length = response_length;
+  oc_send_json_response(request, OC_STATUS_OK);
 }
 
 void
@@ -382,7 +363,7 @@ oc_knx_swu_update_put_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  size_t response_length = 0;
+  // size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_JSON) {
@@ -404,9 +385,7 @@ oc_knx_swu_update_put_handler(oc_request_t *request,
   response_length += length;
   */
 
-  request->response->response_buffer->content_format = APPLICATION_JSON;
-  request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
-  request->response->response_buffer->response_length = response_length;
+  oc_send_json_response(request, OC_STATUS_OK);
 }
 
 void
@@ -424,7 +403,7 @@ oc_knx_swu_pkgv_get_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  size_t response_length = 0;
+  // size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_JSON) {
@@ -446,9 +425,7 @@ oc_knx_swu_pkgv_get_handler(oc_request_t *request,
   response_length += length;
   */
 
-  request->response->response_buffer->content_format = APPLICATION_JSON;
-  request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
-  request->response->response_buffer->response_length = response_length;
+  oc_send_json_response(request, OC_STATUS_OK);
 }
 
 void
@@ -466,7 +443,7 @@ oc_knx_swu_pkgcmd_post_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  size_t response_length = 0;
+  // size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_JSON) {
@@ -488,9 +465,7 @@ oc_knx_swu_pkgcmd_post_handler(oc_request_t *request,
   response_length += length;
   */
 
-  request->response->response_buffer->content_format = APPLICATION_JSON;
-  request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
-  request->response->response_buffer->response_length = response_length;
+  oc_send_json_response(request, OC_STATUS_OK);
 }
 
 void
@@ -508,7 +483,7 @@ oc_knx_swu_bytes_get_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  size_t response_length = 0;
+  // size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_JSON) {
@@ -530,9 +505,7 @@ oc_knx_swu_bytes_get_handler(oc_request_t *request,
   response_length += length;
   */
 
-  request->response->response_buffer->content_format = APPLICATION_JSON;
-  request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
-  request->response->response_buffer->response_length = response_length;
+  oc_send_json_response(request, OC_STATUS_OK);
 }
 
 void
@@ -550,7 +523,7 @@ oc_knx_swu_pkgqurl_get_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  size_t response_length = 0;
+  // size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_JSON) {
@@ -572,9 +545,7 @@ oc_knx_swu_pkgqurl_get_handler(oc_request_t *request,
   response_length += length;
   */
 
-  request->response->response_buffer->content_format = APPLICATION_JSON;
-  request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
-  request->response->response_buffer->response_length = response_length;
+  oc_send_json_response(request, OC_STATUS_OK);
 }
 
 static void
@@ -583,7 +554,7 @@ oc_knx_swu_pkgqurl_put_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  size_t response_length = 0;
+  // size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_JSON) {
@@ -605,9 +576,7 @@ oc_knx_swu_pkgqurl_put_handler(oc_request_t *request,
   response_length += length;
   */
 
-  request->response->response_buffer->content_format = APPLICATION_JSON;
-  request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
-  request->response->response_buffer->response_length = response_length;
+  oc_send_json_response(request, OC_STATUS_OK);
 }
 
 void
@@ -626,7 +595,7 @@ oc_knx_swu_pkgnames_get_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  size_t response_length = 0;
+  // size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_CBOR) {
@@ -636,9 +605,7 @@ oc_knx_swu_pkgnames_get_handler(oc_request_t *request,
   }
   // size_t device_index = request->resource->device;
 
-  request->response->response_buffer->content_format = APPLICATION_CBOR;
-  request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
-  request->response->response_buffer->response_length = response_length;
+  oc_send_cbor_response(request, OC_STATUS_OK);
 }
 
 void
@@ -656,7 +623,7 @@ oc_knx_swu_pkg_put_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  size_t response_length = 0;
+  // size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_CBOR) {
@@ -666,9 +633,7 @@ oc_knx_swu_pkg_put_handler(oc_request_t *request,
   }
   // size_t device_index = request->resource->device;
 
-  request->response->response_buffer->content_format = APPLICATION_CBOR;
-  request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
-  request->response->response_buffer->response_length = response_length;
+  oc_send_cbor_response(request, OC_STATUS_OK);
 }
 
 void
@@ -687,30 +652,31 @@ oc_core_knx_swu_get_handler(oc_request_t *request,
   (void)data;
   (void)iface_mask;
   size_t response_length = 0;
+  int i;
+  int matches = 0;
 
   /* check if the accept header is cbor-format */
-  if (request->accept != APPLICATION_JSON) {
+  if (request->accept != APPLICATION_LINK_FORMAT) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
-  /*
-  int length = clf_add_line_to_buffer("{");
-  response_length += length;
 
-  length = clf_add_line_to_buffer("\"api\": { \"version\": \"1.0\",");
-  response_length += length;
+  size_t device_index = request->resource->device;
 
-  length = clf_add_line_to_buffer("\"base\": \"/ \"}");
-  response_length += length;
+  for (i = (int)OC_KNX_SWU_PROTOCOL; i < (int)OC_KNX_SWU; i++) {
+    oc_resource_t *resource = oc_core_get_resource_by_index(i, device_index);
+    if (oc_filter_resource(resource, request, device_index, &response_length,
+                           matches)) {
+      matches++;
+    }
+  }
 
-  length = clf_add_line_to_buffer("}");
-  response_length += length;
-  */
-
-  request->response->response_buffer->content_format = APPLICATION_JSON;
-  request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
-  request->response->response_buffer->response_length = response_length;
+  if (matches > 0) {
+    oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
+  } else {
+    oc_send_linkformat_response(request, OC_STATUS_INTERNAL_SERVER_ERROR, 0);
+  }
 }
 
 void
