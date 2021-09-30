@@ -176,7 +176,7 @@ oc_blockwise_state_t *oc_blockwise_find_response_buffer(
  * @param href the href
  * @param href_len the href length
  * @param endpoint the endpoint
- * @param method method
+ * @param method the CoAP method
  * @param role the role (clien or server)
  * @return oc_blockwise_state_t*
  */
@@ -242,7 +242,7 @@ bool oc_blockwise_handle_block(oc_blockwise_state_t *buffer,
                                uint32_t incoming_block_size);
 
 /**
- * @brief free all blocks that are handled (refcount = 0)
+ * @brief free all blocks that are handled (ref_count = 0)
  *
  * @param all : including ref count != 0
  */
@@ -251,7 +251,7 @@ void oc_blockwise_scrub_buffers(bool all);
 /**
  * @brief scrub blocks for client side
  *
- * @param cb
+ * @param cb the callback
  */
 void oc_blockwise_scrub_buffers_for_client_cb(void *cb);
 

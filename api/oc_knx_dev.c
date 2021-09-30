@@ -35,8 +35,7 @@ oc_core_dev_sn_get_handler(oc_request_t *request,
     return;
   }
   
-  size_t device_index = request->resource->device;
-
+  //size_t device_index = request->resource->device;
 
   oc_send_cbor_response(request, OC_STATUS_OK);
 }
