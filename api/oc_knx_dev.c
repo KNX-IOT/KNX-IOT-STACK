@@ -36,7 +36,7 @@ oc_core_dev_sn_get_handler(oc_request_t *request,
   }
   // size_t device_index = request->resource->device;
 
-  oc_send_cbor_response(request, oc_status_code(OC_STATUS_OK));
+  oc_send_cbor_response(request, OC_STATUS_OK);
 }
 
 void
@@ -64,7 +64,7 @@ oc_core_dev_hwv_get_handler(oc_request_t *request,
   }
   // size_t device_index = request->resource->device;
 
-  oc_send_cbor_response(request, oc_status_code(OC_STATUS_OK));
+  oc_send_cbor_response(request, OC_STATUS_OK);
 }
 
 void
@@ -91,8 +91,8 @@ oc_core_dev_fwv_get_handler(oc_request_t *request,
     return;
   }
   // size_t device_index = request->resource->device;
-
-  oc_send_cbor_response(request, oc_status_code(OC_STATUS_OK));
+  oc_send_cbor_response(request, OC_STATUS_OK);
+  ;
 }
 
 void
@@ -119,7 +119,7 @@ oc_core_dev_hwt_get_handler(oc_request_t *request,
     return;
   }
   // size_t device_index = request->resource->device;
-  oc_send_cbor_response(request, oc_status_code(OC_STATUS_OK));
+  oc_send_cbor_response(request, OC_STATUS_OK);
 }
 
 void
@@ -147,7 +147,7 @@ oc_core_dev_macaddr_get_handler(oc_request_t *request,
   }
   // size_t device_index = request->resource->device;
 
-  oc_send_cbor_response(request, oc_status_code(OC_STATUS_OK));
+  oc_send_cbor_response(request, OC_STATUS_OK);
 }
 
 void
@@ -175,7 +175,7 @@ oc_core_dev_name_get_handler(oc_request_t *request,
   }
   // size_t device_index = request->resource->device;
 
-  oc_send_cbor_response(request, oc_status_code(OC_STATUS_OK));
+  oc_send_cbor_response(request, OC_STATUS_OK);
 }
 
 void
@@ -202,7 +202,7 @@ oc_core_dev_model_get_handler(oc_request_t *request,
   }
   // size_t device_index = request->resource->device;
 
-  oc_send_cbor_response(request, oc_status_code(OC_STATUS_OK));
+  oc_send_cbor_response(request, OC_STATUS_OK);
 }
 
 void
@@ -229,7 +229,7 @@ oc_core_dev_ia_get_handler(oc_request_t *request,
   }
   // size_t device_index = request->resource->device;
 
-  oc_send_cbor_response(request, oc_status_code(OC_STATUS_OK));
+  oc_send_cbor_response(request, OC_STATUS_OK);
 }
 
 static void
@@ -247,7 +247,7 @@ oc_core_dev_ia_put_handler(oc_request_t *request,
   }
   // size_t device_index = request->resource->device;
 
-  oc_send_cbor_response(request, oc_status_code(OC_STATUS_OK));
+  oc_send_cbor_response(request, OC_STATUS_OK);
 }
 
 void
@@ -276,7 +276,7 @@ oc_core_dev_hostname_put_handler(oc_request_t *request,
   }
   // size_t device_index = request->resource->device;
 
-  oc_send_cbor_response(request, oc_status_code(OC_STATUS_OK));
+  oc_send_cbor_response(request, OC_STATUS_OK);
 }
 
 static void
@@ -295,7 +295,7 @@ oc_core_dev_hostname_get_handler(oc_request_t *request,
   }
   // size_t device_index = request->resource->device;
 
-  oc_send_cbor_response(request, oc_status_code(OC_STATUS_OK));
+  oc_send_cbor_response(request, OC_STATUS_OK);
 }
 
 void
@@ -324,7 +324,7 @@ oc_core_dev_iid_put_handler(oc_request_t *request,
   }
   // size_t device_index = request->resource->device;
 
-  oc_send_cbor_response(request, oc_status_code(OC_STATUS_OK));
+  oc_send_cbor_response(request, OC_STATUS_OK);
 }
 
 static void
@@ -343,7 +343,7 @@ oc_core_dev_iid_get_handler(oc_request_t *request,
   }
   // size_t device_index = request->resource->device;
 
-  oc_send_cbor_response(request, oc_status_code(OC_STATUS_OK));
+  oc_send_cbor_response(request, OC_STATUS_OK);
 }
 
 void

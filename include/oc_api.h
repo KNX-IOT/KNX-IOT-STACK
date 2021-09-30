@@ -1452,6 +1452,7 @@ int oc_query_value_exists(oc_request_t *request, const char *key);
 void oc_send_response(oc_request_t *request, oc_status_t response_code);
 
 void oc_send_cbor_response(oc_request_t *request, oc_status_t response_code);
+void oc_send_json_response(oc_request_t *request, oc_status_t response_code);
 void oc_send_linkformat_response(oc_request_t *request,
                                  oc_status_t response_code, size_t response_length);
 
