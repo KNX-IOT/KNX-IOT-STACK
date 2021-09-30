@@ -292,8 +292,7 @@ get_dpa_352b(oc_request_t *request, oc_interface_mask_t interfaces,
   }
   oc_rep_end_root_object();
   if (error_state == false) {
-    request->response->response_buffer->content_format = APPLICATION_CBOR;
-    oc_send_response(request, oc_status_code);
+    oc_send_cbor_response(request, oc_status_code);
   } else {
     oc_send_response(request, OC_STATUS_BAD_OPTION);
   }
@@ -349,8 +348,7 @@ get_dpa_353(oc_request_t *request, oc_interface_mask_t interfaces,
   }
   oc_rep_end_root_object();
   if (error_state == false) {
-    request->response->response_buffer->content_format = APPLICATION_CBOR;
-    oc_send_response(request, oc_status_code);
+    oc_send_cbor_response(request, oc_status_code);
   } else {
     oc_send_response(request, OC_STATUS_BAD_OPTION);
   }
@@ -419,8 +417,8 @@ post_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
       /* TODO: ACTUATOR add here the code to talk to the HW if one implements an
        actuator. one can use the global variables as input to those calls the
        global values have been updated already with the data from the request */
-      request->response->response_buffer->content_format = APPLICATION_CBOR;
-      oc_send_response(request, OC_STATUS_CHANGED);
+      
+      oc_send_cbor_response(request, OC_STATUS_OK);
     }
     }
   } else {
@@ -494,8 +492,8 @@ post_dpa_352b(oc_request_t *request, oc_interface_mask_t interfaces,
       /* TODO: ACTUATOR add here the code to talk to the HW if one implements an
        actuator. one can use the global variables as input to those calls the
        global values have been updated already with the data from the request */
-      request->response->response_buffer->content_format = APPLICATION_CBOR;
-      oc_send_response(request, OC_STATUS_CHANGED);
+
+      oc_send_cbor_response(request, OC_STATUS_CHANGED);
     }
     }
   } else {
@@ -576,9 +574,7 @@ post_dpa_353(oc_request_t *request, oc_interface_mask_t interfaces,
     PRINT("  Returning Error \n");
     /* TODO: add error response, if any */
     // oc_send_response(request, OC_STATUS_NOT_MODIFIED);
-
-    request->response->response_buffer->content_format = APPLICATION_CBOR;
-    oc_send_response(request, OC_STATUS_BAD_REQUEST);
+    oc_send_cbor_response(request, OC_STATUS_NOT_MODIFIED);
   }
   PRINT("-- End post_dpa_353b\n");
 }
@@ -658,7 +654,7 @@ register_resources(void)
 /**
  * initiate preset for device
  *
- * @param device the device indentifier of the list of devices
+ * @param device the device identifier of the list of devices
  * @param data the supplied data.
  */
 void
@@ -669,7 +665,7 @@ factory_presets_cb(size_t device, void *data)
 }
 
 /**
- * intializes the global variables
+ * initializes the global variables
  * registers and starts the handler
  */
 void
@@ -748,7 +744,7 @@ oc_ownership_status_cb(const oc_uuid_t *device_uuid, size_t device_index,
                                                                                \ \
 /**                                                                              \
  * main application.                                                             \
- * intializes the global variables                                               \
+ * initializes the global variables                                               \
  * registers and starts the handler                                              \
  * handles (in a loop) the next event.                                           \
  * shuts down the stack                                                          \
@@ -767,7 +763,7 @@ main(void)
   signal(SIGINT, handle_signal);
 #endif
 #ifdef __linux__
-  /* linux specific */
+  /* Linux specific */
   struct sigaction sa;
   sigfillset(&sa.sa_mask);
   sa.sa_flags = 0;
@@ -793,7 +789,7 @@ main(void)
   PRINT("\tstorage at './simpleserver_all_creds' \n");
   oc_storage_config("./simpleserver_all_creds");
 
-  /*intialize the variables */
+  /*initialize the variables */
   initialize_variables();
 
   /* initializes the handlers structure */
@@ -850,7 +846,7 @@ main(void)
 #endif
 
 #ifdef __linux__
-  /* linux specific loop */
+  /* Linux specific loop */
   while (quit != 1) {
     next_event = oc_main_poll();
     pthread_mutex_lock(&mutex);

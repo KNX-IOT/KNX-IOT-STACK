@@ -59,7 +59,7 @@ typedef struct oc_blockwise_state_s
   oc_string_t uri_query; ///< the query
 #ifdef OC_CLIENT
   uint8_t token[COAP_TOKEN_LEN]; ///< the token
-  uint8_t token_len;             ///< token lenght
+  uint8_t token_len;             ///< token length
   uint16_t mid;                  ///< the message id
   void *client_cb;               ///< client callback
 #endif                           /* OC_CLIENT */
@@ -81,18 +81,18 @@ typedef struct oc_blockwise_response_state_s
 } oc_blockwise_response_state_t;
 
 /**
- * @brief find the blockwise request based on mid
+ * @brief find the block wise request based on mid
  *
  * @param mid the message id
- * @return oc_blockwise_state_t* the blocktranfer
+ * @return oc_blockwise_state_t* the block transfer
  */
 oc_blockwise_state_t *oc_blockwise_find_request_buffer_by_mid(uint16_t mid);
 
 /**
- * @brief find the blockwise response based on mid
- *
+ * @brief find the block wise response based on mid
+ 
  * @param mid the message id
- * @return oc_blockwise_state_t* the blocktranfer
+ * @return oc_blockwise_state_t* the block transfer
  */
 oc_blockwise_state_t *oc_blockwise_find_response_buffer_by_mid(uint16_t mid);
 
@@ -100,8 +100,8 @@ oc_blockwise_state_t *oc_blockwise_find_response_buffer_by_mid(uint16_t mid);
  * @brief find the request by token
  *
  * @param token the token
- * @param token_len the token lenght
- * @return oc_blockwise_state_t* the blocktranfer
+ * @param token_len the token length
+ * @return oc_blockwise_state_t* the block transfer
  */
 oc_blockwise_state_t *oc_blockwise_find_request_buffer_by_token(
   uint8_t *token, uint8_t token_len);
@@ -110,8 +110,8 @@ oc_blockwise_state_t *oc_blockwise_find_request_buffer_by_token(
  * @brief find the response by token
  *
  * @param token the token
- * @param token_len the token lenght
- * @return oc_blockwise_state_t* the blocktransfer
+ * @param token_len the token length
+ * @return oc_blockwise_state_t* the block transfer
  */
 oc_blockwise_state_t *oc_blockwise_find_response_buffer_by_token(
   uint8_t *token, uint8_t token_len);
@@ -140,11 +140,11 @@ oc_blockwise_state_t *oc_blockwise_find_response_buffer_by_client_cb(
  * @brief find request buffer based on more information
  *
  * @param href the href
- * @param href_len the href lenght
+ * @param href_len the href length
  * @param endpoint the endpoint
  * @param method the method
  * @param query the query parameters
- * @param query_len the query lenght
+ * @param query_len the query length
  * @param role the role (client or server)
  * @return oc_blockwise_state_t*
  */
@@ -157,11 +157,11 @@ oc_blockwise_state_t *oc_blockwise_find_request_buffer(
  * @brief find response buffer based on more information
  *
  * @param href the href
- * @param href_len the href lenght
+ * @param href_len the href length
  * @param endpoint the endpoint
  * @param method the method
  * @param query the query parameters
- * @param query_len the query lenght
+ * @param query_len the query length
  * @param role the role (client or server)
  * @return oc_blockwise_state_t*
  */
@@ -190,8 +190,8 @@ oc_blockwise_state_t *oc_blockwise_alloc_request_buffer(
  * @param href the href
  * @param href_len the href length
  * @param endpoint the endpoint
- * @param method method
- * @param role the role (clien or server)
+ * @param method the CoAP method
+ * @param role the role (client or server)
  * @return oc_blockwise_state_t*
  */
 oc_blockwise_state_t *oc_blockwise_alloc_response_buffer(
@@ -201,14 +201,14 @@ oc_blockwise_state_t *oc_blockwise_alloc_response_buffer(
 /**
  * @brief free the request buffer
  *
- * @param buffer buffer to be freed
+ * @param buffer the buffer to be freed
  */
 void oc_blockwise_free_request_buffer(oc_blockwise_state_t *buffer);
 
 /**
  * @brief free the response buffer
  *
- * @param buffer buffer to be freed
+ * @param buffer the response buffer to be freed
  */
 void oc_blockwise_free_response_buffer(oc_blockwise_state_t *buffer);
 
@@ -217,7 +217,7 @@ void oc_blockwise_free_response_buffer(oc_blockwise_state_t *buffer);
  *
  * @param buffer the buffer (whole message)
  * @param block_offset the block offset
- * @param requested_block_size blocksize to be send
+ * @param requested_block_size block size to be send
  * @param payload_size the send payload size
  * @return const void*
  */
@@ -227,12 +227,12 @@ const void *oc_blockwise_dispatch_block(oc_blockwise_state_t *buffer,
                                         uint32_t *payload_size);
 
 /**
- * @brief handle the incomming block (partial message)
+ * @brief handle the incoming block (partial message)
  *
  * @param buffer the whole message
  * @param incoming_block_offset the block offset
- * @param incoming_block the incomming block to be added
- * @param incoming_block_size the size of the incomming block
+ * @param incoming_block the incoming block to be added
+ * @param incoming_block_size the size of the incoming block
  * @return true
  * @return false
  */
