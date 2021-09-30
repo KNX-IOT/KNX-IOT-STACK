@@ -26,7 +26,7 @@ oc_core_dev_sn_get_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  size_t response_length = 0;
+  //size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_CBOR) {
@@ -36,9 +36,7 @@ oc_core_dev_sn_get_handler(oc_request_t *request,
   }
   // size_t device_index = request->resource->device;
 
-  request->response->response_buffer->content_format = APPLICATION_CBOR;
-  request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
-  request->response->response_buffer->response_length = response_length;
+  oc_send_cbor_response(request, oc_status_code(OC_STATUS_OK));
 }
 
 void
@@ -56,7 +54,7 @@ oc_core_dev_hwv_get_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  size_t response_length = 0;
+  //size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_CBOR) {
@@ -66,9 +64,7 @@ oc_core_dev_hwv_get_handler(oc_request_t *request,
   }
   // size_t device_index = request->resource->device;
 
-  request->response->response_buffer->content_format = APPLICATION_CBOR;
-  request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
-  request->response->response_buffer->response_length = response_length;
+  oc_send_cbor_response(request, oc_status_code(OC_STATUS_OK));
 }
 
 void
@@ -86,7 +82,7 @@ oc_core_dev_fwv_get_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  size_t response_length = 0;
+  //size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_CBOR) {
@@ -96,9 +92,7 @@ oc_core_dev_fwv_get_handler(oc_request_t *request,
   }
   // size_t device_index = request->resource->device;
 
-  request->response->response_buffer->content_format = APPLICATION_CBOR;
-  request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
-  request->response->response_buffer->response_length = response_length;
+  oc_send_cbor_response(request, oc_status_code(OC_STATUS_OK));
 }
 
 void
@@ -116,7 +110,7 @@ oc_core_dev_hwt_get_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  size_t response_length = 0;
+  //size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_CBOR) {
@@ -125,10 +119,7 @@ oc_core_dev_hwt_get_handler(oc_request_t *request,
     return;
   }
   // size_t device_index = request->resource->device;
-
-  request->response->response_buffer->content_format = APPLICATION_CBOR;
-  request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
-  request->response->response_buffer->response_length = response_length;
+  oc_send_cbor_response(request, oc_status_code(OC_STATUS_OK));
 }
 
 void
@@ -146,7 +137,7 @@ oc_core_dev_macaddr_get_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  size_t response_length = 0;
+  //size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_CBOR) {
@@ -156,9 +147,7 @@ oc_core_dev_macaddr_get_handler(oc_request_t *request,
   }
   // size_t device_index = request->resource->device;
 
-  request->response->response_buffer->content_format = APPLICATION_CBOR;
-  request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
-  request->response->response_buffer->response_length = response_length;
+  oc_send_cbor_response(request, oc_status_code(OC_STATUS_OK));
 }
 
 void
@@ -176,7 +165,7 @@ oc_core_dev_name_get_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  size_t response_length = 0;
+  //size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_CBOR) {
@@ -186,9 +175,7 @@ oc_core_dev_name_get_handler(oc_request_t *request,
   }
   // size_t device_index = request->resource->device;
 
-  request->response->response_buffer->content_format = APPLICATION_CBOR;
-  request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
-  request->response->response_buffer->response_length = response_length;
+  oc_send_cbor_response(request, oc_status_code(OC_STATUS_OK));
 }
 
 void
@@ -279,7 +266,7 @@ oc_core_dev_hostname_put_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  size_t response_length = 0;
+  //size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_CBOR) {
@@ -298,7 +285,7 @@ oc_core_dev_hostname_get_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  size_t response_length = 0;
+  //size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_CBOR) {
@@ -327,7 +314,7 @@ oc_core_dev_iid_put_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  size_t response_length = 0;
+  //size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_CBOR) {
@@ -346,7 +333,7 @@ oc_core_dev_iid_get_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  size_t response_length = 0;
+  //size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_CBOR) {
