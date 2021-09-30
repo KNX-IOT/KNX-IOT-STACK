@@ -26,7 +26,7 @@ oc_core_dev_sn_get_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  //size_t response_length = 0;
+  // size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_CBOR) {
@@ -54,7 +54,7 @@ oc_core_dev_hwv_get_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  //size_t response_length = 0;
+  // size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_CBOR) {
@@ -82,7 +82,7 @@ oc_core_dev_fwv_get_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  //size_t response_length = 0;
+  // size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_CBOR) {
@@ -110,7 +110,7 @@ oc_core_dev_hwt_get_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  //size_t response_length = 0;
+  // size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_CBOR) {
@@ -137,7 +137,7 @@ oc_core_dev_macaddr_get_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  //size_t response_length = 0;
+  // size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_CBOR) {
@@ -165,7 +165,7 @@ oc_core_dev_name_get_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  //size_t response_length = 0;
+  // size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_CBOR) {
@@ -254,10 +254,10 @@ void
 oc_create_dev_ia_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_dev_ia_resource\n");
-  oc_core_populate_resource(
-    resource_idx, device, "/dev/ia", OC_IF_D, OC_IF_NONE, OC_DISCOVERABLE,
-    oc_core_dev_ia_get_handler, oc_core_dev_ia_put_handler, 0, 0, 1,
-    "urn:knx:ia");
+  oc_core_populate_resource(resource_idx, device, "/dev/ia", OC_IF_D,
+                            OC_IF_NONE, OC_DISCOVERABLE,
+                            oc_core_dev_ia_get_handler,
+                            oc_core_dev_ia_put_handler, 0, 0, 1, "urn:knx:ia");
 }
 
 static void
@@ -266,7 +266,7 @@ oc_core_dev_hostname_put_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  //size_t response_length = 0;
+  // size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_CBOR) {
@@ -285,7 +285,7 @@ oc_core_dev_hostname_get_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  //size_t response_length = 0;
+  // size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_CBOR) {
@@ -304,8 +304,8 @@ oc_create_dev_hostname_resource(int resource_idx, size_t device)
   OC_DBG("oc_create_dev_hostname_resource\n");
   oc_core_populate_resource(
     resource_idx, device, "/dev/hostname", OC_IF_D, OC_IF_NONE, OC_DISCOVERABLE,
-    oc_core_dev_hostname_get_handler, oc_core_dev_hostname_put_handler, 0, 0,
-    1, "urn:knx:dpt.a[n]");
+    oc_core_dev_hostname_get_handler, oc_core_dev_hostname_put_handler, 0, 0, 1,
+    "urn:knx:dpt.a[n]");
 }
 
 static void
@@ -314,7 +314,7 @@ oc_core_dev_iid_put_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  //size_t response_length = 0;
+  // size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_CBOR) {
@@ -333,7 +333,7 @@ oc_core_dev_iid_get_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  //size_t response_length = 0;
+  // size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_CBOR) {
@@ -385,11 +385,9 @@ oc_core_dev_dev_get_handler(oc_request_t *request,
   }
 
   if (matches > 0) {
-    oc_send_linkformat_response(request, OC_STATUS_OK,
-                                response_length);
+    oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
   } else {
-    oc_send_linkformat_response(
-      request, OC_STATUS_INTERNAL_SERVER_ERROR, 0);
+    oc_send_linkformat_response(request, OC_STATUS_INTERNAL_SERVER_ERROR, 0);
   }
 
   PRINT("oc_core_dev_dev_get_handler - end\n");

@@ -106,7 +106,6 @@ oc_send_response(oc_request_t *request, oc_status_t response_code)
   request->response->response_buffer->code = oc_status_code(response_code);
 }
 
-
 void
 oc_send_cbor_response(oc_request_t *request, oc_status_t response_code)
 {
@@ -124,13 +123,13 @@ oc_send_json_response(oc_request_t *request, oc_status_t response_code)
 }
 
 void
-oc_send_linkformat_response(oc_request_t *request, oc_status_t response_code, size_t response_length)
+oc_send_linkformat_response(oc_request_t *request, oc_status_t response_code,
+                            size_t response_length)
 {
   request->response->response_buffer->content_format = APPLICATION_LINK_FORMAT;
   request->response->response_buffer->response_length = response_length;
   request->response->response_buffer->code = oc_status_code(response_code);
 }
-
 
 void
 oc_ignore_request(oc_request_t *request)

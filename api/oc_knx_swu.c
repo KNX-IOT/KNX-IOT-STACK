@@ -26,7 +26,7 @@ oc_knx_swu_protocol_get_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  //size_t response_length = 0;
+  // size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_JSON) {
@@ -48,7 +48,6 @@ oc_knx_swu_protocol_get_handler(oc_request_t *request,
   response_length += length;
   */
 
-  
   oc_send_json_response(request, OC_STATUS_OK);
 }
 
@@ -58,7 +57,7 @@ oc_knx_swu_protocol_put_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  //size_t response_length = 0;
+  // size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_JSON) {
@@ -98,7 +97,7 @@ oc_knx_swu_maxdefer_get_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  //size_t response_length = 0;
+  // size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_JSON) {
@@ -129,7 +128,7 @@ oc_knx_swu_maxdefer_put_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  //size_t response_length = 0;
+  // size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_JSON) {
@@ -170,7 +169,7 @@ oc_knx_swu_method_get_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  //size_t response_length = 0;
+  // size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_JSON) {
@@ -201,7 +200,7 @@ oc_knx_swu_method_put_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  //size_t response_length = 0;
+  // size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_JSON) {
@@ -242,7 +241,7 @@ oc_knx_swu_lastupdate_get_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  //size_t response_length = 0;
+  // size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_JSON) {
@@ -283,7 +282,7 @@ oc_knx_swu_result_get_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  //size_t response_length = 0;
+  // size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_JSON) {
@@ -324,7 +323,7 @@ oc_knx_swu_state_get_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  //size_t response_length = 0;
+  // size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_JSON) {
@@ -364,7 +363,7 @@ oc_knx_swu_update_put_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  //size_t response_length = 0;
+  // size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_JSON) {
@@ -404,7 +403,7 @@ oc_knx_swu_pkgv_get_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  //size_t response_length = 0;
+  // size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_JSON) {
@@ -444,7 +443,7 @@ oc_knx_swu_pkgcmd_post_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  //size_t response_length = 0;
+  // size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_JSON) {
@@ -484,7 +483,7 @@ oc_knx_swu_bytes_get_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  //size_t response_length = 0;
+  // size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_JSON) {
@@ -524,7 +523,7 @@ oc_knx_swu_pkgqurl_get_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  //size_t response_length = 0;
+  // size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_JSON) {
@@ -555,7 +554,7 @@ oc_knx_swu_pkgqurl_put_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  //size_t response_length = 0;
+  // size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_JSON) {
@@ -596,7 +595,7 @@ oc_knx_swu_pkgnames_get_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  //size_t response_length = 0;
+  // size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_CBOR) {
@@ -605,9 +604,8 @@ oc_knx_swu_pkgnames_get_handler(oc_request_t *request,
     return;
   }
   // size_t device_index = request->resource->device;
-  
-  oc_send_cbor_response(request, OC_STATUS_OK);
 
+  oc_send_cbor_response(request, OC_STATUS_OK);
 }
 
 void
@@ -625,7 +623,7 @@ oc_knx_swu_pkg_put_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  //size_t response_length = 0;
+  // size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_CBOR) {

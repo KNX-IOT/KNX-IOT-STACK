@@ -577,8 +577,7 @@ post_dpa_353(oc_request_t *request, oc_interface_mask_t interfaces,
     /* TODO: add error response, if any */
     // oc_send_response(request, OC_STATUS_NOT_MODIFIED);
 
-    request->response->response_buffer->content_format =
-      APPLICATION_CBOR;
+    request->response->response_buffer->content_format = APPLICATION_CBOR;
     oc_send_response(request, OC_STATUS_BAD_REQUEST);
   }
   PRINT("-- End post_dpa_353b\n");
@@ -745,14 +744,14 @@ oc_ownership_status_cb(const oc_uuid_t *device_uuid, size_t device_index,
   oc_uuid_to_str(device_uuid, uuid, OC_UUID_LEN);
   PRINT(" oc_ownership_status_cb: DI: '%s'\n", uuid);
 }
-#endif /* OC_SECURITY * /                                                      \
-                                                                               \
-/**                                                                            \
- * main application.                                                           \
- * intializes the global variables                                             \
- * registers and starts the handler                                            \
- * handles (in a loop) the next event.                                         \
- * shuts down the stack                                                        \
+#endif /* OC_SECURITY * /                                                        \
+                                                                               \ \
+/**                                                                              \
+ * main application.                                                             \
+ * intializes the global variables                                               \
+ * registers and starts the handler                                              \
+ * handles (in a loop) the next event.                                           \
+ * shuts down the stack                                                          \
  */
 int
 main(void)
