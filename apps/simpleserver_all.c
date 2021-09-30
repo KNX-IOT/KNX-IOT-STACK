@@ -292,6 +292,7 @@ get_dpa_352b(oc_request_t *request, oc_interface_mask_t interfaces,
   }
   oc_rep_end_root_object();
   if (error_state == false) {
+    request->response->response_buffer->content_format = APPLICATION_CBOR;
     oc_send_response(request, oc_status_code);
   } else {
     oc_send_response(request, OC_STATUS_BAD_OPTION);
@@ -348,6 +349,7 @@ get_dpa_353(oc_request_t *request, oc_interface_mask_t interfaces,
   }
   oc_rep_end_root_object();
   if (error_state == false) {
+    request->response->response_buffer->content_format = APPLICATION_CBOR;
     oc_send_response(request, oc_status_code);
   } else {
     oc_send_response(request, OC_STATUS_BAD_OPTION);
@@ -417,6 +419,7 @@ post_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
       /* TODO: ACTUATOR add here the code to talk to the HW if one implements an
        actuator. one can use the global variables as input to those calls the
        global values have been updated already with the data from the request */
+      request->response->response_buffer->content_format = APPLICATION_CBOR;
       oc_send_response(request, OC_STATUS_CHANGED);
     }
     }
@@ -491,6 +494,7 @@ post_dpa_352b(oc_request_t *request, oc_interface_mask_t interfaces,
       /* TODO: ACTUATOR add here the code to talk to the HW if one implements an
        actuator. one can use the global variables as input to those calls the
        global values have been updated already with the data from the request */
+      request->response->response_buffer->content_format = APPLICATION_CBOR;
       oc_send_response(request, OC_STATUS_CHANGED);
     }
     }
@@ -572,6 +576,9 @@ post_dpa_353(oc_request_t *request, oc_interface_mask_t interfaces,
     PRINT("  Returning Error \n");
     /* TODO: add error response, if any */
     // oc_send_response(request, OC_STATUS_NOT_MODIFIED);
+
+    request->response->response_buffer->content_format =
+      APPLICATION_CBOR;
     oc_send_response(request, OC_STATUS_BAD_REQUEST);
   }
   PRINT("-- End post_dpa_353b\n");
