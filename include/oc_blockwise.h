@@ -53,10 +53,10 @@ typedef struct oc_blockwise_state_s
   void *block;
 #endif /* OC_APP_DATA_BUFFER_POOL */
   uint8_t *buffer;
-#else                    /* OC_DYNAMIC_ALLOCATION */
+#else                                      /* OC_DYNAMIC_ALLOCATION */
   uint8_t buffer[OC_MAX_APP_DATA_SIZE]; ///< the buffer
-#endif                   /* !OC_DYNAMIC_ALLOCATION */
-  oc_string_t uri_query; ///< the query
+#endif                                     /* !OC_DYNAMIC_ALLOCATION */
+  oc_string_t uri_query;                   ///< the query
   oc_content_format_t return_content_type; ///< the content type
 #ifdef OC_CLIENT
   uint8_t token[COAP_TOKEN_LEN]; ///< the token
@@ -91,7 +91,7 @@ oc_blockwise_state_t *oc_blockwise_find_request_buffer_by_mid(uint16_t mid);
 
 /**
  * @brief find the block wise response based on mid
- 
+
  * @param mid the message id
  * @return oc_blockwise_state_t* the block transfer
  */

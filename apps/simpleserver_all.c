@@ -417,7 +417,7 @@ post_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
       /* TODO: ACTUATOR add here the code to talk to the HW if one implements an
        actuator. one can use the global variables as input to those calls the
        global values have been updated already with the data from the request */
-      
+
       oc_send_cbor_response(request, OC_STATUS_OK);
     }
     }
@@ -744,7 +744,7 @@ oc_ownership_status_cb(const oc_uuid_t *device_uuid, size_t device_index,
                                                                                \ \
 /**                                                                              \
  * main application.                                                             \
- * initializes the global variables                                               \
+ * initializes the global variables                                              \
  * registers and starts the handler                                              \
  * handles (in a loop) the next event.                                           \
  * shuts down the stack                                                          \
