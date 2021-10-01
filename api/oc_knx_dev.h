@@ -25,7 +25,7 @@ extern "C" {
 
 /**
 @brief Creation of the KNX device resources.
-e.g. the /dev/* resources
+e.g. the / dev / * resources
 
 @param device index of the device to which the resource is to be created
 */

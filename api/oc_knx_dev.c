@@ -57,7 +57,7 @@ oc_core_dev_hwv_get_handler(oc_request_t *request,
   (void)iface_mask;
   // size_t response_length = 0;
 
-  /* check if the accept header is cbor-format */
+  /* check if the accept header is CBOR-format */
   if (request->accept != APPLICATION_CBOR) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
