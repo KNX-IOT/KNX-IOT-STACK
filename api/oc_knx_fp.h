@@ -26,7 +26,7 @@ extern "C" {
 /**
 @brief Creation of the KNX feature point resources.
 
-e.g. the /fp/* resources
+e.g. the / fp / * resources
 
 @param device index of the device to which the resource are to be created
 */
