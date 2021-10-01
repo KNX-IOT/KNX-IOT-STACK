@@ -26,8 +26,6 @@ extern "C" {
 /**
 @brief Creation of the KNX feature point resources.
 
-e.g. the / fp / * resources
-
 @param device index of the device to which the resource are to be created
 */
 void oc_create_knx_fp_resources(size_t device);
