@@ -365,7 +365,7 @@ oc_knx_swu_update_put_handler(oc_request_t *request,
   (void)iface_mask;
   // size_t response_length = 0;
 
-  /* check if the accept header is cbor-format */
+  /* check if the accept header is CBOR-format */
   if (request->accept != APPLICATION_JSON) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
@@ -405,7 +405,7 @@ oc_knx_swu_pkgv_get_handler(oc_request_t *request,
   (void)iface_mask;
   // size_t response_length = 0;
 
-  /* check if the accept header is cbor-format */
+  /* check if the accept header is CBOR-format */
   if (request->accept != APPLICATION_JSON) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
@@ -445,7 +445,7 @@ oc_knx_swu_pkgcmd_post_handler(oc_request_t *request,
   (void)iface_mask;
   // size_t response_length = 0;
 
-  /* check if the accept header is cbor-format */
+  /* check if the accept header is CBOR-format */
   if (request->accept != APPLICATION_JSON) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
@@ -485,7 +485,7 @@ oc_knx_swu_bytes_get_handler(oc_request_t *request,
   (void)iface_mask;
   // size_t response_length = 0;
 
-  /* check if the accept header is cbor-format */
+  /* check if the accept header is CBOR-format */
   if (request->accept != APPLICATION_JSON) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
@@ -525,7 +525,7 @@ oc_knx_swu_pkgqurl_get_handler(oc_request_t *request,
   (void)iface_mask;
   // size_t response_length = 0;
 
-  /* check if the accept header is cbor-format */
+  /* check if the accept header is CBOR-format */
   if (request->accept != APPLICATION_JSON) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
@@ -556,7 +556,7 @@ oc_knx_swu_pkgqurl_put_handler(oc_request_t *request,
   (void)iface_mask;
   // size_t response_length = 0;
 
-  /* check if the accept header is cbor-format */
+  /* check if the accept header is CBOR-format */
   if (request->accept != APPLICATION_JSON) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
@@ -597,7 +597,7 @@ oc_knx_swu_pkgnames_get_handler(oc_request_t *request,
   (void)iface_mask;
   // size_t response_length = 0;
 
-  /* check if the accept header is cbor-format */
+  /* check if the accept header is CBOR-format */
   if (request->accept != APPLICATION_CBOR) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
@@ -625,7 +625,7 @@ oc_knx_swu_pkg_put_handler(oc_request_t *request,
   (void)iface_mask;
   // size_t response_length = 0;
 
-  /* check if the accept header is cbor-format */
+  /* check if the accept header is CBOR-format */
   if (request->accept != APPLICATION_CBOR) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);

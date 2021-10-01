@@ -24,9 +24,9 @@ extern "C" {
 #endif
 
 /**
-@brief Creation of the knx software update resources.
+@brief Creation of the KNX software update resources.
 
-@param device index of the device to which the resource is to be created
+@param device index of the device to which the resources are to be created
 */
 void oc_create_knx_swu_resources(size_t device);
 

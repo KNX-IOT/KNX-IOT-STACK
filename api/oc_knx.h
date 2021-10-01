@@ -24,7 +24,7 @@ extern "C" {
 #endif
 
 /**
-@brief Creation of the knx device resources.
+@brief Creation of the KNX device resources.
 
 @param device index of the device to which the resource is to be created
 */

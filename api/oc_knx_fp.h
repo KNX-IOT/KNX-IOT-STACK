@@ -24,9 +24,9 @@ extern "C" {
 #endif
 
 /**
-@brief Creation of the knx device resources.
+@brief Creation of the KNX feature point resources.
 
-@param device index of the device to which the resource is to be created
+@param device index of the device to which the resource are to be created
 */
 void oc_create_knx_fp_resources(size_t device);
 
