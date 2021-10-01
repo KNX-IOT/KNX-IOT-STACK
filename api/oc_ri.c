@@ -1156,7 +1156,9 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
           oc_new_string(&(*response_state)->uri_query, uri_query,
                         uri_query_len);
         }
-        (*response_state)->content_type = cf;
+        // note that this should be the same as what has been set in the return.
+        // but that should be the same as the request
+        (*response_state)->return_content_type = accept;
         response_buffer.buffer = (*response_state)->buffer;
         response_buffer.buffer_size = OC_MAX_APP_DATA_SIZE;
       }

@@ -57,6 +57,7 @@ typedef struct oc_blockwise_state_s
   uint8_t buffer[OC_MAX_APP_DATA_SIZE]; ///< the buffer
 #endif                   /* !OC_DYNAMIC_ALLOCATION */
   oc_string_t uri_query; ///< the query
+  oc_content_format_t return_content_type; ///< the content type
 #ifdef OC_CLIENT
   uint8_t token[COAP_TOKEN_LEN]; ///< the token
   uint8_t token_len;             ///< token length
