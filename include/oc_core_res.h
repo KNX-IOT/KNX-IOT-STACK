@@ -130,9 +130,35 @@ oc_device_info_t *oc_core_add_device(const char *name, const char *version,
                                      const char *base, const char *serialnumber,
                                      oc_core_add_device_cb_t add_device_cb,
                                      void *data);
-
+/**
+ * @brief set the firmware version
+ * 
+ * @param device_index the device index
+ * @param major the xxx number of xxx.yyy.zzz
+ * @param minor the yyy number of xxx.yyy.zz
+ * @param minor2 the zzz number of xxx.yyy.zzz
+ * @return int error status, 0 = OK
+ */
 int oc_core_set_device_fwv(int device_index, int major, int minor, int minor2);
+
+/**
+ * @brief sets the hardware revision number
+ * 
+ * @param device_index the device index
+ * @param major the xxx number of xxx.yyy.zzz
+ * @param minor the yyy number of xxx.yyy.zz
+ * @param minor2 the zzz number of xxx.yyy.zzz
+ * @return int  error status, 0 = OK
+ */
 int oc_core_set_device_hwt(int device_index, int major, int minor, int minor2);
+
+/**
+ * @brief sets the internal address
+ * 
+ * @param device_index the device index
+ * @param ia the internal address
+ * @return int error status, 0 = OK
+ */
 int oc_core_set_device_ia(int device_index, int ia);
 
 /**
@@ -254,9 +280,9 @@ void oc_core_lf_populate_resource(
   int num_resource_types, ...);
 
 /**
- * @brief filter if the query param of the request contains the resource
+ * @brief filter if the query parameters of the request contains the resource
  * (determined by resource type "rt")
- * including wildcarts
+ * including wild carts
  *
  * @param resource the resource to look for
  * @param request the request to scan
@@ -266,9 +292,9 @@ void oc_core_lf_populate_resource(
 bool oc_filter_resource_by_rt(oc_resource_t *resource, oc_request_t *request);
 
 /**
- * @brief filter if the query param of the request contains the resource
+ * @brief filter if the query parameters of the request contains the resource
  * (determined by resource type "if")
- * including wildcarts
+ * including wild carts
  *
  * @param resource the resource to look for
  * @param request the request to scan
@@ -276,6 +302,7 @@ bool oc_filter_resource_by_rt(oc_resource_t *resource, oc_request_t *request);
  * @return false interface type of the resource is not in the request
  */
 bool oc_filter_resource_by_if(oc_resource_t *resource, oc_request_t *request);
+
 
 int oc_get_interfaces_mask(oc_interface_mask_t iface_mask);
 

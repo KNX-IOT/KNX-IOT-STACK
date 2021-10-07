@@ -33,6 +33,17 @@ extern "C" {
  */
 void oc_create_discovery_resource(int resource_idx, size_t device);
 
+/**
+ * @brief filter resource if it needs to be included in the response of a link-format response
+ * 
+ * @param resource the resource to be included
+ * @param request  the request, with all query parameters
+ * @param device_index the device index on the request is being made
+ * @param response_length the current response lenght
+ * @param matches if there are already resources addded to the response
+ * @return true resource added (as entry) to the response
+ * @return false resource not added to the response
+ */
 bool oc_filter_resource(oc_resource_t *resource, oc_request_t *request,
                         size_t device_index, size_t *response_length,
                         int matches);
