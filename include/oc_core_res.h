@@ -238,7 +238,7 @@ void oc_core_populate_resource(int core_resource, size_t device_index,
  * @param device_index the device index
  * @param uri the uri for the resource
  * @param iface_mask interfaces (as mask) to be implemented on the resource
- * @param the content type
+ * @param content_format the content type that should be listed as ct in link-format responses
  * @param properties the properties (as mask)
  * @param get_cb get callback function
  * @param put_cb put callback function
