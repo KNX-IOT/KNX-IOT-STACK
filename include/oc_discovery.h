@@ -34,8 +34,9 @@ extern "C" {
 void oc_create_discovery_resource(int resource_idx, size_t device);
 
 /**
- * @brief filter resource if it needs to be included in the response of a link-format response
- * 
+ * @brief filter resource if it needs to be included in the response of a
+ * link-format response
+ *
  * @param resource the resource to be included
  * @param request  the request, with all query parameters
  * @param device_index the device index on the request is being made

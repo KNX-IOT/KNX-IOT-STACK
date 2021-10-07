@@ -36,7 +36,7 @@ typedef enum oc_device_mode_t {
 
 /**
  * @brief checks if the device is in programming mode
- * 
+ *
  * @param device_index the device index
  * @return true in programming mode
  * @return false not in programming mode

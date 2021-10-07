@@ -132,7 +132,7 @@ oc_device_info_t *oc_core_add_device(const char *name, const char *version,
                                      void *data);
 /**
  * @brief set the firmware version
- * 
+ *
  * @param device_index the device index
  * @param major the xxx number of xxx.yyy.zzz
  * @param minor the yyy number of xxx.yyy.zz
@@ -143,7 +143,7 @@ int oc_core_set_device_fwv(int device_index, int major, int minor, int minor2);
 
 /**
  * @brief sets the hardware revision number
- * 
+ *
  * @param device_index the device index
  * @param major the xxx number of xxx.yyy.zzz
  * @param minor the yyy number of xxx.yyy.zz
@@ -154,7 +154,7 @@ int oc_core_set_device_hwt(int device_index, int major, int minor, int minor2);
 
 /**
  * @brief sets the internal address
- * 
+ *
  * @param device_index the device index
  * @param ia the internal address
  * @return int error status, 0 = OK
@@ -302,7 +302,6 @@ bool oc_filter_resource_by_rt(oc_resource_t *resource, oc_request_t *request);
  * @return false interface type of the resource is not in the request
  */
 bool oc_filter_resource_by_if(oc_resource_t *resource, oc_request_t *request);
-
 
 int oc_get_interfaces_mask(oc_interface_mask_t iface_mask);
 

@@ -282,8 +282,9 @@ typedef struct oc_request_t
   size_t _payload_len;       ///< payload size
   oc_content_format_t
     content_format; ///< content format (of the payload in the request)
-  oc_content_format_t accept; ///< accept header, e.g the format to be returned on the request
-  oc_response_t *response;    ///< pointer to the response
+  oc_content_format_t
+    accept; ///< accept header, e.g the format to be returned on the request
+  oc_response_t *response; ///< pointer to the response
 } oc_request_t;
 
 /**
