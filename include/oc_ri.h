@@ -50,7 +50,7 @@ typedef enum {
   OC_DISCOVERABLE = (1 << 0), ///< discoverable
   OC_OBSERVABLE = (1 << 1),   ///< observable
   OC_SECURE = (1 << 4),       ///< secure
-  OC_PERIODIC = (1 << 6),     ///< periodiacal update
+  OC_PERIODIC = (1 << 6),     ///< periodical update
   OC_SECURE_MCAST = (1 << 8)  ///< secure multicast (oscore)
 } oc_resource_properties_t;
 
@@ -348,6 +348,7 @@ struct oc_resource_s
   oc_string_array_t types;               ///< "rt" types of the resource
   oc_interface_mask_t interfaces;        ///< supported interfaces
   oc_interface_mask_t default_interface; ///< default interface
+  oc_content_format_t content_type  ;    ///< the content format that the resource supports, e.g. only 1 at the moment
   oc_resource_properties_t properties;   ///< properties (as bit mask)
   oc_request_handler_t get_handler;      ///< callback for GET
   oc_request_handler_t put_handler;      ///< callback for PUT

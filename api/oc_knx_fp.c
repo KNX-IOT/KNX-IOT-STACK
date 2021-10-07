@@ -44,7 +44,8 @@ void
 oc_create_fp_g_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_fp_g_resource\n");
-  oc_core_populate_resource(resource_idx, device, "/fp/g", OC_IF_D, OC_IF_NONE,
+  oc_core_lf_populate_resource(
+    resource_idx, device, "/fp/g", OC_IF_D, APPLICATION_CBOR,
                             OC_DISCOVERABLE, 0, oc_core_fp_g_post_handler, 0, 0,
                             0, 1, "urn:knx:if.c");
 }
@@ -74,7 +75,8 @@ void
 oc_create_fp_p_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_fp_p_resource\n");
-  oc_core_populate_resource(resource_idx, device, "/fp/p", OC_IF_D, OC_IF_NONE,
+  oc_core_lf_populate_resource(
+    resource_idx, device, "/fp/p", OC_IF_D, APPLICATION_CBOR,
                             OC_DISCOVERABLE, 0, oc_core_fp_p_post_handler, 0, 0,
                             0, 1, "urn:knx:if.c");
 }
@@ -104,7 +106,8 @@ void
 oc_create_fp_r_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_fp_r_resource\n");
-  oc_core_populate_resource(resource_idx, device, "/fp/r", OC_IF_D, OC_IF_NONE,
+  oc_core_lf_populate_resource(
+    resource_idx, device, "/fp/r", OC_IF_D, APPLICATION_CBOR,
                             OC_DISCOVERABLE, 0, oc_core_fp_r_post_handler, 0, 0,
                             0, 1, "urn:knx:if.c");
 }
@@ -179,7 +182,8 @@ static void
 oc_create_p_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_p_resource\n");
-  oc_core_populate_resource(resource_idx, device, "/p", OC_IF_LL, OC_IF_NONE,
+  oc_core_lf_populate_resource(
+    resource_idx, device, "/p", OC_IF_LL, APPLICATION_CBOR,
                             OC_DISCOVERABLE, oc_core_p_get_handler, 0,
                             oc_core_p_post_handler, 0, 1, "urn:knx:if.c");
 }
@@ -189,7 +193,7 @@ void
 oc_create_fp_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_fp_resource\n");
-  oc_core_populate_resource(resource_idx, device, "/fp", OC_IF_LL, OC_IF_NONE,
+  oc_core_lf_populate_resource(resource_idx, device, "/fp", OC_IF_LL, APPLICATION_LINK_FORMAT,
                             OC_DISCOVERABLE, oc_core_p_get_handler, 0,
                             oc_core_p_post_handler, 0, 1, "urn:knx:if.c");
 }

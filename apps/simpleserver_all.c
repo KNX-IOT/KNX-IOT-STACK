@@ -148,8 +148,14 @@ app_init(void)
   oc_device_info_t *device = oc_core_get_device_info(0);
   PRINT("Serial Number: %s\n", oc_string(device->serialnumber));
 
-  oc_core_set_device_hwt(0, "123456");
+  /* set the hardware type*/
+  oc_core_set_device_hwt(0, 5, 6, 7);
 
+  
+  /* set the firmware version*/
+  oc_core_set_device_fwv(0, 1, 2, 3);
+
+  /* set the serial number */
   oc_core_set_device_ia(0, 5);
 
   oc_device_mode_display(0);
@@ -159,7 +165,7 @@ app_init(void)
 
 /**
  * helper function to check if the POST input document contains
- * the common readOnly properties or the resouce readOnly properties
+ * the common readOnly properties or the resource readOnly properties
  * @param name the name of the property
  * @param error_state the current (input) error state
  * @return the error_status, e.g. if error_status is true, then the input
@@ -188,9 +194,9 @@ check_on_readonly_common_resource_properties(oc_string_t name, bool error_state)
 }
 
 /**
- * get method for "/a" resource.
- * function is called to intialize the return values of the GET method.
- * initialisation of the returned values are done from the global property
+ * get method for "/p/a" resource.
+ * function is called to initialize the return values of the GET method.
+ * initialization of the returned values are done from the global property
  * values. Resource Description: This Resource describes a binary switch
  * (on/off). The Property "value" is a boolean. A value of 'true' means that the
  * switch is on. A value of 'false' means that the switch is off.
@@ -213,30 +219,28 @@ get_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
   int oc_status_code = OC_STATUS_OK;
 
   PRINT("-- Begin get_dpa_352: interface %d\n", interfaces);
-  oc_rep_start_root_object();
-  switch (interfaces) {
-  case OC_IF_BASELINE:
-    PRINT("   Adding Baseline info\n");
-    oc_process_baseline_interface(request->resource);
-
-    /* property (boolean) 'value' */
-    //   oc_rep_set_boolean(root, value, g_binaryswitch_value);
-    //   PRINT("   %s : %s\n", g_binaryswitch_RESOURCE_PROPERTY_NAME_value,
-    //          (char *)btoa(g_binaryswitch_value));
-    break;
-  case OC_IF_A:
-
-    /* property (boolean) 'value' */
-    //   oc_rep_set_boolean(root, value, g_binaryswitch_value);
-    //   PRINT("   %s : %s\n", g_binaryswitch_RESOURCE_PROPERTY_NAME_value,
-    //         (char *)btoa(g_binaryswitch_value));
-    break;
-  default:
-    break;
+  /* check if the accept header is CBOR */
+  if (request->accept != APPLICATION_CBOR) {
+    oc_send_response(request, OC_STATUS_BAD_OPTION);
+    return;
   }
-  oc_rep_end_root_object();
+
+  CborError error;
+  error = cbor_encode_boolean(&g_encoder, true);
+  if (error) {
+    PRINT("CBOR error %s\n", cbor_error_string(error));
+    //oc_status_code = true;
+  }
+  PRINT("CBOR encoder size %d\n", oc_rep_get_encoded_payload_size());
+  error = cbor_encode_boolean(&g_encoder, false);
+  if (error) {
+    PRINT("CBOR error %s\n", cbor_error_string(error));
+    //oc_status_code = true;
+  }
+  PRINT("CBOR encoder size %d\n", oc_rep_get_encoded_payload_size());
+
   if (error_state == false) {
-    oc_send_response(request, oc_status_code);
+    oc_send_cbor_response(request, oc_status_code);
   } else {
     oc_send_response(request, OC_STATUS_BAD_OPTION);
   }
@@ -245,8 +249,8 @@ get_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
 
 /**
  * get method for "/b" resource.
- * function is called to intialize the return values of the GET method.
- * initialisation of the returned values are done from the global property
+ * function is called to initialize the return values of the GET method.
+ * initialization of the returned values are done from the global property
  * values. Resource Description: This Resource describes a binary switch
  * (on/off). The Property "value" is a boolean. A value of 'true' means that the
  * switch is on. A value of 'false' means that the switch is off.
@@ -269,28 +273,30 @@ get_dpa_352b(oc_request_t *request, oc_interface_mask_t interfaces,
   int oc_status_code = OC_STATUS_OK;
 
   PRINT("-- Begin get_dpa_352b: interface %d\n", interfaces);
-  oc_rep_start_root_object();
-  switch (interfaces) {
-  case OC_IF_BASELINE:
-    PRINT("   Adding Baseline info\n");
-    oc_process_baseline_interface(request->resource);
-
-    /* property (boolean) 'value' */
-    //   oc_rep_set_boolean(root, value, g_binaryswitch_value);
-    //   PRINT("   %s : %s\n", g_binaryswitch_RESOURCE_PROPERTY_NAME_value,
-    //          (char *)btoa(g_binaryswitch_value));
-    break;
-  case OC_IF_A:
-
-    /* property (boolean) 'value' */
-    //   oc_rep_set_boolean(root, value, g_binaryswitch_value);
-    //   PRINT("   %s : %s\n", g_binaryswitch_RESOURCE_PROPERTY_NAME_value,
-    //         (char *)btoa(g_binaryswitch_value));
-    break;
-  default:
-    break;
+  /* check if the accept header is CBOR */
+  if (request->accept != APPLICATION_CBOR) {
+    oc_send_response(request, OC_STATUS_BAD_OPTION);
+    return;
   }
-  oc_rep_end_root_object();
+
+  // set a string value
+  CborError error;
+  error = cbor_encode_text_stringz(&g_encoder, "blahblah");
+  if (error) {
+    PRINT("CBOR error %s\n", cbor_error_string(error));
+    //oc_status_code = true;
+  }
+  PRINT("CBOR encoder size %d\n", oc_rep_get_encoded_payload_size());
+  error = cbor_encode_text_string(&g_encoder, "xyzxyz",3);
+  if (error) {
+    PRINT("CBOR error %s\n", cbor_error_string(error));
+    //oc_status_code = true;
+  }
+  PRINT("CBOR encoder size %d\n",oc_rep_get_encoded_payload_size());
+
+
+  //oc_rep_start_root_object();
+  //oc_rep_end_root_object();
   if (error_state == false) {
     oc_send_cbor_response(request, oc_status_code);
   } else {
@@ -300,9 +306,9 @@ get_dpa_352b(oc_request_t *request, oc_interface_mask_t interfaces,
 }
 
 /**
- * get method for "/c" resource.
- * function is called to intialize the return values of the GET method.
- * initialisation of the returned values are done from the global property
+ * get method for "/p/c" resource.
+ * function is called to initialize the return values of the GET method.
+ * initialization of the returned values are done from the global property
  * values. Resource Description: This Resource describes a binary switch
  * (on/off). The Property "value" is a boolean. A value of 'true' means that the
  * switch is on. A value of 'false' means that the switch is off.
@@ -325,28 +331,29 @@ get_dpa_353(oc_request_t *request, oc_interface_mask_t interfaces,
   int oc_status_code = OC_STATUS_OK;
 
   PRINT("-- Begin get_dpa_353: interface %d\n", interfaces);
-  oc_rep_start_root_object();
-  switch (interfaces) {
-  case OC_IF_BASELINE:
-    PRINT("   Adding Baseline info\n");
-    oc_process_baseline_interface(request->resource);
 
-    /* property (boolean) 'value' */
-    //   oc_rep_set_boolean(root, value, g_binaryswitch_value);
-    //   PRINT("   %s : %s\n", g_binaryswitch_RESOURCE_PROPERTY_NAME_value,
-    //          (char *)btoa(g_binaryswitch_value));
-    break;
-  case OC_IF_A:
-
-    /* property (boolean) 'value' */
-    //   oc_rep_set_boolean(root, value, g_binaryswitch_value);
-    //   PRINT("   %s : %s\n", g_binaryswitch_RESOURCE_PROPERTY_NAME_value,
-    //         (char *)btoa(g_binaryswitch_value));
-    break;
-  default:
-    break;
+  /* check if the accept header is CBOR */
+  if (request->accept != APPLICATION_CBOR) {
+    PRINT(" accept %d", request->accept);
+    oc_send_response(request, OC_STATUS_BAD_OPTION);
+    return;
   }
-  oc_rep_end_root_object();
+
+  //oc_rep_start_root_object();
+  //oc_rep_end_root_object();
+  CborError error;
+  error = cbor_encode_int(&g_encoder, (int64_t)555);
+  if (error) {
+    PRINT("CBOR error %s\n", cbor_error_string(error));
+    //oc_status_code = true;
+  }
+  PRINT("CBOR encoder size %d\n", oc_rep_get_encoded_payload_size());
+  error = cbor_encode_int(&g_encoder, (int64_t)666);
+  if (error) {
+    PRINT("CBOR error %s\n", cbor_error_string(error));
+    //oc_status_code = true;
+  }
+  PRINT("CBOR encoder size %d\n", oc_rep_get_encoded_payload_size());
   if (error_state == false) {
     oc_send_cbor_response(request, oc_status_code);
   } else {
@@ -356,7 +363,7 @@ get_dpa_353(oc_request_t *request, oc_interface_mask_t interfaces,
 }
 
 /**
- * post method for "/a" resource.
+ * post method for "/p/a" resource.
  * The function has as input the request body, which are the input values of the
  POST method.
  * The input values (as a set) are checked if all supplied values are correct.
@@ -431,7 +438,7 @@ post_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
 }
 
 /**
- * post method for "/b" resource.
+ * post method for "/p/b" resource.
  * The function has as input the request body, which are the input values of the
  POST method.
  * The input values (as a set) are checked if all supplied values are correct.
@@ -506,7 +513,7 @@ post_dpa_352b(oc_request_t *request, oc_interface_mask_t interfaces,
 }
 
 /**
- * post method for "/b" resource.
+ * post method for "/p/b" resource.
  * The function has as input the request body, which are the input values of the
  POST method.
  * The input values (as a set) are checked if all supplied values are correct.
@@ -596,9 +603,10 @@ void
 register_resources(void)
 {
 
-  PRINT("Register Resource with local path \"/a\"\n");
-  oc_resource_t *res_352 = oc_new_resource("myname", "a", 1, 0);
+  PRINT("Register Resource with local path \"/p/a\"\n");
+  oc_resource_t *res_352 = oc_new_resource("myname", "p/a", 1, 0);
   oc_resource_bind_resource_type(res_352, "urn:knx:dpa.352.51");
+  oc_resource_bind_content_type(res_352, APPLICATION_CBOR);
   oc_resource_bind_resource_interface(res_352, OC_IF_AC); /* if.a */
   oc_resource_set_discoverable(res_352, true);
   /* periodic observable
@@ -614,9 +622,10 @@ register_resources(void)
   oc_resource_set_request_handler(res_352, OC_POST, post_dpa_352, NULL);
   oc_add_resource(res_352);
 
-  PRINT("Register Resource with local path \"/b\"\n");
-  oc_resource_t *res_352b = oc_new_resource("myname_b", "b", 1, 0);
+  PRINT("Register Resource with local path \"/p/b\"\n");
+  oc_resource_t *res_352b = oc_new_resource("myname_b", "p/b", 1, 0);
   oc_resource_bind_resource_type(res_352b, "urn:knx:dpa.352.52");
+  oc_resource_bind_content_type(res_352b, APPLICATION_CBOR);
   oc_resource_bind_resource_interface(res_352b, OC_IF_SE); /* if.s */
   oc_resource_set_discoverable(res_352b, true);
   /* periodic observable
@@ -632,9 +641,10 @@ register_resources(void)
   oc_resource_set_request_handler(res_352b, OC_POST, post_dpa_352b, NULL);
   oc_add_resource(res_352b);
 
-  PRINT("Register Resource with local path \"/c\"\n");
-  oc_resource_t *res_353 = oc_new_resource("myname_c", "c", 1, 0);
+  PRINT("Register Resource with local path \"/p/c\"\n");
+  oc_resource_t *res_353 = oc_new_resource("myname_c", "p/c", 1, 0);
   oc_resource_bind_resource_type(res_353, "urn:knx:dpa.353.52");
+  oc_resource_bind_content_type(res_353, APPLICATION_CBOR);
   oc_resource_bind_resource_interface(res_353, OC_IF_SE); /* if.s */
   oc_resource_set_discoverable(res_353, true);
   /* periodic observable

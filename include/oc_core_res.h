@@ -53,6 +53,17 @@ typedef struct oc_platform_info_t
 } oc_platform_info_t;
 
 /**
+ 
+ */
+typedef struct oc_knx_version_info_t
+{
+  int major;   ///< major version number
+  int minor;   ///< minor version number
+  int third;   ///< third version number
+} oc_knx_version_info_t;
+
+
+/**
  * @brief device information
  *
  */
@@ -63,7 +74,8 @@ typedef struct oc_device_info_t
   oc_string_t name;             ///< name of the device
   oc_string_t icv;              ///< specification version
   oc_string_t dmv;              ///< data model version
-  oc_string_t hwt;              ///< knx hwt
+  oc_knx_version_info_t hwt;    ///< knx hardware type
+  oc_knx_version_info_t fwv;    ///< fwv firmware version number
   oc_string_t serialnumber;     ///< knx serial number
   oc_device_mode_t device_mode; ///< device mode (programming, normal operation)
   int individual_address; ///< the individual address of the device, 0 == not
@@ -120,8 +132,9 @@ oc_device_info_t *oc_core_add_device(const char *name, const char *version,
                                      oc_core_add_device_cb_t add_device_cb,
                                      void *data);
 
-int oc_core_set_device_hwt(int device_index, const char *hwt);
 
+int oc_core_set_device_fwv(int device_index, int major, int minor, int minor2);
+int oc_core_set_device_hwt(int device_index, int major, int minor, int minor2);
 int oc_core_set_device_ia(int device_index, int ia);
 
 /**
@@ -210,6 +223,34 @@ void oc_store_uri(const char *s_uri, oc_string_t *d_uri);
 void oc_core_populate_resource(int core_resource, size_t device_index,
                                const char *uri, oc_interface_mask_t iface_mask,
                                oc_interface_mask_t default_interface,
+                               int properties, oc_request_callback_t get_cb,
+                               oc_request_callback_t put_cb,
+                               oc_request_callback_t post_cb,
+                               oc_request_callback_t delete_cb,
+                               int num_resource_types, ...);
+
+
+/**
+ * @brief populate resource for link-format responses
+ * mainly used for creation of core resources
+ *
+ * @param core_resource the resource index
+ * @param device_index the device index
+ * @param uri the uri for the resource
+ * @param iface_mask interfaces (as mask) to be implemented on the resource
+ * @param the content type
+ * @param properties the properties (as mask)
+ * @param get_cb get callback function
+ * @param put_cb put callback function
+ * @param post_cb post callback function
+ * @param delete_cb delete callback function
+ * @param num_resource_types amount of resource types, listed as variable
+ * arguments after this argument
+ * @param ...
+ */
+void oc_core_lf_populate_resource(int core_resource, size_t device_index,
+                               const char *uri, oc_interface_mask_t iface_mask, 
+                               oc_content_format_t content_format,
                                int properties, oc_request_callback_t get_cb,
                                oc_request_callback_t put_cb,
                                oc_request_callback_t post_cb,

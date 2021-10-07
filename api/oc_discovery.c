@@ -43,20 +43,6 @@
 #include "security/oc_tls.h"
 #endif
 
-static int
-clf_add_line_to_buffer(const char *line)
-{
-  int len = (int)strlen(line);
-  oc_rep_encode_raw((uint8_t *)line, len);
-  return len;
-}
-
-static int
-clf_add_line_size_to_buffer(const char *line, int len)
-{
-  oc_rep_encode_raw((uint8_t *)line, len);
-  return len;
-}
 
 bool
 oc_filter_resource(oc_resource_t *resource, oc_request_t *request,
@@ -78,11 +64,11 @@ oc_filter_resource(oc_resource_t *resource, oc_request_t *request,
   }
 
   if (matches > 0) {
-    length = clf_add_line_to_buffer(",\n");
+    length = oc_rep_add_line_to_buffer(",\n");
     *response_length += length;
   }
 
-  length = clf_add_line_to_buffer("<");
+  length = oc_rep_add_line_to_buffer("<");
   *response_length += length;
 
   oc_endpoint_t *eps = oc_connectivity_get_endpoints(request->resource->device);
@@ -95,7 +81,7 @@ oc_filter_resource(oc_resource_t *resource, oc_request_t *request,
     if ((eps->flags & SECURED) == 0) {
 #endif /* OC_SECURITY */
       if (oc_endpoint_to_string(eps, &ep) == 0) {
-        length = clf_add_line_to_buffer(oc_string(ep));
+        length = oc_rep_add_line_to_buffer(oc_string(ep));
         *response_length += length;
         oc_free_string(&ep);
         break;
@@ -104,10 +90,10 @@ oc_filter_resource(oc_resource_t *resource, oc_request_t *request,
     eps = eps->next;
   }
 
-  length = clf_add_line_to_buffer(oc_string(resource->uri));
+  length = oc_rep_add_line_to_buffer(oc_string(resource->uri));
   *response_length += length;
 
-  length = clf_add_line_to_buffer(">;");
+  length = oc_rep_add_line_to_buffer(">;");
   *response_length += length;
 
   int i;
@@ -115,7 +101,7 @@ oc_filter_resource(oc_resource_t *resource, oc_request_t *request,
     (int)oc_string_array_get_allocated_size(resource->types);
 
   if (numberofresourcetypes > 0) {
-    length = clf_add_line_to_buffer("rt=\"");
+    length = oc_rep_add_line_to_buffer("rt=\"");
     *response_length += length;
 
     for (i = 0; i < numberofresourcetypes; i++) {
@@ -123,25 +109,31 @@ oc_filter_resource(oc_resource_t *resource, oc_request_t *request,
       const char *t =
         (const char *)oc_string_array_get_item(resource->types, i);
       if (size > 0) {
-        length = clf_add_line_size_to_buffer(t, size);
+        length = oc_rep_add_line_size_to_buffer(t, size);
         *response_length += length;
       }
     }
 
-    length = clf_add_line_to_buffer("\";");
+    length = oc_rep_add_line_to_buffer("\";");
     *response_length += length;
   }
 
-  length = clf_add_line_to_buffer("if=");
+  length = oc_rep_add_line_to_buffer("if=");
   *response_length += length;
   length = oc_get_interfaces_mask(resource->interfaces);
   *response_length += length;
 
-  length = clf_add_line_to_buffer(";");
+  length = oc_rep_add_line_to_buffer(";");
   *response_length += length;
 
-  length = clf_add_line_to_buffer("ct=50");
-  *response_length += length;
+  if (resource->content_type) {
+    length = oc_rep_add_line_to_buffer("ct=");
+    *response_length += length;
+    char my_ct_value[5];
+    sprintf(&my_ct_value,"%d", resource->content_type);
+    length = oc_rep_add_line_to_buffer(my_ct_value);
+    *response_length += length;
+  }
 
   return true;
 }
@@ -577,9 +569,9 @@ oc_wkcore_discovery_handler(oc_request_t *request,
     // add only the serial number when the interface is if.pm && device is in
     // programming mode
     if (if_len == 13 && strncmp(if_request, "urn:knx:if.pm", 13) == 0) {
-      int size = clf_add_line_to_buffer("<>;ep=urn:knx:sn.");
+      int size = oc_rep_add_line_to_buffer("<>;ep=urn:knx:sn.");
       response_length = response_length + size;
-      size = clf_add_line_to_buffer(oc_string(device->serialnumber));
+      size = oc_rep_add_line_to_buffer(oc_string(device->serialnumber));
       response_length = response_length + size;
       matches = 1;
     }
@@ -601,9 +593,9 @@ oc_wkcore_discovery_handler(oc_request_t *request,
     }
     if (frame_ep) {
       /* return <>; ep=”urn:knx:sn.<serial-number>”*/
-      int size = clf_add_line_to_buffer("<>;ep=urn:knx:sn.");
+      int size = oc_rep_add_line_to_buffer("<>;ep=urn:knx:sn.");
       response_length = response_length + size;
-      size = clf_add_line_to_buffer(oc_string(device->serialnumber));
+      size = oc_rep_add_line_to_buffer(oc_string(device->serialnumber));
       response_length = response_length + size;
       matches = 1;
     }
@@ -634,9 +626,10 @@ oc_create_discovery_resource(int resource_idx, size_t device)
 #ifdef OC_SERVER
   if (resource_idx == WELLKNOWNCORE) {
 
-    oc_core_populate_resource(resource_idx, device, "/.well-known/core", 0, 0,
-                              OC_DISCOVERABLE, oc_wkcore_discovery_handler, 0,
-                              0, 0, 1, "wk");
+    oc_core_lf_populate_resource(resource_idx, device, "/.well-known/core", 0,
+                                 APPLICATION_LINK_FORMAT,
+                                 OC_DISCOVERABLE, oc_wkcore_discovery_handler, 0,
+                                 0, 0, 1, "wk");
 
     return;
   }
