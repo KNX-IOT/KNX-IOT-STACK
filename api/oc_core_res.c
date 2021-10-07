@@ -456,7 +456,8 @@ oc_core_set_device_ia(int device_index, int ia)
 }
 
 int
-oc_core_set_device_hwt(int device_index, const char *hardwaretype) {
+oc_core_set_device_hwt(int device_index, const char *hardwaretype)
+{
 
   oc_new_string(&oc_device_info[device_index].hwt, hardwaretype,
                 strlen(hardwaretype));
@@ -478,12 +479,10 @@ int
 oc_core_set_device_model(int device_index, const char *model)
 {
 
-  oc_new_string(&oc_device_info[device_index].model, model,
-                strlen(model));
+  oc_new_string(&oc_device_info[device_index].model, model, strlen(model));
 
   return 0;
 }
-
 
 int
 oc_core_set_device_hostname(int device_index, const char *hostname)

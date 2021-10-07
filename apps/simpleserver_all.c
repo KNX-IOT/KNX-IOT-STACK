@@ -166,14 +166,12 @@ app_init(void)
   /* set the model */
   oc_core_set_device_model(0, "my model");
 
-  
   /* set the hostname */
   oc_core_set_device_hostname(0, "my.hostname");
 
   /* set the iid */
   oc_core_set_device_iid(0, "my installation");
 
-  
   /* set the internal address */
   oc_core_set_device_ia(0, 5);
 

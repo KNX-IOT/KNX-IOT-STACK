@@ -52,8 +52,7 @@ oc_create_dev_sn_resource(int resource_idx, size_t device)
   OC_DBG("oc_create_dev_sn_resource\n");
   oc_core_lf_populate_resource(
     resource_idx, device, "/dev/sn", OC_IF_D, APPLICATION_CBOR, OC_DISCOVERABLE,
-    oc_core_dev_sn_get_handler, 0, 0, 0, 1,
-    "urn:knx:dpt.a[n]");
+    oc_core_dev_sn_get_handler, 0, 0, 0, 1, "urn:knx:dpt.a[n]");
 }
 
 static void
@@ -297,9 +296,9 @@ oc_core_dev_ia_get_handler(oc_request_t *request,
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device != NULL) {
 
-    //CborError error;
+    // CborError error;
     cbor_encode_int(&g_encoder, (int64_t)device->ia);
-    //if (error) {
+    // if (error) {
     //  PRINT("CBOR error %s\n", cbor_error_string(error));
     //}
     oc_send_cbor_response(request, OC_STATUS_OK);
