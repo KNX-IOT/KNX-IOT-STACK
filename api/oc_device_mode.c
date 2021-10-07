@@ -59,8 +59,8 @@ oc_device_mode_set_mode(int device_index, oc_device_mode_t mode)
     return -1;
   }
 
-  if (mode != OC_PROGRAMMING_MODE && device->individual_address == 0) {
-    OC_DBG("oc_device_mode_set_mode: individual adress = 0, which means that "
+  if (mode != OC_PROGRAMMING_MODE && device->ia == 0) {
+    OC_DBG("oc_device_mode_set_mode: individual address = 0, which means that "
            "it is not set");
     return -1;
   }

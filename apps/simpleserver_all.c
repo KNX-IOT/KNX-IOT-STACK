@@ -148,13 +148,33 @@ app_init(void)
   oc_device_info_t *device = oc_core_get_device_info(0);
   PRINT("Serial Number: %s\n", oc_string(device->serialnumber));
 
-  /* set the hardware type*/
-  oc_core_set_device_hwt(0, 5, 6, 7);
+  /* set the hardware version*/
+  oc_core_set_device_hwv(0, 5, 6, 7);
 
   /* set the firmware version*/
   oc_core_set_device_fwv(0, 1, 2, 3);
 
   /* set the serial number */
+  oc_core_set_device_ia(0, 5);
+
+  /* set the hardware type*/
+  oc_core_set_device_hwt(0, "hwt-mytype");
+
+  /* set the mac address */
+  oc_core_set_device_macaddr(0, "macaddr");
+
+  /* set the model */
+  oc_core_set_device_model(0, "my model");
+
+  
+  /* set the hostname */
+  oc_core_set_device_hostname(0, "my.hostname");
+
+  /* set the idd */
+  oc_core_set_device_idd(0, "my installation");
+
+  
+  /* set the internal address */
   oc_core_set_device_ia(0, 5);
 
   oc_device_mode_display(0);
