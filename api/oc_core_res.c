@@ -83,7 +83,6 @@ oc_core_free_device_info_properties(oc_device_info_t *oc_device_info_item)
     oc_free_string(&(oc_device_info_item->icv));
     oc_free_string(&(oc_device_info_item->dmv));
     // KNX
-    oc_free_string(&(oc_device_info_item->hwt));
     oc_free_string(&(oc_device_info_item->serialnumber));
   }
 }
