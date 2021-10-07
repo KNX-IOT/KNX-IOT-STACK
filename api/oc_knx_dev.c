@@ -297,11 +297,11 @@ oc_core_dev_ia_get_handler(oc_request_t *request,
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device != NULL) {
 
-    CborError error;
-    error = cbor_encode_int(&g_encoder, (int64_t)device->ia);
-    if (error) {
-      PRINT("CBOR error %s\n", cbor_error_string(error));
-    }
+    //CborError error;
+    cbor_encode_int(&g_encoder, (int64_t)device->ia);
+    //if (error) {
+    //  PRINT("CBOR error %s\n", cbor_error_string(error));
+    //}
     oc_send_cbor_response(request, OC_STATUS_OK);
     return;
   }
