@@ -34,6 +34,13 @@ typedef enum oc_device_mode_t {
   OC_NORMAL_OPERATION      ///< device is in normal operation
 } oc_device_mode_t;
 
+/**
+ * @brief checks if the device is in programming mode
+ *
+ * @param device_index the device index
+ * @return true in programming mode
+ * @return false not in programming mode
+ */
 bool is_device_in_programming_mode(int device_index);
 
 #ifdef __cplusplus

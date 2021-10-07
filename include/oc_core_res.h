@@ -68,17 +68,23 @@ typedef struct oc_knx_version_info_t
  */
 typedef struct oc_device_info_t
 {
-  oc_uuid_t di;                 ///< device indentifier
-  oc_uuid_t piid;               ///< Permanent Immutable ID
-  oc_string_t name;             ///< name of the device
-  oc_string_t icv;              ///< specification version
-  oc_string_t dmv;              ///< data model version
-  oc_knx_version_info_t hwt;    ///< knx hardware type
-  oc_knx_version_info_t fwv;    ///< fwv firmware version number
-  oc_string_t serialnumber;     ///< knx serial number
+  oc_uuid_t di;     ///< device indentifier
+  oc_uuid_t piid;   ///< Permanent Immutable ID
+  oc_string_t name; ///< name of the device
+  oc_string_t icv;  ///< specification version
+  oc_string_t dmv;  ///< data model version
+
+  oc_string_t serialnumber;  ///< knx serial number
+  oc_knx_version_info_t hwv; ///< knx hardware version
+  oc_knx_version_info_t fwv; ///< fwv firmware version number
+  oc_string_t hwt;           ///< knx hardware type
+  oc_string_t macaddr;       ///< knx macaddr
+  oc_string_t model;         ///< knx model
+  int ia;                    ///< knx ia Device individual address
+  oc_string_t hostname;      ///< knx hostname
+  oc_string_t iid;           ///< knx idd (installation id)
+
   oc_device_mode_t device_mode; ///< device mode (programming, normal operation)
-  int individual_address; ///< the individual address of the device, 0 == not
-                          ///< assigned
   oc_core_add_device_cb_t add_device_cb; ///< callback when device is changed
   void *data;                            ///< user data
 } oc_device_info_t;
@@ -108,7 +114,7 @@ oc_platform_info_t *oc_core_init_platform(const char *mfg_name,
                                           void *data);
 
 /**
- * @brief Add new devide to the platform
+ * @brief Add new device to the platform
  *
  * @param uri the uri of the device
  * @param rt the device type of the device
@@ -130,10 +136,81 @@ oc_device_info_t *oc_core_add_device(const char *name, const char *version,
                                      const char *base, const char *serialnumber,
                                      oc_core_add_device_cb_t add_device_cb,
                                      void *data);
-
+/**
+ * @brief set the firmware version
+ *
+ * @param device_index the device index
+ * @param major the xxx number of xxx.yyy.zzz
+ * @param minor the yyy number of xxx.yyy.zz
+ * @param minor2 the zzz number of xxx.yyy.zzz
+ * @return int error status, 0 = OK
+ */
 int oc_core_set_device_fwv(int device_index, int major, int minor, int minor2);
-int oc_core_set_device_hwt(int device_index, int major, int minor, int minor2);
+
+/**
+ * @brief sets the hardware version number
+ *
+ * @param device_index the device index
+ * @param major the xxx number of xxx.yyy.zzz
+ * @param minor the yyy number of xxx.yyy.zz
+ * @param minor2 the zzz number of xxx.yyy.zzz
+ * @return int  error status, 0 = OK
+ */
+int oc_core_set_device_hwv(int device_index, int major, int minor, int minor2);
+
+/**
+ * @brief sets the internal address
+ *
+ * @param device_index the device index
+ * @param ia the internal address
+ * @return int error status, 0 = OK
+ */
 int oc_core_set_device_ia(int device_index, int ia);
+
+/**
+ * @brief sets the hardware type (string)
+ *
+ * @param device_index the device index
+ * @param hardwaretype the hardware type
+ * @return int error status, 0 = OK
+ */
+int oc_core_set_device_hwt(int device_index, const char *hardwaretype);
+
+/**
+ * @brief sets the macaddres (string)
+ *
+ * @param device_index the device index
+ * @param macaddr the mac address
+ * @return int error status, 0 = OK
+ */
+int oc_core_set_device_macaddr(int device_index, const char *macaddr);
+
+/**
+ * @brief sets the model (string)
+ *
+ * @param device_index the device index
+ * @param model the device model
+ * @return int error status, 0 = OK
+ */
+int oc_core_set_device_model(int device_index, const char *model);
+
+/**
+ * @brief sets the hostname (string)
+ *
+ * @param device_index the device index
+ * @param hostname the hostname
+ * @return int error status, 0 = OK
+ */
+int oc_core_set_device_hostname(int device_index, const char *hostname);
+
+/**
+ * @brief sets the iid (string)
+ *
+ * @param device_index the device index
+ * @param iid the knx installation id
+ * @return int error status, 0 = OK
+ */
+int oc_core_set_device_iid(int device_index, const char *iid);
 
 /**
  * @brief retrieve the amount of devices
@@ -254,9 +331,9 @@ void oc_core_lf_populate_resource(
   int num_resource_types, ...);
 
 /**
- * @brief filter if the query param of the request contains the resource
+ * @brief filter if the query parameters of the request contains the resource
  * (determined by resource type "rt")
- * including wildcarts
+ * including wild carts
  *
  * @param resource the resource to look for
  * @param request the request to scan
@@ -266,9 +343,9 @@ void oc_core_lf_populate_resource(
 bool oc_filter_resource_by_rt(oc_resource_t *resource, oc_request_t *request);
 
 /**
- * @brief filter if the query param of the request contains the resource
+ * @brief filter if the query parameters of the request contains the resource
  * (determined by resource type "if")
- * including wildcarts
+ * including wild carts
  *
  * @param resource the resource to look for
  * @param request the request to scan
