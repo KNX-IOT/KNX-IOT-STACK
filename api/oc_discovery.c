@@ -130,7 +130,7 @@ oc_filter_resource(oc_resource_t *resource, oc_request_t *request,
     length = oc_rep_add_line_to_buffer("ct=");
     *response_length += length;
     char my_ct_value[5];
-    sprintf(&my_ct_value,"%d", resource->content_type);
+    sprintf((char *)&my_ct_value, "%d", resource->content_type);
     length = oc_rep_add_line_to_buffer(my_ct_value);
     *response_length += length;
   }
