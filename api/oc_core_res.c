@@ -730,16 +730,15 @@ oc_core_populate_resource(int core_resource, size_t device_index,
   r->delete_handler.cb = delete;
 }
 
-
 void
 oc_core_lf_populate_resource(int core_resource, size_t device_index,
-                          const char *uri, oc_interface_mask_t iface_mask,
-                             oc_content_format_t content_type,
-                             int properties,
-                          oc_request_callback_t get, oc_request_callback_t put,
-                          oc_request_callback_t post,
-                          oc_request_callback_t delete, int num_resource_types,
-                          ...)
+                             const char *uri, oc_interface_mask_t iface_mask,
+                             oc_content_format_t content_type, int properties,
+                             oc_request_callback_t get,
+                             oc_request_callback_t put,
+                             oc_request_callback_t post,
+                             oc_request_callback_t delete,
+                             int num_resource_types, ...)
 {
   oc_resource_t *r = oc_core_get_resource_by_index(core_resource, device_index);
   if (!r) {

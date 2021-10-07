@@ -348,19 +348,20 @@ struct oc_resource_s
   oc_string_array_t types;               ///< "rt" types of the resource
   oc_interface_mask_t interfaces;        ///< supported interfaces
   oc_interface_mask_t default_interface; ///< default interface
-  oc_content_format_t content_type  ;    ///< the content format that the resource supports, e.g. only 1 at the moment
-  oc_resource_properties_t properties;   ///< properties (as bit mask)
-  oc_request_handler_t get_handler;      ///< callback for GET
-  oc_request_handler_t put_handler;      ///< callback for PUT
-  oc_request_handler_t post_handler;     ///< callback for POST
-  oc_request_handler_t delete_handler;   ///< callback for DELETE
-  oc_properties_cb_t get_properties;     ///< callback for get properties
-  oc_properties_cb_t set_properties;     ///< callback for set properties
-  double tag_pos_rel[3];                 ///< tag relative position [x,y,z]
-  oc_pos_description_t tag_pos_desc; ///< tag (value) for position description
-  oc_enum_t tag_func_desc;           ///< tag (value) for function description
-  oc_locn_t tag_locn;                ///< tag (value) for location desciption
-  uint8_t num_observers;             ///< amount of observers
+  oc_content_format_t content_type;    ///< the content format that the resource
+                                       ///< supports, e.g. only 1 at the moment
+  oc_resource_properties_t properties; ///< properties (as bit mask)
+  oc_request_handler_t get_handler;    ///< callback for GET
+  oc_request_handler_t put_handler;    ///< callback for PUT
+  oc_request_handler_t post_handler;   ///< callback for POST
+  oc_request_handler_t delete_handler; ///< callback for DELETE
+  oc_properties_cb_t get_properties;   ///< callback for get properties
+  oc_properties_cb_t set_properties;   ///< callback for set properties
+  double tag_pos_rel[3];               ///< tag relative position [x,y,z]
+  oc_pos_description_t tag_pos_desc;   ///< tag (value) for position description
+  oc_enum_t tag_func_desc;             ///< tag (value) for function description
+  oc_locn_t tag_locn;                  ///< tag (value) for location desciption
+  uint8_t num_observers;               ///< amount of observers
 #ifdef OC_COLLECTIONS
   uint8_t num_links;               ///< number of links in the collection
 #endif                             /* OC_COLLECTIONS */

@@ -407,7 +407,6 @@ oc_resource_bind_resource_type(oc_resource_t *resource, const char *type)
   oc_string_array_add_item(resource->types, (char *)type);
 }
 
-
 void
 oc_resource_bind_content_type(oc_resource_t *resource,
                               oc_content_format_t content_type)

@@ -53,15 +53,14 @@ typedef struct oc_platform_info_t
 } oc_platform_info_t;
 
 /**
- 
+
  */
 typedef struct oc_knx_version_info_t
 {
-  int major;   ///< major version number
-  int minor;   ///< minor version number
-  int third;   ///< third version number
+  int major; ///< major version number
+  int minor; ///< minor version number
+  int third; ///< third version number
 } oc_knx_version_info_t;
-
 
 /**
  * @brief device information
@@ -131,7 +130,6 @@ oc_device_info_t *oc_core_add_device(const char *name, const char *version,
                                      const char *base, const char *serialnumber,
                                      oc_core_add_device_cb_t add_device_cb,
                                      void *data);
-
 
 int oc_core_set_device_fwv(int device_index, int major, int minor, int minor2);
 int oc_core_set_device_hwt(int device_index, int major, int minor, int minor2);
@@ -229,7 +227,6 @@ void oc_core_populate_resource(int core_resource, size_t device_index,
                                oc_request_callback_t delete_cb,
                                int num_resource_types, ...);
 
-
 /**
  * @brief populate resource for link-format responses
  * mainly used for creation of core resources
@@ -238,7 +235,8 @@ void oc_core_populate_resource(int core_resource, size_t device_index,
  * @param device_index the device index
  * @param uri the uri for the resource
  * @param iface_mask interfaces (as mask) to be implemented on the resource
- * @param content_format the content type that should be listed as ct in link-format responses
+ * @param content_format the content type that should be listed as ct in
+ * link-format responses
  * @param properties the properties (as mask)
  * @param get_cb get callback function
  * @param put_cb put callback function
@@ -248,14 +246,12 @@ void oc_core_populate_resource(int core_resource, size_t device_index,
  * arguments after this argument
  * @param ...
  */
-void oc_core_lf_populate_resource(int core_resource, size_t device_index,
-                               const char *uri, oc_interface_mask_t iface_mask, 
-                               oc_content_format_t content_format,
-                               int properties, oc_request_callback_t get_cb,
-                               oc_request_callback_t put_cb,
-                               oc_request_callback_t post_cb,
-                               oc_request_callback_t delete_cb,
-                               int num_resource_types, ...);
+void oc_core_lf_populate_resource(
+  int core_resource, size_t device_index, const char *uri,
+  oc_interface_mask_t iface_mask, oc_content_format_t content_format,
+  int properties, oc_request_callback_t get_cb, oc_request_callback_t put_cb,
+  oc_request_callback_t post_cb, oc_request_callback_t delete_cb,
+  int num_resource_types, ...);
 
 /**
  * @brief filter if the query param of the request contains the resource

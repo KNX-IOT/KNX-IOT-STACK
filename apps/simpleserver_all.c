@@ -151,7 +151,6 @@ app_init(void)
   /* set the hardware type*/
   oc_core_set_device_hwt(0, 5, 6, 7);
 
-  
   /* set the firmware version*/
   oc_core_set_device_fwv(0, 1, 2, 3);
 
@@ -229,13 +228,13 @@ get_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
   error = cbor_encode_boolean(&g_encoder, true);
   if (error) {
     PRINT("CBOR error %s\n", cbor_error_string(error));
-    //oc_status_code = true;
+    // oc_status_code = true;
   }
   PRINT("CBOR encoder size %d\n", oc_rep_get_encoded_payload_size());
   error = cbor_encode_boolean(&g_encoder, false);
   if (error) {
     PRINT("CBOR error %s\n", cbor_error_string(error));
-    //oc_status_code = true;
+    // oc_status_code = true;
   }
   PRINT("CBOR encoder size %d\n", oc_rep_get_encoded_payload_size());
 
@@ -284,19 +283,18 @@ get_dpa_352b(oc_request_t *request, oc_interface_mask_t interfaces,
   error = cbor_encode_text_stringz(&g_encoder, "blahblah");
   if (error) {
     PRINT("CBOR error %s\n", cbor_error_string(error));
-    //oc_status_code = true;
+    // oc_status_code = true;
   }
   PRINT("CBOR encoder size %d\n", oc_rep_get_encoded_payload_size());
-  error = cbor_encode_text_string(&g_encoder, "xyzxyz",3);
+  error = cbor_encode_text_string(&g_encoder, "xyzxyz", 3);
   if (error) {
     PRINT("CBOR error %s\n", cbor_error_string(error));
-    //oc_status_code = true;
+    // oc_status_code = true;
   }
-  PRINT("CBOR encoder size %d\n",oc_rep_get_encoded_payload_size());
+  PRINT("CBOR encoder size %d\n", oc_rep_get_encoded_payload_size());
 
-
-  //oc_rep_start_root_object();
-  //oc_rep_end_root_object();
+  // oc_rep_start_root_object();
+  // oc_rep_end_root_object();
   if (error_state == false) {
     oc_send_cbor_response(request, oc_status_code);
   } else {
@@ -339,19 +337,19 @@ get_dpa_353(oc_request_t *request, oc_interface_mask_t interfaces,
     return;
   }
 
-  //oc_rep_start_root_object();
-  //oc_rep_end_root_object();
+  // oc_rep_start_root_object();
+  // oc_rep_end_root_object();
   CborError error;
   error = cbor_encode_int(&g_encoder, (int64_t)555);
   if (error) {
     PRINT("CBOR error %s\n", cbor_error_string(error));
-    //oc_status_code = true;
+    // oc_status_code = true;
   }
   PRINT("CBOR encoder size %d\n", oc_rep_get_encoded_payload_size());
   error = cbor_encode_int(&g_encoder, (int64_t)666);
   if (error) {
     PRINT("CBOR error %s\n", cbor_error_string(error));
-    //oc_status_code = true;
+    // oc_status_code = true;
   }
   PRINT("CBOR encoder size %d\n", oc_rep_get_encoded_payload_size());
   if (error_state == false) {

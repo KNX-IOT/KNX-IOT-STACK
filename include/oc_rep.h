@@ -80,7 +80,6 @@ const uint8_t *oc_rep_get_encoder_buf(void);
  */
 void oc_rep_encode_raw(const uint8_t *data, size_t len);
 
-
 int oc_rep_add_line_to_buffer(const char *line);
 
 int oc_rep_add_line_size_to_buffer(const char *line, int len);
@@ -226,8 +225,6 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
     }                                                                          \
   } while (0)
 
-
-
 /**
  * Add an string `value` to the cbor `object` under the `key` name
  * Example:
@@ -245,7 +242,7 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
  *     oc_rep_end_root_object();
  * ~~~
  */
-#define oc_rep_set_text_string_no_tag(object, value)                             \
+#define oc_rep_set_text_string_no_tag(object, value)                           \
   do {                                                                         \
     if ((const char *)value != NULL) {                                         \
       g_err |= cbor_encode_text_string(&object##_map, value, strlen(value));   \
@@ -253,7 +250,6 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
       g_err |= cbor_encode_text_string(&object##_map, "", 0);                  \
     }                                                                          \
   } while (0)
-
 
 /**
  * Add an byte array `value` to the cbor `object` under the `key` name
@@ -381,16 +377,14 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
 #define oc_rep_begin_root_object()                                             \
   g_err |= cbor_encoder_create_map(&g_encoder, &root_map, CborIndefiniteLength)
 
-
 /**
  * Begin the root (without map). Items can be added to the root object till
  * oc_rep_end_root_object is called
  *
  * @see oc_rep_end_root_object
  */
-#define oc_rep_begin_root()                                             \
+#define oc_rep_begin_root()                                                    \
   g_err |= cbor_encoder_create_map(&g_encoder, &root_map, CborIndefiniteLength)
-
 
 /**
  * End the root object. Items can no longer be added to the root object.
