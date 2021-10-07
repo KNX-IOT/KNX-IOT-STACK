@@ -305,6 +305,21 @@ int oc_conv_byte_array_to_hex_string(const uint8_t *array, size_t array_len,
 int oc_conv_hex_string_to_byte_array(const char *hex_str, size_t hex_str_len,
                                      uint8_t *array, size_t *array_len);
 
+#ifdef WIN32
+#define oc_sprintf sprintf_s
+#define oc_strcpy strcpy_s
+#define oc_strncpy strncpy_s
+#define oc_fopen fopen_s
+
+#else
+
+#define oc_sprintf sprintf
+#define oc_strcpy strcpy
+#define oc_strncpy strncpy
+#define oc_fopen fopen
+
+#endif
+
 #ifdef __cplusplus
 }
 #endif

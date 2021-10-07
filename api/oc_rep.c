@@ -63,12 +63,27 @@ oc_rep_encode_raw(const uint8_t *data, size_t len)
 }
 
 int
+oc_rep_add_line_to_buffer(const char *line)
+{
+  int len = (int)strlen(line);
+  oc_rep_encode_raw((uint8_t *)line, len);
+  return len;
+}
+
+int
+oc_rep_add_line_size_to_buffer(const char *line, int len)
+{
+  oc_rep_encode_raw((uint8_t *)line, len);
+  return len;
+}
+
+int
 oc_rep_get_encoded_payload_size(void)
 {
   size_t size = cbor_encoder_get_buffer_size(&g_encoder, g_buf);
   if (g_err == CborErrorOutOfMemory) {
     OC_WRN("Insufficient memory: Increase OC_MAX_APP_DATA_SIZE to "
-           "accomodate a larger payload");
+           "accommodate a larger payload");
   }
   if (g_err != CborNoError)
     return -1;

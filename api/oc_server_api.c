@@ -407,6 +407,13 @@ oc_resource_bind_resource_type(oc_resource_t *resource, const char *type)
   oc_string_array_add_item(resource->types, (char *)type);
 }
 
+void
+oc_resource_bind_content_type(oc_resource_t *resource,
+                              oc_content_format_t content_type)
+{
+  resource->content_type = content_type;
+}
+
 #ifdef OC_SECURITY
 void
 oc_resource_make_public(oc_resource_t *resource)

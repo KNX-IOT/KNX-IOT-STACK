@@ -832,6 +832,9 @@ void oc_resource_set_default_interface(oc_resource_t *resource,
  */
 void oc_resource_bind_resource_type(oc_resource_t *resource, const char *type);
 
+void oc_resource_bind_content_type(oc_resource_t *resource,
+                                   oc_content_format_t content_type);
+
 /**
  * Add a Resource Type "rt" property to the an `/oic/d` resource.
  *
