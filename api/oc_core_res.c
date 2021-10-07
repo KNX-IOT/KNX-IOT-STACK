@@ -495,19 +495,13 @@ oc_core_set_device_hostname(int device_index, const char *hostname)
   return 0;
 }
 
-
-
 int
-oc_core_set_device_idd(int device_index, const char *iid)
+oc_core_set_device_iid(int device_index, const char *iid)
 {
   oc_new_string(&oc_device_info[device_index].iid, iid, strlen(iid));
 
   return 0;
 }
-
-
-
-
 
 oc_device_info_t *
 oc_core_add_new_device(const char *uri, const char *rt, const char *name,

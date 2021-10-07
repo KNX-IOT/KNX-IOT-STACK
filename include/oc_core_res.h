@@ -205,13 +205,13 @@ int oc_core_set_device_hostname(int device_index, const char *hostname);
 
 
 /**
- * @brief sets the idd (string)
+ * @brief sets the iid (string)
  *
  * @param device_index the device index
- * @param idd the knx installation id
+ * @param iid the knx installation id
  * @return int error status, 0 = OK
  */
-int oc_core_set_device_hostname(int device_index, const char *idd);
+int oc_core_set_device_iid(int device_index, const char *iid);
 
 
 /**

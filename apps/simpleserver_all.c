@@ -170,8 +170,8 @@ app_init(void)
   /* set the hostname */
   oc_core_set_device_hostname(0, "my.hostname");
 
-  /* set the idd */
-  oc_core_set_device_idd(0, "my installation");
+  /* set the iid */
+  oc_core_set_device_iid(0, "my installation");
 
   
   /* set the internal address */
