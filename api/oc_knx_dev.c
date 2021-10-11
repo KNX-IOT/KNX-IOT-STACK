@@ -486,7 +486,8 @@ void
 oc_create_dev_dev_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_dev_dev_resource\n");
-  oc_core_lf_populate_resource(resource_idx, device, "/dev", OC_IF_D,
+  // OC_IF_D  OC_IF_NONE
+  oc_core_lf_populate_resource(resource_idx, device, "/dev", OC_IF_NONE,
                                APPLICATION_LINK_FORMAT, 0,
                                oc_core_dev_dev_get_handler, 0, 0, 0, 0, "");
 }
