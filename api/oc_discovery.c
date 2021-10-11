@@ -140,7 +140,6 @@ oc_filter_resource(oc_resource_t *resource, oc_request_t *request,
 {
   (void)device_index; /* variable not used */
 
-  int length;
   if (!oc_filter_resource_by_rt(resource, request)) {
     return false;
   }
