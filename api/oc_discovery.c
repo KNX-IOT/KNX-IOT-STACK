@@ -45,18 +45,17 @@
 
 bool
 oc_add_resource_to_wk(oc_resource_t *resource, oc_request_t *request,
-                size_t device_index,
-  size_t *response_length, int matches)
+                      size_t device_index, size_t *response_length, int matches)
 {
   (void)device_index; /* variable not used */
   int length;
-  
+
   if (matches > 0) {
     length = oc_rep_add_line_to_buffer(",\n");
     *response_length += length;
   }
 
-    if (matches > 0) {
+  if (matches > 0) {
     length = oc_rep_add_line_to_buffer(",\n");
     *response_length += length;
   }
@@ -133,7 +132,6 @@ oc_add_resource_to_wk(oc_resource_t *resource, oc_request_t *request,
   return true;
 }
 
-
 bool
 oc_filter_resource(oc_resource_t *resource, oc_request_t *request,
                    size_t device_index, size_t *response_length, int matches)
@@ -152,9 +150,8 @@ oc_filter_resource(oc_resource_t *resource, oc_request_t *request,
     return false;
   }
 
-
   return oc_add_resource_to_wk(resource, request, device_index, response_length,
-                         matches);
+                               matches);
 }
 
 static bool
@@ -548,7 +545,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   /* check if the accept header is link-format */
   if (request->accept != APPLICATION_LINK_FORMAT &&
       request->accept != APPLICATION_JSON) {
-    /* handle bad request.. 
+    /* handle bad request..
     note below layer ignores this message if it is a multicast request */
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
@@ -658,15 +655,15 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   }
 
   oc_add_resource_to_wk(oc_core_get_resource_by_index(OC_DEV, device_index),
-                          request, device_index, &response_length, matches);
+                        request, device_index, &response_length, matches);
 
-  //oc_add_resource_to_wk(oc_core_get_resource_by_index(OC_AUTH, device_index),
+  // oc_add_resource_to_wk(oc_core_get_resource_by_index(OC_AUTH, device_index),
   //                      request, device_index, &response_length, matches);
 
   oc_add_resource_to_wk(oc_core_get_resource_by_index(OC_KNX_SWU, device_index),
                         request, device_index, &response_length, matches);
 
-  //oc_add_resource_to_wk(oc_core_get_resource_by_index(OC_SUB, device_index),
+  // oc_add_resource_to_wk(oc_core_get_resource_by_index(OC_SUB, device_index),
   //                      request, device_index, &response_length, matches);
 
   request->response->response_buffer->content_format = APPLICATION_LINK_FORMAT;
