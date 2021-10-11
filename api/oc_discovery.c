@@ -48,6 +48,7 @@ oc_add_resource_to_wk(oc_resource_t *resource, oc_request_t *request,
                 size_t device_index,
   size_t *response_length, int matches)
 {
+  (void)device_index; /* variable not used */
   int length;
   
   if (matches > 0) {
@@ -658,16 +659,16 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   }
 
   oc_add_resource_to_wk(oc_core_get_resource_by_index(OC_DEV, device_index),
-                          request, device, &response_length, matches);
+                          request, device_index, &response_length, matches);
 
   //oc_add_resource_to_wk(oc_core_get_resource_by_index(OC_AUTH, device_index),
-  //                      request, device, &response_length, matches);
+  //                      request, device_index, &response_length, matches);
 
   oc_add_resource_to_wk(oc_core_get_resource_by_index(OC_KNX_SWU, device_index),
-                        request, device, &response_length, matches);
+                        request, device_index, &response_length, matches);
 
   //oc_add_resource_to_wk(oc_core_get_resource_by_index(OC_SUB, device_index),
-  //                      request, device, &response_length, matches);
+  //                      request, device_index, &response_length, matches);
 
   request->response->response_buffer->content_format = APPLICATION_LINK_FORMAT;
   if (matches > 0 && response_length > 0) {
