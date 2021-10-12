@@ -85,7 +85,6 @@ oc_core_free_device_info_properties(oc_device_info_t *oc_device_info_item)
     // KNX
     oc_free_string(&(oc_device_info_item->serialnumber));
     oc_free_string(&(oc_device_info_item->hwt));
-    oc_free_string(&(oc_device_info_item->macaddr));
     oc_free_string(&(oc_device_info_item->model));
     oc_free_string(&(oc_device_info_item->hostname));
     oc_free_string(&(oc_device_info_item->iid));
@@ -459,6 +458,7 @@ int
 oc_core_set_device_hwt(int device_index, const char *hardwaretype)
 {
 
+  oc_free_string(&oc_device_info[device_index].hwt);
   oc_new_string(&oc_device_info[device_index].hwt, hardwaretype,
                 strlen(hardwaretype));
 
@@ -466,11 +466,10 @@ oc_core_set_device_hwt(int device_index, const char *hardwaretype)
 }
 
 int
-oc_core_set_device_macaddr(int device_index, const char *macaddr)
+oc_core_set_device_pm(int device_index, bool pm)
 {
 
-  oc_new_string(&oc_device_info[device_index].macaddr, macaddr,
-                strlen(macaddr));
+  oc_device_info[device_index].pm = pm;
 
   return 0;
 }
@@ -479,6 +478,7 @@ int
 oc_core_set_device_model(int device_index, const char *model)
 {
 
+  oc_free_string(&oc_device_info[device_index].model);
   oc_new_string(&oc_device_info[device_index].model, model, strlen(model));
 
   return 0;
@@ -488,6 +488,7 @@ int
 oc_core_set_device_hostname(int device_index, const char *hostname)
 {
 
+  oc_free_string(&oc_device_info[device_index].hostname);
   oc_new_string(&oc_device_info[device_index].hostname, hostname,
                 strlen(hostname));
 
@@ -497,6 +498,7 @@ oc_core_set_device_hostname(int device_index, const char *hostname)
 int
 oc_core_set_device_iid(int device_index, const char *iid)
 {
+  oc_free_string(&oc_device_info[device_index].iid);
   oc_new_string(&oc_device_info[device_index].iid, iid, strlen(iid));
 
   return 0;

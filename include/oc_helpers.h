@@ -284,10 +284,10 @@ void _oc_alloc_string_array(
 /**
  * @brief convert array to hex
  *
- * @param[in] array array of bytes
+ * @param[in] array the array of bytes
  * @param[in] array_len length of the array
  * @param hex_str data as hex
- * @param hex_str_len lenght of the hex string
+ * @param hex_str_len length of the hex string
  * @return int 0 success
  */
 int oc_conv_byte_array_to_hex_string(const uint8_t *array, size_t array_len,
@@ -298,27 +298,13 @@ int oc_conv_byte_array_to_hex_string(const uint8_t *array, size_t array_len,
  *
  * @param[in] hex_str hex string input
  * @param[in] hex_str_len size of the hex string
- * @param array array of bytes
- * @param array_len byte array
+ * @param array the array of bytes
+ * @param array_len length of the byte array
  * @return int 0 success
  */
 int oc_conv_hex_string_to_byte_array(const char *hex_str, size_t hex_str_len,
                                      uint8_t *array, size_t *array_len);
 
-#ifdef WIN32
-#define oc_sprintf sprintf_s
-#define oc_strcpy strcpy_s
-#define oc_strncpy strncpy_s
-#define oc_fopen fopen_s
-
-#else
-
-#define oc_sprintf sprintf
-#define oc_strcpy strcpy
-#define oc_strncpy strncpy
-#define oc_fopen fopen
-
-#endif
 
 #ifdef __cplusplus
 }

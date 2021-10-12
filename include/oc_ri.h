@@ -202,12 +202,12 @@ typedef enum {
   OC_DEV_FWV, /// Firmware version
   OC_DEV_HWT, ///< The hardware type is a manufacture specific id for a device
               ///< type (MaC uses this id for compatibility checks)
-  OC_DEV_MACADDRESS, ///< MAC address
   OC_DEV_NAME,       ///< Device name. Name may can be changed w/ MaC.
   OC_DEV_MODEL,      ///< Device model
   OC_DEV_IA,         ///< Device individual address
   OC_DEV_HOSTNAME,   ///< Device hostname for DNS resolution.
   OC_DEV_IID,        ///< KNX installation ID
+  OC_DEV_PM,         ///< Programming Mode
   OC_DEV,            ///< core link
   OC_KNX_SPAKE,      ///< spake
   OC_KNX_IDEVID,     ///< IDevID
