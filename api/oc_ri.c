@@ -1013,6 +1013,7 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
 
   /* Read the Content-Format CoAP option in the request */
   oc_content_format_t cf = 0;
+  cf = 60;
   coap_get_header_content_format(request, &cf);
 
   /* Read the accept CoAP option in the request */
