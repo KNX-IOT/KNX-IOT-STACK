@@ -321,9 +321,18 @@ oc_core_dev_hostname_put_handler(oc_request_t *request,
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
-  // size_t device_index = request->resource->device;
 
-  oc_send_cbor_response(request, OC_STATUS_OK);
+  size_t device_index = request->resource->device;
+  oc_rep_t *rep = request->request_payload;
+  if ((rep != NULL) && (rep->type == OC_REP_STRING)) {
+    PRINT("  oc_core_dev_hostname_put_handler received : %s\n",
+          oc_string(rep->value.string));
+    oc_core_set_device_hostname(device_index, oc_string(rep->value.string));
+    oc_send_cbor_response(request, OC_STATUS_OK);
+    return;
+  }
+
+  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
 }
 
 static void
@@ -374,14 +383,10 @@ oc_core_dev_iid_put_handler(oc_request_t *request,
   }
 
   size_t device_index = request->resource->device;
-  oc_device_info_t *device = oc_core_get_device_info(device_index);
   oc_rep_t *rep = request->request_payload;
-
   if ((rep != NULL) && (rep->type == OC_REP_STRING)) {
-
     PRINT("  oc_core_dev_iid_put_handler received : %s\n", oc_string(rep->value.string));
     oc_core_set_device_iid(device_index, oc_string(rep->value.string));
- 
     oc_send_cbor_response(request, OC_STATUS_OK);
     return;
   }
@@ -468,6 +473,9 @@ oc_core_dev_pm_put_handler(oc_request_t *request,
   oc_rep_t *rep = request->request_payload;
 
   if ((rep != NULL) && (rep->type == OC_REP_BOOL)) {
+
+    PRINT("  oc_core_dev_pm_put_handler received : %d\n",
+          rep->value.boolean);
     device->pm = rep->value.boolean;
     oc_send_cbor_response(request, OC_STATUS_OK);
     return;
