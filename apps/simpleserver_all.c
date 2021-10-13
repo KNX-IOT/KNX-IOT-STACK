@@ -154,22 +154,22 @@ app_init(void)
   /* set the firmware version*/
   oc_core_set_device_fwv(0, 1, 2, 3);
 
-  /* set the serial number */
+  /* set the internal address (ia) */
   oc_core_set_device_ia(0, 5);
 
   /* set the hardware type*/
   oc_core_set_device_hwt(0, "hwt-mytype");
 
-  /* set the mac address */
-  oc_core_set_device_macaddr(0, "macaddr");
+  /* set the programming mode */
+  oc_core_set_device_pm(0, true);
 
   /* set the model */
   oc_core_set_device_model(0, "my model");
 
-  /* set the hostname */
+  /* set the host name */
   oc_core_set_device_hostname(0, "my.hostname");
 
-  /* set the iid */
+  /* set the installation id (iid) */
   oc_core_set_device_iid(0, "my installation");
 
   /* set the internal address */

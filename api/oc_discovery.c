@@ -55,11 +55,6 @@ oc_add_resource_to_wk(oc_resource_t *resource, oc_request_t *request,
     *response_length += length;
   }
 
-  if (matches > 0) {
-    length = oc_rep_add_line_to_buffer(",\n");
-    *response_length += length;
-  }
-
   length = oc_rep_add_line_to_buffer("<");
   *response_length += length;
 

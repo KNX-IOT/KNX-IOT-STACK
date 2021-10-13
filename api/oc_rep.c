@@ -160,6 +160,65 @@ oc_free_rep(oc_rep_t *rep)
   the next pointer of the first object.
 */
 
+static void
+oc_parse_single_entity(CborValue *value, oc_rep_t **rep, CborError *err)
+{
+  size_t len;
+
+  *rep = _alloc_rep();
+  if (*rep == NULL) {
+    *err = CborErrorOutOfMemory;
+    return;
+  }
+  oc_rep_t *cur = *rep;
+
+  switch (value->type) {
+  case CborTagType: {
+    CborTag tag;
+    cbor_value_get_tag(value, &tag);
+    /* skip over CBOR Tags */
+    // goto get_tagged_value;
+  } break;
+  case CborIntegerType:
+    *err |= cbor_value_get_int64(value, &cur->value.integer);
+    cur->type = OC_REP_INT;
+    break;
+  case CborBooleanType:
+    *err |= cbor_value_get_boolean(value, &cur->value.boolean);
+    cur->type = OC_REP_BOOL;
+    break;
+  case CborDoubleType:
+    *err |= cbor_value_get_double(value, &cur->value.double_p);
+    cur->type = OC_REP_DOUBLE;
+    break;
+  case CborByteStringType:
+    *err |= cbor_value_calculate_string_length(value, &len);
+    len++;
+    if (*err != CborNoError || len == 0)
+      return;
+    oc_alloc_string(&cur->value.string, len);
+    *err |= cbor_value_copy_byte_string(
+      value, oc_cast(cur->value.string, uint8_t), &len, NULL);
+    cur->type = OC_REP_BYTE_STRING;
+    break;
+  case CborTextStringType:
+    *err |= cbor_value_calculate_string_length(value, &len);
+    len++;
+    if (*err != CborNoError || len == 0)
+      return;
+    oc_alloc_string(&cur->value.string, len);
+    *err |= cbor_value_copy_text_string(value, oc_string(cur->value.string),
+                                        &len, NULL);
+    cur->type = OC_REP_STRING;
+    break;
+  case CborInvalidType:
+    *err |= CborErrorIllegalType;
+    return;
+  default:
+    break;
+  }
+}
+
 /* Parse single property */
 static void
 oc_parse_rep_value(CborValue *value, oc_rep_t **rep, CborError *err)
@@ -432,6 +491,8 @@ oc_parse_rep(const uint8_t *in_payload, int payload_size, oc_rep_t **out_rep)
         return err;
       err |= cbor_value_advance(&map);
     }
+  } else if (cbor_value_is_valid(&root_value)) {
+    oc_parse_single_entity(&root_value, out_rep, &err);
   } else {
     *out_rep = 0;
   }
