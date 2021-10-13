@@ -177,7 +177,7 @@ oc_parse_single_entity(CborValue *value, oc_rep_t **rep, CborError *err)
     CborTag tag;
     cbor_value_get_tag(value, &tag);
     /* skip over CBOR Tags */
-    //goto get_tagged_value;
+    // goto get_tagged_value;
   } break;
   case CborIntegerType:
     *err |= cbor_value_get_int64(value, &cur->value.integer);
@@ -217,9 +217,7 @@ oc_parse_single_entity(CborValue *value, oc_rep_t **rep, CborError *err)
   default:
     break;
   }
-
 }
-
 
 /* Parse single property */
 static void
@@ -495,8 +493,7 @@ oc_parse_rep(const uint8_t *in_payload, int payload_size, oc_rep_t **out_rep)
     }
   } else if (cbor_value_is_valid(&root_value)) {
     oc_parse_single_entity(&root_value, out_rep, &err);
-  }
-  else {
+  } else {
     *out_rep = 0;
   }
   return err;

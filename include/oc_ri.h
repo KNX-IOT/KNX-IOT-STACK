@@ -197,29 +197,29 @@ const char *get_interface_string(oc_interface_mask_t mask);
 
 typedef enum {
   OCF_P = 0,
-  OC_DEV_SN,  ///< Device serial number
-  OC_DEV_HWV, ///< Hardware version
-  OC_DEV_FWV, /// Firmware version
-  OC_DEV_HWT, ///< The hardware type is a manufacture specific id for a device
-              ///< type (MaC uses this id for compatibility checks)
-  OC_DEV_NAME,       ///< Device name. Name may can be changed w/ MaC.
-  OC_DEV_MODEL,      ///< Device model
-  OC_DEV_IA,         ///< Device individual address
-  OC_DEV_HOSTNAME,   ///< Device hostname for DNS resolution.
-  OC_DEV_IID,        ///< KNX installation ID
-  OC_DEV_PM,         ///< Programming Mode
-  OC_DEV,            ///< core link
-  OC_KNX_SPAKE,      ///< spake
-  OC_KNX_IDEVID,     ///< IDevID
-  OC_KNX_LDEVID,     ///< LDevID
-  OC_KNX_RESET,      ///< reset the device
-  OC_KNX_LSM,        ///< load state machine
-  OC_KNX_CRC,        ///< CRC value of loaded contents
-  OC_KNX,            ///< well-known/knx
-  OC_KNX_FP_G,       ///< FP/G
-  OC_KNX_FP_P,       ///< FP/G
-  OC_KNX_FP_R,       ///< FP/G
-  OC_KNX_P,          ///< FP/G
+  OC_DEV_SN,    ///< Device serial number
+  OC_DEV_HWV,   ///< Hardware version
+  OC_DEV_FWV,   /// Firmware version
+  OC_DEV_HWT,   ///< The hardware type is a manufacture specific id for a device
+                ///< type (MaC uses this id for compatibility checks)
+  OC_DEV_NAME,  ///< Device name. Name may can be changed w/ MaC.
+  OC_DEV_MODEL, ///< Device model
+  OC_DEV_IA,    ///< Device individual address
+  OC_DEV_HOSTNAME, ///< Device hostname for DNS resolution.
+  OC_DEV_IID,      ///< KNX installation ID
+  OC_DEV_PM,       ///< Programming Mode
+  OC_DEV,          ///< core link
+  OC_KNX_SPAKE,    ///< spake
+  OC_KNX_IDEVID,   ///< IDevID
+  OC_KNX_LDEVID,   ///< LDevID
+  OC_KNX_RESET,    ///< reset the device
+  OC_KNX_LSM,      ///< load state machine
+  OC_KNX_CRC,      ///< CRC value of loaded contents
+  OC_KNX,          ///< well-known/knx
+  OC_KNX_FP_G,     ///< FP/G
+  OC_KNX_FP_P,     ///< FP/G
+  OC_KNX_FP_R,     ///< FP/G
+  OC_KNX_P,        ///< FP/G
   OC_KNX_SWU_PROTOCOL,
   OC_KNX_SWU_MAXDEFER,
   OC_KNX_SWU_METHOD,

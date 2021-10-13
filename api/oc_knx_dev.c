@@ -91,10 +91,9 @@ void
 oc_create_dev_hwv_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_dev_hwv_resource\n");
-  oc_core_lf_populate_resource(resource_idx, device, "/dev/hwv", OC_IF_D,
-                               APPLICATION_CBOR, OC_DISCOVERABLE,
-                               oc_core_dev_hwv_get_handler, 0, 0, 0, 1,
-                               ":dpt.version");
+  oc_core_lf_populate_resource(
+    resource_idx, device, "/dev/hwv", OC_IF_D, APPLICATION_CBOR,
+    OC_DISCOVERABLE, oc_core_dev_hwv_get_handler, 0, 0, 0, 1, ":dpt.version");
 }
 
 static void
@@ -132,10 +131,9 @@ void
 oc_create_dev_fwv_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_dev_fwv_resource\n");
-  oc_core_lf_populate_resource(resource_idx, device, "/dev/fwv", OC_IF_D,
-                               APPLICATION_CBOR, OC_DISCOVERABLE,
-                               oc_core_dev_fwv_get_handler, 0, 0, 0, 1,
-                               ":dpt.version");
+  oc_core_lf_populate_resource(
+    resource_idx, device, "/dev/fwv", OC_IF_D, APPLICATION_CBOR,
+    OC_DISCOVERABLE, oc_core_dev_fwv_get_handler, 0, 0, 0, 1, ":dpt.version");
 }
 
 static void
@@ -202,10 +200,9 @@ void
 oc_create_dev_name_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_dev_name_resource\n");
-  oc_core_lf_populate_resource(resource_idx, device, "/dev/name", OC_IF_D,
-                               APPLICATION_CBOR, OC_DISCOVERABLE,
-                               oc_core_dev_name_get_handler, 0, 0, 0, 1,
-                               ":dpt.utf8");
+  oc_core_lf_populate_resource(
+    resource_idx, device, "/dev/name", OC_IF_D, APPLICATION_CBOR,
+    OC_DISCOVERABLE, oc_core_dev_name_get_handler, 0, 0, 0, 1, ":dpt.utf8");
 }
 
 static void
@@ -237,10 +234,9 @@ void
 oc_create_dev_model_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_dev_model_resource\n");
-  oc_core_lf_populate_resource(resource_idx, device, "/dev/model", OC_IF_D,
-                               APPLICATION_CBOR, OC_DISCOVERABLE,
-                               oc_core_dev_model_get_handler, 0, 0, 0, 1,
-                               ":dpa.0.15");
+  oc_core_lf_populate_resource(
+    resource_idx, device, "/dev/model", OC_IF_D, APPLICATION_CBOR,
+    OC_DISCOVERABLE, oc_core_dev_model_get_handler, 0, 0, 0, 1, ":dpa.0.15");
 }
 
 static void
@@ -293,7 +289,6 @@ oc_core_dev_ia_put_handler(oc_request_t *request,
     oc_send_cbor_response(request, OC_STATUS_OK);
     return;
   }
-
 
   oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
 }
@@ -385,7 +380,8 @@ oc_core_dev_iid_put_handler(oc_request_t *request,
   size_t device_index = request->resource->device;
   oc_rep_t *rep = request->request_payload;
   if ((rep != NULL) && (rep->type == OC_REP_STRING)) {
-    PRINT("  oc_core_dev_iid_put_handler received : %s\n", oc_string(rep->value.string));
+    PRINT("  oc_core_dev_iid_put_handler received : %s\n",
+          oc_string(rep->value.string));
     oc_core_set_device_iid(device_index, oc_string(rep->value.string));
     oc_send_cbor_response(request, OC_STATUS_OK);
     return;
@@ -428,7 +424,6 @@ oc_create_dev_iid_resource(int resource_idx, size_t device)
     0, 0, 1, ":dpt.value4Ucount ");
 }
 
-
 static void
 oc_core_dev_pm_get_handler(oc_request_t *request,
                            oc_interface_mask_t iface_mask, void *data)
@@ -445,7 +440,7 @@ oc_core_dev_pm_get_handler(oc_request_t *request,
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
 
-  if (device != NULL ) {
+  if (device != NULL) {
     cbor_encode_boolean(&g_encoder, device->pm);
 
     oc_send_cbor_response(request, OC_STATUS_OK);
@@ -474,8 +469,7 @@ oc_core_dev_pm_put_handler(oc_request_t *request,
 
   if ((rep != NULL) && (rep->type == OC_REP_BOOL)) {
 
-    PRINT("  oc_core_dev_pm_put_handler received : %d\n",
-          rep->value.boolean);
+    PRINT("  oc_core_dev_pm_put_handler received : %d\n", rep->value.boolean);
     device->pm = rep->value.boolean;
     oc_send_cbor_response(request, OC_STATUS_OK);
     return;
@@ -535,10 +529,11 @@ void
 oc_create_dev_dev_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_dev_dev_resource\n");
-  // note that this resource is listed in /.well-known/core so it should have the full rt with urn:knx prefix
-  oc_core_lf_populate_resource(resource_idx, device, "/dev", OC_IF_NONE,
-                               APPLICATION_LINK_FORMAT, 0,
-                               oc_core_dev_dev_get_handler, 0, 0, 0, 1, "urn:knx:fb.0");
+  // note that this resource is listed in /.well-known/core so it should have
+  // the full rt with urn:knx prefix
+  oc_core_lf_populate_resource(
+    resource_idx, device, "/dev", OC_IF_NONE, APPLICATION_LINK_FORMAT, 0,
+    oc_core_dev_dev_get_handler, 0, 0, 0, 1, "urn:knx:fb.0");
 }
 
 void

@@ -681,7 +681,7 @@ coap_oscore_parse_options(void *packet, uint8_t *data, uint32_t data_len,
       OC_DBG("  Content-Format [%u]", coap_pkt->content_format);
       if (coap_pkt->content_format != APPLICATION_VND_OCF_CBOR &&
           coap_pkt->content_format != APPLICATION_CBOR &&
-          coap_pkt->content_format != APPLICATION_JSON )
+          coap_pkt->content_format != APPLICATION_JSON)
         return UNSUPPORTED_MEDIA_TYPE_4_15;
       break;
     case COAP_OPTION_MAX_AGE:
