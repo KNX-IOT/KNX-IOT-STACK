@@ -183,18 +183,18 @@ oc_core_lsm_check_string(const char *lsm)
   int len = strlen(lsm);
 
   // states
-  if (len == 8 && strncmp(lsm, "unloaded",8) == 0) {
+  if (len == 8 && strncmp(lsm, "unloaded", 8) == 0) {
     return true;
   }
-  if (len == 7 && strncmp(lsm, "loading",7) == 0) {
+  if (len == 7 && strncmp(lsm, "loading", 7) == 0) {
     return true;
   }
-  if (len == 6 && strncmp(lsm, "loaded",6) == 0) {
+  if (len == 6 && strncmp(lsm, "loaded", 6) == 0) {
     return true;
   }
 
   // commands
-  if (len == 6 && strncmp(lsm, "unload",6) == 0 ) {
+  if (len == 6 && strncmp(lsm, "unload", 6) == 0) {
     return true;
   }
   if (len == 12 && strncmp(lsm, "startLoading", 12) == 0) {
@@ -213,13 +213,13 @@ oc_core_lsm_parse_string(const char *lsm)
   int len = strlen(lsm);
 
   // states
-  if (len == 8 && strncmp(lsm, "unloaded",8) == 0) {
+  if (len == 8 && strncmp(lsm, "unloaded", 8) == 0) {
     return LSM_UNLOADED;
   }
-  if (len == 7 && strncmp(lsm, "loading",7) == 0) {
+  if (len == 7 && strncmp(lsm, "loading", 7) == 0) {
     return LSM_LOADING;
   }
-  if (len == 6 && strncmp(lsm, "loaded",6) == 0) {
+  if (len == 6 && strncmp(lsm, "loaded", 6) == 0) {
     return LSM_LOADED;
   }
 
@@ -227,16 +227,15 @@ oc_core_lsm_parse_string(const char *lsm)
   if (len == 6 && strncmp(lsm, "unload", 6) == 0) {
     return LSM_UNLOAD;
   }
-  if (len == 12 && strncmp(lsm, "startLoading",12) == 0) {
+  if (len == 12 && strncmp(lsm, "startLoading", 12) == 0) {
     return LSM_STARTLOADING;
   }
-  if (len == 12 && strncmp(lsm, "loadComplete",12) == 0) {
+  if (len == 12 && strncmp(lsm, "loadComplete", 12) == 0) {
     return LSM_lOADCOMPLETE;
   }
 
   return LSM_UNLOADED;
 }
-
 
 static int
 lsm_create_response(const char *lsm_string)
