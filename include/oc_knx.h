@@ -24,11 +24,34 @@ extern "C" {
 #endif
 
 /**
+ * @brief LSM state machine values
+ *
+ */
+typedef enum {
+  LSM_UNLOADED = 0, ///< state is unloaded, e.g. ready for loading
+  LSM_LOADED,       ///< state is LOADED, e.g. normal operation
+  LSM_lOADCOMPLETE, ///< command loading complete, state will be LOADED
+  LSM_STARTLOADING, ///< command loading started, state will be LOADING
+  LSM_LOADING,      ///< state loading.
+  LSM_UNLOAD        ///< command unload: state will be UNLOADED
+} oc_lsm_state_t;
+
+/**
 @brief Creation of the KNX device resources.
 
 @param device index of the device to which the resource is to be created
 */
 void oc_create_knx_resources(size_t device);
+
+/**
+@brief function to retrieve the loading state
+
+@param device index of the device to which the resource is to be created
+ * @return
+ *  - the loading state
+ *  - note unloaded is returned if the device is incorrect.
+*/
+oc_lsm_state_t oc_knx_lsm_state(size_t device);
 
 #ifdef __cplusplus
 }

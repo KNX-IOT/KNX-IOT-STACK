@@ -50,6 +50,8 @@ void
 oc_create_dev_sn_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_dev_sn_resource\n");
+  // cbor rt :dpa:0.11
+  // json rt :dpt.serNum
   oc_core_lf_populate_resource(
     resource_idx, device, "/dev/sn", OC_IF_D, APPLICATION_CBOR, OC_DISCOVERABLE,
     oc_core_dev_sn_get_handler, 0, 0, 0, 1, ":dpa:0.11");
@@ -153,7 +155,6 @@ oc_core_dev_hwt_get_handler(oc_request_t *request,
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device != NULL && oc_string(device->hwt) != NULL) {
     cbor_encode_text_stringz(&g_encoder, oc_string(device->hwt));
-
     oc_send_cbor_response(request, OC_STATUS_OK);
     return;
   }
@@ -165,13 +166,14 @@ void
 oc_create_dev_hwt_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_dev_hwt_resource\n");
+  // cbor rt :dpt.varString8859_1
   oc_core_lf_populate_resource(resource_idx, device, "/dev/hwt", OC_IF_D,
                                APPLICATION_CBOR, OC_DISCOVERABLE,
                                oc_core_dev_hwt_get_handler, 0, 0, 0, 1,
-                               "urn:knx:dpt.Version");
+                               ":dpt.varString8859_1");
 }
 
-static void
+void
 oc_core_dev_name_get_handler(oc_request_t *request,
                              oc_interface_mask_t iface_mask, void *data)
 {
@@ -200,6 +202,7 @@ void
 oc_create_dev_name_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_dev_name_resource\n");
+  // cbor rt:
   oc_core_lf_populate_resource(
     resource_idx, device, "/dev/name", OC_IF_D, APPLICATION_CBOR,
     OC_DISCOVERABLE, oc_core_dev_name_get_handler, 0, 0, 0, 1, ":dpt.utf8");
@@ -309,7 +312,6 @@ oc_core_dev_hostname_put_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  // size_t response_length = 0;
 
   /* check if the accept header is CBOR-format */
   if (request->accept != APPLICATION_CBOR) {
@@ -396,13 +398,13 @@ oc_core_dev_iid_get_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  // size_t response_length = 0;
 
   /* check if the accept header is CBOR-format */
   if (request->accept != APPLICATION_CBOR) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
+
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device != NULL && oc_string(device->iid) != NULL) {
@@ -439,10 +441,8 @@ oc_core_dev_pm_get_handler(oc_request_t *request,
 
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
-
   if (device != NULL) {
     cbor_encode_boolean(&g_encoder, device->pm);
-
     oc_send_cbor_response(request, OC_STATUS_OK);
     return;
   }
@@ -466,9 +466,12 @@ oc_core_dev_pm_put_handler(oc_request_t *request,
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   oc_rep_t *rep = request->request_payload;
+  // debugging
+  if (rep != NULL) {
+    PRINT("  oc_core_dev_pm_put_handler type: %d\n", rep->type);
+  }
 
   if ((rep != NULL) && (rep->type == OC_REP_BOOL)) {
-
     PRINT("  oc_core_dev_pm_put_handler received : %d\n", rep->value.boolean);
     device->pm = rep->value.boolean;
     oc_send_cbor_response(request, OC_STATUS_OK);
@@ -545,7 +548,7 @@ oc_create_knx_device_resources(size_t device_index)
   oc_create_dev_hwv_resource(OC_DEV_HWV, device_index);
   oc_create_dev_fwv_resource(OC_DEV_FWV, device_index);
   oc_create_dev_hwt_resource(OC_DEV_HWT, device_index);
-  oc_create_dev_name_resource(OC_DEV_NAME, device_index);
+  // oc_create_dev_name_resource(OC_DEV_NAME, device_index);
   oc_create_dev_model_resource(OC_DEV_MODEL, device_index);
   oc_create_dev_ia_resource(OC_DEV_IA, device_index);
   oc_create_dev_hostname_resource(OC_DEV_HOSTNAME, device_index);
