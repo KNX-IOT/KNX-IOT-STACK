@@ -145,7 +145,7 @@ typedef enum {
 typedef struct oc_separate_response_s oc_separate_response_t;
 
 /**
- * @brief reponse buffer type
+ * @brief response buffer type
  *
  */
 typedef struct oc_response_buffer_s oc_response_buffer_t;
@@ -156,7 +156,7 @@ typedef struct oc_response_buffer_s oc_response_buffer_t;
  */
 typedef struct oc_response_t
 {
-  oc_separate_response_t *separate_response; ///< seperate response
+  oc_separate_response_t *separate_response; ///< separate response
   oc_response_buffer_t *response_buffer;     ///< response buffer
 } oc_response_t;
 
@@ -205,7 +205,7 @@ typedef enum {
   OC_DEV_NAME,  ///< Device name. Name may can be changed w/ MaC.
   OC_DEV_MODEL, ///< Device model
   OC_DEV_IA,    ///< Device individual address
-  OC_DEV_HOSTNAME, ///< Device hostname for DNS resolution.
+  OC_DEV_HOSTNAME, ///< Device host name for DNS resolution.
   OC_DEV_IID,      ///< KNX installation ID
   OC_DEV_PM,       ///< Programming Mode
   OC_DEV,          ///< core link
@@ -215,7 +215,7 @@ typedef enum {
   OC_KNX_RESET,    ///< reset the device
   OC_KNX_LSM,      ///< load state machine
   OC_KNX_CRC,      ///< CRC value of loaded contents
-  OC_KNX,          ///< well-known/knx
+  OC_KNX,          ///< well-known / knx
   OC_KNX_FP_G,     ///< FP/G
   OC_KNX_FP_P,     ///< FP/G
   OC_KNX_FP_R,     ///< FP/G
@@ -276,7 +276,7 @@ typedef struct oc_request_t
   oc_endpoint_t *origin;     ///< origin of the request
   oc_resource_t *resource;   ///< resource structure
   const char *query;         ///< query (as string)
-  size_t query_len;          ///< query lenght
+  size_t query_len;          ///< query length
   oc_rep_t *request_payload; ///< request payload structure
   const uint8_t *_payload;   ///< payload of the request
   size_t _payload_len;       ///< payload size

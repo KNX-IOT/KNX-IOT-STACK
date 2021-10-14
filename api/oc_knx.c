@@ -15,7 +15,7 @@
  */
 
 #include "oc_api.h"
-#include "api/oc_knx.h"
+#include "oc_knx.h"
 #include "oc_core_res.h"
 #include <stdio.h>
 
@@ -138,6 +138,94 @@ oc_create_knx_reset_resource(int resource_idx, size_t device)
                                oc_core_knx_reset_post_handler, 0, 0, "");
 }
 
+oc_lsm_state_t
+oc_knx_lsm_state(size_t device)
+{
+
+}
+
+
+
+const char *
+oc_core_get_lsm_as_string(oc_lsm_state_t lsm)
+{
+  // states
+  if (lsm == LSM_UNLOADED) {
+    return "unloaded";
+  }
+  if (lsm == LSM_LOADING) {
+    return "loading";
+  }
+  if (lsm == LSM_LOADED) {
+    return "loaded";
+  }
+  // commands
+  if (lsm == LSM_UNLOAD) {
+    return "unload";
+  }
+  if (lsm == LSM_STARTLOADING) { 
+    return "startLoading";
+  }
+  if (lsm == LSM_LOADED) {
+    return "loadComplete";
+  }
+
+  return "";
+}
+
+
+bool oc_core_lsm_check_string(char* lsm) {
+  int len = strlen(lsm);
+
+  // states
+  if (len == 9 && strcmp(lsm, "unloaded")) {
+    return true;
+  }
+  if (len == 8 && strcmp(lsm, "loading")) {
+    return true;
+  }
+  if (len == 7 && strcmp(lsm, "loaded")) {
+    return true;
+  }
+
+  // commands
+  if (len == 9 && strcmp(lsm, "unload")) {
+    return true;
+  }
+  if (len == 13 && strcmp(lsm, "startLoading")) {
+    return true;
+  }
+  if (len == 13 && strcmp(lsm, "loadComplete")) {
+    return true;
+  }
+
+  return false;
+}
+
+static int
+lsm_create_response(char* lsm_string)
+{
+  int response_lenght = 0;
+
+  int length = oc_rep_add_line_to_buffer("{");
+  response_lenght += length;
+
+  length = oc_rep_add_line_to_buffer("\"cmd\":\"");
+  response_lenght += length;
+
+  length = oc_rep_add_line_to_buffer(lsm_string);
+  response_lenght += length;
+
+  length = oc_rep_add_line_to_buffer("\"}");
+  response_lenght += length;
+
+  length = oc_rep_add_line_to_buffer("}");
+  response_lenght += length;
+
+  return response_lenght;
+}
+
+
 static void
 oc_core_knx_lsm_get_handler(oc_request_t *request,
                             oc_interface_mask_t iface_mask, void *data)
@@ -152,22 +240,17 @@ oc_core_knx_lsm_get_handler(oc_request_t *request,
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
-  /*
-  int length = clf_add_line_to_buffer("{");
-  response_length += length;
+  
+  size_t device_index = request->resource->device;
+  oc_device_info_t *device = oc_core_get_device_info(device_index);
+  if (device == NULL ) {
+    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    return;
+  }
 
-  length = clf_add_line_to_buffer("\"api\": { \"version\": \"1.0\",");
-  response_length += length;
+  response_length = lsm_create_response(oc_core_get_lsm_as_string(device->lsm));
 
-  length = clf_add_line_to_buffer("\"base\": \"/ \"}");
-  response_length += length;
-
-  length = clf_add_line_to_buffer("}");
-  response_length += length;
-  */
-
-  request->response->response_buffer->content_format = APPLICATION_JSON;
-  request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
+  oc_send_json_response(request, OC_STATUS_OK);
   request->response->response_buffer->response_length = response_length;
 }
 
@@ -185,22 +268,20 @@ oc_core_knx_lsm_post_handler(oc_request_t *request,
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
-  /*
-  int length = clf_add_line_to_buffer("{");
-  response_length += length;
 
-  length = clf_add_line_to_buffer("\"api\": { \"version\": \"1.0\",");
-  response_length += length;
+  size_t device_index = request->resource->device;
+  oc_device_info_t *device = oc_core_get_device_info(device_index);
+  if (device == NULL) {
+    oc_send_json_response(request, OC_STATUS_BAD_REQUEST);
+    return;
+  }
 
-  length = clf_add_line_to_buffer("\"base\": \"/ \"}");
-  response_length += length;
+  // parse the received command and sets the state machine accordingly
 
-  length = clf_add_line_to_buffer("}");
-  response_length += length;
-  */
 
-  request->response->response_buffer->content_format = APPLICATION_JSON;
-  request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
+  response_length = lsm_create_response(oc_core_get_lsm_as_string(device->lsm));
+
+  oc_send_json_response(request, OC_STATUS_OK);
   request->response->response_buffer->response_length = response_length;
 }
 
@@ -208,8 +289,9 @@ void
 oc_create_knx_lsm_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_lsm_resource\n");
-  oc_core_lf_populate_resource(resource_idx, device, "/.well-known/knx/lsm",
-                               OC_IF_LL | OC_IF_BASELINE, APPLICATION_CBOR,
+  // "/.well-known/knx/lsm"
+  oc_core_lf_populate_resource(resource_idx, device, "/a/lsm",
+                               OC_IF_LL | OC_IF_BASELINE, APPLICATION_JSON,
                                OC_DISCOVERABLE, oc_core_knx_lsm_get_handler, 0,
                                oc_core_knx_lsm_post_handler, 0, 0, "");
 }

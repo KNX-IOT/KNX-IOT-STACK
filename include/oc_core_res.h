@@ -22,6 +22,7 @@
 
 #include "oc_ri.h"
 #include "oc_device_mode.h"
+#include "oc_knx.h"
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -47,7 +48,7 @@ typedef void (*oc_core_add_device_cb_t)(void *data);
 typedef struct oc_platform_info_t
 {
   oc_uuid_t pi;                                ///< the platform identifier
-  oc_string_t mfg_name;                        ///< manufactorer name
+  oc_string_t mfg_name;                        ///< manufacturer name
   oc_core_init_platform_cb_t init_platform_cb; ///< callback function
   void *data; ///< user data for the callback function
 } oc_platform_info_t;
@@ -68,7 +69,7 @@ typedef struct oc_knx_version_info_t
  */
 typedef struct oc_device_info_t
 {
-  oc_uuid_t di;     ///< device indentifier
+  oc_uuid_t di;     ///< device identifier
   oc_uuid_t piid;   ///< Permanent Immutable ID
   oc_string_t name; ///< name of the device
   oc_string_t icv;  ///< specification version
@@ -80,9 +81,10 @@ typedef struct oc_device_info_t
   oc_string_t hwt;           ///< knx hardware type
   oc_string_t model;         ///< knx model
   int ia;                    ///< knx ia Device individual address
-  oc_string_t hostname;      ///< knx hostname
+  oc_string_t hostname;      ///< knx host name
   oc_string_t iid;           ///< knx idd (installation id)
   bool pm;                   ///< knx programming mode
+  oc_lsm_state_t lsm;        ///< knx lsm states
 
   oc_device_mode_t device_mode; ///< device mode (programming, normal operation)
   oc_core_add_device_cb_t add_device_cb; ///< callback when device is changed
@@ -104,7 +106,7 @@ void oc_core_shutdown(void);
 /**
  * @brief initialize the platform
  *
- * @param mfg_name the manufactorer name
+ * @param mfg_name the manufacturer name
  * @param init_cb the callback
  * @param data  the user data
  * @return oc_platform_info_t* the platform information
@@ -116,7 +118,7 @@ oc_platform_info_t *oc_core_init_platform(const char *mfg_name,
 /**
  * @brief Add new device to the platform
  *
- * @param uri the uri of the device
+ * @param uri the URI of the device
  * @param rt the device type of the device
  * @param name the friendly name
  * @param spec_version specification version
@@ -195,10 +197,10 @@ int oc_core_set_device_pm(int device_index, bool pm);
 int oc_core_set_device_model(int device_index, const char *model);
 
 /**
- * @brief sets the hostname (string)
+ * @brief sets the host name (string)
  *
  * @param device_index the device index
- * @param hostname the hostname
+ * @param hostname the host name
  * @return int error status, 0 = OK
  */
 int oc_core_set_device_hostname(int device_index, const char *hostname);
@@ -207,7 +209,7 @@ int oc_core_set_device_hostname(int device_index, const char *hostname);
  * @brief sets the iid (string)
  *
  * @param device_index the device index
- * @param iid the knx installation id
+ * @param iid the KNX installation id
  * @return int error status, 0 = OK
  */
 int oc_core_set_device_iid(int device_index, const char *iid);
@@ -263,17 +265,17 @@ oc_resource_t *oc_core_get_resource_by_index(int type, size_t device);
 /**
  * @brief retrieve the resource by uri
  *
- * @param uri the uri
+ * @param uri the URI
  * @param device the device index
  * @return oc_resource_t* the resource handle
  */
 oc_resource_t *oc_core_get_resource_by_uri(const char *uri, size_t device);
 
 /**
- * @brief store the uri as a string
+ * @brief store the URI as a string
  *
  * @param s_uri source string
- * @param d_uri destination (to be allocated) to store the uri
+ * @param d_uri destination (to be allocated) to store the URI
  */
 void oc_store_uri(const char *s_uri, oc_string_t *d_uri);
 
@@ -283,7 +285,7 @@ void oc_store_uri(const char *s_uri, oc_string_t *d_uri);
  *
  * @param core_resource the resource index
  * @param device_index the device index
- * @param uri the uri for the resource
+ * @param uri the URI for the resource
  * @param iface_mask interfaces (as mask) to be implemented on the resource
  * @param default_interface the default interface
  * @param properties the properties (as mask)
@@ -310,7 +312,7 @@ void oc_core_populate_resource(int core_resource, size_t device_index,
  *
  * @param core_resource the resource index
  * @param device_index the device index
- * @param uri the uri for the resource
+ * @param uri the URI for the resource
  * @param iface_mask interfaces (as mask) to be implemented on the resource
  * @param content_format the content type that should be listed as ct in
  * link-format responses
