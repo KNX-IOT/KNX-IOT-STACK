@@ -202,7 +202,7 @@ void
 oc_create_dev_name_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_dev_name_resource\n");
-  // cbor rt: 
+  // cbor rt:
   oc_core_lf_populate_resource(
     resource_idx, device, "/dev/name", OC_IF_D, APPLICATION_CBOR,
     OC_DISCOVERABLE, oc_core_dev_name_get_handler, 0, 0, 0, 1, ":dpt.utf8");

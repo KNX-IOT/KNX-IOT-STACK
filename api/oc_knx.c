@@ -150,7 +150,6 @@ oc_knx_lsm_state(size_t device_index)
   return device->lsm;
 }
 
-
 const char *
 oc_core_get_lsm_as_string(oc_lsm_state_t lsm)
 {
@@ -168,7 +167,7 @@ oc_core_get_lsm_as_string(oc_lsm_state_t lsm)
   if (lsm == LSM_UNLOAD) {
     return "unload";
   }
-  if (lsm == LSM_STARTLOADING) { 
+  if (lsm == LSM_STARTLOADING) {
     return "startLoading";
   }
   if (lsm == LSM_LOADED) {
@@ -178,8 +177,9 @@ oc_core_get_lsm_as_string(oc_lsm_state_t lsm)
   return "";
 }
 
-
-bool oc_core_lsm_check_string(const char* lsm) {
+bool
+oc_core_lsm_check_string(const char *lsm)
+{
   int len = strlen(lsm);
 
   // states
@@ -208,7 +208,7 @@ bool oc_core_lsm_check_string(const char* lsm) {
 }
 
 static int
-lsm_create_response(const char* lsm_string)
+lsm_create_response(const char *lsm_string)
 {
   int response_lenght = 0;
 
@@ -230,7 +230,6 @@ lsm_create_response(const char* lsm_string)
   return response_lenght;
 }
 
-
 static void
 oc_core_knx_lsm_get_handler(oc_request_t *request,
                             oc_interface_mask_t iface_mask, void *data)
@@ -245,10 +244,10 @@ oc_core_knx_lsm_get_handler(oc_request_t *request,
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
-  
+
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
-  if (device == NULL ) {
+  if (device == NULL) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -282,7 +281,6 @@ oc_core_knx_lsm_post_handler(oc_request_t *request,
   }
 
   // parse the received command and sets the state machine accordingly
-
 
   response_length = lsm_create_response(oc_core_get_lsm_as_string(device->lsm));
 
