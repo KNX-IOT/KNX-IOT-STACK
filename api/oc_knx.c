@@ -139,11 +139,16 @@ oc_create_knx_reset_resource(int resource_idx, size_t device)
 }
 
 oc_lsm_state_t
-oc_knx_lsm_state(size_t device)
+oc_knx_lsm_state(size_t device_index)
 {
+  oc_device_info_t *device = oc_core_get_device_info(device_index);
+  if (device == NULL) {
+    OC_ERR("device not found %d", device_index)
+    return LSM_UNLOADED;
+  }
 
+  return device->lsm;
 }
-
 
 
 const char *
@@ -174,7 +179,7 @@ oc_core_get_lsm_as_string(oc_lsm_state_t lsm)
 }
 
 
-bool oc_core_lsm_check_string(char* lsm) {
+bool oc_core_lsm_check_string(const char* lsm) {
   int len = strlen(lsm);
 
   // states
@@ -203,7 +208,7 @@ bool oc_core_lsm_check_string(char* lsm) {
 }
 
 static int
-lsm_create_response(char* lsm_string)
+lsm_create_response(const char* lsm_string)
 {
   int response_lenght = 0;
 
