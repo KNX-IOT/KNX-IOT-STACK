@@ -234,19 +234,33 @@ oc_parse_rep_value(CborValue *value, oc_rep_t **rep, CborError *err)
   cur->next = 0;
   cur->value.object_array = 0;
   /* key */
-  if (!cbor_value_is_text_string(value)) {
+  //if (!cbor_value_is_text_string(value) || !cbor_value_is_integer(value)) {
+  //  *err = CborErrorIllegalType;
+  //  return;
+  //}
+
+  /* key */
+  if (cbor_value_is_text_string(value)) {
+    /* key as string */
+    *err |= cbor_value_calculate_string_length(value, &len);
+    len++;
+    if (*err != CborNoError || len == 0)
+      return;
+    oc_alloc_string(&cur->name, len);
+    *err |= cbor_value_copy_text_string(value, (char *)oc_string(cur->name), &len,
+                                        NULL);
+    if (*err != CborNoError)
+      return;
+  } else if (cbor_value_is_integer(value)) {
+    /* key as integer */
+    *err |= cbor_value_get_int(value, &cur->iname);
+    if (*err != CborNoError)
+      return;
+  } else {
     *err = CborErrorIllegalType;
     return;
   }
-  *err |= cbor_value_calculate_string_length(value, &len);
-  len++;
-  if (*err != CborNoError || len == 0)
-    return;
-  oc_alloc_string(&cur->name, len);
-  *err |= cbor_value_copy_text_string(value, (char *)oc_string(cur->name), &len,
-                                      NULL);
-  if (*err != CborNoError)
-    return;
+
 get_tagged_value:
   *err |= cbor_value_advance(value);
   /* value */

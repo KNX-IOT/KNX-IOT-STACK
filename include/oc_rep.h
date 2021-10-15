@@ -40,7 +40,7 @@ extern int g_err;
  * Unlikely to be used by outside the stack library.
  *
  * @param[in] payload  pointer to payload buffer
- * @param[in] size     size of the payload buffer
+ * @param[in] size     the size of the payload buffer
  */
 void oc_rep_new(uint8_t *payload, int size);
 
@@ -990,9 +990,10 @@ typedef enum {
 
 typedef struct oc_rep_s
 {
-  oc_rep_value_type_t type;
-  struct oc_rep_s *next;
-  oc_string_t name;
+  oc_rep_value_type_t type;   ///< type of the data
+  struct oc_rep_s *next;  ///< next in list
+  oc_string_t name;  ///< name of the tag
+  int iname;         ///< integer as tag name
   union oc_rep_value {
     int64_t integer;
     bool boolean;
@@ -1001,7 +1002,7 @@ typedef struct oc_rep_s
     oc_array_t array;
     struct oc_rep_s *object;
     struct oc_rep_s *object_array;
-  } value;
+  } value;  ///< values
 } oc_rep_t;
 
 void oc_rep_set_pool(struct oc_memb *rep_objects_pool);
