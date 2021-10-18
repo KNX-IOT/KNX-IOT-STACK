@@ -53,15 +53,16 @@ oc_core_knx_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     request->response->response_buffer->response_length = response_length;
   } else {
 
-    /*
+    
+    oc_rep_begin_root_object();
 
-    oc_rep_start_root_object();
-    oc_rep_begin_object(root, api);
+    oc_rep_begin_new_object(root, api);
     oc_rep_set_text_string(api, version, "1.0");
-    oc_rep_end_object(root, api);
+    oc_rep_end_new_object(root, api);
+
     oc_rep_set_text_string(root, base, "/");
     oc_rep_end_root_object();
-    */
+    
     oc_send_cbor_response(request, OC_STATUS_OK);
 
   }

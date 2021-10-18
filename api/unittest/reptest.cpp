@@ -1605,3 +1605,576 @@ TEST(TestRep, OCRepRootArrayObject)
 
   oc_free_rep(rep);
 }
+
+
+
+/*
+ * ====================================================================================
+ * testing with tag is an integer instead of ascii
+ * ====================================================================================
+ */
+TEST(TestRep, OCRepISetGetDouble)
+{
+
+  /*buffer for oc_rep_t */
+  uint8_t buf[1024];
+  oc_rep_new(&buf[0], 1024);
+
+  /* add int values to root object */
+  oc_rep_start_root_object();
+  oc_rep_i_set_double(root, 5, 3.14159);
+  oc_rep_end_root_object();
+
+  /* convert CborEncoder to oc_rep_t */
+  const uint8_t *payload = oc_rep_get_encoder_buf();
+  int payload_len = oc_rep_get_encoded_payload_size();
+  EXPECT_NE(payload_len, -1);
+  struct oc_memb rep_objects = { sizeof(oc_rep_t), 0, 0, 0, 0 };
+  oc_rep_set_pool(&rep_objects);
+  oc_rep_t *rep = NULL;
+  oc_parse_rep(payload, payload_len, &rep);
+  ASSERT_TRUE(rep != NULL);
+
+  /* read values from  the oc_rep_t */
+  double pi_out = 0;
+  EXPECT_TRUE(oc_rep_i_get_double(rep, 5, &pi_out));
+  EXPECT_EQ(3.14159, pi_out);
+  /* error handling */
+  EXPECT_FALSE(oc_rep_i_get_double(NULL, 5, &pi_out));
+  EXPECT_FALSE(oc_rep_i_get_double(rep, 5, NULL));
+  EXPECT_FALSE(oc_rep_i_get_double(rep, 0, &pi_out));
+
+  char *json;
+  size_t json_size;
+  json_size = oc_rep_to_json(rep, NULL, 0, false);
+  json = (char *)malloc(json_size + 1);
+  oc_rep_to_json(rep, json, json_size + 1, false);
+  EXPECT_STREQ("{\"5\":3.141590}", json);
+  free(json);
+  json = NULL;
+  json_size = oc_rep_to_json(rep, NULL, 0, true);
+  json = (char *)malloc(json_size + 1);
+  oc_rep_to_json(rep, json, json_size + 1, true);
+  EXPECT_STREQ("{\n  \"5\" : 3.141590\n}\n", json);
+  free(json);
+  json = NULL;
+
+  oc_free_rep(rep);
+}
+
+
+
+TEST(TestRep, OCRepISetGetInt)
+{
+
+  /*buffer for oc_rep_t */
+  uint8_t buf[1024];
+  oc_rep_new(&buf[0], 1024);
+
+  /* add values to root object */
+  oc_rep_start_root_object();
+  EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
+  oc_rep_i_set_int(root, 2, 10000000000);
+  EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
+  oc_rep_i_set_int(root, 3, -1024);
+  EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
+  oc_rep_i_set_int(root, 4, 0);
+  EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
+  oc_rep_end_root_object();
+  EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
+
+  /* convert CborEncoder to oc_rep_t */
+  const uint8_t *payload = oc_rep_get_encoder_buf();
+  int payload_len = oc_rep_get_encoded_payload_size();
+  EXPECT_NE(payload_len, -1);
+  struct oc_memb rep_objects = { sizeof(oc_rep_t), 0, 0, 0, 0 };
+  oc_rep_set_pool(&rep_objects);
+  oc_rep_t *rep = NULL;
+  oc_parse_rep(payload, payload_len, &rep);
+  ASSERT_TRUE(rep != NULL);
+
+  /* read the values from  the oc_rep_t */
+  int64_t ultimate_answer_out = 0;
+  EXPECT_TRUE(oc_rep_i_get_int(rep, 2, &ultimate_answer_out));
+  EXPECT_EQ(10000000000, ultimate_answer_out);
+  int64_t negative_out = 0;
+  EXPECT_TRUE(oc_rep_i_get_int(rep, 3, &negative_out));
+  EXPECT_EQ(-1024, negative_out);
+  int64_t zero_out = -1;
+  EXPECT_TRUE(oc_rep_i_get_int(rep, 4, &zero_out));
+  EXPECT_EQ(0, zero_out);
+  /* check error handling */
+  EXPECT_FALSE(oc_rep_i_get_int(NULL, 4, &zero_out));
+  //EXPECT_FALSE(oc_rep_i_get_int(rep, NULL, &zero_out));
+  EXPECT_FALSE(oc_rep_i_get_int(rep, 4, NULL));
+  EXPECT_FALSE(oc_rep_i_get_int(rep, 255, &zero_out));
+
+  char json_buf[75];
+  EXPECT_EQ(33, oc_rep_to_json(rep, json_buf, 75, false));
+  EXPECT_STREQ(
+    "{\"2\":10000000000,\"3\":-1024,\"4\":0}",
+    json_buf);
+  const char json[] = "{\n"
+                      "  \"2\" : 10000000000,\n"
+                      "  \"3\" : -1024,\n"
+                      "  \"4\" : 0\n"
+                      "}\n";
+  EXPECT_EQ(50, oc_rep_to_json(rep, json_buf, 75, true));
+  EXPECT_STREQ(json, json_buf);
+
+  oc_free_rep(rep);
+}
+
+/*
+ * Working with uint is a little unusual there is a macro to set the uint type
+ * but no function to get the uint type.  In addition the type uint is encoded
+ * to use is OC_REP_INT. You can successfully pass a number larger than int but
+ * must cast it to uint after reading from the value. This requires the client
+ * to know that the service it encoding the uint with no over the wire
+ * indication of the fact.
+ *
+ * Should there be a oc_rep_get_uint() function?
+ * Should there be a OC_REP_UINT type?
+ * Should the oc_rep_set_uint macro be removed?
+ */
+TEST(TestRep, OCRepISetGetUint)
+{
+
+  /*buffer for oc_rep_t */
+  uint8_t buf[1024];
+  oc_rep_new(&buf[0], 1024);
+
+  /* add values to root object */
+  oc_rep_start_root_object();
+  EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
+  oc_rep_i_set_uint(root, 2, 42);
+  EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
+  /*
+   * Assuming 32 bit int, which should be true for systems the gtest will
+   * be running on, the largest value for 32 bit int is 2,147,483,647 or
+   * 0x7FFFFFFF
+   */
+  oc_rep_i_set_uint(root, 3, 3000000000);
+  EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
+  oc_rep_i_set_uint(root, 4, 0);
+  EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
+  oc_rep_end_root_object();
+  EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
+
+  /* convert CborEncoder to oc_rep_t */
+  const uint8_t *payload = oc_rep_get_encoder_buf();
+  int payload_len = oc_rep_get_encoded_payload_size();
+  EXPECT_NE(payload_len, -1);
+  struct oc_memb rep_objects = { sizeof(oc_rep_t), 0, 0, 0, 0 };
+  oc_rep_set_pool(&rep_objects);
+  oc_rep_t *rep = NULL;
+  oc_parse_rep(payload, payload_len, &rep);
+  ASSERT_TRUE(rep != NULL);
+
+  /* read the values from  the oc_rep_t */
+  EXPECT_EQ(OC_REP_INT, rep->type);
+  int64_t ultimate_answer_out = 0;
+  EXPECT_TRUE(oc_rep_i_get_int(rep, 2, &ultimate_answer_out));
+  EXPECT_EQ(42u, (uint)ultimate_answer_out);
+  int64_t larger_than_int_out = 0;
+  EXPECT_TRUE(oc_rep_i_get_int(rep, 3, &larger_than_int_out));
+  EXPECT_EQ(3000000000u, (uint)larger_than_int_out);
+  int64_t zero_out = -1;
+  EXPECT_TRUE(oc_rep_i_get_int(rep, 4, &zero_out));
+  EXPECT_EQ(0u, (uint)zero_out);
+  /* check error handling */
+  EXPECT_FALSE(oc_rep_i_get_int(NULL, 4, &zero_out));
+  //EXPECT_FALSE(oc_rep_i_get_int(rep, NULL, &zero_out));
+  EXPECT_FALSE(oc_rep_i_get_int(rep, 4, NULL));
+  EXPECT_FALSE(oc_rep_i_get_int(rep, 254, &zero_out));
+
+  char *json;
+  size_t json_size;
+  json_size = oc_rep_to_json(rep, NULL, 0, false);
+  json = (char *)malloc(json_size + 1);
+  oc_rep_to_json(rep, json, json_size + 1, false);
+  EXPECT_STREQ(
+    "{\"2\":42,\"3\":3000000000,\"4\":0}", json);
+  free(json);
+  json = NULL;
+  json_size = oc_rep_to_json(rep, NULL, 0, true);
+  json = (char *)malloc(json_size + 1);
+  oc_rep_to_json(rep, json, json_size + 1, true);
+  const char pretty_json[] = "{\n"
+                             "  \"2\" : 42,\n"
+                             "  \"3\" : 3000000000,\n"
+                             "  \"4\" : 0\n"
+                             "}\n";
+  EXPECT_STREQ(pretty_json, json);
+  free(json);
+  json = NULL;
+
+  oc_free_rep(rep);
+}
+
+/* why do we have set_boolean but get_bool shouldn't the function names match */
+TEST(TestRep, OCRepISetGetBool)
+{
+
+  /*buffer for oc_rep_t */
+  uint8_t buf[1024];
+  oc_rep_new(&buf[0], 1024);
+
+  /* add values to root object */
+  oc_rep_start_root_object();
+  EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
+  oc_rep_i_set_boolean(root, 2, true);
+  EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
+  oc_rep_i_set_boolean(root, 3, false);
+  EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
+  oc_rep_end_root_object();
+  EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
+
+  /* convert CborEncoder to oc_rep_t */
+  const uint8_t *payload = oc_rep_get_encoder_buf();
+  int payload_len = oc_rep_get_encoded_payload_size();
+  EXPECT_NE(payload_len, -1);
+  struct oc_memb rep_objects = { sizeof(oc_rep_t), 0, 0, 0, 0 };
+  oc_rep_set_pool(&rep_objects);
+  oc_rep_t *rep = NULL;
+  oc_parse_rep(payload, payload_len, &rep);
+  ASSERT_TRUE(rep != NULL);
+
+  /* read the ultimate_answer from  the oc_rep_t */
+  bool true_flag_out = false;
+  EXPECT_TRUE(oc_rep_i_get_bool(rep, 2, &true_flag_out));
+  EXPECT_TRUE(true_flag_out);
+  bool false_flag_out = true;
+  EXPECT_TRUE(oc_rep_i_get_bool(rep, 3, &false_flag_out));
+  EXPECT_FALSE(false_flag_out);
+  /* check error handling */
+  EXPECT_FALSE(oc_rep_i_get_bool(NULL, 2, &true_flag_out));
+  //EXPECT_FALSE(oc_rep_get_bool(rep, NULL, &true_flag_out));
+  EXPECT_FALSE(oc_rep_i_get_bool(rep, 3, NULL));
+  EXPECT_FALSE(oc_rep_i_get_bool(rep, 200, &true_flag_out));
+
+  char *json;
+  size_t json_size;
+  json_size = oc_rep_to_json(rep, NULL, 0, false);
+  json = (char *)malloc(json_size + 1);
+  oc_rep_to_json(rep, json, json_size + 1, false);
+  const char non_pretty_json[] = "{\"2\":true,\"3\":false}";
+  EXPECT_STREQ(non_pretty_json, json);
+  free(json);
+  json = NULL;
+  json_size = oc_rep_to_json(rep, NULL, 0, true);
+  json = (char *)malloc(json_size + 1);
+  oc_rep_to_json(rep, json, json_size + 1, true);
+  const char pretty_json[] = "{\n"
+                             "  \"2\" : true,\n"
+                             "  \"3\" : false\n"
+                             "}\n";
+  EXPECT_STREQ(pretty_json, json);
+  free(json);
+  json = NULL;
+
+  oc_free_rep(rep);
+}
+
+/*
+ * This test assumes text in this file is saved using a utf8 format. This is
+ * generally a safe assumption since it is the default format use by git.
+ *
+ * If the test is run on a terminal that does not support utf8 it should still
+ * pass the tests.  However, if the test should fail the printed error may be
+ * gibberish when read from the terminal. Only place this is a known problem
+ * is Windows CMD terminal.
+ *
+ * TODO Is there a max string length? If so consider adding test that equals and
+ * exceeds max sting length.
+ */
+TEST(TestRep, OCRepISetGetTextString)
+{
+  /*buffer for oc_rep_t */
+  uint8_t buf[1024];
+  oc_rep_new(&buf[0], 1024);
+
+  /* add text string value "2":"Dave" to root object */
+  oc_rep_start_root_object();
+  EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
+  oc_rep_i_set_text_string(root, 2, "Dave");
+  EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
+  /* test utf8 character support "hello world" in russian */
+  oc_rep_i_set_text_string(root, 3, "Привет, мир");
+  EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
+  oc_rep_end_root_object();
+  EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
+
+  /* convert CborEncoder to oc_rep_t */
+  const uint8_t *payload = oc_rep_get_encoder_buf();
+  int payload_len = oc_rep_get_encoded_payload_size();
+  EXPECT_NE(payload_len, -1);
+  struct oc_memb rep_objects = { sizeof(oc_rep_t), 0, 0, 0, 0 };
+  oc_rep_set_pool(&rep_objects);
+  oc_rep_t *rep = NULL;
+  oc_parse_rep(payload, payload_len, &rep);
+  ASSERT_TRUE(rep != NULL);
+
+  /* read the hal9000 from  the oc_rep_t */
+  char *hal9000_out = NULL;
+  size_t str_len;
+  EXPECT_TRUE(oc_rep_i_get_string(rep, 2, &hal9000_out, &str_len));
+  EXPECT_STREQ("Dave", hal9000_out);
+  EXPECT_EQ(4, str_len);
+  char *ru_character_set_out = NULL;
+  EXPECT_TRUE(oc_rep_i_get_string(rep, 3, &ru_character_set_out,
+                                &str_len));
+  EXPECT_STREQ("Привет, мир", ru_character_set_out);
+  /*
+   * to encode Привет, мир takes more bytes than the number of characters so
+   * calculate the the number of bytes using the strlen function.
+   */
+  EXPECT_EQ(strlen("Привет, мир"), str_len);
+  /* check error handling */
+  EXPECT_FALSE(oc_rep_i_get_string(NULL, 2, &hal9000_out, &str_len));
+  //EXPECT_FALSE(oc_rep_i_get_string(rep, NULL, &hal9000_out, &str_len));
+  EXPECT_FALSE(oc_rep_i_get_string(rep, 2, NULL, &str_len));
+  EXPECT_FALSE(oc_rep_i_get_string(rep, 2, &hal9000_out, NULL));
+  EXPECT_FALSE(oc_rep_i_get_string(rep, 250, &hal9000_out, &str_len));
+
+  char *json;
+  size_t json_size;
+  json_size = oc_rep_to_json(rep, NULL, 0, false);
+  json = (char *)malloc(json_size + 1);
+  oc_rep_to_json(rep, json, json_size + 1, false);
+  const char non_pretty_json[] = "{\"2\":\"Dave\","
+                                 "\"3\":\"Привет, мир\"}";
+  EXPECT_STREQ(non_pretty_json, json);
+  free(json);
+  json = NULL;
+  json_size = oc_rep_to_json(rep, NULL, 0, true);
+  json = (char *)malloc(json_size + 1);
+  oc_rep_to_json(rep, json, json_size + 1, true);
+  const char pretty_json[] = "{\n"
+                             "  \"2\" : \"Dave\",\n"
+                             "  \"3\" : \"Привет, мир\"\n"
+                             "}\n";
+  EXPECT_STREQ(pretty_json, json);
+  free(json);
+  json = NULL;
+
+  oc_free_rep(rep);
+}
+
+/*
+ * TODO is there a max byte array length? If so consider adding a test that
+ * equals and exceeds the max array length.
+ */
+TEST(TestRep, OCRepISetGetByteString)
+{
+  /*buffer for oc_rep_t */
+  uint8_t buf[1024];
+  oc_rep_new(&buf[0], 1024);
+
+  /* add text string value "2":"Dave" to root object */
+  oc_rep_start_root_object();
+  EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
+  const uint8_t test_byte_string[] = { 0x01, 0x02, 0x03, 0x04, 0x02, 0x00 };
+  oc_rep_i_set_byte_string(root, 2, test_byte_string, 6u);
+  EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
+  oc_rep_end_root_object();
+  EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
+  
+  /* convert CborEncoder to oc_rep_t */
+  const uint8_t *payload = oc_rep_get_encoder_buf();
+  int payload_len = oc_rep_get_encoded_payload_size();
+  EXPECT_NE(payload_len, -1);
+  struct oc_memb rep_objects = { sizeof(oc_rep_t), 0, 0, 0, 0 };
+  oc_rep_set_pool(&rep_objects);
+  oc_rep_t *rep = NULL;
+  oc_parse_rep(payload, payload_len, &rep);
+  ASSERT_TRUE(rep != NULL);
+
+  char *test_byte_string_out = NULL;
+  size_t str_len;
+  EXPECT_TRUE(oc_rep_i_get_byte_string(rep, 2,
+                                     &test_byte_string_out, &str_len));
+  EXPECT_EQ(6, str_len);
+  /*
+   * cast the array and use STREQ to compare this only works because the
+   * test_byte_string was nul terminated other wise we would have to loop
+   * through the array.
+   */
+  EXPECT_STREQ((const char *)test_byte_string, test_byte_string_out);
+  /* error handling */
+  EXPECT_FALSE(oc_rep_i_get_byte_string(NULL, 2,
+                                      &test_byte_string_out, &str_len));
+  //EXPECT_FALSE(
+  //  oc_rep_get_byte_string(rep, NULL, &test_byte_string_out, &str_len));
+  EXPECT_FALSE(oc_rep_i_get_byte_string(rep, 2, NULL, &str_len));
+  EXPECT_FALSE(oc_rep_i_get_byte_string(rep, 2,
+                                      &test_byte_string_out, NULL));
+  EXPECT_FALSE(
+    oc_rep_i_get_byte_string(rep, 250, &test_byte_string_out, &str_len));
+
+  char *json;
+  size_t json_size;
+  json_size = oc_rep_to_json(rep, NULL, 0, false);
+  json = (char *)malloc(json_size + 1);
+  oc_rep_to_json(rep, json, json_size + 1, false);
+  const char non_pretty_json[] = "{\"2\":\"AQIDBAIA\"}";
+  EXPECT_STREQ(non_pretty_json, json);
+  free(json);
+  json = NULL;
+  json_size = oc_rep_to_json(rep, NULL, 0, true);
+  json = (char *)malloc(json_size + 1);
+  oc_rep_to_json(rep, json, json_size + 1, true);
+  const char pretty_json[] = "{\n"
+                             "  \"2\" : \"AQIDBAIA\"\n"
+                             "}\n";
+  EXPECT_STREQ(pretty_json, json);
+  free(json);
+  json = NULL;
+
+  char too_small[15];
+  EXPECT_LT(15, oc_rep_to_json(rep, NULL, 0, false));
+  EXPECT_LT(15, oc_rep_to_json(rep, too_small, 15, false));
+  // Decoding of byte string is an all or nothing action. Since there
+  // is not enough room in the too_small output buffer nothing is placed in the
+  // buffer and remaining space is left empty.
+  const char too_small_json[] = "{\"2\":\"";
+  EXPECT_STREQ(too_small_json, too_small);
+
+  oc_free_rep(rep);
+}
+
+TEST(TestRep, OCRepISetGetIntArray)
+{
+  /*buffer for oc_rep_t */
+  uint8_t buf[1024];
+  oc_rep_new(&buf[0], 1024);
+
+  /* add values to root object */
+  oc_rep_start_root_object();
+  EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
+  int64_t fib[] = { 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 10000000000 };
+  oc_rep_i_set_int_array(root, i2, fib,
+                       (int)(sizeof(fib) / sizeof(fib[0])));
+  EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
+  oc_rep_end_root_object();
+  EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
+
+  /* convert CborEncoder to oc_rep_t */
+  const uint8_t *payload = oc_rep_get_encoder_buf();
+  int payload_len = oc_rep_get_encoded_payload_size();
+  EXPECT_NE(payload_len, -1);
+  struct oc_memb rep_objects = { sizeof(oc_rep_t), 0, 0, 0, 0 };
+  oc_rep_set_pool(&rep_objects);
+  oc_rep_t *rep = NULL;
+  oc_parse_rep(payload, payload_len, &rep);
+  ASSERT_TRUE(rep != NULL);
+
+  /* read the values from the oc_rep_t */
+  int64_t *fib_out = 0;
+  size_t fib_len;
+  EXPECT_TRUE(oc_rep_i_get_int_array(rep, 2, &fib_out, &fib_len));
+  ASSERT_EQ(sizeof(fib) / sizeof(fib[0]), fib_len);
+  for (size_t i = 0; i < fib_len; ++i) {
+    EXPECT_EQ(fib[i], fib_out[i]);
+  }
+
+  /* Error handling */
+  EXPECT_FALSE(oc_rep_i_get_int_array(NULL, 2, &fib_out, &fib_len));
+  // EXPECT_FALSE(oc_rep_i_get_int_array(rep, NULL, &fib_out, &fib_len));
+  EXPECT_FALSE(oc_rep_i_get_int_array(rep, 2, NULL, &fib_len));
+  EXPECT_FALSE(oc_rep_i_get_int_array(rep, 2, &fib_out, NULL));
+  EXPECT_FALSE(oc_rep_i_get_int_array(rep, 250, &fib_out, &fib_len));
+
+  char *json;
+  size_t json_size;
+  json_size = oc_rep_to_json(rep, NULL, 0, false);
+  json = (char *)malloc(json_size + 1);
+  oc_rep_to_json(rep, json, json_size + 1, false);
+  const char non_pretty_json[] =
+    "{\"2\":[1,1,2,3,5,8,13,21,34,55,89,10000000000]}";
+  EXPECT_STREQ(non_pretty_json, json);
+  free(json);
+  json = NULL;
+  json_size = oc_rep_to_json(rep, NULL, 0, true);
+  json = (char *)malloc(json_size + 1);
+  oc_rep_to_json(rep, json, json_size + 1, true);
+  const char pretty_json[] =
+    "{\n"
+    "  \"2\" : [1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 10000000000]\n"
+    "}\n";
+  EXPECT_STREQ(pretty_json, json);
+  free(json);
+  json = NULL;
+
+  oc_free_rep(rep);
+}
+
+/*
+ * This test uses oc_rep_add_int to build the cbor array instead of
+ * oc_rep_set_int_array
+ */
+TEST(TestRep, OCRepIAddGetIntArray)
+{
+  /*buffer for oc_rep_t */
+  uint8_t buf[1024];
+  oc_rep_new(&buf[0], 1024);
+
+  /* add values to root object */
+  oc_rep_start_root_object();
+  EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
+  int64_t fib[] = { 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89 };
+
+  oc_rep_i_open_array(root, i2);
+  EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
+  for (size_t i = 0; i < (sizeof(fib) / sizeof(fib[0])); i++) {
+    oc_rep_add_int(i2, fib[i]);
+    EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
+  }
+  oc_rep_close_array(root, i2);
+  EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
+  oc_rep_end_root_object();
+  EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
+
+  /* convert CborEncoder to oc_rep_t */
+  const uint8_t *payload = oc_rep_get_encoder_buf();
+  int payload_len = oc_rep_get_encoded_payload_size();
+  EXPECT_NE(payload_len, -1);
+  struct oc_memb rep_objects = { sizeof(oc_rep_t), 0, 0, 0, 0 };
+  oc_rep_set_pool(&rep_objects);
+  oc_rep_t *rep = NULL;
+  oc_parse_rep(payload, payload_len, &rep);
+  ASSERT_TRUE(rep != NULL);
+
+  /* read the values from the oc_rep_t */
+  int64_t *fib_out = 0;
+  size_t fib_len;
+  EXPECT_TRUE(oc_rep_i_get_int_array(rep, 2, &fib_out, &fib_len));
+  ASSERT_EQ(sizeof(fib) / sizeof(fib[0]), fib_len);
+  for (size_t i = 0; i < fib_len; ++i) {
+    EXPECT_EQ(fib[i], fib_out[i]);
+  }
+
+  char *json;
+  size_t json_size;
+  json_size = oc_rep_to_json(rep, NULL, 0, false);
+  json = (char *)malloc(json_size + 1);
+  oc_rep_to_json(rep, json, json_size + 1, false);
+  const char non_pretty_json[] = "{\"2\":[1,1,2,3,5,8,13,21,34,55,89]}";
+  EXPECT_STREQ(non_pretty_json, json);
+  free(json);
+  json = NULL;
+  json_size = oc_rep_to_json(rep, NULL, 0, true);
+  json = (char *)malloc(json_size + 1);
+  oc_rep_to_json(rep, json, json_size + 1, true);
+  const char pretty_json[] =
+    "{\n"
+    "  \"2\" : [1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89]\n"
+    "}\n";
+  EXPECT_STREQ(pretty_json, json);
+  free(json);
+  json = NULL;
+
+  oc_free_rep(rep);
+}
+
+
