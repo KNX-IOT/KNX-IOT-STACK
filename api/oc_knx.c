@@ -18,6 +18,7 @@
 #include "oc_knx.h"
 #include "oc_core_res.h"
 #include <stdio.h>
+#include "oc_rep.h" // should not be needed
 
 static void
 oc_core_knx_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
@@ -28,28 +29,41 @@ oc_core_knx_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
-  if (request->accept != APPLICATION_JSON) {
+  if (request->accept != APPLICATION_JSON ||
+      request->accept != APPLICATION_CBOR) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
-  /*
-  int length = clf_add_line_to_buffer("{");
-  response_length += length;
+  if (request->accept == APPLICATION_JSON) {
 
-  length = clf_add_line_to_buffer("\"api\": { \"version\": \"1.0\",");
-  response_length += length;
+    int length = oc_rep_add_line_to_buffer("{");
+    response_length += length;
 
-  length = clf_add_line_to_buffer("\"base\": \"/ \"}");
-  response_length += length;
+    length = oc_rep_add_line_to_buffer("\"api\": { \"version\": \"1.0\",");
+    response_length += length;
 
-  length = clf_add_line_to_buffer("}");
-  response_length += length;
-  */
+    length = oc_rep_add_line_to_buffer("\"base\": \"/ \"}");
+    response_length += length;
 
-  request->response->response_buffer->content_format = APPLICATION_JSON;
-  request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
-  request->response->response_buffer->response_length = response_length;
+    length = oc_rep_add_line_to_buffer("}");
+    response_length += length;
+
+    oc_send_json_response(request, OC_STATUS_OK);
+    request->response->response_buffer->response_length = response_length;
+  } else {
+
+    oc_rep_begin_root_object();
+
+    oc_rep_begin_new_object(root, api);
+    oc_rep_set_text_string(api, version, "1.0");
+    oc_rep_end_new_object(root, api);
+
+    oc_rep_set_text_string(root, base, "/");
+    oc_rep_end_root_object();
+
+    oc_send_cbor_response(request, OC_STATUS_OK);
+  }
 }
 
 static void
@@ -66,22 +80,22 @@ oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
+
   /*
-  int length = clf_add_line_to_buffer("{");
+  int length = oc_rep_add_line_to_buffer("{");
   response_length += length;
 
-  length = clf_add_line_to_buffer("\"api\": { \"version\": \"1.0\",");
+  length = oc_rep_add_line_to_buffer("\"api\": { \"version\": \"1.0\",");
   response_length += length;
 
-  length = clf_add_line_to_buffer("\"base\": \"/ \"}");
+  length = oc_rep_add_line_to_buffer("\"base\": \"/ \"}");
   response_length += length;
 
-  length = clf_add_line_to_buffer("}");
+  length = oc_rep_add_line_to_buffer("}");
   response_length += length;
   */
 
-  request->response->response_buffer->content_format = APPLICATION_JSON;
-  request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
+  oc_send_json_response(request, OC_STATUS_OK);
   request->response->response_buffer->response_length = response_length;
 }
 
@@ -123,8 +137,7 @@ oc_core_knx_reset_post_handler(oc_request_t *request,
   response_length += length;
   */
 
-  request->response->response_buffer->content_format = APPLICATION_JSON;
-  request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
+  oc_send_json_response(request, OC_STATUS_OK);
   request->response->response_buffer->response_length = response_length;
 }
 

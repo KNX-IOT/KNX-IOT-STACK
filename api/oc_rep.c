@@ -234,19 +234,33 @@ oc_parse_rep_value(CborValue *value, oc_rep_t **rep, CborError *err)
   cur->next = 0;
   cur->value.object_array = 0;
   /* key */
-  if (!cbor_value_is_text_string(value)) {
+  // if (!cbor_value_is_text_string(value) || !cbor_value_is_integer(value)) {
+  //  *err = CborErrorIllegalType;
+  //  return;
+  //}
+
+  /* key */
+  if (cbor_value_is_text_string(value)) {
+    /* key as string */
+    *err |= cbor_value_calculate_string_length(value, &len);
+    len++;
+    if (*err != CborNoError || len == 0)
+      return;
+    oc_alloc_string(&cur->name, len);
+    *err |= cbor_value_copy_text_string(value, (char *)oc_string(cur->name),
+                                        &len, NULL);
+    if (*err != CborNoError)
+      return;
+  } else if (cbor_value_is_integer(value)) {
+    /* key as integer */
+    *err |= cbor_value_get_int(value, &cur->iname);
+    if (*err != CborNoError)
+      return;
+  } else {
     *err = CborErrorIllegalType;
     return;
   }
-  *err |= cbor_value_calculate_string_length(value, &len);
-  len++;
-  if (*err != CborNoError || len == 0)
-    return;
-  oc_alloc_string(&cur->name, len);
-  *err |= cbor_value_copy_text_string(value, (char *)oc_string(cur->name), &len,
-                                      NULL);
-  if (*err != CborNoError)
-    return;
+
 get_tagged_value:
   *err |= cbor_value_advance(value);
   /* value */
@@ -565,6 +579,69 @@ oc_rep_get_value(oc_rep_t *rep, oc_rep_value_type_t type, const char *key,
   return false;
 }
 
+static bool
+oc_rep_i_get_value(oc_rep_t *rep, oc_rep_value_type_t type, int key,
+                   void **value, size_t *size)
+{
+  if (!rep || !value) {
+    OC_ERR("Error of input parameters");
+    return false;
+  }
+
+  oc_rep_t *rep_value = rep;
+  while (rep_value != NULL) {
+    if ((rep_value->iname == key) && (rep_value->type == type)) {
+      OC_DBG("Found the value with %d", key);
+      switch (rep_value->type) {
+      case OC_REP_INT:
+        **(int64_t **)value = rep_value->value.integer;
+        break;
+      case OC_REP_BOOL:
+        **(bool **)value = rep_value->value.boolean;
+        break;
+      case OC_REP_DOUBLE:
+        **(double **)value = rep_value->value.double_p;
+        break;
+      case OC_REP_BYTE_STRING:
+      case OC_REP_STRING:
+        *value = oc_string(rep_value->value.string);
+        *size = oc_string_len(rep_value->value.string);
+        break;
+      case OC_REP_INT_ARRAY:
+        *value = oc_int_array(rep_value->value.array);
+        *size = (int)oc_int_array_size(rep_value->value.array);
+        break;
+      case OC_REP_BOOL_ARRAY:
+        *value = oc_bool_array(rep_value->value.array);
+        *size = (int)oc_bool_array_size(rep_value->value.array);
+        break;
+      case OC_REP_DOUBLE_ARRAY:
+        *value = oc_double_array(rep_value->value.array);
+        *size = (int)oc_double_array_size(rep_value->value.array);
+        break;
+      case OC_REP_BYTE_STRING_ARRAY:
+      case OC_REP_STRING_ARRAY:
+        **(oc_string_array_t **)value = rep_value->value.array;
+        *size = (int)oc_string_array_get_allocated_size(rep_value->value.array);
+        break;
+      case OC_REP_OBJECT:
+        *value = rep_value->value.object;
+        break;
+      case OC_REP_OBJECT_ARRAY:
+        *value = rep_value->value.object_array;
+        break;
+      default:
+        return false;
+      }
+
+      return true;
+    }
+    rep_value = rep_value->next;
+  }
+
+  return false;
+}
+
 bool
 oc_rep_get_int(oc_rep_t *rep, const char *key, int64_t *value)
 {
@@ -574,6 +651,17 @@ oc_rep_get_int(oc_rep_t *rep, const char *key, int64_t *value)
   }
   return oc_rep_get_value(rep, OC_REP_INT, key, (void **)&value,
                           (size_t *)NULL);
+}
+
+bool
+oc_rep_i_get_int(oc_rep_t *rep, int key, int64_t *value)
+{
+  if (!value) {
+    OC_ERR("Error of input parameters");
+    return false;
+  }
+  return oc_rep_i_get_value(rep, OC_REP_INT, key, (void **)&value,
+                            (size_t *)NULL);
 }
 
 bool
@@ -588,6 +676,17 @@ oc_rep_get_bool(oc_rep_t *rep, const char *key, bool *value)
 }
 
 bool
+oc_rep_i_get_bool(oc_rep_t *rep, int key, bool *value)
+{
+  if (!value) {
+    OC_ERR("Error of input parameters");
+    return false;
+  }
+  return oc_rep_i_get_value(rep, OC_REP_BOOL, key, (void **)&value,
+                            (size_t *)NULL);
+}
+
+bool
 oc_rep_get_double(oc_rep_t *rep, const char *key, double *value)
 {
   if (!value) {
@@ -596,6 +695,17 @@ oc_rep_get_double(oc_rep_t *rep, const char *key, double *value)
   }
   return oc_rep_get_value(rep, OC_REP_DOUBLE, key, (void **)&value,
                           (size_t *)NULL);
+}
+
+bool
+oc_rep_i_get_double(oc_rep_t *rep, int key, double *value)
+{
+  if (!value) {
+    OC_ERR("Error of input parameters");
+    return false;
+  }
+  return oc_rep_i_get_value(rep, OC_REP_DOUBLE, key, (void **)&value,
+                            (size_t *)NULL);
 }
 
 bool
@@ -610,6 +720,16 @@ oc_rep_get_byte_string(oc_rep_t *rep, const char *key, char **value,
 }
 
 bool
+oc_rep_i_get_byte_string(oc_rep_t *rep, int key, char **value, size_t *size)
+{
+  if (!size) {
+    OC_ERR("Error of input parameters");
+    return false;
+  }
+  return oc_rep_i_get_value(rep, OC_REP_BYTE_STRING, key, (void **)value, size);
+}
+
+bool
 oc_rep_get_string(oc_rep_t *rep, const char *key, char **value, size_t *size)
 {
   if (!size) {
@@ -617,6 +737,16 @@ oc_rep_get_string(oc_rep_t *rep, const char *key, char **value, size_t *size)
     return false;
   }
   return oc_rep_get_value(rep, OC_REP_STRING, key, (void **)value, size);
+}
+
+bool
+oc_rep_i_get_string(oc_rep_t *rep, int key, char **value, size_t *size)
+{
+  if (!size) {
+    OC_ERR("Error of input parameters");
+    return false;
+  }
+  return oc_rep_i_get_value(rep, OC_REP_STRING, key, (void **)value, size);
 }
 
 bool
@@ -631,6 +761,16 @@ oc_rep_get_int_array(oc_rep_t *rep, const char *key, int64_t **value,
 }
 
 bool
+oc_rep_i_get_int_array(oc_rep_t *rep, int key, int64_t **value, size_t *size)
+{
+  if (!size) {
+    OC_ERR("Error of input parameters");
+    return false;
+  }
+  return oc_rep_i_get_value(rep, OC_REP_INT_ARRAY, key, (void **)value, size);
+}
+
+bool
 oc_rep_get_bool_array(oc_rep_t *rep, const char *key, bool **value,
                       size_t *size)
 {
@@ -642,6 +782,16 @@ oc_rep_get_bool_array(oc_rep_t *rep, const char *key, bool **value,
 }
 
 bool
+oc_rep_i_get_bool_array(oc_rep_t *rep, int key, bool **value, size_t *size)
+{
+  if (!size) {
+    OC_ERR("Error of input parameters");
+    return false;
+  }
+  return oc_rep_i_get_value(rep, OC_REP_BOOL_ARRAY, key, (void **)value, size);
+}
+
+bool
 oc_rep_get_double_array(oc_rep_t *rep, const char *key, double **value,
                         size_t *size)
 {
@@ -650,6 +800,17 @@ oc_rep_get_double_array(oc_rep_t *rep, const char *key, double **value,
     return false;
   }
   return oc_rep_get_value(rep, OC_REP_DOUBLE_ARRAY, key, (void **)value, size);
+}
+
+bool
+oc_rep_i_get_double_array(oc_rep_t *rep, int key, double **value, size_t *size)
+{
+  if (!size) {
+    OC_ERR("Error of input parameters");
+    return false;
+  }
+  return oc_rep_i_get_value(rep, OC_REP_DOUBLE_ARRAY, key, (void **)value,
+                            size);
 }
 
 bool
@@ -665,6 +826,18 @@ oc_rep_get_byte_string_array(oc_rep_t *rep, const char *key,
 }
 
 bool
+oc_rep_i_get_byte_string_array(oc_rep_t *rep, int key, oc_string_array_t *value,
+                               size_t *size)
+{
+  if (!value || !size) {
+    OC_ERR("Error of input parameters");
+    return false;
+  }
+  return oc_rep_i_get_value(rep, OC_REP_BYTE_STRING_ARRAY, key, (void **)&value,
+                            size);
+}
+
+bool
 oc_rep_get_string_array(oc_rep_t *rep, const char *key,
                         oc_string_array_t *value, size_t *size)
 {
@@ -676,9 +849,27 @@ oc_rep_get_string_array(oc_rep_t *rep, const char *key,
 }
 
 bool
+oc_rep_i_get_string_array(oc_rep_t *rep, int key, oc_string_array_t *value,
+                          size_t *size)
+{
+  if (!value || !size) {
+    OC_ERR("Error of input parameters");
+    return false;
+  }
+  return oc_rep_i_get_value(rep, OC_REP_STRING_ARRAY, key, (void **)&value,
+                            size);
+}
+
+bool
 oc_rep_get_object(oc_rep_t *rep, const char *key, oc_rep_t **value)
 {
   return oc_rep_get_value(rep, OC_REP_OBJECT, key, (void **)value, NULL);
+}
+
+bool
+oc_rep_i_get_object(oc_rep_t *rep, int key, oc_rep_t **value)
+{
+  return oc_rep_i_get_value(rep, OC_REP_OBJECT, key, (void **)value, NULL);
 }
 
 bool
@@ -687,8 +878,15 @@ oc_rep_get_object_array(oc_rep_t *rep, const char *key, oc_rep_t **value)
   return oc_rep_get_value(rep, OC_REP_OBJECT_ARRAY, key, (void **)value, NULL);
 }
 
+bool
+oc_rep_i_get_object_array(oc_rep_t *rep, int key, oc_rep_t **value)
+{
+  return oc_rep_i_get_value(rep, OC_REP_OBJECT_ARRAY, key, (void **)value,
+                            NULL);
+}
+
 /*
- * This macro assumes that four variables are already avalible to be changed.
+ * This macro assumes that four variables are already available to be changed.
  *
  *  - total_char_printed = running total of characters printed to buf
  *  - num_char_printed = the number of characters the command just before the
@@ -721,9 +919,9 @@ oc_rep_get_object_array(oc_rep_t *rep, const char *key, oc_rep_t **value)
 /*
  * Internal function used to complete the oc_rep_to_json function
  *
- * This function is used when pretty_print param of the oc_rep_to_json function
- * is set to true. It helps produce output with reasonably human readable
- * white-space.
+ * This function is used when pretty_print parameter of the oc_rep_to_json
+ * function is set to true. It helps produce output with reasonably human
+ * readable white-space.
  */
 size_t
 oc_rep_to_json_tab(char *buf, size_t buf_size, int tab_depth)
@@ -805,6 +1003,13 @@ oc_rep_to_json_format(oc_rep_t *rep, char *buf, size_t buf_size, int tab_depth,
           ? snprintf(buf, buf_size, "\"%s\" : ", oc_string(rep->name))
           : snprintf(buf, buf_size, "\"%s\":", oc_string(rep->name));
       OC_JSON_UPDATE_BUFFER_AND_TOTAL;
+    } else {
+      if (rep->iname > 0) {
+        num_char_printed = (pretty_print)
+                             ? snprintf(buf, buf_size, "\"%d\" : ", rep->iname)
+                             : snprintf(buf, buf_size, "\"%d\":", rep->iname);
+        OC_JSON_UPDATE_BUFFER_AND_TOTAL;
+      }
     }
     switch (rep->type) {
     case OC_REP_NIL: {
@@ -832,8 +1037,13 @@ oc_rep_to_json_format(oc_rep_t *rep, char *buf, size_t buf_size, int tab_depth,
     case OC_REP_BYTE_STRING: {
       char *byte_string = NULL;
       size_t byte_string_size;
-      oc_rep_get_byte_string(rep, oc_string(rep->name), &byte_string,
-                             &byte_string_size);
+      if (oc_string(rep->name) != NULL) {
+        oc_rep_get_byte_string(rep, oc_string(rep->name), &byte_string,
+                               &byte_string_size);
+      } else {
+        oc_rep_i_get_byte_string(rep, rep->iname, &byte_string,
+                                 &byte_string_size);
+      }
       num_char_printed = oc_rep_to_json_base64_encoded_byte_string(
         buf, buf_size, byte_string, byte_string_size);
       OC_JSON_UPDATE_BUFFER_AND_TOTAL;
@@ -865,8 +1075,12 @@ oc_rep_to_json_format(oc_rep_t *rep, char *buf, size_t buf_size, int tab_depth,
       OC_JSON_UPDATE_BUFFER_AND_TOTAL;
       int64_t *int_array;
       size_t int_array_size = 0;
-      oc_rep_get_int_array(rep, oc_string(rep->name), &int_array,
-                           &int_array_size);
+      if (oc_string(rep->name) != NULL) {
+        oc_rep_get_int_array(rep, oc_string(rep->name), &int_array,
+                             &int_array_size);
+      } else {
+        oc_rep_i_get_int_array(rep, rep->iname, &int_array, &int_array_size);
+      }
       for (size_t i = 0; i < int_array_size; i++) {
         num_char_printed = snprintf(buf, buf_size, "%" PRId64, int_array[i]);
         OC_JSON_UPDATE_BUFFER_AND_TOTAL;
@@ -885,8 +1099,13 @@ oc_rep_to_json_format(oc_rep_t *rep, char *buf, size_t buf_size, int tab_depth,
       OC_JSON_UPDATE_BUFFER_AND_TOTAL;
       double *double_array;
       size_t double_array_size = 0;
-      oc_rep_get_double_array(rep, oc_string(rep->name), &double_array,
-                              &double_array_size);
+      if (oc_string(rep->name) != NULL) {
+        oc_rep_get_double_array(rep, oc_string(rep->name), &double_array,
+                                &double_array_size);
+      } else {
+        oc_rep_i_get_double_array(rep, rep->iname, &double_array,
+                                  &double_array_size);
+      }
       for (size_t i = 0; i < double_array_size; i++) {
         num_char_printed = snprintf(buf, buf_size, "%f", double_array[i]);
         OC_JSON_UPDATE_BUFFER_AND_TOTAL;
@@ -905,8 +1124,14 @@ oc_rep_to_json_format(oc_rep_t *rep, char *buf, size_t buf_size, int tab_depth,
       OC_JSON_UPDATE_BUFFER_AND_TOTAL;
       bool *bool_array;
       size_t bool_array_size = 0;
-      oc_rep_get_bool_array(rep, oc_string(rep->name), &bool_array,
-                            &bool_array_size);
+      if (oc_string(rep->name) != NULL) {
+        oc_rep_get_bool_array(rep, oc_string(rep->name), &bool_array,
+                              &bool_array_size);
+      } else {
+        oc_rep_i_get_bool_array(rep, rep->iname, &bool_array, &bool_array_size);
+      }
+      // oc_rep_get_bool_array(rep, oc_string(rep->name), &bool_array,
+      //                      &bool_array_size);
       for (size_t i = 0; i < bool_array_size; i++) {
         num_char_printed =
           snprintf(buf, buf_size, "%s", (bool_array[i]) ? "true" : "false");
@@ -927,8 +1152,16 @@ oc_rep_to_json_format(oc_rep_t *rep, char *buf, size_t buf_size, int tab_depth,
       OC_JSON_UPDATE_BUFFER_AND_TOTAL;
       oc_string_array_t byte_str_array;
       size_t byte_str_array_size = 0;
-      oc_rep_get_byte_string_array(rep, oc_string(rep->name), &byte_str_array,
-                                   &byte_str_array_size);
+      if (oc_string(rep->name) != NULL) {
+        oc_rep_get_byte_string_array(rep, oc_string(rep->name), &byte_str_array,
+                                     &byte_str_array_size);
+      } else {
+        oc_rep_i_get_byte_string_array(rep, rep->iname, &byte_str_array,
+                                       &byte_str_array_size);
+      }
+      // oc_rep_get_byte_string_array(rep, oc_string(rep->name),
+      // &byte_str_array,
+      //                             &byte_str_array_size);
       for (size_t i = 0; i < byte_str_array_size; i++) {
         if (pretty_print) {
           num_char_printed = oc_rep_to_json_tab(buf, buf_size, tab_depth + 2);
@@ -965,8 +1198,14 @@ oc_rep_to_json_format(oc_rep_t *rep, char *buf, size_t buf_size, int tab_depth,
       OC_JSON_UPDATE_BUFFER_AND_TOTAL;
       oc_string_array_t str_array;
       size_t str_array_size = 0;
-      oc_rep_get_string_array(rep, oc_string(rep->name), &str_array,
-                              &str_array_size);
+      if (oc_string(rep->name) != NULL) {
+        oc_rep_get_string_array(rep, oc_string(rep->name), &str_array,
+                                &str_array_size);
+      } else {
+        oc_rep_i_get_string_array(rep, rep->iname, &str_array, &str_array_size);
+      }
+      // oc_rep_get_string_array(rep, oc_string(rep->name), &str_array,
+      //                        &str_array_size);
       for (size_t i = 0; i < str_array_size; i++) {
         if (pretty_print) {
           num_char_printed = oc_rep_to_json_tab(buf, buf_size, tab_depth + 2);
