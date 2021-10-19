@@ -83,7 +83,7 @@ void oc_rep_encode_raw(const uint8_t *data, size_t len);
 /**
  * @brief add a line to the response buffer
  * note updates the occupied size in the response buffer
- *      
+ *
  * @param line data to be added
  * @return length of the line added to the response buffer
  */
@@ -152,15 +152,14 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
  *     oc_rep_i_set_double(root, 5, 3.14159);
  *     oc_rep_end_root_object();
  * ~~~
- *      
+ *
  * @see oc_rep_i_get_double
  */
-#define oc_rep_i_set_double(object, key, value)             \
-  do {                                                      \
-    g_err |= cbor_encode_int(&object##_map, (int64_t) key);       \
-    g_err |= cbor_encode_double(&object##_map, value);      \
+#define oc_rep_i_set_double(object, key, value)                                \
+  do {                                                                         \
+    g_err |= cbor_encode_int(&object##_map, (int64_t)key);                     \
+    g_err |= cbor_encode_double(&object##_map, value);                         \
   } while (0)
-
 
 /**
  * Add an integer `value` to the cbor `object` under the `key` name
@@ -206,9 +205,9 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
  *
  * @see oc_rep_i_get_int
  */
-#define oc_rep_i_set_int(object, key, value)                                     \
+#define oc_rep_i_set_int(object, key, value)                                   \
   do {                                                                         \
-    g_err |= cbor_encode_int(&object##_map, (int64_t)key);       \
+    g_err |= cbor_encode_int(&object##_map, (int64_t)key);                     \
     g_err |= cbor_encode_int(&object##_map, value);                            \
   } while (0)
 
@@ -240,8 +239,8 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
   } while (0)
 
 /**
- * Add an unsigned integer `value` to the cbor `object` under the integer `key` name
- * Example:
+ * Add an unsigned integer `value` to the cbor `object` under the integer `key`
+ * name Example:
  *
  * To build the an object with the following cbor value
  *
@@ -260,9 +259,9 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
  * a client to know that the server sent the INT as an unsigned
  * value.
  */
-#define oc_rep_i_set_uint(object, key, value)                                    \
+#define oc_rep_i_set_uint(object, key, value)                                  \
   do {                                                                         \
-    g_err |= cbor_encode_int(&object##_map, (int64_t)key);       \
+    g_err |= cbor_encode_int(&object##_map, (int64_t)key);                     \
     g_err |= cbor_encode_uint(&object##_map, value);                           \
   } while (0)
 
@@ -310,9 +309,9 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
  *
  * @see oc_rep_i_get_bool
  */
-#define oc_rep_i_set_boolean(object, key, value)                                 \
+#define oc_rep_i_set_boolean(object, key, value)                               \
   do {                                                                         \
-    g_err |= cbor_encode_int(&object##_map, (int64_t)key);       \
+    g_err |= cbor_encode_int(&object##_map, (int64_t)key);                     \
     g_err |= cbor_encode_boolean(&object##_map, value);                        \
   } while (0)
 
@@ -360,9 +359,9 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
  *     oc_rep_end_root_object();
  * ~~~
  */
-#define oc_rep_i_set_text_string(object, key, value)                             \
+#define oc_rep_i_set_text_string(object, key, value)                           \
   do {                                                                         \
-    g_err |= cbor_encode_int(&object##_map, (int64_t)key);       \
+    g_err |= cbor_encode_int(&object##_map, (int64_t)key);                     \
     if ((const char *)value != NULL) {                                         \
       g_err |= cbor_encode_text_string(&object##_map, value, strlen(value));   \
     } else {                                                                   \
@@ -395,7 +394,6 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
       g_err |= cbor_encode_text_string(&object##_map, "", 0);                  \
     }                                                                          \
   } while (0)
-
 
 /**
  * Add an byte array `value` to the cbor `object` under the `key` name
@@ -445,12 +443,11 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
  *     oc_rep_end_root_object();
  * ~~~
  */
-#define oc_rep_i_set_byte_string(object, key, value, length)                     \
+#define oc_rep_i_set_byte_string(object, key, value, length)                   \
   do {                                                                         \
-    g_err |= cbor_encode_int(&object##_map, (int64_t)key);       \
+    g_err |= cbor_encode_int(&object##_map, (int64_t)key);                     \
     g_err |= cbor_encode_byte_string(&object##_map, value, length);            \
   } while (0)
-
 
 /**
  * This macro has been replaced with oc_rep_begin_array
@@ -742,7 +739,6 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
 #define oc_rep_add_int(parent, value)                                          \
   g_err |= cbor_encode_int(&parent##_array, value)
 
-
 #define oc_rep_set_value_int(parent, value)                                    \
   g_err |= cbor_encode_int(&parent##_map, value)
 
@@ -826,8 +822,8 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
   oc_rep_begin_array(&parent##_map, key)
 
 /**
- * Open a cbor array object belonging to `parent` object under the integer `key` name.
- * Items can then be added to the array till oc_rep_close_array is called.
+ * Open a cbor array object belonging to `parent` object under the integer `key`
+ * name. Items can then be added to the array till oc_rep_close_array is called.
  *
  * Most common array types such as `int`, `bool`, `double` and `strings` have
  * specific macros for handling those array types.  This macro will mostly be
@@ -838,9 +834,9 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
  *
  * @see oc_rep_close_array
  */
-#define oc_rep_i_open_array(parent, key)                                         \
+#define oc_rep_i_open_array(parent, key)                                       \
   int64_t x = (int64_t)atoi((const char *)&(#key)[1]);                         \
-  g_err |= cbor_encode_int(&parent##_map, x);                                \
+  g_err |= cbor_encode_int(&parent##_map, x);                                  \
   oc_rep_begin_array(&parent##_map, key)
 
 /**
@@ -852,18 +848,17 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
  */
 #define oc_rep_close_array(parent, key) oc_rep_end_array(&parent##_map, key)
 
-
 /* NEW document this one*/
-#define oc_rep_begin_new_object(parent, key)                                      \
-  do {                                                                            \
-    CborEncoder key##_map;                                                        \
-    g_err |= cbor_encoder_create_map(&parent##_map, &key##_map, CborIndefiniteLength)
+#define oc_rep_begin_new_object(parent, key)                                   \
+  do {                                                                         \
+    CborEncoder key##_map;                                                     \
+  g_err |=                                                                     \
+    cbor_encoder_create_map(&parent##_map, &key##_map, CborIndefiniteLength)
 
-#define oc_rep_end_new_object(parent, key)                                         \
-    g_err |= cbor_encoder_close_container(&parent##_map, &key##_map);              \
-  }                                                                                \
+#define oc_rep_end_new_object(parent, key)                                     \
+  g_err |= cbor_encoder_close_container(&parent##_map, &key##_map);            \
+  }                                                                            \
   while (0)
-
 
 /**
  * This macro has been replaced with oc_rep_begin_object
@@ -1059,16 +1054,16 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
  */
 #define oc_rep_i_set_int_array(object, key, values, length)                    \
   do {                                                                         \
-   g_err |= cbor_encode_int(&object##_map, (int64_t)key);                          \
-    CborEncoder x_key##_value_array;                                             \
+    g_err |= cbor_encode_int(&object##_map, (int64_t)key);                     \
+    CborEncoder x_key##_value_array;                                           \
     g_err |=                                                                   \
-      cbor_encoder_create_array(&object##_map, &x_key##_value_array, length);    \
+      cbor_encoder_create_array(&object##_map, &x_key##_value_array, length);  \
     int i;                                                                     \
     for (i = 0; i < length; i++) {                                             \
-      g_err |= cbor_encode_int(&x_key##_value_array, values[i]);                 \
+      g_err |= cbor_encode_int(&x_key##_value_array, values[i]);               \
     }                                                                          \
     g_err |=                                                                   \
-      cbor_encoder_close_container(&object##_map, &x_key##_value_array);         \
+      cbor_encoder_close_container(&object##_map, &x_key##_value_array);       \
   } while (0)
 
 /**
@@ -1132,20 +1127,19 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
  *     oc_rep_end_root_object();
  * ~~~
  */
-#define oc_rep_i_set_bool_array(object, key, values, length)                     \
+#define oc_rep_i_set_bool_array(object, key, values, length)                   \
   do {                                                                         \
-    g_err |= cbor_encode_int(&object##_map, (int64_t)key);       \
-    CborEncoder x_key##_value_array;                                             \
+    g_err |= cbor_encode_int(&object##_map, (int64_t)key);                     \
+    CborEncoder x_key##_value_array;                                           \
     g_err |=                                                                   \
-      cbor_encoder_create_array(&object##_map, &x_key##_value_array, length);    \
+      cbor_encoder_create_array(&object##_map, &x_key##_value_array, length);  \
     int i;                                                                     \
     for (i = 0; i < length; i++) {                                             \
-      g_err |= cbor_encode_boolean(&x_key##_value_array, values[i]);             \
+      g_err |= cbor_encode_boolean(&x_key##_value_array, values[i]);           \
     }                                                                          \
     g_err |=                                                                   \
-      cbor_encoder_close_container(&object##_map, &x_key##_value_array);  \
+      cbor_encoder_close_container(&object##_map, &x_key##_value_array);       \
   } while (0)
-
 
 /**
  * Add a double array with `values` of `length` to the cbor `object` under the
@@ -1210,21 +1204,22 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
  *                                 sizeof(math_constants[0]) ) );
  *     oc_rep_end_root_object();
  * ~~~
- *      
+ *
  * @see oc_rep_i_get_double_array
  */
-#define oc_rep_i_set_double_array(object, key, values, length)                   \
+#define oc_rep_i_set_double_array(object, key, values, length)                 \
   do {                                                                         \
-    g_err |= cbor_encode_int(&object##_map, (int64_t) key);       \
-    CborEncoder x_key##_value_array;                                             \
+    g_err |= cbor_encode_int(&object##_map, (int64_t)key);                     \
+    CborEncoder x_key##_value_array;                                           \
     g_err |=                                                                   \
-      cbor_encoder_create_array(&object##_map, &x_key##_value_array, length);    \
+      cbor_encoder_create_array(&object##_map, &x_key##_value_array, length);  \
     int i;                                                                     \
     for (i = 0; i < length; i++) {                                             \
-      g_err |= cbor_encode_floating_point(&x_key##_value_array, CborDoubleType,  \
-                                          &values[i]);                         \
+      g_err |= cbor_encode_floating_point(&x_key##_value_array,                \
+                                          CborDoubleType, &values[i]);         \
     }                                                                          \
-    g_err |= cbor_encoder_close_container(&object##_map, &x_key##_value_array);  \
+    g_err |=                                                                   \
+      cbor_encoder_close_container(&object##_map, &x_key##_value_array);       \
   } while (0)
 
 /**
@@ -1336,22 +1331,22 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
  * @see oc_free_string_array
  * @see oc_string_array_add_item
  */
-#define oc_rep_i_set_string_array(object, key, values)                           \
+#define oc_rep_i_set_string_array(object, key, values)                         \
   do {                                                                         \
-    g_err |= cbor_encode_int(&object##_map, (int64_t)key);       \
-    CborEncoder x_key##_value_array;                                             \
-    g_err |= cbor_encoder_create_array(&object##_map, &x_key##_value_array,      \
+    g_err |= cbor_encode_int(&object##_map, (int64_t)key);                     \
+    CborEncoder x_key##_value_array;                                           \
+    g_err |= cbor_encoder_create_array(&object##_map, &x_key##_value_array,    \
                                        CborIndefiniteLength);                  \
     int i;                                                                     \
     for (i = 0; i < (int)oc_string_array_get_allocated_size(values); i++) {    \
       if (oc_string_array_get_item_size(values, i) > 0) {                      \
         g_err |= cbor_encode_text_string(                                      \
-          &x_key##_value_array, oc_string_array_get_item(values, i),             \
+          &x_key##_value_array, oc_string_array_get_item(values, i),           \
           oc_string_array_get_item_size(values, i));                           \
       }                                                                        \
     }                                                                          \
     g_err |=                                                                   \
-      cbor_encoder_close_container(&object##_map, &x_key##_value_array);  \
+      cbor_encoder_close_container(&object##_map, &x_key##_value_array);       \
   } while (0)
 
 /**
@@ -1386,10 +1381,10 @@ typedef enum {
 
 typedef struct oc_rep_s
 {
-  oc_rep_value_type_t type;   ///< type of the data
-  struct oc_rep_s *next;  ///< next in list
-  oc_string_t name;  ///< name of the tag
-  int iname;         ///< integer as tag name
+  oc_rep_value_type_t type; ///< type of the data
+  struct oc_rep_s *next;    ///< next in list
+  oc_string_t name;         ///< name of the tag
+  int iname;                ///< integer as tag name
   union oc_rep_value {
     int64_t integer;
     bool boolean;
@@ -1398,7 +1393,7 @@ typedef struct oc_rep_s
     oc_array_t array;
     struct oc_rep_s *object;
     struct oc_rep_s *object_array;
-  } value;  ///< values
+  } value; ///< values
 } oc_rep_t;
 
 void oc_rep_set_pool(struct oc_memb *rep_objects_pool);
@@ -1429,7 +1424,6 @@ void oc_free_rep(oc_rep_t *rep);
  * @see oc_rep_set_int
  */
 bool oc_rep_get_int(oc_rep_t *rep, const char *key, int64_t *value);
-
 
 /**
  * Read an integer from an `oc_rep_t` with an integer as key
@@ -1587,7 +1581,7 @@ bool oc_rep_get_byte_string(oc_rep_t *rep, const char *key, char **value,
  * @see oc_rep_i_set_byte_string
  */
 bool oc_rep_i_get_byte_string(oc_rep_t *rep, int key, char **value,
-                            size_t *size);
+                              size_t *size);
 
 /**
  * Read a text string value from an `oc_rep_t`
@@ -1621,7 +1615,8 @@ bool oc_rep_get_string(oc_rep_t *rep, const char *key, char **value,
  * ~~~{.c}
  *     char* greeting_out = NULL;
  *     size_t str_len;
- *     if( true == oc_rep_i_get_string(rep, "greeting", &greeting_out, &str_len))
+ *     if( true == oc_rep_i_get_string(rep, "greeting", &greeting_out,
+ * &str_len))
  *     {
  *       printf("%s\n", greeting_out);
  *     }
@@ -1636,8 +1631,7 @@ bool oc_rep_get_string(oc_rep_t *rep, const char *key, char **value,
  *
  * @see oc_rep_i_set_text_string
  */
-bool oc_rep_i_get_string(oc_rep_t *rep, int key, char **value,
-                       size_t *size);
+bool oc_rep_i_get_string(oc_rep_t *rep, int key, char **value, size_t *size);
 
 /**
  * Read an integer array value from an `oc_rep_t`
@@ -1685,7 +1679,7 @@ bool oc_rep_get_int_array(oc_rep_t *rep, const char *key, int64_t **value,
  * @see oc_rep_i_set_int_array
  */
 bool oc_rep_i_get_int_array(oc_rep_t *rep, int key, int64_t **value,
-                          size_t *size);
+                            size_t *size);
 
 /**
  * Read an boolean array value from an `oc_rep_t`
@@ -1733,7 +1727,7 @@ bool oc_rep_get_bool_array(oc_rep_t *rep, const char *key, bool **value,
  * @see oc_rep_i_set_bool_array
  */
 bool oc_rep_i_get_bool_array(oc_rep_t *rep, int key, bool **value,
-                           size_t *size);
+                             size_t *size);
 
 /**
  * Read an double array value from an `oc_rep_t`
@@ -1787,7 +1781,7 @@ bool oc_rep_get_double_array(oc_rep_t *rep, const char *key, double **value,
  * @see oc_rep_i_set_double_array
  */
 bool oc_rep_i_get_double_array(oc_rep_t *rep, int key, double **value,
-                             size_t *size);
+                               size_t *size);
 
 /**
  * Read an byte string array value from an `oc_rep_t`
@@ -1855,7 +1849,7 @@ bool oc_rep_get_byte_string_array(oc_rep_t *rep, const char *key,
  * @see oc_byte_string_array_get_item_size
  */
 bool oc_rep_i_get_byte_string_array(oc_rep_t *rep, int key,
-                                  oc_string_array_t *value, size_t *size);
+                                    oc_string_array_t *value, size_t *size);
 
 /**
  * Read a string array value from an `oc_rep_t`
@@ -1924,8 +1918,8 @@ bool oc_rep_get_string_array(oc_rep_t *rep, const char *key,
  * @see oc_string_array_get_item
  * @see oc_string_array_get_item_size
  */
-bool oc_rep_i_get_string_array(oc_rep_t *rep, int key,
-                             oc_string_array_t *value, size_t *size);
+bool oc_rep_i_get_string_array(oc_rep_t *rep, int key, oc_string_array_t *value,
+                               size_t *size);
 /**
  * Read a object value from an `oc_rep_t`
  *
@@ -2089,7 +2083,7 @@ bool oc_rep_i_get_object_array(oc_rep_t *rep, int key, oc_rep_t **value);
  *
  * NOTE: if the key is an integer, the key will be printed as string e.g. "5".
  * integers with value 0 will not be framed.
- *      
+ *
  * @param[in]  rep the oc_rep_t object to be converted to JSON
  * @param[out] buf a char array that will hold the JSON encoded string.
  * @param[in]  buf_size the size of the passed in char array

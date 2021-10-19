@@ -1606,8 +1606,6 @@ TEST(TestRep, OCRepRootArrayObject)
   oc_free_rep(rep);
 }
 
-
-
 /*
  * ====================================================================================
  * testing with tag is an integer instead of ascii
@@ -1692,8 +1690,8 @@ TEST(TestRep, OCRepISetGetDoubleArray)
   /* read the values from the oc_rep_t */
   double *math_constants_out = 0;
   size_t math_constants_len;
-  EXPECT_TRUE(oc_rep_i_get_double_array(
-    rep, 5, &math_constants_out, &math_constants_len));
+  EXPECT_TRUE(oc_rep_i_get_double_array(rep, 5, &math_constants_out,
+                                        &math_constants_len));
   ASSERT_EQ(sizeof(math_constants) / sizeof(math_constants[0]),
             math_constants_len);
   for (size_t i = 0; i < math_constants_len; ++i) {
@@ -1701,16 +1699,14 @@ TEST(TestRep, OCRepISetGetDoubleArray)
   }
 
   /* Error handling */
-  EXPECT_FALSE(oc_rep_i_get_double_array(
-    NULL, 5, &math_constants_out, &math_constants_len));
-  //EXPECT_FALSE(oc_rep_get_double_array(rep, NULL, &math_constants_out,
+  EXPECT_FALSE(oc_rep_i_get_double_array(NULL, 5, &math_constants_out,
+                                         &math_constants_len));
+  // EXPECT_FALSE(oc_rep_get_double_array(rep, NULL, &math_constants_out,
   //                                     &math_constants_len));
-  EXPECT_FALSE(
-    oc_rep_i_get_double_array(rep, 5, NULL, &math_constants_len));
-  EXPECT_FALSE(
-    oc_rep_i_get_double_array(rep, 5, &math_constants_out, NULL));
+  EXPECT_FALSE(oc_rep_i_get_double_array(rep, 5, NULL, &math_constants_len));
+  EXPECT_FALSE(oc_rep_i_get_double_array(rep, 5, &math_constants_out, NULL));
   EXPECT_FALSE(oc_rep_i_get_double_array(rep, 6, &math_constants_out,
-                                       &math_constants_len));
+                                         &math_constants_len));
 
   char *json;
   size_t json_size;
@@ -1736,7 +1732,6 @@ TEST(TestRep, OCRepISetGetDoubleArray)
 
   oc_free_rep(rep);
 }
-
 
 TEST(TestRep, OCRepISetGetInt)
 {
@@ -1779,15 +1774,13 @@ TEST(TestRep, OCRepISetGetInt)
   EXPECT_EQ(0, zero_out);
   /* check error handling */
   EXPECT_FALSE(oc_rep_i_get_int(NULL, 4, &zero_out));
-  //EXPECT_FALSE(oc_rep_i_get_int(rep, NULL, &zero_out));
+  // EXPECT_FALSE(oc_rep_i_get_int(rep, NULL, &zero_out));
   EXPECT_FALSE(oc_rep_i_get_int(rep, 4, NULL));
   EXPECT_FALSE(oc_rep_i_get_int(rep, 255, &zero_out));
 
   char json_buf[75];
   EXPECT_EQ(33, oc_rep_to_json(rep, json_buf, 75, false));
-  EXPECT_STREQ(
-    "{\"2\":10000000000,\"3\":-1024,\"4\":0}",
-    json_buf);
+  EXPECT_STREQ("{\"2\":10000000000,\"3\":-1024,\"4\":0}", json_buf);
   const char json[] = "{\n"
                       "  \"2\" : 10000000000,\n"
                       "  \"3\" : -1024,\n"
@@ -1858,7 +1851,7 @@ TEST(TestRep, OCRepISetGetUint)
   EXPECT_EQ(0u, (uint)zero_out);
   /* check error handling */
   EXPECT_FALSE(oc_rep_i_get_int(NULL, 4, &zero_out));
-  //EXPECT_FALSE(oc_rep_i_get_int(rep, NULL, &zero_out));
+  // EXPECT_FALSE(oc_rep_i_get_int(rep, NULL, &zero_out));
   EXPECT_FALSE(oc_rep_i_get_int(rep, 4, NULL));
   EXPECT_FALSE(oc_rep_i_get_int(rep, 254, &zero_out));
 
@@ -1867,8 +1860,7 @@ TEST(TestRep, OCRepISetGetUint)
   json_size = oc_rep_to_json(rep, NULL, 0, false);
   json = (char *)malloc(json_size + 1);
   oc_rep_to_json(rep, json, json_size + 1, false);
-  EXPECT_STREQ(
-    "{\"2\":42,\"3\":3000000000,\"4\":0}", json);
+  EXPECT_STREQ("{\"2\":42,\"3\":3000000000,\"4\":0}", json);
   free(json);
   json = NULL;
   json_size = oc_rep_to_json(rep, NULL, 0, true);
@@ -1923,7 +1915,7 @@ TEST(TestRep, OCRepISetGetBool)
   EXPECT_FALSE(false_flag_out);
   /* check error handling */
   EXPECT_FALSE(oc_rep_i_get_bool(NULL, 2, &true_flag_out));
-  //EXPECT_FALSE(oc_rep_get_bool(rep, NULL, &true_flag_out));
+  // EXPECT_FALSE(oc_rep_get_bool(rep, NULL, &true_flag_out));
   EXPECT_FALSE(oc_rep_i_get_bool(rep, 3, NULL));
   EXPECT_FALSE(oc_rep_i_get_bool(rep, 200, &true_flag_out));
 
@@ -1950,7 +1942,6 @@ TEST(TestRep, OCRepISetGetBool)
   oc_free_rep(rep);
 }
 
-
 TEST(TestRep, OCRepISetGetBoolArray)
 {
   /*buffer for oc_rep_t */
@@ -1961,8 +1952,7 @@ TEST(TestRep, OCRepISetGetBoolArray)
   oc_rep_start_root_object();
   EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
   bool flip[] = { false, false, true, false, false };
-  oc_rep_i_set_bool_array(root, 3, flip,
-                        (int)(sizeof(flip) / sizeof(flip[0])));
+  oc_rep_i_set_bool_array(root, 3, flip, (int)(sizeof(flip) / sizeof(flip[0])));
   EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
   oc_rep_end_root_object();
   EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
@@ -1988,7 +1978,7 @@ TEST(TestRep, OCRepISetGetBoolArray)
 
   /* Error handling */
   EXPECT_FALSE(oc_rep_i_get_bool_array(NULL, 3, &flip_out, &flip_len));
-  //EXPECT_FALSE(oc_rep_i_get_bool_array(rep, NULL, &flip_out, &flip_len));
+  // EXPECT_FALSE(oc_rep_i_get_bool_array(rep, NULL, &flip_out, &flip_len));
   EXPECT_FALSE(oc_rep_i_get_bool_array(rep, 3, NULL, &flip_len));
   EXPECT_FALSE(oc_rep_i_get_bool_array(rep, 3, &flip_out, NULL));
   EXPECT_FALSE(oc_rep_i_get_bool_array(rep, 6, &flip_out, &flip_len));
@@ -2061,8 +2051,7 @@ TEST(TestRep, OCRepISetGetTextString)
   EXPECT_STREQ("Dave", hal9000_out);
   EXPECT_EQ(4, str_len);
   char *ru_character_set_out = NULL;
-  EXPECT_TRUE(oc_rep_i_get_string(rep, 3, &ru_character_set_out,
-                                &str_len));
+  EXPECT_TRUE(oc_rep_i_get_string(rep, 3, &ru_character_set_out, &str_len));
   EXPECT_STREQ("Привет, мир", ru_character_set_out);
   /*
    * to encode Привет, мир takes more bytes than the number of characters so
@@ -2071,7 +2060,7 @@ TEST(TestRep, OCRepISetGetTextString)
   EXPECT_EQ(strlen("Привет, мир"), str_len);
   /* check error handling */
   EXPECT_FALSE(oc_rep_i_get_string(NULL, 2, &hal9000_out, &str_len));
-  //EXPECT_FALSE(oc_rep_i_get_string(rep, NULL, &hal9000_out, &str_len));
+  // EXPECT_FALSE(oc_rep_i_get_string(rep, NULL, &hal9000_out, &str_len));
   EXPECT_FALSE(oc_rep_i_get_string(rep, 2, NULL, &str_len));
   EXPECT_FALSE(oc_rep_i_get_string(rep, 2, &hal9000_out, NULL));
   EXPECT_FALSE(oc_rep_i_get_string(rep, 250, &hal9000_out, &str_len));
@@ -2099,7 +2088,6 @@ TEST(TestRep, OCRepISetGetTextString)
 
   oc_free_rep(rep);
 }
-
 
 /* use oc_rep_set_string_array to build the string array. */
 TEST(TestRep, OCRepISetGetStringArray)
@@ -2190,7 +2178,6 @@ TEST(TestRep, OCRepISetGetStringArray)
   oc_free_rep(rep);
 }
 
-
 /*
  * TODO is there a max byte array length? If so consider adding a test that
  * equals and exceeds the max array length.
@@ -2209,7 +2196,7 @@ TEST(TestRep, OCRepISetGetByteString)
   EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
   oc_rep_end_root_object();
   EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
-  
+
   /* convert CborEncoder to oc_rep_t */
   const uint8_t *payload = oc_rep_get_encoder_buf();
   int payload_len = oc_rep_get_encoded_payload_size();
@@ -2222,8 +2209,8 @@ TEST(TestRep, OCRepISetGetByteString)
 
   char *test_byte_string_out = NULL;
   size_t str_len;
-  EXPECT_TRUE(oc_rep_i_get_byte_string(rep, 2,
-                                     &test_byte_string_out, &str_len));
+  EXPECT_TRUE(
+    oc_rep_i_get_byte_string(rep, 2, &test_byte_string_out, &str_len));
   EXPECT_EQ(6, str_len);
   /*
    * cast the array and use STREQ to compare this only works because the
@@ -2232,13 +2219,12 @@ TEST(TestRep, OCRepISetGetByteString)
    */
   EXPECT_STREQ((const char *)test_byte_string, test_byte_string_out);
   /* error handling */
-  EXPECT_FALSE(oc_rep_i_get_byte_string(NULL, 2,
-                                      &test_byte_string_out, &str_len));
-  //EXPECT_FALSE(
+  EXPECT_FALSE(
+    oc_rep_i_get_byte_string(NULL, 2, &test_byte_string_out, &str_len));
+  // EXPECT_FALSE(
   //  oc_rep_get_byte_string(rep, NULL, &test_byte_string_out, &str_len));
   EXPECT_FALSE(oc_rep_i_get_byte_string(rep, 2, NULL, &str_len));
-  EXPECT_FALSE(oc_rep_i_get_byte_string(rep, 2,
-                                      &test_byte_string_out, NULL));
+  EXPECT_FALSE(oc_rep_i_get_byte_string(rep, 2, &test_byte_string_out, NULL));
   EXPECT_FALSE(
     oc_rep_i_get_byte_string(rep, 250, &test_byte_string_out, &str_len));
 
@@ -2283,8 +2269,7 @@ TEST(TestRep, OCRepISetGetIntArray)
   oc_rep_start_root_object();
   EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
   int64_t fib[] = { 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 10000000000 };
-  oc_rep_i_set_int_array(root, 2, fib,
-                       (int)(sizeof(fib) / sizeof(fib[0])));
+  oc_rep_i_set_int_array(root, 2, fib, (int)(sizeof(fib) / sizeof(fib[0])));
   EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
   oc_rep_end_root_object();
   EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
@@ -2410,5 +2395,3 @@ TEST(TestRep, OCRepIAddGetIntArray)
 // oc_rep_i_set_bool_array
 // oc_rep_i_set_string_array
 // oc_rep_i_set_double_array
-
-
