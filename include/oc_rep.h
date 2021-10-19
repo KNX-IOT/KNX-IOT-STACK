@@ -797,6 +797,23 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
   g_err |= cbor_encode_text_string(parent, key, strlen(key))
 
 /**
+ * End users are very unlikely to use this macro.
+ *
+ * This will add a `key` as integer to a `parent` object.
+ *
+ * This is almost always followed by oc_rep_begin_array to build an array when
+ * the number of items being placed in the array are not known before the end of
+ * the array.
+ *
+ * See oc_rep_begin_array for example code
+ *
+ * @see oc_rep_begin_array
+ */
+#define oc_rep_i_set_key(parent, key)                                          \
+  if ((uint64_t)key != 0)                                                      \
+    g_err |= cbor_encode_int(parent, (int64_t)key);
+
+/**
  * This macro has been replaced with oc_rep_open_array
  *
  * @see oc_rep_open_array
@@ -822,43 +839,12 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
   oc_rep_begin_array(&parent##_map, key)
 
 /**
- * Open a cbor array object belonging to `parent` object under the integer `key`
- * name. Items can then be added to the array till oc_rep_close_array is called.
- *
- * Most common array types such as `int`, `bool`, `double` and `strings` have
- * specific macros for handling those array types.  This macro will mostly be
- * used to make arrays where the length is unknown ahead of time or to make
- * an array of other objects.
- *
- * For and example of this macro being used see oc_rep_object_array_begin_item.
- *
- * @see oc_rep_close_array
- */
-#define oc_rep_i_open_array(parent, key)                                       \
-  int64_t x = (int64_t)atoi((const char *)&(#key)[1]);                         \
-  g_err |= cbor_encode_int(&parent##_map, x);                                  \
-  oc_rep_begin_array(&parent##_map, key)
-
-/**
  * Close the array object.  No additional items can be added to the array after
  * this is called.
  *
  * @see oc_rep_open_array
- * @see oc_rep_i_open_array
  */
 #define oc_rep_close_array(parent, key) oc_rep_end_array(&parent##_map, key)
-
-/* NEW document this one*/
-#define oc_rep_begin_new_object(parent, key)                                   \
-  do {                                                                         \
-    CborEncoder key##_map;                                                     \
-  g_err |=                                                                     \
-    cbor_encoder_create_map(&parent##_map, &key##_map, CborIndefiniteLength)
-
-#define oc_rep_end_new_object(parent, key)                                     \
-  g_err |= cbor_encoder_close_container(&parent##_map, &key##_map);            \
-  }                                                                            \
-  while (0)
 
 /**
  * This macro has been replaced with oc_rep_begin_object

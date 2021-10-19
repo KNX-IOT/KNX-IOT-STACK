@@ -55,9 +55,9 @@ oc_core_knx_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 
     oc_rep_begin_root_object();
 
-    oc_rep_begin_new_object(root, api);
+    oc_rep_begin_object(oc_rep_object(root), api);
     oc_rep_set_text_string(api, version, "1.0");
-    oc_rep_end_new_object(root, api);
+    oc_rep_end_object(oc_rep_object(root), api);
 
     oc_rep_set_text_string(root, base, "/");
     oc_rep_end_root_object();
