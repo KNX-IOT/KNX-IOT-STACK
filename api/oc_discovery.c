@@ -574,6 +574,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
       if_len = (int)value_len;
     }
   }
+  /* d */
 
   // get the device structure from the request.
   size_t device_index = request->resource->device;
