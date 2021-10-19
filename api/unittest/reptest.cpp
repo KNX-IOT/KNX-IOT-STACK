@@ -2342,7 +2342,7 @@ TEST(TestRep, OCRepIAddGetIntArray)
   oc_rep_i_set_key(oc_rep_object(root), 2);
   oc_rep_begin_array(oc_rep_object(root), i2);
   // oc_rep_set_key(oc_rep_object(root), "fibonacci");
-  //oc_rep_i_set_key(oc_rep_object(i2), 2);
+  // oc_rep_i_set_key(oc_rep_object(i2), 2);
   EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
   for (size_t i = 0; i < (sizeof(fib) / sizeof(fib[0])); i++) {
     oc_rep_add_int(i2, fib[i]);
