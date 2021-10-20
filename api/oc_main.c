@@ -30,6 +30,8 @@
 #include "oc_introspection_internal.h"
 #include "oc_signal_event_loop.h"
 
+#include "oc_knx_dev.h"
+
 #if defined(OC_COLLECTIONS) && defined(OC_SERVER) &&                           \
   defined(OC_COLLECTIONS_IF_CREATE)
 #include "oc_collection.h"
