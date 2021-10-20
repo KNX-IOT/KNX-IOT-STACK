@@ -30,6 +30,8 @@
 #include "oc_introspection_internal.h"
 #include "oc_signal_event_loop.h"
 
+#include "oc_knx_dev.h"
+
 #if defined(OC_COLLECTIONS) && defined(OC_SERVER) &&                           \
   defined(OC_COLLECTIONS_IF_CREATE)
 #include "oc_collection.h"
@@ -249,6 +251,11 @@ oc_main_init(const oc_handler_t *handler)
 #ifdef OC_SOFTWARE_UPDATE
   oc_swupdate_init();
 #endif /* OC_SOFTWARE_UPDATE */
+
+  for (size_t device = 0; device < oc_core_get_num_devices(); device++) {
+    oc_knx_device_storage_read(device);
+    // add here more
+  }
 
 #ifdef OC_SECURITY
   size_t device;
