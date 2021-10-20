@@ -541,7 +541,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   if (request->accept != APPLICATION_LINK_FORMAT &&
       request->accept != APPLICATION_JSON) {
     /* handle bad request..
-    note below layer ignores this message if it is a multicast request */
+    note below layer ignores this message if it is a multi cast request */
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
@@ -598,16 +598,14 @@ oc_wkcore_discovery_handler(oc_request_t *request,
     char *if_ia_s = if_request + 11;
     int if_ia_i = atoi(if_ia_s);
     if (if_ia_i == device->ia) {
-      /* return the JSON string  { "<Individual Address>" } */
-      int size = oc_rep_add_line_to_buffer("{\"");
-      response_length = response_length + size;
-      size = oc_rep_add_line_size_to_buffer(if_ia_s, if_len - 11);
-      response_length = response_length + size;
-      size = oc_rep_add_line_to_buffer("\"}");
+      /* return the ll entry: </dev/ia>;rt="dpt.value2Ucount";ct=50 */
+      int size =
+        oc_rep_add_line_to_buffer("</dev/ia>;rt=\"dpt.value2Ucount\";ct=50");
       response_length = response_length + size;
 
       request->response->response_buffer->response_length = response_length;
-      request->response->response_buffer->content_format = request->accept;
+      request->response->response_buffer->content_format =
+        APPLICATION_LINK_FORMAT;
       request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
       ;
       PRINT(" oc_wkcore_discovery_handler IA HANDLING: OK\n");
