@@ -613,6 +613,8 @@ oc_knx_device_storage_read(size_t device_index)
 void
 oc_knx_device_storage_reset(size_t device_index)
 {
+  (void)device_index;
+
   char buf[2] = "";
   int zero = 0;
 
