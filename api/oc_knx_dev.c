@@ -295,7 +295,7 @@ oc_core_dev_ia_put_handler(oc_request_t *request,
           (int)rep->value.integer);
     oc_core_set_device_ia(device_index, (int)rep->value.integer);
 
-    oc_storage_write(KNX_STORAGE_IA, (uint8_t *)&(int)rep->value.integer,
+    oc_storage_write(KNX_STORAGE_IA, (uint8_t *)&((int)rep->value.integer),
                                      sizeof(rep->value.integer));
 
 
