@@ -290,13 +290,14 @@ oc_core_dev_ia_put_handler(oc_request_t *request,
   oc_rep_t *rep = request->request_payload;
 
   if ((rep != NULL) && (rep->type == OC_REP_INT)) {
-
+    int temp;
     PRINT("  oc_core_dev_ia_put_handler received : %d\n",
           (int)rep->value.integer);
     oc_core_set_device_ia(device_index, (int)rep->value.integer);
+    temp = (int)rep->value.integer;
 
-    oc_storage_write(KNX_STORAGE_IA, (uint8_t *)&((int)rep->value.integer),
-                                     sizeof(rep->value.integer));
+    oc_storage_write(KNX_STORAGE_IA, (uint8_t *)&temp,
+                                     sizeof(temp));
 
 
     oc_send_cbor_response(request, OC_STATUS_OK);
