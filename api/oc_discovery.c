@@ -602,7 +602,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
       int size =
         oc_rep_add_line_to_buffer("</dev/ia>;rt=\"dpt.value2Ucount\";ct=50");
       response_length = response_length + size;
-      
+
       request->response->response_buffer->response_length = response_length;
       request->response->response_buffer->content_format =
         APPLICATION_LINK_FORMAT;
