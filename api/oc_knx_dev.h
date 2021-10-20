@@ -31,6 +31,16 @@ e.g. the / dev / * resources
 */
 void oc_create_knx_device_resources(size_t device);
 
+/**
+@brief read the contents from disk during start up
+for the resources implemented / dev / *
+
+@param device index of the device to which the data is to be read
+*/
+void oc_knx_device_storage_read(size_t device);
+
+void oc_knx_device_storage_reset(size_t device_index);
+
 #ifdef __cplusplus
 }
 #endif

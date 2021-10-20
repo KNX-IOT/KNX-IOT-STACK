@@ -250,6 +250,12 @@ oc_main_init(const oc_handler_t *handler)
   oc_swupdate_init();
 #endif /* OC_SOFTWARE_UPDATE */
 
+  for (size_t device = 0; device < oc_core_get_num_devices(); device++) {
+    oc_knx_device_storage_read(device);
+    // add here more
+  }
+
+
 #ifdef OC_SECURITY
   size_t device;
   for (device = 0; device < oc_core_get_num_devices(); device++) {
