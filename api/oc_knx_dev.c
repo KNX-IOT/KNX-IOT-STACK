@@ -25,7 +25,6 @@
 #define KNX_STORAGE_IID "dev_knx_iid"
 #define KNX_STORAGE_PM "dev_knx_pm"
 
-
 static void
 oc_core_dev_sn_get_handler(oc_request_t *request,
                            oc_interface_mask_t iface_mask, void *data)
@@ -296,9 +295,7 @@ oc_core_dev_ia_put_handler(oc_request_t *request,
     oc_core_set_device_ia(device_index, (int)rep->value.integer);
     temp = (int)rep->value.integer;
 
-    oc_storage_write(KNX_STORAGE_IA, (uint8_t *)&temp,
-                                     sizeof(temp));
-
+    oc_storage_write(KNX_STORAGE_IA, (uint8_t *)&temp, sizeof(temp));
 
     oc_send_cbor_response(request, OC_STATUS_OK);
     return;
@@ -402,8 +399,7 @@ oc_core_dev_iid_put_handler(oc_request_t *request,
           oc_string(rep->value.string));
     oc_core_set_device_iid(device_index, oc_string(rep->value.string));
 
-    oc_storage_write(KNX_STORAGE_IID,
-                     (uint8_t *)oc_string(rep->value.string),
+    oc_storage_write(KNX_STORAGE_IID, (uint8_t *)oc_string(rep->value.string),
                      oc_string_len(rep->value.string));
 
     oc_send_cbor_response(request, OC_STATUS_OK);
@@ -576,18 +572,16 @@ oc_knx_device_storage_read(size_t device_index)
   if (device == NULL) {
     OC_ERR(" could not get device %d\n", device_index)
   }
-  
+
   /* IA */
-  temp_size = oc_storage_read(
-    KNX_STORAGE_IA, (uint8_t *)&ia, sizeof(ia));
+  temp_size = oc_storage_read(KNX_STORAGE_IA, (uint8_t *)&ia, sizeof(ia));
   if (temp_size > 0) {
     device->ia = ia;
     PRINT(" ia (storage) %ld\n", ia);
   }
 
   /* HOST NAME */
-  temp_size =
-    oc_storage_read(KNX_STORAGE_HOSTNAME, (uint8_t *)&tempstring, 20);
+  temp_size = oc_storage_read(KNX_STORAGE_HOSTNAME, (uint8_t *)&tempstring, 20);
   if (temp_size > 1) {
     tempstring[temp_size] = 0;
     oc_core_set_device_hostname(device_index, tempstring);
@@ -608,7 +602,6 @@ oc_knx_device_storage_read(size_t device_index)
     device->pm = pm;
     PRINT(" pm (storage) %d\n", device->pm);
   }
-
 }
 
 void
@@ -619,8 +612,7 @@ oc_knx_device_storage_reset(size_t device_index)
   char buf[2] = "";
   int zero = 0;
 
-  oc_storage_write(KNX_STORAGE_IA, (uint8_t *)&zero,
-                   sizeof(int));
+  oc_storage_write(KNX_STORAGE_IA, (uint8_t *)&zero, sizeof(int));
   oc_storage_write(KNX_STORAGE_HOSTNAME, (uint8_t *)&buf, 1);
   oc_storage_write(KNX_STORAGE_IID, (uint8_t *)&buf, 1);
 
@@ -632,8 +624,7 @@ oc_create_knx_device_resources(size_t device_index)
 {
   OC_DBG("oc_create_knx_device_resources");
 
-
-  //oc_knx_device_storage_read(device_index);
+  // oc_knx_device_storage_read(device_index);
 
   oc_create_dev_sn_resource(OC_DEV_SN, device_index);
   oc_create_dev_hwv_resource(OC_DEV_HWV, device_index);
