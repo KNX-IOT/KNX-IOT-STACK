@@ -41,7 +41,7 @@ The  project offers device vendors and application developers royalty-free acces
 Stack features
 -----------------------
 
-- **OS agnostic:** The  device stack and modules work cross-platform (pure C code) and execute in an event-driven style. The stack interacts with lower level OS/hardware platform-specific functionality through a set of abstract interfaces. This decoupling of the common OCF standards related functionality from platform adaptation code promotes ease of long-term maintenance and evolution of the stack through successive releases of the OCF specifications.
+- **OS agnostic:** The  device stack and modules work cross-platform (pure C code) and execute in an event-driven style. The stack interacts with lower level OS/hardware platform-specific functionality through a set of abstract interfaces. This decoupling of standards related functionality from platform adaptation code promotes ease of long-term maintenance and evolution of the stack through successive releases.
 
 .. image:: ./images/porting.png
    :scale: 100%
@@ -93,8 +93,7 @@ include/oc_api.h
   contains client/server APIs.
 
 include/oc_rep.h
-  contains helper functions to encode/decode to/from OCF’s
-  data model.
+  contains helper functions to encode/decode to/from cbor
 
 include/oc_helpers.h
   contains utility functions for allocating strings and
@@ -109,7 +108,7 @@ port/<OS>/*
   contains adaptations for each OS.
 
 apps/*
-  contains sample OCF applications.
+  contains sample  applications.
 
 
 Build instructions
