@@ -116,7 +116,6 @@ oc_knx_swu_protocol_put_handler(oc_request_t *request,
   /* not sure what to do with request data, so we are just parsing it for now*/
   oc_rep_t *rep = request->request_payload;
   if ((rep != NULL) && (rep->type == OC_REP_INT)) {
-    int temp;
     PRINT("  oc_knx_swu_protocol_put_handler received : %d\n",
           (int)rep->value.integer);
 
@@ -372,7 +371,6 @@ oc_knx_swu_update_put_handler(oc_request_t *request,
   /* not sure what to do with request data, so we are just parsing it for now*/
   oc_rep_t *rep = request->request_payload;
   if ((rep != NULL) && (rep->type == OC_REP_INT)) {
-    int temp;
     PRINT("  oc_knx_swu_update_put_handler received : %d\n",
           (int)rep->value.integer);
 
@@ -431,8 +429,13 @@ oc_create_knx_swu_pkgv_resource(int resource_idx, size_t device)
 void
 write_to_file(char *fname, int offset, const uint8_t* payload, size_t len)
 {
+  (void)offset;  // needed later to convert this function into writing all chunks to a single file
+
   FILE *fp = fopen(fname, "w");
   size_t written = fwrite(payload, len, 1, fp);
+  if (written != len) {
+    PRINT(" write_to_file returned %d != %d (expected)\n", written, len)
+  }
   fclose(fp);
 }
 
@@ -447,7 +450,6 @@ oc_knx_swu_a_put_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   char *key = 0;
   char *value = 0;
   size_t key_len = 0, value_len;
-  int pos = 0;
 
   oc_content_format_t content_format;
   const uint8_t *payload = NULL;
@@ -514,7 +516,6 @@ oc_knx_swu_a_post_handler(oc_request_t *request,
   // not implemented
   oc_rep_t *rep = request->request_payload;
   if ((rep != NULL) && (rep->type == OC_REP_INT)) {
-    int temp;
     PRINT("  oc_knx_swu_a_post_handler received : %d\n",
           (int)rep->value.integer);
 
@@ -599,7 +600,6 @@ oc_knx_swu_pkgqurl_put_handler(oc_request_t *request,
 
     oc_rep_t *rep = request->request_payload;
   if ((rep != NULL) && (rep->type == OC_REP_STRING)) {
-    int temp;
     PRINT("  oc_knx_swu_pkgqurl_put_handler received : %s\n",
           oc_string(rep->value.string));
 
