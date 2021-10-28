@@ -78,12 +78,12 @@ oc_knx_swu_protocol_get_handler(oc_request_t *request,
     return;
   }
   /*
-  A list of supported protocols by the KNX IoT device. 
-  0: Unicast CoAP w/ OSCORE (as defined in RFC 7252) with the additional support for Block-wise transfer. CoAP is the default setting. 
-  1: CoAPS (as defined in RFC 7252) with the additional support for Block-wise transfer
-  4: CoAP w/ OSCORE over TCP (as defined in RFC 8323)
-  5: CoAP over TLS (as defined in RFC 8323)
-  254: Manufacturer specific
+  A list of supported protocols by the KNX IoT device.
+  0: Unicast CoAP w/ OSCORE (as defined in RFC 7252) with the additional support
+  for Block-wise transfer. CoAP is the default setting. 1: CoAPS (as defined in
+  RFC 7252) with the additional support for Block-wise transfer 4: CoAP w/
+  OSCORE over TCP (as defined in RFC 8323) 5: CoAP over TLS (as defined in RFC
+  8323) 254: Manufacturer specific
   */
   /* only support 0 */
 
@@ -211,10 +211,10 @@ oc_knx_swu_method_get_handler(oc_request_t *request,
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
-  /*  
-  0: Pull only 
-  1: Push only 
-  2: Both (Initial value). 
+  /*
+  0: Pull only
+  1: Push only
+  2: Both (Initial value).
   */
   /* we are only going to support PUSH */
   cbor_encode_int(&g_encoder, (int64_t)g_swu_update_method);
@@ -285,11 +285,10 @@ void
 oc_create_knx_swu_lastupdate_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_swu_lastupdate_resource\n");
-  oc_core_lf_populate_resource(resource_idx, device, "/swu/lastupdate", 
-    OC_IF_D | OC_IF_SWU,
-    APPLICATION_CBOR, OC_DISCOVERABLE,
-                               oc_knx_swu_lastupdate_get_handler, 0, 0, 0, 1,
-                               "urn:knx:dpt.varString8859_1");
+  oc_core_lf_populate_resource(
+    resource_idx, device, "/swu/lastupdate", OC_IF_D | OC_IF_SWU,
+    APPLICATION_CBOR, OC_DISCOVERABLE, oc_knx_swu_lastupdate_get_handler, 0, 0,
+    0, 1, "urn:knx:dpt.varString8859_1");
 }
 
 static void
@@ -386,9 +385,9 @@ oc_create_knx_swu_update_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_swu_update_resource\n");
   oc_core_lf_populate_resource(
-    resource_idx, device, "/swu/update", OC_IF_D | OC_IF_SWU,
-    APPLICATION_CBOR, OC_DISCOVERABLE, 0, oc_knx_swu_update_put_handler, 0, 0,
-    1, ":dpt.value2UCount");
+    resource_idx, device, "/swu/update", OC_IF_D | OC_IF_SWU, APPLICATION_CBOR,
+    OC_DISCOVERABLE, 0, oc_knx_swu_update_put_handler, 0, 0, 1,
+    ":dpt.value2UCount");
 }
 
 static void
@@ -419,29 +418,30 @@ void
 oc_create_knx_swu_pkgv_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_swu_pkgv_resource\n");
-  oc_core_lf_populate_resource(resource_idx, device, "/swu/pkgv",
-                               OC_IF_D | OC_IF_SWU, APPLICATION_CBOR,
-                               OC_DISCOVERABLE, oc_knx_swu_pkgv_get_handler, 0,
-                               0, 0, 1, "dpt.version");
+  oc_core_lf_populate_resource(
+    resource_idx, device, "/swu/pkgv", OC_IF_D | OC_IF_SWU, APPLICATION_CBOR,
+    OC_DISCOVERABLE, oc_knx_swu_pkgv_get_handler, 0, 0, 0, 1, "dpt.version");
 }
 
 /* separate files for each call to transport a block of data*/
 void
-write_to_file(char *fname, int offset, const uint8_t* payload, size_t len)
+write_to_file(char *fname, int offset, const uint8_t *payload, size_t len)
 {
-  (void)offset;  // needed later to convert this function into writing all chunks to a single file
+  (void)offset; // needed later to convert this function into writing all chunks
+                // to a single file
 
   FILE *fp = fopen(fname, "w");
   size_t written = fwrite(payload, len, 1, fp);
   if (written != len) {
-    PRINT(" write_to_file returned %d != %d (expected)\n", (int)written, (int)len);
+    PRINT(" write_to_file returned %d != %d (expected)\n", (int)written,
+          (int)len);
   }
   fclose(fp);
 }
 
 static void
 oc_knx_swu_a_put_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
-                          void *data)
+                         void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -473,34 +473,32 @@ oc_knx_swu_a_put_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   }
   PRINT("block_size: %d\n", block_size);
   PRINT("block_offset: %d\n", block_offset);
-  //if (block_size == 0) {
+  // if (block_size == 0) {
   //  oc_send_response(request, OC_STATUS_BAD_REQUEST);
   //  return;
   //}
 
-  
   bool berr =
     oc_get_request_payload_raw(request, &payload, &len, &content_format);
   PRINT("      raw buffer ok: %d\n", berr);
 
   char filebase[20];
-  sprintf((char*)&filebase, "block_%d", block_size);
-
+  sprintf((char *)&filebase, "block_%d", block_size);
 
 #ifdef WIN32
-  write_to_file((char*)filebase, block_offset, payload, len);
+  write_to_file((char *)filebase, block_offset, payload, len);
 #endif
 
 #ifdef __linux__
   write_to_file((char *)filebase, block_offset, payload, len);
-#endif 
+#endif
 
   oc_send_json_response(request, OC_STATUS_OK);
 }
 
 static void
-oc_knx_swu_a_post_handler(oc_request_t *request,
-                               oc_interface_mask_t iface_mask, void *data)
+oc_knx_swu_a_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
+                          void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -511,7 +509,7 @@ oc_knx_swu_a_post_handler(oc_request_t *request,
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
- 
+
   // Triggers a software update query request (PULL on Software Update Server).
   // not implemented
   oc_rep_t *rep = request->request_payload;
@@ -531,7 +529,8 @@ oc_create_knx_swu_a_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_reset_resource\n");
   oc_core_lf_populate_resource(resource_idx, device, "a/swu", OC_IF_NONE,
-                               APPLICATION_CBOR, OC_DISCOVERABLE, 0, oc_knx_swu_a_put_handler,
+                               APPLICATION_CBOR, OC_DISCOVERABLE, 0,
+                               oc_knx_swu_a_put_handler,
                                oc_knx_swu_a_post_handler, 0, 1, ":dpt.file");
 }
 
@@ -550,7 +549,7 @@ oc_knx_swu_bytes_get_handler(oc_request_t *request,
     return;
   }
 
-  //g_swu_package_bytes
+  // g_swu_package_bytes
   cbor_encode_int(&g_encoder, (int64_t)g_swu_package_bytes);
 
   oc_send_json_response(request, OC_STATUS_OK);
@@ -598,7 +597,7 @@ oc_knx_swu_pkgqurl_put_handler(oc_request_t *request,
     return;
   }
 
-    oc_rep_t *rep = request->request_payload;
+  oc_rep_t *rep = request->request_payload;
   if ((rep != NULL) && (rep->type == OC_REP_STRING)) {
     PRINT("  oc_knx_swu_pkgqurl_put_handler received : %s\n",
           oc_string(rep->value.string));
@@ -614,10 +613,10 @@ void
 oc_create_knx_swu_pkgqurl_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_swu_pkgqurl_resource\n");
-  oc_core_lf_populate_resource(resource_idx, device, "/swu/pkgqurl",
-                               OC_IF_D | OC_IF_BASELINE, OC_IF_LL,
-                               OC_DISCOVERABLE, oc_knx_swu_pkgqurl_get_handler,
-                               oc_knx_swu_pkgqurl_put_handler, 0, 0, 1, ":dpt.url");
+  oc_core_lf_populate_resource(
+    resource_idx, device, "/swu/pkgqurl", OC_IF_D | OC_IF_BASELINE, OC_IF_LL,
+    OC_DISCOVERABLE, oc_knx_swu_pkgqurl_get_handler,
+    oc_knx_swu_pkgqurl_put_handler, 0, 0, 1, ":dpt.url");
 }
 
 static void
@@ -717,18 +716,16 @@ oc_create_knx_swu_resources(size_t device_index)
 
   oc_create_knx_swu_resource(OC_KNX_SWU, device_index);
 
-
   oc_swu_set_package_name("");
   oc_swu_set_last_update("");
-  oc_swu_set_package_version(0,0,0);
+  oc_swu_set_package_version(0, 0, 0);
 }
 
 void
 oc_swu_set_package_name(char *name)
 {
   oc_free_string(&g_swu_package_name);
-  oc_new_string(&g_swu_package_name, name,
-                strlen(name));
+  oc_new_string(&g_swu_package_name, name, strlen(name));
 }
 
 void
@@ -741,7 +738,7 @@ oc_swu_set_last_update(char *time)
 void
 oc_swu_set_package_bytes(int package_bytes)
 {
-  g_swu_package_bytes =  package_bytes;
+  g_swu_package_bytes = package_bytes;
 }
 
 void
@@ -750,7 +747,6 @@ oc_swu_set_package_version(int major, int minor, int minor2)
   g_swu_package_version.major = major;
   g_swu_package_version.minor = minor;
   g_swu_package_version.third = minor2;
-
 }
 
 void
