@@ -30,10 +30,15 @@ int g_swu_update_method = 0;
 
 
 /* PACKAGE names*/
+/* note will be initialized with "" during creation of the resource*/
 #define KNX_STORAGE_SWU_METHOD "swu_knx_package_names"
-oc_string_t g_swu_update_method = 0;
+oc_string_t g_swu_package_name;
 
-//oc_string_t hwt; ///< knx hardware type
+
+/* last update (time) */
+/* note will be initialized with "" during creation of the resource*/
+#define KNX_STORAGE_SWU_METHOD "swu_knx_last_update"
+oc_string_t g_swu_last_update;
 
 
 static void
@@ -65,7 +70,7 @@ oc_knx_swu_protocol_get_handler(oc_request_t *request,
   CborEncoder arrayEncoder;
   cbor_encoder_create_array(&g_encoder, &arrayEncoder, 1);
   cbor_encode_int(&arrayEncoder, (int64_t)0);
-    cbor_encoder_close_container(&g_encoder, &arrayEncoder);
+  cbor_encoder_close_container(&g_encoder, &arrayEncoder);
 
   oc_send_cbor_response(request, OC_STATUS_OK);
   return;
@@ -233,27 +238,16 @@ oc_knx_swu_lastupdate_get_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  // size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
-  if (request->accept != APPLICATION_JSON) {
+  if (request->accept != APPLICATION_CBOR) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
-  /*
-  int length = clf_add_line_to_buffer("{");
-  response_length += length;
 
-  length = clf_add_line_to_buffer("\"api\": { \"version\": \"1.0\",");
-  response_length += length;
-
-  length = clf_add_line_to_buffer("\"base\": \"/ \"}");
-  response_length += length;
-
-  length = clf_add_line_to_buffer("}");
-  response_length += length;
-  */
+  // last update (time)
+  cbor_encode_text_stringz(&g_encoder, oc_string(g_swu_last_update));
 
   oc_send_json_response(request, OC_STATUS_OK);
 }
@@ -262,10 +256,11 @@ void
 oc_create_knx_swu_lastupdate_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_swu_lastupdate_resource\n");
-  oc_core_lf_populate_resource(resource_idx, device, "/swu/lastupdate",
-                               OC_IF_LL, APPLICATION_CBOR, OC_DISCOVERABLE,
+  oc_core_lf_populate_resource(resource_idx, device, "/swu/lastupdate", 
+    OC_IF_D | OC_IF_SWU,
+    APPLICATION_CBOR, OC_DISCOVERABLE,
                                oc_knx_swu_lastupdate_get_handler, 0, 0, 0, 1,
-                               "urn:knx:dpt.value1UCount");
+                               "urn:knx:dpt.varString8859_1");
 }
 
 static void
@@ -600,6 +595,13 @@ oc_knx_swu_pkgnames_get_handler(oc_request_t *request,
   }
   // size_t device_index = request->resource->device;
 
+  //g_swu_package_name
+
+  CborEncoder arrayEncoder;
+  cbor_encoder_create_array(&g_encoder, &arrayEncoder, 1);
+  cbor_encode_text_stringz(&arrayEncoder, oc_string(g_swu_package_name));
+  cbor_encoder_close_container(&g_encoder, &arrayEncoder);
+
   oc_send_cbor_response(request, OC_STATUS_OK);
 }
 
@@ -706,4 +708,23 @@ oc_create_knx_swu_resources(size_t device_index)
   oc_create_knx_swu_pkg_resource(OC_KNX_SWU_PKG, device_index);
 
   oc_create_knx_swu_resource(OC_KNX_SWU, device_index);
+
+
+  oc_swu_set_package_name("");
+  oc_swu_set_last_update("");
+}
+
+void
+oc_swu_set_package_name(char *name)
+{
+  oc_free_string(&g_swu_package_name);
+  oc_new_string(&g_swu_package_name, name,
+                strlen(name));
+}
+
+void
+oc_swu_set_last_update(char *time)
+{
+  oc_free_string(&g_swu_last_update);
+  oc_new_string(&g_swu_last_update, time, strlen(time));
 }

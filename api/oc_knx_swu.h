@@ -30,6 +30,11 @@ extern "C" {
 */
 void oc_create_knx_swu_resources(size_t device);
 
+
+void oc_swu_set_package_name(char *name);
+
+void oc_swu_set_last_update(char *time);
+
 #ifdef __cplusplus
 }
 #endif
