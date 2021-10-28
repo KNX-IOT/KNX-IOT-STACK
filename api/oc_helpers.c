@@ -315,3 +315,16 @@ oc_conv_hex_string_to_byte_array(const char *hex_str, size_t hex_str_len,
 
   return 0;
 }
+
+bool
+oc_uri_contains_wildcard(char *uri)
+{
+  if (uri == NULL)
+    return false;
+
+  int len = strlen(uri);
+  if (uri[len - 1] == '*') {
+    return true;
+  }
+  return false;
+}

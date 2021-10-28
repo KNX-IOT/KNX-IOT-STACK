@@ -139,7 +139,7 @@ typedef enum {
 } oc_content_format_t;
 
 /**
- * @brief seperate response type
+ * @brief separate response type
  *
  */
 typedef struct oc_separate_response_s oc_separate_response_t;
@@ -216,7 +216,8 @@ typedef enum {
   OC_KNX_LSM,      ///< load state machine
   OC_KNX_CRC,      ///< CRC value of loaded contents
   OC_KNX,          ///< well-known / knx
-  OC_KNX_FP_G,     ///< FP/G
+  OC_KNX_FP_GM,    ///< FP/GM
+  OC_KNX_FP_GM_X,  ///< FP/GM/X
   OC_KNX_FP_P,     ///< FP/G
   OC_KNX_FP_R,     ///< FP/G
   OC_KNX_P,        ///< FP/G
