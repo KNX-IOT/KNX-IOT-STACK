@@ -577,7 +577,7 @@ oc_knx_device_storage_read(size_t device_index)
   temp_size = oc_storage_read(KNX_STORAGE_IA, (uint8_t *)&ia, sizeof(ia));
   if (temp_size > 0) {
     device->ia = ia;
-    PRINT(" ia (storage) %ld\n", ia);
+    PRINT(" ia (storage) %ld\n", (long)ia);
   }
 
   /* HOST NAME */

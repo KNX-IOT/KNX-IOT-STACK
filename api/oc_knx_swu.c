@@ -20,6 +20,22 @@
 #include "oc_core_res.h"
 #include <stdio.h>
 
+/* MAX DEFER*/
+#define KNX_STORAGE_SWU_MAX_DEFER "swu_knx_max_defer"
+int g_swu_max_defer = 0;
+
+/* UPDATE METHOD*/
+#define KNX_STORAGE_SWU_METHOD "swu_knx_method"
+int g_swu_update_method = 0;
+
+
+/* PACKAGE names*/
+#define KNX_STORAGE_SWU_METHOD "swu_knx_package_names"
+oc_string_t g_swu_update_method = 0;
+
+//oc_string_t hwt; ///< knx hardware type
+
+
 static void
 oc_knx_swu_protocol_get_handler(oc_request_t *request,
                                 oc_interface_mask_t iface_mask, void *data)
@@ -29,27 +45,32 @@ oc_knx_swu_protocol_get_handler(oc_request_t *request,
   // size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
-  if (request->accept != APPLICATION_JSON) {
+  if (request->accept != APPLICATION_CBOR) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
   /*
-  int length = clf_add_line_to_buffer("{");
-  response_length += length;
-
-  length = clf_add_line_to_buffer("\"api\": { \"version\": \"1.0\",");
-  response_length += length;
-
-  length = clf_add_line_to_buffer("\"base\": \"/ \"}");
-  response_length += length;
-
-  length = clf_add_line_to_buffer("}");
-  response_length += length;
+  A list of supported protocols by the KNX IoT device. 
+  0: Unicast CoAP w/ OSCORE (as defined in RFC 7252) with the additional support for Block-wise transfer. CoAP is the default setting. 
+  1: CoAPS (as defined in RFC 7252) with the additional support for Block-wise transfer
+  4: CoAP w/ OSCORE over TCP (as defined in RFC 8323)
+  5: CoAP over TLS (as defined in RFC 8323)
+  254: Manufacturer specific
   */
+  /* only support 0 */
 
-  oc_send_json_response(request, OC_STATUS_OK);
+  // Content-Format: "application/cbor"
+  // Payload: [ 0 ]
+  CborEncoder arrayEncoder;
+  cbor_encoder_create_array(&g_encoder, &arrayEncoder, 1);
+  cbor_encode_int(&arrayEncoder, (int64_t)0);
+    cbor_encoder_close_container(&g_encoder, &arrayEncoder);
+
+  oc_send_cbor_response(request, OC_STATUS_OK);
+  return;
 }
+
 
 static void
 oc_knx_swu_protocol_put_handler(oc_request_t *request,
@@ -60,25 +81,15 @@ oc_knx_swu_protocol_put_handler(oc_request_t *request,
   // size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
-  if (request->accept != APPLICATION_JSON) {
+  if (request->accept != APPLICATION_CBOR) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
-  /*
-  int length = clf_add_line_to_buffer("{");
-  response_length += length;
 
-  length = clf_add_line_to_buffer("\"api\": { \"version\": \"1.0\",");
-  response_length += length;
+  /* not sure what to do with request data */
 
-  length = clf_add_line_to_buffer("\"base\": \"/ \"}");
-  response_length += length;
-
-  length = clf_add_line_to_buffer("}");
-  response_length += length;
-  */
-  oc_send_json_response(request, OC_STATUS_OK);
+  oc_send_json_response(request, OC_STATUS_BAD_REQUEST);
 }
 
 void
@@ -97,7 +108,6 @@ oc_knx_swu_maxdefer_get_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  // size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_JSON) {
@@ -105,19 +115,11 @@ oc_knx_swu_maxdefer_get_handler(oc_request_t *request,
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
+
   /*
-  int length = clf_add_line_to_buffer("{");
-  response_length += length;
-
-  length = clf_add_line_to_buffer("\"api\": { \"version\": \"1.0\",");
-  response_length += length;
-
-  length = clf_add_line_to_buffer("\"base\": \"/ \"}");
-  response_length += length;
-
-  length = clf_add_line_to_buffer("}");
-  response_length += length;
+   max defer in seconds
   */
+  cbor_encode_int(&g_encoder, (int64_t)g_swu_max_defer);
 
   oc_send_json_response(request, OC_STATUS_OK);
 }
@@ -136,21 +138,19 @@ oc_knx_swu_maxdefer_put_handler(oc_request_t *request,
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
-  /*
-  int length = clf_add_line_to_buffer("{");
-  response_length += length;
 
-  length = clf_add_line_to_buffer("\"api\": { \"version\": \"1.0\",");
-  response_length += length;
+  oc_rep_t *rep = request->request_payload;
+  if ((rep != NULL) && (rep->type == OC_REP_INT)) {
+    PRINT("  oc_knx_swu_maxdefer_put_handler received : %d\n",
+          (int)rep->value.integer);
+    g_swu_max_defer = (int)rep->value.integer;
+    oc_storage_write(KNX_STORAGE_SWU_MAX_DEFER, (uint8_t *)&g_swu_max_defer,
+                     sizeof(g_swu_max_defer));
+    oc_send_cbor_response(request, OC_STATUS_OK);
+    return;
+  }
 
-  length = clf_add_line_to_buffer("\"base\": \"/ \"}");
-  response_length += length;
-
-  length = clf_add_line_to_buffer("}");
-  response_length += length;
-  */
-
-  oc_send_json_response(request, OC_STATUS_OK);
+  oc_send_json_response(request, OC_STATUS_BAD_REQUEST);
 }
 
 void
@@ -177,19 +177,13 @@ oc_knx_swu_method_get_handler(oc_request_t *request,
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
-  /*
-  int length = clf_add_line_to_buffer("{");
-  response_length += length;
-
-  length = clf_add_line_to_buffer("\"api\": { \"version\": \"1.0\",");
-  response_length += length;
-
-  length = clf_add_line_to_buffer("\"base\": \"/ \"}");
-  response_length += length;
-
-  length = clf_add_line_to_buffer("}");
-  response_length += length;
+  /*  
+  0: Pull only 
+  1: Push only 
+  2: Both (Initial value). 
   */
+  /* we are only going to support PUSH */
+  cbor_encode_int(&g_encoder, (int64_t)g_swu_update_method);
 
   oc_send_json_response(request, OC_STATUS_OK);
 }
@@ -208,19 +202,17 @@ oc_knx_swu_method_put_handler(oc_request_t *request,
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
-  /*
-  int length = clf_add_line_to_buffer("{");
-  response_length += length;
 
-  length = clf_add_line_to_buffer("\"api\": { \"version\": \"1.0\",");
-  response_length += length;
-
-  length = clf_add_line_to_buffer("\"base\": \"/ \"}");
-  response_length += length;
-
-  length = clf_add_line_to_buffer("}");
-  response_length += length;
-  */
+  oc_rep_t *rep = request->request_payload;
+  if ((rep != NULL) && (rep->type == OC_REP_INT)) {
+    PRINT("  oc_knx_swu_method_put_handler received : %d\n",
+          (int)rep->value.integer);
+    g_swu_update_method = (int)rep->value.integer;
+    oc_storage_write(KNX_STORAGE_SWU_METHOD, (uint8_t *)&g_swu_update_method,
+                     sizeof(g_swu_update_method));
+    oc_send_cbor_response(request, OC_STATUS_OK);
+    return;
+  }
 
   oc_send_json_response(request, OC_STATUS_OK);
 }
@@ -712,5 +704,6 @@ oc_create_knx_swu_resources(size_t device_index)
   oc_create_knx_swu_pkgqurl_resource(OC_KNX_SWU_PKGQURL, device_index);
   oc_create_knx_swu_pkgnames_resource(OC_KNX_SWU_PKGNAMES, device_index);
   oc_create_knx_swu_pkg_resource(OC_KNX_SWU_PKG, device_index);
+
   oc_create_knx_swu_resource(OC_KNX_SWU, device_index);
 }
