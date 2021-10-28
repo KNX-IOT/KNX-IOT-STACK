@@ -22,24 +22,46 @@
 
 /* MAX DEFER*/
 #define KNX_STORAGE_SWU_MAX_DEFER "swu_knx_max_defer"
-int g_swu_max_defer = 0;
+static int g_swu_max_defer = 0;
 
 /* UPDATE METHOD*/
 #define KNX_STORAGE_SWU_METHOD "swu_knx_method"
-int g_swu_update_method = 0;
-
+static int g_swu_update_method = 0;
 
 /* PACKAGE names*/
 /* note will be initialized with "" during creation of the resource*/
-#define KNX_STORAGE_SWU_METHOD "swu_knx_package_names"
-oc_string_t g_swu_package_name;
-
+#define KNX_STORAGE_PACKAGE_NAMES "swu_knx_package_names"
+static oc_string_t g_swu_package_name;
 
 /* last update (time) */
 /* note will be initialized with "" during creation of the resource*/
-#define KNX_STORAGE_SWU_METHOD "swu_knx_last_update"
-oc_string_t g_swu_last_update;
+#define KNX_STORAGE_LAST_UPDATE "swu_knx_last_update"
+static oc_string_t g_swu_last_update;
 
+/* package bytes */
+/* note will be initialized with "" during creation of the resource*/
+#define KNX_STORAGE_PACKAGE_BYTES "swu_knx_package_bytes"
+static int g_swu_package_bytes = 0;
+
+/* package version (pkgv) */
+/* note will be initialized with "" during creation of the resource*/
+#define KNX_STORAGE_PACKAGE_VERSION "swu_knx_package_version"
+static oc_knx_version_info_t g_swu_package_version;
+
+/* software update state */
+/* note will be initialized with "" during creation of the resource*/
+#define KNX_STORAGE_UPDATE_STATE "swu_knx_update_state"
+static oc_swu_state_t g_swu_state = OC_SWU_STATE_IDLE;
+
+/* package query url /swu/pkgqurl */
+/* note will be initialized with "" during creation of the resource*/
+#define KNX_STORAGE_QURL "swu_knx_qurl"
+static oc_string_t g_swu_qurl;
+
+/* software update result */
+/* note will be initialized with "" during creation of the resource*/
+#define KNX_STORAGE_UPDATE_RESULT "swu_knx_update_result"
+static oc_swu_result_t g_swu_result = OC_SWU_RESULT_INIT;
 
 static void
 oc_knx_swu_protocol_get_handler(oc_request_t *request,
@@ -76,7 +98,6 @@ oc_knx_swu_protocol_get_handler(oc_request_t *request,
   return;
 }
 
-
 static void
 oc_knx_swu_protocol_put_handler(oc_request_t *request,
                                 oc_interface_mask_t iface_mask, void *data)
@@ -92,9 +113,18 @@ oc_knx_swu_protocol_put_handler(oc_request_t *request,
     return;
   }
 
-  /* not sure what to do with request data */
+  /* not sure what to do with request data, so we are just parsing it for now*/
+  oc_rep_t *rep = request->request_payload;
+  if ((rep != NULL) && (rep->type == OC_REP_INT)) {
+    int temp;
+    PRINT("  oc_knx_swu_protocol_put_handler received : %d\n",
+          (int)rep->value.integer);
 
-  oc_send_json_response(request, OC_STATUS_BAD_REQUEST);
+    oc_send_cbor_response(request, OC_STATUS_OK);
+    return;
+  }
+
+  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
 }
 
 void
@@ -102,7 +132,7 @@ oc_create_knx_swu_protocol_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_swu_protocol_resource\n");
   oc_core_lf_populate_resource(
-    resource_idx, device, "/swu/protocol", OC_IF_LL, APPLICATION_CBOR,
+    resource_idx, device, "/swu/protocol", OC_IF_D, APPLICATION_CBOR,
     OC_DISCOVERABLE, oc_knx_swu_protocol_get_handler,
     oc_knx_swu_protocol_put_handler, 0, 0, 1, "urn:knx:dpt.value1UCount");
 }
@@ -227,7 +257,7 @@ oc_create_knx_swu_method_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_swu_method_resource\n");
   oc_core_lf_populate_resource(
-    resource_idx, device, "/swu/method", OC_IF_LL, APPLICATION_CBOR,
+    resource_idx, device, "/swu/method", OC_IF_D, APPLICATION_CBOR,
     OC_DISCOVERABLE, oc_knx_swu_method_get_handler,
     oc_knx_swu_method_put_handler, 0, 0, 1, "urn:knx:dpt.value1UCount");
 }
@@ -277,19 +307,9 @@ oc_knx_swu_result_get_handler(oc_request_t *request,
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
-  /*
-  int length = clf_add_line_to_buffer("{");
-  response_length += length;
 
-  length = clf_add_line_to_buffer("\"api\": { \"version\": \"1.0\",");
-  response_length += length;
-
-  length = clf_add_line_to_buffer("\"base\": \"/ \"}");
-  response_length += length;
-
-  length = clf_add_line_to_buffer("}");
-  response_length += length;
-  */
+  // g_swu_state
+  cbor_encode_int(&g_encoder, (int64_t)g_swu_result);
 
   oc_send_json_response(request, OC_STATUS_OK);
 }
@@ -299,7 +319,7 @@ oc_create_knx_swu_result_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_swu_result_resource\n");
   oc_core_lf_populate_resource(resource_idx, device, "/swu/result",
-                               OC_IF_LL | OC_IF_BASELINE, APPLICATION_CBOR,
+                               OC_IF_D | OC_IF_SWU, APPLICATION_CBOR,
                                OC_DISCOVERABLE, oc_knx_swu_result_get_handler,
                                0, 0, 0, 1, "urn:knx:dpt.value1UCount");
 }
@@ -310,27 +330,17 @@ oc_knx_swu_state_get_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  // size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
-  if (request->accept != APPLICATION_JSON) {
+  if (request->accept != APPLICATION_CBOR) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
-  /*
-  int length = clf_add_line_to_buffer("{");
-  response_length += length;
 
-  length = clf_add_line_to_buffer("\"api\": { \"version\": \"1.0\",");
-  response_length += length;
+  // g_swu_state
+  cbor_encode_int(&g_encoder, (int64_t)g_swu_state);
 
-  length = clf_add_line_to_buffer("\"base\": \"/ \"}");
-  response_length += length;
-
-  length = clf_add_line_to_buffer("}");
-  response_length += length;
-  */
   oc_send_json_response(request, OC_STATUS_OK);
 }
 
@@ -339,7 +349,7 @@ oc_create_knx_swu_state_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_swu_state_resource\n");
   oc_core_lf_populate_resource(resource_idx, device, "/swu/state",
-                               OC_IF_LL | OC_IF_BASELINE, APPLICATION_CBOR,
+                               OC_IF_D | OC_IF_SWU, APPLICATION_CBOR,
                                OC_DISCOVERABLE, oc_knx_swu_state_get_handler, 0,
                                0, 0, 1, "urn:knx:dpt.value1UCount");
 }
@@ -350,29 +360,27 @@ oc_knx_swu_update_put_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  // size_t response_length = 0;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_JSON) {
+  if (request->accept != APPLICATION_CBOR) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
-  /*
-  int length = clf_add_line_to_buffer("{");
-  response_length += length;
+  // note we are not doing anything with the trigger.
 
-  length = clf_add_line_to_buffer("\"api\": { \"version\": \"1.0\",");
-  response_length += length;
+  /* not sure what to do with request data, so we are just parsing it for now*/
+  oc_rep_t *rep = request->request_payload;
+  if ((rep != NULL) && (rep->type == OC_REP_INT)) {
+    int temp;
+    PRINT("  oc_knx_swu_update_put_handler received : %d\n",
+          (int)rep->value.integer);
 
-  length = clf_add_line_to_buffer("\"base\": \"/ \"}");
-  response_length += length;
+    oc_send_cbor_response(request, OC_STATUS_OK);
+    return;
+  }
 
-  length = clf_add_line_to_buffer("}");
-  response_length += length;
-  */
-
-  oc_send_json_response(request, OC_STATUS_OK);
+  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
 }
 
 void
@@ -380,9 +388,9 @@ oc_create_knx_swu_update_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_swu_update_resource\n");
   oc_core_lf_populate_resource(
-    resource_idx, device, "/swu/pkgv", OC_IF_LL | OC_IF_BASELINE,
+    resource_idx, device, "/swu/update", OC_IF_D | OC_IF_SWU,
     APPLICATION_CBOR, OC_DISCOVERABLE, 0, oc_knx_swu_update_put_handler, 0, 0,
-    1, "dpt.version");
+    1, ":dpt.value2UCount");
 }
 
 static void
@@ -391,27 +399,20 @@ oc_knx_swu_pkgv_get_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  // size_t response_length = 0;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_JSON) {
+  if (request->accept != APPLICATION_CBOR) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
-  /*
-  int length = clf_add_line_to_buffer("{");
-  response_length += length;
-
-  length = clf_add_line_to_buffer("\"api\": { \"version\": \"1.0\",");
-  response_length += length;
-
-  length = clf_add_line_to_buffer("\"base\": \"/ \"}");
-  response_length += length;
-
-  length = clf_add_line_to_buffer("}");
-  response_length += length;
-  */
+  // Payload: [ 1, 2, 3 ]
+  CborEncoder arrayEncoder;
+  cbor_encoder_create_array(&g_encoder, &arrayEncoder, 3);
+  cbor_encode_int(&arrayEncoder, (int64_t)g_swu_package_version.major);
+  cbor_encode_int(&arrayEncoder, (int64_t)g_swu_package_version.minor);
+  cbor_encode_int(&arrayEncoder, (int64_t)g_swu_package_version.third);
+  cbor_encoder_close_container(&g_encoder, &arrayEncoder);
 
   oc_send_json_response(request, OC_STATUS_OK);
 }
@@ -421,49 +422,116 @@ oc_create_knx_swu_pkgv_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_swu_pkgv_resource\n");
   oc_core_lf_populate_resource(resource_idx, device, "/swu/pkgv",
-                               OC_IF_LL | OC_IF_BASELINE, APPLICATION_CBOR,
+                               OC_IF_D | OC_IF_SWU, APPLICATION_CBOR,
                                OC_DISCOVERABLE, oc_knx_swu_pkgv_get_handler, 0,
                                0, 0, 1, "dpt.version");
 }
 
+/* separate files for each call to transport a block of data*/
+void
+write_to_file(char *fname, int offset, const uint8_t* payload, size_t len)
+{
+  FILE *fp = fopen(fname, "w");
+  size_t written = fwrite(payload, len, 1, fp);
+  fclose(fp);
+}
+
 static void
-oc_knx_swu_pkgcmd_post_handler(oc_request_t *request,
-                               oc_interface_mask_t iface_mask, void *data)
+oc_knx_swu_a_put_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
+                          void *data)
 {
   (void)data;
   (void)iface_mask;
-  // size_t response_length = 0;
+  int block_size = 0;
+  int block_offset = 0;
+  char *key = 0;
+  char *value = 0;
+  size_t key_len = 0, value_len;
+  int pos = 0;
+
+  oc_content_format_t content_format;
+  const uint8_t *payload = NULL;
+  size_t len = 0;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_JSON) {
+  if (request->accept != APPLICATION_OCTET_STREAM) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
-  /*
-  int length = clf_add_line_to_buffer("{");
-  response_length += length;
 
-  length = clf_add_line_to_buffer("\"api\": { \"version\": \"1.0\",");
-  response_length += length;
+  oc_init_query_iterator();
+  while (oc_iterate_query(request, &key, &key_len, &value, &value_len) > 0) {
+    if (strncmp(key, "po", key_len) == 0) {
+      block_offset = atoi(value);
+    }
+    if (strncmp(key, "ps", key_len) == 0) {
+      block_size = atoi(value);
+    }
+  }
+  PRINT("block_size: %d\n", block_size);
+  PRINT("block_offset: %d\n", block_offset);
+  //if (block_size == 0) {
+  //  oc_send_response(request, OC_STATUS_BAD_REQUEST);
+  //  return;
+  //}
 
-  length = clf_add_line_to_buffer("\"base\": \"/ \"}");
-  response_length += length;
+  
+  bool berr =
+    oc_get_request_payload_raw(request, &payload, &len, &content_format);
+  PRINT("      raw buffer ok: %d\n", berr);
 
-  length = clf_add_line_to_buffer("}");
-  response_length += length;
-  */
+  char filebase[20];
+  sprintf((char*)&filebase, "block_%d", block_size);
+
+
+#ifdef WIN32
+  write_to_file((char*)filebase, block_offset, payload, len);
+#endif
+
+#ifdef __linux__
+  write_to_file((char *)filebase, block_offset, payload, len);
+#endif 
 
   oc_send_json_response(request, OC_STATUS_OK);
 }
 
+static void
+oc_knx_swu_a_post_handler(oc_request_t *request,
+                               oc_interface_mask_t iface_mask, void *data)
+{
+  (void)data;
+  (void)iface_mask;
+
+  /* check if the accept header is CBOR-format */
+  if (request->accept != APPLICATION_CBOR) {
+    request->response->response_buffer->code =
+      oc_status_code(OC_STATUS_BAD_REQUEST);
+    return;
+  }
+ 
+  // Triggers a software update query request (PULL on Software Update Server).
+  // not implemented
+  oc_rep_t *rep = request->request_payload;
+  if ((rep != NULL) && (rep->type == OC_REP_INT)) {
+    int temp;
+    PRINT("  oc_knx_swu_a_post_handler received : %d\n",
+          (int)rep->value.integer);
+
+    oc_send_cbor_response(request, OC_STATUS_OK);
+    return;
+  }
+
+  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+}
+
 void
-oc_create_knx_swu_pkgcmd_resource(int resource_idx, size_t device)
+oc_create_knx_swu_a_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_reset_resource\n");
-  oc_core_lf_populate_resource(resource_idx, device, "/swu/pkgcmd", OC_IF_NONE,
-                               APPLICATION_CBOR, OC_DISCOVERABLE, 0, 0,
-                               oc_knx_swu_pkgcmd_post_handler, 0, 0, "");
+  oc_core_lf_populate_resource(resource_idx, device, "a/swu", OC_IF_NONE,
+                               APPLICATION_CBOR, OC_DISCOVERABLE, 0, oc_knx_swu_a_put_handler,
+                               oc_knx_swu_a_post_handler, 0, 1, ":dpt.file");
 }
 
 static void
@@ -475,24 +543,14 @@ oc_knx_swu_bytes_get_handler(oc_request_t *request,
   // size_t response_length = 0;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_JSON) {
+  if (request->accept != APPLICATION_CBOR) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
-  /*
-  int length = clf_add_line_to_buffer("{");
-  response_length += length;
 
-  length = clf_add_line_to_buffer("\"api\": { \"version\": \"1.0\",");
-  response_length += length;
-
-  length = clf_add_line_to_buffer("\"base\": \"/ \"}");
-  response_length += length;
-
-  length = clf_add_line_to_buffer("}");
-  response_length += length;
-  */
+  //g_swu_package_bytes
+  cbor_encode_int(&g_encoder, (int64_t)g_swu_package_bytes);
 
   oc_send_json_response(request, OC_STATUS_OK);
 }
@@ -513,27 +571,14 @@ oc_knx_swu_pkgqurl_get_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  // size_t response_length = 0;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_JSON) {
+  if (request->accept != APPLICATION_CBOR) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
-  /*
-  int length = clf_add_line_to_buffer("{");
-  response_length += length;
-
-  length = clf_add_line_to_buffer("\"api\": { \"version\": \"1.0\",");
-  response_length += length;
-
-  length = clf_add_line_to_buffer("\"base\": \"/ \"}");
-  response_length += length;
-
-  length = clf_add_line_to_buffer("}");
-  response_length += length;
-  */
+  cbor_encode_text_stringz(&g_encoder, oc_string(g_swu_qurl));
 
   oc_send_json_response(request, OC_STATUS_OK);
 }
@@ -544,29 +589,25 @@ oc_knx_swu_pkgqurl_put_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  // size_t response_length = 0;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_JSON) {
+  if (request->accept != APPLICATION_CBOR) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
-  /*
-  int length = clf_add_line_to_buffer("{");
-  response_length += length;
 
-  length = clf_add_line_to_buffer("\"api\": { \"version\": \"1.0\",");
-  response_length += length;
+    oc_rep_t *rep = request->request_payload;
+  if ((rep != NULL) && (rep->type == OC_REP_STRING)) {
+    int temp;
+    PRINT("  oc_knx_swu_pkgqurl_put_handler received : %s\n",
+          oc_string(rep->value.string));
 
-  length = clf_add_line_to_buffer("\"base\": \"/ \"}");
-  response_length += length;
+    oc_send_cbor_response(request, OC_STATUS_OK);
+    return;
+  }
 
-  length = clf_add_line_to_buffer("}");
-  response_length += length;
-  */
-
-  oc_send_json_response(request, OC_STATUS_OK);
+  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
 }
 
 void
@@ -574,9 +615,9 @@ oc_create_knx_swu_pkgqurl_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_swu_pkgqurl_resource\n");
   oc_core_lf_populate_resource(resource_idx, device, "/swu/pkgqurl",
-                               OC_IF_LL | OC_IF_BASELINE, OC_IF_LL,
+                               OC_IF_D | OC_IF_BASELINE, OC_IF_LL,
                                OC_DISCOVERABLE, oc_knx_swu_pkgqurl_get_handler,
-                               oc_knx_swu_pkgqurl_put_handler, 0, 0, 0, "");
+                               oc_knx_swu_pkgqurl_put_handler, 0, 0, 1, ":dpt.url");
 }
 
 static void
@@ -585,7 +626,6 @@ oc_knx_swu_pkgnames_get_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  // size_t response_length = 0;
 
   /* check if the accept header is CBOR-format */
   if (request->accept != APPLICATION_CBOR) {
@@ -593,9 +633,6 @@ oc_knx_swu_pkgnames_get_handler(oc_request_t *request,
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
-  // size_t device_index = request->resource->device;
-
-  //g_swu_package_name
 
   CborEncoder arrayEncoder;
   cbor_encoder_create_array(&g_encoder, &arrayEncoder, 1);
@@ -613,34 +650,6 @@ oc_create_knx_swu_pkgnames_resource(int resource_idx, size_t device)
                                APPLICATION_CBOR, OC_DISCOVERABLE,
                                oc_knx_swu_pkgnames_get_handler, 0, 0, 0, 0, 1,
                                ":dpt.a[n]");
-}
-
-static void
-oc_knx_swu_pkg_put_handler(oc_request_t *request,
-                           oc_interface_mask_t iface_mask, void *data)
-{
-  (void)data;
-  (void)iface_mask;
-  // size_t response_length = 0;
-
-  /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
-    request->response->response_buffer->code =
-      oc_status_code(OC_STATUS_BAD_REQUEST);
-    return;
-  }
-  // size_t device_index = request->resource->device;
-
-  oc_send_cbor_response(request, OC_STATUS_OK);
-}
-
-void
-oc_create_knx_swu_pkg_resource(int resource_idx, size_t device)
-{
-  OC_DBG("oc_create_knx_swu_pkg_resource\n");
-  oc_core_lf_populate_resource(
-    resource_idx, device, "/dev/idevid", OC_IF_D, APPLICATION_CBOR,
-    OC_DISCOVERABLE, 0, oc_knx_swu_pkg_put_handler, 0, 0, 0, 1, ":dpt.a[n]");
 }
 
 static void
@@ -701,17 +710,17 @@ oc_create_knx_swu_resources(size_t device_index)
   // /swu/update/{filename} // optional resource not implemented
   oc_create_knx_swu_update_resource(OC_KNX_SWU_UPDATE, device_index);
   oc_create_knx_swu_pkgv_resource(OC_KNX_SWU_PKGV, device_index);
-  oc_create_knx_swu_pkgcmd_resource(OC_KNX_SWU_PKGCMD, device_index);
+  oc_create_knx_swu_a_resource(OC_KNX_SWU_PKGCMD, device_index);
   oc_create_knx_swu_pkgbytes_resource(OC_KNX_SWU_PKGBYTES, device_index);
   oc_create_knx_swu_pkgqurl_resource(OC_KNX_SWU_PKGQURL, device_index);
   oc_create_knx_swu_pkgnames_resource(OC_KNX_SWU_PKGNAMES, device_index);
-  oc_create_knx_swu_pkg_resource(OC_KNX_SWU_PKG, device_index);
 
   oc_create_knx_swu_resource(OC_KNX_SWU, device_index);
 
 
   oc_swu_set_package_name("");
   oc_swu_set_last_update("");
+  oc_swu_set_package_version(0,0,0);
 }
 
 void
@@ -727,4 +736,38 @@ oc_swu_set_last_update(char *time)
 {
   oc_free_string(&g_swu_last_update);
   oc_new_string(&g_swu_last_update, time, strlen(time));
+}
+
+void
+oc_swu_set_package_bytes(int package_bytes)
+{
+  g_swu_package_bytes =  package_bytes;
+}
+
+void
+oc_swu_set_package_version(int major, int minor, int minor2)
+{
+  g_swu_package_version.major = major;
+  g_swu_package_version.minor = minor;
+  g_swu_package_version.third = minor2;
+
+}
+
+void
+oc_swu_set_state(oc_swu_state_t state)
+{
+  g_swu_state = state;
+}
+
+void
+oc_swu_set_qurl(char *qurl)
+{
+  oc_free_string(&g_swu_qurl);
+  oc_new_string(&g_swu_qurl, qurl, strlen(qurl));
+}
+
+void
+oc_swu_set_result(oc_swu_result_t result)
+{
+  g_swu_result = result;
 }

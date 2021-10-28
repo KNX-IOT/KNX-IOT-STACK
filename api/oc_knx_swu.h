@@ -24,16 +24,91 @@ extern "C" {
 #endif
 
 /**
-@brief Creation of the KNX software update resources.
+ * @brief The software update states
+ * 
+ */
+typedef enum {
+  OC_SWU_STATE_IDLE = 0,    /**< state is idle */
+  OC_SWU_STATE_DOWNLOADING, /**< state is downloading */
+  OC_SWU_STATE_DOWNLOADED   /**< state is downloaded */
+} oc_swu_state_t;
 
-@param device index of the device to which the resources are to be created
+/**
+ * @brief The software result states
+ * 
+ */
+typedef enum {
+  OC_SWU_RESULT_INIT = 0,  /**< 0: Initial value. Once the updating process is initiated (Download /Update), this Resource MUST be reset to Initial value. */
+  OC_SWU_RESULT_SUCCESS,   /**< 1: Software updated successfully.*/
+  OC_SWU_RESULT_ERR_FLASH, /**< 2: Not enough flash memory for the new software package.*/
+  OC_SWU_RESULT_ERR_RAM,   /**< 3: Out of RAM during downloading process*/
+  OC_SWU_RESULT_ERR_CONN,  /**< 4: Connection lost during downloading process.*/
+  OC_SWU_RESULT_ERR_ICF,   /**< 5: Integrity check failure for new downloaded package.*/
+  OC_SWU_RESULT_ERR_UPT,   /**< 6: Unsupported package type.*/
+  OC_SWU_RESULT_ERR_URL,   /**< 7: Invalid URL.*/
+  OC_SWU_RESULT_ERR_SUF,   /**< 8: Software update failed.*/
+  OC_SWU_RESULT_ERR_UP,    /**< 9: Unsupported protocol..*/
+} oc_swu_result_t;
+
+
+/**
+ * @brief Creation of the KNX software update resources.
+ *
+ * @param device index of the device to which the resources are to be created
 */
 void oc_create_knx_swu_resources(size_t device);
 
-
+/**
+ * @brief set the current firmware package name
+ * 
+ * @param name the name of the firmware package
+ */
 void oc_swu_set_package_name(char *name);
 
+/**
+ * @brief set the current last update time
+ * 
+ * @param time the update time in IETF RFC 3339
+ */
 void oc_swu_set_last_update(char *time);
+
+/**
+ * @brief set the current amount of the bytes written
+ * 
+ * @param package_bytes the amount of bytes written 
+ */
+void oc_swu_set_package_bytes(int package_bytes);
+
+/**
+ * @brief Sets the current package version
+ * 
+ * @param major the major number e.g. 1 of [1, 2, 3]
+ * @param minor the minor number e.g. 2 of [1, 2, 3]
+ * @param minor2 the minor2 number e.g. 3 of [1, 2, 3]
+ */
+void oc_swu_set_package_version(int major, int minor, int minor2);
+
+/**
+ * @brief sets the current download state
+ * 
+ * @param state the download state
+ */
+void oc_swu_set_state(oc_swu_state_t state);
+
+/**
+ * @brief sets the url to be queried for downloading
+ * 
+ * @param qurl the url
+ */
+void oc_swu_set_qurl(char *qurl);
+
+/**
+ * @brief sets the result of the download procedure
+ * 
+ * @param result the result, including possible errors
+ */
+void oc_swu_set_result(oc_swu_result_t result);
+
 
 #ifdef __cplusplus
 }
