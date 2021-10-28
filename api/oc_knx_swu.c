@@ -434,7 +434,7 @@ write_to_file(char *fname, int offset, const uint8_t* payload, size_t len)
   FILE *fp = fopen(fname, "w");
   size_t written = fwrite(payload, len, 1, fp);
   if (written != len) {
-    PRINT(" write_to_file returned %d != %d (expected)\n", written, len)
+    PRINT(" write_to_file returned %d != %d (expected)\n", (int)written, (int)len);
   }
   fclose(fp);
 }
