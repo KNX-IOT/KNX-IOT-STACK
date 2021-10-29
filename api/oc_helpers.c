@@ -18,6 +18,7 @@
 #include "port/oc_assert.h"
 #include "port/oc_log.h"
 #include <stdbool.h>
+#include <stdlib.h>
 
 static bool mmem_initialized = false;
 
