@@ -306,7 +306,12 @@ int oc_conv_hex_string_to_byte_array(const char *hex_str, size_t hex_str_len,
                                      uint8_t *array, size_t *array_len);
 
 
-bool oc_uri_contains_wildcard(char *uri);
+bool oc_uri_contains_wildcard(const char *uri);
+
+//-1 as error
+
+int oc_uri_get_wildcard_value_as_int(const char *uri_resource, size_t uri_len,
+                                     const char *uri_invoked, size_t invoked_len);
 
 #ifdef __cplusplus
 }

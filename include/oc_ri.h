@@ -218,9 +218,11 @@ typedef enum {
   OC_KNX,          ///< well-known / knx
   OC_KNX_FP_GM,    ///< FP/GM
   OC_KNX_FP_GM_X,  ///< FP/GM/X
-  OC_KNX_FP_P,     ///< FP/G
-  OC_KNX_FP_R,     ///< FP/G
-  OC_KNX_P,        ///< FP/G
+  OC_KNX_FP_G,     ///< FP/G
+  OC_KNX_FP_G_X,   ///< FP/G/X
+  OC_KNX_FP_P,     ///< FP/P
+  OC_KNX_FP_R,     ///< FP/R
+  OC_KNX_P,        ///< P
   OC_KNX_SWU_PROTOCOL,
   OC_KNX_SWU_MAXDEFER,
   OC_KNX_SWU_METHOD,
@@ -278,6 +280,8 @@ typedef struct oc_request_t
   oc_resource_t *resource;   ///< resource structure
   const char *query;         ///< query (as string)
   size_t query_len;          ///< query length
+  const char *uri_path;      ///< path (as string)
+  size_t uri_path_len;       ///< path length
   oc_rep_t *request_payload; ///< request payload structure
   const uint8_t *_payload;   ///< payload of the request
   size_t _payload_len;       ///< payload size
