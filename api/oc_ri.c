@@ -203,9 +203,6 @@ get_interface_string(oc_interface_mask_t mask)
   return "";
 }
 
-
-
-
 #ifdef OC_SERVER
 oc_resource_t *
 oc_ri_get_app_resources(void)
@@ -1107,11 +1104,12 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
       }
       if (oc_uri_contains_wildcard(oc_string(resource->uri))) {
         len_resource = oc_string_len(resource->uri);
-        // incoming URL should be equal or larger than the one with the wild card 
-        // comparison should match to what ever is in front of the last char.
-        if ( ((int)(uri_path_len + 1) >= len_resource)  &&
+        // incoming URL should be equal or larger than the one with the wild
+        // card comparison should match to what ever is in front of the last
+        // char.
+        if (((int)(uri_path_len + 1) >= len_resource) &&
             strncmp((const char *)oc_string(resource->uri) + 1, uri_path,
-                    len_resource - 2 ) == 0) {
+                    len_resource - 2) == 0) {
           request_obj.resource = cur_resource = resource;
           break;
         }

@@ -39,7 +39,6 @@ extern int g_err;
   https://docs.microsoft.com/en-us/cpp/preprocessor/stringizing-operator-hash?view=msvc-160
 */
 
-
 /**
  * Initialize the buffer used to hold the cbor encoded data
  *
