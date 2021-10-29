@@ -482,6 +482,12 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
           object = object->next;
         }
       }
+
+    case OC_REP_NIL:
+      break;
+
+    default:
+      break;
     }
 
     index = +1;
