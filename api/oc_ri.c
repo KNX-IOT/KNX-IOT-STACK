@@ -1050,6 +1050,8 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
   request_obj._payload_len = (size_t)payload_len;
   request_obj.content_format = cf;
   request_obj.accept = accept;
+  request_obj.uri_path = uri_path;
+  request_obj.uri_path_len = uri_path_len;
 #ifndef OC_DYNAMIC_ALLOCATION
   char rep_objects_alloc[OC_MAX_NUM_REP_OBJECTS];
   oc_rep_t rep_objects_pool[OC_MAX_NUM_REP_OBJECTS];
@@ -1091,6 +1093,7 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
    */
   if (!bad_request) {
     int i;
+    int len_resource;
     for (i = 0; i < OC_NUM_CORE_RESOURCES_PER_DEVICE; i++) {
       resource = oc_core_get_resource_by_index(i, endpoint->device);
       if (oc_string_len(resource->uri) == (uri_path_len + 1) &&
@@ -1098,6 +1101,18 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
                   uri_path_len) == 0) {
         request_obj.resource = cur_resource = resource;
         break;
+      }
+      if (oc_uri_contains_wildcard(oc_string(resource->uri))) {
+        len_resource = oc_string_len(resource->uri);
+        // incoming URL should be equal or larger than the one with the wild
+        // card comparison should match to what ever is in front of the last
+        // char.
+        if (((int)(uri_path_len + 1) >= len_resource) &&
+            strncmp((const char *)oc_string(resource->uri) + 1, uri_path,
+                    len_resource - 2) == 0) {
+          request_obj.resource = cur_resource = resource;
+          break;
+        }
       }
     }
   }

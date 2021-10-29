@@ -18,6 +18,7 @@
 #include "port/oc_assert.h"
 #include "port/oc_log.h"
 #include <stdbool.h>
+#include <stdlib.h>
 
 static bool mmem_initialized = false;
 
@@ -314,4 +315,31 @@ oc_conv_hex_string_to_byte_array(const char *hex_str, size_t hex_str_len,
   }
 
   return 0;
+}
+
+bool
+oc_uri_contains_wildcard(const char *uri)
+{
+  if (uri == NULL)
+    return false;
+
+  int len = strlen(uri);
+  if (uri[len - 1] == '*') {
+    return true;
+  }
+  return false;
+}
+
+int
+oc_uri_get_wildcard_value_as_int(const char *uri_resource, size_t uri_len,
+                                 const char *uri_invoked, size_t invoked_len)
+{
+  if (uri_resource[uri_len - 1] == '*') {
+    if ((invoked_len + 1) >= uri_len) {
+      int value = atoi(&uri_invoked[uri_len - 2]);
+      return value;
+    }
+  }
+
+  return -1;
 }

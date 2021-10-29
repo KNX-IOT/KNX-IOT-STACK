@@ -34,6 +34,11 @@ extern "C" {
 extern CborEncoder g_encoder, root_map, links_array;
 extern int g_err;
 
+/*
+  The macros are based on stringizing operator (also known as Stringify)
+  https://docs.microsoft.com/en-us/cpp/preprocessor/stringizing-operator-hash?view=msvc-160
+*/
+
 /**
  * Initialize the buffer used to hold the cbor encoded data
  *
