@@ -344,8 +344,6 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 {
   (void)data;
   (void)iface_mask;
-  size_t response_length = 0;
-
   
   PRINT("oc_core_fp_g_post_handler\n");
 
@@ -476,7 +474,8 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
             }
           }
           break;
-
+          case OC_REP_NIL: 
+            break;
           default:
             break;
           }
