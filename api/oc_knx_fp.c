@@ -217,7 +217,6 @@ oc_core_fp_gm_x_get_handler(oc_request_t *request, oc_interface_mask_t iface_mas
 {
   (void)data;
   (void)iface_mask;
-  size_t response_length = 0;
   PRINT("oc_core_fp_gm_x_get_handler\n");
 
   /* check if the accept header is link-format */
@@ -261,9 +260,6 @@ oc_core_fp_gm_x_del_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  size_t response_length = 0;
-  int i;
-  int length = 0;
   PRINT("oc_core_fp_gm_x_del_handler\n");
 
   int value = oc_uri_get_wildcard_value_as_int(
@@ -361,8 +357,8 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   }
 
   char buffer[200];
-  memset(buffer, 0, 1, 200);
-  int xx = oc_rep_to_json(request->request_payload, &buffer, 200, true);
+  memset(buffer, 200, 1);
+  oc_rep_to_json(request->request_payload, (char*)&buffer, 200, true);
   PRINT(buffer);
 
   int index = 0;
@@ -404,7 +400,6 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
               g_got[index].id = object->value.integer;
             }
           } break;
-
           case OC_REP_INT_ARRAY: {
 #ifdef TAGS_AS_STRINGS
             if (oc_string_len(object->name) == 5 &&
@@ -514,7 +509,6 @@ oc_core_fp_g_x_get_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  size_t response_length = 0;
   PRINT("oc_core_fp_g_x_get_handler\n");
 
   /* check if the accept header is link-format */
@@ -582,9 +576,6 @@ oc_core_fp_g_x_del_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  size_t response_length = 0;
-  int i;
-  int length = 0;
   PRINT("oc_core_fp_g_x_del_handler\n");
 
   int value = oc_uri_get_wildcard_value_as_int(
