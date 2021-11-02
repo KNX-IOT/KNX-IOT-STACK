@@ -19,16 +19,13 @@
 
 #include <stddef.h>
 
-
 #include "oc_api.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-
-
-  /**
+/**
  * @brief Group Object Notification
  *
  *  { 5: { 6: "st value" , 7: "ga value", 1: "value" } }
@@ -60,7 +57,6 @@ typedef struct oc_group_object_notification_t
   int ga;
 } oc_group_object_notification_t;
 
-
 /**
  * @brief LSM state machine values
  *
@@ -74,8 +70,6 @@ typedef enum {
   LSM_UNLOAD        ///< cmd unload: state will be UNLOADED
 } oc_lsm_state_t;
 
-
-
 /**
 @brief check if the lsm state is loaded
 
@@ -88,7 +82,6 @@ bool oc_core_lsm_check_string(const char *lsm);
 oc_lsm_state_t oc_core_lsm_parse_string(const char *lsm);
 
 const char *oc_core_get_lsm_as_string(oc_lsm_state_t lsm);
-
 
 /**
 @brief Creation of the KNX device resources.

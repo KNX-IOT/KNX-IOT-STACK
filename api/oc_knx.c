@@ -22,11 +22,7 @@
 
 #define TAGS_AS_STRINGS
 
-
-
-
 oc_group_object_notification_t g_received_notification;
-
 
 // -----------------------------------------------------------------------------
 
@@ -119,7 +115,6 @@ oc_create_knx_resource(int resource_idx, size_t device)
     oc_core_knx_post_handler, 0, 0, "");
 }
 
-
 // -----------------------------------------------------------------------------
 
 static void
@@ -163,7 +158,6 @@ oc_create_knx_reset_resource(int resource_idx, size_t device)
                                OC_DISCOVERABLE, 0, 0,
                                oc_core_knx_reset_post_handler, 0, 0, "");
 }
-
 
 // -----------------------------------------------------------------------------
 
@@ -266,7 +260,8 @@ oc_core_lsm_parse_string(const char *lsm)
   return LSM_UNLOADED;
 }
 
-oc_lsm_state_t oc_core_lsm_cmd_to_state(oc_lsm_state_t cmd)
+oc_lsm_state_t
+oc_core_lsm_cmd_to_state(oc_lsm_state_t cmd)
 {
   if (cmd == LSM_STARTLOADING) {
     return LSM_LOADING;
@@ -296,7 +291,7 @@ oc_core_knx_lsm_get_handler(oc_request_t *request,
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
-      
+
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device == NULL) {
@@ -345,20 +340,20 @@ oc_core_knx_lsm_post_handler(oc_request_t *request,
 #ifdef TAGS_AS_STRINGS
       if (oc_string_len(rep->name) == 3 &&
           memcmp(oc_string(rep->name), "cmd", 3) == 0) {
-          oc_lsm_state_t state =
-             oc_core_lsm_parse_string(oc_string(rep->value.string));
-          device->lsm = oc_core_lsm_cmd_to_state(state);
-          changed = true;
-          break;
-        }
+        oc_lsm_state_t state =
+          oc_core_lsm_parse_string(oc_string(rep->value.string));
+        device->lsm = oc_core_lsm_cmd_to_state(state);
+        changed = true;
+        break;
+      }
 #endif
-        if (rep->iname == 2) {
-          oc_lsm_state_t state =
-            oc_core_lsm_parse_string(oc_string(rep->value.string));
-          device->lsm = oc_core_lsm_cmd_to_state(state);
-          changed = true;
-          break;
-        }
+      if (rep->iname == 2) {
+        oc_lsm_state_t state =
+          oc_core_lsm_parse_string(oc_string(rep->value.string));
+        device->lsm = oc_core_lsm_cmd_to_state(state);
+        changed = true;
+        break;
+      }
     }
 
     rep = rep->next;
@@ -458,7 +453,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
     return;
   }
 
-  //bool changed = false;
+  // bool changed = false;
   /* loop over the request document to check if all inputs are ok */
   rep = request->request_payload;
 
@@ -526,16 +521,16 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
   };
 
   /* input was set, so create the response*/
-  //if (changed == true) {
-   // oc_rep_start_root_object();
-   // oc_rep_i_set_text_string(root, 3, oc_core_get_lsm_as_string(device->lsm));
-   // oc_rep_end_root_object();
+  // if (changed == true) {
+  // oc_rep_start_root_object();
+  // oc_rep_i_set_text_string(root, 3, oc_core_get_lsm_as_string(device->lsm));
+  // oc_rep_end_root_object();
 
-    oc_send_cbor_response(request, OC_STATUS_CHANGED);
-    return;
+  oc_send_cbor_response(request, OC_STATUS_CHANGED);
+  return;
   //}
 
-  //oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+  // oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
 }
 
 void
@@ -543,10 +538,10 @@ oc_create_knx_knx_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_knx_resource\n");
   // "/a/lsm"
-  oc_core_lf_populate_resource(resource_idx, device, "/.knx",
-                               OC_IF_LL | OC_IF_BASELINE, APPLICATION_CBOR,
-                               OC_DISCOVERABLE, oc_core_knx_knx_get_handler, 0,
-                               oc_core_knx_knx_post_handler, 0, 1, "urn:knx:g.s");
+  oc_core_lf_populate_resource(
+    resource_idx, device, "/.knx", OC_IF_LL | OC_IF_BASELINE, APPLICATION_CBOR,
+    OC_DISCOVERABLE, oc_core_knx_knx_get_handler, 0,
+    oc_core_knx_knx_post_handler, 0, 1, "urn:knx:g.s");
 }
 
 // -----------------------------------------------------------------------------
@@ -627,7 +622,6 @@ oc_create_knx_crc_resource(int resource_idx, size_t device)
                                oc_core_knx_crc_post_handler, 0, 0, "");
 }
 
-
 // -----------------------------------------------------------------------------
 
 static void
@@ -661,7 +655,6 @@ oc_create_knx_ldevid_resource(int resource_idx, size_t device)
                                ":dpt.a[n]");
 }
 
-
 // -----------------------------------------------------------------------------
 
 static void
@@ -694,7 +687,6 @@ oc_create_knx_idevid_resource(int resource_idx, size_t device)
                                oc_core_knx_idevid_get_handler, 0, 0, 0, 0, 1,
                                ":dpt.a[n]");
 }
-
 
 // -----------------------------------------------------------------------------
 
@@ -781,7 +773,6 @@ oc_create_knx_resources(size_t device_index)
 {
   OC_DBG("oc_create_knx_resources");
 
-  
   oc_create_knx_lsm_resource(OC_KNX_LSM, device_index);
   oc_create_knx_knx_resource(OC_KNX_DOT_KNX, device_index);
 
