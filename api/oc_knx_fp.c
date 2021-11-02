@@ -692,7 +692,7 @@ oc_core_fp_g_x_del_handler(oc_request_t *request,
   g_got[value].id = 0;
   oc_free_string(&g_got[value].href);
   oc_new_string(&g_got[value].href, "", 0);
-  oc_free_int_array(&g_got[value].ga);
+  oc_free_int_array(g_got[value].ga);
   g_got[value].ga_len = 0;
 
 
@@ -976,7 +976,7 @@ oc_core_fp_p_x_del_handler(oc_request_t *request,
   g_gpt[value].id = 0;
   oc_free_string(&g_gpt[value].url);
   oc_new_string(&g_gpt[value].url, "", 0);
-  oc_free_int_array(&g_gpt[value].ga);
+  oc_free_int_array(g_gpt[value].ga);
   g_gpt[value].ga_len = 0;
 
   PRINT("oc_core_fp_p_x_del_handler - end\n");
@@ -1052,7 +1052,6 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 {
   (void)data;
   (void)iface_mask;
-  size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_CBOR) {
@@ -1258,7 +1257,7 @@ oc_core_fp_r_x_del_handler(oc_request_t *request,
   g_grt[value].id = 0;
   oc_free_string(&g_grt[value].url);
   oc_new_string(&g_grt[value].url, "", 0);
-  oc_free_int_array(&g_grt[value].ga);
+  oc_free_int_array(g_grt[value].ga);
   g_grt[value].ga_len = 0;
 
   PRINT("oc_core_fp_r_x_del_handler - end\n");

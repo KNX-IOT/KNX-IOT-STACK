@@ -266,10 +266,6 @@ oc_core_dev_ia_get_handler(oc_request_t *request,
   if (device != NULL) {
     cbor_encode_int(&g_encoder, (int64_t)device->ia);
     oc_send_cbor_response(request, OC_STATUS_OK);
-    // note since it is only a scalar 
-    request->response->response_buffer->response_length =
-      oc_rep_get_encoded_payload_size();
-
     return;
   }
 
@@ -465,10 +461,6 @@ oc_core_dev_pm_get_handler(oc_request_t *request,
   if (device != NULL) {
     cbor_encode_boolean(&g_encoder, device->pm);
     oc_send_cbor_response(request, OC_STATUS_OK);
-
-    // note since it is only a scalar
-    request->response->response_buffer->response_length =
-      oc_rep_get_encoded_payload_size();
     return;
   }
 
@@ -500,9 +492,7 @@ oc_core_dev_pm_put_handler(oc_request_t *request,
     PRINT("  oc_core_dev_pm_put_handler received : %d\n", rep->value.boolean);
     device->pm = rep->value.boolean;
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
-
     oc_storage_write(KNX_STORAGE_PM, (uint8_t *)&(rep->value.boolean), 1);
-
     return;
   }
 
