@@ -41,12 +41,12 @@ extern "C" {
  *
  * Key translation
  * | Json Key | Integer Value |
- * | ----------- | ----------- |
- * | value  | 1 |
- * | sia | 4 |
- * | s | 5 |
- * | st | 6 |
- * | ga | 7 |
+ * | -------- | ------------- |
+ * | value    | 1             |
+ * | sia      | 4             |
+ * | s        | 5             |
+ * | st       | 6             |
+ * | ga       | 7             |
  */
 typedef struct oc_group_object_notification_t
 {
