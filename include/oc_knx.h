@@ -19,9 +19,13 @@
 
 #include <stddef.h>
 
+
+#include "oc_api.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 
   /**
