@@ -100,21 +100,20 @@ typedef enum {
  *
  * cflag translation
  * | string | Integer Value |
- * | ----------- | ----------- |
- * | r  | 1 |
- * | w | 2 |
- * | t | 3 |
- * | u | 4 |
- * | i | 5 |
+ * | ------ | ------------- |
+ * | r      | 1             |
+ * | w      | 2             |
+ * | t      | 3             |
+ * | u      | 4             |
+ * | i      | 5             |
 
  * Key translation
  * | Json Key | Integer Value |
- * | ----------- | ----------- |
- * | id  | 0 |
- * |href | 11 |
- * | ga | 7 |
- * | cflag | 8 |
- *
+ * | -------- | ------------- |
+ * | id       | 0             |
+ * | href     | 11            |
+ * | ga       | 7             |
+ * | cflag    | 8             |
  *
  */
 typedef struct oc_group_object_table_t
@@ -150,16 +149,15 @@ oc_group_object_table_t g_got[GOT_MAX_ENTRIES];
  *     }
  * ]
  *
- *
  * Key translation
  * | Json Key | Integer Value |
- * | ----------- | ----------- |
- * | id  | 0 |
- * | ia  | 12 |
- * | path  | 112 |
- * |url | 10 |
- * | ga | 7 |
- * | con | - |
+ * | -------- | ------------- |
+ * | id       | 0             |
+ * | ia       | 12            |
+ * | path     | 112           |
+ * | url      | 10            |
+ * | ga       | 7             |
+ * | con      | -             |
  *
  */
 typedef struct oc_group_rp_table_t
