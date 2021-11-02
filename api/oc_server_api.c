@@ -86,8 +86,9 @@ oc_query_value_exists(oc_request_t *request, const char *key)
 static int
 response_length(void)
 {
-  int size = oc_rep_get_encoded_payload_size();
-  return (size <= 2) ? 0 : size;
+  // int size = oc_rep_get_encoded_payload_size();
+  // return (size <= 2) ? 0 : size;
+  return oc_rep_get_encoded_payload_size();
 }
 
 void
