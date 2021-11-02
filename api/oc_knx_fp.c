@@ -129,13 +129,12 @@ typedef struct oc_group_object_table_t
 #define GOT_MAX_ENTRIES 20
 oc_group_object_table_t g_got[GOT_MAX_ENTRIES];
 
-
 /**
  * @brief Function point Recipient - Publisher Table Resource (/fp/r) (/fp/p)
- *      
+ *
  * the same table is used for recipient and publisher.
  * the only difference is the confirmable/not confirmable sending.
- *      
+ *
  * array of objects (as json)
  * [
  *    {
@@ -155,7 +154,7 @@ oc_group_object_table_t g_got[GOT_MAX_ENTRIES];
  * Key translation
  * | Json Key | Integer Value |
  * | ----------- | ----------- |
- * | id  | 0 | 
+ * | id  | 0 |
  * | ia  | 12 |
  * | path  | 112 |
  * |url | 10 |
@@ -165,13 +164,13 @@ oc_group_object_table_t g_got[GOT_MAX_ENTRIES];
  */
 typedef struct oc_group_rp_table_t
 {
-  int id;                 ///< contents of id
-  oc_string_t ia;         ///< contents of ia
-  oc_string_t path;       ///< contents of path
-  oc_string_t url;        ///< contents of url
-  bool con;               ///< confirmed message, default = false
-  int *ga;                ///< array of integers
-  int ga_len;             //< length of the array of ga identifiers
+  int id;           ///< contents of id
+  oc_string_t ia;   ///< contents of ia
+  oc_string_t path; ///< contents of path
+  oc_string_t url;  ///< contents of url
+  bool con;         ///< confirmed message, default = false
+  int *ga;          ///< array of integers
+  int ga_len;       //< length of the array of ga identifiers
 } oc_group_rp_table_t;
 
 #define GPT_MAX_ENTRIES 20
@@ -397,7 +396,7 @@ oc_core_fp_g_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 
     if (g_got[i].ga_len != 0) {
       // index  in use
-      
+
       if (response_length > 0) {
         length = oc_rep_add_line_to_buffer(",\n");
         response_length += length;
@@ -423,7 +422,6 @@ oc_core_fp_g_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 
   PRINT("oc_core_fp_g_get_handler - end\n");
 }
-
 
 static void
 oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
@@ -462,7 +460,7 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
         return;
       }
 
-      object = rep->value.object; 
+      object = rep->value.object;
 
       while (object != NULL) {
         switch (object->type) {
@@ -629,7 +627,7 @@ oc_core_fp_g_x_get_handler(oc_request_t *request,
   }
 
   if (&g_got[value].ga_len == 0) {
-    //it is empty
+    // it is empty
     oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
     return;
   }
@@ -681,7 +679,7 @@ oc_core_fp_g_x_del_handler(oc_request_t *request,
   int value = oc_uri_get_wildcard_value_as_int(
     oc_string(request->resource->uri), oc_string_len(request->resource->uri),
     request->uri_path, request->uri_path_len);
-  
+
   PRINT(" deleting %d\n", value);
 
   if (value >= GOT_MAX_ENTRIES) {
@@ -694,9 +692,8 @@ oc_core_fp_g_x_del_handler(oc_request_t *request,
   oc_new_string(&g_got[value].href, "", 0);
   free(g_got[value].ga);
   g_got[value].ga = NULL;
-  //oc_free_int_array(g_got[value].ga);
+  // oc_free_int_array(g_got[value].ga);
   g_got[value].ga_len = 0;
-
 
   PRINT("oc_core_fp_g_x_del_handler - end\n");
 
@@ -746,7 +743,7 @@ oc_core_fp_p_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       length = oc_rep_add_line_to_buffer("<fp/p/");
       response_length += length;
       char string[10];
-      sprintf((char *)&string, "%d", i );
+      sprintf((char *)&string, "%d", i);
       length = oc_rep_add_line_to_buffer(string);
       response_length += length;
 
@@ -770,7 +767,7 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 {
   (void)data;
   (void)iface_mask;
-  
+
   PRINT("oc_core_fp_p_post_handler\n");
 
   /* check if the accept header is cbor-format */
@@ -800,7 +797,7 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       }
       g_gpt[index].id = index;
 
-      object = rep->value.object; 
+      object = rep->value.object;
       while (object != NULL) {
         switch (object->type) {
         case OC_REP_STRING: {
@@ -858,7 +855,7 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
             g_gpt[index].ga_len = array_size;
             g_gpt[index].ga = new_array;
           }
-#endif 
+#endif
           if (object->iname == 7) {
             // g_got[index].id = object->value.integer;
             int64_t *arr = oc_int_array(object->value.array);
@@ -931,7 +928,7 @@ oc_core_fp_p_x_get_handler(oc_request_t *request,
   }
 
   if (g_gpt[value].ga_len == 0) {
-    //it is empty
+    // it is empty
     oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
     return;
   }
@@ -976,7 +973,7 @@ oc_core_fp_p_x_del_handler(oc_request_t *request,
   g_gpt[value].id = 0;
   oc_free_string(&g_gpt[value].url);
   oc_new_string(&g_gpt[value].url, "", 0);
-  //oc_free_int_array(g_gpt[value].ga);
+  // oc_free_int_array(g_gpt[value].ga);
   free(g_gpt[value].ga);
   g_gpt[value].ga = NULL;
   g_gpt[value].ga_len = 0;
@@ -995,7 +992,6 @@ oc_create_fp_p_x_resource(int resource_idx, size_t device)
     oc_core_fp_p_x_get_handler, 0, 0, oc_core_fp_p_x_del_handler, 0, 1,
     "urn:knx:if.c");
 }
-
 
 // -----------------------------------------------------------------------------
 
@@ -1083,7 +1079,7 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       }
       g_grt[index].id = index;
 
-      object = rep->value.object; 
+      object = rep->value.object;
       while (object != NULL) {
         switch (object->type) {
         case OC_REP_STRING: {
@@ -1141,7 +1137,7 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
             g_grt[index].ga_len = array_size;
             g_grt[index].ga = new_array;
           }
-#endif 
+#endif
           if (object->iname == 7) {
             // g_got[index].id = object->value.integer;
             int64_t *arr = oc_int_array(object->value.array);
@@ -1259,7 +1255,7 @@ oc_core_fp_r_x_del_handler(oc_request_t *request,
   g_grt[value].id = 0;
   oc_free_string(&g_grt[value].url);
   oc_new_string(&g_grt[value].url, "", 0);
-  //oc_free_int_array(g_grt[value].ga);
+  // oc_free_int_array(g_grt[value].ga);
   free(g_grt[value].ga);
   g_grt[value].ga = NULL;
   g_grt[value].ga_len = 0;
@@ -1280,7 +1276,6 @@ oc_create_fp_r_x_resource(int resource_idx, size_t device)
 }
 
 // -----------------------------------------------------------------------------
-
 
 /*
 void
@@ -1306,10 +1301,10 @@ oc_create_knx_fp_resources(size_t device_index)
 
   oc_create_fp_p_resource(OC_KNX_FP_P, device_index);
   oc_create_fp_p_x_resource(OC_KNX_FP_P_X, device_index);
-  
+
   oc_create_fp_r_resource(OC_KNX_FP_R, device_index);
   oc_create_fp_r_x_resource(OC_KNX_FP_R_X, device_index);
-  
+
   // note: /fp does not exist..
   // oc_create_fp_resource(OC_KNX_FP, device_index);
 }
