@@ -31,7 +31,7 @@ extern "C" {
   /**
  * @brief Group Object Notification
  *
- *  { 5: { 6: <st>, 7: <ga>, 1: <value> } }
+ *  { 5: { 6: "st value" , 7: "ga value", 1: "value" } }
  *
  *  {
  *    "value": {
