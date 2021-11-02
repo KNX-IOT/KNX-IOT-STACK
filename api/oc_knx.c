@@ -23,6 +23,13 @@
 #define TAGS_AS_STRINGS
 
 
+
+
+oc_group_object_notification_t g_received_notification;
+
+
+// -----------------------------------------------------------------------------
+
 static void
 oc_core_knx_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
                         void *data)
@@ -112,6 +119,9 @@ oc_create_knx_resource(int resource_idx, size_t device)
     oc_core_knx_post_handler, 0, 0, "");
 }
 
+
+// -----------------------------------------------------------------------------
+
 static void
 oc_core_knx_reset_post_handler(oc_request_t *request,
                                oc_interface_mask_t iface_mask, void *data)
@@ -153,6 +163,9 @@ oc_create_knx_reset_resource(int resource_idx, size_t device)
                                OC_DISCOVERABLE, 0, 0,
                                oc_core_knx_reset_post_handler, 0, 0, "");
 }
+
+
+// -----------------------------------------------------------------------------
 
 oc_lsm_state_t
 oc_knx_lsm_state(size_t device_index)
@@ -253,7 +266,6 @@ oc_core_lsm_parse_string(const char *lsm)
   return LSM_UNLOADED;
 }
 
-
 oc_lsm_state_t oc_core_lsm_cmd_to_state(oc_lsm_state_t cmd)
 {
   if (cmd == LSM_STARTLOADING) {
@@ -268,7 +280,6 @@ oc_lsm_state_t oc_core_lsm_cmd_to_state(oc_lsm_state_t cmd)
 
   return LSM_UNLOADED;
 }
-
 
 static void
 oc_core_knx_lsm_get_handler(oc_request_t *request,
@@ -377,6 +388,171 @@ oc_create_knx_lsm_resource(int resource_idx, size_t device)
                                oc_core_knx_lsm_post_handler, 0, 0, "");
 }
 
+// -----------------------------------------------------------------------------
+
+static void
+oc_core_knx_knx_get_handler(oc_request_t *request,
+                            oc_interface_mask_t iface_mask, void *data)
+{
+  (void)data;
+  (void)iface_mask;
+
+  PRINT("oc_core_knx_knx_get_handler\n");
+
+  /* check if the accept header is cbor-format */
+  if (request->accept != APPLICATION_CBOR) {
+    request->response->response_buffer->code =
+      oc_status_code(OC_STATUS_BAD_REQUEST);
+    return;
+  }
+
+  size_t device_index = request->resource->device;
+  oc_device_info_t *device = oc_core_get_device_info(device_index);
+  if (device == NULL) {
+    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    return;
+  }
+
+  // g_received_notification
+
+  oc_lsm_state_t lsm = oc_knx_lsm_state(device_index);
+
+  oc_rep_begin_root_object();
+  oc_rep_i_set_key(&root_map, 1);
+  CborEncoder value_map;
+  cbor_encoder_create_map(&root_map, &value_map, CborIndefiniteLength);
+  // sia
+  oc_rep_i_set_int(value, 4, g_received_notification.sia);
+  // ga
+  oc_rep_i_set_int(value, 7, g_received_notification.ga);
+  // st M Service type code(write = w, read = r, response = rp) Enum : w, r, rp
+  oc_rep_i_set_text_string(value, 6, oc_string(g_received_notification.st));
+  // missing s (5) a map
+
+  cbor_encoder_close_container_checked(&root_map, &value_map);
+
+  oc_rep_end_root_object();
+
+  oc_send_cbor_response(request, OC_STATUS_OK);
+
+  PRINT("oc_core_knx_knx_get_handler - done\n");
+}
+
+static void
+oc_core_knx_knx_post_handler(oc_request_t *request,
+                             oc_interface_mask_t iface_mask, void *data)
+{
+  (void)data;
+  (void)iface_mask;
+  oc_rep_t *rep = NULL;
+
+  /* check if the accept header is cbor-format */
+  if (request->accept != APPLICATION_CBOR) {
+    request->response->response_buffer->code =
+      oc_status_code(OC_STATUS_BAD_REQUEST);
+    return;
+  }
+
+  size_t device_index = request->resource->device;
+  oc_device_info_t *device = oc_core_get_device_info(device_index);
+  if (device == NULL) {
+    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    return;
+  }
+
+  //bool changed = false;
+  /* loop over the request document to check if all inputs are ok */
+  rep = request->request_payload;
+
+  while (rep != NULL) {
+    switch (rep->type) {
+    case OC_REP_OBJECT: {
+      // find the storage index, e.g. for this object
+      oc_rep_t *object = rep->value.object;
+
+      object = rep->value.object;
+      while (object != NULL) {
+        switch (object->type) {
+        case OC_REP_STRING: {
+#ifdef TAGS_AS_STRINGS
+          if (oc_string_len(object->name) == 2 &&
+              memcmp(oc_string(object->name), "st", 2) == 0) {
+            oc_free_string(&g_received_notification.st);
+            oc_new_string(&g_received_notification.st,
+                          oc_string(object->value.string),
+                          oc_string_len(object->value.string));
+          }
+#endif
+          if (object->iname == 6) {
+            oc_free_string(&g_received_notification.st);
+            oc_new_string(&g_received_notification.st,
+                          oc_string(object->value.string),
+                          oc_string_len(object->value.string));
+          }
+        } break;
+
+        case OC_REP_INT: {
+#ifdef TAGS_AS_STRINGS
+          if (oc_string_len(object->name) == 3 &&
+              memcmp(oc_string(object->name), "sia", 3) == 0) {
+            g_received_notification.sia = object->value.integer;
+          }
+          if (oc_string_len(object->name) == 2 &&
+              memcmp(oc_string(object->name), "ga", 2) == 0) {
+            g_received_notification.ga = object->value.integer;
+          }
+#endif
+          // sia
+          if (object->iname == 4) {
+            g_received_notification.sia = object->value.integer;
+          }
+          // ga
+          if (object->iname == 7) {
+            g_received_notification.ga = object->value.integer;
+          }
+        } break;
+        case OC_REP_NIL:
+          break;
+        default:
+          break;
+        }
+        object = object->next;
+      }
+    }
+    case OC_REP_NIL:
+      break;
+    default:
+      break;
+    }
+    rep = rep->next;
+  };
+
+  /* input was set, so create the response*/
+  //if (changed == true) {
+   // oc_rep_start_root_object();
+   // oc_rep_i_set_text_string(root, 3, oc_core_get_lsm_as_string(device->lsm));
+   // oc_rep_end_root_object();
+
+    oc_send_cbor_response(request, OC_STATUS_CHANGED);
+    return;
+  //}
+
+  //oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+}
+
+void
+oc_create_knx_knx_resource(int resource_idx, size_t device)
+{
+  OC_DBG("oc_create_knx_knx_resource\n");
+  // "/a/lsm"
+  oc_core_lf_populate_resource(resource_idx, device, "/.knx",
+                               OC_IF_LL | OC_IF_BASELINE, APPLICATION_CBOR,
+                               OC_DISCOVERABLE, oc_core_knx_knx_get_handler, 0,
+                               oc_core_knx_knx_post_handler, 0, 1, "urn:knx:g.s");
+}
+
+// -----------------------------------------------------------------------------
+
 static void
 oc_core_knx_crc_get_handler(oc_request_t *request,
                             oc_interface_mask_t iface_mask, void *data)
@@ -453,6 +629,9 @@ oc_create_knx_crc_resource(int resource_idx, size_t device)
                                oc_core_knx_crc_post_handler, 0, 0, "");
 }
 
+
+// -----------------------------------------------------------------------------
+
 static void
 oc_core_knx_ldevid_get_handler(oc_request_t *request,
                                oc_interface_mask_t iface_mask, void *data)
@@ -477,12 +656,15 @@ oc_core_knx_ldevid_get_handler(oc_request_t *request,
 void
 oc_create_knx_ldevid_resource(int resource_idx, size_t device)
 {
-  OC_DBG("oc_create_dev_iid_resource\n");
+  OC_DBG("oc_create_knx_ldevid_resource\n");
   oc_core_lf_populate_resource(resource_idx, device, "/dev/ldevid", OC_IF_D,
                                APPLICATION_CBOR, OC_DISCOVERABLE,
                                oc_core_knx_ldevid_get_handler, 0, 0, 0, 0, 1,
                                ":dpt.a[n]");
 }
+
+
+// -----------------------------------------------------------------------------
 
 static void
 oc_core_knx_idevid_get_handler(oc_request_t *request,
@@ -508,12 +690,15 @@ oc_core_knx_idevid_get_handler(oc_request_t *request,
 void
 oc_create_knx_idevid_resource(int resource_idx, size_t device)
 {
-  OC_DBG("oc_create_dev_iid_resource\n");
+  OC_DBG("oc_create_knx_idevid_resource\n");
   oc_core_lf_populate_resource(resource_idx, device, "/dev/idevid", OC_IF_D,
                                APPLICATION_CBOR, OC_DISCOVERABLE,
                                oc_core_knx_idevid_get_handler, 0, 0, 0, 0, 1,
                                ":dpt.a[n]");
 }
+
+
+// -----------------------------------------------------------------------------
 
 static void
 oc_core_knx_spake_get_handler(oc_request_t *request,
@@ -591,14 +776,19 @@ oc_create_knx_spake_resource(int resource_idx, size_t device)
                                oc_core_knx_spake_post_handler, 0, 0, "");
 }
 
+// -----------------------------------------------------------------------------
+
 void
 oc_create_knx_resources(size_t device_index)
 {
   OC_DBG("oc_create_knx_resources");
 
+  
+  oc_create_knx_lsm_resource(OC_KNX_LSM, device_index);
+  oc_create_knx_knx_resource(OC_KNX_DOT_KNX, device_index);
+
   oc_create_knx_reset_resource(OC_KNX, device_index);
   oc_create_knx_resource(OC_KNX_RESET, device_index);
-  oc_create_knx_lsm_resource(OC_KNX_LSM, device_index);
   oc_create_knx_crc_resource(OC_KNX_CRC, device_index);
   oc_create_knx_ldevid_resource(OC_KNX_LDEVID, device_index);
   oc_create_knx_idevid_resource(OC_KNX_IDEVID, device_index);

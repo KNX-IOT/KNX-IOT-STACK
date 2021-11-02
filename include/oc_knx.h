@@ -23,6 +23,40 @@
 extern "C" {
 #endif
 
+
+  /**
+ * @brief Group Object Notification
+ *
+ *  { 5: { 6: <st>, 7: <ga>, 1: <value> } }
+ *
+ *  {
+ *    "value": {
+ *      "sia": int,
+ *      "s": {},
+ *      "st": "string",
+ *      "ga": int
+ *    }
+ *  }
+ *
+ * Key translation
+ * | Json Key | Integer Value |
+ * | ----------- | ----------- |
+ * | value  | 1 |
+ * | sia | 4 |
+ * | s | 5 |
+ * | st | 6 |
+ * | ga | 7 |
+ */
+typedef struct oc_group_object_notification_t
+{
+  oc_string_t value;
+  int sia;
+  oc_string_t s;
+  oc_string_t st;
+  int ga;
+} oc_group_object_notification_t;
+
+
 /**
  * @brief LSM state machine values
  *
@@ -36,12 +70,7 @@ typedef enum {
   LSM_UNLOAD        ///< cmd unload: state will be UNLOADED
 } oc_lsm_state_t;
 
-/**
-@brief Creation of the KNX device resources.
 
-@param device index of the device to which the resource is to be created
-*/
-void oc_create_knx_resources(size_t device);
 
 /**
 @brief check if the lsm state is loaded
@@ -55,6 +84,14 @@ bool oc_core_lsm_check_string(const char *lsm);
 oc_lsm_state_t oc_core_lsm_parse_string(const char *lsm);
 
 const char *oc_core_get_lsm_as_string(oc_lsm_state_t lsm);
+
+
+/**
+@brief Creation of the KNX device resources.
+
+@param device index of the device to which the resource is to be created
+*/
+void oc_create_knx_resources(size_t device);
 
 #ifdef __cplusplus
 }
