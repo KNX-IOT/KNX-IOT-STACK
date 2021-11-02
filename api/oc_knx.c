@@ -415,8 +415,6 @@ oc_core_knx_knx_get_handler(oc_request_t *request,
 
   // g_received_notification
 
-  oc_lsm_state_t lsm = oc_knx_lsm_state(device_index);
-
   oc_rep_begin_root_object();
   oc_rep_i_set_key(&root_map, 1);
   CborEncoder value_map;
