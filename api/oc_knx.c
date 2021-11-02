@@ -20,6 +20,9 @@
 #include <stdio.h>
 #include "oc_rep.h" // should not be needed
 
+#define TAGS_AS_STRINGS
+
+
 static void
 oc_core_knx_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
                         void *data)
@@ -250,28 +253,22 @@ oc_core_lsm_parse_string(const char *lsm)
   return LSM_UNLOADED;
 }
 
-static int
-lsm_create_response(const char *lsm_string)
+
+oc_lsm_state_t oc_core_lsm_cmd_to_state(oc_lsm_state_t cmd)
 {
-  int response_lenght = 0;
+  if (cmd == LSM_STARTLOADING) {
+    return LSM_LOADING;
+  }
+  if (cmd == LSM_lOADCOMPLETE) {
+    return LSM_LOADED;
+  }
+  if (cmd == LSM_UNLOAD) {
+    return LSM_UNLOADED;
+  }
 
-  int length = oc_rep_add_line_to_buffer("{");
-  response_lenght += length;
-
-  length = oc_rep_add_line_to_buffer("\"cmd\":\"");
-  response_lenght += length;
-
-  length = oc_rep_add_line_to_buffer(lsm_string);
-  response_lenght += length;
-
-  length = oc_rep_add_line_to_buffer("\"}");
-  response_lenght += length;
-
-  length = oc_rep_add_line_to_buffer("}");
-  response_lenght += length;
-
-  return response_lenght;
+  return LSM_UNLOADED;
 }
+
 
 static void
 oc_core_knx_lsm_get_handler(oc_request_t *request,
@@ -279,10 +276,43 @@ oc_core_knx_lsm_get_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  size_t response_length = 0;
+
+  PRINT("oc_core_knx_lsm_get_handler\n");
 
   /* check if the accept header is cbor-format */
-  if (request->accept != APPLICATION_JSON) {
+  if (request->accept != APPLICATION_CBOR) {
+    request->response->response_buffer->code =
+      oc_status_code(OC_STATUS_BAD_REQUEST);
+    return;
+  }
+      
+  size_t device_index = request->resource->device;
+  oc_device_info_t *device = oc_core_get_device_info(device_index);
+  if (device == NULL) {
+    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    return;
+  }
+  oc_lsm_state_t lsm = oc_knx_lsm_state(device_index);
+
+  oc_rep_start_root_object();
+  oc_rep_i_set_text_string(root, 3, oc_core_get_lsm_as_string(lsm));
+  oc_rep_end_root_object();
+
+  oc_send_cbor_response(request, OC_STATUS_OK);
+
+  PRINT("oc_core_knx_lsm_get_handler - done\n");
+}
+
+static void
+oc_core_knx_lsm_post_handler(oc_request_t *request,
+                             oc_interface_mask_t iface_mask, void *data)
+{
+  (void)data;
+  (void)iface_mask;
+  oc_rep_t *rep = NULL;
+
+  /* check if the accept header is cbor-format */
+  if (request->accept != APPLICATION_CBOR) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
@@ -295,49 +325,54 @@ oc_core_knx_lsm_get_handler(oc_request_t *request,
     return;
   }
 
-  response_length = lsm_create_response(oc_core_get_lsm_as_string(device->lsm));
+  bool changed = false;
+  /* loop over the request document to check if all inputs are ok */
+  rep = request->request_payload;
+  while (rep != NULL) {
+    PRINT("key: (check) %s \n", oc_string(rep->name));
+    if (rep->type == OC_REP_STRING) {
+#ifdef TAGS_AS_STRINGS
+      if (oc_string_len(rep->name) == 3 &&
+          memcmp(oc_string(rep->name), "cmd", 3) == 0) {
+          oc_lsm_state_t state =
+             oc_core_lsm_parse_string(oc_string(rep->value.string));
+          device->lsm = oc_core_lsm_cmd_to_state(state);
+          changed = true;
+          break;
+        }
+#endif
+        if (rep->iname == 2) {
+          oc_lsm_state_t state =
+            oc_core_lsm_parse_string(oc_string(rep->value.string));
+          device->lsm = oc_core_lsm_cmd_to_state(state);
+          changed = true;
+          break;
+        }
+    }
 
-  oc_send_json_response(request, OC_STATUS_OK);
-  request->response->response_buffer->response_length = response_length;
-}
+    rep = rep->next;
+  }
 
-static void
-oc_core_knx_lsm_post_handler(oc_request_t *request,
-                             oc_interface_mask_t iface_mask, void *data)
-{
-  (void)data;
-  (void)iface_mask;
-  size_t response_length = 0;
+  /* input was set, so create the response*/
+  if (changed == true) {
+    oc_rep_start_root_object();
+    oc_rep_i_set_text_string(root, 3, oc_core_get_lsm_as_string(device->lsm));
+    oc_rep_end_root_object();
 
-  /* check if the accept header is cbor-format */
-  if (request->accept != APPLICATION_JSON) {
-    request->response->response_buffer->code =
-      oc_status_code(OC_STATUS_BAD_REQUEST);
+    oc_send_cbor_response(request, OC_STATUS_CHANGED);
     return;
   }
 
-  size_t device_index = request->resource->device;
-  oc_device_info_t *device = oc_core_get_device_info(device_index);
-  if (device == NULL) {
-    oc_send_json_response(request, OC_STATUS_BAD_REQUEST);
-    return;
-  }
-
-  // parse the received command and sets the state machine accordingly
-
-  response_length = lsm_create_response(oc_core_get_lsm_as_string(device->lsm));
-
-  oc_send_json_response(request, OC_STATUS_OK);
-  request->response->response_buffer->response_length = response_length;
+  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
 }
 
 void
 oc_create_knx_lsm_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_lsm_resource\n");
-  // "/.well-known/knx/lsm"
+  // "/a/lsm"
   oc_core_lf_populate_resource(resource_idx, device, "/a/lsm",
-                               OC_IF_LL | OC_IF_BASELINE, APPLICATION_JSON,
+                               OC_IF_LL | OC_IF_BASELINE, APPLICATION_CBOR,
                                OC_DISCOVERABLE, oc_core_knx_lsm_get_handler, 0,
                                oc_core_knx_lsm_post_handler, 0, 0, "");
 }
