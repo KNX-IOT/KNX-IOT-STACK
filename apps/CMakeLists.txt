@@ -9,6 +9,16 @@ target_link_libraries(simpleserver_all
     )
     file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/simpleserver_all_creds)
 
+add_executable(simpleclient_all
+    ${PROJECT_SOURCE_DIR}/simpleclient_all.c
+    ${PROJECT_SOURCE_DIR}/../api/oc_introspection.c
+)
+target_link_libraries(simpleclient_all
+        kis-server-client
+    )
+    file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/simpleclient_all_creds)
+
+
 if(UNIX)
     add_executable(simpleserver
         ${PROJECT_SOURCE_DIR}/simpleserver.c

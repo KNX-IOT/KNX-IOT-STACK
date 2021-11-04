@@ -65,16 +65,22 @@ oc_rep_encode_raw(const uint8_t *data, size_t len)
 int
 oc_rep_add_line_to_buffer(const char *line)
 {
-  int len = (int)strlen(line);
-  oc_rep_encode_raw((uint8_t *)line, len);
+  int len = 0;
+  if (line != NULL) {
+    int len = (int)strlen(line);
+    oc_rep_encode_raw((uint8_t *)line, len);
+  }
   return len;
 }
 
 int
 oc_rep_add_line_size_to_buffer(const char *line, int len)
 {
-  oc_rep_encode_raw((uint8_t *)line, len);
-  return len;
+  if (line != NULL) {
+    oc_rep_encode_raw((uint8_t *)line, len);
+    return len;
+  }
+  return 0;
 }
 
 int

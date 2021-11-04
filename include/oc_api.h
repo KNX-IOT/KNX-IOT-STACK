@@ -1651,6 +1651,10 @@ int oc_notify_observers(oc_resource_t *resource);
 extern "C" {
 #endif
 
+  bool oc_do_wk_discovery(const char *uri_query, oc_discovery_handler_t handler,
+                        void *user_data);
+
+
 /**
  * Discover all servers that have a resource type using the site-local scope
  *

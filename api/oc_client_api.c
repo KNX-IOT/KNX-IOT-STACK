@@ -42,7 +42,7 @@ oc_message_t *multicast_update = NULL;
 oc_event_callback_retval_t oc_ri_remove_client_cb(void *data);
 
 static bool
-dispatch_coap_request(void)
+dispatch_coap_request(oc_content_format_t content)
 {
   int payload_size = oc_rep_get_encoded_payload_size();
 
@@ -84,7 +84,7 @@ dispatch_coap_request(void)
     } else
 #endif /* OC_SPEC_VER_OIC */
     {
-      coap_set_header_content_format(request, APPLICATION_VND_OCF_CBOR);
+      coap_set_header_content_format(request, content);
     }
   }
 
@@ -122,8 +122,10 @@ dispatch_coap_request(void)
   return success;
 }
 
+
+
 static bool
-prepare_coap_request(oc_client_cb_t *cb)
+prepare_coap_request_ex(oc_client_cb_t *cb, oc_content_format_t accept)
 {
   coap_message_type_t type = COAP_TYPE_NON;
 
@@ -171,7 +173,7 @@ prepare_coap_request(oc_client_cb_t *cb)
   } else
 #endif /* OC_SPEC_VER_OIC */
   {
-    coap_set_header_accept(request, APPLICATION_VND_OCF_CBOR);
+    coap_set_header_accept(request, accept);
   }
 
   coap_set_token(request, cb->token, cb->token_len);
@@ -189,6 +191,14 @@ prepare_coap_request(oc_client_cb_t *cb)
 
   return true;
 }
+
+
+static bool
+prepare_coap_request(oc_client_cb_t *cb)
+{
+  return prepare_coap_request_ex(cb, APPLICATION_VND_OCF_CBOR);
+}
+
 
 #ifdef OC_OSCORE
 bool
@@ -325,7 +335,8 @@ oc_get_diagnostic_message(oc_client_response_t *response, const char **msg,
 
 bool
 oc_do_delete(const char *uri, oc_endpoint_t *endpoint, const char *query,
-             oc_response_handler_t handler, oc_qos_t qos, void *user_data)
+             oc_response_handler_t handler, oc_qos_t qos,
+              void *user_data)
 {
   oc_client_handler_t client_handler;
   client_handler.response = handler;
@@ -341,14 +352,41 @@ oc_do_delete(const char *uri, oc_endpoint_t *endpoint, const char *query,
   status = prepare_coap_request(cb);
 
   if (status)
-    status = dispatch_coap_request();
+    status = dispatch_coap_request(APPLICATION_VND_OCF_CBOR);
 
   return status;
 }
 
+
 bool
-oc_do_get(const char *uri, oc_endpoint_t *endpoint, const char *query,
-          oc_response_handler_t handler, oc_qos_t qos, void *user_data)
+oc_do_delete_ex(const char *uri, oc_endpoint_t *endpoint, const char *query,
+             oc_response_handler_t handler, oc_qos_t qos,
+             oc_content_format_t content, void *user_data)
+{
+  oc_client_handler_t client_handler;
+  client_handler.response = handler;
+
+  oc_client_cb_t *cb = oc_ri_alloc_client_cb(uri, endpoint, OC_DELETE, query,
+                                             client_handler, qos, user_data);
+
+  if (!cb)
+    return false;
+
+  bool status = false;
+
+  status = prepare_coap_request(cb);
+
+  if (status)
+    status = dispatch_coap_request(content);
+
+  return status;
+}
+
+
+bool
+oc_do_get_ex(const char *uri, oc_endpoint_t *endpoint, const char *query,
+          oc_response_handler_t handler, oc_qos_t qos,
+          oc_content_format_t content, void *user_data)
 {
   oc_client_handler_t client_handler;
   client_handler.response = handler;
@@ -363,9 +401,18 @@ oc_do_get(const char *uri, oc_endpoint_t *endpoint, const char *query,
   status = prepare_coap_request(cb);
 
   if (status)
-    status = dispatch_coap_request();
+    status = dispatch_coap_request(content);
 
   return status;
+}
+
+
+bool
+oc_do_get(const char *uri, oc_endpoint_t *endpoint, const char *query,
+          oc_response_handler_t handler, oc_qos_t qos, void *user_data)
+{
+  return oc_do_get_ex(uri, endpoint, query, handler, qos,
+                      APPLICATION_VND_OCF_CBOR, user_data);
 }
 
 bool
@@ -402,13 +449,13 @@ oc_init_post(const char *uri, oc_endpoint_t *endpoint, const char *query,
 bool
 oc_do_put(void)
 {
-  return dispatch_coap_request();
+  return dispatch_coap_request(APPLICATION_VND_OCF_CBOR);
 }
 
 bool
 oc_do_post(void)
 {
-  return dispatch_coap_request();
+  return dispatch_coap_request(APPLICATION_VND_OCF_CBOR);
 }
 
 bool
@@ -430,7 +477,7 @@ oc_do_observe(const char *uri, oc_endpoint_t *endpoint, const char *query,
   status = prepare_coap_request(cb);
 
   if (status)
-    status = dispatch_coap_request();
+    status = dispatch_coap_request(APPLICATION_VND_OCF_CBOR);
 
   return status;
 }
@@ -451,7 +498,7 @@ oc_stop_observe(const char *uri, oc_endpoint_t *endpoint)
   status = prepare_coap_request(cb);
 
   if (status)
-    status = dispatch_coap_request();
+    status = dispatch_coap_request(APPLICATION_VND_OCF_CBOR);
 
   return status;
 }
@@ -494,6 +541,13 @@ oc_send_ping(bool custody, oc_endpoint_t *endpoint, uint16_t timeout_seconds,
 }
 #endif /* OC_TCP */
 
+// -----------------------------------------------------------------------------
+
+
+
+
+
+// -----------------------------------------------------------------------------
 #ifdef OC_IPV4
 static oc_client_cb_t *
 oc_do_ipv4_discovery(const char *query, oc_client_handler_t handler,
@@ -507,7 +561,7 @@ oc_do_ipv4_discovery(const char *query, oc_client_handler_t handler,
   if (cb) {
     cb->discovery = true;
     if (prepare_coap_request(cb)) {
-      dispatch_coap_request();
+      dispatch_coap_request(APPLICATION_VND_OCF_CBOR);
     }
   }
 
@@ -535,7 +589,7 @@ oc_do_ipv4_multicast(const char *uri, const char *query,
   bool status = prepare_coap_request(cb);
 
   if (status) {
-    status = dispatch_coap_request();
+    status = dispatch_coap_request(APPLICATION_VND_OCF_CBOR);
   }
 
   if (status) {
@@ -578,7 +632,8 @@ multi_scope_ipv6_multicast(oc_client_cb_t *cb4, uint8_t scope, const char *uri,
       memcpy(cb->token, cb4->token, cb4->token_len);
     }
     cb->multicast = true;
-    if (prepare_coap_request(cb) && dispatch_coap_request()) {
+    if (prepare_coap_request(cb) &&
+        dispatch_coap_request(APPLICATION_VND_OCF_CBOR)) {
       return true;
     }
 
@@ -625,17 +680,19 @@ oc_do_ip_multicast(const char *uri, const char *query,
 }
 
 static bool
-dispatch_ip_discovery(oc_client_cb_t *cb4, const char *query,
+dispatch_ip_discovery_ex(oc_client_cb_t *cb4, const char* uri, const char *query,
                       oc_client_handler_t handler, oc_endpoint_t *endpoint,
-                      void *user_data)
+                      oc_content_format_t accept, oc_content_format_t content,void *user_data)
 {
   if (!endpoint) {
     OC_ERR("require valid endpoint");
     return false;
   }
 
-  oc_client_cb_t *cb = oc_ri_alloc_client_cb(
-    "/oic/res", endpoint, OC_GET, query, handler, LOW_QOS, user_data);
+//  oc_client_cb_t *cb = oc_ri_alloc_client_cb(
+//    "/oic/res", endpoint, OC_GET, query, handler, LOW_QOS, user_data);
+  oc_client_cb_t *cb = oc_ri_alloc_client_cb( uri,
+      endpoint, OC_GET, query, handler, LOW_QOS, user_data);
 
   if (cb) {
     cb->discovery = true;
@@ -644,7 +701,8 @@ dispatch_ip_discovery(oc_client_cb_t *cb4, const char *query,
       memcpy(cb->token, cb4->token, cb4->token_len);
     }
 
-    if (prepare_coap_request(cb) && dispatch_coap_request()) {
+    if (prepare_coap_request_ex(cb, accept) &&
+        dispatch_coap_request(content)) {
       goto exit;
     }
 
@@ -664,6 +722,17 @@ exit:
 }
 
 static bool
+dispatch_ip_discovery(oc_client_cb_t *cb4, const char *uri, const char *query,
+                      oc_client_handler_t handler, oc_endpoint_t *endpoint,
+                      void *user_data)
+{
+  return dispatch_ip_discovery_ex(cb4, uri, query, handler, endpoint,
+                                  APPLICATION_VND_OCF_CBOR,
+                                  APPLICATION_VND_OCF_CBOR, user_data);
+}
+
+
+static bool
 multi_scope_ipv6_discovery(oc_client_cb_t *cb4, uint8_t scope,
                            const char *query, oc_client_handler_t handler,
                            void *user_data)
@@ -671,8 +740,27 @@ multi_scope_ipv6_discovery(oc_client_cb_t *cb4, uint8_t scope,
   oc_make_ipv6_endpoint(mcast, IPV6 | DISCOVERY, 5683, 0xff, scope, 0, 0, 0, 0,
                         0, 0, 0, 0, 0, 0, 0, 0, 0x01, 0x58);
   mcast.addr.ipv6.scope = 0;
-  return dispatch_ip_discovery(cb4, query, handler, &mcast, user_data);
+  return dispatch_ip_discovery(cb4, "oic/res", query, handler, &mcast, user_data);
 }
+
+
+static bool
+multi_scope_ipv6_discovery_wk(oc_client_cb_t *cb4, uint8_t scope,
+                           const char *query, oc_client_handler_t handler,
+                           void *user_data)
+{
+  // ALL_COAP_NODES_IPV6_SITE = "FF05::FD"
+  //oc_make_ipv6_endpoint(mcast, IPV6 | DISCOVERY, 5683, 0xff, scope, 0, 0, 0, 0,
+  //                       0, 0, 0, 0, 0, 0, 0, 0, 0x01, 0x58);
+  oc_make_ipv6_endpoint(mcast, IPV6 | DISCOVERY, 5683, 0xff, scope, 0, 0, 0, 0,
+                         0, 0, 0, 0, 0, 0, 0, 0, 0x01, 0xfd);
+
+  mcast.addr.ipv6.scope = 0;
+  return dispatch_ip_discovery_ex(cb4, ".well-known/core", query, handler,
+                                  &mcast, APPLICATION_LINK_FORMAT,
+                                  APPLICATION_LINK_FORMAT, user_data);
+}
+
 
 bool
 oc_do_site_local_ipv6_discovery_all(oc_discovery_all_handler_t handler,
@@ -775,7 +863,7 @@ oc_do_ip_discovery_all_at_endpoint(oc_discovery_all_handler_t handler,
   oc_client_handler_t handlers;
   handlers.discovery_all = handler;
   handlers.discovery = NULL;
-  return dispatch_ip_discovery(NULL, NULL, handlers, endpoint, user_data);
+  return dispatch_ip_discovery(NULL, "oic/res", NULL, handlers, endpoint, user_data);
 }
 
 bool
@@ -790,12 +878,38 @@ oc_do_ip_discovery_at_endpoint(const char *rt, oc_discovery_handler_t handler,
   if (rt && strlen(rt) > 0) {
     oc_concat_strings(&uri_query, "rt=", rt);
   }
-  bool status = dispatch_ip_discovery(NULL, oc_string(uri_query), handlers,
+  bool status = dispatch_ip_discovery(NULL, "oic/res", oc_string(uri_query), handlers,
                                       endpoint, user_data);
   oc_free_string(&uri_query);
 
   return status;
 }
+
+
+// -----------------------------------------------------------------------------
+
+
+
+bool
+oc_do_wk_discovery(const char *uri_query, oc_discovery_handler_t handler,
+                   void *user_data)
+{
+  oc_client_handler_t handlers;
+  handlers.discovery = handler;
+  handlers.discovery_all = NULL;
+ 
+  oc_client_cb_t *cb4 = NULL;
+  //bool status = multi_scope_ipv6_discovery_wk(cb4, 0x02, uri_query,
+  //                                         handlers, user_data);
+
+  bool status =
+    multi_scope_ipv6_discovery_wk(cb4, 0x05, uri_query, handlers, user_data);
+
+  return status;
+}
+
+// -----------------------------------------------------------------------------
+
 
 void
 oc_close_session(oc_endpoint_t *endpoint)

@@ -120,15 +120,15 @@ oc_endpoint_t *oc_new_endpoint(void);
 /**
  * @brief free endpoint
  *
- * @param endpoint endpoint to be freed
+ * @param endpoint the endpoint to be freed
  */
 void oc_free_endpoint(oc_endpoint_t *endpoint);
 
 /**
  * @brief set device identifier (di) for the endpoint
  *
- * @param endpoint end point
- * @param di device identifier
+ * @param endpoint the end point
+ * @param di the device identifier
  */
 void oc_endpoint_set_di(oc_endpoint_t *endpoint, oc_uuid_t *di);
 
@@ -154,7 +154,7 @@ int oc_string_to_endpoint(oc_string_t *endpoint_str, oc_endpoint_t *endpoint,
                           oc_string_t *uri);
 
 /**
- * @brief parse endopoint
+ * @brief parse endpoint
  *
  * @param endpoint_str
  * @param path
@@ -192,7 +192,7 @@ int oc_endpoint_compare_address(const oc_endpoint_t *ep1,
 /**
  * @brief set interface index on the endpoint
  *
- * @param ep the endpoing
+ * @param ep the endpoint
  * @param interface_index the interface index
  */
 void oc_endpoint_set_local_address(oc_endpoint_t *ep, int interface_index);
@@ -200,16 +200,16 @@ void oc_endpoint_set_local_address(oc_endpoint_t *ep, int interface_index);
 /**
  * @brief copy endpoint
  *
- * @param dst desination endpoint
- * @param src source endpoint
+ * @param dst the destination endpoint
+ * @param src the source endpoint
  */
 void oc_endpoint_copy(oc_endpoint_t *dst, oc_endpoint_t *src);
 
 /**
  * @brief copy list of endpoint
  *
- * @param dst destination list of endpoints
- * @param src source list of endpoints
+ * @param dst the destination list of endpoints
+ * @param src the source list of endpoints
  */
 void oc_endpoint_list_copy(oc_endpoint_t **dst, oc_endpoint_t *src);
 
