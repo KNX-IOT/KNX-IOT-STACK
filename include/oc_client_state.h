@@ -70,7 +70,6 @@ typedef enum {
   OC_CONTINUE_DISCOVERY  ///< continue discovering (more data)
 } oc_discovery_flags_t;
 
-
 /**
  * @brief discovery_all handler
  *
@@ -78,11 +77,9 @@ typedef enum {
 typedef oc_discovery_flags_t (*oc_discovery_all_handler_t)(
   const char *, int len, oc_endpoint_t *endpoint, void *);
 
-
 typedef oc_discovery_flags_t (*oc_discovery_handler_t)(
   const char *, int len, const char *, oc_string_array_t, oc_interface_mask_t,
   oc_endpoint_t *, oc_resource_properties_t, void *);
-
 
 /**
  * @brief client response handler
@@ -96,9 +93,10 @@ typedef void (*oc_response_handler_t)(oc_client_response_t *);
  */
 typedef struct oc_client_handler_t
 {
-  oc_response_handler_t response;           ///< response handler
-  oc_discovery_handler_t discovery;         ///< discovery handler, e.g. per line entry
-  oc_discovery_all_handler_t discovery_all; ///< discovery all handler, full payload
+  oc_response_handler_t response;   ///< response handler
+  oc_discovery_handler_t discovery; ///< discovery handler, e.g. per line entry
+  oc_discovery_all_handler_t
+    discovery_all; ///< discovery all handler, full payload
 } oc_client_handler_t;
 
 /**

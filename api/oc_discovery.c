@@ -661,7 +661,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   //                      request, device_index, &response_length, matches);
 
   request->response->response_buffer->content_format = APPLICATION_LINK_FORMAT;
-  //if (matches > 0 && response_length > 0) {
+  // if (matches > 0 && response_length > 0) {
   if (response_length > 0) {
     request->response->response_buffer->response_length = response_length;
     request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
@@ -708,17 +708,16 @@ oc_ri_process_discovery_payload(uint8_t *payload, int len,
                                 oc_content_format_t content, void *user_data)
 {
 
-  //oc_discovery_handler_t handler = client_handler.discovery;
+  // oc_discovery_handler_t handler = client_handler.discovery;
   oc_discovery_all_handler_t all_handler = client_handler.discovery_all;
 
   oc_discovery_flags_t ret = OC_CONTINUE_DISCOVERY;
-
 
   if (content == APPLICATION_LINK_FORMAT) {
 
     PRINT("calling handler all\n");
     if (all_handler) {
-      all_handler((const char*)payload, len, endpoint, user_data);
+      all_handler((const char *)payload, len, endpoint, user_data);
     }
   }
 

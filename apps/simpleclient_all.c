@@ -19,7 +19,6 @@
 #define STATIC static
 #endif
 
-
 #include "oc_api.h"
 #include "port/oc_clock.h"
 #include <signal.h>
@@ -35,7 +34,6 @@ static struct timespec ts;
 #endif /* NO_MAIN */
 #endif
 
-
 #ifdef WIN32
 /** windows specific code */
 #include <windows.h>
@@ -48,7 +46,7 @@ STATIC CRITICAL_SECTION cs;   /**< event loop variable */
 #define GetCurrentDir getcwd
 #endif
 
-volatile int quit = 0;          /**< stop variable, used by handle_signal */
+volatile int quit = 0; /**< stop variable, used by handle_signal */
 
 static int
 app_init(void)
@@ -210,36 +208,34 @@ get_light(oc_client_response_t *data)
     PRINT("Could not init PUT request\n");
 }
 
-//static oc_discovery_flags_t
-//discovery(const char *payload, int len, const char *uri, oc_string_array_t types,
+// static oc_discovery_flags_t
+// discovery(const char *payload, int len, const char *uri, oc_string_array_t
+// types,
 //          oc_interface_mask_t iface_mask, oc_endpoint_t *endpoint,
 //          oc_resource_properties_t bm, void *user_data)
 
 static oc_discovery_flags_t
-  discovery(const char *payload, int len, 
-            oc_endpoint_t *endpoint, void *user_data)
+discovery(const char *payload, int len, oc_endpoint_t *endpoint,
+          void *user_data)
 {
   //(void)anchor;
   (void)user_data;
   (void)endpoint;
-
 
   PRINT(" DISCOVERY:\n");
   PRINT("%.*s\n", len, payload);
   PRINT(" DISCOVERY- END\n");
 
   return OC_STOP_DISCOVERY;
-
 }
 
 static void
 issue_requests(void)
 {
   PRINT("Discovering devices:\n");
-  //oc_do_ip_discovery(".well-known/core", &discovery, NULL);
+  // oc_do_ip_discovery(".well-known/core", &discovery, NULL);
 
   oc_do_wk_discovery_all("rt=urn:knx:dpa.*", &discovery, NULL);
-
 }
 
 #ifdef WIN32
@@ -285,8 +281,8 @@ main(void)
 {
   int init;
 
-   PRINT("Simple Client:\n");
-  
+  PRINT("Simple Client:\n");
+
 #ifdef WIN32
   /* windows specific */
   InitializeCriticalSection(&cs);
@@ -303,8 +299,6 @@ main(void)
   /* install Ctrl-C */
   sigaction(SIGINT, &sa, NULL);
 #endif
-  
-  
 
   static const oc_handler_t handler = { .init = app_init,
                                         .signal_event_loop = signal_event_loop,
@@ -320,12 +314,11 @@ main(void)
   if (init < 0)
     return init;
 
- #ifdef OC_SECURITY
+#ifdef OC_SECURITY
   PRINT("Security - Enabled\n");
 #else
   PRINT("Security - Disabled\n");
 #endif /* OC_SECURITY */
-
 
 #ifdef WIN32
   /* windows specific loop */
@@ -358,7 +351,6 @@ main(void)
     pthread_mutex_unlock(&mutex);
   }
 #endif
-
 
   oc_free_server_endpoints(light_server);
   oc_free_string(&name);

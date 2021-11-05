@@ -126,8 +126,8 @@ STATIC CRITICAL_SECTION cs;   /**< event loop variable */
 /* Note: Magic numbers are derived from the resource definition, either from the
  * example or the definition.*/
 
-volatile int quit = 0;          /**< stop variable, used by handle_signal */
-//STATIC const size_t DEVICE = 0; /**< default device index */
+volatile int quit = 0; /**< stop variable, used by handle_signal */
+// STATIC const size_t DEVICE = 0; /**< default device index */
 
 /**
  * function to set up the device.
@@ -245,13 +245,13 @@ get_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
   CborError error;
   error = cbor_encode_boolean(&g_encoder, true);
   if (error) {
-    //PRINT("CBOR error %s\n", cbor_error_string(error));
+    // PRINT("CBOR error %s\n", cbor_error_string(error));
     // oc_status_code = true;
   }
   PRINT("CBOR encoder size %d\n", oc_rep_get_encoded_payload_size());
   error = cbor_encode_boolean(&g_encoder, false);
   if (error) {
-    //PRINT("CBOR error %s\n", cbor_error_string(error));
+    // PRINT("CBOR error %s\n", cbor_error_string(error));
     // oc_status_code = true;
   }
   PRINT("CBOR encoder size %d\n", oc_rep_get_encoded_payload_size());
@@ -300,13 +300,13 @@ get_dpa_352b(oc_request_t *request, oc_interface_mask_t interfaces,
   CborError error;
   error = cbor_encode_text_stringz(&g_encoder, "blahblah");
   if (error) {
-    //PRINT("CBOR error %s\n", cbor_error_string(error));
+    // PRINT("CBOR error %s\n", cbor_error_string(error));
     // oc_status_code = true;
   }
   PRINT("CBOR encoder size %d\n", oc_rep_get_encoded_payload_size());
   error = cbor_encode_text_string(&g_encoder, "xyzxyz", 3);
   if (error) {
-    //PRINT("CBOR error %s\n", cbor_error_string(error));
+    // PRINT("CBOR error %s\n", cbor_error_string(error));
     // oc_status_code = true;
   }
   PRINT("CBOR encoder size %d\n", oc_rep_get_encoded_payload_size());
@@ -360,13 +360,13 @@ get_dpa_353(oc_request_t *request, oc_interface_mask_t interfaces,
   CborError error;
   error = cbor_encode_int(&g_encoder, (int64_t)555);
   if (error) {
-    //PRINT("CBOR error %s\n", cbor_error_string(error));
+    // PRINT("CBOR error %s\n", cbor_error_string(error));
     // oc_status_code = true;
   }
   PRINT("CBOR encoder size %d\n", oc_rep_get_encoded_payload_size());
   error = cbor_encode_int(&g_encoder, (int64_t)666);
   if (error) {
-    //PRINT("CBOR error %s\n", cbor_error_string(error));
+    // PRINT("CBOR error %s\n", cbor_error_string(error));
     // oc_status_code = true;
   }
   PRINT("CBOR encoder size %d\n", oc_rep_get_encoded_payload_size());
@@ -400,12 +400,12 @@ post_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
   (void)user_data;
   bool error_state = false;
   PRINT("-- Begin post_dpa_352:\n");
-  //oc_rep_t *rep = request->request_payload;
+  // oc_rep_t *rep = request->request_payload;
 
   /* loop over the request document for each required input field to check if
    * all required input fields are present */
   bool var_in_request = false;
-  //rep = request->request_payload;
+  // rep = request->request_payload;
   //  while (rep != NULL) {
   //    if (strcmp(oc_string(rep->name),
   //               g_binaryswitch_RESOURCE_PROPERTY_NAME_value) == 0) {
@@ -418,7 +418,7 @@ post_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
     PRINT(" required property: 'value' not in request\n");
   }
   /* loop over the request document to check if all inputs are ok */
-  //rep = request->request_payload;
+  // rep = request->request_payload;
 
   /* if the input is ok, then process the input document and assign the global
    * variables */
@@ -426,7 +426,7 @@ post_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
     switch (interfaces) {
     default: {
       /* loop over all the properties in the input document */
-      //oc_rep_t *rep = request->request_payload;
+      // oc_rep_t *rep = request->request_payload;
 
       /* set the response */
       PRINT("Set response \n");
@@ -475,12 +475,12 @@ post_dpa_352b(oc_request_t *request, oc_interface_mask_t interfaces,
   (void)user_data;
   bool error_state = false;
   PRINT("-- Begin post_dpa_352b:\n");
-  //oc_rep_t *rep = request->request_payload;
+  // oc_rep_t *rep = request->request_payload;
 
   /* loop over the request document for each required input field to check if
    * all required input fields are present */
   bool var_in_request = false;
-  //rep = request->request_payload;
+  // rep = request->request_payload;
   //  while (rep != NULL) {
   //    if (strcmp(oc_string(rep->name),
   //               g_binaryswitch_RESOURCE_PROPERTY_NAME_value) == 0) {
@@ -493,7 +493,7 @@ post_dpa_352b(oc_request_t *request, oc_interface_mask_t interfaces,
     PRINT(" required property: 'value' not in request\n");
   }
   /* loop over the request document to check if all inputs are ok */
-  //rep = request->request_payload;
+  // rep = request->request_payload;
 
   /* if the input is ok, then process the input document and assign the global
    * variables */
@@ -501,7 +501,7 @@ post_dpa_352b(oc_request_t *request, oc_interface_mask_t interfaces,
     switch (interfaces) {
     default: {
       /* loop over all the properties in the input document */
-      //oc_rep_t *rep = request->request_payload;
+      // oc_rep_t *rep = request->request_payload;
 
       /* set the response */
       PRINT("Set response \n");
@@ -550,12 +550,12 @@ post_dpa_353(oc_request_t *request, oc_interface_mask_t interfaces,
   (void)user_data;
   bool error_state = false;
   PRINT("-- Begin post_dpa_353:\n");
-  //oc_rep_t *rep = request->request_payload;
+  // oc_rep_t *rep = request->request_payload;
 
   /* loop over the request document for each required input field to check if
    * all required input fields are present */
   bool var_in_request = false;
-  //rep = request->request_payload;
+  // rep = request->request_payload;
   //  while (rep != NULL) {
   //    if (strcmp(oc_string(rep->name),
   //               g_binaryswitch_RESOURCE_PROPERTY_NAME_value) == 0) {
@@ -568,7 +568,7 @@ post_dpa_353(oc_request_t *request, oc_interface_mask_t interfaces,
     PRINT(" required property: 'value' not in request\n");
   }
   /* loop over the request document to check if all inputs are ok */
-  //rep = request->request_payload;
+  // rep = request->request_payload;
 
   /* if the input is ok, then process the input document and assign the global
    * variables */
@@ -576,7 +576,7 @@ post_dpa_353(oc_request_t *request, oc_interface_mask_t interfaces,
     switch (interfaces) {
     default: {
       /* loop over all the properties in the input document */
-      //oc_rep_t *rep = request->request_payload;
+      // oc_rep_t *rep = request->request_payload;
 
       /* set the response */
       PRINT("Set response \n");
@@ -768,12 +768,12 @@ oc_ownership_status_cb(const oc_uuid_t *device_uuid, size_t device_index,
 }
 #endif /* OC_SECURITY */
 
-/**                                                                            
- * main application.                                                           
- *       * initializes the global variables                                             
- * registers and starts the handler                                          
- *       * handles (in a loop) the next event.                                          
- * shuts down the stack                                                         
+/**
+ * main application.
+ *       * initializes the global variables
+ * registers and starts the handler
+ *       * handles (in a loop) the next event.
+ * shuts down the stack
  */
 int
 main(void)
