@@ -38,14 +38,14 @@ if(UNIX)
     )
     file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/simpleserver_pki_creds)
 
-    add_executable(simpleclient
-        ${PROJECT_SOURCE_DIR}/simpleclient.c
-        ${PROJECT_SOURCE_DIR}/../api/oc_introspection.c
-    )
-    target_link_libraries(simpleclient
-        kis-server-client
-    )
-    file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/simpleclient_creds)
+#    add_executable(simpleclient
+#        ${PROJECT_SOURCE_DIR}/simpleclient.c
+#        ${PROJECT_SOURCE_DIR}/../api/oc_introspection.c
+#    )
+#    target_link_libraries(simpleclient
+#        kis-server-client
+#    )
+#    file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/simpleclient_creds)
 
     if(EXISTS ${PROJECT_SOURCE_DIR}/device_builder_server.c)
         add_executable(device_builder_server
@@ -69,14 +69,14 @@ elseif(WIN32)
     )
     file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/simpleserver_creds)
 
-    add_executable(simpleclient
-        ${PROJECT_SOURCE_DIR}/simpleclient_windows.c
-        ${PROJECT_SOURCE_DIR}/../api/oc_introspection.c
-    )
-    target_link_libraries(simpleclient
-        kis-server-client
-    )
-    file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/simpleclient_creds)
+#    add_executable(simpleclient
+#        ${PROJECT_SOURCE_DIR}/simpleclient_windows.c
+#        ${PROJECT_SOURCE_DIR}/../api/oc_introspection.c
+#    )
+#    target_link_libraries(simpleclient
+#        kis-server-client
+#    )
+#    file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/simpleclient_creds)
 endif()
 
 # copy credentials, used by example applications.
