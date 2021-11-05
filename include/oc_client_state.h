@@ -73,17 +73,22 @@ typedef enum {
  * @brief discovery_all handler
  *
  */
-typedef oc_discovery_flags_t (*oc_discovery_all_handler_t)(
-  const char *, const char *, oc_string_array_t, oc_interface_mask_t,
-  oc_endpoint_t *, oc_resource_properties_t, bool, void *);
+//typedef oc_discovery_flags_t (*oc_discovery_all_handler_t)(
+//  const char *, const char *, oc_string_array_t, oc_interface_mask_t,
+//  oc_endpoint_t *, oc_resource_properties_t, bool, void *);
 
 /**
- * @brief discovery handler
+ * @brief discovery_all handler
  *
  */
+typedef oc_discovery_flags_t (*oc_discovery_all_handler_t)(
+  const char *, int len, void *);
+
+
 typedef oc_discovery_flags_t (*oc_discovery_handler_t)(
-  const char *, const char *, oc_string_array_t, oc_interface_mask_t,
+  const char *, int len, const char *, oc_string_array_t, oc_interface_mask_t,
   oc_endpoint_t *, oc_resource_properties_t, void *);
+
 
 /**
  * @brief client response handler
@@ -120,15 +125,15 @@ typedef struct oc_client_cb_t
   oc_method_t method;            ///< method used
   uint16_t mid;                  ///< CoAP message identifier
   uint8_t token[COAP_TOKEN_LEN]; ///< CoAP token
-  uint8_t token_len;             ///< CoAP token lenght
+  uint8_t token_len;             ///< CoAP token length
   bool discovery;                ///< discovery call
-  bool multicast;                ///< multicast
-  bool stop_multicast_receive;   ///< stop receiving multicast
+  bool multicast;                ///< multi cast
+  bool stop_multicast_receive;   ///< stop receiving multi cast
   uint8_t ref_count;             ///< reference counting on this data block
-  uint8_t separate;              ///< seperate responses
+  uint8_t separate;              ///< separate responses
 #ifdef OC_OSCORE
   uint8_t piv[OSCORE_PIV_LEN]; ///< partial IV
-  uint8_t piv_len;             ///< lenght of the partial IV
+  uint8_t piv_len;             ///< length of the partial IV
   uint64_t notification_num;   ///< notification number
 #endif                         /* OC_OSCORE */
 } oc_client_cb_t;
@@ -231,19 +236,20 @@ void oc_ri_free_client_cbs_by_endpoint(oc_endpoint_t *endpoint);
 void oc_ri_free_client_cbs_by_mid(uint16_t mid);
 
 /**
- * @brief handle the discovery payload (e.g. parse the oic/res response and do
+ * @brief handle the discovery payload (e.g. parse the response and do
  * the callbacks)
  *
- * @param payload the recieved discovery response
- * @param len lenght of the payload
- * @param handler handler of the discovery
- * @param endpoint endpoint
+ * @param payload the received discovery response
+ * @param len the length of the payload
+ * @param handler the handler of the discovery
+ * @param endpoint the endpoint
+ * @param content the content format of the payload
  * @param user_data the user data to be supplied to the handler
  * @return oc_discovery_flags_t the discovery flags (e.g. more to come)
  */
 oc_discovery_flags_t oc_ri_process_discovery_payload(
   uint8_t *payload, int len, oc_client_handler_t handler,
-  oc_endpoint_t *endpoint, void *user_data);
+  oc_endpoint_t *endpoint, oc_content_format_t content, void *user_data);
 
 #ifdef __cplusplus
 }

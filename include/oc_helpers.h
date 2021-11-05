@@ -209,7 +209,7 @@ bool _oc_byte_string_array_add_item(oc_string_array_t *ocstringarray,
 /**
  * @brief new oc_string from string
  *
- * @param ocstring ocstring to be allocated
+ * @param ocstring the ocstring to be allocated
  * @param str not terminated string
  * @param str_len size of the string to be copied
  */
@@ -222,7 +222,7 @@ void _oc_new_string(
 /**
  * @brief allocate oc_string
  *
- * @param ocstring ocstring to be allocated
+ * @param ocstring the ocstring to be allocated
  * @param size size to be allocated
  */
 void _oc_alloc_string(
@@ -234,7 +234,7 @@ void _oc_alloc_string(
 /**
  * @brief free oc string
  *
- * @param ocstring ocstring to be freed
+ * @param ocstring the ocstring to be freed
  */
 void _oc_free_string(
 #ifdef OC_MEMORY_TRACE
@@ -245,7 +245,7 @@ void _oc_free_string(
 /**
  * @brief free array
  *
- * @param ocarray ocarray to be freed
+ * @param ocarray the ocarray to be freed
  * @param type pool type
  */
 void _oc_free_array(
@@ -257,8 +257,8 @@ void _oc_free_array(
 /**
  * @brief new array
  *
- * @param ocarray ocarray to be freed
- * @param size size to be allocated
+ * @param ocarray the ocarray to be freed
+ * @param size the size to be allocated
  * @param type pool type
  */
 void _oc_new_array(

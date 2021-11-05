@@ -78,14 +78,7 @@ dispatch_coap_request(oc_content_format_t content)
   }
 
   if (payload_size > 0) {
-#ifdef OC_SPEC_VER_OIC
-    if (client_cb->endpoint.version == OIC_VER_1_1_0) {
-      coap_set_header_content_format(request, APPLICATION_CBOR);
-    } else
-#endif /* OC_SPEC_VER_OIC */
-    {
       coap_set_header_content_format(request, content);
-    }
   }
 
   bool success = false;
@@ -167,14 +160,7 @@ prepare_coap_request_ex(oc_client_cb_t *cb, oc_content_format_t accept)
     coap_udp_init_message(request, type, cb->method, cb->mid);
   }
 
-#ifdef OC_SPEC_VER_OIC
-  if (cb->endpoint.version == OIC_VER_1_1_0) {
-    coap_set_header_accept(request, APPLICATION_CBOR);
-  } else
-#endif /* OC_SPEC_VER_OIC */
-  {
-    coap_set_header_accept(request, accept);
-  }
+  coap_set_header_accept(request, accept);
 
   coap_set_token(request, cb->token, cb->token_len);
 
@@ -752,8 +738,20 @@ multi_scope_ipv6_discovery_wk(oc_client_cb_t *cb4, uint8_t scope,
   // ALL_COAP_NODES_IPV6_SITE = "FF05::FD"
   //oc_make_ipv6_endpoint(mcast, IPV6 | DISCOVERY, 5683, 0xff, scope, 0, 0, 0, 0,
   //                       0, 0, 0, 0, 0, 0, 0, 0, 0x01, 0x58);
+  PRINT("  multi_scope_ipv6_discovery_wk: %d\n", scope);
+
   oc_make_ipv6_endpoint(mcast, IPV6 | DISCOVERY, 5683, 0xff, scope, 0, 0, 0, 0,
-                         0, 0, 0, 0, 0, 0, 0, 0, 0x01, 0xfd);
+                         0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0xfd);
+  
+  // debug info
+  oc_string_t mcast_str;
+  oc_endpoint_to_string(&mcast, &mcast_str);
+  PRINT("   sending to: %s\n", oc_string(mcast_str));
+  oc_free_string(&mcast_str);
+
+  
+  PRINT("   query: %s\n", query);
+
 
   mcast.addr.ipv6.scope = 0;
   return dispatch_ip_discovery_ex(cb4, ".well-known/core", query, handler,
@@ -895,15 +893,17 @@ oc_do_wk_discovery(const char *uri_query, oc_discovery_handler_t handler,
                    void *user_data)
 {
   oc_client_handler_t handlers;
-  handlers.discovery = handler;
-  handlers.discovery_all = NULL;
+  handlers.discovery = NULL;
+  handlers.discovery_all = handler;
  
   oc_client_cb_t *cb4 = NULL;
   //bool status = multi_scope_ipv6_discovery_wk(cb4, 0x02, uri_query,
   //                                         handlers, user_data);
 
+//  bool status =
+//    multi_scope_ipv6_discovery_wk(cb4, 0x05, uri_query, handlers, user_data);
   bool status =
-    multi_scope_ipv6_discovery_wk(cb4, 0x05, uri_query, handlers, user_data);
+    multi_scope_ipv6_discovery_wk(cb4, 0x02, uri_query, handlers, user_data);
 
   return status;
 }

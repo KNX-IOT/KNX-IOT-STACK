@@ -67,7 +67,7 @@ oc_rep_add_line_to_buffer(const char *line)
 {
   int len = 0;
   if (line != NULL) {
-    int len = (int)strlen(line);
+    len = (int)strlen(line);
     oc_rep_encode_raw((uint8_t *)line, len);
   }
   return len;

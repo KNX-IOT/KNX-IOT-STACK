@@ -210,39 +210,27 @@ get_light(oc_client_response_t *data)
     PRINT("Could not init PUT request\n");
 }
 
+//static oc_discovery_flags_t
+//discovery(const char *payload, int len, const char *uri, oc_string_array_t types,
+//          oc_interface_mask_t iface_mask, oc_endpoint_t *endpoint,
+//          oc_resource_properties_t bm, void *user_data)
+
 static oc_discovery_flags_t
-discovery(const char *anchor, const char *uri, oc_string_array_t types,
-          oc_interface_mask_t iface_mask, oc_endpoint_t *endpoint,
-          oc_resource_properties_t bm, void *user_data)
+  discovery(const char *payload, int len, 
+            void *user_data)
 {
-  (void)anchor;
+  //(void)anchor;
   (void)user_data;
-  (void)iface_mask;
-  (void)bm;
-  int i;
-  int uri_len = strlen(uri);
-  uri_len = (uri_len >= MAX_URI_LENGTH) ? MAX_URI_LENGTH - 1 : uri_len;
-  for (i = 0; i < (int)oc_string_array_get_allocated_size(types); i++) {
-    char *t = oc_string_array_get_item(types, i);
-    if (strlen(t) == 10 && strncmp(t, "core.light", 10) == 0) {
-      oc_endpoint_list_copy(&light_server, endpoint);
-      strncpy(a_light, uri, uri_len);
-      a_light[uri_len] = '\0';
 
-      PRINT("Resource %s hosted at endpoints:\n", a_light);
-      oc_endpoint_t *ep = endpoint;
-      while (ep != NULL) {
-        PRINTipaddr(*ep);
-        PRINT("\n");
-        ep = ep->next;
-      }
 
-      oc_do_get(a_light, light_server, NULL, &get_light, LOW_QOS, NULL);
 
-      return OC_STOP_DISCOVERY;
-    }
-  }
-  return OC_CONTINUE_DISCOVERY;
+
+
+  PRINT(" DISCOVERY:\n" );
+  PRINT("  %.*s\n", len, payload);
+
+  return OC_STOP_DISCOVERY;
+
 }
 
 static void
@@ -332,6 +320,12 @@ main(void)
   init = oc_main_init(&handler);
   if (init < 0)
     return init;
+
+ #ifdef OC_SECURITY
+  PRINT("Security - Enabled\n");
+#else
+  PRINT("Security - Disabled\n");
+#endif /* OC_SECURITY */
 
 
 #ifdef WIN32

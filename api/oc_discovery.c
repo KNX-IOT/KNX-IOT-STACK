@@ -661,7 +661,8 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   //                      request, device_index, &response_length, matches);
 
   request->response->response_buffer->content_format = APPLICATION_LINK_FORMAT;
-  if (matches > 0 && response_length > 0) {
+  //if (matches > 0 && response_length > 0) {
+  if (response_length > 0) {
     request->response->response_buffer->response_length = response_length;
     request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
   } else if (request->origin && (request->origin->flags & MULTICAST) == 0) {
@@ -703,7 +704,8 @@ oc_create_discovery_resource(int resource_idx, size_t device)
 oc_discovery_flags_t
 oc_ri_process_discovery_payload(uint8_t *payload, int len,
                                 oc_client_handler_t client_handler,
-                                oc_endpoint_t *endpoint, void *user_data)
+                                oc_endpoint_t *endpoint,
+                                oc_content_format_t content, void *user_data)
 {
   oc_discovery_handler_t handler = client_handler.discovery;
   oc_discovery_all_handler_t all_handler = client_handler.discovery_all;
@@ -716,6 +718,23 @@ oc_ri_process_discovery_payload(uint8_t *payload, int len,
   oc_string_t *anchor = NULL;
   oc_string_array_t *types = NULL;
   oc_interface_mask_t iface_mask = 0;
+
+  if (content == APPLICATION_LINK_FORMAT) {
+    //  typedef oc_discovery_flags_t (*oc_discovery_handler_t)(
+    //    const char *, int len, const char *, oc_string_array_t,
+    //    oc_interface_mask_t, oc_endpoint_t *, oc_resource_properties_t, void *);
+    //oc_new_string_array(types, 1); 
+    //oc_string_array_add_item(types, "sss");
+
+
+
+    PRINT("calling handler all\n");
+    if (all_handler) {
+      all_handler(payload, len,
+              user_data);
+    }
+  }
+
 
 #ifndef OC_DYNAMIC_ALLOCATION
   char rep_objects_alloc[OC_MAX_NUM_REP_OBJECTS];
@@ -871,12 +890,14 @@ oc_ri_process_discovery_payload(uint8_t *payload, int len,
       link = link->next;
     }
 
-    if (eps_list &&
-        (all ? all_handler(oc_string(*anchor), oc_string(*uri), *types,
-                           iface_mask, eps_list, bm,
-                           (links->next ? true : false), user_data)
-             : handler(oc_string(*anchor), oc_string(*uri), *types, iface_mask,
-                       eps_list, bm, user_data)) == OC_STOP_DISCOVERY) {
+ //   if (eps_list &&
+ //       (all ? all_handler(oc_string(*anchor), oc_string(*uri), *types,
+ //                          iface_mask, eps_list, bm,
+ //                          (links->next ? true : false), user_data)
+ //            : handler(oc_string(*anchor), 0, oc_string(*uri), *types, iface_mask,
+ //                      eps_list, bm, user_data)) == OC_STOP_DISCOVERY
+//      ) 
+{
       oc_free_server_endpoints(eps_list);
       ret = OC_STOP_DISCOVERY;
       goto done;
