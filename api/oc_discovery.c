@@ -709,10 +709,10 @@ oc_ri_process_discovery_payload(uint8_t *payload, int len,
 {
   oc_discovery_handler_t handler = client_handler.discovery;
   oc_discovery_all_handler_t all_handler = client_handler.discovery_all;
-  bool all = false;
-  if (all_handler) {
-    all = true;
-  }
+  //bool all = false;
+  //if (all_handler) {
+  //  all = true;
+  //}
   oc_discovery_flags_t ret = OC_CONTINUE_DISCOVERY;
   oc_string_t *uri = NULL;
   oc_string_t *anchor = NULL;
@@ -730,187 +730,11 @@ oc_ri_process_discovery_payload(uint8_t *payload, int len,
 
     PRINT("calling handler all\n");
     if (all_handler) {
-      all_handler(payload, len,
+      all_handler((const char*)payload, len,
               user_data);
     }
   }
 
-
-#ifndef OC_DYNAMIC_ALLOCATION
-  char rep_objects_alloc[OC_MAX_NUM_REP_OBJECTS];
-  oc_rep_t rep_objects_pool[OC_MAX_NUM_REP_OBJECTS];
-  memset(rep_objects_alloc, 0, OC_MAX_NUM_REP_OBJECTS * sizeof(char));
-  memset(rep_objects_pool, 0, OC_MAX_NUM_REP_OBJECTS * sizeof(oc_rep_t));
-  struct oc_memb rep_objects = { sizeof(oc_rep_t), OC_MAX_NUM_REP_OBJECTS,
-                                 rep_objects_alloc, (void *)rep_objects_pool,
-                                 0 };
-#else  /* !OC_DYNAMIC_ALLOCATION */
-  struct oc_memb rep_objects = { sizeof(oc_rep_t), 0, 0, 0, 0 };
-#endif /* OC_DYNAMIC_ALLOCATION */
-  oc_rep_set_pool(&rep_objects);
-
-  oc_rep_t *links = 0, *rep, *p;
-  int s = oc_parse_rep(payload, len, &p);
-  if (s != 0) {
-    OC_WRN("error parsing discovery response");
-  }
-  links = rep = p;
-  /*  While the oic.wk.res schema over the baseline interface provides for an
-   *  array of objects, only one object is present and used in practice.
-   *
-   *  If rep->value.object != NULL, it means the response was from the baseline
-   *  interface, and in that case make rep point to the properties of its first
-   *  object. It is traversed in the following loop to obtain a handle to its
-   *  array of links.
-   */
-  if (rep != NULL && rep->value.object) {
-    rep = rep->value.object;
-  }
-
-  while (rep != NULL) {
-    switch (rep->type) {
-    /*  Ignore other oic.wk.res properties over here as they're known
-     *  and fixed. Only process the "links" property.
-     */
-    case OC_REP_OBJECT_ARRAY: {
-      if (oc_string_len(rep->name) == 5 &&
-          memcmp(oc_string(rep->name), "links", 5) == 0) {
-        links = rep->value.object_array;
-      }
-    } break;
-    default:
-      break;
-    }
-    rep = rep->next;
-  }
-
-  while (links != NULL) {
-    /* Reset bm in every round as this can be omitted if 0. */
-    oc_uuid_t di;
-    oc_resource_properties_t bm = 0;
-    oc_endpoint_t *eps_list = NULL;
-    oc_rep_t *link = links->value.object;
-
-    while (link != NULL) {
-      switch (link->type) {
-      case OC_REP_STRING: {
-        if (oc_string_len(link->name) == 6 &&
-            memcmp(oc_string(link->name), "anchor", 6) == 0) {
-          anchor = &link->value.string;
-          oc_str_to_uuid(oc_string(*anchor) + 6, &di);
-        } else if (oc_string_len(link->name) == 4 &&
-                   memcmp(oc_string(link->name), "href", 4) == 0) {
-          uri = &link->value.string;
-        }
-      } break;
-      case OC_REP_STRING_ARRAY: {
-        size_t i;
-        if (oc_string_len(link->name) == 2 &&
-            strncmp(oc_string(link->name), "rt", 2) == 0) {
-          types = &link->value.array;
-        } else {
-          iface_mask = 0;
-          for (i = 0; i < oc_string_array_get_allocated_size(link->value.array);
-               i++) {
-            iface_mask |= oc_ri_get_interface_mask(
-              oc_string_array_get_item(link->value.array, i),
-              oc_string_array_get_item_size(link->value.array, i));
-          }
-        }
-      } break;
-      case OC_REP_OBJECT_ARRAY: {
-        oc_rep_t *eps = link->value.object_array;
-        oc_endpoint_t *eps_cur = NULL;
-        oc_endpoint_t temp_ep;
-        while (eps != NULL) {
-          oc_rep_t *ep = eps->value.object;
-          while (ep != NULL) {
-            switch (ep->type) {
-            case OC_REP_STRING: {
-              if (oc_string_len(ep->name) == 2 &&
-                  memcmp(oc_string(ep->name), "ep", 2) == 0) {
-                if (oc_string_to_endpoint(&ep->value.string, &temp_ep, NULL) ==
-                    0) {
-                  if (!((temp_ep.flags & IPV6) &&
-                        (temp_ep.addr.ipv6.port == 5683)) &&
-#ifdef OC_IPV4
-                      !((temp_ep.flags & IPV4) &&
-                        (temp_ep.addr.ipv4.port == 5683)) &&
-#endif /* OC_IPV4 */
-                      !(temp_ep.flags & TCP) &&
-                      (((endpoint->flags & IPV4) && (temp_ep.flags & IPV6)) ||
-                       ((endpoint->flags & IPV6) && (temp_ep.flags & IPV4)))) {
-                    goto next_ep;
-                  }
-                  if (eps_cur) {
-                    eps_cur->next = oc_new_endpoint();
-                    eps_cur = eps_cur->next;
-                  } else {
-                    eps_cur = eps_list = oc_new_endpoint();
-                  }
-
-                  if (eps_cur) {
-                    memcpy(eps_cur, &temp_ep, sizeof(oc_endpoint_t));
-                    eps_cur->next = NULL;
-                    eps_cur->device = endpoint->device;
-                    memcpy(eps_cur->di.id, di.id, 16);
-                    eps_cur->interface_index = endpoint->interface_index;
-                    oc_endpoint_set_local_address(eps_cur,
-                                                  endpoint->interface_index);
-                    if (oc_ipv6_endpoint_is_link_local(eps_cur) == 0 &&
-                        oc_ipv6_endpoint_is_link_local(endpoint) == 0) {
-                      eps_cur->addr.ipv6.scope = endpoint->addr.ipv6.scope;
-                    }
-                    eps_cur->version = endpoint->version;
-                  }
-                }
-              }
-            } break;
-            default:
-              break;
-            }
-            ep = ep->next;
-          }
-        next_ep:
-          eps = eps->next;
-        }
-      } break;
-      case OC_REP_OBJECT: {
-        oc_rep_t *policy = link->value.object;
-        if (policy != NULL && oc_string_len(link->name) == 1 &&
-            *(oc_string(link->name)) == 'p' && policy->type == OC_REP_INT &&
-            oc_string_len(policy->name) == 2 &&
-            memcmp(oc_string(policy->name), "bm", 2) == 0) {
-          bm = policy->value.integer;
-        }
-      } break;
-      default:
-        break;
-      }
-      link = link->next;
-    }
-
- //   if (eps_list &&
- //       (all ? all_handler(oc_string(*anchor), oc_string(*uri), *types,
- //                          iface_mask, eps_list, bm,
- //                          (links->next ? true : false), user_data)
- //            : handler(oc_string(*anchor), 0, oc_string(*uri), *types, iface_mask,
- //                      eps_list, bm, user_data)) == OC_STOP_DISCOVERY
-//      ) 
-{
-      oc_free_server_endpoints(eps_list);
-      ret = OC_STOP_DISCOVERY;
-      goto done;
-    }
-    oc_free_server_endpoints(eps_list);
-    links = links->next;
-  }
-
-done:
-  oc_free_rep(p);
-#ifdef OC_DNS_CACHE
-  oc_dns_clear_cache();
-#endif /* OC_DNS_CACHE */
   return ret;
 }
 #endif /* OC_CLIENT */
