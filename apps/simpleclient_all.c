@@ -67,7 +67,7 @@ static bool state;
 static int power;
 static oc_string_t name;
 
-static oc_event_callback_retval_t
+oc_event_callback_retval_t
 stop_observe(void *data)
 {
   (void)data;
@@ -76,7 +76,7 @@ stop_observe(void *data)
   return OC_EVENT_DONE;
 }
 
-static void
+void
 observe_light(oc_client_response_t *data)
 {
   PRINT("OBSERVE_light:\n");
@@ -105,7 +105,7 @@ observe_light(oc_client_response_t *data)
   }
 }
 
-static void
+void
 post2_light(oc_client_response_t *data)
 {
   PRINT("POST2_light:\n");
@@ -121,7 +121,7 @@ post2_light(oc_client_response_t *data)
   PRINT("Sent OBSERVE request\n");
 }
 
-static void
+void
 post_light(oc_client_response_t *data)
 {
   PRINT("POST_light:\n");
@@ -145,7 +145,7 @@ post_light(oc_client_response_t *data)
     PRINT("Could not init POST request\n");
 }
 
-static void
+void
 put_light(oc_client_response_t *data)
 {
   PRINT("PUT_light:\n");
@@ -168,7 +168,7 @@ put_light(oc_client_response_t *data)
     PRINT("Could not init POST request\n");
 }
 
-static void
+void
 get_light(oc_client_response_t *data)
 {
   PRINT("GET_light:\n");
