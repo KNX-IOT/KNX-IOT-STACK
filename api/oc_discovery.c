@@ -718,8 +718,7 @@ oc_ri_process_discovery_payload(uint8_t *payload, int len,
 
     PRINT("calling handler all\n");
     if (all_handler) {
-      all_handler((const char*)payload, len,
-                  endpoint, user_data);
+      all_handler((const char*)payload, len, endpoint, user_data);
     }
   }
 

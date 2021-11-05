@@ -349,9 +349,9 @@ int oc_obt_discover_owned_devices_site_local_ipv6(oc_obt_discovery_cb_t cb,
  *  - `0` on success
  *  - `-1` on failure
  */
-//int oc_obt_discover_all_resources(oc_uuid_t *uuid,
-//                                  oc_discovery_all_handler_t handler,
-//                                  void *data);
+int oc_obt_discover_all_resources(oc_uuid_t *uuid,
+                                  oc_discovery_all_handler_t handler,
+                                  void *data);
 /* Perform ownership transfer */
 /**
  * Perform ownership transfer method (OTM) on the device using Just-Works
