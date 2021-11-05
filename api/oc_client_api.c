@@ -893,8 +893,8 @@ oc_do_wk_discovery(const char *uri_query, oc_discovery_handler_t handler,
                    void *user_data)
 {
   oc_client_handler_t handlers;
-  handlers.discovery = NULL;
-  handlers.discovery_all = handler;
+  handlers.discovery = handler;
+  handlers.discovery_all = NULL;
  
   oc_client_cb_t *cb4 = NULL;
   //bool status = multi_scope_ipv6_discovery_wk(cb4, 0x02, uri_query,
@@ -902,6 +902,27 @@ oc_do_wk_discovery(const char *uri_query, oc_discovery_handler_t handler,
 
 //  bool status =
 //    multi_scope_ipv6_discovery_wk(cb4, 0x05, uri_query, handlers, user_data);
+  bool status =
+    multi_scope_ipv6_discovery_wk(cb4, 0x02, uri_query, handlers, user_data);
+
+  return status;
+}
+
+bool
+oc_do_wk_discovery_all(const char *uri_query, oc_discovery_all_handler_t handler,
+                   void *user_data)
+{
+  oc_client_handler_t handlers;
+  handlers.discovery = NULL;
+  handlers.discovery_all = handler;
+
+  oc_client_cb_t *cb4 = NULL;
+  // bool status = multi_scope_ipv6_discovery_wk(cb4, 0x02, uri_query,
+  //                                         handlers, user_data);
+
+  //  bool status =
+  //    multi_scope_ipv6_discovery_wk(cb4, 0x05, uri_query, handlers,
+  //    user_data);
   bool status =
     multi_scope_ipv6_discovery_wk(cb4, 0x02, uri_query, handlers, user_data);
 

@@ -239,7 +239,7 @@ issue_requests(void)
   PRINT("Discovering devices:\n");
   //oc_do_ip_discovery(".well-known/core", &discovery, NULL);
 
-  oc_do_wk_discovery("rt=urn:knx:dpa.*", &discovery, NULL);
+  oc_do_wk_discovery_all("rt=urn:knx:dpa.*", &discovery, NULL);
 
 }
 

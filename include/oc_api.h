@@ -1651,7 +1651,7 @@ int oc_notify_observers(oc_resource_t *resource);
 extern "C" {
 #endif
 
-  bool oc_do_wk_discovery(const char *uri_query, oc_discovery_handler_t handler,
+  bool oc_do_wk_discovery_all(const char *uri_query, oc_discovery_all_handler_t handler,
                         void *user_data);
 
 
