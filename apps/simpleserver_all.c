@@ -766,8 +766,8 @@ oc_ownership_status_cb(const oc_uuid_t *device_uuid, size_t device_index,
   oc_uuid_to_str(device_uuid, uuid, OC_UUID_LEN);
   PRINT(" oc_ownership_status_cb: DI: '%s'\n", uuid);
 }
-#endif /* OC_SECURITY * /                                                        
-                                                                               
+#endif /* OC_SECURITY */
+
 /**                                                                            
  * main application.                                                           
  *       * initializes the global variables                                             
