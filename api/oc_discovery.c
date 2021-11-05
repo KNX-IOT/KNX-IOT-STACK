@@ -707,6 +707,7 @@ oc_ri_process_discovery_payload(uint8_t *payload, int len,
                                 oc_endpoint_t *endpoint,
                                 oc_content_format_t content, void *user_data)
 {
+
   //oc_discovery_handler_t handler = client_handler.discovery;
   oc_discovery_all_handler_t all_handler = client_handler.discovery_all;
   //bool all = false;
@@ -731,7 +732,7 @@ oc_ri_process_discovery_payload(uint8_t *payload, int len,
     PRINT("calling handler all\n");
     if (all_handler) {
       all_handler((const char*)payload, len,
-              user_data);
+                  endpoint, user_data);
     }
   }
 

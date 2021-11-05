@@ -217,17 +217,16 @@ get_light(oc_client_response_t *data)
 
 static oc_discovery_flags_t
   discovery(const char *payload, int len, 
-            void *user_data)
+            oc_endpoint_t *endpoint, void *user_data)
 {
   //(void)anchor;
   (void)user_data;
+  (void)endpoint;
 
 
-
-
-
-  PRINT(" DISCOVERY:\n" );
-  PRINT("  %.*s\n", len, payload);
+  PRINT(" DISCOVERY:\n");
+  PRINT("%.*s\n", len, payload);
+  PRINT(" DISCOVERY- END\n");
 
   return OC_STOP_DISCOVERY;
 
