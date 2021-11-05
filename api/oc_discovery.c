@@ -707,17 +707,17 @@ oc_ri_process_discovery_payload(uint8_t *payload, int len,
                                 oc_endpoint_t *endpoint,
                                 oc_content_format_t content, void *user_data)
 {
-  oc_discovery_handler_t handler = client_handler.discovery;
+  //oc_discovery_handler_t handler = client_handler.discovery;
   oc_discovery_all_handler_t all_handler = client_handler.discovery_all;
   //bool all = false;
   //if (all_handler) {
   //  all = true;
   //}
   oc_discovery_flags_t ret = OC_CONTINUE_DISCOVERY;
-  oc_string_t *uri = NULL;
-  oc_string_t *anchor = NULL;
-  oc_string_array_t *types = NULL;
-  oc_interface_mask_t iface_mask = 0;
+  //oc_string_t *uri = NULL;
+  //oc_string_t *anchor = NULL;
+  //oc_string_array_t *types = NULL;
+  //oc_interface_mask_t iface_mask = 0;
 
   if (content == APPLICATION_LINK_FORMAT) {
     //  typedef oc_discovery_flags_t (*oc_discovery_handler_t)(
