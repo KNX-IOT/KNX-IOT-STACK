@@ -257,7 +257,7 @@ do_event(void)
    * through the list of processes to see if the event should be
    * delivered to any of them. If so, we call the event handler
    * function for the process. We only process one event at a time and
-   * call the poll handlers inbetween.
+   * call the poll handlers in between.
    */
 
   if (nevents > 0) {
