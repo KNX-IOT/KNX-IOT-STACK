@@ -105,8 +105,11 @@ OBJ_CLIENT_SERVER=$(addprefix obj/client_server/,$(notdir $(SRC:.c=.o)))
 VPATH=../../messaging/coap/:../../util/:../../api/:../../deps/tinycbor/src/:../../deps/mbedtls/library:../../api/c-timestamp:../../service/resource-directory/client/src/:
 LIBS?= -lm -pthread -lrt
 
-SAMPLES = server client temp_sensor simpleserver simpleserver_pki simpleclient  \
-	server_block_linux client_block_linux server_certification_tests smart_home_server_linux multi_device_server multi_device_client server_multithread_linux client_multithread_linux client_certification_tests  secure_mcast_client secure_mcast_server1 secure_mcast_server2
+#SAMPLES = server client temp_sensor simpleserver simpleserver_pki simpleclient  \
+#	server_block_linux client_block_linux server_certification_tests smart_home_server_linux multi_device_server multi_device_client server_multithread_linux client_multithread_linux #client_certification_tests  secure_mcast_client secure_mcast_server1 secure_mcast_server2
+
+SAMPLES = server  temp_sensor simpleserver simpleserver_pki \
+	server_block_linux smart_home_server_linux multi_device_server  server_multithread_linux client_multithread_linux secure_mcast_server1 secure_mcast_server
 
 ifeq ($(V6DNS),1)
 	EXTRA_CFLAGS += -DOC_DNS_LOOKUP_IPV6
