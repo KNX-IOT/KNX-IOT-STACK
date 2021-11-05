@@ -284,13 +284,13 @@ server: libkis-server.a $(ROOT_DIR)/apps/server_linux.c
 	@mkdir -p $@_creds
 	${CC} -o $@ ../../apps/server_linux.c libkis-server.a -DOC_SERVER ${CFLAGS} ${LIBS}
 
-client: libkis-client.a $(ROOT_DIR)/apps/client_linux.c
-	@mkdir -p $@_creds
-	${CC} -o $@ ../../apps/client_linux.c libkis-client.a -DOC_CLIENT ${CFLAGS} ${LIBS}
+#client: libkis-client.a $(ROOT_DIR)/apps/client_linux.c
+#	@mkdir -p $@_creds
+#	${CC} -o $@ ../../apps/client_linux.c libkis-client.a -DOC_CLIENT ${CFLAGS} ${LIBS}
 
-client_certification_tests: libkis-client-server.a $(ROOT_DIR)/apps/client_certification_tests.c copy_idd_files
-	@mkdir -p $@_creds
-	${CC} -o $@ ../../apps/client_certification_tests.c libkis-client-server.a -DOC_CLIENT -DOC_SERVER ${CFLAGS} ${LIBS}
+#client_certification_tests: libkis-client-server.a $(ROOT_DIR)/apps/client_certification_tests.c copy_idd_files
+#	@mkdir -p $@_creds
+#	${CC} -o $@ ../../apps/client_certification_tests.c libkis-client-server.a -DOC_CLIENT -DOC_SERVER ${CFLAGS} ${LIBS}
 
 temp_sensor: libkis-client.a $(ROOT_DIR)/apps/temp_sensor_client_linux.c
 	@mkdir -p $@_creds
@@ -312,17 +312,17 @@ simpleserver_pki: libkis-server.a $(ROOT_DIR)/apps/simpleserver_pki.c
 	@mkdir -p $@_creds
 	${CC} -o $@ ../../apps/simpleserver_pki.c libkis-server.a -DOC_SERVER ${CFLAGS}  ${LIBS}
 
-simpleclient: libkis-client.a $(ROOT_DIR)/apps/simpleclient.c
-	@mkdir -p $@_creds
-	${CC} -o $@ ../../apps/simpleclient.c libkis-client.a -DOC_CLIENT ${CFLAGS}  ${LIBS}
+#simpleclient: libkis-client.a $(ROOT_DIR)/apps/simpleclient.c
+#	@mkdir -p $@_creds
+#	${CC} -o $@ ../../apps/simpleclient.c libkis-client.a -DOC_CLIENT ${CFLAGS}  ${LIBS}
 
-secure_mcast_client: libkis-client.a $(ROOT_DIR)/apps/secure_mcast_client.c
-	@mkdir -p $@_creds
-	${CC} -o $@ ../../apps/secure_mcast_client.c libkis-client.a -DOC_CLIENT ${CFLAGS}  ${LIBS}
+#secure_mcast_client: libkis-client.a $(ROOT_DIR)/apps/secure_mcast_client.c
+#	@mkdir -p $@_creds
+#	${CC} -o $@ ../../apps/secure_mcast_client.c libkis-client.a -DOC_CLIENT ${CFLAGS}  ${LIBS}
 
 
-client_block_linux: libkis-client.a $(ROOT_DIR)/apps/client_block_linux.c
-	${CC} -o $@ ../../apps/client_block_linux.c libkis-client.a -DOC_CLIENT ${CFLAGS}  ${LIBS}
+#client_block_linux: libkis-client.a $(ROOT_DIR)/apps/client_block_linux.c
+#	${CC} -o $@ ../../apps/client_block_linux.c libkis-client.a -DOC_CLIENT ${CFLAGS}  ${LIBS}
 
 server_block_linux: libkis-server.a $(ROOT_DIR)/apps/server_block_linux.c
 	${CC} -o $@ ../../apps/server_block_linux.c libkis-server.a -DOC_SERVER ${CFLAGS} ${LIBS}
@@ -345,17 +345,17 @@ multi_device_server: libkis-server.a $(ROOT_DIR)/apps/multi_device_server_linux.
 	@mkdir -p $@_creds
 	${CC} -o $@ ../../apps/multi_device_server_linux.c libkis-server.a -DOC_SERVER ${CFLAGS} ${LIBS}
 
-multi_device_client: libkis-client.a $(ROOT_DIR)/apps/multi_device_client_linux.c
-	@mkdir -p $@_creds
-	${CC} -o $@ ../../apps/multi_device_client_linux.c libkis-client.a -DOC_CLIENT ${CFLAGS}  ${LIBS}
+#multi_device_client: libkis-client.a $(ROOT_DIR)/apps/multi_device_client_linux.c
+#	@mkdir -p $@_creds
+#	${CC} -o $@ ../../apps/multi_device_client_linux.c libkis-client.a -DOC_CLIENT ${CFLAGS}  ${LIBS}
 
 server_multithread_linux: libkis-server.a $(ROOT_DIR)/apps/server_multithread_linux.c
 	@mkdir -p $@_creds
 	${CC} -o $@ ../../apps/server_multithread_linux.c libkis-server.a -DOC_SERVER ${CFLAGS} ${LIBS}
 
-client_multithread_linux: libkis-client.a $(ROOT_DIR)/apps/client_multithread_linux.c
-	@mkdir -p $@_creds
-	${CC} -o $@ ../../apps/client_multithread_linux.c libkis-client.a -DOC_CLIENT ${CFLAGS}  ${LIBS}
+#client_multithread_linux: libkis-client.a $(ROOT_DIR)/apps/client_multithread_linux.c
+#	@mkdir -p $@_creds
+#	${CC} -o $@ ../../apps/client_multithread_linux.c libkis-client.a -DOC_CLIENT ${CFLAGS}  ${LIBS}
 
 kis-server.pc: kis-server.pc.in
 	$(SED) > $@ < $< \
