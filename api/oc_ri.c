@@ -1,5 +1,6 @@
 /*
 // Copyright (c) 2016 Intel Corporation
+// Copyright (c) 2021 Cascoda Ltd.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -1614,11 +1615,6 @@ oc_ri_invoke_client_cb(void *response, oc_client_cb_t *cb,
   endpoint->version = OCF_VER_1_0_0;
   oc_content_format_t cf = 0;
   coap_get_header_content_format(response, &cf);
-#ifdef OC_SPEC_VER_OIC
-  if (cf == APPLICATION_CBOR) {
-    endpoint->version = OIC_VER_1_1_0;
-  }
-#endif /* OC_SPEC_VER_OIC */
 
   cb->ref_count = 1;
 
@@ -1692,7 +1688,7 @@ oc_ri_invoke_client_cb(void *response, oc_client_cb_t *cb,
   if (payload_len) {
     if (cb->discovery) {
       if (oc_ri_process_discovery_payload(payload, payload_len, cb->handler,
-                                          endpoint,
+                                          endpoint, cf,
                                           cb->user_data) == OC_STOP_DISCOVERY) {
         uint16_t mid = cb->mid;
         cb->ref_count = 0;

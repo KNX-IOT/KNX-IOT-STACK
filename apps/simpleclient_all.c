@@ -1,5 +1,6 @@
 /*
 // Copyright (c) 2016 Intel Corporation
+// Copyright (c) 2021 Cascoda Ltd
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,18 +14,39 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 */
+#ifndef DOXYGEN
+// Force doxygen to document static inline
+#define STATIC static
+#endif
 
 #include "oc_api.h"
 #include "port/oc_clock.h"
-#include <pthread.h>
 #include <signal.h>
 #include <stdio.h>
 
-pthread_mutex_t mutex;
-pthread_cond_t cv;
-struct timespec ts;
+#ifdef __linux__
+/** linux specific code */
+#include <pthread.h>
+#ifndef NO_MAIN
+static pthread_mutex_t mutex;
+static pthread_cond_t cv;
+static struct timespec ts;
+#endif /* NO_MAIN */
+#endif
 
-int quit = 0;
+#ifdef WIN32
+/** windows specific code */
+#include <windows.h>
+STATIC CONDITION_VARIABLE cv; /**< event loop variable */
+STATIC CRITICAL_SECTION cs;   /**< event loop variable */
+#include <direct.h>
+#define GetCurrentDir _getcwd
+#else
+#include <unistd.h>
+#define GetCurrentDir getcwd
+#endif
+
+volatile int quit = 0; /**< stop variable, used by handle_signal */
 
 static int
 app_init(void)
@@ -43,7 +65,7 @@ static bool state;
 static int power;
 static oc_string_t name;
 
-static oc_event_callback_retval_t
+oc_event_callback_retval_t
 stop_observe(void *data)
 {
   (void)data;
@@ -52,7 +74,7 @@ stop_observe(void *data)
   return OC_EVENT_DONE;
 }
 
-static void
+void
 observe_light(oc_client_response_t *data)
 {
   PRINT("OBSERVE_light:\n");
@@ -81,7 +103,7 @@ observe_light(oc_client_response_t *data)
   }
 }
 
-static void
+void
 post2_light(oc_client_response_t *data)
 {
   PRINT("POST2_light:\n");
@@ -97,7 +119,7 @@ post2_light(oc_client_response_t *data)
   PRINT("Sent OBSERVE request\n");
 }
 
-static void
+void
 post_light(oc_client_response_t *data)
 {
   PRINT("POST_light:\n");
@@ -121,7 +143,7 @@ post_light(oc_client_response_t *data)
     PRINT("Could not init POST request\n");
 }
 
-static void
+void
 put_light(oc_client_response_t *data)
 {
   PRINT("PUT_light:\n");
@@ -144,7 +166,7 @@ put_light(oc_client_response_t *data)
     PRINT("Could not init POST request\n");
 }
 
-static void
+void
 get_light(oc_client_response_t *data)
 {
   PRINT("GET_light:\n");
@@ -186,55 +208,66 @@ get_light(oc_client_response_t *data)
     PRINT("Could not init PUT request\n");
 }
 
+// static oc_discovery_flags_t
+// discovery(const char *payload, int len, const char *uri, oc_string_array_t
+// types,
+//          oc_interface_mask_t iface_mask, oc_endpoint_t *endpoint,
+//          oc_resource_properties_t bm, void *user_data)
+
 static oc_discovery_flags_t
-discovery(const char *anchor, const char *uri, oc_string_array_t types,
-          oc_interface_mask_t iface_mask, oc_endpoint_t *endpoint,
-          oc_resource_properties_t bm, void *user_data)
+discovery(const char *payload, int len, oc_endpoint_t *endpoint,
+          void *user_data)
 {
-  (void)anchor;
+  //(void)anchor;
   (void)user_data;
-  (void)iface_mask;
-  (void)bm;
-  int i;
-  int uri_len = strlen(uri);
-  uri_len = (uri_len >= MAX_URI_LENGTH) ? MAX_URI_LENGTH - 1 : uri_len;
-  for (i = 0; i < (int)oc_string_array_get_allocated_size(types); i++) {
-    char *t = oc_string_array_get_item(types, i);
-    if (strlen(t) == 10 && strncmp(t, "core.light", 10) == 0) {
-      oc_endpoint_list_copy(&light_server, endpoint);
-      strncpy(a_light, uri, uri_len);
-      a_light[uri_len] = '\0';
+  (void)endpoint;
 
-      PRINT("Resource %s hosted at endpoints:\n", a_light);
-      oc_endpoint_t *ep = endpoint;
-      while (ep != NULL) {
-        PRINTipaddr(*ep);
-        PRINT("\n");
-        ep = ep->next;
-      }
+  PRINT(" DISCOVERY:\n");
+  PRINT("%.*s\n", len, payload);
+  PRINT(" DISCOVERY- END\n");
 
-      oc_do_get(a_light, light_server, NULL, &get_light, LOW_QOS, NULL);
-
-      return OC_STOP_DISCOVERY;
-    }
-  }
-  return OC_CONTINUE_DISCOVERY;
+  return OC_STOP_DISCOVERY;
 }
 
 static void
 issue_requests(void)
 {
-  oc_do_ip_discovery("core.light", &discovery, NULL);
+  PRINT("Discovering devices:\n");
+  // oc_do_ip_discovery(".well-known/core", &discovery, NULL);
+
+  oc_do_wk_discovery_all("rt=urn:knx:dpa.*", &discovery, NULL);
 }
 
-static void
+#ifdef WIN32
+/**
+ * signal the event loop (windows version)
+ * wakes up the main function to handle the next callback
+ */
+STATIC void
+signal_event_loop(void)
+{
+  WakeConditionVariable(&cv);
+}
+#endif /* WIN32 */
+
+#ifdef __linux__
+/**
+ * signal the event loop (Linux)
+ * wakes up the main function to handle the next callback
+ */
+STATIC void
 signal_event_loop(void)
 {
   pthread_mutex_lock(&mutex);
   pthread_cond_signal(&cv);
   pthread_mutex_unlock(&mutex);
 }
+#endif /* __linux__ */
 
+/**
+ * handle Ctrl-C
+ * @param signal the captured signal
+ */
 void
 handle_signal(int signal)
 {
@@ -247,11 +280,25 @@ int
 main(void)
 {
   int init;
+
+  PRINT("Simple Client:\n");
+
+#ifdef WIN32
+  /* windows specific */
+  InitializeCriticalSection(&cs);
+  InitializeConditionVariable(&cv);
+  /* install Ctrl-C */
+  signal(SIGINT, handle_signal);
+#endif
+#ifdef __linux__
+  /* Linux specific */
   struct sigaction sa;
   sigfillset(&sa.sa_mask);
   sa.sa_flags = 0;
   sa.sa_handler = handle_signal;
+  /* install Ctrl-C */
   sigaction(SIGINT, &sa, NULL);
+#endif
 
   static const oc_handler_t handler = { .init = app_init,
                                         .signal_event_loop = signal_event_loop,
@@ -267,6 +314,30 @@ main(void)
   if (init < 0)
     return init;
 
+#ifdef OC_SECURITY
+  PRINT("Security - Enabled\n");
+#else
+  PRINT("Security - Disabled\n");
+#endif /* OC_SECURITY */
+
+#ifdef WIN32
+  /* windows specific loop */
+  while (quit != 1) {
+    next_event = oc_main_poll();
+    if (next_event == 0) {
+      SleepConditionVariableCS(&cv, &cs, INFINITE);
+    } else {
+      oc_clock_time_t now = oc_clock_time();
+      if (now < next_event) {
+        SleepConditionVariableCS(
+          &cv, &cs, (DWORD)((next_event - now) * 1000 / OC_CLOCK_SECOND));
+      }
+    }
+  }
+#endif
+
+#ifdef __linux__
+  /* Linux specific loop */
   while (quit != 1) {
     next_event = oc_main_poll();
     pthread_mutex_lock(&mutex);
@@ -279,6 +350,8 @@ main(void)
     }
     pthread_mutex_unlock(&mutex);
   }
+#endif
+
   oc_free_server_endpoints(light_server);
   oc_free_string(&name);
   oc_main_shutdown();

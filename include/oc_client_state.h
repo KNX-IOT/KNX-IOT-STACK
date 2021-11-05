@@ -1,5 +1,6 @@
 /*
 // Copyright (c) 2016, 2020 Intel Corporation
+// Copyright (c) 2021 Cascoda Ltd.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -51,7 +52,7 @@ typedef struct
 {
   oc_rep_t *payload;       ///< response payload, interpreted as cbor
   const uint8_t *_payload; ///< payload buffer
-  size_t _payload_len;     ///< payload buffer lenght
+  size_t _payload_len;     ///< payload buffer length
   oc_endpoint_t *endpoint; ///< endpoint on where the response has been received
   void *client_cb;         ///< callback for the response to the calling client
   void *user_data; ///< user data to be supplied to the callback to the client
@@ -74,15 +75,10 @@ typedef enum {
  *
  */
 typedef oc_discovery_flags_t (*oc_discovery_all_handler_t)(
-  const char *, const char *, oc_string_array_t, oc_interface_mask_t,
-  oc_endpoint_t *, oc_resource_properties_t, bool, void *);
+  const char *, int len, oc_endpoint_t *endpoint, void *);
 
-/**
- * @brief discovery handler
- *
- */
 typedef oc_discovery_flags_t (*oc_discovery_handler_t)(
-  const char *, const char *, oc_string_array_t, oc_interface_mask_t,
+  const char *, int len, const char *, oc_string_array_t, oc_interface_mask_t,
   oc_endpoint_t *, oc_resource_properties_t, void *);
 
 /**
@@ -97,9 +93,10 @@ typedef void (*oc_response_handler_t)(oc_client_response_t *);
  */
 typedef struct oc_client_handler_t
 {
-  oc_response_handler_t response;           ///< response handler
-  oc_discovery_handler_t discovery;         ///< discovery handler
-  oc_discovery_all_handler_t discovery_all; ///< discovery all handler
+  oc_response_handler_t response;   ///< response handler
+  oc_discovery_handler_t discovery; ///< discovery handler, e.g. per line entry
+  oc_discovery_all_handler_t
+    discovery_all; ///< discovery all handler, full payload
 } oc_client_handler_t;
 
 /**
@@ -120,15 +117,15 @@ typedef struct oc_client_cb_t
   oc_method_t method;            ///< method used
   uint16_t mid;                  ///< CoAP message identifier
   uint8_t token[COAP_TOKEN_LEN]; ///< CoAP token
-  uint8_t token_len;             ///< CoAP token lenght
+  uint8_t token_len;             ///< CoAP token length
   bool discovery;                ///< discovery call
-  bool multicast;                ///< multicast
-  bool stop_multicast_receive;   ///< stop receiving multicast
+  bool multicast;                ///< multi cast
+  bool stop_multicast_receive;   ///< stop receiving multi cast
   uint8_t ref_count;             ///< reference counting on this data block
-  uint8_t separate;              ///< seperate responses
+  uint8_t separate;              ///< separate responses
 #ifdef OC_OSCORE
   uint8_t piv[OSCORE_PIV_LEN]; ///< partial IV
-  uint8_t piv_len;             ///< lenght of the partial IV
+  uint8_t piv_len;             ///< length of the partial IV
   uint64_t notification_num;   ///< notification number
 #endif                         /* OC_OSCORE */
 } oc_client_cb_t;
@@ -138,7 +135,7 @@ typedef struct oc_client_cb_t
  * @brief invoke the Client callback when a response is received
  *
  * @param response the response
- * @param response_state the state of the blockwise transfer
+ * @param response_state the state of the block-wise transfer
  * @param cb  the callback
  * @param endpoint the endpoint
  * @return true
@@ -166,8 +163,8 @@ bool oc_ri_invoke_client_cb(void *response, oc_client_cb_t *cb,
  *
  * @param uri the uri to be called
  * @param endpoint the endpoint of the device
- * @param method method to be used
- * @param query the query params to be used
+ * @param method the method to be used
+ * @param query the query parameters to be used
  * @param handler the callback when data arrives
  * @param qos quality of service level
  * @param user_data user data to be provided with the invocation of the callback
@@ -202,7 +199,7 @@ bool oc_ri_is_client_cb_valid(oc_client_cb_t *client_cb);
  * @brief find the client callback info by token
  *
  * @param token the token
- * @param token_len the token lenght
+ * @param token_len the token length
  * @return oc_client_cb_t* the client callback info
  */
 oc_client_cb_t *oc_ri_find_client_cb_by_token(uint8_t *token,
@@ -217,33 +214,34 @@ oc_client_cb_t *oc_ri_find_client_cb_by_token(uint8_t *token,
 oc_client_cb_t *oc_ri_find_client_cb_by_mid(uint16_t mid);
 
 /**
- * @brief free the client callback informatin by endpoint
+ * @brief free the client callback information by endpoint
  *
  * @param endpoint the endpoint
  */
 void oc_ri_free_client_cbs_by_endpoint(oc_endpoint_t *endpoint);
 
 /**
- * @brief free the client callback infomation by message id (mid)
+ * @brief free the client callback information by message id (mid)
  *
  * @param mid the message id
  */
 void oc_ri_free_client_cbs_by_mid(uint16_t mid);
 
 /**
- * @brief handle the discovery payload (e.g. parse the oic/res response and do
+ * @brief handle the discovery payload (e.g. parse the response and do
  * the callbacks)
  *
- * @param payload the recieved discovery response
- * @param len lenght of the payload
- * @param handler handler of the discovery
- * @param endpoint endpoint
+ * @param payload the received discovery response
+ * @param len the length of the payload
+ * @param handler the handler of the discovery
+ * @param endpoint the endpoint
+ * @param content the content format of the payload
  * @param user_data the user data to be supplied to the handler
  * @return oc_discovery_flags_t the discovery flags (e.g. more to come)
  */
 oc_discovery_flags_t oc_ri_process_discovery_payload(
   uint8_t *payload, int len, oc_client_handler_t handler,
-  oc_endpoint_t *endpoint, void *user_data);
+  oc_endpoint_t *endpoint, oc_content_format_t content, void *user_data);
 
 #ifdef __cplusplus
 }
