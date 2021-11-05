@@ -108,8 +108,7 @@ LIBS?= -lm -pthread -lrt
 #SAMPLES = server client temp_sensor simpleserver simpleserver_pki simpleclient  \
 #	server_block_linux client_block_linux server_certification_tests smart_home_server_linux multi_device_server multi_device_client server_multithread_linux client_multithread_linux #client_certification_tests  secure_mcast_client secure_mcast_server1 secure_mcast_server2
 
-SAMPLES = server simpleserver simpleserver_pki \
-	server_block_linux smart_home_server_linux multi_device_server  server_multithread_linux secure_mcast_server1 secure_mcast_server
+SAMPLES = simpleserver_all simpleclient_all 
 
 ifeq ($(V6DNS),1)
 	EXTRA_CFLAGS += -DOC_DNS_LOOKUP_IPV6
@@ -299,21 +298,21 @@ server: libkis-server.a $(ROOT_DIR)/apps/server_linux.c
 #	@mkdir -p $@_creds
 #	${CC} -o $@ ../../apps/temp_sensor_client_linux.c libkis-client.a -DOC_CLIENT ${CFLAGS} ${LIBS}
 
-simpleserver: libkis-server.a $(ROOT_DIR)/apps/simpleserver.c
+simpleserver_all: libkis-server.a $(ROOT_DIR)/apps/simpleserver_all.c
 	@mkdir -p $@_creds
-	${CC} -o $@ ../../apps/simpleserver.c libkis-server.a -DOC_SERVER ${CFLAGS}  ${LIBS}
+	${CC} -o $@ ../../apps/simpleserver_all.c libkis-server.a -DOC_SERVER ${CFLAGS}  ${LIBS}
 
-secure_mcast_server1: libkis-server.a $(ROOT_DIR)/apps/secure_mcast_server1.c
-	@mkdir -p $@_creds
-	${CC} -o $@ ../../apps/secure_mcast_server1.c libkis-server.a -DOC_SERVER ${CFLAGS}  ${LIBS}
+#secure_mcast_server1: libkis-server.a $(ROOT_DIR)/apps/secure_mcast_server1.c
+#	@mkdir -p $@_creds
+#	${CC} -o $@ ../../apps/secure_mcast_server1.c libkis-server.a -DOC_SERVER ${CFLAGS}  ${LIBS}
 
-secure_mcast_server2: libkis-server.a $(ROOT_DIR)/apps/secure_mcast_server2.c
-	@mkdir -p $@_creds
-	${CC} -o $@ ../../apps/secure_mcast_server2.c libkis-server.a -DOC_SERVER ${CFLAGS}  ${LIBS}
+#secure_mcast_server2: libkis-server.a $(ROOT_DIR)/apps/secure_mcast_server2.c
+#	@mkdir -p $@_creds
+#	${CC} -o $@ ../../apps/secure_mcast_server2.c libkis-server.a -DOC_SERVER ${CFLAGS}  ${LIBS}
 
-simpleserver_pki: libkis-server.a $(ROOT_DIR)/apps/simpleserver_pki.c
-	@mkdir -p $@_creds
-	${CC} -o $@ ../../apps/simpleserver_pki.c libkis-server.a -DOC_SERVER ${CFLAGS}  ${LIBS}
+#simpleserver_pki: libkis-server.a $(ROOT_DIR)/apps/simpleserver_pki.c
+#	@mkdir -p $@_creds
+#	${CC} -o $@ ../../apps/simpleserver_pki.c libkis-server.a -DOC_SERVER ${CFLAGS}  ${LIBS}
 
 #simpleclient: libkis-client.a $(ROOT_DIR)/apps/simpleclient.c
 #	@mkdir -p $@_creds
@@ -327,38 +326,38 @@ simpleserver_pki: libkis-server.a $(ROOT_DIR)/apps/simpleserver_pki.c
 #client_block_linux: libkis-client.a $(ROOT_DIR)/apps/client_block_linux.c
 #	${CC} -o $@ ../../apps/client_block_linux.c libkis-client.a -DOC_CLIENT ${CFLAGS}  ${LIBS}
 
-server_block_linux: libkis-server.a $(ROOT_DIR)/apps/server_block_linux.c
-	${CC} -o $@ ../../apps/server_block_linux.c libkis-server.a -DOC_SERVER ${CFLAGS} ${LIBS}
+#server_block_linux: libkis-server.a $(ROOT_DIR)/apps/server_block_linux.c
+#	${CC} -o $@ ../../apps/server_block_linux.c libkis-server.a -DOC_SERVER ${CFLAGS} ${LIBS}
 
-server_certification_tests: libkis-server.a $(ROOT_DIR)/apps/server_certification_tests.c copy_pki_certs copy_idd_files
-	@mkdir -p $@_creds
-	${CC} -o $@ ../../apps/server_certification_tests.c libkis-client-server.a -DOC_CLIENT -DOC_SERVER ${CFLAGS} ${LIBS}
+#server_certification_tests: libkis-server.a $(ROOT_DIR)/apps/server_certification_tests.c copy_pki_certs copy_idd_files
+#	@mkdir -p $@_creds
+#	${CC} -o $@ ../../apps/server_certification_tests.c libkis-client-server.a -DOC_CLIENT -DOC_SERVER ${CFLAGS} ${LIBS}
 
-smart_home_server_linux: libkis-server.a $(ROOT_DIR)/apps/smart_home_server_linux.c copy_pki_certs copy_idd_files
-	@mkdir -p $@_creds
-	${CC} -o $@ ../../apps/smart_home_server_linux.c libkis-server.a -DOC_SERVER ${CFLAGS} ${LIBS}
+#smart_home_server_linux: libkis-server.a $(ROOT_DIR)/apps/smart_home_server_linux.c copy_pki_certs copy_idd_files
+#	@mkdir -p $@_creds
+#	${CC} -o $@ ../../apps/smart_home_server_linux.c libkis-server.a -DOC_SERVER ${CFLAGS} ${LIBS}
 
-smart_home_server_with_mock_swupdate: libkis-server.a $(ROOT_DIR)/apps/smart_home_server_with_mock_swupdate.cpp
-	@mkdir -p $@_creds
-	# old implemenation with boost
-	#${CXX} -o $@ ../../apps/smart_home_server_with_mock_swupdate.cpp libkis-server.a -DOC_SERVER ${CXXFLAGS} ${LIBS} -lboost_system -lcppnetlib-uri
-	${CXX} -o $@ ../../apps/smart_home_server_with_mock_swupdate.cpp libkis-server.a -DOC_SERVER ${CXXFLAGS} ${LIBS}
+#smart_home_server_with_mock_swupdate: libkis-server.a $(ROOT_DIR)/apps/smart_home_server_with_mock_swupdate.cpp
+#	@mkdir -p $@_creds
+#	# old implemenation with boost
+#	#${CXX} -o $@ ../../apps/smart_home_server_with_mock_swupdate.cpp libkis-server.a -DOC_SERVER ${CXXFLAGS} ${LIBS} -lboost_system -lcppnetlib-uri
+#	${CXX} -o $@ ../../apps/smart_home_server_with_mock_swupdate.cpp libkis-server.a -DOC_SERVER ${CXXFLAGS} ${LIBS}
 
-multi_device_server: libkis-server.a $(ROOT_DIR)/apps/multi_device_server_linux.c
-	@mkdir -p $@_creds
-	${CC} -o $@ ../../apps/multi_device_server_linux.c libkis-server.a -DOC_SERVER ${CFLAGS} ${LIBS}
+#multi_device_server: libkis-server.a $(ROOT_DIR)/apps/multi_device_server_linux.c
+#	@mkdir -p $@_creds
+#	${CC} -o $@ ../../apps/multi_device_server_linux.c libkis-server.a -DOC_SERVER ${CFLAGS} ${LIBS}
 
 #multi_device_client: libkis-client.a $(ROOT_DIR)/apps/multi_device_client_linux.c
 #	@mkdir -p $@_creds
 #	${CC} -o $@ ../../apps/multi_device_client_linux.c libkis-client.a -DOC_CLIENT ${CFLAGS}  ${LIBS}
 
-server_multithread_linux: libkis-server.a $(ROOT_DIR)/apps/server_multithread_linux.c
-	@mkdir -p $@_creds
-	${CC} -o $@ ../../apps/server_multithread_linux.c libkis-server.a -DOC_SERVER ${CFLAGS} ${LIBS}
-
-#client_multithread_linux: libkis-client.a $(ROOT_DIR)/apps/client_multithread_linux.c
+#server_multithread_linux: libkis-server.a $(ROOT_DIR)/apps/server_multithread_linux.c
 #	@mkdir -p $@_creds
-#	${CC} -o $@ ../../apps/client_multithread_linux.c libkis-client.a -DOC_CLIENT ${CFLAGS}  ${LIBS}
+#	${CC} -o $@ ../../apps/server_multithread_linux.c libkis-server.a -DOC_SERVER ${CFLAGS} ${LIBS}
+
+simpleclient_all: libkis-client.a $(ROOT_DIR)/apps/simpleclient_all.c
+	@mkdir -p $@_creds
+	${CC} -o $@ ../../apps/simpleclient_all.c libkis-client.a -DOC_CLIENT ${CFLAGS}  ${LIBS}
 
 kis-server.pc: kis-server.pc.in
 	$(SED) > $@ < $< \
