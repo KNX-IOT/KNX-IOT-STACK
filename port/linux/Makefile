@@ -108,7 +108,7 @@ LIBS?= -lm -pthread -lrt
 #SAMPLES = server client temp_sensor simpleserver simpleserver_pki simpleclient  \
 #	server_block_linux client_block_linux server_certification_tests smart_home_server_linux multi_device_server multi_device_client server_multithread_linux client_multithread_linux #client_certification_tests  secure_mcast_client secure_mcast_server1 secure_mcast_server2
 
-SAMPLES = server  temp_sensor simpleserver simpleserver_pki \
+SAMPLES = server simpleserver simpleserver_pki \
 	server_block_linux smart_home_server_linux multi_device_server  server_multithread_linux client_multithread_linux secure_mcast_server1 secure_mcast_server
 
 ifeq ($(V6DNS),1)
@@ -295,9 +295,9 @@ server: libkis-server.a $(ROOT_DIR)/apps/server_linux.c
 #	@mkdir -p $@_creds
 #	${CC} -o $@ ../../apps/client_certification_tests.c libkis-client-server.a -DOC_CLIENT -DOC_SERVER ${CFLAGS} ${LIBS}
 
-temp_sensor: libkis-client.a $(ROOT_DIR)/apps/temp_sensor_client_linux.c
-	@mkdir -p $@_creds
-	${CC} -o $@ ../../apps/temp_sensor_client_linux.c libkis-client.a -DOC_CLIENT ${CFLAGS} ${LIBS}
+#temp_sensor: libkis-client.a $(ROOT_DIR)/apps/temp_sensor_client_linux.c
+#	@mkdir -p $@_creds
+#	${CC} -o $@ ../../apps/temp_sensor_client_linux.c libkis-client.a -DOC_CLIENT ${CFLAGS} ${LIBS}
 
 simpleserver: libkis-server.a $(ROOT_DIR)/apps/simpleserver.c
 	@mkdir -p $@_creds
