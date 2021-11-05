@@ -405,7 +405,7 @@ post_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
   /* loop over the request document for each required input field to check if
    * all required input fields are present */
   bool var_in_request = false;
-  rep = request->request_payload;
+  //rep = request->request_payload;
   //  while (rep != NULL) {
   //    if (strcmp(oc_string(rep->name),
   //               g_binaryswitch_RESOURCE_PROPERTY_NAME_value) == 0) {
@@ -418,7 +418,7 @@ post_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
     PRINT(" required property: 'value' not in request\n");
   }
   /* loop over the request document to check if all inputs are ok */
-  rep = request->request_payload;
+  //rep = request->request_payload;
 
   /* if the input is ok, then process the input document and assign the global
    * variables */
@@ -480,7 +480,7 @@ post_dpa_352b(oc_request_t *request, oc_interface_mask_t interfaces,
   /* loop over the request document for each required input field to check if
    * all required input fields are present */
   bool var_in_request = false;
-  rep = request->request_payload;
+  //rep = request->request_payload;
   //  while (rep != NULL) {
   //    if (strcmp(oc_string(rep->name),
   //               g_binaryswitch_RESOURCE_PROPERTY_NAME_value) == 0) {
@@ -493,7 +493,7 @@ post_dpa_352b(oc_request_t *request, oc_interface_mask_t interfaces,
     PRINT(" required property: 'value' not in request\n");
   }
   /* loop over the request document to check if all inputs are ok */
-  rep = request->request_payload;
+  //rep = request->request_payload;
 
   /* if the input is ok, then process the input document and assign the global
    * variables */
@@ -555,7 +555,7 @@ post_dpa_353(oc_request_t *request, oc_interface_mask_t interfaces,
   /* loop over the request document for each required input field to check if
    * all required input fields are present */
   bool var_in_request = false;
-  rep = request->request_payload;
+  //rep = request->request_payload;
   //  while (rep != NULL) {
   //    if (strcmp(oc_string(rep->name),
   //               g_binaryswitch_RESOURCE_PROPERTY_NAME_value) == 0) {
@@ -568,7 +568,7 @@ post_dpa_353(oc_request_t *request, oc_interface_mask_t interfaces,
     PRINT(" required property: 'value' not in request\n");
   }
   /* loop over the request document to check if all inputs are ok */
-  rep = request->request_payload;
+  //rep = request->request_payload;
 
   /* if the input is ok, then process the input document and assign the global
    * variables */
