@@ -710,24 +710,11 @@ oc_ri_process_discovery_payload(uint8_t *payload, int len,
 
   //oc_discovery_handler_t handler = client_handler.discovery;
   oc_discovery_all_handler_t all_handler = client_handler.discovery_all;
-  //bool all = false;
-  //if (all_handler) {
-  //  all = true;
-  //}
+
   oc_discovery_flags_t ret = OC_CONTINUE_DISCOVERY;
-  //oc_string_t *uri = NULL;
-  //oc_string_t *anchor = NULL;
-  //oc_string_array_t *types = NULL;
-  //oc_interface_mask_t iface_mask = 0;
+
 
   if (content == APPLICATION_LINK_FORMAT) {
-    //  typedef oc_discovery_flags_t (*oc_discovery_handler_t)(
-    //    const char *, int len, const char *, oc_string_array_t,
-    //    oc_interface_mask_t, oc_endpoint_t *, oc_resource_properties_t, void *);
-    //oc_new_string_array(types, 1); 
-    //oc_string_array_add_item(types, "sss");
-
-
 
     PRINT("calling handler all\n");
     if (all_handler) {
