@@ -127,7 +127,7 @@ STATIC CRITICAL_SECTION cs;   /**< event loop variable */
  * example or the definition.*/
 
 volatile int quit = 0;          /**< stop variable, used by handle_signal */
-STATIC const size_t DEVICE = 0; /**< default device index */
+//STATIC const size_t DEVICE = 0; /**< default device index */
 
 /**
  * function to set up the device.
@@ -188,7 +188,7 @@ app_init(void)
  * @return the error_status, e.g. if error_status is true, then the input
  * document contains something illegal
  */
-STATIC bool
+bool
 check_on_readonly_common_resource_properties(oc_string_t name, bool error_state)
 {
   if (strcmp(oc_string(name), "n") == 0) {
@@ -400,7 +400,7 @@ post_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
   (void)user_data;
   bool error_state = false;
   PRINT("-- Begin post_dpa_352:\n");
-  oc_rep_t *rep = request->request_payload;
+  //oc_rep_t *rep = request->request_payload;
 
   /* loop over the request document for each required input field to check if
    * all required input fields are present */
@@ -426,7 +426,7 @@ post_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
     switch (interfaces) {
     default: {
       /* loop over all the properties in the input document */
-      oc_rep_t *rep = request->request_payload;
+      //oc_rep_t *rep = request->request_payload;
 
       /* set the response */
       PRINT("Set response \n");
@@ -475,7 +475,7 @@ post_dpa_352b(oc_request_t *request, oc_interface_mask_t interfaces,
   (void)user_data;
   bool error_state = false;
   PRINT("-- Begin post_dpa_352b:\n");
-  oc_rep_t *rep = request->request_payload;
+  //oc_rep_t *rep = request->request_payload;
 
   /* loop over the request document for each required input field to check if
    * all required input fields are present */
@@ -501,7 +501,7 @@ post_dpa_352b(oc_request_t *request, oc_interface_mask_t interfaces,
     switch (interfaces) {
     default: {
       /* loop over all the properties in the input document */
-      oc_rep_t *rep = request->request_payload;
+      //oc_rep_t *rep = request->request_payload;
 
       /* set the response */
       PRINT("Set response \n");
@@ -550,7 +550,7 @@ post_dpa_353(oc_request_t *request, oc_interface_mask_t interfaces,
   (void)user_data;
   bool error_state = false;
   PRINT("-- Begin post_dpa_353:\n");
-  oc_rep_t *rep = request->request_payload;
+  //oc_rep_t *rep = request->request_payload;
 
   /* loop over the request document for each required input field to check if
    * all required input fields are present */
@@ -576,7 +576,7 @@ post_dpa_353(oc_request_t *request, oc_interface_mask_t interfaces,
     switch (interfaces) {
     default: {
       /* loop over all the properties in the input document */
-      oc_rep_t *rep = request->request_payload;
+      //oc_rep_t *rep = request->request_payload;
 
       /* set the response */
       PRINT("Set response \n");
@@ -766,14 +766,14 @@ oc_ownership_status_cb(const oc_uuid_t *device_uuid, size_t device_index,
   oc_uuid_to_str(device_uuid, uuid, OC_UUID_LEN);
   PRINT(" oc_ownership_status_cb: DI: '%s'\n", uuid);
 }
-#endif /* OC_SECURITY * /                                                        \
-                                                                               \ \
-/**                                                                              \
- * main application.                                                             \
- * initializes the global variables                                              \
- * registers and starts the handler                                              \
- * handles (in a loop) the next event.                                           \
- * shuts down the stack                                                          \
+#endif /* OC_SECURITY * /                                                        
+                                                                               
+/**                                                                            
+ * main application.                                                           
+ *       * initializes the global variables                                             
+ * registers and starts the handler                                          
+ *       * handles (in a loop) the next event.                                          
+ * shuts down the stack                                                         
  */
 int
 main(void)
