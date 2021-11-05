@@ -245,13 +245,13 @@ get_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
   CborError error;
   error = cbor_encode_boolean(&g_encoder, true);
   if (error) {
-    PRINT("CBOR error %s\n", cbor_error_string(error));
+    //PRINT("CBOR error %s\n", cbor_error_string(error));
     // oc_status_code = true;
   }
   PRINT("CBOR encoder size %d\n", oc_rep_get_encoded_payload_size());
   error = cbor_encode_boolean(&g_encoder, false);
   if (error) {
-    PRINT("CBOR error %s\n", cbor_error_string(error));
+    //PRINT("CBOR error %s\n", cbor_error_string(error));
     // oc_status_code = true;
   }
   PRINT("CBOR encoder size %d\n", oc_rep_get_encoded_payload_size());
@@ -300,13 +300,13 @@ get_dpa_352b(oc_request_t *request, oc_interface_mask_t interfaces,
   CborError error;
   error = cbor_encode_text_stringz(&g_encoder, "blahblah");
   if (error) {
-    PRINT("CBOR error %s\n", cbor_error_string(error));
+    //PRINT("CBOR error %s\n", cbor_error_string(error));
     // oc_status_code = true;
   }
   PRINT("CBOR encoder size %d\n", oc_rep_get_encoded_payload_size());
   error = cbor_encode_text_string(&g_encoder, "xyzxyz", 3);
   if (error) {
-    PRINT("CBOR error %s\n", cbor_error_string(error));
+    //PRINT("CBOR error %s\n", cbor_error_string(error));
     // oc_status_code = true;
   }
   PRINT("CBOR encoder size %d\n", oc_rep_get_encoded_payload_size());
@@ -360,13 +360,13 @@ get_dpa_353(oc_request_t *request, oc_interface_mask_t interfaces,
   CborError error;
   error = cbor_encode_int(&g_encoder, (int64_t)555);
   if (error) {
-    PRINT("CBOR error %s\n", cbor_error_string(error));
+    //PRINT("CBOR error %s\n", cbor_error_string(error));
     // oc_status_code = true;
   }
   PRINT("CBOR encoder size %d\n", oc_rep_get_encoded_payload_size());
   error = cbor_encode_int(&g_encoder, (int64_t)666);
   if (error) {
-    PRINT("CBOR error %s\n", cbor_error_string(error));
+    //PRINT("CBOR error %s\n", cbor_error_string(error));
     // oc_status_code = true;
   }
   PRINT("CBOR encoder size %d\n", oc_rep_get_encoded_payload_size());
