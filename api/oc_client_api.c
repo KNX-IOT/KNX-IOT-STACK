@@ -869,8 +869,6 @@ oc_do_ip_discovery_at_endpoint(const char *rt, oc_discovery_handler_t handler,
   return status;
 }
 
-// -----------------------------------------------------------------------------
-
 bool
 oc_do_wk_discovery(const char *uri_query, oc_discovery_handler_t handler,
                    void *user_data)
@@ -928,6 +926,135 @@ oc_close_session(oc_endpoint_t *endpoint)
 #endif /* OC_TCP */
   }
 }
+
+
+
+// -----------------------------------------------------------------------------
+
+int oc_lf_number_of_entries(const char *payload, int payload_len)
+{
+  int nr_entries = 0;
+  int i;
+  if (payload == NULL) {
+    return nr_entries;
+  }
+  if (payload_len < 5) {
+    return nr_entries;
+  }
+  
+  // multiple lines
+  for (i = 0; i < payload_len; i++) {
+     if (payload[i] == ',') {
+        nr_entries++; 
+     }
+  }
+  if (nr_entries > 0) {
+    // add the last entry, that does not have the continuation character.
+    nr_entries++; 
+  }
+
+
+  if (nr_entries == 0) {
+    // only 1 line
+    if (payload[0] == '<') {
+      nr_entries = 1;
+    }
+  }
+
+  return nr_entries;
+}
+
+
+int
+oc_lf_get_line(const char *payload, int payload_len, int entry, char** line, int* line_len)
+{
+  int nr_entries = 0;
+  int i;
+  if (payload == NULL) {
+    return nr_entries;
+  }
+  if (payload_len < 5) {
+    return nr_entries;
+  }
+
+  int begin_line_index = 0;
+  int end_line_index = 0;
+  bool begin_set = false;
+  bool end_set = false;
+
+  // find begin
+  for (i = 0; i < payload_len - 1; i++) {
+    if (entry == nr_entries) {
+      if (begin_set == false) {
+        begin_line_index = i;
+        begin_set = true;
+      }
+    }
+    if (entry + 1 == nr_entries) {
+      if (end_set == false) {
+        end_line_index = i;
+        end_set = true;
+      }
+    }
+    if (payload[i] == ',') {
+      nr_entries++;
+    }
+  }
+  if (end_line_index == 0) {
+    end_line_index = payload_len - 1;
+  }
+
+  if (payload[begin_line_index] == "\n") {
+    begin_line_index++;
+  }
+  if (payload[end_line_index-1] == ",") {
+    end_line_index--;
+  }
+  int line_tot = end_line_index - begin_line_index;
+  PRINT("  b = %d e = %d t = %d\n", begin_line_index, end_line_index, line_tot);
+
+  *line = &payload[begin_line_index];
+  *line_len = line_tot;
+
+  return 1;
+}
+
+int
+oc_lf_get_entry_uri(const char *payload, int payload_len, int entry,
+                const char** uri, int* uri_len)
+{
+  const char *line = NULL;
+  int line_len = 0;
+  int i;
+  int begin_uri= 0;
+  int end_uri=0;
+
+  oc_lf_get_line(payload, payload_len, entry, &line, &line_len);
+
+  PRINT(" LINE: %.*s\n", line_len, line);
+
+  for (i = 0; i < line_len; i++) {
+    if (line[i] == '<') {
+      begin_uri = i+1;
+    }
+    if (line[i] == '>') {
+      end_uri = i;
+      break;
+    }
+  }
+
+  *uri = &line[begin_uri];
+  *uri_len = end_uri - begin_uri;
+  
+  PRINT(" URI: %.*s\n", *uri_len, *uri);
+
+  return 1;
+}
+
+
+// -----------------------------------------------------------------------------
+
+
 
 #if defined(OC_SECURITY) && defined(OC_PKI)
 oc_role_t *

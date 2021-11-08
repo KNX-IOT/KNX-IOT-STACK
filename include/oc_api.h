@@ -1655,6 +1655,12 @@ bool oc_do_wk_discovery_all(const char *uri_query,
                             oc_discovery_all_handler_t handler,
                             void *user_data);
 
+int oc_lf_number_of_entries(const char *payload, int payload_len);
+
+int oc_lf_get_entry_uri(const char *payload, int payload_len, int entry,
+                        const char **uri, int *uri_len);
+
+
 /**
  * Discover all servers that have a resource type using the site-local scope
  *
