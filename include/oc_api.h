@@ -1709,8 +1709,12 @@ int oc_lf_get_entry_uri(const char *payload, int payload_len, int entry,
 int oc_lf_get_entry_param(const char *payload, int payload_len, int entry,
                           const char *param, const char **p_out, int *p_len);
 
+bool oc_do_get(const char *uri, oc_endpoint_t *endpoint, const char *query,
+               oc_response_handler_t handler, oc_qos_t qos, void *user_data);
+
 /**
- * Issue a GET request to obtain the current value of all properties a resource
+ * @brief Issue a GET request to obtain the current value of all properties a
+ * resource
  *
  * Example:
  * ```
@@ -1736,8 +1740,10 @@ int oc_lf_get_entry_param(const char *payload, int payload_len, int entry,
  * }
  * //the server uri and server endpoint obtained from oc_discovery_handler_t
  * // as a result of an oc_do_ip_discovery call
- * oc_do_get(server_uri, server_ep, NULL, &get_switch, LOW_QOS, NULL);
+ * oc_do_get_ex(server_uri, server_ep, NULL, &get_switch, LOW_QOS,
+ *   APPLICATION_CBOR, APPLICATION_CBOR, NULL);
  * ```
+ *
  * @param[in] uri the uri of the resource
  * @param[in] endpoint the endpoint of the server
  * @param[in] query a query parameter that will be sent to the server's
@@ -1745,14 +1751,13 @@ int oc_lf_get_entry_param(const char *payload, int payload_len, int entry,
  * @param[in] handler function invoked once the client has received the servers
  *                    response to the GET request
  * @param[in] qos the quality of service current options are HIGH_QOS or LOW_QOS
+ * @param content The content format of the request payload
+ * @param accept  The content format of the response payload
  * @param[in] user_data context pointer that will be sent to the
  *                      oc_response_handler_t
  *
  * @return True if the client successfully dispatched the CoAP GET request
  */
-bool oc_do_get(const char *uri, oc_endpoint_t *endpoint, const char *query,
-               oc_response_handler_t handler, oc_qos_t qos, void *user_data);
-
 bool oc_do_get_ex(const char *uri, oc_endpoint_t *endpoint, const char *query,
                   oc_response_handler_t handler, oc_qos_t qos,
                   oc_content_format_t content, oc_content_format_t accept,
@@ -1798,7 +1803,7 @@ bool oc_do_delete(const char *uri, oc_endpoint_t *endpoint, const char *query,
  *   oc_rep_start_root_object();
  *   oc_rep_set_boolean(root, value, true);
  *   oc_rep_end_root_object();
- *   if (oc_do_put())
+ *   if (oc_do_put(APPLICATION_CBOR, APPLICATION_CBOR))
  *     printf("Sent PUT request\n");
  *   else
  *     printf("Could not send PUT request\n");
@@ -1817,23 +1822,24 @@ bool oc_do_delete(const char *uri, oc_endpoint_t *endpoint, const char *query,
  *
  * @return True if the client successfully prepared the CoAP PUT request
  *
- * @see oc_do_put
+ * @see oc_do_put_ex
  * @see oc_init_post
  */
 bool oc_init_put(const char *uri, oc_endpoint_t *endpoint, const char *query,
                  oc_response_handler_t handler, oc_qos_t qos, void *user_data);
 
+bool oc_do_put(void);
+
 /**
- * Dispatch the CoAP PUT request
+ * @brief Dispatch the CoAP PUT request
  *
- * Before the PUT request is dispatched it must be initialized using oc_init_put
- *
- * @return True if the client successfully dispatched the CoAP request
+ * @param content The content format of the request payload
+ * @param accept  The content format of the response payload
+ * @return true if the client successfully dispatched the CoAP request
+ * @return false
  *
  * @see oc_init_put
  */
-bool oc_do_put(void);
-
 bool oc_do_put_ex(oc_content_format_t content, oc_content_format_t accept);
 
 /**
@@ -1858,7 +1864,7 @@ bool oc_do_put_ex(oc_content_format_t content, oc_content_format_t accept);
  *   oc_rep_start_root_object();
  *   oc_rep_set_boolean(root, value, true);
  *   oc_rep_end_root_object();
- *   if (oc_do_put())
+ *   if (oc_do_put(APPLICATION_CBOR, APPLICATION_CBOR))
  *     printf("Sent POST request\n");
  *   else
  *     printf("Could not send POST request\n");
@@ -1883,18 +1889,18 @@ bool oc_do_put_ex(oc_content_format_t content, oc_content_format_t accept);
 bool oc_init_post(const char *uri, oc_endpoint_t *endpoint, const char *query,
                   oc_response_handler_t handler, oc_qos_t qos, void *user_data);
 
+bool oc_do_post(void);
+
 /**
- * Dispatch the CoAP POST request
+ * @brief  Dispatch the CoAP POST request
  *
- * Before the POST request is dispatched it must be initialized using
- * oc_init_put
- *
- * @return True if the client successfully dispatched the CoAP POST request
+ * @param content The content format of the request payload
+ * @param accept  The content format of the response payload
+ * @return true if the client successfully dispatched the CoAP POST request
+ * @return false
  *
  * @see oc_init_post
  */
-bool oc_do_post(void);
-
 bool oc_do_post_ex(oc_content_format_t content, oc_content_format_t accept);
 
 /**
@@ -1932,56 +1938,6 @@ bool oc_do_observe(const char *uri, oc_endpoint_t *endpoint, const char *query,
  *         request
  */
 bool oc_stop_observe(const char *uri, oc_endpoint_t *endpoint);
-
-/**
- * invoke multicast discovery of devices
- *
- * @param[in] uri the uri for multicast command to be used
- * @param[in] query the query of the multicast command
- * @param[in] handler function invoked once the client has received the servers
- *                     response to the discovery request
- * @param[in] user_data context pointer that will be sent to the
- *                      oc_response_handler_t
- *
- * @return True if the client successfully dispatched the multicast discovery
- *         request
- */
-bool oc_do_ip_multicast(const char *uri, const char *query,
-                        oc_response_handler_t handler, void *user_data);
-
-/**
- * invoke multicast discovery of devices on IPV6 realm local scope
- *
- * @param[in] uri the uri for multicast command to be used
- * @param[in] query the query of the multicast command
- * @param[in] handler function invoked once the client has received the servers
- *                     response to the discovery request
- * @param[in] user_data context pointer that will be sent to the
- *                      oc_response_handler_t
- *
- * @return True if the client successfully dispatched the multicast discovery
- *         request
- */
-bool oc_do_realm_local_ipv6_multicast(const char *uri, const char *query,
-                                      oc_response_handler_t handler,
-                                      void *user_data);
-
-/**
- * invoke multicast discovery of devices on IPV6 site local scope
- *
- * @param[in] uri the uri for multicast command to be used
- * @param[in] query the query of the multicast command
- * @param[in] handler function invoked once the client has received the servers
- *                     response to the discovery request
- * @param[in] user_data context pointer that will be sent to the
- *                      oc_response_handler_t
- *
- * @return True if the client successfully dispatched the multicast discovery
- *         request
- */
-bool oc_do_site_local_ipv6_multicast(const char *uri, const char *query,
-                                     oc_response_handler_t handler,
-                                     void *user_data);
 
 /**
  * stop the multicast update (e.g. do not handle the responses)
