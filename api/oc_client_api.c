@@ -966,7 +966,7 @@ int oc_lf_number_of_entries(const char *payload, int payload_len)
 
 
 int
-oc_lf_get_line(const char *payload, int payload_len, int entry, char** line, int* line_len)
+oc_lf_get_line(const char *payload, int payload_len, int entry, const char** line, int* line_len)
 {
   int nr_entries = 0;
   int i;
@@ -1001,17 +1001,17 @@ oc_lf_get_line(const char *payload, int payload_len, int entry, char** line, int
     }
   }
   if (end_line_index == 0) {
-    end_line_index = payload_len - 1;
+    end_line_index = payload_len;
   }
 
-  if (payload[begin_line_index] == "\n") {
+  if (payload[begin_line_index] == '\n') {
     begin_line_index++;
   }
-  if (payload[end_line_index-1] == ",") {
+  // remove the trailing comma, if it exists.
+  if (payload[end_line_index-1] == ',') {
     end_line_index--;
   }
   int line_tot = end_line_index - begin_line_index;
-  //PRINT("  b = %d e = %d t = %d\n", begin_line_index, end_line_index, line_tot);
 
   *line = &payload[begin_line_index];
   *line_len = line_tot;
@@ -1045,8 +1045,6 @@ oc_lf_get_entry_uri(const char *payload, int payload_len, int entry,
 
   *uri = &line[begin_uri];
   *uri_len = end_uri - begin_uri;
-  
-  //PRINT(" URI: %.*s\n", *uri_len, *uri);
 
   return 1;
 }
@@ -1066,7 +1064,7 @@ oc_lf_get_entry_param(const char *payload, int payload_len, int entry, const cha
 
   oc_lf_get_line(payload, payload_len, entry, &line, &line_len);
 
-  // <coap://[fe80::8d4c:632a:c5e7:ae09]:60054/p/a>;rt="urn:knx:dpa.352.51";if=if.a;ct=60,
+  // <coap://[fe80::8d4c:632a:c5e7:ae09]:60054/p/a>;rt="urn:knx:dpa.352.51";if=if.a;ct=60
   // 
   int param_len = strlen(param);
   for (i = 0; i < line_len-param_len - 1; i++) {
@@ -1086,7 +1084,7 @@ oc_lf_get_entry_param(const char *payload, int payload_len, int entry, const cha
       }
     }
     if (end_param == 0) {
-      end_param = line_len - 1;
+      end_param = line_len;
     }
 
     *p_out = &line[begin_param];
