@@ -1709,12 +1709,12 @@ int oc_lf_get_entry_uri(const char *payload, int payload_len, int entry,
 int oc_lf_get_entry_param(const char *payload, int payload_len, int entry,
                           const char *param, const char **p_out, int *p_len);
 
-
 bool oc_do_get(const char *uri, oc_endpoint_t *endpoint, const char *query,
                oc_response_handler_t handler, oc_qos_t qos, void *user_data);
 
 /**
- * @brief Issue a GET request to obtain the current value of all properties a resource
+ * @brief Issue a GET request to obtain the current value of all properties a
+ * resource
  *
  * Example:
  * ```
@@ -1740,10 +1740,10 @@ bool oc_do_get(const char *uri, oc_endpoint_t *endpoint, const char *query,
  * }
  * //the server uri and server endpoint obtained from oc_discovery_handler_t
  * // as a result of an oc_do_ip_discovery call
- * oc_do_get_ex(server_uri, server_ep, NULL, &get_switch, LOW_QOS, 
+ * oc_do_get_ex(server_uri, server_ep, NULL, &get_switch, LOW_QOS,
  *   APPLICATION_CBOR, APPLICATION_CBOR, NULL);
  * ```
- * 
+ *
  * @param[in] uri the uri of the resource
  * @param[in] endpoint the endpoint of the server
  * @param[in] query a query parameter that will be sent to the server's
@@ -1752,7 +1752,7 @@ bool oc_do_get(const char *uri, oc_endpoint_t *endpoint, const char *query,
  *                    response to the GET request
  * @param[in] qos the quality of service current options are HIGH_QOS or LOW_QOS
  * @param content The content format of the request payload
- * @param accept  The content format of the response payload 
+ * @param accept  The content format of the response payload
  * @param[in] user_data context pointer that will be sent to the
  *                      oc_response_handler_t
  *
@@ -1828,18 +1828,16 @@ bool oc_do_delete(const char *uri, oc_endpoint_t *endpoint, const char *query,
 bool oc_init_put(const char *uri, oc_endpoint_t *endpoint, const char *query,
                  oc_response_handler_t handler, oc_qos_t qos, void *user_data);
 
-
-
 bool oc_do_put(void);
 
 /**
  * @brief Dispatch the CoAP PUT request
- * 
+ *
  * @param content The content format of the request payload
- * @param accept  The content format of the response payload 
+ * @param accept  The content format of the response payload
  * @return true if the client successfully dispatched the CoAP request
- * @return false 
- * 
+ * @return false
+ *
  * @see oc_init_put
  */
 bool oc_do_put_ex(oc_content_format_t content, oc_content_format_t accept);
@@ -1891,17 +1889,16 @@ bool oc_do_put_ex(oc_content_format_t content, oc_content_format_t accept);
 bool oc_init_post(const char *uri, oc_endpoint_t *endpoint, const char *query,
                   oc_response_handler_t handler, oc_qos_t qos, void *user_data);
 
-
 bool oc_do_post(void);
 
 /**
  * @brief  Dispatch the CoAP POST request
- * 
+ *
  * @param content The content format of the request payload
- * @param accept  The content format of the response payload 
+ * @param accept  The content format of the response payload
  * @return true if the client successfully dispatched the CoAP POST request
- * @return false 
- * 
+ * @return false
+ *
  * @see oc_init_post
  */
 bool oc_do_post_ex(oc_content_format_t content, oc_content_format_t accept);
