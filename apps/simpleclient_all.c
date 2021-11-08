@@ -52,8 +52,9 @@ static int
 app_init(void)
 {
   int ret = oc_init_platform("Cascoda", NULL, NULL);
-  ret |= oc_add_device("/oic/d", "oic.d.phone", "Control Application",
-                       "ocf.1.0.0", "ocf.res.1.0.0", NULL, NULL);
+
+  ret |= ock_add_device("my-client", "1.0", "//", "012347", NULL, NULL);
+
   return ret;
 }
 
@@ -90,10 +91,11 @@ get_dev_pm(oc_client_response_t *data)
 
     cbor_encode_boolean(&g_encoder, true);
 
-    if (oc_do_put_ex(APPLICATION_CBOR, APPLICATION_CBOR))
+    if (oc_do_put_ex(APPLICATION_CBOR, APPLICATION_CBOR)) {
       PRINT("  Sent PUT request\n");
-    else
+    } else {
       PRINT("  Could not send PUT request\n");
+    }
   }
 }
 
