@@ -63,18 +63,38 @@ void
 put_dev_pm(oc_client_response_t *data)
 {
   PRINT("put_dev_pm:\n");
-  PRINT(" content format %d\n", data->content_format);
+  PRINT("  content format %d\n", data->content_format);
+
+  oc_rep_t *rep = data->payload;
+
+  if ((rep != NULL) && (rep->type == OC_REP_BOOL)) {
+    PRINT("  put_dev_pm received : %d\n", rep->value.boolean);
+  }
 }
 
 void
 get_dev_pm(oc_client_response_t *data)
 {
   PRINT("get_dev_pm:\n");
-  PRINT("\nGET_DEV:\n");
 
-  PRINT(" content format %d\n", data->content_format);
+  PRINT("  content format %d\n", data->content_format);
 
-  PRINT("%.*s\n", (int)data->_payload_len, data->_payload);
+  oc_rep_t *rep = data->payload;
+
+  if ((rep != NULL) && (rep->type == OC_REP_BOOL)) {
+    PRINT("  get_dev_pm received : %d\n", rep->value.boolean);
+  }
+
+  if (oc_init_put("/dev/pm", data->endpoint, NULL, &put_dev_pm, HIGH_QOS,
+                  NULL)) {
+
+    cbor_encode_boolean(&g_encoder, true);
+
+    if (oc_do_put_ex(APPLICATION_CBOR, APPLICATION_CBOR))
+      PRINT("  Sent PUT request\n");
+    else
+      PRINT("  Could not send PUT request\n");
+  }
 }
 
 void
@@ -82,11 +102,9 @@ get_dev(oc_client_response_t *data)
 {
   PRINT("\nGET_DEV:\n");
 
-  PRINT(" content format %d\n", data->content_format);
+  PRINT("  content format %d\n", data->content_format);
 
   PRINT("%.*s\n", (int)data->_payload_len, data->_payload);
-
-  // data->endpoint
 
   oc_do_get_ex("/dev/pm", data->endpoint, NULL, &get_dev_pm, HIGH_QOS,
                APPLICATION_CBOR, APPLICATION_CBOR, NULL);

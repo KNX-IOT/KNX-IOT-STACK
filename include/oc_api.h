@@ -1834,6 +1834,8 @@ bool oc_init_put(const char *uri, oc_endpoint_t *endpoint, const char *query,
  */
 bool oc_do_put(void);
 
+bool oc_do_put_ex(oc_content_format_t content, oc_content_format_t accept);
+
 /**
  * Prepare the stack to issue a POST request
  *
@@ -1892,6 +1894,8 @@ bool oc_init_post(const char *uri, oc_endpoint_t *endpoint, const char *query,
  * @see oc_init_post
  */
 bool oc_do_post(void);
+
+bool oc_do_post_ex(oc_content_format_t content, oc_content_format_t accept);
 
 /**
  * Dispatch a GET request with the CoAP Observe option to subscribe for
