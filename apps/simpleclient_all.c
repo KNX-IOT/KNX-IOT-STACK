@@ -226,7 +226,6 @@ discovery(const char *payload, int len, oc_endpoint_t *endpoint,
   const char *param;
   int param_len;
 
-
   PRINT(" DISCOVERY:\n");
   PRINT("%.*s\n", len, payload);
 
