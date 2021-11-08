@@ -59,6 +59,31 @@ app_init(void)
 
 static oc_endpoint_t *the_server;
 
+
+
+void
+put_dev_pm(oc_client_response_t *data)
+{
+  PRINT("put_dev_pm:\n");
+
+
+
+}
+
+
+void
+get_dev_pm(oc_client_response_t *data)
+{
+  PRINT("get_dev_pm:\n");
+  PRINT("\nGET_DEV:\n");
+
+  PRINT(" content format %d\n", data->content_format);
+
+  PRINT("%.*s\n", (int)data->_payload_len, data->_payload);
+}
+
+
+
 void
 get_dev(oc_client_response_t *data)
 {
@@ -67,6 +92,12 @@ get_dev(oc_client_response_t *data)
   PRINT(" content format %d\n", data->content_format);
 
   PRINT("%.*s\n", (int)data->_payload_len, data->_payload);
+
+  //data->endpoint
+
+  
+  oc_do_get_ex("/dev/pm", data->endpoint, NULL, &get_dev_pm, HIGH_QOS,
+               APPLICATION_CBOR, APPLICATION_CBOR, NULL);
 
 }
 
@@ -108,6 +139,9 @@ discovery(const char *payload, int len, oc_endpoint_t *endpoint,
 
    oc_do_get_ex("/dev", endpoint, NULL, &get_dev, HIGH_QOS,
                APPLICATION_LINK_FORMAT, APPLICATION_LINK_FORMAT, NULL);
+
+
+
 
 
   PRINT(" DISCOVERY- END\n");

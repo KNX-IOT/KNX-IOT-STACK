@@ -113,11 +113,11 @@ target_sources(kis-common INTERFACE
     ${PROJECT_SOURCE_DIR}/security/oc_csr.c
     ${PROJECT_SOURCE_DIR}/security/oc_doxm.c
     ${PROJECT_SOURCE_DIR}/security/oc_keypair.c
-    ${PROJECT_SOURCE_DIR}/security/oc_obt.c
+    #${PROJECT_SOURCE_DIR}/security/oc_obt.c
     ${PROJECT_SOURCE_DIR}/security/oc_obt_certs.c
-    ${PROJECT_SOURCE_DIR}/security/oc_obt_otm_cert.c
-    ${PROJECT_SOURCE_DIR}/security/oc_obt_otm_justworks.c
-    ${PROJECT_SOURCE_DIR}/security/oc_obt_otm_randompin.c
+    #${PROJECT_SOURCE_DIR}/security/oc_obt_otm_cert.c
+    #${PROJECT_SOURCE_DIR}/security/oc_obt_otm_justworks.c
+    #${PROJECT_SOURCE_DIR}/security/oc_obt_otm_randompin.c
     ${PROJECT_SOURCE_DIR}/security/oc_pki.c
     ${PROJECT_SOURCE_DIR}/security/oc_pstat.c
     ${PROJECT_SOURCE_DIR}/security/oc_roles.c
