@@ -690,7 +690,7 @@ discover_owned_devices(uint8_t scope, oc_obt_discovery_cb_t cb, void *data)
   }
   c->cb = cb;
   c->data = data;
-
+/*
   if (scope == 0x02) {
     if (oc_do_ip_multicast("/oic/res", "rt=oic.r.doxm", &get_endpoints, c)) {
       oc_list_add(oc_discovery_cbs, c);
@@ -712,7 +712,7 @@ discover_owned_devices(uint8_t scope, oc_obt_discovery_cb_t cb, void *data)
       return 0;
     }
   }
-
+*/
   oc_memb_free(&oc_discovery_s, c);
   return -1;
 }
