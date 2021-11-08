@@ -44,12 +44,13 @@ protected:
 
 TEST_F(TestLinkFormat, LF_)
 {
-  const char input[] = "<coap://[fe80::8d4c:632a:c5e7:ae09]:60054/p/a>;rt="urn:knx:dpa.352.51";if=if.a;ct=60, \
+  const char payload[] = "<coap://[fe80::8d4c:632a:c5e7:ae09]:60054/p/a>;rt="urn:knx:dpa.352.51";if=if.a;ct=60, \
   <coap://[fe80::8d4c:632a:c5e7:ae09]:60054/p/b>;rt="urn:knx:dpa.352.52";if=if.s;ct=60, \
 <coap://[fe80::8d4c:632a:c5e7:ae09]:60054/p/c>;rt="urn:knx:dpa.353.52";if=if.s;ct=60, \
 <coap://[fe80::8d4c:632a:c5e7:ae09]:60054/dev>;rt="urn:knx:fb.0";ct=40,\
 <coap://[fe80::8d4c:632a:c5e7:ae09]:60054/swu>;rt="urn:knx:fbswu";ct=40";
-
+  int len = strlen(payload);
+  
   int nr_entries = oc_lf_number_of_entries(payload, len);
   
   const char* uri;
