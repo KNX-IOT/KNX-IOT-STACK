@@ -1011,7 +1011,7 @@ oc_lf_get_line(const char *payload, int payload_len, int entry, char** line, int
     end_line_index--;
   }
   int line_tot = end_line_index - begin_line_index;
-  PRINT("  b = %d e = %d t = %d\n", begin_line_index, end_line_index, line_tot);
+  //PRINT("  b = %d e = %d t = %d\n", begin_line_index, end_line_index, line_tot);
 
   *line = &payload[begin_line_index];
   *line_len = line_tot;
@@ -1046,10 +1046,60 @@ oc_lf_get_entry_uri(const char *payload, int payload_len, int entry,
   *uri = &line[begin_uri];
   *uri_len = end_uri - begin_uri;
   
-  PRINT(" URI: %.*s\n", *uri_len, *uri);
+  //PRINT(" URI: %.*s\n", *uri_len, *uri);
 
   return 1;
 }
+
+
+
+int
+oc_lf_get_entry_param(const char *payload, int payload_len, int entry, const char* param,
+                    const char **p_out, int *p_len)
+{
+  const char *line = NULL;
+  int line_len = 0;
+  int i;
+  int begin_param = 0;
+  int end_param = 0;
+  int found = 0;
+
+  oc_lf_get_line(payload, payload_len, entry, &line, &line_len);
+
+  // <coap://[fe80::8d4c:632a:c5e7:ae09]:60054/p/a>;rt="urn:knx:dpa.352.51";if=if.a;ct=60,
+  // 
+  int param_len = strlen(param);
+  for (i = 0; i < line_len-param_len - 1; i++) {
+    if (line[i] == ';') {
+      if (strncmp(&line[i + 1], param, param_len) == 0) {
+        begin_param = i + 1;
+        found = 1;
+        break;
+      }
+    }
+  }
+  if (found == 1) {
+    for (i = begin_param + 1; i < line_len - 1; i++) {
+      if (line[i] == ';') {
+        end_param = i;
+        break;
+      }
+    }
+    if (end_param == 0) {
+      end_param = line_len - 1;
+    }
+
+    *p_out = &line[begin_param];
+    *p_len = end_param - begin_param;
+
+  } else {
+    *p_out = line;
+    *p_len = line_len;
+  }
+
+  return found;
+}
+
 
 
 // -----------------------------------------------------------------------------
