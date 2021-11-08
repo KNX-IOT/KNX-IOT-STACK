@@ -164,8 +164,9 @@ public:
   }
   static bool discoverResource(std::string &errorMessage)
   {
-    s_isCallbackReceived = false;
-    oc_do_ip_discovery(NULL, &onResourceDiscovered, NULL);
+    //s_isCallbackReceived = false;
+	s_isCallbackReceived = true;
+    //oc_do_ip_discovery(NULL, &onResourceDiscovered, NULL);
     waitForEvent(MAX_WAIT_TIME);
     if (!s_isCallbackReceived) {
       errorMessage += "Unable to discover Light Resource";
