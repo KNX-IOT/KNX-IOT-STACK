@@ -80,11 +80,10 @@ get_dev_pm(oc_client_response_t *data)
   PRINT("  content format %d\n", data->content_format);
 
   oc_rep_t *rep = data->payload;
-  
+
   if ((rep != NULL) && (rep->type == OC_REP_BOOL)) {
     PRINT("  get_dev_pm received : %d\n", rep->value.boolean);
   }
-
 
   if (oc_init_put("/dev/pm", data->endpoint, NULL, &put_dev_pm, HIGH_QOS,
                   NULL)) {

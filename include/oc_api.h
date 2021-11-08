@@ -1895,7 +1895,6 @@ bool oc_init_post(const char *uri, oc_endpoint_t *endpoint, const char *query,
  */
 bool oc_do_post(void);
 
-
 bool oc_do_post_ex(oc_content_format_t content, oc_content_format_t accept);
 
 /**
