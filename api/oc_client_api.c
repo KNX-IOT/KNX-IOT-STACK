@@ -335,7 +335,7 @@ oc_do_delete(const char *uri, oc_endpoint_t *endpoint, const char *query,
 
   if (status)
     status =
-      dispatch_coap_request(APPLICATION_VND_OCF_CBOR, APPLICATION_VND_OCF_CBOR);
+      dispatch_coap_request(APPLICATION_CBOR, APPLICATION_CBOR);
 
   return status;
 }
