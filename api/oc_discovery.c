@@ -661,8 +661,8 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   //                      request, device_index, &response_length, matches);
 
   request->response->response_buffer->content_format = APPLICATION_LINK_FORMAT;
-  // if (matches > 0 && response_length > 0) {
-  if (response_length > 0) {
+
+  if (matches > 0 && response_length > 0) {
     request->response->response_buffer->response_length = response_length;
     request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
   } else if (request->origin && (request->origin->flags & MULTICAST) == 0) {

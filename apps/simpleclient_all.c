@@ -221,11 +221,35 @@ discovery(const char *payload, int len, oc_endpoint_t *endpoint,
   //(void)anchor;
   (void)user_data;
   (void)endpoint;
+  const char *uri;
+  int uri_len;
+  const char *param;
+  int param_len;
 
   PRINT(" DISCOVERY:\n");
   PRINT("%.*s\n", len, payload);
-  PRINT(" DISCOVERY- END\n");
 
+  int nr_entries = oc_lf_number_of_entries(payload, len);
+  PRINT(" entries %d\n", nr_entries);
+
+  for (int i = 0; i < nr_entries; i++) {
+
+    // oc_lf_get_entry(payload, len, i, uri);
+    oc_lf_get_entry_uri(payload, len, i, &uri, &uri_len);
+
+    PRINT(" DISCOVERY URL %.*s\n", uri_len, uri);
+
+    oc_lf_get_entry_param(payload, len, i, "rt", &param, &param_len);
+    PRINT(" DISCOVERY RT %.*s\n", param_len, param);
+
+    oc_lf_get_entry_param(payload, len, i, "if", &param, &param_len);
+    PRINT(" DISCOVERY IF %.*s\n", param_len, param);
+
+    oc_lf_get_entry_param(payload, len, i, "ct", &param, &param_len);
+    PRINT(" DISCOVERY CT %.*s\n", param_len, param);
+  }
+
+  PRINT(" DISCOVERY- END\n");
   return OC_STOP_DISCOVERY;
 }
 
