@@ -52,23 +52,19 @@ static int
 app_init(void)
 {
   int ret = oc_init_platform("Cascoda", NULL, NULL);
-  ret |= oc_add_device("/oic/d", "oic.d.phone", "Control Application", "ocf.1.0.0",
-                       "ocf.res.1.0.0", NULL, NULL);
+  ret |= oc_add_device("/oic/d", "oic.d.phone", "Control Application",
+                       "ocf.1.0.0", "ocf.res.1.0.0", NULL, NULL);
   return ret;
 }
 
 static oc_endpoint_t *the_server;
-
-
 
 void
 put_dev_pm(oc_client_response_t *data)
 {
   PRINT("put_dev_pm:\n");
   PRINT(" content format %d\n", data->content_format);
-
 }
-
 
 void
 get_dev_pm(oc_client_response_t *data)
@@ -81,8 +77,6 @@ get_dev_pm(oc_client_response_t *data)
   PRINT("%.*s\n", (int)data->_payload_len, data->_payload);
 }
 
-
-
 void
 get_dev(oc_client_response_t *data)
 {
@@ -92,12 +86,10 @@ get_dev(oc_client_response_t *data)
 
   PRINT("%.*s\n", (int)data->_payload_len, data->_payload);
 
-  //data->endpoint
+  // data->endpoint
 
-  
   oc_do_get_ex("/dev/pm", data->endpoint, NULL, &get_dev_pm, HIGH_QOS,
                APPLICATION_CBOR, APPLICATION_CBOR, NULL);
-
 }
 
 static oc_discovery_flags_t
@@ -124,7 +116,7 @@ discovery(const char *payload, int len, oc_endpoint_t *endpoint,
 
     PRINT(" DISCOVERY URL %.*s\n", uri_len, uri);
 
-    //oc_string_to_endpoint()
+    // oc_string_to_endpoint()
 
     oc_lf_get_entry_param(payload, len, i, "rt", &param, &param_len);
     PRINT(" DISCOVERY RT %.*s\n", param_len, param);
@@ -136,12 +128,8 @@ discovery(const char *payload, int len, oc_endpoint_t *endpoint,
     PRINT(" DISCOVERY CT %.*s\n", param_len, param);
   }
 
-   oc_do_get_ex("/dev", endpoint, NULL, &get_dev, HIGH_QOS,
+  oc_do_get_ex("/dev", endpoint, NULL, &get_dev, HIGH_QOS,
                APPLICATION_LINK_FORMAT, APPLICATION_LINK_FORMAT, NULL);
-
-
-
-
 
   PRINT(" DISCOVERY- END\n");
   return OC_STOP_DISCOVERY;
@@ -270,7 +258,7 @@ main(void)
 #endif
 
   oc_free_server_endpoints(the_server);
-  //oc_free_string(&name);
+  // oc_free_string(&name);
   oc_main_shutdown();
   return 0;
 }

@@ -307,19 +307,18 @@ int oc_conv_hex_string_to_byte_array(const char *hex_str, size_t hex_str_len,
 
 /**
  * @brief checks if the uri contains a wildcard (e.g. "*")
- * 
+ *
  * @param uri The URI to be checked.
- * @return true 
- * @return false 
+ * @return true
+ * @return false
  */
 bool oc_uri_contains_wildcard(const char *uri);
 
-
 /**
  * @brief retrieve the wildcard value as integer
- * The invoked URI is checked against teh URI of a resource 
+ * The invoked URI is checked against teh URI of a resource
  * that might contain a wild card, if the resource URI contains a wild card
- * then the invoked URI is compared against this URI and 
+ * then the invoked URI is compared against this URI and
  * e.g.  resource URI: / abc / *
  * invoked URI: / abc / 1
  * return will be 1.
@@ -327,8 +326,8 @@ bool oc_uri_contains_wildcard(const char *uri);
  * @param uri_len The lenght of the URI with wild card
  * @param uri_invoked The URI that should match a wild card
  * @param invoked_len The URI length of the invoked URI
- * @return int -1 is error, otherwise the value is the integer value which is used as 
- *      value for the wild card.
+ * @return int -1 is error, otherwise the value is the integer value which is
+ * used as value for the wild card.
  */
 int oc_uri_get_wildcard_value_as_int(const char *uri_resource, size_t uri_len,
                                      const char *uri_invoked,

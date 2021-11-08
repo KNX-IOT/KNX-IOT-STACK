@@ -1651,7 +1651,7 @@ int oc_notify_observers(oc_resource_t *resource);
 extern "C" {
 #endif
 
- /**
+/**
  * Discover all servers that have a resource type using the site-local scope
  *
  * The discovery request will make a muli-cast request to the IPv6 ``scope``
@@ -1669,14 +1669,13 @@ extern "C" {
  *
  * @return true on success
  */
-bool oc_do_wk_discovery_all(const char *uri_query,
-                            int scope,
+bool oc_do_wk_discovery_all(const char *uri_query, int scope,
                             oc_discovery_all_handler_t handler,
                             void *user_data);
 
 /**
  * @brief link format parser, retrieve the number of entries in a response
- * 
+ *
  * @param payload The link-format response
  * @param payload_len The length of the response
  * @return int amount of entries
@@ -1685,7 +1684,7 @@ int oc_lf_number_of_entries(const char *payload, int payload_len);
 
 /**
  * @brief link format parser, retrieve the URL of an entry.
- * 
+ *
  * @param payload The link-format response
  * @param payload_len The length of the response
  * @param entry The index of entries, starting with 0.
@@ -1698,12 +1697,12 @@ int oc_lf_get_entry_uri(const char *payload, int payload_len, int entry,
 
 /**
  * @brief link format parser, retrieve a parameter value
- * 
+ *
  * @param payload The link-format response
  * @param payload_len The length of the response
  * @param entry The index of entries, starting with 0.
  * @param param The query parameter, e.g. "rt"
- * @param p_out The pointer to store the value, e.g. "blah" 
+ * @param p_out The pointer to store the value, e.g. "blah"
  * @param p_len The length of the URI
  * @return int 1 success full
  */
@@ -1754,11 +1753,10 @@ int oc_lf_get_entry_param(const char *payload, int payload_len, int entry,
 bool oc_do_get(const char *uri, oc_endpoint_t *endpoint, const char *query,
                oc_response_handler_t handler, oc_qos_t qos, void *user_data);
 
-
 bool oc_do_get_ex(const char *uri, oc_endpoint_t *endpoint, const char *query,
                   oc_response_handler_t handler, oc_qos_t qos,
-                  oc_content_format_t content,
-                  oc_content_format_t accept, void *user_data);
+                  oc_content_format_t content, oc_content_format_t accept,
+                  void *user_data);
 
 /**
  * Issue a DELETE request to delete a resource

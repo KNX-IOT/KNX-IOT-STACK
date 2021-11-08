@@ -343,7 +343,8 @@ oc_do_delete(const char *uri, oc_endpoint_t *endpoint, const char *query,
 bool
 oc_do_delete_ex(const char *uri, oc_endpoint_t *endpoint, const char *query,
                 oc_response_handler_t handler, oc_qos_t qos,
-                oc_content_format_t content, oc_content_format_t accept, void *user_data)
+                oc_content_format_t content, oc_content_format_t accept,
+                void *user_data)
 {
   oc_client_handler_t client_handler;
   client_handler.response = handler;
@@ -393,10 +394,9 @@ oc_do_get(const char *uri, oc_endpoint_t *endpoint, const char *query,
           oc_response_handler_t handler, oc_qos_t qos, void *user_data)
 {
   return oc_do_get_ex(uri, endpoint, query, handler, qos,
-                      APPLICATION_VND_OCF_CBOR,
-                      APPLICATION_VND_OCF_CBOR, user_data);
+                      APPLICATION_VND_OCF_CBOR, APPLICATION_VND_OCF_CBOR,
+                      user_data);
 }
-
 
 bool
 oc_init_put(const char *uri, oc_endpoint_t *endpoint, const char *query,
@@ -436,7 +436,6 @@ oc_do_put(void)
                                APPLICATION_VND_OCF_CBOR);
 }
 
-
 bool
 oc_do_put_ex(oc_content_format_t content, oc_content_format_t accept)
 {
@@ -449,7 +448,6 @@ oc_do_post(void)
   return dispatch_coap_request(APPLICATION_VND_OCF_CBOR,
                                APPLICATION_VND_OCF_CBOR);
 }
-
 
 bool
 oc_do_post_ex(oc_content_format_t content, oc_content_format_t accept)
@@ -553,7 +551,6 @@ oc_stop_multicast(oc_client_response_t *response)
   cb->stop_multicast_receive = true;
 }
 
-
 static bool
 dispatch_ip_discovery_ex(oc_client_cb_t *cb4, const char *uri,
                          const char *query, oc_client_handler_t handler,
@@ -575,7 +572,8 @@ dispatch_ip_discovery_ex(oc_client_cb_t *cb4, const char *uri,
       memcpy(cb->token, cb4->token, cb4->token_len);
     }
 
-    if (prepare_coap_request_ex(cb, accept) && dispatch_coap_request(content, accept)) {
+    if (prepare_coap_request_ex(cb, accept) &&
+        dispatch_coap_request(content, accept)) {
       goto exit;
     }
 
@@ -618,7 +616,6 @@ multi_scope_ipv6_discovery_wk(oc_client_cb_t *cb4, uint8_t scope,
                                   &mcast, APPLICATION_LINK_FORMAT,
                                   APPLICATION_LINK_FORMAT, user_data);
 }
-
 
 bool
 oc_do_wk_discovery(const char *uri_query, oc_discovery_handler_t handler,

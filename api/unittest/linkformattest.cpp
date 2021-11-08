@@ -41,19 +41,20 @@ protected:
   }
 };
 
-
-int check_string(const char* input1, const char* input2, int input2_len){
+int
+check_string(const char *input1, const char *input2, int input2_len)
+{
   oc_string_t compare;
-  
-  oc_new_string(&compare,input2, input2_len);
-  
-  EXPECT_STREQ(input1, oc_string(compare)) << input1 << "  " << oc_string(compare);
-  
+
+  oc_new_string(&compare, input2, input2_len);
+
+  EXPECT_STREQ(input1, oc_string(compare))
+    << input1 << "  " << oc_string(compare);
+
   oc_free_string(&compare);
 
   return 0;
 }
-
 
 TEST_F(TestLinkFormat, LF_full)
 {
@@ -78,77 +79,71 @@ TEST_F(TestLinkFormat, LF_full)
   int i = 0;
   oc_lf_get_entry_uri(payload, len, i, &uri, &uri_len);
   check_string("coap://[fe80::8d4c:632a:c5e7:ae09]:60054/p/a", uri, uri_len);
-  
+
   oc_lf_get_entry_param(payload, len, i, "rt", &param, &param_len);
   check_string("\"urn:knx:dpa.352.51\"", param, param_len);
-  
+
   oc_lf_get_entry_param(payload, len, i, "if", &param, &param_len);
   check_string("if.a", param, param_len);
-  
+
   oc_lf_get_entry_param(payload, len, i, "ct", &param, &param_len);
   check_string("60", param, param_len);
-  
-  
+
   i = 1;
   oc_lf_get_entry_uri(payload, len, i, &uri, &uri_len);
   check_string("coap://[fe80::8d4c:632a:c5e7:ae09]:60054/p/b", uri, uri_len);
-  
+
   oc_lf_get_entry_param(payload, len, i, "rt", &param, &param_len);
   check_string("\"urn:knx:dpa.352.52\"", param, param_len);
-  
+
   oc_lf_get_entry_param(payload, len, i, "if", &param, &param_len);
   check_string("if.s", param, param_len);
-  
+
   oc_lf_get_entry_param(payload, len, i, "ct", &param, &param_len);
   check_string("60", param, param_len);
-  
-  
+
   i = 2;
   oc_lf_get_entry_uri(payload, len, i, &uri, &uri_len);
   check_string("coap://[fe80::8d4c:632a:c5e7:ae09]:60054/p/c", uri, uri_len);
-  
+
   oc_lf_get_entry_param(payload, len, i, "rt", &param, &param_len);
   check_string("\"urn:knx:dpa.353.52\"", param, param_len);
-  
+
   oc_lf_get_entry_param(payload, len, i, "if", &param, &param_len);
   check_string("if.s", param, param_len);
-  
+
   oc_lf_get_entry_param(payload, len, i, "ct", &param, &param_len);
   check_string("60", param, param_len);
-  
-  
+
   i = 3;
   oc_lf_get_entry_uri(payload, len, i, &uri, &uri_len);
   check_string("coap://[fe80::8d4c:632a:c5e7:ae09]:60054/dev", uri, uri_len);
-  
+
   oc_lf_get_entry_param(payload, len, i, "rt", &param, &param_len);
   check_string("\"urn:knx:fb.0\"", param, param_len);
-  
+
   int retval = oc_lf_get_entry_param(payload, len, i, "if", &param, &param_len);
   EXPECT_EQ(0, retval);
-  //check_string("if.s", param, param_len);
-  
+  // check_string("if.s", param, param_len);
+
   oc_lf_get_entry_param(payload, len, i, "ct", &param, &param_len);
   check_string("40", param, param_len);
-  
-  
+
   i = 4;
   oc_lf_get_entry_uri(payload, len, i, &uri, &uri_len);
   check_string("coap://[fe80::8d4c:632a:c5e7:ae09]:60054/swu", uri, uri_len);
-  
+
   oc_lf_get_entry_param(payload, len, i, "rt", &param, &param_len);
   check_string("\"urn:knx:fbswu\"", param, param_len);
-  
+
   retval = oc_lf_get_entry_param(payload, len, i, "if", &param, &param_len);
   EXPECT_EQ(0, retval);
-  
-  //check_string("if.s", param, param_len);
-  
+
+  // check_string("if.s", param, param_len);
+
   oc_lf_get_entry_param(payload, len, i, "ct", &param, &param_len);
   check_string("40", param, param_len);
-  
 }
-
 
 TEST_F(TestLinkFormat, LF_zero)
 {
@@ -166,4 +161,3 @@ TEST_F(TestLinkFormat, LF_zero)
   nr_entries = oc_lf_number_of_entries(payload, 0);
   EXPECT_EQ(0, nr_entries);
 }
-
