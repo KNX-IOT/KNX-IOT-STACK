@@ -927,11 +927,10 @@ oc_close_session(oc_endpoint_t *endpoint)
   }
 }
 
-
-
 // -----------------------------------------------------------------------------
 
-int oc_lf_number_of_entries(const char *payload, int payload_len)
+int
+oc_lf_number_of_entries(const char *payload, int payload_len)
 {
   int nr_entries = 0;
   int i;
@@ -941,18 +940,17 @@ int oc_lf_number_of_entries(const char *payload, int payload_len)
   if (payload_len < 5) {
     return nr_entries;
   }
-  
+
   // multiple lines
   for (i = 0; i < payload_len; i++) {
-     if (payload[i] == ',') {
-        nr_entries++; 
-     }
+    if (payload[i] == ',') {
+      nr_entries++;
+    }
   }
   if (nr_entries > 0) {
     // add the last entry, that does not have the continuation character.
-    nr_entries++; 
+    nr_entries++;
   }
-
 
   if (nr_entries == 0) {
     // only 1 line
@@ -964,9 +962,9 @@ int oc_lf_number_of_entries(const char *payload, int payload_len)
   return nr_entries;
 }
 
-
 int
-oc_lf_get_line(const char *payload, int payload_len, int entry, const char** line, int* line_len)
+oc_lf_get_line(const char *payload, int payload_len, int entry,
+               const char **line, int *line_len)
 {
   int nr_entries = 0;
   int i;
@@ -1008,7 +1006,7 @@ oc_lf_get_line(const char *payload, int payload_len, int entry, const char** lin
     begin_line_index++;
   }
   // remove the trailing comma, if it exists.
-  if (payload[end_line_index-1] == ',') {
+  if (payload[end_line_index - 1] == ',') {
     end_line_index--;
   }
   int line_tot = end_line_index - begin_line_index;
@@ -1021,13 +1019,13 @@ oc_lf_get_line(const char *payload, int payload_len, int entry, const char** lin
 
 int
 oc_lf_get_entry_uri(const char *payload, int payload_len, int entry,
-                const char** uri, int* uri_len)
+                    const char **uri, int *uri_len)
 {
   const char *line = NULL;
   int line_len = 0;
   int i;
-  int begin_uri= 0;
-  int end_uri=0;
+  int begin_uri = 0;
+  int end_uri = 0;
 
   oc_lf_get_line(payload, payload_len, entry, &line, &line_len);
 
@@ -1035,7 +1033,7 @@ oc_lf_get_entry_uri(const char *payload, int payload_len, int entry,
 
   for (i = 0; i < line_len; i++) {
     if (line[i] == '<') {
-      begin_uri = i+1;
+      begin_uri = i + 1;
     }
     if (line[i] == '>') {
       end_uri = i;
@@ -1050,8 +1048,8 @@ oc_lf_get_entry_uri(const char *payload, int payload_len, int entry,
 }
 
 int
-oc_lf_get_entry_param(const char *payload, int payload_len, int entry, const char* param,
-                    const char **p_out, int *p_len)
+oc_lf_get_entry_param(const char *payload, int payload_len, int entry,
+                      const char *param, const char **p_out, int *p_len)
 {
   const char *line = NULL;
   int line_len = 0;
@@ -1063,7 +1061,7 @@ oc_lf_get_entry_param(const char *payload, int payload_len, int entry, const cha
   oc_lf_get_line(payload, payload_len, entry, &line, &line_len);
 
   // <coap://[fe80::8d4c:632a:c5e7:ae09]:60054/p/a>;rt="urn:knx:dpa.352.51";if=if.a;ct=60
-  // 
+  //
   int param_len = strlen(param);
   for (i = 0; i < line_len - param_len - 1; i++) {
     if (line[i] == ';') {
@@ -1097,11 +1095,7 @@ oc_lf_get_entry_param(const char *payload, int payload_len, int entry, const cha
   return found;
 }
 
-
-
 // -----------------------------------------------------------------------------
-
-
 
 #if defined(OC_SECURITY) && defined(OC_PKI)
 oc_role_t *

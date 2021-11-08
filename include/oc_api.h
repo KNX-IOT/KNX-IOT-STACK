@@ -1661,7 +1661,7 @@ int oc_lf_get_entry_uri(const char *payload, int payload_len, int entry,
                         const char **uri, int *uri_len);
 
 int oc_lf_get_entry_param(const char *payload, int payload_len, int entry,
-                          const char* param, const char **p_out, int *p_len);
+                          const char *param, const char **p_out, int *p_len);
 
 /**
  * Discover all servers that have a resource type using the site-local scope
