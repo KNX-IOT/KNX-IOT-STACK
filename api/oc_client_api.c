@@ -42,7 +42,7 @@ oc_message_t *multicast_update = NULL;
 oc_event_callback_retval_t oc_ri_remove_client_cb(void *data);
 
 static bool
-dispatch_coap_request(oc_content_format_t content)
+dispatch_coap_request(oc_content_format_t content, oc_content_format_t accept)
 {
   int payload_size = oc_rep_get_encoded_payload_size();
 
@@ -80,6 +80,7 @@ dispatch_coap_request(oc_content_format_t content)
   if (payload_size > 0) {
     coap_set_header_content_format(request, content);
   }
+  coap_set_header_accept(request, accept);
 
   bool success = false;
   transaction->message->length =
@@ -333,7 +334,8 @@ oc_do_delete(const char *uri, oc_endpoint_t *endpoint, const char *query,
   status = prepare_coap_request(cb);
 
   if (status)
-    status = dispatch_coap_request(APPLICATION_VND_OCF_CBOR);
+    status =
+      dispatch_coap_request(APPLICATION_VND_OCF_CBOR, APPLICATION_VND_OCF_CBOR);
 
   return status;
 }
@@ -341,7 +343,7 @@ oc_do_delete(const char *uri, oc_endpoint_t *endpoint, const char *query,
 bool
 oc_do_delete_ex(const char *uri, oc_endpoint_t *endpoint, const char *query,
                 oc_response_handler_t handler, oc_qos_t qos,
-                oc_content_format_t content, void *user_data)
+                oc_content_format_t content, oc_content_format_t accept, void *user_data)
 {
   oc_client_handler_t client_handler;
   client_handler.response = handler;
@@ -357,7 +359,7 @@ oc_do_delete_ex(const char *uri, oc_endpoint_t *endpoint, const char *query,
   status = prepare_coap_request(cb);
 
   if (status)
-    status = dispatch_coap_request(content);
+    status = dispatch_coap_request(content, accept);
 
   return status;
 }
@@ -365,7 +367,8 @@ oc_do_delete_ex(const char *uri, oc_endpoint_t *endpoint, const char *query,
 bool
 oc_do_get_ex(const char *uri, oc_endpoint_t *endpoint, const char *query,
              oc_response_handler_t handler, oc_qos_t qos,
-             oc_content_format_t content, void *user_data)
+             oc_content_format_t content, oc_content_format_t accept,
+             void *user_data)
 {
   oc_client_handler_t client_handler;
   client_handler.response = handler;
@@ -380,7 +383,7 @@ oc_do_get_ex(const char *uri, oc_endpoint_t *endpoint, const char *query,
   status = prepare_coap_request(cb);
 
   if (status)
-    status = dispatch_coap_request(content);
+    status = dispatch_coap_request(content, accept);
 
   return status;
 }
@@ -390,8 +393,10 @@ oc_do_get(const char *uri, oc_endpoint_t *endpoint, const char *query,
           oc_response_handler_t handler, oc_qos_t qos, void *user_data)
 {
   return oc_do_get_ex(uri, endpoint, query, handler, qos,
+                      APPLICATION_VND_OCF_CBOR,
                       APPLICATION_VND_OCF_CBOR, user_data);
 }
+
 
 bool
 oc_init_put(const char *uri, oc_endpoint_t *endpoint, const char *query,
@@ -427,13 +432,29 @@ oc_init_post(const char *uri, oc_endpoint_t *endpoint, const char *query,
 bool
 oc_do_put(void)
 {
-  return dispatch_coap_request(APPLICATION_VND_OCF_CBOR);
+  return dispatch_coap_request(APPLICATION_VND_OCF_CBOR,
+                               APPLICATION_VND_OCF_CBOR);
+}
+
+
+bool
+oc_do_put_ex(oc_content_format_t content, oc_content_format_t accept)
+{
+  return dispatch_coap_request(content, accept);
 }
 
 bool
 oc_do_post(void)
 {
-  return dispatch_coap_request(APPLICATION_VND_OCF_CBOR);
+  return dispatch_coap_request(APPLICATION_VND_OCF_CBOR,
+                               APPLICATION_VND_OCF_CBOR);
+}
+
+
+bool
+oc_do_post_ex(oc_content_format_t content, oc_content_format_t accept)
+{
+  return dispatch_coap_request(content, accept);
 }
 
 bool
@@ -455,7 +476,8 @@ oc_do_observe(const char *uri, oc_endpoint_t *endpoint, const char *query,
   status = prepare_coap_request(cb);
 
   if (status)
-    status = dispatch_coap_request(APPLICATION_VND_OCF_CBOR);
+    status =
+      dispatch_coap_request(APPLICATION_VND_OCF_CBOR, APPLICATION_VND_OCF_CBOR);
 
   return status;
 }
@@ -476,7 +498,8 @@ oc_stop_observe(const char *uri, oc_endpoint_t *endpoint)
   status = prepare_coap_request(cb);
 
   if (status)
-    status = dispatch_coap_request(APPLICATION_VND_OCF_CBOR);
+    status =
+      dispatch_coap_request(APPLICATION_VND_OCF_CBOR, APPLICATION_VND_OCF_CBOR);
 
   return status;
 }
@@ -552,7 +575,7 @@ dispatch_ip_discovery_ex(oc_client_cb_t *cb4, const char *uri,
       memcpy(cb->token, cb4->token, cb4->token_len);
     }
 
-    if (prepare_coap_request_ex(cb, accept) && dispatch_coap_request(content)) {
+    if (prepare_coap_request_ex(cb, accept) && dispatch_coap_request(content, accept)) {
       goto exit;
     }
 

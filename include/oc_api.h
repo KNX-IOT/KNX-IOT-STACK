@@ -1678,19 +1678,19 @@ bool oc_do_wk_discovery_all(const char *uri_query,
  * @brief link format parser, retrieve the number of entries in a response
  * 
  * @param payload The link-format response
- * @param payload_len The lenght of the response
+ * @param payload_len The length of the response
  * @return int amount of entries
  */
 int oc_lf_number_of_entries(const char *payload, int payload_len);
 
 /**
- * @brief link format parser, retrieve the url of an entry.
+ * @brief link format parser, retrieve the URL of an entry.
  * 
  * @param payload The link-format response
- * @param payload_len The lenght of the response
+ * @param payload_len The length of the response
  * @param entry The index of entries, starting with 0.
  * @param uri The pointer to store the URI
- * @param uri_len the length of the URI
+ * @param uri_len The length of the URI
  * @return int 1 success full
  */
 int oc_lf_get_entry_uri(const char *payload, int payload_len, int entry,
@@ -1700,11 +1700,11 @@ int oc_lf_get_entry_uri(const char *payload, int payload_len, int entry,
  * @brief link format parser, retrieve a parameter value
  * 
  * @param payload The link-format response
- * @param payload_len The lenght of the response
+ * @param payload_len The length of the response
  * @param entry The index of entries, starting with 0.
- * @param param the query parameter, e.g. "rt"
+ * @param param The query parameter, e.g. "rt"
  * @param p_out The pointer to store the value, e.g. "blah" 
- * @param p_len the length of the URI
+ * @param p_len The length of the URI
  * @return int 1 success full
  */
 int oc_lf_get_entry_param(const char *payload, int payload_len, int entry,
@@ -1754,10 +1754,16 @@ int oc_lf_get_entry_param(const char *payload, int payload_len, int entry,
 bool oc_do_get(const char *uri, oc_endpoint_t *endpoint, const char *query,
                oc_response_handler_t handler, oc_qos_t qos, void *user_data);
 
+
+bool oc_do_get_ex(const char *uri, oc_endpoint_t *endpoint, const char *query,
+                  oc_response_handler_t handler, oc_qos_t qos,
+                  oc_content_format_t content,
+                  oc_content_format_t accept, void *user_data);
+
 /**
  * Issue a DELETE request to delete a resource
  *
- * @param[in] uri the uri of the resource
+ * @param[in] uri The uri of the resource
  * @param[in] endpoint the endpoint of the server
  * @param[in] query a query parameter that will be sent to the server's
  *                  oc_request_callback_t.
