@@ -522,57 +522,6 @@ oc_send_ping(bool custody, oc_endpoint_t *endpoint, uint16_t timeout_seconds,
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-#ifdef OC_IPV4
-static oc_client_cb_t *
-oc_do_ipv4_discovery(const char *query, oc_client_handler_t handler,
-                     void *user_data)
-{
-  oc_make_ipv4_endpoint(mcast4, IPV4 | DISCOVERY, 5683, 0xe0, 0x00, 0x01, 0xbb);
-
-  oc_client_cb_t *cb = oc_ri_alloc_client_cb("/oic/res", &mcast4, OC_GET, query,
-                                             handler, LOW_QOS, user_data);
-
-  if (cb) {
-    cb->discovery = true;
-    if (prepare_coap_request(cb)) {
-      dispatch_coap_request(APPLICATION_VND_OCF_CBOR);
-    }
-  }
-
-  return cb;
-}
-
-static oc_client_cb_t *
-oc_do_ipv4_multicast(const char *uri, const char *query,
-                     oc_response_handler_t handler, void *user_data)
-{
-  oc_client_handler_t client_handler;
-  client_handler.response = handler;
-
-  oc_make_ipv4_endpoint(mcast4, IPV4 | DISCOVERY, 5683, 0xe0, 0x00, 0x01, 0xbb);
-
-  oc_client_cb_t *cb = oc_ri_alloc_client_cb(
-    uri, &mcast4, OC_GET, query, client_handler, LOW_QOS, user_data);
-
-  if (!cb) {
-    return NULL;
-  }
-
-  cb->multicast = true;
-
-  bool status = prepare_coap_request(cb);
-
-  if (status) {
-    status = dispatch_coap_request(APPLICATION_VND_OCF_CBOR);
-  }
-
-  if (status) {
-    return cb;
-  }
-
-  return NULL;
-}
-#endif /* OC_IPV4 */
 
 void
 oc_stop_multicast(oc_client_response_t *response)
@@ -581,77 +530,6 @@ oc_stop_multicast(oc_client_response_t *response)
   cb->stop_multicast_receive = true;
 }
 
-static bool
-multi_scope_ipv6_multicast(oc_client_cb_t *cb4, uint8_t scope, const char *uri,
-                           const char *query, oc_response_handler_t handler,
-                           void *user_data)
-{
-  if (!uri || !handler) {
-    return false;
-  }
-
-  oc_make_ipv6_endpoint(mcast, IPV6 | DISCOVERY, 5683, 0xff, scope, 0, 0, 0, 0,
-                        0, 0, 0, 0, 0, 0, 0, 0, 0x01, 0x58);
-  mcast.addr.ipv6.scope = 0;
-
-  oc_client_handler_t client_handler;
-  client_handler.response = handler;
-
-  oc_client_cb_t *cb = oc_ri_alloc_client_cb(
-    uri, &mcast, OC_GET, query, client_handler, LOW_QOS, user_data);
-
-  if (cb) {
-    if (cb4) {
-      cb->mid = cb4->mid;
-      memcpy(cb->token, cb4->token, cb4->token_len);
-    }
-    cb->multicast = true;
-    if (prepare_coap_request(cb) &&
-        dispatch_coap_request(APPLICATION_VND_OCF_CBOR)) {
-      return true;
-    }
-
-    if (transaction) {
-      coap_clear_transaction(transaction);
-      transaction = NULL;
-    }
-    oc_ri_remove_client_cb(cb);
-    client_cb = NULL;
-  }
-  return false;
-}
-
-bool
-oc_do_realm_local_ipv6_multicast(const char *uri, const char *query,
-                                 oc_response_handler_t handler, void *user_data)
-{
-  if (multi_scope_ipv6_multicast(NULL, 0x03, uri, query, handler, user_data)) {
-    return true;
-  }
-  return false;
-}
-
-bool
-oc_do_site_local_ipv6_multicast(const char *uri, const char *query,
-                                oc_response_handler_t handler, void *user_data)
-{
-  if (multi_scope_ipv6_multicast(NULL, 0x05, uri, query, handler, user_data)) {
-    return true;
-  }
-  return false;
-}
-
-bool
-oc_do_ip_multicast(const char *uri, const char *query,
-                   oc_response_handler_t handler, void *user_data)
-{
-  oc_client_cb_t *cb4 = NULL;
-#ifdef OC_IPV4
-  cb4 = oc_do_ipv4_multicast(uri, query, handler, user_data);
-#endif /* OC_IPV4 */
-
-  return multi_scope_ipv6_multicast(cb4, 0x02, uri, query, handler, user_data);
-}
 
 static bool
 dispatch_ip_discovery_ex(oc_client_cb_t *cb4, const char *uri,
@@ -664,8 +542,6 @@ dispatch_ip_discovery_ex(oc_client_cb_t *cb4, const char *uri,
     return false;
   }
 
-  //  oc_client_cb_t *cb = oc_ri_alloc_client_cb(
-  //    "/oic/res", endpoint, OC_GET, query, handler, LOW_QOS, user_data);
   oc_client_cb_t *cb = oc_ri_alloc_client_cb(uri, endpoint, OC_GET, query,
                                              handler, LOW_QOS, user_data);
 
@@ -696,36 +572,11 @@ exit:
 }
 
 static bool
-dispatch_ip_discovery(oc_client_cb_t *cb4, const char *uri, const char *query,
-                      oc_client_handler_t handler, oc_endpoint_t *endpoint,
-                      void *user_data)
-{
-  return dispatch_ip_discovery_ex(cb4, uri, query, handler, endpoint,
-                                  APPLICATION_VND_OCF_CBOR,
-                                  APPLICATION_VND_OCF_CBOR, user_data);
-}
-
-static bool
-multi_scope_ipv6_discovery(oc_client_cb_t *cb4, uint8_t scope,
-                           const char *query, oc_client_handler_t handler,
-                           void *user_data)
-{
-  oc_make_ipv6_endpoint(mcast, IPV6 | DISCOVERY, 5683, 0xff, scope, 0, 0, 0, 0,
-                        0, 0, 0, 0, 0, 0, 0, 0, 0x01, 0x58);
-  mcast.addr.ipv6.scope = 0;
-  return dispatch_ip_discovery(cb4, "oic/res", query, handler, &mcast,
-                               user_data);
-}
-
-static bool
 multi_scope_ipv6_discovery_wk(oc_client_cb_t *cb4, uint8_t scope,
                               const char *query, oc_client_handler_t handler,
                               void *user_data)
 {
   // ALL_COAP_NODES_IPV6_SITE = "FF05::FD"
-  // oc_make_ipv6_endpoint(mcast, IPV6 | DISCOVERY, 5683, 0xff, scope, 0, 0, 0,
-  // 0,
-  //                       0, 0, 0, 0, 0, 0, 0, 0, 0x01, 0x58);
   PRINT("  multi_scope_ipv6_discovery_wk: %d\n", scope);
 
   oc_make_ipv6_endpoint(mcast, IPV6 | DISCOVERY, 5683, 0xff, scope, 0, 0, 0, 0,
@@ -745,129 +596,6 @@ multi_scope_ipv6_discovery_wk(oc_client_cb_t *cb4, uint8_t scope,
                                   APPLICATION_LINK_FORMAT, user_data);
 }
 
-bool
-oc_do_site_local_ipv6_discovery_all(oc_discovery_all_handler_t handler,
-                                    void *user_data)
-{
-  oc_client_handler_t handlers;
-  handlers.discovery_all = handler;
-  handlers.discovery = NULL;
-  return multi_scope_ipv6_discovery(NULL, 0x05, NULL, handlers, user_data);
-}
-
-bool
-oc_do_site_local_ipv6_discovery(const char *rt, oc_discovery_handler_t handler,
-                                void *user_data)
-{
-  oc_client_handler_t handlers;
-  handlers.discovery = handler;
-  handlers.discovery_all = NULL;
-  oc_string_t uri_query;
-  memset(&uri_query, 0, sizeof(oc_string_t));
-  if (rt && strlen(rt) > 0) {
-    oc_concat_strings(&uri_query, "rt=", rt);
-  }
-  bool status = multi_scope_ipv6_discovery(NULL, 0x05, oc_string(uri_query),
-                                           handlers, user_data);
-  oc_free_string(&uri_query);
-
-  return status;
-}
-
-bool
-oc_do_realm_local_ipv6_discovery_all(oc_discovery_all_handler_t handler,
-                                     void *user_data)
-{
-  oc_client_handler_t handlers;
-  handlers.discovery_all = handler;
-  handlers.discovery = NULL;
-  return multi_scope_ipv6_discovery(NULL, 0x03, NULL, handlers, user_data);
-}
-
-bool
-oc_do_realm_local_ipv6_discovery(const char *rt, oc_discovery_handler_t handler,
-                                 void *user_data)
-{
-  oc_client_handler_t handlers;
-  handlers.discovery = handler;
-  handlers.discovery_all = NULL;
-  oc_string_t uri_query;
-  memset(&uri_query, 0, sizeof(oc_string_t));
-  if (rt && strlen(rt) > 0) {
-    oc_concat_strings(&uri_query, "rt=", rt);
-  }
-  bool status = multi_scope_ipv6_discovery(NULL, 0x03, oc_string(uri_query),
-                                           handlers, user_data);
-  oc_free_string(&uri_query);
-
-  return status;
-}
-
-bool
-oc_do_ip_discovery(const char *rt, oc_discovery_handler_t handler,
-                   void *user_data)
-{
-  oc_client_handler_t handlers;
-  handlers.discovery = handler;
-  handlers.discovery_all = NULL;
-  oc_string_t uri_query;
-  memset(&uri_query, 0, sizeof(oc_string_t));
-  if (rt && strlen(rt) > 0) {
-    oc_concat_strings(&uri_query, "rt=", rt);
-  }
-  oc_client_cb_t *cb4 = NULL;
-#ifdef OC_IPV4
-  cb4 = oc_do_ipv4_discovery(oc_string(uri_query), handlers, user_data);
-#endif
-  bool status = multi_scope_ipv6_discovery(cb4, 0x02, oc_string(uri_query),
-                                           handlers, user_data);
-  oc_free_string(&uri_query);
-
-  return status;
-}
-
-bool
-oc_do_ip_discovery_all(oc_discovery_all_handler_t handler, void *user_data)
-{
-  oc_client_cb_t *cb4 = NULL;
-  oc_client_handler_t handlers;
-  handlers.discovery_all = handler;
-  handlers.discovery = NULL;
-#ifdef OC_IPV4
-  cb4 = oc_do_ipv4_discovery(NULL, handlers, user_data);
-#endif
-  return multi_scope_ipv6_discovery(cb4, 0x02, NULL, handlers, user_data);
-}
-
-bool
-oc_do_ip_discovery_all_at_endpoint(oc_discovery_all_handler_t handler,
-                                   oc_endpoint_t *endpoint, void *user_data)
-{
-  oc_client_handler_t handlers;
-  handlers.discovery_all = handler;
-  handlers.discovery = NULL;
-  return dispatch_ip_discovery(NULL, "oic/res", NULL, handlers, endpoint,
-                               user_data);
-}
-
-bool
-oc_do_ip_discovery_at_endpoint(const char *rt, oc_discovery_handler_t handler,
-                               oc_endpoint_t *endpoint, void *user_data)
-{
-  oc_client_handler_t handlers;
-  handlers.discovery = handler;
-  handlers.discovery_all = NULL;
-  oc_string_t uri_query;
-  memset(&uri_query, 0, sizeof(oc_string_t));
-  if (rt && strlen(rt) > 0) {
-    oc_concat_strings(&uri_query, "rt=", rt);
-  }
-  bool status = dispatch_ip_discovery(NULL, "oic/res", oc_string(uri_query),
-                                      handlers, endpoint, user_data);
-  oc_free_string(&uri_query);
-
-  return status;
-}
 
 bool
 oc_do_wk_discovery(const char *uri_query, oc_discovery_handler_t handler,
@@ -891,7 +619,7 @@ oc_do_wk_discovery(const char *uri_query, oc_discovery_handler_t handler,
 }
 
 bool
-oc_do_wk_discovery_all(const char *uri_query,
+oc_do_wk_discovery_all(const char *uri_query, int scope,
                        oc_discovery_all_handler_t handler, void *user_data)
 {
   oc_client_handler_t handlers;
@@ -899,14 +627,9 @@ oc_do_wk_discovery_all(const char *uri_query,
   handlers.discovery_all = handler;
 
   oc_client_cb_t *cb4 = NULL;
-  // bool status = multi_scope_ipv6_discovery_wk(cb4, 0x02, uri_query,
-  //                                         handlers, user_data);
 
-  //  bool status =
-  //    multi_scope_ipv6_discovery_wk(cb4, 0x05, uri_query, handlers,
-  //    user_data);
   bool status =
-    multi_scope_ipv6_discovery_wk(cb4, 0x02, uri_query, handlers, user_data);
+    multi_scope_ipv6_discovery_wk(cb4, scope, uri_query, handlers, user_data);
 
   return status;
 }

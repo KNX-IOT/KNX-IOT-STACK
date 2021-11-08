@@ -208,12 +208,6 @@ get_light(oc_client_response_t *data)
     PRINT("Could not init PUT request\n");
 }
 
-// static oc_discovery_flags_t
-// discovery(const char *payload, int len, const char *uri, oc_string_array_t
-// types,
-//          oc_interface_mask_t iface_mask, oc_endpoint_t *endpoint,
-//          oc_resource_properties_t bm, void *user_data)
-
 static oc_discovery_flags_t
 discovery(const char *payload, int len, oc_endpoint_t *endpoint,
           void *user_data)
@@ -234,7 +228,6 @@ discovery(const char *payload, int len, oc_endpoint_t *endpoint,
 
   for (int i = 0; i < nr_entries; i++) {
 
-    // oc_lf_get_entry(payload, len, i, uri);
     oc_lf_get_entry_uri(payload, len, i, &uri, &uri_len);
 
     PRINT(" DISCOVERY URL %.*s\n", uri_len, uri);
@@ -257,9 +250,8 @@ static void
 issue_requests(void)
 {
   PRINT("Discovering devices:\n");
-  // oc_do_ip_discovery(".well-known/core", &discovery, NULL);
 
-  oc_do_wk_discovery_all("rt=urn:knx:dpa.*", &discovery, NULL);
+  oc_do_wk_discovery_all("rt=urn:knx:dpa.*", 0x2, &discovery, NULL);
 }
 
 #ifdef WIN32
