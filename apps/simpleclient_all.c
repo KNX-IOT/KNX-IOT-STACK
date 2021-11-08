@@ -52,7 +52,7 @@ static int
 app_init(void)
 {
   int ret = oc_init_platform("Cascoda", NULL, NULL);
-  ret |= oc_add_device("/oic/d", "oic.d.phone", "Kishen's IPhone", "ocf.1.0.0",
+  ret |= oc_add_device("/oic/d", "oic.d.phone", "Control Application", "ocf.1.0.0",
                        "ocf.res.1.0.0", NULL, NULL);
   return ret;
 }
@@ -66,7 +66,7 @@ get_dev(oc_client_response_t *data)
 
   PRINT(" content format %d\n", data->content_format);
 
-  PRINT("%.*s\n", data->_payload_len, data->_payload);
+  PRINT("%.*s\n", (int)data->_payload_len, data->_payload);
 
 }
 
