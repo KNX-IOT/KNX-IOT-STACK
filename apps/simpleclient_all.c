@@ -65,8 +65,7 @@ void
 put_dev_pm(oc_client_response_t *data)
 {
   PRINT("put_dev_pm:\n");
-
-
+  PRINT(" content format %d\n", data->content_format);
 
 }
 
