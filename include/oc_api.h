@@ -1651,169 +1651,63 @@ int oc_notify_observers(oc_resource_t *resource);
 extern "C" {
 #endif
 
-bool oc_do_wk_discovery_all(const char *uri_query,
-                            oc_discovery_all_handler_t handler,
-                            void *user_data);
-
-int oc_lf_number_of_entries(const char *payload, int payload_len);
-
-int oc_lf_get_entry_uri(const char *payload, int payload_len, int entry,
-                        const char **uri, int *uri_len);
-
-int oc_lf_get_entry_param(const char *payload, int payload_len, int entry,
-                          const char *param, const char **p_out, int *p_len);
-
 /**
  * Discover all servers that have a resource type using the site-local scope
  *
- * The discovery request will make a muli-cast request to the IPv6 site-local
- * multicast address scope.  The address scope is the domain in which the
+ * The discovery request will make a muli-cast request to the IPv6 ``scope``
+ * multicast address scope. The address scope is the domain in which the
  * multicast discovery packet should be propagated.
  *
  * Read RFC4291 and RFC7346 for more information about IPv6 Reference Scopes.
  *
- * @param[in] rt the resource type the client is trying to discover
- * @param[in] handler the oc_discovery_handler_t that will be called once a
+ * @param[in] uri_query the query to be added the .well-known/core URI.
+ * @param[in] scope  the scope of the request, for example: 0x2
+ * @param[in] handler the oc_discovery_all_handler_t that will be called once a
  *                    server containing the resource type is discovered
  * @param[in] user_data context pointer that is passed to the
  *                      oc_discovery_handler_t.
  *
  * @return true on success
  */
-bool oc_do_site_local_ipv6_discovery(const char *rt,
-                                     oc_discovery_handler_t handler,
-                                     void *user_data);
-
-/**
- * Discover all servers using the realm-local scope
- *
- * The discovery request will make a muli-cast request to the IPv6 site-local
- * multicast address scope.  The address scope is the domain in which the
- * multicast discovery packet should be propagated.
- *
- * Read RFC4291 and RFC7346 for more information about IPv6 Reference Scopes.
- *
- * @param[in] handler the oc_discovery_all_handler_t that will be called once a
- *                    server is discovered
- * @param[in] user_data context pointer that is passed to the
- *                      oc_discovery_all_handler_t.
- *
- * @return true on success
- */
-bool oc_do_site_local_ipv6_discovery_all(oc_discovery_all_handler_t handler,
-                                         void *user_data);
-
-/**
- * Discover all servers that have a resource type using the realm-local scope
- *
- * The discovery request will make a muli-cast request to the IPv6 realm-local
- * multicast address scope.  The address scope is the domain in which the
- * multicast discovery packet should be propagated.
-
- *
- * Read RFC4291 and RFC7346 for more information about IPv6 Reference Scopes.
- *
- * @param[in] rt the resource type the client is trying to discover
- * @param[in] handler the oc_discovery_handler_t that will be called once a
- *                    server containing the resource type is discovered
- * @param[in] user_data context pointer that is passed to the
- *                      oc_discovery_handler_t.
- *
- * @return true on success
- */
-bool oc_do_realm_local_ipv6_discovery(const char *rt,
-                                      oc_discovery_handler_t handler,
-                                      void *user_data);
-
-/**
- * Discover all servers using the realm-local scope
- *
- * The discovery request will make a muli-cast request to the IPv6 realm-local
- * multicast address scope.  The address scope is the domain in which the
- * multicast discovery packet should be propagated.
-
- *
- * Read RFC4291 and RFC7346 for more information about IPv6 Reference Scopes.
- *
- * @param[in] handler the oc_discovery_all_handler_t that will be called once a
- *                    server is discovered
- * @param[in] user_data context pointer that is passed to the
- *                      oc_discovery_all_handler_t.
- *
- * @return true on success
- */
-bool oc_do_realm_local_ipv6_discovery_all(oc_discovery_all_handler_t handler,
-                                          void *user_data);
-
-/**
- * Discover all servers that have a resource type
- *
- * The discovery request will make a muli-cast request to the IPv6 link-local
- * multicast address scope and over IPv4.
- *
- * Multicast discovery over IPv4 will only happen if the stack is built with
- * the OC_IPV4 build flag.
- *
- * Read RFC4291 and RFC7346 for more information about IPv6 Reference Scopes.
- *
- * @param[in] rt the resource type the client is trying to discover
- * @param[in] handler the oc_discovery_handler_t that will be called once a
- *                    server containing the resource type is discovered
- * @param[in] user_data context pointer that is passed to the
- *                      oc_discovery_handler_t.
- *
- * @return true on success
- */
-bool oc_do_ip_discovery(const char *rt, oc_discovery_handler_t handler,
-                        void *user_data);
-
-/**
- * Discover all servers
- *
- * The discovery request will make a muli-cast request to the IPv6 link-local
- * multicast address scope and over IPv4.
- *
- * Multicast discovery over IPv4 will only happen if the stack is built with
- * the OC_IPV4 build flag.
- *
- * Read RFC4291 and RFC7346 for more information about IPv6 Reference Scopes.
- *
- * @param[in] handler the oc_discovery_all_handler_t that will be called once a
- *                    server is discovered
- * @param[in] user_data context pointer that is passed to the
- *                      oc_discovery_all_handler_t.
- *
- * @return true on success
- */
-bool oc_do_ip_discovery_all(oc_discovery_all_handler_t handler,
+bool oc_do_wk_discovery_all(const char *uri_query, int scope,
+                            oc_discovery_all_handler_t handler,
                             void *user_data);
 
 /**
- * Discover resources in a specific endpoint.
+ * @brief link format parser, retrieve the number of entries in a response
  *
- * @param  rt         Resource type query to discover.
- * @param  handler    The callback for discovered resources. Must not be NULL.
- * @param  endpoint   Endpoint at which to discover resources. Must not be NULL.
- * @param  user_data  Callback parameter for user defined value.
- *
- * @return Returns true if it successfully makes and dispatches a coap packet.
+ * @param payload The link-format response
+ * @param payload_len The length of the response
+ * @return int amount of entries
  */
-bool oc_do_ip_discovery_at_endpoint(const char *rt,
-                                    oc_discovery_handler_t handler,
-                                    oc_endpoint_t *endpoint, void *user_data);
+int oc_lf_number_of_entries(const char *payload, int payload_len);
 
 /**
- * Discover all resources in a specific endpoint.
+ * @brief link format parser, retrieve the URL of an entry.
  *
- * @param  handler    The callback for discovered resources. Must not be NULL.
- * @param  endpoint   Endpoint at which to discover resources. Must not be NULL.
- * @param  user_data  Callback parameter for user defined value.
- *
- * @return Returns true if it successfully makes and dispatches a coap packet.
+ * @param payload The link-format response
+ * @param payload_len The length of the response
+ * @param entry The index of entries, starting with 0.
+ * @param uri The pointer to store the URI
+ * @param uri_len The length of the URI
+ * @return int 1 success full
  */
-bool oc_do_ip_discovery_all_at_endpoint(oc_discovery_all_handler_t handler,
-                                        oc_endpoint_t *endpoint,
-                                        void *user_data);
+int oc_lf_get_entry_uri(const char *payload, int payload_len, int entry,
+                        const char **uri, int *uri_len);
+
+/**
+ * @brief link format parser, retrieve a parameter value
+ *
+ * @param payload The link-format response
+ * @param payload_len The length of the response
+ * @param entry The index of entries, starting with 0.
+ * @param param The query parameter, e.g. "rt"
+ * @param p_out The pointer to store the value, e.g. "blah"
+ * @param p_len The length of the URI
+ * @return int 1 success full
+ */
+int oc_lf_get_entry_param(const char *payload, int payload_len, int entry,
+                          const char *param, const char **p_out, int *p_len);
 
 /**
  * Issue a GET request to obtain the current value of all properties a resource
@@ -1859,10 +1753,15 @@ bool oc_do_ip_discovery_all_at_endpoint(oc_discovery_all_handler_t handler,
 bool oc_do_get(const char *uri, oc_endpoint_t *endpoint, const char *query,
                oc_response_handler_t handler, oc_qos_t qos, void *user_data);
 
+bool oc_do_get_ex(const char *uri, oc_endpoint_t *endpoint, const char *query,
+                  oc_response_handler_t handler, oc_qos_t qos,
+                  oc_content_format_t content, oc_content_format_t accept,
+                  void *user_data);
+
 /**
  * Issue a DELETE request to delete a resource
  *
- * @param[in] uri the uri of the resource
+ * @param[in] uri The uri of the resource
  * @param[in] endpoint the endpoint of the server
  * @param[in] query a query parameter that will be sent to the server's
  *                  oc_request_callback_t.

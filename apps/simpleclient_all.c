@@ -51,168 +51,46 @@ volatile int quit = 0; /**< stop variable, used by handle_signal */
 static int
 app_init(void)
 {
-  int ret = oc_init_platform("Apple", NULL, NULL);
-  ret |= oc_add_device("/oic/d", "oic.d.phone", "Kishen's IPhone", "ocf.1.0.0",
-                       "ocf.res.1.0.0", NULL, NULL);
+  int ret = oc_init_platform("Cascoda", NULL, NULL);
+  ret |= oc_add_device("/oic/d", "oic.d.phone", "Control Application",
+                       "ocf.1.0.0", "ocf.res.1.0.0", NULL, NULL);
   return ret;
 }
 
-#define MAX_URI_LENGTH (30)
-static char a_light[MAX_URI_LENGTH];
-static oc_endpoint_t *light_server;
+static oc_endpoint_t *the_server;
 
-static bool state;
-static int power;
-static oc_string_t name;
-
-oc_event_callback_retval_t
-stop_observe(void *data)
+void
+put_dev_pm(oc_client_response_t *data)
 {
-  (void)data;
-  PRINT("Stopping OBSERVE\n");
-  oc_stop_observe(a_light, light_server);
-  return OC_EVENT_DONE;
+  PRINT("put_dev_pm:\n");
+  PRINT(" content format %d\n", data->content_format);
 }
 
 void
-observe_light(oc_client_response_t *data)
+get_dev_pm(oc_client_response_t *data)
 {
-  PRINT("OBSERVE_light:\n");
-  oc_rep_t *rep = data->payload;
-  while (rep != NULL) {
-    PRINT("key %s, value ", oc_string(rep->name));
-    switch (rep->type) {
-    case OC_REP_BOOL:
-      PRINT("%d\n", rep->value.boolean);
-      state = rep->value.boolean;
-      break;
-    case OC_REP_INT:
-      PRINT("%lld\n", rep->value.integer);
-      power = (int)rep->value.integer;
-      break;
-    case OC_REP_STRING:
-      PRINT("%s\n", oc_string(rep->value.string));
-      oc_free_string(&name);
-      oc_new_string(&name, oc_string(rep->value.string),
-                    oc_string_len(rep->value.string));
-      break;
-    default:
-      break;
-    }
-    rep = rep->next;
-  }
+  PRINT("get_dev_pm:\n");
+  PRINT("\nGET_DEV:\n");
+
+  PRINT(" content format %d\n", data->content_format);
+
+  PRINT("%.*s\n", (int)data->_payload_len, data->_payload);
 }
 
 void
-post2_light(oc_client_response_t *data)
+get_dev(oc_client_response_t *data)
 {
-  PRINT("POST2_light:\n");
-  if (data->code == OC_STATUS_CHANGED)
-    PRINT("POST response: CHANGED\n");
-  else if (data->code == OC_STATUS_CREATED)
-    PRINT("POST response: CREATED\n");
-  else
-    PRINT("POST response code %d\n", data->code);
+  PRINT("\nGET_DEV:\n");
 
-  oc_do_observe(a_light, light_server, NULL, &observe_light, LOW_QOS, NULL);
-  oc_set_delayed_callback(NULL, &stop_observe, 30);
-  PRINT("Sent OBSERVE request\n");
+  PRINT(" content format %d\n", data->content_format);
+
+  PRINT("%.*s\n", (int)data->_payload_len, data->_payload);
+
+  // data->endpoint
+
+  oc_do_get_ex("/dev/pm", data->endpoint, NULL, &get_dev_pm, HIGH_QOS,
+               APPLICATION_CBOR, APPLICATION_CBOR, NULL);
 }
-
-void
-post_light(oc_client_response_t *data)
-{
-  PRINT("POST_light:\n");
-  if (data->code == OC_STATUS_CHANGED)
-    PRINT("POST response: CHANGED\n");
-  else if (data->code == OC_STATUS_CREATED)
-    PRINT("POST response: CREATED\n");
-  else
-    PRINT("POST response code %d\n", data->code);
-
-  if (oc_init_post(a_light, light_server, NULL, &post2_light, LOW_QOS, NULL)) {
-    oc_rep_start_root_object();
-    oc_rep_set_boolean(root, state, true);
-    oc_rep_set_int(root, power, 55);
-    oc_rep_end_root_object();
-    if (oc_do_post())
-      PRINT("Sent POST request\n");
-    else
-      PRINT("Could not send POST request\n");
-  } else
-    PRINT("Could not init POST request\n");
-}
-
-void
-put_light(oc_client_response_t *data)
-{
-  PRINT("PUT_light:\n");
-
-  if (data->code == OC_STATUS_CHANGED)
-    PRINT("PUT response: CHANGED\n");
-  else
-    PRINT("PUT response code %d\n", data->code);
-
-  if (oc_init_post(a_light, light_server, NULL, &post_light, LOW_QOS, NULL)) {
-    oc_rep_start_root_object();
-    oc_rep_set_boolean(root, state, false);
-    oc_rep_set_int(root, power, 105);
-    oc_rep_end_root_object();
-    if (oc_do_post())
-      PRINT("Sent POST request\n");
-    else
-      PRINT("Could not send POST request\n");
-  } else
-    PRINT("Could not init POST request\n");
-}
-
-void
-get_light(oc_client_response_t *data)
-{
-  PRINT("GET_light:\n");
-  oc_rep_t *rep = data->payload;
-  while (rep != NULL) {
-    PRINT("key %s, value ", oc_string(rep->name));
-    switch (rep->type) {
-    case OC_REP_BOOL:
-      PRINT("%d\n", rep->value.boolean);
-      state = rep->value.boolean;
-      break;
-    case OC_REP_INT:
-      PRINT("%lld\n", rep->value.integer);
-      power = (int)rep->value.integer;
-      break;
-    case OC_REP_STRING:
-      PRINT("%s\n", oc_string(rep->value.string));
-      oc_free_string(&name);
-      oc_new_string(&name, oc_string(rep->value.string),
-                    oc_string_len(rep->value.string));
-      break;
-    default:
-      break;
-    }
-    rep = rep->next;
-  }
-
-  if (oc_init_put(a_light, light_server, NULL, &put_light, LOW_QOS, NULL)) {
-    oc_rep_start_root_object();
-    oc_rep_set_boolean(root, state, true);
-    oc_rep_set_int(root, power, 15);
-    oc_rep_end_root_object();
-
-    if (oc_do_put())
-      PRINT("Sent PUT request\n");
-    else
-      PRINT("Could not send PUT request\n");
-  } else
-    PRINT("Could not init PUT request\n");
-}
-
-// static oc_discovery_flags_t
-// discovery(const char *payload, int len, const char *uri, oc_string_array_t
-// types,
-//          oc_interface_mask_t iface_mask, oc_endpoint_t *endpoint,
-//          oc_resource_properties_t bm, void *user_data)
 
 static oc_discovery_flags_t
 discovery(const char *payload, int len, oc_endpoint_t *endpoint,
@@ -234,10 +112,11 @@ discovery(const char *payload, int len, oc_endpoint_t *endpoint,
 
   for (int i = 0; i < nr_entries; i++) {
 
-    // oc_lf_get_entry(payload, len, i, uri);
     oc_lf_get_entry_uri(payload, len, i, &uri, &uri_len);
 
     PRINT(" DISCOVERY URL %.*s\n", uri_len, uri);
+
+    // oc_string_to_endpoint()
 
     oc_lf_get_entry_param(payload, len, i, "rt", &param, &param_len);
     PRINT(" DISCOVERY RT %.*s\n", param_len, param);
@@ -249,6 +128,9 @@ discovery(const char *payload, int len, oc_endpoint_t *endpoint,
     PRINT(" DISCOVERY CT %.*s\n", param_len, param);
   }
 
+  oc_do_get_ex("/dev", endpoint, NULL, &get_dev, HIGH_QOS,
+               APPLICATION_LINK_FORMAT, APPLICATION_LINK_FORMAT, NULL);
+
   PRINT(" DISCOVERY- END\n");
   return OC_STOP_DISCOVERY;
 }
@@ -257,9 +139,8 @@ static void
 issue_requests(void)
 {
   PRINT("Discovering devices:\n");
-  // oc_do_ip_discovery(".well-known/core", &discovery, NULL);
 
-  oc_do_wk_discovery_all("rt=urn:knx:dpa.*", &discovery, NULL);
+  oc_do_wk_discovery_all("rt=urn:knx:dpa.*", 0x2, &discovery, NULL);
 }
 
 #ifdef WIN32
@@ -376,8 +257,8 @@ main(void)
   }
 #endif
 
-  oc_free_server_endpoints(light_server);
-  oc_free_string(&name);
+  oc_free_server_endpoints(the_server);
+  // oc_free_string(&name);
   oc_main_shutdown();
   return 0;
 }

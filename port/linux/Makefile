@@ -100,7 +100,10 @@ CFLAGS=-fPIC -fno-asynchronous-unwind-tables -fno-omit-frame-pointer -ffreestand
 CXXFLAGS+=-fPIC -fno-asynchronous-unwind-tables -fno-omit-frame-pointer -ffreestanding -Os -fno-stack-protector -ffunction-sections -fdata-sections -fno-reorder-functions -fno-defer-pop -fno-strict-overflow -I./ -I../../include/ -I../../ -Wall -Wextra -Werror -pedantic #-Wl,-Map,client.map
 OBJ_COMMON=$(addprefix obj/,$(notdir $(SRC_COMMON:.c=.o)))
 OBJ_CLIENT=$(addprefix obj/client/,$(notdir $(SRC:.c=.o)))
-OBJ_SERVER=$(addprefix obj/server/,$(filter-out oc_obt.o oc_obt_otm_justworks.o oc_obt_otm_randompin.o oc_obt_otm_cert.o oc_obt_certs.o,$(notdir $(SRC:.c=.o))))
+
+# OBJ_SERVER=$(addprefix obj/server/,$(filter-out oc_obt.o oc_obt_otm_justworks.o oc_obt_otm_randompin.o oc_obt_otm_cert.o oc_obt_certs.o,$(notdir $(SRC:.c=.o))))
+OBJ_SERVER=$(addprefix obj/server/,$(filter-out oc_obt_certs.o,$(notdir $(SRC:.c=.o))))
+
 OBJ_CLIENT_SERVER=$(addprefix obj/client_server/,$(notdir $(SRC:.c=.o)))
 VPATH=../../messaging/coap/:../../util/:../../api/:../../deps/tinycbor/src/:../../deps/mbedtls/library:../../api/c-timestamp:../../service/resource-directory/client/src/:
 LIBS?= -lm -pthread -lrt
@@ -151,8 +154,8 @@ ifneq ($(SECURE),0)
 	SRC_COMMON += $(addprefix $(MBEDTLS_DIR)/library/,${DTLS})
 	MBEDTLS_PATCH_FILE := $(MBEDTLS_DIR)/patched.txt
 ifeq ($(DYNAMIC),1)
-	SRC += ../../security/oc_obt.c ../../security/oc_obt_otm_justworks.c \
-		../../security/oc_obt_otm_randompin.c ../../security/oc_obt_otm_cert.c ../../security/oc_obt_certs.c
+	#SRC += ../../security/oc_obt.c ../../security/oc_obt_otm_justworks.c \
+    #		../../security/oc_obt_otm_randompin.c ../../security/oc_obt_otm_cert.c ../../security/oc_obt_certs.c
 else
 	SRC_COMMON += $(MBEDTLS_DIR)/library/memory_buffer_alloc.c
 endif
