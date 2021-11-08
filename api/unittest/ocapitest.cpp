@@ -216,7 +216,7 @@ protected:
   {
     std::string msg = "";
     ASSERT_TRUE(ApiHelper::startServer(msg)) << msg;
-    ASSERT_TRUE(ApiHelper::discoverResource(msg)) << msg;
+    //ASSERT_TRUE(ApiHelper::discoverResource(msg)) << msg;
   }
 
   virtual void TearDown()
