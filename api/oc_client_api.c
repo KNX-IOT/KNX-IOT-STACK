@@ -1049,8 +1049,6 @@ oc_lf_get_entry_uri(const char *payload, int payload_len, int entry,
   return 1;
 }
 
-
-
 int
 oc_lf_get_entry_param(const char *payload, int payload_len, int entry, const char* param,
                     const char **p_out, int *p_len)
@@ -1067,7 +1065,7 @@ oc_lf_get_entry_param(const char *payload, int payload_len, int entry, const cha
   // <coap://[fe80::8d4c:632a:c5e7:ae09]:60054/p/a>;rt="urn:knx:dpa.352.51";if=if.a;ct=60
   // 
   int param_len = strlen(param);
-  for (i = 0; i < line_len-param_len - 1; i++) {
+  for (i = 0; i < line_len - param_len - 1; i++) {
     if (line[i] == ';') {
       if (strncmp(&line[i + 1], param, param_len) == 0) {
         begin_param = i + 1;
@@ -1087,8 +1085,9 @@ oc_lf_get_entry_param(const char *payload, int payload_len, int entry, const cha
       end_param = line_len;
     }
 
-    *p_out = &line[begin_param];
-    *p_len = end_param - begin_param;
+    // remove the "param=" part from the return value.
+    *p_out = &line[begin_param + param_len + 1];
+    *p_len = end_param - (begin_param + param_len + 1);
 
   } else {
     *p_out = line;
