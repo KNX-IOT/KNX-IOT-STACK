@@ -843,9 +843,9 @@ coap_oscore_parse_options(void *packet, uint8_t *data, uint32_t data_len,
       if (!inner) {
         return BAD_OPTION_4_02;
       }
-      uint16_t version =
-        (uint16_t)coap_parse_int_option(current_option, option_length);
-      OC_DBG("  Content-format/accept-Version: [%u]", version);
+      //uint16_t version =
+      //  (uint16_t)coap_parse_int_option(current_option, option_length);
+      //OC_DBG("  Content-format/accept-Version: [%u]", version);
     } break;
     default:
       OC_DBG("  unknown (%u)", option_number);
@@ -1175,8 +1175,7 @@ void
 coap_send_message(oc_message_t *message)
 {
 #ifdef OC_TCP
-  if (message->endpoint.flags & TCP &&
-      message->endpoint.version == OCF_VER_1_0_0) {
+  if (message->endpoint.flags & TCP) {
     tcp_csm_state_t state = oc_tcp_get_csm_state(&message->endpoint);
     if (state == CSM_NONE) {
       coap_send_csm_message(&message->endpoint, OC_PDU_SIZE, 0);
