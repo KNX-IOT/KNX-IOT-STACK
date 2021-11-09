@@ -156,7 +156,7 @@ if(OC_DYNAMIC_ALLOCATION_ENABLED)
 endif()
 
 if(OC_SECURITY_ENABLED)
-    target_compile_definitions(mbedcrypto PUBLIC OC_SECURITY)
+    #target_compile_definitions(mbedcrypto PUBLIC OC_SECURITY)
 endif()
 
 if(OC_PKI_ENABLED)
@@ -206,6 +206,6 @@ if(PROJECT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     )
 endif()
 
-add_subdirectory(port)
 add_subdirectory(apps)
+add_subdirectory(port)
 add_subdirectory(deps)
