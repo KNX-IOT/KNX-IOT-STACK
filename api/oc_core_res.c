@@ -19,7 +19,6 @@
 #include "oc_api.h"
 #include "messaging/coap/oc_coap.h"
 #include "oc_discovery.h"
-#include "oc_introspection_internal.h"
 #include "oc_rep.h"
 
 #include "oc_knx.h"
@@ -574,8 +573,6 @@ oc_core_add_new_device(const char *uri, const char *rt, const char *name,
 
   oc_create_discovery_resource(WELLKNOWNCORE, device_count);
 
-  oc_create_introspection_resource(device_count);
-
   oc_device_info[device_count].data = data;
 
   if (oc_connectivity_init(device_count) < 0) {
@@ -901,9 +898,7 @@ oc_core_is_DCR(oc_resource_t *resource, size_t device)
   size_t DCRs_end = device_resources + OCF_D, i;
   for (i = device_resources + 1; i <= DCRs_end; i++) {
     if (resource == &core_resources[i]) {
-      if (i == (device_resources + OCF_INTROSPECTION_WK) ||
-          i == (device_resources + OCF_INTROSPECTION_DATA) ||
-          i == (device_resources + OCF_CON)) {
+      if (i == (device_resources + OCF_CON)) {
         return false;
       }
       return true;
@@ -932,12 +927,6 @@ oc_core_get_resource_by_uri(const char *uri, size_t device)
              (strlen(uri) - skip) == OC_NAMELEN_CON_RES &&
              memcmp(uri + skip, OC_NAME_CON_RES, OC_NAMELEN_CON_RES) == 0) {
     type = OCF_CON;
-  } else if ((strlen(uri) - skip) == 19 &&
-             memcmp(uri + skip, "oc/wk/introspection", 19) == 0) {
-    type = OCF_INTROSPECTION_WK;
-  } else if ((strlen(uri) - skip) == 16 &&
-             memcmp(uri + skip, "oc/introspection", 16) == 0) {
-    type = OCF_INTROSPECTION_DATA;
   }
 
 #ifdef OC_SECURITY

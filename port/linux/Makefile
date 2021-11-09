@@ -250,10 +250,6 @@ obj/client_server/%.o: %.c
 	${CC} -c -o $@ $< ${CFLAGS} -DOC_CLIENT -DOC_SERVER
 
 
-obj/server/oc_introspection.o: ../../include/server_introspection.dat.h
-obj/client/oc_introspection.o: ../../include/server_introspection.dat.h
-obj/client_server/oc_introspection.o: ../../include/server_introspection.dat.h
-
 libkis-server.a: $(OBJ_COMMON) $(OBJ_SERVER)
 	$(AR) -rcs $@ $(OBJ_COMMON) $(OBJ_SERVER)
 

@@ -348,11 +348,6 @@ process_device_resources(CborEncoder *links, oc_request_t *request,
                       request, oc_string(anchor), links, device_index))
     matches++;
 
-  if (filter_resource(
-        oc_core_get_resource_by_index(OCF_INTROSPECTION_WK, device_index),
-        request, oc_string(anchor), links, device_index))
-    matches++;
-
   if (oc_get_con_res_announced() &&
       filter_resource(oc_core_get_resource_by_index(OCF_CON, device_index),
                       request, oc_string(anchor), links, device_index))
