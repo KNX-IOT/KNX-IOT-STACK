@@ -52,9 +52,6 @@
 #include "security/oc_sdi.h"
 #endif /* OC_SECURITY */
 
-#ifdef OC_SOFTWARE_UPDATE
-#include "oc_swupdate_internal.h"
-#endif /* OC_SOFTWARE_UPDATE */
 #ifdef OC_MEMORY_TRACE
 #include "util/oc_mem_trace.h"
 #endif /* OC_MEMORY_TRACE */
@@ -247,10 +244,6 @@ oc_main_init(const oc_handler_t *handler)
   oc_sec_create_svr();
 #endif
 
-#ifdef OC_SOFTWARE_UPDATE
-  oc_swupdate_init();
-#endif /* OC_SOFTWARE_UPDATE */
-
   for (size_t device = 0; device < oc_core_get_num_devices(); device++) {
     oc_knx_device_storage_read(device);
     // add here more
@@ -344,10 +337,6 @@ oc_main_shutdown(void)
 #endif /* OC_PKI */
   oc_sec_sdi_free();
 #endif /* OC_SECURITY */
-
-#ifdef OC_SOFTWARE_UPDATE
-  oc_swupdate_free();
-#endif /* OC_SOFTWARE_UPDATE */
 
   oc_shutdown_all_devices();
 

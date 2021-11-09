@@ -43,8 +43,6 @@ typedef uint64_t oc_clock_time_t;
 /* Add request history for deduplicate UDP/DTLS messages */
 #define OC_REQUEST_HISTORY
 
-/* Add support for software update */
-//#define OC_SOFTWARE_UPDATE or run "make" with SWUPDATE=1
 /* Add support for the oic.if.create interface in Collections */
 //#define OC_COLLECTIONS_IF_CREATE or run "make" with CREATE=1
 /* Add batch interface support to /oic/res */
@@ -122,9 +120,6 @@ typedef uint64_t oc_clock_time_t;
 #define OC_STORAGE
 #endif
 #ifdef OC_IDD_API
-#define OC_STORAGE
-#endif
-#ifdef OC_SOFTWARE_UPDATE
 #define OC_STORAGE
 #endif
 

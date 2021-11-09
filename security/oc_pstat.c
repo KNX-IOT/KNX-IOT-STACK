@@ -33,10 +33,6 @@
 #include "api/oc_resource_factory.h"
 #endif /* OC_COLLECTIONS_IF_CREATE */
 
-#ifdef OC_SOFTWARE_UPDATE
-#include "api/oc_swupdate_internal.h"
-#endif /* OC_SOFTWARE_UPDATE */
-
 #ifdef OC_DYNAMIC_ALLOCATION
 #include "port/oc_assert.h"
 #include <stdlib.h>
@@ -448,33 +444,6 @@ oc_sec_encode_pstat(size_t device, oc_interface_mask_t iface_mask,
   oc_rep_end_root_object();
 }
 
-#ifdef OC_SOFTWARE_UPDATE
-static void
-oc_pstat_handle_target_mode(size_t device, oc_dpmtype_t *tm)
-{
-  if (*tm == OC_DPM_NSA) {
-    oc_swupdate_perform_action(OC_SWUPDATE_ISAC, device);
-    *tm = 0;
-  } else if (*tm == OC_DPM_SVV) {
-    oc_swupdate_perform_action(OC_SWUPDATE_ISVV, device);
-    *tm = 0;
-  } else if (*tm == OC_DPM_SSV) {
-    oc_swupdate_perform_action(OC_SWUPDATE_UPGRADE, device);
-    *tm = 0;
-  }
-}
-
-void
-oc_sec_pstat_set_current_mode(size_t device, oc_dpmtype_t cm)
-{
-  oc_sec_pstat_t *ps = &pstat[device];
-  ps->cm = cm;
-#ifdef OC_SERVER
-  oc_notify_observers(oc_core_get_resource_by_index(OCF_SEC_PSTAT, device));
-#endif /* OC_SERVER */
-}
-#endif /* OC_SOFTWARE_UPDATE */
-
 bool
 oc_sec_decode_pstat(oc_rep_t *rep, bool from_storage, size_t device)
 {
@@ -560,11 +529,6 @@ oc_sec_decode_pstat(oc_rep_t *rep, bool from_storage, size_t device)
     rep = rep->next;
   }
   (void)target_mode;
-#ifdef OC_SOFTWARE_UPDATE
-  if (target_mode) {
-    oc_pstat_handle_target_mode(device, &ps.tm);
-  }
-#endif /* OC_SOFTWARE_UPDATE */
   if (from_storage || valid_transition(device, ps.s)) {
     if (!from_storage && transition_state) {
       bool transition_success =
