@@ -182,7 +182,7 @@ coap_receive(oc_message_t *msg)
   coap_status_code = COAP_NO_ERROR;
 
   OC_DBG("CoAP Engine: received datalen=%u from", (unsigned int)msg->length);
-  //PRINT("CoAP Engine: received datalen=%u from", (unsigned int)msg->length);
+  // PRINT("CoAP Engine: received datalen=%u from", (unsigned int)msg->length);
   OC_LOGipaddr(msg->endpoint);
   OC_LOGbytes(msg->data, msg->length);
 
@@ -276,7 +276,7 @@ coap_receive(oc_message_t *msg)
     /* handle requests */
     if (message->code >= COAP_GET && message->code <= COAP_DELETE) {
 
-//#ifdef OC_DEBUG
+      //#ifdef OC_DEBUG
       switch (message->code) {
       case COAP_GET:
         PRINT("  method: GET");

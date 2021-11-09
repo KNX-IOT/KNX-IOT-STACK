@@ -1176,14 +1176,14 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
     } else
 #endif /* OC_SECURITY */
     {
-/* If cur_resource is a collection resource, invoke the framework's
- * internal handler for collections.
- */
-        /* If cur_resource is a non-collection resource, invoke
-         * its handler for the requested method. If it has not
-         * implemented that method, then return a 4.05 response.
-         */
-        if (method == OC_GET && cur_resource->get_handler.cb) {
+      /* If cur_resource is a collection resource, invoke the framework's
+       * internal handler for collections.
+       */
+      /* If cur_resource is a non-collection resource, invoke
+       * its handler for the requested method. If it has not
+       * implemented that method, then return a 4.05 response.
+       */
+      if (method == OC_GET && cur_resource->get_handler.cb) {
         cur_resource->get_handler.cb(&request_obj, iface_mask,
                                      cur_resource->get_handler.user_data);
       } else if (method == OC_POST && cur_resource->post_handler.cb) {
@@ -1359,9 +1359,8 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
      * altered the resource state, so attempt to notify all observers
      * of that resource with the change.
      */
-    if (
-      cur_resource && (method == OC_PUT || method == OC_POST) &&
-      response_buffer.code < oc_status_code(OC_STATUS_BAD_REQUEST)) {
+    if (cur_resource && (method == OC_PUT || method == OC_POST) &&
+        response_buffer.code < oc_status_code(OC_STATUS_BAD_REQUEST)) {
       if ((iface_mask == OC_IF_STARTUP) ||
           (iface_mask == OC_IF_STARTUP_REVERT)) {
         oc_resource_defaults_data_t *resource_defaults_data =

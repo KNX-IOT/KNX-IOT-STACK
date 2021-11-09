@@ -850,7 +850,6 @@ oc_sec_acl_free(void)
 #endif /* OC_DYNAMIC_ALLOCATION */
 }
 
-
 void
 oc_sec_acl_default(size_t device)
 {

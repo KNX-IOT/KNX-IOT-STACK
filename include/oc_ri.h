@@ -366,7 +366,7 @@ struct oc_resource_s
   oc_enum_t tag_func_desc;             ///< tag (value) for function description
   oc_locn_t tag_locn;                  ///< tag (value) for location description
   uint8_t num_observers;               ///< amount of observers
-  uint16_t observe_period_seconds; ///< observe period in seconds
+  uint16_t observe_period_seconds;     ///< observe period in seconds
 };
 
 typedef struct oc_link_s oc_link_t;
