@@ -15,6 +15,7 @@
  */
 
 #include "oc_api.h"
+//#include "oc_storage.h"
 #include "api/oc_knx_dev.h"
 #include "oc_core_res.h"
 #include "oc_discovery.h"

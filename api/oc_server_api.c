@@ -23,10 +23,6 @@
 #include "security/oc_store.h"
 #endif /* OC_SECURITY */
 
-#if defined(OC_COLLECTIONS) && defined(OC_SERVER)
-#include "oc_collection.h"
-#endif /* OC_COLLECTIONS && OC_SERVER */
-
 #ifdef OC_DYNAMIC_ALLOCATION
 #include <stdlib.h>
 #endif /* OC_DYNAMIC_ALLOCATION */
@@ -352,41 +348,6 @@ oc_new_resource(const char *name, const char *uri, uint8_t num_resource_types,
   }
   return resource;
 }
-
-#if defined(OC_COLLECTIONS)
-oc_resource_t *
-oc_new_collection(const char *name, const char *uri, uint8_t num_resource_types,
-                  size_t device)
-{
-  oc_resource_t *collection = (oc_resource_t *)oc_collection_alloc();
-  if (collection) {
-    collection->interfaces = OC_IF_BASELINE | OC_IF_LL | OC_IF_B;
-    collection->default_interface = OC_IF_LL;
-    oc_populate_resource_object(collection, name, uri, num_resource_types,
-                                device);
-  }
-  return collection;
-}
-
-void
-oc_delete_collection(oc_resource_t *collection)
-{
-  oc_collection_free((oc_collection_t *)collection);
-}
-
-void
-oc_add_collection(oc_resource_t *collection)
-{
-  oc_resource_set_observable(collection, true);
-  oc_collection_add((oc_collection_t *)collection);
-}
-
-oc_resource_t *
-oc_collection_get_collections(void)
-{
-  return (oc_resource_t *)oc_collection_get_all();
-}
-#endif /* OC_COLLECTIONS */
 
 void
 oc_resource_bind_resource_interface(oc_resource_t *resource,

@@ -47,7 +47,6 @@ target_sources(kis-api INTERFACE
     ${PROJECT_SOURCE_DIR}/api/oc_buffer.c
     ${PROJECT_SOURCE_DIR}/api/oc_client_api.c
     ${PROJECT_SOURCE_DIR}/api/oc_clock.c
-    ${PROJECT_SOURCE_DIR}/api/oc_collection.c
     ${PROJECT_SOURCE_DIR}/api/oc_core_res.c
     ${PROJECT_SOURCE_DIR}/api/oc_device_mode.c
     ${PROJECT_SOURCE_DIR}/api/oc_discovery.c
@@ -57,7 +56,6 @@ target_sources(kis-api INTERFACE
     ${PROJECT_SOURCE_DIR}/api/oc_main.c
     ${PROJECT_SOURCE_DIR}/api/oc_network_events.c
     ${PROJECT_SOURCE_DIR}/api/oc_rep.c
-    ${PROJECT_SOURCE_DIR}/api/oc_resource_factory.c
     ${PROJECT_SOURCE_DIR}/api/oc_ri.c
     ${PROJECT_SOURCE_DIR}/api/oc_server_api.c
     ${PROJECT_SOURCE_DIR}/api/oc_session_events.c

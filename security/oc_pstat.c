@@ -29,9 +29,6 @@
 #include "oc_sp.h"
 #include "oc_store.h"
 #include "oc_tls.h"
-#ifdef OC_COLLECTIONS_IF_CREATE
-#include "api/oc_resource_factory.h"
-#endif /* OC_COLLECTIONS_IF_CREATE */
 
 #ifdef OC_DYNAMIC_ALLOCATION
 #include "port/oc_assert.h"
@@ -176,9 +173,6 @@ oc_pstat_handle_state(oc_sec_pstat_t *ps, size_t device, bool from_storage,
 #endif /* OC_PKI */
     oc_sec_sp_default(device);
 #ifdef OC_SERVER
-#if defined(OC_COLLECTIONS) && defined(OC_COLLECTIONS_IF_CREATE)
-    oc_rt_factory_free_created_resources(device);
-#endif /* OC_COLLECTIONS && OC_COLLECTIONS_IF_CREATE */
     coap_remove_observers_on_dos_change(device, true);
 #endif /* OC_SERVER */
     ps->p = false;

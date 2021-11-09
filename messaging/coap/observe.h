@@ -87,15 +87,10 @@ int coap_remove_observer_by_token(oc_endpoint_t *endpoint, uint8_t *token,
 int coap_remove_observer_by_mid(oc_endpoint_t *endpoint, uint16_t mid);
 int coap_remove_observer_by_resource(const oc_resource_t *rsc);
 void coap_free_all_observers(void);
-int coap_notify_collection_observers(oc_resource_t *resource,
-                                     oc_response_buffer_t *response_buf,
-                                     oc_interface_mask_t iface_mask);
+
 int coap_notify_observers(oc_resource_t *resource,
                           oc_response_buffer_t *response_buf,
                           oc_endpoint_t *endpoint);
-int coap_notify_collection_links_list(oc_collection_t *collection);
-int coap_notify_collection_batch(oc_collection_t *collection);
-int coap_notify_collection_baseline(oc_collection_t *collection);
 void notify_resource_defaults_observer(oc_resource_t *resource,
                                        oc_interface_mask_t iface_mask,
                                        oc_response_buffer_t *response_buf);

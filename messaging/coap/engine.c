@@ -182,6 +182,7 @@ coap_receive(oc_message_t *msg)
   coap_status_code = COAP_NO_ERROR;
 
   OC_DBG("CoAP Engine: received datalen=%u from", (unsigned int)msg->length);
+  // PRINT("CoAP Engine: received datalen=%u from", (unsigned int)msg->length);
   OC_LOGipaddr(msg->endpoint);
   OC_LOGbytes(msg->data, msg->length);
 
@@ -275,25 +276,25 @@ coap_receive(oc_message_t *msg)
     /* handle requests */
     if (message->code >= COAP_GET && message->code <= COAP_DELETE) {
 
-#ifdef OC_DEBUG
+      //#ifdef OC_DEBUG
       switch (message->code) {
       case COAP_GET:
-        OC_DBG("  method: GET");
+        PRINT("  method: GET");
         break;
       case COAP_PUT:
-        OC_DBG("  method: PUT");
+        PRINT("  method: PUT");
         break;
       case COAP_POST:
-        OC_DBG("  method: POST");
+        PRINT("  method: POST");
         break;
       case COAP_DELETE:
-        OC_DBG("  method: DELETE");
+        PRINT("  method: DELETE");
         break;
       }
-      OC_DBG("  URL: %.*s", (int)message->uri_path_len, message->uri_path);
-      OC_DBG("  QUERY: %.*s", (int)message->uri_query_len, message->uri_query);
-      OC_DBG("  Payload: %.*s", (int)message->payload_len, message->payload);
-#endif
+      PRINT("  URL: %.*s", (int)message->uri_path_len, message->uri_path);
+      PRINT("  QUERY: %.*s", (int)message->uri_query_len, message->uri_query);
+      PRINT("  Payload: %.*s", (int)message->payload_len, message->payload);
+      //#endif
       const char *href;
       size_t href_len = coap_get_header_uri_path(message, &href);
 #ifdef OC_TCP
