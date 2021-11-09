@@ -86,7 +86,6 @@
 #include "port/oc_clock.h"
 #include <signal.h>
 
-
 #ifdef INCLUDE_EXTERNAL
 /* import external definitions from header file*/
 /* this file should be externally supplied */
