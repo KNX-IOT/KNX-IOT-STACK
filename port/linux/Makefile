@@ -290,7 +290,7 @@ server: libkis-server.a $(ROOT_DIR)/apps/server_linux.c
 
 simpleserver_all: libkis-client-server.a $(ROOT_DIR)/apps/simpleserver_all.c
 	@mkdir -p $@_creds
-	${CC} -o $@ ../../apps/simpleserver_all.c libkis-server.a -DOC_SERVER ${CFLAGS}  ${LIBS}
+	${CC} -o $@ ../../apps/simpleserver_all.c libkis-client-server.a -DOC_SERVER ${CFLAGS}  ${LIBS}
 
 #secure_mcast_server1: libkis-server.a $(ROOT_DIR)/apps/secure_mcast_server1.c
 #	@mkdir -p $@_creds
@@ -347,7 +347,7 @@ simpleserver_all: libkis-client-server.a $(ROOT_DIR)/apps/simpleserver_all.c
 
 simpleclient_all: libkis-client-server.a $(ROOT_DIR)/apps/simpleclient_all.c
 	@mkdir -p $@_creds
-	${CC} -o $@ ../../apps/simpleclient_all.c libkis-client.a -DOC_CLIENT ${CFLAGS}  ${LIBS}
+	${CC} -o $@ ../../apps/simpleclient_all.c libkis-client-server.a -DOC_CLIENT ${CFLAGS}  ${LIBS}
 
 kis-server.pc: kis-server.pc.in
 	$(SED) > $@ < $< \
