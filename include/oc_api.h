@@ -1498,8 +1498,8 @@ bool oc_do_get_ex(const char *uri, oc_endpoint_t *endpoint, const char *query,
  * @param[in] endpoint The endpoint of the server
  * @param[in] query a query parameter that will be sent to the server's
  *                  oc_request_callback_t.
- * @param[in] handler The function invoked once the client has received the servers
- *                    response to the DELETE request
+ * @param[in] handler The function invoked once the client has received the
+ * servers response to the DELETE request
  * @param[in] qos The quality of service current options are HIGH_QOS or LOW_QOS
  * @param[in] user_data The context pointer that will be sent to the
  *                      oc_response_handler_t

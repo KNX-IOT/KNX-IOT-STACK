@@ -898,7 +898,7 @@ oc_core_is_DCR(oc_resource_t *resource, size_t device)
   size_t DCRs_end = device_resources + OCF_D, i;
   for (i = device_resources + 1; i <= DCRs_end; i++) {
     if (resource == &core_resources[i]) {
-      if ( i == (device_resources + OCF_CON)) {
+      if (i == (device_resources + OCF_CON)) {
         return false;
       }
       return true;
@@ -927,7 +927,7 @@ oc_core_get_resource_by_uri(const char *uri, size_t device)
              (strlen(uri) - skip) == OC_NAMELEN_CON_RES &&
              memcmp(uri + skip, OC_NAME_CON_RES, OC_NAMELEN_CON_RES) == 0) {
     type = OCF_CON;
-  } 
+  }
 
 #ifdef OC_SECURITY
   else if ((strlen(uri) - skip) == 12) {
