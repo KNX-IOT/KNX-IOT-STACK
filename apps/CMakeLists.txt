@@ -18,21 +18,21 @@ target_link_libraries(simpleclient_all
 
 
 if(UNIX)
-    add_executable(simpleserver
-        ${PROJECT_SOURCE_DIR}/simpleserver.c
-    )
-    target_link_libraries(simpleserver
-        kis-server-client
-    )
-    file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/simpleserver_creds)
+    #add_executable(simpleserver
+    #    ${PROJECT_SOURCE_DIR}/simpleserver.c
+    #)
+    #target_link_libraries(simpleserver
+    #    kis-server-client
+    #)
+    #file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/simpleserver_creds)
 
-    add_executable(simpleserver_pki
-        ${PROJECT_SOURCE_DIR}/simpleserver_pki.c
-    )
-    target_link_libraries(simpleserver_pki
-        kis-server-client
-    )
-    file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/simpleserver_pki_creds)
+    #add_executable(simpleserver_pki
+    #    ${PROJECT_SOURCE_DIR}/simpleserver_pki.c
+    #)
+    #target_link_libraries(simpleserver_pki
+    #    kis-server-client
+    #)
+    #file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/simpleserver_pki_creds)
 
 #    add_executable(simpleclient
 #        ${PROJECT_SOURCE_DIR}/simpleclient.c
@@ -54,13 +54,13 @@ if(UNIX)
 
 
 elseif(WIN32)
-    add_executable(simpleserver
-        ${PROJECT_SOURCE_DIR}/simpleserver_windows.c
-    )
-    target_link_libraries(simpleserver
-        kis-server-client
-    )
-    file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/simpleserver_creds)
+    #add_executable(simpleserver
+    #    ${PROJECT_SOURCE_DIR}/simpleserver_windows.c
+    #)
+    #target_link_libraries(simpleserver
+    #    kis-server-client
+    #)
+    #file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/simpleserver_creds)
 
 #    add_executable(simpleclient
 #        ${PROJECT_SOURCE_DIR}/simpleclient_windows.c

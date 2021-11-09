@@ -440,7 +440,7 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   char buffer[200];
   memset(buffer, 200, 1);
   oc_rep_to_json(request->request_payload, (char *)&buffer, 200, true);
-  PRINT(buffer);
+  PRINT("%s", buffer);
 
   int index = -1;
   oc_rep_t *rep = request->request_payload;
@@ -777,7 +777,7 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   char buffer[200];
   memset(buffer, 200, 1);
   oc_rep_to_json(request->request_payload, (char *)&buffer, 200, true);
-  PRINT(buffer);
+  PRINT("%s", buffer);
 
   int index = -1;
   oc_rep_t *rep = request->request_payload;
@@ -1059,7 +1059,7 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   char buffer[200];
   memset(buffer, 200, 1);
   oc_rep_to_json(request->request_payload, (char *)&buffer, 200, true);
-  PRINT(buffer);
+  PRINT("%s", buffer);
 
   int index = -1;
   oc_rep_t *rep = request->request_payload;
