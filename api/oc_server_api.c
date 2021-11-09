@@ -163,7 +163,6 @@ oc_remove_delayed_callback(void *cb_data, oc_trigger_t callback)
   oc_ri_remove_timed_event_callback(cb_data, callback);
 }
 
-
 void
 oc_process_baseline_interface(oc_resource_t *resource)
 {
@@ -172,7 +171,6 @@ oc_process_baseline_interface(oc_resource_t *resource)
   }
   oc_rep_set_string_array(root, rt, resource->types);
   oc_core_encode_interfaces_mask(oc_rep_object(root), resource->interfaces);
-
 }
 
 void
