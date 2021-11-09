@@ -50,6 +50,8 @@ typedef uint64_t oc_clock_time_t;
 #define OC_STORAGE
 #endif
 
+#define OC_STORAGE
+
 #ifdef __cplusplus
 }
 #endif
