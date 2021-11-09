@@ -1,5 +1,6 @@
 /*
 // Copyright (c) 2016-2019 Intel Corporation
+// Copyright (c) 2021 Cascoda Ltd.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,7 +22,6 @@
 
 #include "oc_config.h"
 #include "oc_endpoint.h"
-#include "oc_enums.h"
 #include "oc_rep.h"
 #include "oc_uuid.h"
 #include "util/oc_etimer.h"
@@ -51,7 +51,7 @@ typedef enum {
   OC_OBSERVABLE = (1 << 1),   ///< observable
   OC_SECURE = (1 << 4),       ///< secure
   OC_PERIODIC = (1 << 6),     ///< periodical update
-  OC_SECURE_MCAST = (1 << 8)  ///< secure multicast (oscore)
+  OC_SECURE_MCAST = (1 << 8)  ///< secure multi cast (OSCORE)
 } oc_resource_properties_t;
 
 /**
@@ -195,6 +195,10 @@ typedef enum {
 
 const char *get_interface_string(oc_interface_mask_t mask);
 
+/**
+ * @brief core resource numbers
+ *
+ */
 typedef enum {
   OCF_P = 0,
   OC_DEV_SN,    ///< Device serial number
@@ -360,10 +364,6 @@ struct oc_resource_s
   oc_request_handler_t delete_handler; ///< callback for DELETE
   oc_properties_cb_t get_properties;   ///< callback for get properties
   oc_properties_cb_t set_properties;   ///< callback for set properties
-  double tag_pos_rel[3];               ///< tag relative position [x,y,z]
-  oc_pos_description_t tag_pos_desc;   ///< tag (value) for position description
-  oc_enum_t tag_func_desc;             ///< tag (value) for function description
-  oc_locn_t tag_locn;                  ///< tag (value) for location description
   uint8_t num_observers;               ///< amount of observers
   uint16_t observe_period_seconds;     ///< observe period in seconds
 };

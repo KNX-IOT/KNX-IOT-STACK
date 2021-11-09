@@ -51,7 +51,6 @@ target_sources(kis-api INTERFACE
     ${PROJECT_SOURCE_DIR}/api/oc_device_mode.c
     ${PROJECT_SOURCE_DIR}/api/oc_discovery.c
     ${PROJECT_SOURCE_DIR}/api/oc_endpoint.c
-    ${PROJECT_SOURCE_DIR}/api/oc_enums.c
     ${PROJECT_SOURCE_DIR}/api/oc_helpers.c
     ${PROJECT_SOURCE_DIR}/api/oc_main.c
     ${PROJECT_SOURCE_DIR}/api/oc_network_events.c
