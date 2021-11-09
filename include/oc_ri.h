@@ -22,7 +22,6 @@
 
 #include "oc_config.h"
 #include "oc_endpoint.h"
-#include "oc_enums.h"
 #include "oc_rep.h"
 #include "oc_uuid.h"
 #include "util/oc_etimer.h"
