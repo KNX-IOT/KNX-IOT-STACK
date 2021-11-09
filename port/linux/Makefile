@@ -117,10 +117,6 @@ ifeq ($(V6DNS),1)
 	EXTRA_CFLAGS += -DOC_DNS_LOOKUP_IPV6
 endif
 
-ifeq ($(SWUPDATE),1)
-	SAMPLES += smart_home_server_with_mock_swupdate
-endif
-
 
 ifeq ($(DEBUG),1)
 	EXTRA_CFLAGS += -DOC_DEBUG -g -O0
@@ -142,11 +138,6 @@ endif
 
 ifeq ($(IDD), 1)
 	EXTRA_CFLAGS += -DOC_IDD_API
-endif
-
-ifeq ($(SWUPDATE),1)
-	EXTRA_CFLAGS += -DOC_SOFTWARE_UPDATE
-	export SWUPDATE
 endif
 
 ifneq ($(SECURE),0)
@@ -174,10 +165,6 @@ endif
 
 ifeq ($(TCP),1)
 	EXTRA_CFLAGS += -DOC_TCP
-endif
-
-ifeq ($(JAVA),1)
-	SWIG = swig
 endif
 
 CFLAGS += $(EXTRA_CFLAGS)
@@ -301,9 +288,9 @@ server: libkis-server.a $(ROOT_DIR)/apps/server_linux.c
 #	@mkdir -p $@_creds
 #	${CC} -o $@ ../../apps/temp_sensor_client_linux.c libkis-client.a -DOC_CLIENT ${CFLAGS} ${LIBS}
 
-simpleserver_all: libkis-server.a $(ROOT_DIR)/apps/simpleserver_all.c
+simpleserver_all: libkis-client-server.a $(ROOT_DIR)/apps/simpleserver_all.c
 	@mkdir -p $@_creds
-	${CC} -o $@ ../../apps/simpleserver_all.c libkis-server.a -DOC_SERVER ${CFLAGS}  ${LIBS}
+	${CC} -o $@ ../../apps/simpleserver_all.c libkis-client-server.a -DOC_SERVER ${CFLAGS}  ${LIBS}
 
 #secure_mcast_server1: libkis-server.a $(ROOT_DIR)/apps/secure_mcast_server1.c
 #	@mkdir -p $@_creds
@@ -358,9 +345,9 @@ simpleserver_all: libkis-server.a $(ROOT_DIR)/apps/simpleserver_all.c
 #	@mkdir -p $@_creds
 #	${CC} -o $@ ../../apps/server_multithread_linux.c libkis-server.a -DOC_SERVER ${CFLAGS} ${LIBS}
 
-simpleclient_all: libkis-client.a $(ROOT_DIR)/apps/simpleclient_all.c
+simpleclient_all: libkis-client-server.a $(ROOT_DIR)/apps/simpleclient_all.c
 	@mkdir -p $@_creds
-	${CC} -o $@ ../../apps/simpleclient_all.c libkis-client.a -DOC_CLIENT ${CFLAGS}  ${LIBS}
+	${CC} -o $@ ../../apps/simpleclient_all.c libkis-client-server.a -DOC_CLIENT ${CFLAGS}  ${LIBS}
 
 kis-server.pc: kis-server.pc.in
 	$(SED) > $@ < $< \

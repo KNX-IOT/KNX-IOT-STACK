@@ -84,7 +84,7 @@ typedef struct
 
   /**
    * Function to signal the event loop
-   * so that incomming events are being processed.
+   * so that incoming events are being processed.
    *
    * @see oc_main_poll
    */
@@ -182,9 +182,10 @@ typedef struct
  * static int app_init(void)
  * {
  *   int ret = oc_init_platform("My Platform",
- * set_additional_platform_properties, NULL); ret |= oc_add_device("/oic/d",
- * "oic.d.light", "My light", "ocf.1.0.0", "ocf.res.1.0.0", NULL, NULL); return
- * ret;
+ *      set_additional_platform_properties, NULL);
+ *   ret |= oc_add_device("/oic/d",
+ *      "oic.d.light", "My light", "ocf.1.0.0", "ocf.res.1.0.0", NULL, NULL);
+ *      return ret;
  * }
  * ```
  *
@@ -364,61 +365,13 @@ typedef void (*oc_factory_presets_cb_t)(size_t device, void *data);
  */
 void oc_set_factory_presets_cb(oc_factory_presets_cb_t cb, void *data);
 
-/**
- * Add an ocf device to the the stack.
- *
- * This function is typically called as part of the stack initialization
- * process from inside the `init` callback handler.
- *
- * The `oc_add_device` function may be called as many times as needed.
- * Each call will add a new device to the stack with its own port address.
- * Each device is automatically assigned a number starting with zero and
- * incremented by one each time the function is called. This number is not
- * returned therefore it is important to know the order devices are added.
- *
- * Example:
- * ```
- * //app_init is an instance of the `init` callback handler.
- * static int app_init(void)
- * {
- *   int ret = oc_init_platform("Refrigerator", NULL, NULL);
- *   ret |= oc_add_device("/oic/d", "oic.d.refrigeration", "My fridge",
- *                        "ocf.2.0.5", "ocf.res.1.0.0,ocf.sh.1.0.0",
- *                        NULL, NULL);
- *   ret |= oc_add_device("/oic/d", "oic.d.thermostat", "My thermostat",
- *                        "ocf.2.0.5", "ocf.res.1.0.0,ocf.sh.1.0.0",
- *                        NULL, NULL);
- *   return ret;
- * }
- * ```
- *
- * @param[in] uri the The device URI.  The wellknown default URI "/oic/d"
- *            is hosted by every server. Used to expose device specific
- *            information
- * @param[in] rt the resource type
- * @param[in] name the user readable name of the device
- * @param[in] spec_version The version of the OCF Server.  This is the "icv"
- *                         device property
- * @param[in] data_model_version Spec version of the resource and device
- * specifications to which this device data model is implemtned. This is the
- * "dmv" device property
- * @param[in] add_device_cb callback function invoked during oc_add_device().
- * The purpose is to add additional device properties that are not supplied to
- * oc_add_device() function call.
- * @param[in] data context pointer that is passed to the oc_add_device_cb_t
- *
- * @return
- *   - `0` on success
- *   - `-1` on failure
- *
- * @see init
- */
+// obsolete
 int oc_add_device(const char *uri, const char *rt, const char *name,
                   const char *spec_version, const char *data_model_version,
                   oc_add_device_cb_t add_device_cb, void *data);
 
 /**
- * Add an ocf device to the the stack.
+ * Add an a device to the stack.
  *
  * This function is typically called as part of the stack initialization
  * process from inside the `init` callback handler.
@@ -435,17 +388,13 @@ int oc_add_device(const char *uri, const char *rt, const char *name,
  * static int app_init(void)
  * {
  *   int ret = oc_init_platform("Refrigerator", NULL, NULL);
- *   ret |= oc_add_device("/oic/d", "oic.d.refrigeration", "My fridge",
- *                        "ocf.2.0.5", "ocf.res.1.0.0,ocf.sh.1.0.0",
- *                        NULL, NULL);
- *   ret |= oc_add_device("/oic/d", "oic.d.thermostat", "My thermostat",
- *                        "ocf.2.0.5", "ocf.res.1.0.0,ocf.sh.1.0.0",
- *                        NULL, NULL);
+ *   ret |= ock_add_device("my_name", "1.0", "//",
+ *                        "0123456", NULL, NULL);
+
  *   return ret;
  * }
  * ```
  *
-
  * @param[in] name the user readable name of the device
  * @param[in] version The api version e.g. "1.0"
  * @param[in] base the base url e.g. "/"
@@ -507,7 +456,7 @@ int oc_init_platform(const char *mfg_name,
 /**
  * Set custom platform property.
  *
- * The purpose is to add additional platfrom properties that are not supplied to
+ * The purpose is to add additional platform properties that are not supplied to
  * oc_init_platform() function call. This function will likely only be used
  * inside the oc_init_platform_cb_t().
  *
@@ -520,6 +469,7 @@ int oc_init_platform(const char *mfg_name,
 #define oc_set_custom_platform_property(prop, value)                           \
   oc_rep_set_text_string(root, prop, value)
 
+// obsolete???
 /**
  * Callback invoked when an onboarding client requests device ownership via the
  * Random PIN Ownership Transfer Method (OTM).  The purpose of the callback is
@@ -572,28 +522,10 @@ typedef void (*oc_random_pin_cb_t)(const unsigned char *pin, size_t pin_len,
  */
 void oc_set_random_pin_callback(oc_random_pin_cb_t cb, void *data);
 
-/**
- * Returns whether the oic.wk.con resource is advertised.
- *
- * @return
- *  - true if advertised (default)
- *  - false if not
- *
- * @see oc_set_con_res_announced
- * @see oc_set_con_write_cb
- */
+// obsolete
 bool oc_get_con_res_announced(void);
 
-/**
- * Sets whether the oic.wk.con resource is announced.
- *
- * @note This should be set before invoking oc_main_init().
- *
- * @param[in] announce true to announce (default) or false if not
- *
- * @see oc_get_con_res_announced
- * @see oc_set_con_write_cb
- */
+// obsolete
 void oc_set_con_res_announced(bool announce);
 
 /**
@@ -745,6 +677,7 @@ bool oc_is_owned_device(size_t device_index);
 oc_resource_t *oc_new_resource(const char *name, const char *uri,
                                uint8_t num_resource_types, size_t device);
 
+// UPDATE
 /**
  * Add the supported interface(s) to the resource.
  *
@@ -787,22 +720,7 @@ oc_resource_t *oc_new_resource(const char *name, const char *uri,
 void oc_resource_bind_resource_interface(oc_resource_t *resource,
                                          oc_interface_mask_t iface_mask);
 
-/**
- * Select the default interface.
- *
- * The default interface must be one of the resources specified in the
- * oc_resource_bind_resource_interface() function.
- *
- * If a request to the resource comes in and the interface is not specified
- * then the default interface will be used to service the request.
- *
- * If the default interface is not set then the OC_IF_BASELINE will be used
- * by the stack.
- *
- * @param[in] resource the resource that the default interface will be set on
- * @param[in] iface_mask a single interface that will will be used as the
- *                       default interface
- */
+// obsolete
 void oc_resource_set_default_interface(oc_resource_t *resource,
                                        oc_interface_mask_t iface_mask);
 
@@ -835,6 +753,7 @@ void oc_resource_bind_resource_type(oc_resource_t *resource, const char *type);
 void oc_resource_bind_content_type(oc_resource_t *resource,
                                    oc_content_format_t content_type);
 
+// UPDATE
 /**
  * Add a Resource Type "rt" property to the an `/oic/d` resource.
  *
@@ -846,75 +765,21 @@ void oc_resource_bind_content_type(oc_resource_t *resource,
  */
 void oc_device_bind_resource_type(size_t device, const char *type);
 
-/**
- * @brief Sets the tag value for tag "tag-pos-desc" on the resource
- *
- * @param resource the resource
- * @param pos the descriptive text for the tag
- */
+// obsolete
 void oc_resource_tag_pos_desc(oc_resource_t *resource,
                               oc_pos_description_t pos);
 
-/**
- * @brief Sets the value for the relative position "tag-pos-rel" tag
- *
- * @param resource the resource to apply the tag too.
- * @param x the x value in 3D space
- * @param y the y value in 3D space
- * @param z the z value in 3D space
- */
+// obsolete
 void oc_resource_tag_pos_rel(oc_resource_t *resource, double x, double y,
                              double z);
 
-/**
- * @brief Sets the tag value for the relatvie position "tag_func_rel" tag
- *
- * @param resource the resource to apply the tag too.
- * @param func the function description
- */
+// obsolete
 void oc_resource_tag_func_desc(oc_resource_t *resource, oc_enum_t func);
 
-/**
- * @brief sets the value of the "tag_locn" tag
- *
- * @param resource the resource to apply the tag too.
- * @param locn the location
- */
+// obsolete
 void oc_resource_tag_locn(oc_resource_t *resource, oc_enum_t locn);
 
-/**
- * Helper function used when responding to a GET request to add Common
- * Properties to a GET response.
- *
- * This add Common Properties name ("n"), Interface ("if"), and Resource Type
- * ("rt") to a GET response.
- *
- * Example:
- * ```
- * bool bswitch_state = false;
- *
- * void get_bswitch(oc_resource_t *resource, oc_interface_mask_t iface_mask,
- *                  void *data)
- * {
- *   oc_rep_start_root_object();
- *   switch (iface_mask) {
- *   case OC_IF_BASELINE:
- *     oc_process_baseline_interface(resource);
- *   // fall through
- *   case OC_IF_A:
- *     oc_rep_set_boolean(root, value, bswitch_state);
- *     break;
- *   default:
- *     break;
- *   }
- *   oc_rep_end_root_object();
- *   oc_send_response(request, OC_STATUS_OK);
- * }
- * ```
- *
- * @param[in] resource the resource the baseline Common Properties will be read
- *            from to respond to the GET request
- */
+// obsolete
 void oc_process_baseline_interface(oc_resource_t *resource);
 
 /**
@@ -923,182 +788,45 @@ void oc_process_baseline_interface(oc_resource_t *resource);
  * @{
  */
 
-/**
- * Creates a new empty collection.
- *
- * The collection is created with interfaces `OC_IF_BASELINE`,
- * `OC_IF_LL` (also default) and `OC_IF_B`. Initially it is neither discoverable
- * nor observable.
- *
- * The function only allocates the collection. Use oc_add_collection() after the
- * setup of the collection is complete.
- *
- * @param[in] name name of the collection
- * @param[in] uri Unique URI of this collection. Must not be NULL.
- * @param[in] num_resource_types Number of resources the caller will bind with
-                      this resource (e.g. by invoking
-                      `oc_resource_bind_resource_type(col, OIC_WK_COLLECTION)`).
-                      Must be 1 or higher.
- * @param[in] device The internal device that should carry this collection.
- *                   This is typically 0.
- *
- * @return A pointer to the new collection (actually `oc_collection_t *`)
- *  or NULL if out of memory.
- *
- * @see oc_add_collection
- * @see oc_collection_add_link
- */
+// obsolete
 oc_resource_t *oc_new_collection(const char *name, const char *uri,
                                  uint8_t num_resource_types, size_t device);
 
-/**
- * Deletes the specified collection.
- *
- * The function removes the collection from the internal list of collections
- * and releases all direct resources and links associated with this collection.
- *
- * @note The function does not delete the resources set in the links. The caller
- *       needs to do this on her/his own in case these are no longer required.
- *
- * @param[in,out] collection The pointer to the collection to delete. If this is
- *                           NULL, the function does nothing
- *
- * @see oc_collection_get_links
- * @see oc_delete_link
- */
+// obsolete
 void oc_delete_collection(oc_resource_t *collection);
 
-/**
- * Creates a new link for collections with the specified resource.
- *
- * @param[in] resource Resource to set in the link. The resource is not copied.
- *                     Must not be NULL
- *
- * @return The created link or NULL if out of memory or resource is NULL.
- *
- * @see oc_delete_link
- * @see oc_collection_add_link
- * @see oc_new_resource
- */
+// obsolete
 oc_link_t *oc_new_link(oc_resource_t *resource);
 
-/**
- * Deletes the link.
- *
- * @note The function neither removes the resource set on this link  nor does it
- *       remove it from any collection.
- *
- * @param[in,out] link The link to delete. The function does nothing, if the
- *                     parameter is NULL
- */
+// obsolete
 void oc_delete_link(oc_link_t *link);
 
-/**
- * Adds a relation to the link.
- *
- * @param[in,out] link Link to add the relation to. Must not be NULL
- * @param[in] rel Relation to add. Must not be NULL
- */
+// obsolete
 void oc_link_add_rel(oc_link_t *link, const char *rel);
 
-/**
- * Adds a link parameter with specified key and value.
- *
- * @param[in,out] link Link to which to add a link parameter. Must not be NULL
- * @param[in] key Key to identify the link parameter. Must not be NULL
- * @param[in] value Link parameter value. Must not be NULL
- */
+// obsolete
 void oc_link_add_link_param(oc_link_t *link, const char *key,
                             const char *value);
 
-/**
- * Adds the link to the collection.
- *
- * @param[in,out] collection Collection to add the link to. Must not be NULL
- * @param[in] link Link to add to the collection. The link is not copied.
- *                 Must not be NULL. Must not be added again to this or a
- *                 different collection or a list corruption will occur. To
- *                 re-add it, remove the link first.
- *
- * @see oc_new_link
- * @see oc_collection_remove_link
- */
+// obsolete
 void oc_collection_add_link(oc_resource_t *collection, oc_link_t *link);
 
-/**
- * Removes a link from the collection.
- *
- * @param[in,out] collection Collection to remove the link from. Does nothing
- *                           if this is NULL
- * @param[in] link The link to remove. Does nothing if this is NULL or not
- *                 part of the collection. The link and its resource are not
- *                 freed.
- */
+// obsolete
 void oc_collection_remove_link(oc_resource_t *collection, oc_link_t *link);
 
-/**
- * Returns the list of links belonging to this collection.
- *
- * @param[in] collection Collection to get the links from.
- *
- * @return All links of this collection. The links are not copied. Returns
- *         NULL if the collection is NULL or contains no links.
- *
- * @see oc_collection_add_link
- */
+// obsolete
 oc_link_t *oc_collection_get_links(oc_resource_t *collection);
 
-/**
- * Adds a collection to the list of collections.
- *
- * If the caller makes the collection discoverable, then it will be included in
- * the collection discovery once it has been added with this function.
- *
- * @param[in] collection Collection to add to the list of collections. Must not
- *                       be NULL. Must not be added twice or a list corruption
- *                       will occur. The collection is not copied.
- *
- * @see oc_resource_set_discoverable
- * @see oc_new_collection
- */
+// obsolete
 void oc_add_collection(oc_resource_t *collection);
 
-/**
- * Gets all known collections.
- *
- * @return All collections that have been added via oc_add_collection(). The
- *         collections are not copied. Returns NULL if there are no collections.
- *         Collections created only via oc_new_collection() but not added will
- *         not be returned by this function.
- */
+// obsolete
 oc_resource_t *oc_collection_get_collections(void);
 
-/**
- * Add a supported Resource Type to a collection
- *
- * This will become the "rts" property of the collection. The "rts" property is
- * an array of Resource Types that are supported within an array of Links
- * exposed by the collection.
- *
- * @param[in] collection the collection the the Resource Type will be added to
- * @param[in] rt the supported Resource Type being added to the collection
- *
- * @return true on success
- */
+// obsolete
 bool oc_collection_add_supported_rt(oc_resource_t *collection, const char *rt);
 
-/**
- * Add a mandatory Resource Type to a collection
- *
- * This will be come the "rts-m" property of the collection. The "rts-m"
- * property is an array of Resource Types that are mandatory to be exposed with
- * in an array of Links exposed by the collection.
- *
- * @param[in] collection the collection the the Resource Type will be added to
- * @param[in] rt the mandatory Resource Type being added to the collection
- *
- * @return true on success
- */
+// obsolete
 bool oc_collection_add_mandatory_rt(oc_resource_t *collection, const char *rt);
 
 #ifdef OC_COLLECTIONS_IF_CREATE
@@ -1148,7 +876,8 @@ bool oc_collections_add_rt_factory(const char *rt,
 void oc_resource_make_public(oc_resource_t *resource);
 
 /**
- * Specify if a resource can be found using OCF discover mechanisms.
+ * Specify if a resource can be found using .well-known/core discover
+ * mechanisms.
  *
  * @param[in] resource to specify as discoverable or non-discoverable
  * @param[in] state if true the resource will be discoverable if false the
@@ -1356,8 +1085,8 @@ void oc_init_query_iterator(void);
  * ```
  *
  * @param[in] request the oc_request_t that contains the query parameters
- * @param[out] key pointer to the location of the the key of the key=value pair
- * @param[out] key_len the lenght of the key string
+ * @param[out] key pointer to the location of the key of the key=value pair
+ * @param[out] key_len the length of the key string
  * @param[out] value pointer the location of the value string assigned to the
  *             key=value pair
  * @param[out] value_len the length of the value string
@@ -1377,7 +1106,7 @@ int oc_iterate_query(oc_request_t *request, char **key, size_t *key_len,
  * first query parameter.
  *
  * @note The char pointer returned is pointing to the string location in the
- *       query string. Do not rely on a nul terminator to find the end of the
+ *       query string. Do not rely on a null terminator to find the end of the
  *       string since there may be additional query parameters.
  *
  * Example:
@@ -1411,7 +1140,7 @@ bool oc_iterate_query_get_values(oc_request_t *request, const char *key,
  * pair.
  *
  * @note The char pointer returned is pointing to the string location in the
- *       query string. Do not rely on a nul terminator to find the end of the
+ *       query string. Do not rely on a null terminator to find the end of the
  *       string since there may be additional query parameters.
  *
  * @param[in] request the oc_request_t that contains the query parameters
@@ -1505,9 +1234,9 @@ bool oc_get_response_payload_raw(oc_client_response_t *response,
  * @brief send a diagnostic payload
  *
  * @param request the request
- * @param msg the message in ascii
- * @param msg_len the lenght of the message
- * @param response_code the coap response code
+ * @param msg the message in ASCII
+ * @param msg_len the length of the message
+ * @param response_code the CoAP response code
  */
 void oc_send_diagnostic_message(oc_request_t *request, const char *msg,
                                 size_t msg_len, oc_status_t response_code);
@@ -1516,7 +1245,7 @@ void oc_send_diagnostic_message(oc_request_t *request, const char *msg,
  * @brief retrieve the diagnostic payload from a response
  *
  * @param response the response to get the diagnostic payload from
- * @param msg the diagnotic payload
+ * @param msg the diagnostic payload
  * @param size the size of the diagnostic payload
  * @return true - retrieved payload
  * @return false
@@ -1528,8 +1257,8 @@ bool oc_get_diagnostic_message(oc_client_response_t *response, const char **msg,
  * Ignore the request
  *
  * The GET, PUT, POST or DELETE requests can be ignored. For example a
- * oc_request_callback_t may only want to respond to multicast requests. Thus
- * any request that is not over multicast endpoint could be ignored.
+ * oc_request_callback_t may only want to respond to multi-cast requests. Thus
+ * any request that is not over multi-cast endpoint could be ignored.
  *
  * Using `oc_ignore(request)` is preferred over
  * `oc_send_response(request, OC_IGNORE)` since it does not attempt to fill the
@@ -1709,6 +1438,7 @@ int oc_lf_get_entry_uri(const char *payload, int payload_len, int entry,
 int oc_lf_get_entry_param(const char *payload, int payload_len, int entry,
                           const char *param, const char **p_out, int *p_len);
 
+// obsolete
 bool oc_do_get(const char *uri, oc_endpoint_t *endpoint, const char *query,
                oc_response_handler_t handler, oc_qos_t qos, void *user_data);
 
@@ -1718,7 +1448,7 @@ bool oc_do_get(const char *uri, oc_endpoint_t *endpoint, const char *query,
  *
  * Example:
  * ```
- * statuc bool value;
+ * static bool value;
  *
  * static void
  * get_light(oc_client_response_t *data)
@@ -1828,6 +1558,7 @@ bool oc_do_delete(const char *uri, oc_endpoint_t *endpoint, const char *query,
 bool oc_init_put(const char *uri, oc_endpoint_t *endpoint, const char *query,
                  oc_response_handler_t handler, oc_qos_t qos, void *user_data);
 
+// obsolete
 bool oc_do_put(void);
 
 /**
@@ -1889,6 +1620,7 @@ bool oc_do_put_ex(oc_content_format_t content, oc_content_format_t accept);
 bool oc_init_post(const char *uri, oc_endpoint_t *endpoint, const char *query,
                   oc_response_handler_t handler, oc_qos_t qos, void *user_data);
 
+// obsolete
 bool oc_do_post(void);
 
 /**
@@ -2006,7 +1738,7 @@ oc_role_t *oc_get_all_roles(void);
  *
  * @param role the role
  * @param authority the authority
- * @param endpoint endpoint identifying the connection
+ * @param endpoint the endpoint identifying the connection
  * @param handler the response handler
  * @param user_data the user data to be conveyed to the response handler
  * @return true
