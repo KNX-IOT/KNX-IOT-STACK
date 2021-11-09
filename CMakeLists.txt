@@ -61,7 +61,6 @@ target_sources(kis-api INTERFACE
     ${PROJECT_SOURCE_DIR}/api/oc_ri.c
     ${PROJECT_SOURCE_DIR}/api/oc_server_api.c
     ${PROJECT_SOURCE_DIR}/api/oc_session_events.c
-    ${PROJECT_SOURCE_DIR}/api/oc_swupdate.c
     ${PROJECT_SOURCE_DIR}/api/oc_uuid.c
     ${PROJECT_SOURCE_DIR}/api/oc_knx.c
     ${PROJECT_SOURCE_DIR}/api/oc_knx_dev.c

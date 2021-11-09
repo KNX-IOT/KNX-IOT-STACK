@@ -353,13 +353,6 @@ process_device_resources(CborEncoder *links, oc_request_t *request,
                       request, oc_string(anchor), links, device_index))
     matches++;
 
-#ifdef OC_SOFTWARE_UPDATE
-  if (filter_resource(
-        oc_core_get_resource_by_index(OCF_SW_UPDATE, device_index), request,
-        oc_string(anchor), links, device_index))
-    matches++;
-#endif /* OC_SOFTWARE_UPDATE */
-
 #ifdef OC_SECURITY
   if (filter_resource(oc_core_get_resource_by_index(OCF_SEC_DOXM, device_index),
                       request, oc_string(anchor), links, device_index))
