@@ -182,9 +182,9 @@ typedef struct
  * static int app_init(void)
  * {
  *   int ret = oc_init_platform("My Platform",
- *      set_additional_platform_properties, NULL); 
+ *      set_additional_platform_properties, NULL);
  *   ret |= oc_add_device("/oic/d",
- *      "oic.d.light", "My light", "ocf.1.0.0", "ocf.res.1.0.0", NULL, NULL); 
+ *      "oic.d.light", "My light", "ocf.1.0.0", "ocf.res.1.0.0", NULL, NULL);
  *      return ret;
  * }
  * ```
@@ -469,7 +469,6 @@ int oc_init_platform(const char *mfg_name,
 #define oc_set_custom_platform_property(prop, value)                           \
   oc_rep_set_text_string(root, prop, value)
 
-
 // obsolete???
 /**
  * Callback invoked when an onboarding client requests device ownership via the
@@ -678,7 +677,6 @@ bool oc_is_owned_device(size_t device_index);
 oc_resource_t *oc_new_resource(const char *name, const char *uri,
                                uint8_t num_resource_types, size_t device);
 
-
 // UPDATE
 /**
  * Add the supported interface(s) to the resource.
@@ -781,7 +779,7 @@ void oc_resource_tag_func_desc(oc_resource_t *resource, oc_enum_t func);
 // obsolete
 void oc_resource_tag_locn(oc_resource_t *resource, oc_enum_t locn);
 
-// obsolete 
+// obsolete
 void oc_process_baseline_interface(oc_resource_t *resource);
 
 /**
@@ -878,7 +876,8 @@ bool oc_collections_add_rt_factory(const char *rt,
 void oc_resource_make_public(oc_resource_t *resource);
 
 /**
- * Specify if a resource can be found using .well-known/core discover mechanisms.
+ * Specify if a resource can be found using .well-known/core discover
+ * mechanisms.
  *
  * @param[in] resource to specify as discoverable or non-discoverable
  * @param[in] state if true the resource will be discoverable if false the
@@ -1439,7 +1438,6 @@ int oc_lf_get_entry_uri(const char *payload, int payload_len, int entry,
 int oc_lf_get_entry_param(const char *payload, int payload_len, int entry,
                           const char *param, const char **p_out, int *p_len);
 
-
 // obsolete
 bool oc_do_get(const char *uri, oc_endpoint_t *endpoint, const char *query,
                oc_response_handler_t handler, oc_qos_t qos, void *user_data);
@@ -1621,7 +1619,6 @@ bool oc_do_put_ex(oc_content_format_t content, oc_content_format_t accept);
  */
 bool oc_init_post(const char *uri, oc_endpoint_t *endpoint, const char *query,
                   oc_response_handler_t handler, oc_qos_t qos, void *user_data);
-
 
 // obsolete
 bool oc_do_post(void);
