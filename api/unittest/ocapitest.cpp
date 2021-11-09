@@ -142,8 +142,6 @@ public:
     s_handler.register_resources = registerResources;
     s_handler.requests_entry = requestsEntry;
 
-    oc_set_con_res_announced(false);
-
     int initResult = oc_main_init(&s_handler);
     if (initResult < 0) {
       isPassed = false;

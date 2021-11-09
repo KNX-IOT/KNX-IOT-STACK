@@ -243,7 +243,6 @@ typedef enum {
 
   /* List of resources on a logical device: start */
   /* List of Device Configuration Resources (DCRs): start */
-  OCF_CON,
   WELLKNOWNCORE,
   OCF_RES,
 #ifdef OC_SECURITY

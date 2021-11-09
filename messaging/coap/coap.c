@@ -475,48 +475,9 @@ coap_serialize_options(void *packet, uint8_t *option_array, bool inner,
   }
 
   if (inner && IS_OPTION(coap_pkt, COAP_OPTION_ACCEPT)) {
-    if (coap_pkt->accept == APPLICATION_VND_OCF_CBOR) {
-
-      option_length +=
-        coap_serialize_int_option(OCF_OPTION_ACCEPT_CONTENT_FORMAT_VER,
-                                  current_number, option, OCF_VER_1_0_0);
-      if (option) {
-        option = option_array + option_length;
-      }
-    }
-#ifdef OC_SPEC_VER_OIC
-    else if (coap_pkt->accept == APPLICATION_CBOR) {
-
-      option_length +=
-        coap_serialize_int_option(OCF_OPTION_ACCEPT_CONTENT_FORMAT_VER,
-                                  current_number, option, OIC_VER_1_1_0);
-      if (option) {
-        option = option_array + option_length;
-      }
-    }
-#endif /* OC_SPEC_VER_OIC */
-
     current_number = OCF_OPTION_ACCEPT_CONTENT_FORMAT_VER;
   }
   if (inner && IS_OPTION(coap_pkt, COAP_OPTION_CONTENT_FORMAT)) {
-    if (coap_pkt->content_format == APPLICATION_VND_OCF_CBOR) {
-
-      option_length += coap_serialize_int_option(
-        OCF_OPTION_CONTENT_FORMAT_VER, current_number, option, OCF_VER_1_0_0);
-      if (option) {
-        option = option_array + option_length;
-      }
-    }
-#ifdef OC_SPEC_VER_OIC
-    else if (coap_pkt->content_format == APPLICATION_CBOR) {
-
-      option_length += coap_serialize_int_option(
-        OCF_OPTION_CONTENT_FORMAT_VER, current_number, option, OIC_VER_1_1_0);
-      if (option) {
-        option = option_array + option_length;
-      }
-    }
-#endif /* OC_SPEC_VER_OIC */
     current_number = OCF_OPTION_CONTENT_FORMAT_VER;
   }
 
@@ -882,17 +843,9 @@ coap_oscore_parse_options(void *packet, uint8_t *data, uint32_t data_len,
       if (!inner) {
         return BAD_OPTION_4_02;
       }
-      uint16_t version =
-        (uint16_t)coap_parse_int_option(current_option, option_length);
-      OC_DBG("  Content-format/accept-Version: [%u]", version);
-      if (version < OCF_VER_1_0_0
-#ifdef OC_SPEC_VER_OIC
-          && version != OIC_VER_1_1_0
-#endif /* OC_SPEC_VER_OIC */
-      ) {
-        OC_WRN("Unsupported version %d %u", option_number, version);
-        return UNSUPPORTED_MEDIA_TYPE_4_15;
-      }
+      // uint16_t version =
+      //  (uint16_t)coap_parse_int_option(current_option, option_length);
+      // OC_DBG("  Content-format/accept-Version: [%u]", version);
     } break;
     default:
       OC_DBG("  unknown (%u)", option_number);
@@ -1222,8 +1175,7 @@ void
 coap_send_message(oc_message_t *message)
 {
 #ifdef OC_TCP
-  if (message->endpoint.flags & TCP &&
-      message->endpoint.version == OCF_VER_1_0_0) {
+  if (message->endpoint.flags & TCP) {
     tcp_csm_state_t state = oc_tcp_get_csm_state(&message->endpoint);
     if (state == CSM_NONE) {
       coap_send_csm_message(&message->endpoint, OC_PDU_SIZE, 0);

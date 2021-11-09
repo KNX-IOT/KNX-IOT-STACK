@@ -46,17 +46,8 @@ static oc_device_info_t oc_device_info[OC_MAX_NUM_DEVICES];
 #endif /* !OC_DYNAMIC_ALLOCATION */
 static oc_platform_info_t oc_platform_info;
 
-static bool announce_con_res = false;
 static int res_latency = 0;
 static size_t device_count = 0;
-
-/* Although used several times in the OCF spec, "/oic/con" is not
-   accepted by the spec. Use a private prefix instead.
-   Update OC_NAMELEN_CON_RES if changing the value.
-   String must not have a leading slash. */
-#define OC_NAME_CON_RES "oc/con"
-/* Number of characters of OC_NAME_CON_RES */
-#define OC_NAMELEN_CON_RES 6
 
 void
 oc_core_init(void)
@@ -279,7 +270,7 @@ oc_core_device_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 
   char di[OC_UUID_LEN], piid[OC_UUID_LEN];
   oc_uuid_to_str(&oc_device_info[device].di, di, OC_UUID_LEN);
-  if (request->origin && request->origin->version != OIC_VER_1_1_0) {
+  if (request->origin) {
     oc_uuid_to_str(&oc_device_info[device].piid, piid, OC_UUID_LEN);
   }
 
@@ -289,7 +280,7 @@ oc_core_device_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   /* fall through */
   case OC_IF_R: {
     oc_rep_set_text_string(root, di, di);
-    if (request->origin && request->origin->version != OIC_VER_1_1_0) {
+    if (request->origin) {
       oc_rep_set_text_string(root, piid, piid);
     }
     oc_rep_set_text_string(root, n, oc_string(oc_device_info[device].name));
@@ -306,108 +297,10 @@ oc_core_device_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   oc_rep_end_root_object();
   oc_send_response(request, OC_STATUS_OK);
 }
-
-static void
-oc_core_con_handler_get(oc_request_t *request, oc_interface_mask_t iface_mask,
-                        void *data)
-{
-  (void)data;
-  size_t device = request->resource->device;
-  oc_rep_start_root_object();
-
-  switch (iface_mask) {
-  case OC_IF_BASELINE:
-    oc_process_baseline_interface(request->resource);
-  /* fall through */
-  case OC_IF_RW: {
-    /* oic.wk.d attribute n shall always be the same value as
-    oic.wk.con attribute n. */
-    oc_rep_set_text_string(root, n, oc_string(oc_device_info[device].name));
-
-    oc_locn_t oc_locn = oc_core_get_resource_by_index(OCF_D, 0)->tag_locn;
-    if (oc_locn > 0) {
-      oc_rep_set_text_string(root, locn, oc_enum_locn_to_str(oc_locn));
-    }
-
-  } break;
-  default:
-    break;
-  }
-
-  oc_rep_end_root_object();
-  oc_send_response(request, OC_STATUS_OK);
-}
-
-static void
-oc_core_con_handler_post(oc_request_t *request, oc_interface_mask_t iface_mask,
-                         void *data)
-{
-  (void)iface_mask;
-  oc_rep_t *rep = request->request_payload;
-  bool changed = false;
-  size_t device = request->resource->device;
-
-  while (rep != NULL) {
-    if (strcmp(oc_string(rep->name), "n") == 0) {
-      if (rep->type != OC_REP_STRING || oc_string_len(rep->value.string) == 0) {
-        oc_send_response(request, OC_STATUS_BAD_REQUEST);
-        return;
-      }
-
-      oc_free_string(&oc_device_info[device].name);
-      oc_new_string(&oc_device_info[device].name, oc_string(rep->value.string),
-                    oc_string_len(rep->value.string));
-      oc_rep_start_root_object();
-      oc_rep_set_text_string(root, n, oc_string(oc_device_info[device].name));
-      oc_rep_end_root_object();
-
-      changed = true;
-      break;
-    }
-    if (strcmp(oc_string(rep->name), "locn") == 0) {
-      if (rep->type != OC_REP_STRING || oc_string_len(rep->value.string) == 0) {
-        oc_send_response(request, OC_STATUS_BAD_REQUEST);
-        return;
-      }
-      oc_resource_t *device = oc_core_get_resource_by_index(OCF_D, 0);
-      if (device->tag_locn == 0) {
-        oc_send_response(request, OC_STATUS_BAD_REQUEST);
-        return;
-      }
-
-      bool oc_defined = false;
-      oc_locn_t oc_locn = oc_str_to_enum_locn(rep->value.string, &oc_defined);
-      if (oc_defined) {
-        oc_resource_tag_locn(device, oc_locn);
-        changed = true;
-      }
-    }
-
-    rep = rep->next;
-  }
-
-  if (data) {
-    oc_con_write_cb_t cb = *(oc_con_write_cb_t *)(&data);
-    cb(device, request->request_payload);
-  }
-
-  if (changed) {
-    oc_send_response(request, OC_STATUS_CHANGED);
-  } else {
-    oc_send_response(request, OC_STATUS_BAD_REQUEST);
-  }
-}
-
 size_t
 oc_core_get_num_devices(void)
 {
   return device_count;
-}
-
-bool
-oc_get_con_res_announced(void)
-{
-  return announce_con_res;
 }
 
 void
@@ -420,12 +313,6 @@ int
 oc_core_get_latency(void)
 {
   return res_latency;
-}
-
-void
-oc_set_con_res_announced(bool announce)
-{
-  announce_con_res = announce;
 }
 
 int
@@ -558,16 +445,6 @@ oc_core_add_new_device(const char *uri, const char *rt, const char *name,
   oc_new_string(&oc_device_info[device_count].dmv, data_model_version,
                 strlen(data_model_version));
   oc_device_info[device_count].add_device_cb = add_device_cb;
-
-  if (oc_get_con_res_announced()) {
-    /* Construct oic.wk.con resource for this device. */
-
-    oc_core_populate_resource(OCF_CON, device_count, "/" OC_NAME_CON_RES,
-                              OC_IF_RW | OC_IF_BASELINE, OC_IF_RW,
-                              OC_DISCOVERABLE | OC_OBSERVABLE | OC_SECURE,
-                              oc_core_con_handler_get, oc_core_con_handler_post,
-                              oc_core_con_handler_post, 0, 1, "oic.wk.con");
-  }
 
   oc_create_discovery_resource(OCF_RES, device_count);
 
@@ -898,7 +775,7 @@ oc_core_is_DCR(oc_resource_t *resource, size_t device)
   size_t DCRs_end = device_resources + OCF_D, i;
   for (i = device_resources + 1; i <= DCRs_end; i++) {
     if (resource == &core_resources[i]) {
-      if (i == (device_resources + OCF_CON)) {
+      if (i == (device_resources + OCF_RES)) {
         return false;
       }
       return true;
@@ -923,10 +800,6 @@ oc_core_get_resource_by_uri(const char *uri, size_t device)
   } else if ((strlen(uri) - skip) == 7 &&
              memcmp(uri + skip, "oic/res", 7) == 0) {
     type = OCF_RES;
-  } else if (oc_get_con_res_announced() &&
-             (strlen(uri) - skip) == OC_NAMELEN_CON_RES &&
-             memcmp(uri + skip, OC_NAME_CON_RES, OC_NAMELEN_CON_RES) == 0) {
-    type = OCF_CON;
   }
 
 #ifdef OC_SECURITY

@@ -923,16 +923,6 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
   bool method_impl = true, bad_request = false, success = false,
        forbidden = false, entity_too_large = false;
 
-  endpoint->version = OCF_VER_1_0_0;
-#ifdef OC_SPEC_VER_OIC
-  unsigned int accept = 0;
-  if (coap_get_header_accept(request, &accept) == 1) {
-    if (accept == APPLICATION_CBOR) {
-      endpoint->version = OIC_VER_1_1_0;
-    }
-  }
-#endif /* OC_SPEC_VER_OIC */
-
 #ifdef OC_SECURITY
   bool authorized = true;
 #endif /* OC_SECURITY */
@@ -1530,7 +1520,6 @@ oc_ri_invoke_client_cb(void *response, oc_client_cb_t *cb,
                        oc_endpoint_t *endpoint)
 #endif /* OC_BLOCK_WISE */
 {
-  endpoint->version = OCF_VER_1_0_0;
   oc_content_format_t cf = 0;
   coap_get_header_content_format(response, &cf);
 
