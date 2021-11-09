@@ -66,7 +66,6 @@ typedef struct
    * Other actions may be taken in the init handler
    *  - The immutable device identifier can be set `piid`
    *    (a.k.a Protocol Independent ID) oc_set_immutable_device_identifier()
-   *  - Set introspection data oc_set_introspection_data()
    *  - Set up an interrupt handler oc_activate_interrupt_handler()
    *  - Initialize application specific variables
    *
@@ -78,7 +77,6 @@ typedef struct
    * @see oc_add_device
    * @see oc_init_platform
    * @see oc_set_immutable_device_identifier
-   * @see oc_set_introspection_data
    */
   int (*init)(void);
 
@@ -1070,7 +1068,7 @@ void oc_init_query_iterator(void);
  * must be called to reset the query iterator to the first query parameter.
  *
  * @note the char pointers returned are pointing to the string location in the
- *       query string.  Do not rely on a nul terminator to find the end of the
+ *       query string.  Do not rely on a null terminator to find the end of the
  *       string since there may be additional query parameters.
  *
  * Example:
@@ -1383,9 +1381,9 @@ extern "C" {
 /**
  * Discover all servers that have a resource type using the site-local scope
  *
- * The discovery request will make a muli-cast request to the IPv6 ``scope``
- * multicast address scope. The address scope is the domain in which the
- * multicast discovery packet should be propagated.
+ * The discovery request will make a multi-cast request to the IPv6 ``scope``
+ * multi-cast address scope. The address scope is the domain in which the
+ * multi-cast discovery packet should be propagated.
  *
  * Read RFC4291 and RFC7346 for more information about IPv6 Reference Scopes.
  *
@@ -1497,13 +1495,13 @@ bool oc_do_get_ex(const char *uri, oc_endpoint_t *endpoint, const char *query,
  * Issue a DELETE request to delete a resource
  *
  * @param[in] uri The uri of the resource
- * @param[in] endpoint the endpoint of the server
+ * @param[in] endpoint The endpoint of the server
  * @param[in] query a query parameter that will be sent to the server's
  *                  oc_request_callback_t.
- * @param[in] handler function invoked once the client has received the servers
+ * @param[in] handler The function invoked once the client has received the servers
  *                    response to the DELETE request
- * @param[in] qos the quality of service current options are HIGH_QOS or LOW_QOS
- * @param[in] user_data context pointer that will be sent to the
+ * @param[in] qos The quality of service current options are HIGH_QOS or LOW_QOS
+ * @param[in] user_data The context pointer that will be sent to the
  *                      oc_response_handler_t
  *
  * @return True if the client successfully dispatched the CoAP DELETE request
@@ -1689,7 +1687,7 @@ void oc_stop_multicast(oc_client_response_t *response);
 bool oc_init_multicast_update(const char *uri, const char *query);
 
 /**
- * @brief initiate the multicast update
+ * @brief initiate the multi-cast update
  *
  * @return true
  * @return false

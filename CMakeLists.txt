@@ -19,7 +19,6 @@ set(OC_DYNAMIC_ALLOCATION_ENABLED ON CACHE BOOL "Enable dynamic memory allocatio
 set(OC_SECURITY_ENABLED ON CACHE BOOL "Enable security")
 set(OC_PKI_ENABLED ON CACHE BOOL "Enable PKI security")
 set(OC_DEBUG_ENABLED OFF CACHE BOOL "Enable debug messages")
-set(OC_IDD_API_ENABLED ON CACHE BOOL "Enable the Introspection Device Data API")
 
 # If an mbedtls platform layer is defined, add it to the mbedtls list of libs
 if(TARGET mbedtls-plat)

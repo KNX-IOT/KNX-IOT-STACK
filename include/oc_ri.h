@@ -244,8 +244,6 @@ typedef enum {
   /* List of resources on a logical device: start */
   /* List of Device Configuration Resources (DCRs): start */
   OCF_CON,
-  OCF_INTROSPECTION_WK,
-  OCF_INTROSPECTION_DATA,
   WELLKNOWNCORE,
   OCF_RES,
 #ifdef OC_SOFTWARE_UPDATE
