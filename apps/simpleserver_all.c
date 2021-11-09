@@ -696,7 +696,6 @@ initialize_variables(void)
   /* initialize global variables for resource "/binaryswitch" */
   // g_binaryswitch_value =
   //    false; /* current value of property "value" The status of the switch. */
-
 }
 
 #ifndef NO_MAIN

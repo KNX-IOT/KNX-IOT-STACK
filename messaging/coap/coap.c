@@ -843,9 +843,9 @@ coap_oscore_parse_options(void *packet, uint8_t *data, uint32_t data_len,
       if (!inner) {
         return BAD_OPTION_4_02;
       }
-      //uint16_t version =
+      // uint16_t version =
       //  (uint16_t)coap_parse_int_option(current_option, option_length);
-      //OC_DBG("  Content-format/accept-Version: [%u]", version);
+      // OC_DBG("  Content-format/accept-Version: [%u]", version);
     } break;
     default:
       OC_DBG("  unknown (%u)", option_number);

@@ -90,8 +90,8 @@ typedef struct oc_endpoint_t
     oc_ipv4_addr_t ipv4; ///< ipv4 address
     oc_le_addr_t bt;     ///< blue tooth address
   } addr, addr_local;
-  int interface_index;   ///< interface index
-  uint8_t priority;      ///< priority
+  int interface_index; ///< interface index
+  uint8_t priority;    ///< priority
 #ifdef OC_OSCORE
   uint8_t piv[OSCORE_PIV_LEN];
   uint8_t piv_len;

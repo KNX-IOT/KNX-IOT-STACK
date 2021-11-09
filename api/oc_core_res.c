@@ -49,7 +49,6 @@ static oc_platform_info_t oc_platform_info;
 static int res_latency = 0;
 static size_t device_count = 0;
 
-
 void
 oc_core_init(void)
 {
@@ -281,7 +280,7 @@ oc_core_device_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   /* fall through */
   case OC_IF_R: {
     oc_rep_set_text_string(root, di, di);
-    if (request->origin ) {
+    if (request->origin) {
       oc_rep_set_text_string(root, piid, piid);
     }
     oc_rep_set_text_string(root, n, oc_string(oc_device_info[device].name));
@@ -801,7 +800,7 @@ oc_core_get_resource_by_uri(const char *uri, size_t device)
   } else if ((strlen(uri) - skip) == 7 &&
              memcmp(uri + skip, "oic/res", 7) == 0) {
     type = OCF_RES;
-  } 
+  }
 
 #ifdef OC_SECURITY
   else if ((strlen(uri) - skip) == 12) {
