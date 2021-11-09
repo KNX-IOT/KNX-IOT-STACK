@@ -271,7 +271,7 @@ oc_core_device_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 
   char di[OC_UUID_LEN], piid[OC_UUID_LEN];
   oc_uuid_to_str(&oc_device_info[device].di, di, OC_UUID_LEN);
-  if (request->origin && request->origin->version != OIC_VER_1_1_0) {
+  if (request->origin) {
     oc_uuid_to_str(&oc_device_info[device].piid, piid, OC_UUID_LEN);
   }
 
@@ -281,7 +281,7 @@ oc_core_device_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   /* fall through */
   case OC_IF_R: {
     oc_rep_set_text_string(root, di, di);
-    if (request->origin && request->origin->version != OIC_VER_1_1_0) {
+    if (request->origin ) {
       oc_rep_set_text_string(root, piid, piid);
     }
     oc_rep_set_text_string(root, n, oc_string(oc_device_info[device].name));
@@ -776,7 +776,7 @@ oc_core_is_DCR(oc_resource_t *resource, size_t device)
   size_t DCRs_end = device_resources + OCF_D, i;
   for (i = device_resources + 1; i <= DCRs_end; i++) {
     if (resource == &core_resources[i]) {
-      if (i == (device_resources + OCF_CON)) {
+      if (i == (device_resources + OCF_RES)) {
         return false;
       }
       return true;

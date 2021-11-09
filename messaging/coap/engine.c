@@ -276,7 +276,7 @@ coap_receive(oc_message_t *msg)
     /* handle requests */
     if (message->code >= COAP_GET && message->code <= COAP_DELETE) {
 
-      //#ifdef OC_DEBUG
+      #ifdef OC_DEBUG
       switch (message->code) {
       case COAP_GET:
         PRINT("  method: GET");
@@ -294,7 +294,7 @@ coap_receive(oc_message_t *msg)
       PRINT("  URL: %.*s", (int)message->uri_path_len, message->uri_path);
       PRINT("  QUERY: %.*s", (int)message->uri_query_len, message->uri_query);
       PRINT("  Payload: %.*s", (int)message->payload_len, message->payload);
-      //#endif
+      #endif
       const char *href;
       size_t href_len = coap_get_header_uri_path(message, &href);
 #ifdef OC_TCP

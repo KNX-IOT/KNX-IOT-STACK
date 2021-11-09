@@ -43,8 +43,6 @@ typedef uint64_t oc_clock_time_t;
 /* Add request history for deduplicate UDP/DTLS messages */
 #define OC_REQUEST_HISTORY
 
-/* Add batch interface support to /oic/res */
-#define OC_RES_BATCH_SUPPORT
 /* Add support for dns lookup to the endpoint */
 #define OC_DNS_LOOKUP
 #define OC_DNS_CACHE
@@ -114,9 +112,6 @@ typedef uint64_t oc_clock_time_t;
 
 /* library features that require persistent storage */
 #ifdef OC_SECURITY
-#define OC_STORAGE
-#endif
-#ifdef OC_IDD_API
 #define OC_STORAGE
 #endif
 

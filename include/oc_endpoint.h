@@ -29,8 +29,6 @@
 extern "C" {
 #endif
 
-typedef enum { OCF_VER_1_0_0 = 2048, OIC_VER_1_1_0 = 2112 } ocf_version_t;
-
 /**
  * @brief ipv6 data structure
  *
@@ -94,7 +92,6 @@ typedef struct oc_endpoint_t
   } addr, addr_local;
   int interface_index;   ///< interface index
   uint8_t priority;      ///< priority
-  ocf_version_t version; ///< ocf version
 #ifdef OC_OSCORE
   uint8_t piv[OSCORE_PIV_LEN];
   uint8_t piv_len;

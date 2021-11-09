@@ -24,12 +24,6 @@
 #include "oc_discovery.h"
 #include "oc_enums.h"
 
-#ifdef OC_RES_BATCH_SUPPORT
-#ifdef OC_SECURITY
-#include "security/oc_acl_internal.h"
-#endif /* OC_SECURITY */
-#endif /* OC_RES_BATCH_SUPPORT */
-
 #include "oc_core_res.h"
 #include "oc_endpoint.h"
 
@@ -410,14 +404,6 @@ oc_core_discovery_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
                           void *data)
 {
   (void)data;
-
-#ifdef OC_SPEC_VER_OIC
-  if (request->origin && request->origin->version == OIC_VER_1_1_0) {
-    oc_core_1_1_discovery_handler(request, iface_mask, data);
-    return;
-  }
-#endif /* OC_SPEC_VER_OIC */
-
   int matches = 0;
   size_t device = request->resource->device;
 
@@ -587,7 +573,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   /* handle serial number*/
   if (ep_request != 0 && ep_len > 11 &&
       strncmp(ep_request, "urn:knx:sn.", 11) == 0) {
-    /* request for all devices via serial number wildcard*/
+    /* request for all devices via serial number wild card*/
     char *ep_serialnumber = ep_request + 11;
     bool frame_ep = false;
 
@@ -657,10 +643,7 @@ oc_create_discovery_resource(int resource_idx, size_t device)
 #endif /* OC_SERVER*/
 
   oc_core_populate_resource(resource_idx, device, "oic/res",
-#ifdef OC_RES_BATCH_SUPPORT
-                            OC_IF_B |
-#endif /* OC_RES_BATCH_SUPPORT */
-                              OC_IF_LL | OC_IF_BASELINE,
+                            OC_IF_LL | OC_IF_BASELINE,
                             OC_IF_LL, OC_DISCOVERABLE,
                             oc_core_discovery_handler, 0, 0, 0, 1,
                             "oic.wk.res");
