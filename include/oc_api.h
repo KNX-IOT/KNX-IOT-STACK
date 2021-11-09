@@ -520,12 +520,6 @@ typedef void (*oc_random_pin_cb_t)(const unsigned char *pin, size_t pin_len,
  */
 void oc_set_random_pin_callback(oc_random_pin_cb_t cb, void *data);
 
-// obsolete
-bool oc_get_con_res_announced(void);
-
-// obsolete
-void oc_set_con_res_announced(bool announce);
-
 /**
  * Reset all logical devices to the RFOTM state
  *
