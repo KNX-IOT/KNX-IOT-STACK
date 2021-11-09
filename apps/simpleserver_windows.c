@@ -86,9 +86,6 @@
 #include "port/oc_clock.h"
 #include <signal.h>
 
-#if defined(OC_IDD_API)
-#include "oc_introspection.h"
-#endif
 
 #ifdef INCLUDE_EXTERNAL
 /* import external definitions from header file*/

@@ -169,9 +169,6 @@ if(OC_DEBUG_ENABLED)
     target_compile_definitions(mbedcrypto PUBLIC OC_DEBUG)
 endif()
 
-if(OC_IDD_API_ENABLED)
-    target_compile_definitions(kis-common INTERFACE OC_IDD_API)
-endif()
 
 # Client and server versions
 add_library(kis-client)
@@ -179,6 +176,7 @@ target_compile_definitions(kis-client PUBLIC OC_CLIENT)
 target_link_libraries(kis-client PRIVATE
     kis-coap
     kis-api
+    kis-port
 )
 target_link_libraries(kis-client PUBLIC kis-common)
 
@@ -187,6 +185,7 @@ target_compile_definitions(kis-server PUBLIC OC_SERVER)
 target_link_libraries(kis-server PRIVATE
     kis-coap
     kis-api
+    kis-port
 )
 target_link_libraries(kis-server PUBLIC kis-common)
 
@@ -195,6 +194,7 @@ target_compile_definitions(kis-server-client PUBLIC OC_SERVER OC_CLIENT)
 target_link_libraries(kis-server-client PRIVATE
     kis-coap
     kis-api
+    kis-port
 )
 target_link_libraries(kis-server-client PUBLIC kis-common)
 

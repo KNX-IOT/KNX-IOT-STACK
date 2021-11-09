@@ -35,9 +35,6 @@ typedef uint64_t oc_clock_time_t;
 #if !defined(OC_DYNAMIC_ALLOCATION)
 #error "Set preprocessor definition OC_DYNAMIC_ALLOCATION in your build"
 #endif /* OC_DYNAMIC_ALLOCATION */
-#if !defined(OC_COLLECTIONS)
-#define OC_COLLECTIONS
-#endif /* OC_COLLECTIONS */
 #if !defined(OC_BLOCK_WISE)
 #define OC_BLOCK_WISE
 #endif /* OC_BLOCK_WISE */
