@@ -31,11 +31,6 @@
 
 #include "oc_knx_dev.h"
 
-#if defined(OC_COLLECTIONS) && defined(OC_SERVER) &&                           \
-  defined(OC_COLLECTIONS_IF_CREATE)
-#include "oc_collection.h"
-#endif /* OC_COLLECTIONS && OC_SERVER && OC_COLLECTIONS_IF_CREATE */
-
 #ifdef OC_SECURITY
 #include "security/oc_acl_internal.h"
 #include "security/oc_ael.h"
@@ -316,11 +311,6 @@ oc_main_shutdown(void)
     return;
 
   initialized = false;
-
-#if defined(OC_COLLECTIONS) && defined(OC_SERVER) &&                           \
-  defined(OC_COLLECTIONS_IF_CREATE)
-  oc_collections_free_rt_factories();
-#endif /* OC_COLLECTIONS && OC_SERVER && OC_COLLECTIONS_IF_CREATE */
 
   oc_ri_shutdown();
 

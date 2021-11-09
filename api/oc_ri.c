@@ -49,13 +49,6 @@
 #include "oc_blockwise.h"
 #endif /* OC_BLOCK_WISE */
 
-#if defined(OC_COLLECTIONS) && defined(OC_SERVER)
-#include "oc_collection.h"
-#ifdef OC_COLLECTIONS_IF_CREATE
-#include "oc_resource_factory.h"
-#endif /* OC_COLLECTIONS_IF_CREATE */
-#endif /* OC_COLLECTIONS && OC_SERVER */
-
 #ifdef OC_SECURITY
 #include "security/oc_acl_internal.h"
 #include "security/oc_audit.h"
@@ -460,12 +453,6 @@ oc_ri_get_app_resource_by_uri(const char *uri, size_t uri_len, size_t device)
     res = res->next;
   }
 
-#ifdef OC_COLLECTIONS
-  if (!res) {
-    res = (oc_resource_t *)oc_get_collection_by_uri(uri, uri_len, device);
-  }
-#endif /* OC_COLLECTIONS */
-
   return res;
 }
 
@@ -535,14 +522,6 @@ oc_ri_delete_resource(oc_resource_t *resource)
   if (resource->num_observers > 0) {
     coap_remove_observer_by_resource(resource);
   }
-
-#if defined(OC_SERVER) && defined(OC_COLLECTIONS) &&                           \
-  defined(OC_COLLECTIONS_IF_CREATE)
-  oc_rt_created_t *rtc = oc_rt_get_factory_create_for_resource(resource);
-  if (rtc != NULL) {
-    oc_rt_factory_free_created_resource(rtc, rtc->rf);
-  }
-#endif
 
   oc_ri_free_resource_properties(resource);
   oc_memb_free(&app_resources_s, resource);
@@ -954,10 +933,6 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
   }
 #endif /* OC_SPEC_VER_OIC */
 
-#if defined(OC_COLLECTIONS) && defined(OC_SERVER)
-  bool resource_is_collection = false;
-#endif /* OC_COLLECTIONS && OC_SERVER */
-
 #ifdef OC_SECURITY
   bool authorized = true;
 #endif /* OC_SECURITY */
@@ -1124,12 +1099,6 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
   if (!cur_resource && !bad_request) {
     request_obj.resource = cur_resource =
       oc_ri_get_app_resource_by_uri(uri_path, uri_path_len, endpoint->device);
-
-#if defined(OC_COLLECTIONS)
-    if (cur_resource && oc_check_if_collection(cur_resource)) {
-      resource_is_collection = true;
-    }
-#endif /* OC_COLLECTIONS */
   }
 #endif /* OC_SERVER */
 
@@ -1210,11 +1179,6 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
 /* If cur_resource is a collection resource, invoke the framework's
  * internal handler for collections.
  */
-#if defined(OC_COLLECTIONS) && defined(OC_SERVER)
-      if (resource_is_collection) {
-        oc_handle_collection_request(method, &request_obj, iface_mask, NULL);
-      } else
-#endif /* OC_COLLECTIONS && OC_SERVER */
         /* If cur_resource is a non-collection resource, invoke
          * its handler for the requested method. If it has not
          * implemented that method, then return a 4.05 response.
@@ -1323,36 +1287,7 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
             }
           }
         }
-#if defined(OC_COLLECTIONS)
-        if (resource_is_collection) {
-          oc_collection_t *collection = (oc_collection_t *)cur_resource;
-          oc_link_t *links = (oc_link_t *)oc_list_head(collection->links);
-#ifdef OC_SECURITY
-          while (links) {
-            if (links->resource &&
-                (links->resource->properties & OC_OBSERVABLE)) {
-              if (!oc_sec_check_acl(OC_GET, links->resource, endpoint)) {
-                set_observe_option = false;
-                break;
-              }
-            }
-            links = links->next;
-          }
-#endif /* OC_SECURITY */
-          if (set_observe_option) {
-            if (iface_query == OC_IF_B) {
-              links = (oc_link_t *)oc_list_head(collection->links);
-              while (links) {
-                if (links->resource &&
-                    (links->resource->properties & OC_PERIODIC)) {
-                  add_periodic_observe_callback(links->resource);
-                }
-                links = links->next;
-              }
-            }
-          }
-        }
-#endif /* OC_COLLECTIONS */
+
         if (set_observe_option) {
           coap_set_header_observe(response, 0);
         } else {
@@ -1376,19 +1311,6 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
           if (cur_resource->properties & OC_PERIODIC) {
             remove_periodic_observe_callback(cur_resource);
           }
-#if defined(OC_COLLECTIONS)
-          if (resource_is_collection) {
-            oc_collection_t *collection = (oc_collection_t *)cur_resource;
-            oc_link_t *links = (oc_link_t *)oc_list_head(collection->links);
-            while (links) {
-              if (links->resource &&
-                  (links->resource->properties & OC_PERIODIC)) {
-                remove_periodic_observe_callback(links->resource);
-              }
-              links = links->next;
-            }
-          }
-#endif /* OC_COLLECTIONS */
         }
       }
     }
@@ -1438,9 +1360,6 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
      * of that resource with the change.
      */
     if (
-#ifdef OC_COLLECTIONS
-      !resource_is_collection &&
-#endif /* OC_COLLECTIONS */
       cur_resource && (method == OC_PUT || method == OC_POST) &&
       response_buffer.code < oc_status_code(OC_STATUS_BAD_REQUEST)) {
       if ((iface_mask == OC_IF_STARTUP) ||
@@ -1873,15 +1792,6 @@ oc_ri_shutdown(void)
   oc_process_shutdown();
 
 #ifdef OC_SERVER
-#ifdef OC_COLLECTIONS
-  oc_collection_t *collection = oc_collection_get_all(), *next;
-  while (collection != NULL) {
-    next = (oc_collection_t *)collection->res.next;
-    oc_collection_free(collection);
-    collection = next;
-  }
-#endif /* OC_COLLECTIONS */
-
   oc_ri_delete_all_app_resources();
 #endif /* OC_SERVER */
 

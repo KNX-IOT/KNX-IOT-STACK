@@ -43,8 +43,6 @@ typedef uint64_t oc_clock_time_t;
 /* Add request history for deduplicate UDP/DTLS messages */
 #define OC_REQUEST_HISTORY
 
-/* Add support for the oic.if.create interface in Collections */
-//#define OC_COLLECTIONS_IF_CREATE or run "make" with CREATE=1
 /* Add batch interface support to /oic/res */
 #define OC_RES_BATCH_SUPPORT
 /* Add support for dns lookup to the endpoint */
@@ -54,7 +52,6 @@ typedef uint64_t oc_clock_time_t;
 
 /* If we selected support for dynamic memory allocation */
 #ifdef OC_DYNAMIC_ALLOCATION
-#define OC_COLLECTIONS
 #define OC_BLOCK_WISE
 
 // The maximum size of a response to an OBSERVE request, in bytes

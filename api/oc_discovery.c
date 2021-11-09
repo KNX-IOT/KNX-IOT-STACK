@@ -30,10 +30,6 @@
 #endif /* OC_SECURITY */
 #endif /* OC_RES_BATCH_SUPPORT */
 
-#if defined(OC_COLLECTIONS) && defined(OC_SERVER)
-#include "oc_collection.h"
-#endif /* OC_COLLECTIONS  && OC_SERVER */
-
 #include "oc_core_res.h"
 #include "oc_endpoint.h"
 
@@ -407,19 +403,6 @@ process_device_resources(CborEncoder *links, oc_request_t *request,
                         device_index))
       matches++;
   }
-
-#if defined(OC_COLLECTIONS)
-  oc_resource_t *collection = (oc_resource_t *)oc_collection_get_all();
-  for (; collection; collection = collection->next) {
-    if (collection->device != device_index ||
-        !(collection->properties & OC_DISCOVERABLE))
-      continue;
-
-    if (filter_resource(collection, request, oc_string(anchor), links,
-                        device_index))
-      matches++;
-  }
-#endif /* OC_COLLECTIONS */
 #endif /* OC_SERVER */
 
   oc_free_string(&anchor);

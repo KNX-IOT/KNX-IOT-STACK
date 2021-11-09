@@ -364,16 +364,12 @@ struct oc_resource_s
   double tag_pos_rel[3];               ///< tag relative position [x,y,z]
   oc_pos_description_t tag_pos_desc;   ///< tag (value) for position description
   oc_enum_t tag_func_desc;             ///< tag (value) for function description
-  oc_locn_t tag_locn;                  ///< tag (value) for location desciption
+  oc_locn_t tag_locn;                  ///< tag (value) for location description
   uint8_t num_observers;               ///< amount of observers
-#ifdef OC_COLLECTIONS
-  uint8_t num_links;               ///< number of links in the collection
-#endif                             /* OC_COLLECTIONS */
   uint16_t observe_period_seconds; ///< observe period in seconds
 };
 
 typedef struct oc_link_s oc_link_t;
-typedef struct oc_collection_s oc_collection_t;
 
 typedef enum {
   OC_EVENT_DONE = 0,
