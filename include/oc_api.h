@@ -758,20 +758,6 @@ void oc_resource_bind_content_type(oc_resource_t *resource,
 void oc_device_bind_resource_type(size_t device, const char *type);
 
 // obsolete
-void oc_resource_tag_pos_desc(oc_resource_t *resource,
-                              oc_pos_description_t pos);
-
-// obsolete
-void oc_resource_tag_pos_rel(oc_resource_t *resource, double x, double y,
-                             double z);
-
-// obsolete
-void oc_resource_tag_func_desc(oc_resource_t *resource, oc_enum_t func);
-
-// obsolete
-void oc_resource_tag_locn(oc_resource_t *resource, oc_enum_t locn);
-
-// obsolete
 void oc_process_baseline_interface(oc_resource_t *resource);
 
 /**

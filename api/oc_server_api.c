@@ -163,31 +163,6 @@ oc_remove_delayed_callback(void *cb_data, oc_trigger_t callback)
   oc_ri_remove_timed_event_callback(cb_data, callback);
 }
 
-void
-oc_resource_tag_pos_desc(oc_resource_t *resource, oc_pos_description_t pos)
-{
-  resource->tag_pos_desc = pos;
-}
-
-void
-oc_resource_tag_pos_rel(oc_resource_t *resource, double x, double y, double z)
-{
-  resource->tag_pos_rel[0] = x;
-  resource->tag_pos_rel[1] = y;
-  resource->tag_pos_rel[2] = z;
-}
-
-void
-oc_resource_tag_func_desc(oc_resource_t *resource, oc_enum_t func)
-{
-  resource->tag_func_desc = func;
-}
-
-void
-oc_resource_tag_locn(oc_resource_t *resource, oc_enum_t locn)
-{
-  resource->tag_locn = locn;
-}
 
 void
 oc_process_baseline_interface(oc_resource_t *resource)
@@ -197,41 +172,7 @@ oc_process_baseline_interface(oc_resource_t *resource)
   }
   oc_rep_set_string_array(root, rt, resource->types);
   oc_core_encode_interfaces_mask(oc_rep_object(root), resource->interfaces);
-  if (resource->tag_pos_desc > 0) {
-    const char *desc = oc_enum_pos_desc_to_str(resource->tag_pos_desc);
-    if (desc) {
-      /* tag-pos-desc will be handled as a string */
-      // clang-format off
-      oc_rep_set_text_string(root, tag-pos-desc, desc);
-      // clang-format on
-    }
-  }
-  if (resource->tag_func_desc > 0) {
-    const char *func = oc_enum_to_str(resource->tag_func_desc);
-    if (func) {
-      /* tag-pos-desc will be handled as a string */
-      // clang-format off
-      oc_rep_set_text_string(root, tag-func-desc, func);
-      // clang-format on
-    }
-  }
-  if (resource->tag_locn > 0) {
-    const char *locn = oc_enum_locn_to_str(resource->tag_locn);
-    if (locn) {
-      // clang-format off
-      oc_rep_set_text_string(root, tag-locn, locn);
-      // clang-format on
-    }
-  }
-  double *pos = resource->tag_pos_rel;
-  if (pos[0] != 0 || pos[1] != 0 || pos[2] != 0) {
-    oc_rep_set_key(oc_rep_object(root), "tag-pos-rel");
-    oc_rep_start_array(oc_rep_object(root), tag_pos_rel);
-    oc_rep_add_double(tag_pos_rel, pos[0]);
-    oc_rep_add_double(tag_pos_rel, pos[1]);
-    oc_rep_add_double(tag_pos_rel, pos[2]);
-    oc_rep_end_array(oc_rep_object(root), tag_pos_rel);
-  }
+
 }
 
 void

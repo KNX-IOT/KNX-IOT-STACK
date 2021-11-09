@@ -1,5 +1,6 @@
 /*
 // Copyright (c) 2016-2019 Intel Corporation
+// Copyright (c) 2021 Cascoda Ltd.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -51,7 +52,7 @@ typedef enum {
   OC_OBSERVABLE = (1 << 1),   ///< observable
   OC_SECURE = (1 << 4),       ///< secure
   OC_PERIODIC = (1 << 6),     ///< periodical update
-  OC_SECURE_MCAST = (1 << 8)  ///< secure multicast (oscore)
+  OC_SECURE_MCAST = (1 << 8)  ///< secure multi cast (OSCORE)
 } oc_resource_properties_t;
 
 /**
@@ -122,12 +123,12 @@ typedef enum {
   APPLICATION_SENSML_EXI = 115,      ///< application/sensml-exi
   APPLICATION_PKCS7_SGK =
     280, ///< application/pkcs7-mime; smime-type=server-generated-key
-  APPLICATION_PKCS7_CO = 281, ///< application/pkcs7-mime; smime-type=certs-only
+  APPLICATION_PKCS7_CO = 281,        ///< application/pkcs7-mime; smime-type=certs-only
   APPLICATION_PKCS7_CMC_REQUEST =
     282, ///< application/pkcs7-mime; smime-type=CMC-Request
   APPLICATION_PKCS7_CMC_RESPONSE =
     283,                   ///< application/pkcs7-mime; smime-type=CMC-Response
-  APPLICATION_PKCS8 = 284, ///< application/pkcs8
+  APPLICATION_PKCS8 = 284,                ///< application/pkcs8
   APPLICATION_CRATTRS = 285,              ///< application/csrattrs
   APPLICATION_PKCS10 = 286,               ///< application/pkcs10
   APPLICATION_PKIX_CERT = 287,            ///< application/pkix-cert
@@ -195,16 +196,20 @@ typedef enum {
 
 const char *get_interface_string(oc_interface_mask_t mask);
 
+/**
+ * @brief core resource numbers
+ *
+ */
 typedef enum {
   OCF_P = 0,
-  OC_DEV_SN,    ///< Device serial number
-  OC_DEV_HWV,   ///< Hardware version
-  OC_DEV_FWV,   /// Firmware version
-  OC_DEV_HWT,   ///< The hardware type is a manufacture specific id for a device
-                ///< type (MaC uses this id for compatibility checks)
-  OC_DEV_NAME,  ///< Device name. Name may can be changed w/ MaC.
-  OC_DEV_MODEL, ///< Device model
-  OC_DEV_IA,    ///< Device individual address
+  OC_DEV_SN,       ///< Device serial number
+  OC_DEV_HWV,      ///< Hardware version
+  OC_DEV_FWV,      /// Firmware version
+  OC_DEV_HWT,      ///< The hardware type is a manufacture specific id for a device
+                   ///< type (MaC uses this id for compatibility checks)
+  OC_DEV_NAME,     ///< Device name. Name may can be changed w/ MaC.
+  OC_DEV_MODEL,    ///< Device model
+  OC_DEV_IA,       ///< Device individual address
   OC_DEV_HOSTNAME, ///< Device host name for DNS resolution.
   OC_DEV_IID,      ///< KNX installation ID
   OC_DEV_PM,       ///< Programming Mode
@@ -360,10 +365,6 @@ struct oc_resource_s
   oc_request_handler_t delete_handler; ///< callback for DELETE
   oc_properties_cb_t get_properties;   ///< callback for get properties
   oc_properties_cb_t set_properties;   ///< callback for set properties
-  double tag_pos_rel[3];               ///< tag relative position [x,y,z]
-  oc_pos_description_t tag_pos_desc;   ///< tag (value) for position description
-  oc_enum_t tag_func_desc;             ///< tag (value) for function description
-  oc_locn_t tag_locn;                  ///< tag (value) for location description
   uint8_t num_observers;               ///< amount of observers
   uint16_t observe_period_seconds;     ///< observe period in seconds
 };
