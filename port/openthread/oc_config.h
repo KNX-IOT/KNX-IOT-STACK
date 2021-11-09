@@ -69,8 +69,6 @@ typedef uint64_t oc_clock_time_t;
 #define OC_STORAGE
 #endif
 
-
-
 #ifdef __cplusplus
 } // extern "C"
 #endif
