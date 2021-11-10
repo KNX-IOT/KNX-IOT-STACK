@@ -24,6 +24,8 @@
 
 oc_group_object_notification_t g_received_notification;
 
+oc_pase_t g_pase;
+
 // -----------------------------------------------------------------------------
 
 static void
@@ -35,7 +37,7 @@ oc_core_knx_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
-  if (request->accept != APPLICATION_JSON ||
+  if (request->accept != APPLICATION_JSON &&
       request->accept != APPLICATION_CBOR) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
@@ -691,39 +693,6 @@ oc_create_knx_idevid_resource(int resource_idx, size_t device)
 // -----------------------------------------------------------------------------
 
 static void
-oc_core_knx_spake_get_handler(oc_request_t *request,
-                              oc_interface_mask_t iface_mask, void *data)
-{
-  (void)data;
-  (void)iface_mask;
-  size_t response_length = 0;
-
-  /* check if the accept header is cbor-format */
-  if (request->accept != APPLICATION_JSON) {
-    request->response->response_buffer->code =
-      oc_status_code(OC_STATUS_BAD_REQUEST);
-    return;
-  }
-  /*
-  int length = clf_add_line_to_buffer("{");
-  response_length += length;
-
-  length = clf_add_line_to_buffer("\"api\": { \"version\": \"1.0\",");
-  response_length += length;
-
-  length = clf_add_line_to_buffer("\"base\": \"/ \"}");
-  response_length += length;
-
-  length = clf_add_line_to_buffer("}");
-  response_length += length;
-  */
-
-  request->response->response_buffer->content_format = APPLICATION_JSON;
-  request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
-  request->response->response_buffer->response_length = response_length;
-}
-
-static void
 oc_core_knx_spake_post_handler(oc_request_t *request,
                                oc_interface_mask_t iface_mask, void *data)
 {
@@ -732,28 +701,145 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
   size_t response_length = 0;
 
   /* check if the accept header is cbor-format */
-  if (request->accept != APPLICATION_JSON) {
+  if (request->accept != APPLICATION_CBOR) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
-  /*
-  int length = clf_add_line_to_buffer("{");
-  response_length += length;
+  int index = -1;
+  oc_rep_t *rep = request->request_payload;
 
-  length = clf_add_line_to_buffer("\"api\": { \"version\": \"1.0\",");
-  response_length += length;
+  int valid_request = 0;
+  // check input
+  while (rep != NULL) {
+    switch (rep->type) {
+      case OC_REP_BYTE_STRING: {
+         // ca == 14
+         if (rep->iname == 14) {
+           valid_request = 14;
+         }
+         // pa == 10
+         if (rep->iname == 10) {
+           valid_request = 10;
+         }
+      } break;
+      case OC_REP_OBJECT: {
+         // pbkdf2 == 12
+         if (rep->iname == 12) {
+           valid_request = 12;
+         }
+      } break;
+      case OC_REP_NIL:
+         break;
+      default:
+        break;
+    } 
+    rep = rep->next;
+  }
 
-  length = clf_add_line_to_buffer("\"base\": \"/ \"}");
-  response_length += length;
+  if (valid_request == 0) {
+    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+  }
+  rep = request->request_payload;
+  // handle input
+  while (rep != NULL) {
+    switch (rep->type) {
+    case OC_REP_BYTE_STRING: {
+      // ca == 14
+      if (rep->iname == 14) {
+        oc_free_string(&g_pase.ca);
+        oc_new_string(&g_pase.ca, oc_string(rep->value.string),
+                      oc_string_len(rep->value.string));
+      }
+      // pa == 10
+      if (rep->iname == 10) {
+        oc_free_string(&g_pase.pa);
+        oc_new_string(&g_pase.pa, oc_string(rep->value.string),
+                      oc_string_len(rep->value.string));
+      }
+    } break;
+    case OC_REP_OBJECT: {
+      // pbkdf2 == 12
+      if (rep->iname == 12) {
+        oc_rep_t *object = rep->value.object;
+        while (object != NULL) {
+          switch (object->type) {
+          case OC_REP_BYTE_STRING: {
+            // cb
+            if (object->iname == 5) {
+              oc_free_string(&g_pase.salt);
+              oc_new_string(&g_pase.salt, oc_string(object->value.string),
+                            oc_string_len(object->value.string));
+            }
+            // the other values 
 
-  length = clf_add_line_to_buffer("}");
-  response_length += length;
-  */
+          } break;
+          case OC_REP_INT: {
+            // it
+            if (object->iname == 16) {
+              g_pase.it = object->value.integer;
+            }
+          } break;
+          case OC_REP_NIL:
+            break;
+          default:
+            break;
+          }
+          object = object->next;
+        }
+      }
+    } break;
+    case OC_REP_NIL:
+      break;
+    default:
+      break;
+    }
+    rep = rep->next;
+  }
+  // on ca
+  if (valid_request == 14) {
+    // return changed, no payload
+    oc_send_cbor_response(request, OC_STATUS_CHANGED);
+    return;
+  }
+  // on pa
+  if (valid_request == 10) {
+    // return changed, frame pb (11) & cb (13)
+    // TODO: probably we need to calculate them...
 
-  request->response->response_buffer->content_format = APPLICATION_JSON;
-  request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
-  request->response->response_buffer->response_length = response_length;
+    oc_rep_begin_root_object();
+    // pb (11)
+    oc_rep_i_set_text_string(root, 11, oc_string(g_pase.pb));
+    // cb (13)
+    oc_rep_i_set_text_string(root, 13, oc_string(g_pase.cb));
+    oc_rep_end_root_object();
+    oc_send_cbor_response(request, OC_STATUS_CHANGED);
+    return;
+  }
+  // on rnd
+  if (valid_request == 15) {
+    // return changed, frame rnd (15) & pbkdf2 (12 containing (16, 5))
+    // TODO: probably we need to calculate them...
+
+    oc_rep_begin_root_object();
+    // rnd (15)
+    oc_rep_i_set_text_string(root, 15, oc_string(g_pase.rnd));
+    // pbkdf2
+    oc_rep_i_set_key(&root_map, 12);
+    oc_rep_begin_object(&root_map, pbkdf2);
+    // it 16
+    oc_rep_i_set_int(pbkdf2, 5, g_pase.it);
+    // salt 5 
+    oc_rep_i_set_text_string(pbkdf2, 5, oc_string(g_pase.salt));
+    oc_rep_end_object(&root_map, pbkdf2);
+    oc_rep_end_root_object();
+    oc_send_cbor_response(request, OC_STATUS_CHANGED);
+    return;
+  }
+
+  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+
+
 }
 
 void
@@ -762,7 +848,7 @@ oc_create_knx_spake_resource(int resource_idx, size_t device)
   OC_DBG("oc_create_knx_spake_resource\n");
   oc_core_lf_populate_resource(resource_idx, device, "/.well-known/knx/spake",
                                OC_IF_LL, APPLICATION_CBOR, OC_DISCOVERABLE,
-                               oc_core_knx_spake_get_handler, 0,
+                               0, 0,
                                oc_core_knx_spake_post_handler, 0, 0, "");
 }
 

@@ -117,7 +117,7 @@ typedef struct oc_sec_creds_t
 } oc_sec_creds_t;
 
 /**
- * @brief read credential usaga
+ * @brief read credential usage
  *
  * @param credusage credential usage as type
  * @return const char* credential usage as string

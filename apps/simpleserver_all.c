@@ -30,10 +30,11 @@
  * support functions:
  *
  * - app_init
- *   initializes the oic/p and oic/d values.
+ *   initializes the stack values.
  * - register_resources
- *   function that registers all endpoints, e.g. sets the RETRIEVE/UPDATE/DELETE
- handlers for each end point
+ *   function that registers all endpoints,
+ *   e.g. sets the GET/PUT/POST/DELETE
+ *      handlers for each end point
  *
  * - main
  *   starts the stack, with the registered resources.
@@ -41,10 +42,10 @@
  *
  *  handlers for the implemented methods (get/post):
  *   - get_[path]
- *     function that is being called when a RETRIEVE is called on [path]
+ *     function that is being called when a GET is called on [path]
  *     set the global variables in the output
  *   - post_[path]
- *     function that is being called when a UPDATE is called on [path]
+ *     function that is being called when a POST is called on [path]
  *     checks the input data
  *     if input data is correct
  *       updates the global variables
@@ -54,9 +55,7 @@
  *  - OC_SECURITY
       enable security
  *    - OC_PKI
- *      enable use of PKI, note onboarding is enabled by means of run time code
- *  - OC_IDD_API
- *    IDD via API, otherwise use header file to define the IDD
+ *      enable use of PKI
  * - __linux__
  *   build for linux
  * - WIN32
@@ -69,15 +68,7 @@
  * - INCLUDE_EXTERNAL
  *   includes header file "external_header.h", so that other tools/dependencies
  can be included without changing this code
- * - OPTIMIZE_PSTAT
- *   disable PSTAT observe
  */
-/*
- tool_version          : 20200103
- input_file            : ../device_output/out_codegeneration_merged.swagger.json
- version of input_file :
- title of input_file   : server_lite_1599
-*/
 
 #include "oc_api.h"
 #include "oc_core_res.h"
@@ -177,36 +168,6 @@ app_init(void)
 }
 
 /**
- * helper function to check if the POST input document contains
- * the common readOnly properties or the resource readOnly properties
- * @param name the name of the property
- * @param error_state the current (input) error state
- * @return the error_status, e.g. if error_status is true, then the input
- * document contains something illegal
- */
-bool
-check_on_readonly_common_resource_properties(oc_string_t name, bool error_state)
-{
-  if (strcmp(oc_string(name), "n") == 0) {
-    error_state = true;
-    PRINT("   property \"n\" is ReadOnly \n");
-  } else if (strcmp(oc_string(name), "if") == 0) {
-    error_state = true;
-    PRINT("   property \"if\" is ReadOnly \n");
-  } else if (strcmp(oc_string(name), "rt") == 0) {
-    error_state = true;
-    PRINT("   property \"rt\" is ReadOnly \n");
-  } else if (strcmp(oc_string(name), "id") == 0) {
-    error_state = true;
-    PRINT("   property \"id\" is ReadOnly \n");
-  } else if (strcmp(oc_string(name), "id") == 0) {
-    error_state = true;
-    PRINT("   property \"id\" is ReadOnly \n");
-  }
-  return error_state;
-}
-
-/**
  * get method for "/p/a" resource.
  * function is called to initialize the return values of the GET method.
  * initialization of the returned values are done from the global property
@@ -223,6 +184,7 @@ get_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
             void *user_data)
 {
   (void)user_data; /* variable not used */
+  
   /* TODO: SENSOR add here the code to talk to the HW if one implements a
      sensor. the call to the HW needs to fill in the global variable before it
      returns to this function here. alternative is to have a callback from the
@@ -241,14 +203,12 @@ get_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
   CborError error;
   error = cbor_encode_boolean(&g_encoder, true);
   if (error) {
-    // PRINT("CBOR error %s\n", cbor_error_string(error));
-    // oc_status_code = true;
+    oc_status_code = true;
   }
   PRINT("CBOR encoder size %d\n", oc_rep_get_encoded_payload_size());
   error = cbor_encode_boolean(&g_encoder, false);
   if (error) {
-    // PRINT("CBOR error %s\n", cbor_error_string(error));
-    // oc_status_code = true;
+    oc_status_code = true;
   }
   PRINT("CBOR encoder size %d\n", oc_rep_get_encoded_payload_size());
 
@@ -296,8 +256,7 @@ get_dpa_352b(oc_request_t *request, oc_interface_mask_t interfaces,
   CborError error;
   error = cbor_encode_text_stringz(&g_encoder, "blahblah");
   if (error) {
-    // PRINT("CBOR error %s\n", cbor_error_string(error));
-    // oc_status_code = true;
+    oc_status_code = true;
   }
   PRINT("CBOR encoder size %d\n", oc_rep_get_encoded_payload_size());
   error = cbor_encode_text_string(&g_encoder, "xyzxyz", 3);
@@ -307,8 +266,6 @@ get_dpa_352b(oc_request_t *request, oc_interface_mask_t interfaces,
   }
   PRINT("CBOR encoder size %d\n", oc_rep_get_encoded_payload_size());
 
-  // oc_rep_start_root_object();
-  // oc_rep_end_root_object();
   if (error_state == false) {
     oc_send_cbor_response(request, oc_status_code);
   } else {
@@ -351,19 +308,15 @@ get_dpa_353(oc_request_t *request, oc_interface_mask_t interfaces,
     return;
   }
 
-  // oc_rep_start_root_object();
-  // oc_rep_end_root_object();
   CborError error;
   error = cbor_encode_int(&g_encoder, (int64_t)555);
   if (error) {
-    // PRINT("CBOR error %s\n", cbor_error_string(error));
-    // oc_status_code = true;
+    oc_status_code = true;
   }
   PRINT("CBOR encoder size %d\n", oc_rep_get_encoded_payload_size());
   error = cbor_encode_int(&g_encoder, (int64_t)666);
   if (error) {
-    // PRINT("CBOR error %s\n", cbor_error_string(error));
-    // oc_status_code = true;
+    oc_status_code = true;
   }
   PRINT("CBOR encoder size %d\n", oc_rep_get_encoded_payload_size());
   if (error_state == false) {
@@ -419,27 +372,7 @@ post_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
   /* if the input is ok, then process the input document and assign the global
    * variables */
   if (error_state == false) {
-    switch (interfaces) {
-    default: {
-      /* loop over all the properties in the input document */
-      // oc_rep_t *rep = request->request_payload;
-
-      /* set the response */
-      PRINT("Set response \n");
-      oc_rep_start_root_object();
-      /*oc_process_baseline_interface(request->resource); */
-      // PRINT("   %s : %s", g_binaryswitch_RESOURCE_PROPERTY_NAME_value,
-      //        (char *)btoa(g_binaryswitch_value));
-      //  oc_rep_set_boolean(root, value, g_binaryswitch_value);
-
-      oc_rep_end_root_object();
-      /* TODO: ACTUATOR add here the code to talk to the HW if one implements an
-       actuator. one can use the global variables as input to those calls the
-       global values have been updated already with the data from the request */
-
-      oc_send_cbor_response(request, OC_STATUS_OK);
-    }
-    }
+       oc_send_cbor_response(request, OC_STATUS_OK);
   } else {
     PRINT("  Returning Error \n");
     /* TODO: add error response, if any */
@@ -693,9 +626,8 @@ factory_presets_cb(size_t device, void *data)
 void
 initialize_variables(void)
 {
-  /* initialize global variables for resource "/binaryswitch" */
-  // g_binaryswitch_value =
-  //    false; /* current value of property "value" The status of the switch. */
+  /* initialize global variables for resources */
+
 }
 
 #ifndef NO_MAIN
