@@ -38,7 +38,8 @@ typedef uint64_t oc_clock_time_t;
 
 /* Add support for passing network up/down events to the application */
 #define OC_NETWORK_MONITOR
-/* Add support for passing TCP/TLS/DTLS session connection events to the application */
+/* Add support for passing TCP/TLS/DTLS session connection events to the
+ * application */
 #define OC_SESSION_EVENTS
 /* Add request history for deduplicate UDP/DTLS messages */
 #define OC_REQUEST_HISTORY

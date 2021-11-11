@@ -718,32 +718,32 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
   // note: no check if there are multiple byte strings in the request payload
   while (rep != NULL) {
     switch (rep->type) {
-      case OC_REP_BYTE_STRING: {
-         // ca == 14
-         if (rep->iname == 14) {
-           valid_request = 14;
-         }
-         // pa == 10
-         if (rep->iname == 10) {
-           valid_request = 10;
-         }
-         // rnd == 15
-         if (rep->iname == 15) {
-           valid_request = 15;
-         }
-      } break;
-      case OC_REP_OBJECT: {
-         // pbkdf2 == 12
-         // not sure if we need this
-         if (rep->iname == 12) {
-           valid_request = 12;
-         }
-      } break;
-      case OC_REP_NIL:
-         break;
-      default:
-        break;
-    } 
+    case OC_REP_BYTE_STRING: {
+      // ca == 14
+      if (rep->iname == 14) {
+        valid_request = 14;
+      }
+      // pa == 10
+      if (rep->iname == 10) {
+        valid_request = 10;
+      }
+      // rnd == 15
+      if (rep->iname == 15) {
+        valid_request = 15;
+      }
+    } break;
+    case OC_REP_OBJECT: {
+      // pbkdf2 == 12
+      // not sure if we need this
+      if (rep->iname == 12) {
+        valid_request = 12;
+      }
+    } break;
+    case OC_REP_NIL:
+      break;
+    default:
+      break;
+    }
     rep = rep->next;
   }
 
@@ -774,13 +774,11 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
                       oc_string_len(rep->value.string));
         // TODO: compute pB
         oc_free_string(&g_pase.pb);
-        oc_new_string(&g_pase.pb, "pb-computed",
-                     strlen("pb-computed"));
+        oc_new_string(&g_pase.pb, "pb-computed", strlen("pb-computed"));
 
         // TODO: compute cB
         oc_free_string(&g_pase.cb);
-        oc_new_string(&g_pase.cb, "cb-computed",
-                     strlen("cb-computed"));
+        oc_new_string(&g_pase.cb, "cb-computed", strlen("cb-computed"));
       }
     } break;
     case OC_REP_OBJECT: {
@@ -854,7 +852,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     oc_rep_begin_object(&root_map, pbkdf2);
     // it 16
     oc_rep_i_set_int(pbkdf2, 16, g_pase.it);
-    // salt 5 
+    // salt 5
     oc_rep_i_set_text_string(pbkdf2, 5, oc_string(g_pase.salt));
     oc_rep_end_object(&root_map, pbkdf2);
     oc_rep_end_root_object();
@@ -870,9 +868,8 @@ oc_create_knx_spake_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_spake_resource\n");
   oc_core_lf_populate_resource(resource_idx, device, "/.well-known/knx/spake",
-                               OC_IF_NONE, APPLICATION_CBOR, OC_DISCOVERABLE,
-                               0, 0,
-                               oc_core_knx_spake_post_handler, 0, 0, "");
+                               OC_IF_NONE, APPLICATION_CBOR, OC_DISCOVERABLE, 0,
+                               0, oc_core_knx_spake_post_handler, 0, 0, "");
 }
 
 // -----------------------------------------------------------------------------

@@ -184,7 +184,7 @@ get_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
             void *user_data)
 {
   (void)user_data; /* variable not used */
-  
+
   /* TODO: SENSOR add here the code to talk to the HW if one implements a
      sensor. the call to the HW needs to fill in the global variable before it
      returns to this function here. alternative is to have a callback from the
@@ -372,7 +372,7 @@ post_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
   /* if the input is ok, then process the input document and assign the global
    * variables */
   if (error_state == false) {
-       oc_send_cbor_response(request, OC_STATUS_OK);
+    oc_send_cbor_response(request, OC_STATUS_OK);
   } else {
     PRINT("  Returning Error \n");
     /* TODO: add error response, if any */
@@ -627,7 +627,6 @@ void
 initialize_variables(void)
 {
   /* initialize global variables for resources */
-
 }
 
 #ifndef NO_MAIN

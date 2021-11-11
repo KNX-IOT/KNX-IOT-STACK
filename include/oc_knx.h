@@ -25,8 +25,7 @@
 extern "C" {
 #endif
 
-
-  /**
+/**
  * @brief Pase Resource Object
  *
  *  { "rnd": x}
@@ -59,7 +58,6 @@ typedef struct oc_pase_t
   oc_string_t rnd;
   int it;
 } oc_pase_t;
-
 
 /**
  * @brief Group Object Notification
