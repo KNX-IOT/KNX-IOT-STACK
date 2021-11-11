@@ -649,7 +649,8 @@ oc_core_knx_ldevid_get_handler(oc_request_t *request,
     return;
   }
   response_length = oc_string_len(g_ldevid);
-  oc_rep_encode_raw(oc_string(g_ldevid), response_length);
+  oc_rep_encode_raw((const uint8_t *)oc_string(g_ldevid),
+                    (size_t)response_length);
 
   request->response->response_buffer->content_format =
     APPLICATION_PKCS7_CMC_RESPONSE;
@@ -689,7 +690,7 @@ oc_core_knx_idevid_get_handler(oc_request_t *request,
     return;
   }
   response_length = oc_string_len(g_idevid);
-  oc_rep_encode_raw(oc_string(g_idevid), response_length);
+  oc_rep_encode_raw((const uint8_t *)oc_string(g_idevid), (size_t)response_length);
 
   request->response->response_buffer->content_format =
     APPLICATION_PKCS7_CMC_RESPONSE;
@@ -703,8 +704,10 @@ void
 oc_create_knx_idevid_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_idevid_resource\n");
-  oc_core_lf_populate_resource(resource_idx, device, "/.well-known/knx/idevid", OC_IF_D,
-                               APPLICATION_CBOR, OC_DISCOVERABLE, APPLICATION_PKCS7_CMC_REQUEST, 0, 0, 0, 0, 1,
+  oc_core_lf_populate_resource(resource_idx, device, "/.well-known/knx/idevid", 
+                               OC_IF_D, APPLICATION_PKCS7_CMC_REQUEST,
+                               OC_DISCOVERABLE, oc_core_knx_idevid_get_handler,
+                               0, 0, 0, 0, 1,
                                ":dpt.a[n]");
 }
 
