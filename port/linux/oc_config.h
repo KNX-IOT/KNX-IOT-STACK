@@ -36,9 +36,9 @@ typedef uint64_t oc_clock_time_t;
 /* Maximum wait time for select function */
 #define SELECT_TIMEOUT_SEC (1)
 
-/* Add support for passing network up/down events to the app */
+/* Add support for passing network up/down events to the application */
 #define OC_NETWORK_MONITOR
-/* Add support for passing TCP/TLS/DTLS session connection events to the app */
+/* Add support for passing TCP/TLS/DTLS session connection events to the application */
 #define OC_SESSION_EVENTS
 /* Add request history for deduplicate UDP/DTLS messages */
 #define OC_REQUEST_HISTORY
@@ -70,7 +70,7 @@ typedef uint64_t oc_clock_time_t;
 
 #define OC_MAX_NUM_COLLECTIONS (1)
 
-/* Common paramters */
+/* Common parameters */
 /* Prescriptive lower layers MTU size, enable block-wise transfers */
 #define OC_BLOCK_WISE_SET_MTU (700)
 
