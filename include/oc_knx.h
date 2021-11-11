@@ -26,6 +26,40 @@ extern "C" {
 #endif
 
 /**
+ * @brief Pase Resource Object
+ *
+ *  { "rnd": x}
+ *  { "pa": x}
+ *  { "pb": x}
+ *  { "ca": x}
+ *  { "pbkdf2" : { "salt" : "xxxx", "it" : 5}}}
+ *
+ * Key translation
+ * | Json Key | Integer Value |  type       |
+ * | -------- | ------------- |-------------|
+ * | salt     | 5             | byte string |
+ * | pa       | 10            | byte string |
+ * | pb       | 11            | byte string |
+ * | pbkdf2   | 12            | map         |
+ * | cb       | 13            | byte string |
+ * | ca       | 14            | byte string |
+ * | rnd      | 15            | byte string |
+ * | it       | 16            | unsigned    |
+ *
+ * note no storage needed for map
+ */
+typedef struct oc_pase_t
+{
+  oc_string_t salt;
+  oc_string_t pa;
+  oc_string_t pb;
+  oc_string_t ca;
+  oc_string_t cb;
+  oc_string_t rnd;
+  int it;
+} oc_pase_t;
+
+/**
  * @brief Group Object Notification
  *
  *  { 5: { 6: "st value" , 7: "ga value", 1: "value" } }
