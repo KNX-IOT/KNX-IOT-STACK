@@ -22,11 +22,16 @@
 
 #define TAGS_AS_STRINGS
 
+// ---------------------------Variables --------------------------------------
+
 oc_group_object_notification_t g_received_notification;
 
 oc_pase_t g_pase;
 
-// -----------------------------------------------------------------------------
+oc_string_t g_idevid;
+oc_string_t g_ldevid;
+
+// ----------------------------------------------------------------------------
 
 static void
 oc_core_knx_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
@@ -117,7 +122,7 @@ oc_create_knx_resource(int resource_idx, size_t device)
     oc_core_knx_post_handler, 0, 0, "");
 }
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 static void
 oc_core_knx_reset_post_handler(oc_request_t *request,
@@ -161,7 +166,7 @@ oc_create_knx_reset_resource(int resource_idx, size_t device)
                                oc_core_knx_reset_post_handler, 0, 0, "");
 }
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 oc_lsm_state_t
 oc_knx_lsm_state(size_t device_index)
@@ -385,7 +390,7 @@ oc_create_knx_lsm_resource(int resource_idx, size_t device)
                                oc_core_knx_lsm_post_handler, 0, 0, "");
 }
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 static void
 oc_core_knx_knx_get_handler(oc_request_t *request,
@@ -546,7 +551,7 @@ oc_create_knx_knx_resource(int resource_idx, size_t device)
     oc_core_knx_knx_post_handler, 0, 1, "urn:knx:g.s");
 }
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 static void
 oc_core_knx_crc_get_handler(oc_request_t *request,
@@ -624,7 +629,7 @@ oc_create_knx_crc_resource(int resource_idx, size_t device)
                                oc_core_knx_crc_post_handler, 0, 0, "");
 }
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 static void
 oc_core_knx_ldevid_get_handler(oc_request_t *request,
@@ -634,30 +639,38 @@ oc_core_knx_ldevid_get_handler(oc_request_t *request,
   (void)iface_mask;
   size_t response_length = 0;
 
+  PRINT("oc_core_knx_ldevid_get_handler\n");
+
   /* check if the accept header is cbor-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (request->accept != APPLICATION_PKCS7_CMC_REQUEST) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
-  // size_t device_index = request->resource->device;
+  response_length = oc_string_len(g_ldevid);
+  oc_rep_encode_raw((const uint8_t *)oc_string(g_ldevid),
+                    (size_t)response_length);
 
-  request->response->response_buffer->content_format = APPLICATION_CBOR;
+  request->response->response_buffer->content_format =
+    APPLICATION_PKCS7_CMC_RESPONSE;
   request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
   request->response->response_buffer->response_length = response_length;
+
+  PRINT("oc_core_knx_ldevid_get_handler- done\n");
 }
 
+/* optional resource */
 void
 oc_create_knx_ldevid_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_ldevid_resource\n");
-  oc_core_lf_populate_resource(resource_idx, device, "/dev/ldevid", OC_IF_D,
-                               APPLICATION_CBOR, OC_DISCOVERABLE,
-                               oc_core_knx_ldevid_get_handler, 0, 0, 0, 0, 1,
-                               ":dpt.a[n]");
+  oc_core_lf_populate_resource(resource_idx, device, "/.well-known/knx/ldevid",
+                               OC_IF_D, APPLICATION_PKCS7_CMC_REQUEST,
+                               OC_DISCOVERABLE, oc_core_knx_ldevid_get_handler,
+                               0, 0, 0, 0, 1, ":dpt.a[n]");
 }
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 static void
 oc_core_knx_idevid_get_handler(oc_request_t *request,
@@ -667,30 +680,37 @@ oc_core_knx_idevid_get_handler(oc_request_t *request,
   (void)iface_mask;
   size_t response_length = 0;
 
+  PRINT("oc_core_knx_idevid_get_handler\n");
+
   /* check if the accept header is cbor-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (request->accept != APPLICATION_PKCS7_CMC_REQUEST) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
-  // size_t device_index = request->resource->device;
+  response_length = oc_string_len(g_idevid);
+  oc_rep_encode_raw((const uint8_t *)oc_string(g_idevid),
+                    (size_t)response_length);
 
-  request->response->response_buffer->content_format = APPLICATION_CBOR;
+  request->response->response_buffer->content_format =
+    APPLICATION_PKCS7_CMC_RESPONSE;
   request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
   request->response->response_buffer->response_length = response_length;
+
+  PRINT("oc_core_knx_idevid_get_handler- done\n");
 }
 
 void
 oc_create_knx_idevid_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_idevid_resource\n");
-  oc_core_lf_populate_resource(resource_idx, device, "/dev/idevid", OC_IF_D,
-                               APPLICATION_CBOR, OC_DISCOVERABLE,
-                               oc_core_knx_idevid_get_handler, 0, 0, 0, 0, 1,
-                               ":dpt.a[n]");
+  oc_core_lf_populate_resource(resource_idx, device, "/.well-known/knx/idevid",
+                               OC_IF_D, APPLICATION_PKCS7_CMC_REQUEST,
+                               OC_DISCOVERABLE, oc_core_knx_idevid_get_handler,
+                               0, 0, 0, 0, 1, ":dpt.a[n]");
 }
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 static void
 oc_core_knx_spake_post_handler(oc_request_t *request,
@@ -872,7 +892,21 @@ oc_create_knx_spake_resource(int resource_idx, size_t device)
                                0, oc_core_knx_spake_post_handler, 0, 0, "");
 }
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+
+void
+oc_knx_set_idevid(const char *idevid, int len)
+{
+  oc_free_string(&g_idevid);
+  oc_new_string(&g_idevid, idevid, len);
+}
+
+void
+oc_knx_set_ldevid(char *idevid, int len)
+{
+  oc_free_string(&g_ldevid);
+  oc_new_string(&g_ldevid, idevid, len);
+}
 
 void
 oc_create_knx_resources(size_t device_index)

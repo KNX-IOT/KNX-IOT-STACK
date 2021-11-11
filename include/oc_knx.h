@@ -74,13 +74,13 @@ typedef struct oc_pase_t
  *  }
  *
  * Key translation
- * | Json Key | Integer Value |
- * | -------- | ------------- |
- * | value    | 1             |
- * | sia      | 4             |
- * | s        | 5             |
- * | st       | 6             |
- * | ga       | 7             |
+ * | Json Key | Integer Value | type   |
+ * | -------- | ------------- |--------|
+ * | value    | 1             | object |
+ * | sia      | 4             | int    |
+ * | s        | 5             | object |
+ * | st       | 6             | string |
+ * | ga       | 7             | int    |
  */
 typedef struct oc_group_object_notification_t
 {
@@ -116,6 +116,10 @@ bool oc_core_lsm_check_string(const char *lsm);
 oc_lsm_state_t oc_core_lsm_parse_string(const char *lsm);
 
 const char *oc_core_get_lsm_as_string(oc_lsm_state_t lsm);
+
+void oc_knx_set_idevid(const char *idevid, int len);
+
+void oc_knx_set_ldevid(char *idevid, int len);
 
 /**
 @brief Creation of the KNX device resources.
