@@ -22,7 +22,6 @@
 
 #define TAGS_AS_STRINGS
 
-
 // ---------------------------Variables --------------------------------------
 
 oc_group_object_notification_t g_received_notification;
@@ -665,10 +664,10 @@ void
 oc_create_knx_ldevid_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_ldevid_resource\n");
-  oc_core_lf_populate_resource(resource_idx, device, "/.well-known/knx/ldevid", OC_IF_D,
-                               APPLICATION_PKCS7_CMC_REQUEST, OC_DISCOVERABLE,
-                               oc_core_knx_ldevid_get_handler, 0, 0, 0, 0, 1,
-                               ":dpt.a[n]");
+  oc_core_lf_populate_resource(resource_idx, device, "/.well-known/knx/ldevid",
+                               OC_IF_D, APPLICATION_PKCS7_CMC_REQUEST,
+                               OC_DISCOVERABLE, oc_core_knx_ldevid_get_handler,
+                               0, 0, 0, 0, 1, ":dpt.a[n]");
 }
 
 // ----------------------------------------------------------------------------
@@ -680,7 +679,7 @@ oc_core_knx_idevid_get_handler(oc_request_t *request,
   (void)data;
   (void)iface_mask;
   size_t response_length = 0;
-  
+
   PRINT("oc_core_knx_idevid_get_handler\n");
 
   /* check if the accept header is cbor-format */
@@ -690,7 +689,8 @@ oc_core_knx_idevid_get_handler(oc_request_t *request,
     return;
   }
   response_length = oc_string_len(g_idevid);
-  oc_rep_encode_raw((const uint8_t *)oc_string(g_idevid), (size_t)response_length);
+  oc_rep_encode_raw((const uint8_t *)oc_string(g_idevid),
+                    (size_t)response_length);
 
   request->response->response_buffer->content_format =
     APPLICATION_PKCS7_CMC_RESPONSE;
@@ -704,11 +704,10 @@ void
 oc_create_knx_idevid_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_idevid_resource\n");
-  oc_core_lf_populate_resource(resource_idx, device, "/.well-known/knx/idevid", 
+  oc_core_lf_populate_resource(resource_idx, device, "/.well-known/knx/idevid",
                                OC_IF_D, APPLICATION_PKCS7_CMC_REQUEST,
                                OC_DISCOVERABLE, oc_core_knx_idevid_get_handler,
-                               0, 0, 0, 0, 1,
-                               ":dpt.a[n]");
+                               0, 0, 0, 0, 1, ":dpt.a[n]");
 }
 
 // ----------------------------------------------------------------------------
@@ -899,8 +898,7 @@ void
 oc_knx_set_idevid(const char *idevid, int len)
 {
   oc_free_string(&g_idevid);
-  oc_new_string(&g_idevid, idevid,
-                len);
+  oc_new_string(&g_idevid, idevid, len);
 }
 
 void

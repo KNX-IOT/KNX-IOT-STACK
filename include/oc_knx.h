@@ -117,7 +117,6 @@ oc_lsm_state_t oc_core_lsm_parse_string(const char *lsm);
 
 const char *oc_core_get_lsm_as_string(oc_lsm_state_t lsm);
 
-
 void oc_knx_set_idevid(const char *idevid, int len);
 
 void oc_knx_set_ldevid(char *idevid, int len);
