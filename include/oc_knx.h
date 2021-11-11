@@ -121,6 +121,9 @@ void oc_knx_set_idevid(const char *idevid, int len);
 
 void oc_knx_set_ldevid(char *idevid, int len);
 
+void oc_knx_set_crc(uint64_t crc);
+void oc_knx_set_osn(uint64_t osn);
+
 /**
 @brief Creation of the KNX device resources.
 
