@@ -698,7 +698,6 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  size_t response_length = 0;
   PRINT("oc_core_knx_spake_post_handler\n");
 
   /* check if the accept header is cbor-format */
@@ -713,12 +712,8 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     return;
   }
 
-
-  int index = -1;
   oc_rep_t *rep = request->request_payload;
-
   int valid_request = 0;
-  bool is_ok = false;
   // check input
   // note: no check if there are multiple byte strings in the request payload
   while (rep != NULL) {
@@ -795,14 +790,12 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
         while (object != NULL) {
           switch (object->type) {
           case OC_REP_BYTE_STRING: {
-            // cb
+            // salt
             if (object->iname == 5) {
               oc_free_string(&g_pase.salt);
               oc_new_string(&g_pase.salt, oc_string(object->value.string),
                             oc_string_len(object->value.string));
             }
-            // the other values 
-
           } break;
           case OC_REP_INT: {
             // it

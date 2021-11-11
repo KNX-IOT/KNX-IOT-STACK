@@ -33,15 +33,7 @@ extern "C" {
  *  { "pa": x}
  *  { "pb": x}
  *  { "ca": x}
- *
- *  {
- *    "value": {
- *      "sia": int,
- *      "s": {},
- *      "st": "string",
- *      "ga": int
- *    }
- *  }
+ *  { "pbkdf2" : { "salt" : "xxxx", "it" : 5}}}
  *
  * Key translation
  * | Json Key | Integer Value |  type       |
@@ -54,6 +46,8 @@ extern "C" {
  * | ca       | 14            | byte string |
  * | rnd      | 15            | byte string |
  * | it       | 16            | unsigned    |
+ *
+ * note no storage needed for map
  */
 typedef struct oc_pase_t
 {
@@ -62,8 +56,6 @@ typedef struct oc_pase_t
   oc_string_t pb;
   oc_string_t ca;
   oc_string_t cb;
-  oc_string_t pbkdf2_pa;
-  oc_string_t pbkdf2_pb;
   oc_string_t rnd;
   int it;
 } oc_pase_t;
