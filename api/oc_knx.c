@@ -64,7 +64,7 @@ int
 reset_device(int value)
 {
   PRINT("reset device: %d\n", value);
-
+  return 0;
 }
 
 
