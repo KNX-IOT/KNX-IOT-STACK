@@ -23,7 +23,7 @@
 uint64_t g_oscore_replaywindow = 0;
 uint64_t g_oscore_osndelay = 0;
 
-oc_oscore_cc_t g_occ[20];  
+oc_oscore_cc_t g_occ[20];
 
 // ----------------------------------------------------------------------------
 
@@ -210,7 +210,6 @@ oc_create_knx_f_oscore_resource(int resource_idx, size_t device)
 #define LDEVID_RENEW 1
 #define LDEVID_STOP 2
 
-
 static int
 a_sen_convert_cmd(char *cmd)
 {
@@ -225,11 +224,10 @@ a_sen_convert_cmd(char *cmd)
   return 0;
 }
 
-
 // { 2: "renew" }
 static void
 oc_core_a_sen_post_handler(oc_request_t *request,
-                             oc_interface_mask_t iface_mask, void *data)
+                           oc_interface_mask_t iface_mask, void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -273,12 +271,10 @@ oc_create_a_sen_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_a_sen_resource\n");
   // "/a/sen"
-  oc_core_lf_populate_resource(resource_idx, device, "/a/sen",
-                               OC_IF_LL | OC_IF_BASELINE, APPLICATION_CBOR,
-                               OC_DISCOVERABLE, 0, 0,
-                               oc_core_a_sen_post_handler, 0, 0, "");
+  oc_core_lf_populate_resource(
+    resource_idx, device, "/a/sen", OC_IF_LL | OC_IF_BASELINE, APPLICATION_CBOR,
+    OC_DISCOVERABLE, 0, 0, oc_core_a_sen_post_handler, 0, 0, "");
 }
-
 
 // ----------------------------------------------------------------------------
 
@@ -297,7 +293,7 @@ oc_create_a_sen_resource(int resource_idx, size_t device)
 
 static void
 oc_core_auth_at_get_handler(oc_request_t *request,
-                             oc_interface_mask_t iface_mask, void *data)
+                            oc_interface_mask_t iface_mask, void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -314,10 +310,9 @@ oc_core_auth_at_get_handler(oc_request_t *request,
   oc_send_cbor_response(request, OC_STATUS_OK);
 }
 
-
 static void
 oc_core_auth_at_post_handler(oc_request_t *request,
-                           oc_interface_mask_t iface_mask, void *data)
+                             oc_interface_mask_t iface_mask, void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -361,18 +356,17 @@ oc_create_auth_at_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_auth_at_resource\n");
   // "/a/sen"
-  oc_core_lf_populate_resource(
-    resource_idx, device, "/auth/at", OC_IF_LL | OC_IF_BASELINE, APPLICATION_CBOR,
+  oc_core_lf_populate_resource(resource_idx, device, "/auth/at",
+                               OC_IF_LL | OC_IF_BASELINE, APPLICATION_CBOR,
                                OC_DISCOVERABLE, oc_core_auth_at_get_handler, 0,
                                oc_core_auth_at_post_handler, 0, 1, "dpt.a[n]");
 }
-
 
 // ----------------------------------------------------------------------------
 
 static void
 oc_core_knx_auth_get_handler(oc_request_t *request,
-                                 oc_interface_mask_t iface_mask, void *data)
+                             oc_interface_mask_t iface_mask, void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -409,10 +403,9 @@ oc_create_knx_auth_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_auth_resource\n");
   //
-  oc_core_lf_populate_resource(resource_idx, device, "/auth", OC_IF_LIL,
-                               APPLICATION_LINK_FORMAT, OC_DISCOVERABLE,
-                               oc_core_knx_auth_get_handler, 0, 0, 0, 1,
-                               "urn:knx:fbswu");
+  oc_core_lf_populate_resource(
+    resource_idx, device, "/auth", OC_IF_LIL, APPLICATION_LINK_FORMAT,
+    OC_DISCOVERABLE, oc_core_knx_auth_get_handler, 0, 0, 0, 1, "urn:knx:fbswu");
 }
 
 // ----------------------------------------------------------------------------

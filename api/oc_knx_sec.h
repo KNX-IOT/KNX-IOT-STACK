@@ -23,15 +23,14 @@
 extern "C" {
 #endif
 
-
-  /**
+/**
  * @brief The software update states
  *
  */
 typedef enum {
-  OC_PROFILE_UNKNOWN = 0,    /**< unknown profile */
-  OC_PROFILE_COAP_OSCORE,    /**< coap_oscore */
-  OC_PROFILE_COAP_DTLS       /**< coap_dtls */
+  OC_PROFILE_UNKNOWN = 0, /**< unknown profile */
+  OC_PROFILE_COAP_OSCORE, /**< coap_oscore */
+  OC_PROFILE_COAP_DTLS    /**< coap_dtls */
 } oc_cc_profile_t;
 
 /**
@@ -43,13 +42,13 @@ typedef enum {
  * "scope": ["if.g.s.<ga>"],
  * "cnf": {
  * "osc": {
- * "alg": "AES-CCM-16-64-128", 
+ * "alg": "AES-CCM-16-64-128",
  * "id": "<kid>",
  * "ms": "f9af8s.6bd94e6f"
  * }}}
- *      
+ *
  * scope : "coap_oscore" [OSCORE] or "coap_dtls"
- *      
+ *
  * Key translation
  * | Json Key          | Integer Value | type    |
  * | ----------------- | ------------- |---------|
@@ -78,14 +77,14 @@ typedef struct oc_oscore_cc_t
 
 /**
  * @brief retrieve the replay window
- * 
+ *
  * @return uint64_t the replay window
  */
 uint64_t oc_oscore_get_rplwdo();
 
 /**
  * @brief retrieve the oscore sequence number delay value
- * 
+ *
  * @return uint64_t the osn delay value
  */
 uint64_t oc_oscore_get_osndelay();
