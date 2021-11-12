@@ -35,7 +35,9 @@ uint64_t oc_oscore_get_osndelay();
  * - /f/oscore
  * - /p/oscore/rplwdo
  * - /p/oscore/osndelay
- *
+ * - /auth
+ * optional:
+ * - a/sen
  *
  * @param device index of the device to which the resources are to be created
  */
