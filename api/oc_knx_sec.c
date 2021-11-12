@@ -363,7 +363,8 @@ oc_create_auth_at_resource(int resource_idx, size_t device)
   // "/a/sen"
   oc_core_lf_populate_resource(
     resource_idx, device, "/auth/at", OC_IF_LL | OC_IF_BASELINE, APPLICATION_CBOR,
-    OC_DISCOVERABLE, 0, 0, oc_core_auth_at_post_handler, 0, 1, "dpt.a[n]");
+                               OC_DISCOVERABLE, oc_core_auth_at_get_handler, 0,
+                               oc_core_auth_at_post_handler, 0, 1, "dpt.a[n]");
 }
 
 
