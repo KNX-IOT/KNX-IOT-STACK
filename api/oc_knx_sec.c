@@ -23,6 +23,8 @@
 uint64_t g_oscore_replaywindow = 0;
 uint64_t g_oscore_osndelay = 0;
 
+oc_oscore_cc_t g_occ[20];  
+
 // ----------------------------------------------------------------------------
 
 static void
@@ -277,6 +279,73 @@ oc_create_a_sen_resource(int resource_idx, size_t device)
                                oc_core_a_sen_post_handler, 0, 0, "");
 }
 
+
+// ----------------------------------------------------------------------------
+
+/*
+{
+"access_token": "OC5BLLhkAG ...",
+"profile": "coap_oscore",
+"scope": ["if.g.s.<ga>"],
+"cnf": {
+"osc": {
+"alg": "AES-CCM-16-64-128",
+"id": "<kid>",
+"ms": "f9af8….6bd94e6f"
+}}}
+*/
+static void
+oc_core_auth_at_post_handler(oc_request_t *request,
+                           oc_interface_mask_t iface_mask, void *data)
+{
+  (void)data;
+  (void)iface_mask;
+  oc_rep_t *rep = NULL;
+  int cmd = 0;
+
+  /* check if the accept header is cbor-format */
+  if (request->accept != APPLICATION_CBOR) {
+    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    return;
+  }
+
+  bool changed = false;
+  /* loop over the request document to check if all inputs are ok */
+  rep = request->request_payload;
+  while (rep != NULL) {
+    PRINT("key: (check) %s \n", oc_string(rep->name));
+    if (rep->type == OC_REP_STRING) {
+      if (rep->iname == 2) {
+        cmd = a_sen_convert_cmd(oc_string(rep->value.string));
+        changed = true;
+        break;
+      }
+    }
+
+    rep = rep->next;
+  }
+
+  /* input was set, so create the response*/
+  if (changed == true) {
+    PRINT("  cmd %d\n", cmd);
+    oc_send_cbor_response(request, OC_STATUS_CHANGED);
+    return;
+  }
+
+  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+}
+
+void
+oc_create_auth_at_resource(int resource_idx, size_t device)
+{
+  OC_DBG("oc_create_auth_at_resource\n");
+  // "/a/sen"
+  oc_core_lf_populate_resource(
+    resource_idx, device, "/auth/at", OC_IF_LL | OC_IF_BASELINE, APPLICATION_CBOR,
+    OC_DISCOVERABLE, 0, 0, oc_core_auth_at_post_handler, 0, 0, "");
+}
+
+
 // ----------------------------------------------------------------------------
 
 static void
@@ -298,7 +367,7 @@ oc_core_knx_auth_get_handler(oc_request_t *request,
 
   size_t device_index = request->resource->device;
 
-  for (i = (int)OC_KNX_P_OSCORE_REPLWDO; i <= (int)OC_KNX_P_OSCORE_OSNDELAY;
+  for (i = (int)OC_KNX_A_SEN; i = (int)OC_KNX_AUTH;
        i++) {
     oc_resource_t *resource = oc_core_get_resource_by_index(i, device_index);
     if (oc_filter_resource(resource, request, device_index, &response_length,
@@ -327,12 +396,6 @@ oc_create_knx_auth_resource(int resource_idx, size_t device)
 
 // ----------------------------------------------------------------------------
 
-
-
-
-
-
-
 uint64_t
 oc_oscore_get_rplwdo()
 {
@@ -360,5 +423,6 @@ oc_create_knx_sec_resources(size_t device_index)
 
   oc_create_a_sen_resource(OC_KNX_A_SEN, device_index);
 
+  oc_create_auth_at_resource(OC_KNX_AUTH_AT, device_index);
   oc_create_knx_auth_resource(OC_KNX_AUTH, device_index);
 }
