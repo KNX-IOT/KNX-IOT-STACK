@@ -56,9 +56,8 @@ static int convert_cmd(char* cmd) {
 int
 restart_device()
 {
-
   PRINT("restart device\n");
-
+  return 0;
 }
 
 int 
@@ -132,12 +131,12 @@ oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 {
   (void)data;
   (void)iface_mask;
-  size_t response_length = 0;
+  //size_t response_length = 0;
 
   int value = -1;
   int cmd = -1;
-  int time;
-  int code;
+  //int time;
+  //int code;
 
   char buffer[200];
   memset(buffer, 200, 1);
