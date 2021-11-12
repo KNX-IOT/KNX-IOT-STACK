@@ -34,6 +34,39 @@ oc_pase_t g_pase;
 oc_string_t g_idevid;
 oc_string_t g_ldevid;
 
+
+// ----------------------------------------------------------------------------
+#define RESTART_DEVICE 2
+#define RESET_DEVICE  1
+
+
+static convert_cmd(char* cmd) {
+  if (strcmp(cmd, "reset", strlen("reset")) == 0) {
+    return RESET_DEVICE;
+  }
+  if (strcmp(cmd, "restart", strlen("restart")) == 0) {
+    return RESTART_DEVICE;
+  }
+
+  return 0;
+}
+
+int
+restart_device()
+{
+
+  PRINT("restart device\n");
+
+}
+
+int 
+reset_device(int value)
+{
+  PRINT("reset device: %d\n", value);
+
+}
+
+
 // ----------------------------------------------------------------------------
 
 static void
@@ -69,19 +102,28 @@ oc_core_knx_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     request->response->response_buffer->response_length = response_length;
   } else {
 
-    oc_rep_begin_root_object();
-
-    oc_rep_begin_object(oc_rep_object(root), api);
-    oc_rep_set_text_string(api, version, "1.0");
-    oc_rep_end_object(oc_rep_object(root), api);
+    oc_rep_start_root_object();
 
     oc_rep_set_text_string(root, base, "/");
+
+    oc_rep_set_key(&root_map, "api");
+    oc_rep_begin_object(&root_map, api);
+    oc_rep_set_text_string(api, version, "1.0");
+    oc_rep_end_object(&root_map, api);
+
     oc_rep_end_root_object();
 
     oc_send_cbor_response(request, OC_STATUS_OK);
   }
 }
 
+/*
+  value = 1   Unsigned
+  cmd = 2  Text string
+  status = 3  Unsigned
+  code = "code" Unsigned
+  time = "time" Unsigned
+*/
 static void
 oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
                          void *data)
@@ -90,29 +132,76 @@ oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   (void)iface_mask;
   size_t response_length = 0;
 
-  /* check if the accept header is cbor-format */
-  if (request->accept != APPLICATION_JSON) {
-    request->response->response_buffer->code =
-      oc_status_code(OC_STATUS_BAD_REQUEST);
+  int value = -1;
+  int cmd = -1;
+  int time;
+  int code;
+
+  char buffer[200];
+  memset(buffer, 200, 1);
+  oc_rep_to_json(request->request_payload, (char *)&buffer, 200, true);
+  PRINT("%s", buffer);
+
+  int index = -1;
+  oc_rep_t *rep = request->request_payload;
+  while (rep != NULL) {
+    switch (rep->type) {
+
+    case OC_REP_INT: {
+
+      if (rep->iname == 1) {
+        {
+          value = rep->value.integer;
+        }
+      }
+    } break;
+
+    case OC_REP_STRING: {
+
+      if (rep->iname == 2) {
+        {
+          // the command
+          cmd = convert_cmd(oc_string(rep->value.string));
+        }
+      }
+      break;
+
+    } break;
+    case OC_REP_NIL:
+      break;
+    default:
+      break;
+    }
+        rep = rep->next;
+  }
+ 
+  PRINT("cmd   :%d ", cmd);
+  PRINT("value :%d ", value);
+
+  if (cmd == RESTART_DEVICE) {
+    restart_device();
+  } else if (cmd == RESET_DEVICE) {
+    reset_device(value);
+  } else {
+    PRINT(" invalid command");
+    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
 
-  /*
-  int length = oc_rep_add_line_to_buffer("{");
-  response_length += length;
+  //Before executing the reset function, 
+  // the KNX IoT device MUST return a response with CoAP response 690 code 2.04 CHANGED and 
+  // with payload containing Error Code and Process Time in seconds as defined 691 for 
+  // the Response to a Master Reset Request for KNX Classic devices, see [10].
+  
+  oc_rep_start_root_object();
 
-  length = oc_rep_add_line_to_buffer("\"api\": { \"version\": \"1.0\",");
-  response_length += length;
+  // TODO note need to figure out how to fill in the correct response values
+  oc_rep_set_int(root, code, 5);
+  oc_rep_set_int(root, time, 15);
+  oc_rep_end_root_object();
 
-  length = oc_rep_add_line_to_buffer("\"base\": \"/ \"}");
-  response_length += length;
-
-  length = oc_rep_add_line_to_buffer("}");
-  response_length += length;
-  */
-
-  oc_send_json_response(request, OC_STATUS_OK);
-  request->response->response_buffer->response_length = response_length;
+  PRINT("oc_core_knx_post_handler - end\n");
+  oc_send_cbor_response(request, OC_STATUS_CHANGED);
 }
 
 void
@@ -125,49 +214,6 @@ oc_create_knx_resource(int resource_idx, size_t device)
     oc_core_knx_post_handler, 0, 0, "");
 }
 
-// ----------------------------------------------------------------------------
-
-static void
-oc_core_knx_reset_post_handler(oc_request_t *request,
-                               oc_interface_mask_t iface_mask, void *data)
-{
-  (void)data;
-  (void)iface_mask;
-  size_t response_length = 0;
-
-  /* check if the accept header is cbor-format */
-  if (request->accept != APPLICATION_JSON) {
-    request->response->response_buffer->code =
-      oc_status_code(OC_STATUS_BAD_REQUEST);
-    return;
-  }
-  /*
-  int length = clf_add_line_to_buffer("{");
-  response_length += length;
-
-  length = clf_add_line_to_buffer("\"api\": { \"version\": \"1.0\",");
-  response_length += length;
-
-  length = clf_add_line_to_buffer("\"base\": \"/ \"}");
-  response_length += length;
-
-  length = clf_add_line_to_buffer("}");
-  response_length += length;
-  */
-
-  oc_send_json_response(request, OC_STATUS_OK);
-  request->response->response_buffer->response_length = response_length;
-}
-
-void
-oc_create_knx_reset_resource(int resource_idx, size_t device)
-{
-  OC_DBG("oc_create_knx_reset_resource\n");
-  oc_core_lf_populate_resource(resource_idx, device, "/.well-known/knx/reset",
-                               OC_IF_LL | OC_IF_BASELINE, APPLICATION_CBOR,
-                               OC_DISCOVERABLE, 0, 0,
-                               oc_core_knx_reset_post_handler, 0, 0, "");
-}
 
 // ----------------------------------------------------------------------------
 
@@ -527,7 +573,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
       break;
     }
     rep = rep->next;
-  };
+  }
 
   /* input was set, so create the response*/
   // if (changed == true) {
@@ -536,10 +582,6 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
   // oc_rep_end_root_object();
 
   oc_send_cbor_response(request, OC_STATUS_CHANGED);
-  return;
-  //}
-
-  // oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
 }
 
 void
@@ -913,12 +955,10 @@ oc_create_knx_resources(size_t device_index)
 
   oc_create_knx_lsm_resource(OC_KNX_LSM, device_index);
   oc_create_knx_knx_resource(OC_KNX_DOT_KNX, device_index);
-
-  oc_create_knx_reset_resource(OC_KNX, device_index);
-  oc_create_knx_resource(OC_KNX_RESET, device_index);
   oc_create_knx_crc_resource(OC_KNX_CRC, device_index);
   oc_create_knx_osn_resource(OC_KNX_OSN, device_index);
   oc_create_knx_ldevid_resource(OC_KNX_LDEVID, device_index);
   oc_create_knx_idevid_resource(OC_KNX_IDEVID, device_index);
   oc_create_knx_spake_resource(OC_KNX_SPAKE, device_index);
+  oc_create_knx_resource(OC_KNX, device_index);
 }
