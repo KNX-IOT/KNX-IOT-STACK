@@ -294,6 +294,27 @@ oc_create_a_sen_resource(int resource_idx, size_t device)
 "ms": "f9af8….6bd94e6f"
 }}}
 */
+
+static void
+oc_core_auth_at_get_handler(oc_request_t *request,
+                             oc_interface_mask_t iface_mask, void *data)
+{
+  (void)data;
+  (void)iface_mask;
+
+  /* check if the accept header is cbor-format */
+  if (request->accept != APPLICATION_CBOR) {
+    request->response->response_buffer->code =
+      oc_status_code(OC_STATUS_BAD_REQUEST);
+    return;
+  }
+  cbor_encode_uint(&g_encoder, g_oscore_replaywindow);
+
+  PRINT("oc_core_knx_f_oscore_osndelay_get_handler - done\n");
+  oc_send_cbor_response(request, OC_STATUS_OK);
+}
+
+
 static void
 oc_core_auth_at_post_handler(oc_request_t *request,
                            oc_interface_mask_t iface_mask, void *data)
@@ -342,7 +363,7 @@ oc_create_auth_at_resource(int resource_idx, size_t device)
   // "/a/sen"
   oc_core_lf_populate_resource(
     resource_idx, device, "/auth/at", OC_IF_LL | OC_IF_BASELINE, APPLICATION_CBOR,
-    OC_DISCOVERABLE, 0, 0, oc_core_auth_at_post_handler, 0, 0, "");
+    OC_DISCOVERABLE, 0, 0, oc_core_auth_at_post_handler, 0, 1, "dpt.a[n]");
 }
 
 
@@ -367,8 +388,7 @@ oc_core_knx_auth_get_handler(oc_request_t *request,
 
   size_t device_index = request->resource->device;
 
-  for (i = (int)OC_KNX_A_SEN; i = (int)OC_KNX_AUTH;
-       i++) {
+  for (i = (int)OC_KNX_A_SEN; i < (int)OC_KNX_AUTH; i++) {
     oc_resource_t *resource = oc_core_get_resource_by_index(i, device_index);
     if (oc_filter_resource(resource, request, device_index, &response_length,
                            matches)) {
