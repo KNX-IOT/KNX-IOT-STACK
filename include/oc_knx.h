@@ -108,12 +108,12 @@ typedef enum {
  * @brief check if the lsm state is loaded
  *
  * @param device index of the device to which the resource is to be created
-*/
+ */
 oc_lsm_state_t oc_knx_lsm_state(size_t device);
 
 /**
  * @brief checks if the load state machine (lsm) string contains a valid value
- * 
+ *
  * @param lsm The lsm as string
  * @return true correct value
  * @return false incorrect value
@@ -122,7 +122,7 @@ bool oc_core_lsm_check_string(const char *lsm);
 
 /**
  * @brief convert the load state machine (lsm) string to lsm state
- * 
+ *
  * @param lsm The state as string
  * @return oc_lsm_state_t The state as struct
  */
@@ -130,23 +130,23 @@ oc_lsm_state_t oc_core_lsm_parse_string(const char *lsm);
 
 /**
  * @brief convert the load state machine (lsm) state to string
- * 
+ *
  * @param lsm the state
  * @return const char* The state as string
  */
 const char *oc_core_get_lsm_as_string(oc_lsm_state_t lsm);
 
 /**
- * @brief sets the ldevid 
- * 
+ * @brief sets the ldevid
+ *
  * @param ldevid the ldevid certificate
  * @param len the length of the certificate
  */
 void oc_knx_set_idevid(const char *idevid, int len);
 
 /**
- * @brief sets the idevid 
- * 
+ * @brief sets the idevid
+ *
  * @param idevid the idevid certificate
  * @param len the length of the certificate
  */
@@ -154,14 +154,14 @@ void oc_knx_set_ldevid(char *idevid, int len);
 
 /**
  * @brief sets the crc value (of the loaded materials)
- * 
+ *
  * @param crc The crc value
  */
 void oc_knx_set_crc(uint64_t crc);
 
 /**
  * @brief sets the oscore sequence number
- * 
+ *
  * @param osn the oscore sequence number
  */
 void oc_knx_set_osn(uint64_t osn);
@@ -178,10 +178,10 @@ void oc_knx_set_osn(uint64_t osn);
  * - /.well-known/knx/ldevid
  * - /.well-known/knx/idevid
  * - /.well-known/knx/spake
- *      
+ *
  * @param device index of the device to which the resource is to be created
  *
-*/
+ */
 void oc_create_knx_resources(size_t device);
 
 #ifdef __cplusplus

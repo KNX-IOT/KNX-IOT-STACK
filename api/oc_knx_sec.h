@@ -30,12 +30,12 @@ uint64_t oc_oscore_get_osndelay();
 /**
  * @brief Creation of the KNX security resources.
  *
- *      
+ *
  * creates the following resources:
  * - /f/oscore
  * - /p/oscore/rplwdo
  * - /p/oscore/osndelay
- *      
+ *
  *
  * @param device index of the device to which the resources are to be created
  */

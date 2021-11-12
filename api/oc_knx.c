@@ -34,14 +34,14 @@ oc_pase_t g_pase;
 oc_string_t g_idevid;
 oc_string_t g_ldevid;
 
-
 // ----------------------------------------------------------------------------
 
 #define RESTART_DEVICE 2
-#define RESET_DEVICE  1
+#define RESET_DEVICE 1
 
-
-static int convert_cmd(char* cmd) {
+static int
+convert_cmd(char *cmd)
+{
   if (strncmp(cmd, "reset", strlen("reset")) == 0) {
     return RESET_DEVICE;
   }
@@ -60,13 +60,12 @@ restart_device()
   return 0;
 }
 
-int 
+int
 reset_device(int value)
 {
   PRINT("reset device: %d\n", value);
   return 0;
 }
-
 
 // ----------------------------------------------------------------------------
 
@@ -131,12 +130,12 @@ oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 {
   (void)data;
   (void)iface_mask;
-  //size_t response_length = 0;
+  // size_t response_length = 0;
 
   int value = -1;
   int cmd = -1;
-  //int time;
-  //int code;
+  // int time;
+  // int code;
 
   char buffer[200];
   memset(buffer, 200, 1);
@@ -168,7 +167,7 @@ oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     }
     rep = rep->next;
   }
- 
+
   PRINT("  cmd   :%d\n", cmd);
   PRINT("  value :%d\n", value);
 
@@ -182,11 +181,12 @@ oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     return;
   }
 
-  //Before executing the reset function, 
-  // the KNX IoT device MUST return a response with CoAP response 690 code 2.04 CHANGED and 
-  // with payload containing Error Code and Process Time in seconds as defined 691 for 
-  // the Response to a Master Reset Request for KNX Classic devices, see [10].
-  
+  // Before executing the reset function,
+  // the KNX IoT device MUST return a response with CoAP response 690 code 2.04
+  // CHANGED and with payload containing Error Code and Process Time in seconds
+  // as defined 691 for the Response to a Master Reset Request for KNX Classic
+  // devices, see [10].
+
   oc_rep_start_root_object();
 
   // TODO note need to figure out how to fill in the correct response values
@@ -207,7 +207,6 @@ oc_create_knx_resource(int resource_idx, size_t device)
     APPLICATION_LINK_FORMAT, OC_DISCOVERABLE, oc_core_knx_get_handler, 0,
     oc_core_knx_post_handler, 0, 0, "");
 }
-
 
 // ----------------------------------------------------------------------------
 
