@@ -561,7 +561,6 @@ oc_core_knx_crc_get_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  size_t response_length = 0;
   PRINT("oc_core_knx_crc_get_handler\n");
 
   /* check if the accept header is cbor-format */
@@ -595,7 +594,6 @@ oc_core_knx_osn_get_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  size_t response_length = 0;
   PRINT("oc_core_knx_osn_get_handler\n");
 
   /* check if the accept header is cbor-format */
