@@ -60,8 +60,6 @@ oc_core_knx_p_oscore_osndelay_put_handler(oc_request_t *request,
     return;
   }
 
-  size_t device_index = request->resource->device;
-  oc_device_info_t *device = oc_core_get_device_info(device_index);
   oc_rep_t *rep = request->request_payload;
   // debugging
   if (rep != NULL) {
@@ -127,8 +125,6 @@ oc_core_knx_p_oscore_replwdo_put_handler(oc_request_t *request,
     return;
   }
 
-  size_t device_index = request->resource->device;
-  oc_device_info_t *device = oc_core_get_device_info(device_index);
   oc_rep_t *rep = request->request_payload;
   // debugging
   if (rep != NULL) {
