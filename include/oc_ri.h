@@ -245,6 +245,9 @@ typedef enum {
   OC_KNX_SWU_PKGNAMES,
   OC_KNX_SWU_PKG,
   OC_KNX_SWU,
+  OC_KNX_P_OSCORE_REPLWDO,
+  OC_KNX_P_OSCORE_OSNDELAY,
+  OC_KNX_F_OSCORE,
 
   /* List of resources on a logical device: start */
   /* List of Device Configuration Resources (DCRs): start */
