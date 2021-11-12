@@ -23,8 +23,70 @@
 extern "C" {
 #endif
 
+/**
+ * @brief The software update states
+ *
+ */
+typedef enum {
+  OC_PROFILE_UNKNOWN = 0, /**< unknown profile */
+  OC_PROFILE_COAP_OSCORE, /**< coap_oscore */
+  OC_PROFILE_COAP_DTLS    /**< coap_dtls */
+} oc_cc_profile_t;
+
+/**
+ * @brief Oscore Credential Configuration
+ *
+ *{
+ * "access_token": "OC5BLLhkAG ...",
+ * "profile": "coap_oscore",
+ * "scope": ["if.g.s.<ga>"],
+ * "cnf": {
+ * "osc": {
+ * "alg": "AES-CCM-16-64-128",
+ * "id": "<kid>",
+ * "ms": "f9af8s.6bd94e6f"
+ * }}}
+ *
+ * scope : "coap_oscore" [OSCORE] or "coap_dtls"
+ *
+ * Key translation
+ * | Json Key          | Integer Value | type    |
+ * | ----------------- | ------------- |---------|
+ * | access_token (id) | 0             | object  |
+ * | profile           | 38            | string  |
+ * | scope             | 9             | object  |
+ * | cnf               | 8             | map     |
+ * | osc               | 4             | map     |
+ * | alg               | 4             | int     |
+ * | id                | 0             | string  |
+ * | ms                | x             | int     |
+ * | kid               | 2             | string  |
+ * | nbf  (optional)   | 5             | integer |
+ * | sub               | 2             | string  |
+ * | ms  (bytestring)  | 2             | string  |
+ */
+typedef struct oc_oscore_cc_t
+{
+  oc_string_t at;
+  oc_cc_profile_t profile;
+  int *scope;
+  int sia;
+  oc_string_t alg;
+  oc_string_t ms;
+} oc_oscore_cc_t;
+
+/**
+ * @brief retrieve the replay window
+ *
+ * @return uint64_t the replay window
+ */
 uint64_t oc_oscore_get_rplwdo();
 
+/**
+ * @brief retrieve the oscore sequence number delay value
+ *
+ * @return uint64_t the osn delay value
+ */
 uint64_t oc_oscore_get_osndelay();
 
 /**
@@ -35,7 +97,9 @@ uint64_t oc_oscore_get_osndelay();
  * - /f/oscore
  * - /p/oscore/rplwdo
  * - /p/oscore/osndelay
- *
+ * - /auth
+ * optional:
+ * - a/sen
  *
  * @param device index of the device to which the resources are to be created
  */
