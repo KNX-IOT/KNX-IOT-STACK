@@ -36,18 +36,20 @@ oc_string_t g_ldevid;
 
 
 // ----------------------------------------------------------------------------
+
 #define RESTART_DEVICE 2
 #define RESET_DEVICE  1
 
 
-static convert_cmd(char* cmd) {
-  if (strcmp(cmd, "reset", strlen("reset")) == 0) {
+static int convert_cmd(char* cmd) {
+  if (strncmp(cmd, "reset", strlen("reset")) == 0) {
     return RESET_DEVICE;
   }
-  if (strcmp(cmd, "restart", strlen("restart")) == 0) {
+  if (strncmp(cmd, "restart", strlen("restart")) == 0) {
     return RESTART_DEVICE;
   }
 
+  OC_DBG("convert_cmd command not recognized: %s", cmd);
   return 0;
 }
 
@@ -142,41 +144,34 @@ oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   oc_rep_to_json(request->request_payload, (char *)&buffer, 200, true);
   PRINT("%s", buffer);
 
-  int index = -1;
   oc_rep_t *rep = request->request_payload;
   while (rep != NULL) {
     switch (rep->type) {
-
     case OC_REP_INT: {
-
       if (rep->iname == 1) {
         {
           value = rep->value.integer;
         }
       }
     } break;
-
     case OC_REP_STRING: {
-
       if (rep->iname == 2) {
         {
           // the command
           cmd = convert_cmd(oc_string(rep->value.string));
         }
       }
-      break;
-
     } break;
     case OC_REP_NIL:
       break;
     default:
       break;
     }
-        rep = rep->next;
+    rep = rep->next;
   }
  
-  PRINT("cmd   :%d ", cmd);
-  PRINT("value :%d ", value);
+  PRINT("  cmd   :%d ", cmd);
+  PRINT("  value :%d ", value);
 
   if (cmd == RESTART_DEVICE) {
     restart_device();

@@ -68,8 +68,8 @@ oc_core_knx_p_oscore_osndelay_put_handler(oc_request_t *request,
   }
 
   if ((rep != NULL) && (rep->type == OC_REP_INT)) {
-    PRINT("  oc_core_knx_p_oscore_osndelay_put_handler received : %d\n",
-          rep->value.integer);
+    //PRINT("  oc_core_knx_p_oscore_osndelay_put_handler received : %d\n",
+    //      rep->value.integer);
     g_oscore_osndelay = rep->value.integer;
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
     // oc_storage_write(KNX_STORAGE_PM, (uint8_t *)&(rep->value.boolean), 1);
@@ -133,8 +133,8 @@ oc_core_knx_p_oscore_replwdo_put_handler(oc_request_t *request,
   }
 
   if ((rep != NULL) && (rep->type == OC_REP_INT)) {
-    PRINT("  oc_core_knx_p_oscore_replwdo_put_handler received : %d\n",
-          rep->value.integer);
+    //PRINT("  oc_core_knx_p_oscore_replwdo_put_handler received : %d\n",
+    //      rep->value.integer);
     g_oscore_replaywindow = rep->value.integer;
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
     // oc_storage_write(KNX_STORAGE_PM, (uint8_t *)&(rep->value.boolean), 1);
