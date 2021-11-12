@@ -220,7 +220,8 @@ typedef enum {
   OC_KNX_LSM,      ///< load state machine
   OC_KNX_DOT_KNX,  ///< .knx resource
   OC_KNX_CRC,      ///< CRC value of loaded contents
-  OC_KNX,          ///< well-known / knx
+  OC_KNX_OSN,      ///< .well-known / knx / osn
+  OC_KNX,          ///< .well-known / knx
   OC_KNX_FP_GM,    ///< FP/GM
   OC_KNX_FP_GM_X,  ///< FP/GM/X
   OC_KNX_FP_G,     ///< FP/G
@@ -244,6 +245,9 @@ typedef enum {
   OC_KNX_SWU_PKGNAMES,
   OC_KNX_SWU_PKG,
   OC_KNX_SWU,
+  OC_KNX_P_OSCORE_REPLWDO,
+  OC_KNX_P_OSCORE_OSNDELAY,
+  OC_KNX_F_OSCORE,
 
   /* List of resources on a logical device: start */
   /* List of Device Configuration Resources (DCRs): start */

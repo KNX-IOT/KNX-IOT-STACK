@@ -708,7 +708,7 @@ oc_create_fp_g_x_resource(int resource_idx, size_t device)
     "urn:knx:if.c");
 }
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 static void
 oc_core_fp_p_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,

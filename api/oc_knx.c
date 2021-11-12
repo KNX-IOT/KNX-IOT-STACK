@@ -26,6 +26,9 @@
 
 oc_group_object_notification_t g_received_notification;
 
+uint64_t g_crc = 0;
+uint64_t g_osn = 0;
+
 oc_pase_t g_pase;
 
 oc_string_t g_idevid;
@@ -460,7 +463,6 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
     return;
   }
 
-  // bool changed = false;
   /* loop over the request document to check if all inputs are ok */
   rep = request->request_payload;
 
@@ -559,74 +561,58 @@ oc_core_knx_crc_get_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  size_t response_length = 0;
+  PRINT("oc_core_knx_crc_get_handler\n");
 
   /* check if the accept header is cbor-format */
-  if (request->accept != APPLICATION_JSON) {
+  if (request->accept != APPLICATION_CBOR) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
-  /*
-  int length = clf_add_line_to_buffer("{");
-  response_length += length;
+  cbor_encode_uint(&g_encoder, g_crc);
 
-  length = clf_add_line_to_buffer("\"api\": { \"version\": \"1.0\",");
-  response_length += length;
-
-  length = clf_add_line_to_buffer("\"base\": \"/ \"}");
-  response_length += length;
-
-  length = clf_add_line_to_buffer("}");
-  response_length += length;
-  */
-
-  request->response->response_buffer->content_format = APPLICATION_JSON;
-  request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
-  request->response->response_buffer->response_length = response_length;
-}
-
-static void
-oc_core_knx_crc_post_handler(oc_request_t *request,
-                             oc_interface_mask_t iface_mask, void *data)
-{
-  (void)data;
-  (void)iface_mask;
-  size_t response_length = 0;
-
-  /* check if the accept header is cbor-format */
-  if (request->accept != APPLICATION_JSON) {
-    request->response->response_buffer->code =
-      oc_status_code(OC_STATUS_BAD_REQUEST);
-    return;
-  }
-  /*
-  int length = clf_add_line_to_buffer("{");
-  response_length += length;
-
-  length = clf_add_line_to_buffer("\"api\": { \"version\": \"1.0\",");
-  response_length += length;
-
-  length = clf_add_line_to_buffer("\"base\": \"/ \"}");
-  response_length += length;
-
-  length = clf_add_line_to_buffer("}");
-  response_length += length;
-  */
-
-  request->response->response_buffer->content_format = APPLICATION_JSON;
-  request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
-  request->response->response_buffer->response_length = response_length;
+  PRINT("oc_core_knx_crc_get_handler - done\n");
+  oc_send_cbor_response(request, OC_STATUS_OK);
 }
 
 void
 oc_create_knx_crc_resource(int resource_idx, size_t device)
 {
-  OC_DBG("oc_create_crc_lsm_resource\n");
+  OC_DBG("oc_create_knx_crc_resource\n");
   oc_core_lf_populate_resource(resource_idx, device, "/.well-known/knx/crc",
                                OC_IF_LL, APPLICATION_CBOR, OC_DISCOVERABLE,
-                               oc_core_knx_crc_get_handler, 0,
-                               oc_core_knx_crc_post_handler, 0, 0, "");
+                               oc_core_knx_crc_get_handler, 0, 0, 0, 0, "");
+}
+
+// ----------------------------------------------------------------------------
+
+static void
+oc_core_knx_osn_get_handler(oc_request_t *request,
+                            oc_interface_mask_t iface_mask, void *data)
+{
+  (void)data;
+  (void)iface_mask;
+  PRINT("oc_core_knx_osn_get_handler\n");
+
+  /* check if the accept header is cbor-format */
+  if (request->accept != APPLICATION_CBOR) {
+    request->response->response_buffer->code =
+      oc_status_code(OC_STATUS_BAD_REQUEST);
+    return;
+  }
+  cbor_encode_uint(&g_encoder, g_osn);
+
+  PRINT("oc_core_knx_osn_get_handler - done\n");
+  oc_send_cbor_response(request, OC_STATUS_OK);
+}
+
+void
+oc_create_knx_osn_resource(int resource_idx, size_t device)
+{
+  OC_DBG("oc_create_knx_osn_resource\n");
+  oc_core_lf_populate_resource(resource_idx, device, "/.well-known/knx/osn",
+                               OC_IF_LL, APPLICATION_CBOR, OC_DISCOVERABLE,
+                               oc_core_knx_osn_get_handler, 0, 0, 0, 0, "");
 }
 
 // ----------------------------------------------------------------------------
@@ -909,6 +895,18 @@ oc_knx_set_ldevid(char *idevid, int len)
 }
 
 void
+oc_knx_set_crc(uint64_t crc)
+{
+  g_crc = crc;
+}
+
+void
+oc_knx_set_osn(uint64_t osn)
+{
+  g_osn = osn;
+}
+
+void
 oc_create_knx_resources(size_t device_index)
 {
   OC_DBG("oc_create_knx_resources");
@@ -919,6 +917,7 @@ oc_create_knx_resources(size_t device_index)
   oc_create_knx_reset_resource(OC_KNX, device_index);
   oc_create_knx_resource(OC_KNX_RESET, device_index);
   oc_create_knx_crc_resource(OC_KNX_CRC, device_index);
+  oc_create_knx_osn_resource(OC_KNX_OSN, device_index);
   oc_create_knx_ldevid_resource(OC_KNX_LDEVID, device_index);
   oc_create_knx_idevid_resource(OC_KNX_IDEVID, device_index);
   oc_create_knx_spake_resource(OC_KNX_SPAKE, device_index);
