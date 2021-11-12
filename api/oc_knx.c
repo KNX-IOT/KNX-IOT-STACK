@@ -169,15 +169,15 @@ oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     rep = rep->next;
   }
  
-  PRINT("  cmd   :%d ", cmd);
-  PRINT("  value :%d ", value);
+  PRINT("  cmd   :%d\n", cmd);
+  PRINT("  value :%d\n", value);
 
   if (cmd == RESTART_DEVICE) {
     restart_device();
   } else if (cmd == RESET_DEVICE) {
     reset_device(value);
   } else {
-    PRINT(" invalid command");
+    PRINT(" invalid command\n");
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
