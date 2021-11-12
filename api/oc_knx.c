@@ -570,11 +570,10 @@ oc_core_knx_crc_get_handler(oc_request_t *request,
     return;
   }
   cbor_encode_uint(&g_encoder, g_crc);
-  
+
   PRINT("oc_core_knx_crc_get_handler - done\n");
   oc_send_cbor_response(request, OC_STATUS_OK);
 }
-
 
 void
 oc_create_knx_crc_resource(int resource_idx, size_t device)
@@ -582,8 +581,7 @@ oc_create_knx_crc_resource(int resource_idx, size_t device)
   OC_DBG("oc_create_knx_crc_resource\n");
   oc_core_lf_populate_resource(resource_idx, device, "/.well-known/knx/crc",
                                OC_IF_LL, APPLICATION_CBOR, OC_DISCOVERABLE,
-                               oc_core_knx_crc_get_handler, 0,
-                               0, 0, 0, "");
+                               oc_core_knx_crc_get_handler, 0, 0, 0, 0, "");
 }
 
 // ----------------------------------------------------------------------------
@@ -616,7 +614,6 @@ oc_create_knx_osn_resource(int resource_idx, size_t device)
                                OC_IF_LL, APPLICATION_CBOR, OC_DISCOVERABLE,
                                oc_core_knx_osn_get_handler, 0, 0, 0, 0, "");
 }
-
 
 // ----------------------------------------------------------------------------
 

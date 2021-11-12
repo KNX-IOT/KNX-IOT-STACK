@@ -27,7 +27,8 @@ uint64_t g_oscore_osndelay = 0;
 
 static void
 oc_core_knx_f_oscore_osndelay_get_handler(oc_request_t *request,
-                                 oc_interface_mask_t iface_mask, void *data)
+                                          oc_interface_mask_t iface_mask,
+                                          void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -48,8 +49,8 @@ oc_core_knx_f_oscore_osndelay_get_handler(oc_request_t *request,
 
 static void
 oc_core_knx_p_oscore_osndelay_put_handler(oc_request_t *request,
-                                         oc_interface_mask_t iface_mask,
-                                         void *data)
+                                          oc_interface_mask_t iface_mask,
+                                          void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -84,18 +85,17 @@ oc_create_knx_p_oscore_osndelay_resource(int resource_idx, size_t device)
   OC_DBG("oc_create_knx_p_oscore_osndelay_resource\n");
   //
   oc_core_lf_populate_resource(
-    resource_idx, device, "p/oscore/osndelay", OC_IF_D,
-    APPLICATION_CBOR, OC_DISCOVERABLE,
-    oc_core_knx_f_oscore_osndelay_get_handler,
+    resource_idx, device, "p/oscore/osndelay", OC_IF_D, APPLICATION_CBOR,
+    OC_DISCOVERABLE, oc_core_knx_f_oscore_osndelay_get_handler,
     oc_core_knx_p_oscore_osndelay_put_handler, 0, 0, 1, ":dpt:timePeriodMsec");
 }
-
 
 // ----------------------------------------------------------------------------
 
 static void
 oc_core_knx_p_oscore_replwdo_get_handler(oc_request_t *request,
-                                 oc_interface_mask_t iface_mask, void *data)
+                                         oc_interface_mask_t iface_mask,
+                                         void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -114,7 +114,8 @@ oc_core_knx_p_oscore_replwdo_get_handler(oc_request_t *request,
 
 static void
 oc_core_knx_p_oscore_replwdo_put_handler(oc_request_t *request,
-                           oc_interface_mask_t iface_mask, void *data)
+                                         oc_interface_mask_t iface_mask,
+                                         void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -132,10 +133,11 @@ oc_core_knx_p_oscore_replwdo_put_handler(oc_request_t *request,
   }
 
   if ((rep != NULL) && (rep->type == OC_REP_INT)) {
-    PRINT("  oc_core_knx_p_oscore_replwdo_put_handler received : %d\n", rep->value.integer);
+    PRINT("  oc_core_knx_p_oscore_replwdo_put_handler received : %d\n",
+          rep->value.integer);
     g_oscore_replaywindow = rep->value.integer;
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
-    //oc_storage_write(KNX_STORAGE_PM, (uint8_t *)&(rep->value.boolean), 1);
+    // oc_storage_write(KNX_STORAGE_PM, (uint8_t *)&(rep->value.boolean), 1);
     return;
   }
 
@@ -147,18 +149,17 @@ oc_create_knx_p_oscore_replwdo_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_p_oscore_replwdo_resource\n");
   //
-  oc_core_lf_populate_resource(resource_idx, device, "/p/oscore/replwdo", OC_IF_D,
-                               APPLICATION_CBOR, OC_DISCOVERABLE,
-    oc_core_knx_p_oscore_replwdo_get_handler,
-    oc_core_knx_p_oscore_replwdo_put_handler, 0, 0, 1,
-                               ":dpt.value2UCount");
+  oc_core_lf_populate_resource(
+    resource_idx, device, "/p/oscore/replwdo", OC_IF_D, APPLICATION_CBOR,
+    OC_DISCOVERABLE, oc_core_knx_p_oscore_replwdo_get_handler,
+    oc_core_knx_p_oscore_replwdo_put_handler, 0, 0, 1, ":dpt.value2UCount");
 }
 
 // ----------------------------------------------------------------------------
 
 static void
 oc_core_knx_f_oscore_get_handler(oc_request_t *request,
-                            oc_interface_mask_t iface_mask, void *data)
+                                 oc_interface_mask_t iface_mask, void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -216,7 +217,6 @@ oc_oscore_get_osndelay()
   return g_oscore_osndelay;
 }
 
-
 // ----------------------------------------------------------------------------
 
 void
@@ -224,8 +224,9 @@ oc_create_knx_sec_resources(size_t device_index)
 {
   OC_DBG("oc_create_knx_sec_resources");
 
-  oc_create_knx_p_oscore_replwdo_resource(OC_KNX_P_OSCORE_REPLWDO, device_index);
-  oc_create_knx_p_oscore_osndelay_resource(OC_KNX_P_OSCORE_OSNDELAY, device_index);
+  oc_create_knx_p_oscore_replwdo_resource(OC_KNX_P_OSCORE_REPLWDO,
+                                          device_index);
+  oc_create_knx_p_oscore_osndelay_resource(OC_KNX_P_OSCORE_OSNDELAY,
+                                           device_index);
   oc_create_knx_f_oscore_resource(OC_KNX_F_OSCORE, device_index);
 }
-

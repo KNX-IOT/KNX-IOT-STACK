@@ -23,11 +23,9 @@
 extern "C" {
 #endif
 
-
 uint64_t oc_oscore_get_rplwdo();
 
 uint64_t oc_oscore_get_osndelay();
-
 
 /**
  * @brief Creation of the KNX security resources.
@@ -37,8 +35,6 @@ uint64_t oc_oscore_get_osndelay();
  * @param device index of the device to which the resources are to be created
  */
 void oc_create_knx_sec_resources(size_t device);
-
-
 
 #ifdef __cplusplus
 }
