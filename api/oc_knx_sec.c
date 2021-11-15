@@ -23,7 +23,13 @@
 uint64_t g_oscore_replaywindow = 0;
 uint64_t g_oscore_osndelay = 0;
 
-oc_oscore_cc_t g_occ[20];
+/** the list of connections */
+#define G_OCM_MAX_ENTRIES 20
+oc_oscore_cm_t g_ocm[G_OCM_MAX_ENTRIES];
+
+/** the list of oscore profiles */
+#define G_O_PROFILE_MAX_ENTRIES 20
+oc_oscore_profile_t g_o_profile[G_O_PROFILE_MAX_ENTRIES];
 
 // ----------------------------------------------------------------------------
 
@@ -202,7 +208,7 @@ oc_create_knx_f_oscore_resource(int resource_idx, size_t device)
   oc_core_lf_populate_resource(resource_idx, device, "/f/oscore", OC_IF_LIL,
                                APPLICATION_LINK_FORMAT, OC_DISCOVERABLE,
                                oc_core_knx_f_oscore_get_handler, 0, 0, 0, 1,
-                               "urn:knx:fbswu");
+                               "urn:knx:xxx");
 }
 
 // ----------------------------------------------------------------------------
@@ -278,22 +284,220 @@ oc_create_a_sen_resource(int resource_idx, size_t device)
 
 // ----------------------------------------------------------------------------
 
-/*
+static int
+find_empty_at_index()
 {
-"access_token": "OC5BLLhkAG ...",
-"profile": "coap_oscore",
-"scope": ["if.g.s.<ga>"],
-"cnf": {
-"osc": {
-"alg": "AES-CCM-16-64-128",
-"id": "<kid>",
-"ms": "f9af8….6bd94e6f"
-}}}
-*/
+  for (int i = 0; i < G_O_PROFILE_MAX_ENTRIES; i++) {
+    if (oc_string_len(g_o_profile[i].id) == 0) {
+      return i;
+    }
+  }
+
+  return -1;
+}
+
+static int
+find_index_from_at(oc_string_t *at)
+{
+  int len;
+  int len_at = oc_string_len(*at);
+  for (int i = 0; i < G_O_PROFILE_MAX_ENTRIES; i++) {
+    len = oc_string_len(g_o_profile[i].id);
+    if (len > 0 && len == len_at &&
+        (strncmp(oc_string(*at), oc_string(g_o_profile[i].id), len) == 0)) {
+      return i;
+    }
+  }
+
+  return -1;
+}
+
+/* finds 0 ==> id */
+static oc_string_t *
+find_access_token_from_payload(oc_rep_t *object)
+{
+  oc_string_t *index = NULL;
+  while (object != NULL) {
+    switch (object->type) {
+    case OC_REP_BYTE_STRING: {
+      if (oc_string_len(object->name) == 0 && object->iname == 0) {
+        index = &object->value.string;
+        PRINT(" find_access_token_from_payload storing at %s \n",
+              oc_string(*index));
+        return index;
+      }
+    } break;
+    case OC_REP_NIL:
+      break;
+    default:
+      break;
+    } /* switch */
+    object = object->next;
+  } /* while */
+  PRINT("  find_access_token_from_payload ERR: storing \n");
+  return index;
+}
 
 static void
 oc_core_auth_at_get_handler(oc_request_t *request,
                             oc_interface_mask_t iface_mask, void *data)
+{
+  (void)data;
+  (void)iface_mask;
+  size_t response_length = 0;
+  int i;
+  int length = 0;
+  PRINT("oc_core_auth_at_get_handler\n");
+
+  /* check if the accept header is link-format */
+  if (request->accept != APPLICATION_LINK_FORMAT) {
+    request->response->response_buffer->code =
+      oc_status_code(OC_STATUS_BAD_REQUEST);
+    return;
+  }
+
+  /* example entry: </auth/at/token-id>;ct=50 */
+  for (i = 0; i < G_O_PROFILE_MAX_ENTRIES; i++) {
+
+    // g_o_profile[i].contextId != NULL &&
+    if (oc_string_len(g_o_profile[i].contextId) > 0) {
+      // index  in use
+
+      if (response_length > 0) {
+        length = oc_rep_add_line_to_buffer(",\n");
+        response_length += length;
+      }
+
+      length = oc_rep_add_line_to_buffer("<auth/at/");
+
+      length = oc_rep_add_line_to_buffer(oc_string(g_o_profile[i].contextId));
+      response_length += length;
+
+      length = oc_rep_add_line_to_buffer(">;ct=50");
+      response_length += length;
+    }
+  }
+
+  if (response_length > 0) {
+    oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
+  } else {
+    oc_send_linkformat_response(request, OC_STATUS_INTERNAL_SERVER_ERROR, 0);
+  }
+
+  PRINT("oc_core_auth_at_get_handler - end\n");
+}
+
+static void
+oc_core_auth_at_post_handler(oc_request_t *request,
+                             oc_interface_mask_t iface_mask, void *data)
+{
+  (void)data;
+  (void)iface_mask;
+  oc_rep_t *rep = NULL;
+
+  PRINT("oc_core_auth_at_post_handler - end\n");
+
+  /* check if the accept header is cbor-format */
+  if (request->accept != APPLICATION_CBOR) {
+    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    return;
+  }
+
+  rep = request->request_payload;
+  oc_string_t *at = find_access_token_from_payload(rep);
+  if (at == NULL) {
+    PRINT("   access token not found!\n");
+    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    return;
+  }
+
+  int index = find_index_from_at(at);
+  if (index != -1) {
+    PRINT("   already exist!\n");
+    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    return;
+  }
+
+  index = find_empty_at_index();
+  if (index == -1) {
+    PRINT("   no space left!\n");
+    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    return;
+  }
+
+  /* loop over the request document to check if all inputs are ok */
+  rep = request->request_payload;
+  while (rep != NULL) {
+
+    if (rep->type == OC_REP_INT) {
+      // version (1)
+      if (rep->iname == 1) {
+        g_o_profile[index].version = rep->value.integer;
+      }
+    } else if (rep->type == OC_REP_STRING) {
+      // hkdf (3) (as string)
+      if (rep->iname == 3) {
+        oc_free_string(&(g_o_profile[index].hkdf));
+        oc_new_string(&g_o_profile[index].hkdf, oc_string(rep->value.string),
+                      oc_string_len(rep->value.string));
+      }
+      // alg (4)
+      if (rep->iname == 4) {
+        oc_free_string(&(g_o_profile[index].alg));
+        oc_new_string(&g_o_profile[index].alg, oc_string(rep->value.string),
+                      oc_string_len(rep->value.string));
+      }
+    } else if (rep->type == OC_REP_BYTE_STRING) {
+      // id == access token == 0
+      if (rep->iname == 0) {
+        oc_free_string(&(g_o_profile[index].id));
+        oc_new_string(&g_o_profile[index].id, oc_string(rep->value.string),
+                      oc_string_len(rep->value.string));
+      }
+      // ms (2)
+      if (rep->iname == 2) {
+        oc_free_string(&(g_o_profile[index].ms));
+        oc_new_string(&g_o_profile[index].ms, oc_string(rep->value.string),
+                      oc_string_len(rep->value.string));
+      }
+      // salt (5)
+      if (rep->iname == 5) {
+        oc_free_string(&(g_o_profile[index].salt));
+        oc_new_string(&g_o_profile[index].salt, oc_string(rep->value.string),
+                      oc_string_len(rep->value.string));
+      }
+      // contextId (6)
+      if (rep->iname == 6) {
+        oc_free_string(&(g_o_profile[index].contextId));
+        oc_new_string(&g_o_profile[index].contextId,
+                      oc_string(rep->value.string),
+                      oc_string_len(rep->value.string));
+      }
+    } /*if */
+
+    rep = rep->next;
+  }
+
+  PRINT("oc_core_auth_at_post_handler - end\n");
+  oc_send_cbor_response(request, OC_STATUS_CHANGED);
+}
+
+void
+oc_create_auth_at_resource(int resource_idx, size_t device)
+{
+  OC_DBG("oc_create_auth_at_resource\n");
+  // "/a/sen"
+  oc_core_lf_populate_resource(resource_idx, device, "/auth/at", OC_IF_LIL,
+                               APPLICATION_LINK_FORMAT, OC_DISCOVERABLE,
+                               oc_core_auth_at_get_handler, 0,
+                               oc_core_auth_at_post_handler, 0, 1, "dpt.a[n]");
+}
+
+// ----------------------------------------------------------------------------
+
+static void
+oc_core_auth_at_x_get_handler(oc_request_t *request,
+                              oc_interface_mask_t iface_mask, void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -306,13 +510,14 @@ oc_core_auth_at_get_handler(oc_request_t *request,
   }
   cbor_encode_uint(&g_encoder, g_oscore_replaywindow);
 
-  PRINT("oc_core_knx_f_oscore_osndelay_get_handler - done\n");
+  PRINT("oc_core_auth_at_x_get_handler - done\n");
   oc_send_cbor_response(request, OC_STATUS_OK);
 }
 
-static void
-oc_core_auth_at_post_handler(oc_request_t *request,
-                             oc_interface_mask_t iface_mask, void *data)
+// probably no post handler needed
+void
+oc_core_auth_at_x_post_handler(oc_request_t *request,
+                               oc_interface_mask_t iface_mask, void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -351,15 +556,36 @@ oc_core_auth_at_post_handler(oc_request_t *request,
   oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
 }
 
+static void
+oc_core_auth_at_x_delete_handler(oc_request_t *request,
+                                 oc_interface_mask_t iface_mask, void *data)
+{
+  (void)data;
+  (void)iface_mask;
+
+  /* check if the accept header is cbor-format */
+  if (request->accept != APPLICATION_CBOR) {
+    request->response->response_buffer->code =
+      oc_status_code(OC_STATUS_BAD_REQUEST);
+    return;
+  }
+  // todo
+  // - find the id from the url.
+  // - delete the index.
+
+  PRINT("oc_core_auth_at_x_delete_handler - done\n");
+  oc_send_cbor_response(request, OC_STATUS_OK);
+}
+
 void
-oc_create_auth_at_resource(int resource_idx, size_t device)
+oc_create_auth_at_x_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_auth_at_resource\n");
   // "/a/sen"
-  oc_core_lf_populate_resource(resource_idx, device, "/auth/at",
-                               OC_IF_LL | OC_IF_BASELINE, APPLICATION_CBOR,
-                               OC_DISCOVERABLE, oc_core_auth_at_get_handler, 0,
-                               oc_core_auth_at_post_handler, 0, 1, "dpt.a[n]");
+  oc_core_lf_populate_resource(
+    resource_idx, device, "/auth/at/*", OC_IF_LL | OC_IF_BASELINE,
+    APPLICATION_CBOR, OC_DISCOVERABLE, oc_core_auth_at_x_get_handler, 0, 0,
+    oc_core_auth_at_x_delete_handler, 1, "dpt.a[n]");
 }
 
 // ----------------------------------------------------------------------------
@@ -405,7 +631,7 @@ oc_create_knx_auth_resource(int resource_idx, size_t device)
   //
   oc_core_lf_populate_resource(
     resource_idx, device, "/auth", OC_IF_LIL, APPLICATION_LINK_FORMAT,
-    OC_DISCOVERABLE, oc_core_knx_auth_get_handler, 0, 0, 0, 1, "urn:knx:fbswu");
+    OC_DISCOVERABLE, oc_core_knx_auth_get_handler, 0, 0, 0, 1, "urn:knx:xxx");
 }
 
 // ----------------------------------------------------------------------------
@@ -438,5 +664,6 @@ oc_create_knx_sec_resources(size_t device_index)
   oc_create_a_sen_resource(OC_KNX_A_SEN, device_index);
 
   oc_create_auth_at_resource(OC_KNX_AUTH_AT, device_index);
+  oc_create_auth_at_x_resource(OC_KNX_AUTH_AT_X, device_index);
   oc_create_knx_auth_resource(OC_KNX_AUTH, device_index);
 }

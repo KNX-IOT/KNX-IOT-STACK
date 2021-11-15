@@ -249,6 +249,7 @@ typedef enum {
   OC_KNX_F_OSCORE,
   OC_KNX_A_SEN,
   OC_KNX_AUTH_AT,
+  OC_KNX_AUTH_AT_X,
   OC_KNX_AUTH,
 
   /* List of resources on a logical device: start */
