@@ -289,8 +289,8 @@ find_empty_at_index()
 {
   int index = -1;
   for (int i = 0; i < G_O_PROFILE_MAX_ENTRIES; i++) {
-    if (oc_string_len(g_o_profile[i].id) > 0) {
-      return index;
+    if (oc_string_len(g_o_profile[i].id) == 0) {
+      return i;
     }
   }
 
@@ -376,7 +376,7 @@ oc_core_auth_at_get_handler(oc_request_t *request,
       length = oc_rep_add_line_to_buffer(oc_string(g_o_profile[i].contextId));
       response_length += length;
 
-      length = oc_rep_add_line_to_buffer(";ct=50");
+      length = oc_rep_add_line_to_buffer(">;ct=50");
       response_length += length;
     }
   }
@@ -435,14 +435,14 @@ oc_core_auth_at_post_handler(oc_request_t *request,
     } else if (rep->type == OC_REP_STRING) {
       // hkdf (3)
       if (rep->iname == 3) {
-        oc_free_string(&g_o_profile[index].hkdf);
+        oc_free_string(&(g_o_profile[index].hkdf));
         oc_new_string(&g_o_profile[index].hkdf,
                       oc_string(rep->value.string),
                       oc_string_len(rep->value.string));
       }
       // alg (4)
       if (rep->iname == 4) {
-        oc_free_string(&g_o_profile[index].alg);
+        oc_free_string(&(g_o_profile[index].alg));
         oc_new_string(&g_o_profile[index].alg,
                       oc_string(rep->value.string),
                       oc_string_len(rep->value.string));
@@ -450,26 +450,26 @@ oc_core_auth_at_post_handler(oc_request_t *request,
     } else if (rep->type == OC_REP_BYTE_STRING) {
         // id == access token == 0
         if (rep->iname == 0) {
-          oc_free_string(&g_o_profile[index].id);
+          oc_free_string(&(g_o_profile[index].id));
           oc_new_string(&g_o_profile[index].id, oc_string(rep->value.string),
                         oc_string_len(rep->value.string));
         }
         // ms (2)
         if (rep->iname == 2) {
-          oc_free_string(&g_o_profile[index].ms);
+          oc_free_string(&(g_o_profile[index].ms));
           oc_new_string(&g_o_profile[index].ms,
                       oc_string(rep->value.string),
                         oc_string_len(rep->value.string));
         }
         // salt (5)
         if (rep->iname == 5) {
-          oc_free_string(&g_o_profile[index].salt);
+          oc_free_string(&(g_o_profile[index].salt));
           oc_new_string(&g_o_profile[index].salt, oc_string(rep->value.string),
                         oc_string_len(rep->value.string));
         }
         // contextId (6)
         if (rep->iname == 6) {
-          oc_free_string(&g_o_profile[index].contextId);
+          oc_free_string(&(g_o_profile[index].contextId));
           oc_new_string(&g_o_profile[index].contextId,
                         oc_string(rep->value.string),
                         oc_string_len(rep->value.string));
