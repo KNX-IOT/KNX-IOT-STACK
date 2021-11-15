@@ -301,9 +301,10 @@ static int
 find_index_from_at(oc_string_t* at)
 {
   int len;
+  int len_at = oc_string_len(*at);
   for (int i = 0; i < G_O_PROFILE_MAX_ENTRIES; i++) {
     len = oc_string_len(g_o_profile[i].id);
-    if (len > 0 && 
+    if (len > 0 && len == len_at &&
       (strncmp(oc_string(*at), oc_string(g_o_profile[i].id) , len) == 0)) {
       return i;
     }
@@ -575,6 +576,9 @@ oc_core_auth_at_x_delete_handler(oc_request_t *request,
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
+  // todo 
+  // - find the id from the url.
+  // - delete the index.
 
 
   PRINT("oc_core_auth_at_x_delete_handler - done\n");
