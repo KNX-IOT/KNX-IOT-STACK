@@ -287,31 +287,29 @@ oc_create_a_sen_resource(int resource_idx, size_t device)
 static int
 find_empty_at_index()
 {
-  int index = -1;
   for (int i = 0; i < G_O_PROFILE_MAX_ENTRIES; i++) {
     if (oc_string_len(g_o_profile[i].id) == 0) {
       return i;
     }
   }
 
-  return index;
+  return -1;
 }
 
 
 static int
 find_index_from_at(oc_string_t* at)
 {
-  int index = -1;
   int len;
   for (int i = 0; i < G_O_PROFILE_MAX_ENTRIES; i++) {
     len = oc_string_len(g_o_profile[i].id);
     if (len > 0 && 
       (strncmp(oc_string(*at), oc_string(g_o_profile[i].id) , len) == 0)) {
-      return index;
+      return i;
     }
   }
 
-  return index;
+  return -1;
 }
 
 
@@ -410,14 +408,21 @@ oc_core_auth_at_post_handler(oc_request_t *request,
   rep = request->request_payload;
   oc_string_t *at = find_access_token_from_payload(rep);
   if (at == NULL) {
-    PRINT("   access token not found!");
+    PRINT("   access token not found!\n");
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
 
-  int index = find_empty_at_index();
+  int index = find_index_from_at(at);
+  if (index != -1) {
+    PRINT("   already exist!\n");
+    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    return;
+  }
+
+  index = find_empty_at_index();
   if (index == -1) {
-    PRINT("   no space left!");
+    PRINT("   no space left!\n");
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
