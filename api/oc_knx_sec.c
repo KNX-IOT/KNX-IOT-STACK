@@ -296,16 +296,15 @@ find_empty_at_index()
   return -1;
 }
 
-
 static int
-find_index_from_at(oc_string_t* at)
+find_index_from_at(oc_string_t *at)
 {
   int len;
   int len_at = oc_string_len(*at);
   for (int i = 0; i < G_O_PROFILE_MAX_ENTRIES; i++) {
     len = oc_string_len(g_o_profile[i].id);
     if (len > 0 && len == len_at &&
-      (strncmp(oc_string(*at), oc_string(g_o_profile[i].id) , len) == 0)) {
+        (strncmp(oc_string(*at), oc_string(g_o_profile[i].id), len) == 0)) {
       return i;
     }
   }
@@ -334,11 +333,10 @@ find_access_token_from_payload(oc_rep_t *object)
       break;
     } /* switch */
     object = object->next;
-  }   /* while */
+  } /* while */
   PRINT("  find_access_token_from_payload ERR: storing \n");
   return index;
 }
-
 
 static void
 oc_core_auth_at_get_handler(oc_request_t *request,
@@ -440,43 +438,40 @@ oc_core_auth_at_post_handler(oc_request_t *request,
       // hkdf (3) (as string)
       if (rep->iname == 3) {
         oc_free_string(&(g_o_profile[index].hkdf));
-        oc_new_string(&g_o_profile[index].hkdf,
-                      oc_string(rep->value.string),
+        oc_new_string(&g_o_profile[index].hkdf, oc_string(rep->value.string),
                       oc_string_len(rep->value.string));
       }
       // alg (4)
       if (rep->iname == 4) {
         oc_free_string(&(g_o_profile[index].alg));
-        oc_new_string(&g_o_profile[index].alg,
-                      oc_string(rep->value.string),
+        oc_new_string(&g_o_profile[index].alg, oc_string(rep->value.string),
                       oc_string_len(rep->value.string));
       }
     } else if (rep->type == OC_REP_BYTE_STRING) {
-        // id == access token == 0
-        if (rep->iname == 0) {
-          oc_free_string(&(g_o_profile[index].id));
-          oc_new_string(&g_o_profile[index].id, oc_string(rep->value.string),
-                        oc_string_len(rep->value.string));
-        }
-        // ms (2)
-        if (rep->iname == 2) {
-          oc_free_string(&(g_o_profile[index].ms));
-          oc_new_string(&g_o_profile[index].ms,
+      // id == access token == 0
+      if (rep->iname == 0) {
+        oc_free_string(&(g_o_profile[index].id));
+        oc_new_string(&g_o_profile[index].id, oc_string(rep->value.string),
+                      oc_string_len(rep->value.string));
+      }
+      // ms (2)
+      if (rep->iname == 2) {
+        oc_free_string(&(g_o_profile[index].ms));
+        oc_new_string(&g_o_profile[index].ms, oc_string(rep->value.string),
+                      oc_string_len(rep->value.string));
+      }
+      // salt (5)
+      if (rep->iname == 5) {
+        oc_free_string(&(g_o_profile[index].salt));
+        oc_new_string(&g_o_profile[index].salt, oc_string(rep->value.string),
+                      oc_string_len(rep->value.string));
+      }
+      // contextId (6)
+      if (rep->iname == 6) {
+        oc_free_string(&(g_o_profile[index].contextId));
+        oc_new_string(&g_o_profile[index].contextId,
                       oc_string(rep->value.string),
-                        oc_string_len(rep->value.string));
-        }
-        // salt (5)
-        if (rep->iname == 5) {
-          oc_free_string(&(g_o_profile[index].salt));
-          oc_new_string(&g_o_profile[index].salt, oc_string(rep->value.string),
-                        oc_string_len(rep->value.string));
-        }
-        // contextId (6)
-        if (rep->iname == 6) {
-          oc_free_string(&(g_o_profile[index].contextId));
-          oc_new_string(&g_o_profile[index].contextId,
-                        oc_string(rep->value.string),
-                        oc_string_len(rep->value.string));
+                      oc_string_len(rep->value.string));
       }
     } /*if */
 
@@ -492,18 +487,17 @@ oc_create_auth_at_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_auth_at_resource\n");
   // "/a/sen"
-  oc_core_lf_populate_resource(resource_idx, device, "/auth/at",
-                               OC_IF_LIL , APPLICATION_LINK_FORMAT,
-                               OC_DISCOVERABLE, oc_core_auth_at_get_handler, 0,
+  oc_core_lf_populate_resource(resource_idx, device, "/auth/at", OC_IF_LIL,
+                               APPLICATION_LINK_FORMAT, OC_DISCOVERABLE,
+                               oc_core_auth_at_get_handler, 0,
                                oc_core_auth_at_post_handler, 0, 1, "dpt.a[n]");
 }
 
 // ----------------------------------------------------------------------------
 
-
 static void
 oc_core_auth_at_x_get_handler(oc_request_t *request,
-                            oc_interface_mask_t iface_mask, void *data)
+                              oc_interface_mask_t iface_mask, void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -523,7 +517,7 @@ oc_core_auth_at_x_get_handler(oc_request_t *request,
 // probably no post handler needed
 void
 oc_core_auth_at_x_post_handler(oc_request_t *request,
-                             oc_interface_mask_t iface_mask, void *data)
+                               oc_interface_mask_t iface_mask, void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -562,10 +556,9 @@ oc_core_auth_at_x_post_handler(oc_request_t *request,
   oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
 }
 
-
 static void
 oc_core_auth_at_x_delete_handler(oc_request_t *request,
-                              oc_interface_mask_t iface_mask, void *data)
+                                 oc_interface_mask_t iface_mask, void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -576,25 +569,23 @@ oc_core_auth_at_x_delete_handler(oc_request_t *request,
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
-  // todo 
+  // todo
   // - find the id from the url.
   // - delete the index.
-
 
   PRINT("oc_core_auth_at_x_delete_handler - done\n");
   oc_send_cbor_response(request, OC_STATUS_OK);
 }
-
 
 void
 oc_create_auth_at_x_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_auth_at_resource\n");
   // "/a/sen"
-  oc_core_lf_populate_resource(resource_idx, device, "/auth/at/*",
-                               OC_IF_LL | OC_IF_BASELINE, APPLICATION_CBOR,
-                               OC_DISCOVERABLE, oc_core_auth_at_x_get_handler, 0, 0,
-                               oc_core_auth_at_x_delete_handler, 1, "dpt.a[n]");
+  oc_core_lf_populate_resource(
+    resource_idx, device, "/auth/at/*", OC_IF_LL | OC_IF_BASELINE,
+    APPLICATION_CBOR, OC_DISCOVERABLE, oc_core_auth_at_x_get_handler, 0, 0,
+    oc_core_auth_at_x_delete_handler, 1, "dpt.a[n]");
 }
 
 // ----------------------------------------------------------------------------

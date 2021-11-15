@@ -50,7 +50,7 @@ typedef enum {
  * scope : "coap_oscore" [OSCORE] or "coap_dtls"
  *
  *  https://www.iana.org/assignments/cwt/cwt.xhtml#confirmation-methods
- *      
+ *
  * | Name | Key | Value Type                       |
  * |------|-----|----------------------------------|
  * | iss  | 1   | text string                      |
@@ -69,7 +69,7 @@ typedef enum {
  * /aud/ 3 : "coaps://client.example.org",
  * /exp/ 4 : 1879067471,
  * /cnf/ 8 :{
-  *  /COSE_Key/ 1 :{
+ *  /COSE_Key/ 1 :{
  *     /kty/ 1 : /EC2/ 2,
  *     /crv/ -1 : /P-256/ 1,
  *     /x/ -2 : h'd7cc072de2205bdc1537a543d53c60a6acb62eccd890c7fa27c9
@@ -99,7 +99,6 @@ typedef struct oc_oscore_cm_t
   oc_string_t scope;
 } oc_oscore_cm_t;
 
-
 /**
  * Oscore profile
  *
@@ -120,12 +119,12 @@ typedef struct oc_oscore_cm_t
  *   "id" : b64'AQ=='
  *   "ms" : b64'+a+Dg2jjU+eIiOFCa9lObw'
  * }
- *      
+ *
  *     Note, maps are not stored.
-*/
+ */
 typedef struct oc_oscore_profile_t
 {
-  oc_string_t id;   // kid???
+  oc_string_t id; // kid???
   int version;
   oc_string_t ms;
   oc_string_t hkdf;
@@ -133,7 +132,6 @@ typedef struct oc_oscore_profile_t
   oc_string_t salt;
   oc_string_t contextId;
 } oc_oscore_profile_t;
-
 
 /**
  * @brief retrieve the replay window
