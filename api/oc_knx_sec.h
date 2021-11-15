@@ -128,7 +128,7 @@ typedef struct oc_oscore_profile_t
   oc_string_t id;   // kid???
   int version;
   oc_string_t ms;
-  int hkdf;
+  oc_string_t hkdf;
   oc_string_t alg;
   oc_string_t salt;
   oc_string_t contextId;

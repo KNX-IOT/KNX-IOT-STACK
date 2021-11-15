@@ -312,7 +312,7 @@ find_index_from_at(oc_string_t* at)
   return -1;
 }
 
-
+/* finds 0 ==> id */
 static oc_string_t *
 find_access_token_from_payload(oc_rep_t *object)
 {
@@ -395,7 +395,6 @@ oc_core_auth_at_post_handler(oc_request_t *request,
   (void)data;
   (void)iface_mask;
   oc_rep_t *rep = NULL;
-  int cmd = 0;
 
   PRINT("oc_core_auth_at_post_handler - end\n");
 
@@ -427,7 +426,6 @@ oc_core_auth_at_post_handler(oc_request_t *request,
     return;
   }
 
-  bool changed = false;
   /* loop over the request document to check if all inputs are ok */
   rep = request->request_payload;
   while (rep != NULL) {
@@ -438,7 +436,7 @@ oc_core_auth_at_post_handler(oc_request_t *request,
         g_o_profile[index].version = rep->value.integer;
       }
     } else if (rep->type == OC_REP_STRING) {
-      // hkdf (3)
+      // hkdf (3) (as string)
       if (rep->iname == 3) {
         oc_free_string(&(g_o_profile[index].hkdf));
         oc_new_string(&g_o_profile[index].hkdf,
