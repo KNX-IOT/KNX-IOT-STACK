@@ -508,13 +508,19 @@ oc_core_auth_at_x_get_handler(oc_request_t *request,
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
-  cbor_encode_uint(&g_encoder, g_oscore_replaywindow);
+  //cbor_encode_uint(&g_encoder, g_oscore_replaywindow);
+  // todo
+  // - find the id from the url.
+  // - get the entry.
+  // - frame the response
 
   PRINT("oc_core_auth_at_x_get_handler - done\n");
   oc_send_cbor_response(request, OC_STATUS_OK);
 }
 
 // probably no post handler needed
+// partial update?
+// how does that look like?
 void
 oc_core_auth_at_x_post_handler(oc_request_t *request,
                                oc_interface_mask_t iface_mask, void *data)
