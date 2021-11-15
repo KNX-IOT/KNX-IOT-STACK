@@ -321,7 +321,7 @@ find_access_token_from_payload(oc_rep_t *object)
   oc_string_t *index = NULL;
   while (object != NULL) {
     switch (object->type) {
-    case OC_REP_STRING: {
+    case OC_REP_BYTE_STRING: {
       if (oc_string_len(object->name) == 0 && object->iname == 0) {
         index = &object->value.string;
         PRINT(" find_access_token_from_payload storing at %s \n",
@@ -334,6 +334,7 @@ find_access_token_from_payload(oc_rep_t *object)
     default:
       break;
     } /* switch */
+    object = object->next;
   }   /* while */
   PRINT("  find_access_token_from_payload ERR: storing \n");
   return index;
@@ -426,27 +427,12 @@ oc_core_auth_at_post_handler(oc_request_t *request,
   rep = request->request_payload;
   while (rep != NULL) {
 
-    if (rep->type == OC_REP_STRING) {
+    if (rep->type == OC_REP_INT) {
       // version (1)
       if (rep->iname == 1) {
         g_o_profile[index].version = rep->value.integer;
       }
-
     } else if (rep->type == OC_REP_STRING) {
-      // id == access token == 0
-      if (rep->iname == 0) {
-        oc_free_string(&g_o_profile[index].id);
-        oc_new_string(&g_o_profile[index].id,
-                      oc_string(rep->value.string),
-                      oc_string_len(rep->value.string));
-      }
-      // ms (2)
-      if (rep->iname == 2) {
-        oc_free_string(&g_o_profile[index].ms);
-        oc_new_string(&g_o_profile[index].ms,
-                      oc_string(rep->value.string),
-                      oc_string_len(rep->value.string));
-      }
       // hkdf (3)
       if (rep->iname == 3) {
         oc_free_string(&g_o_profile[index].hkdf);
@@ -461,19 +447,32 @@ oc_core_auth_at_post_handler(oc_request_t *request,
                       oc_string(rep->value.string),
                       oc_string_len(rep->value.string));
       }
-      // salt (5)
-      if (rep->iname == 5) {
-        oc_free_string(&g_o_profile[index].salt);
-        oc_new_string(&g_o_profile[index].salt,
+    } else if (rep->type == OC_REP_BYTE_STRING) {
+        // id == access token == 0
+        if (rep->iname == 0) {
+          oc_free_string(&g_o_profile[index].id);
+          oc_new_string(&g_o_profile[index].id, oc_string(rep->value.string),
+                        oc_string_len(rep->value.string));
+        }
+        // ms (2)
+        if (rep->iname == 2) {
+          oc_free_string(&g_o_profile[index].ms);
+          oc_new_string(&g_o_profile[index].ms,
                       oc_string(rep->value.string),
-                      oc_string_len(rep->value.string));
-      }
-      // contextId (6)
-      if (rep->iname == 6) {
-        oc_free_string(&g_o_profile[index].contextId);
-        oc_new_string(&g_o_profile[index].contextId,
-                      oc_string(rep->value.string),
-                      oc_string_len(rep->value.string));
+                        oc_string_len(rep->value.string));
+        }
+        // salt (5)
+        if (rep->iname == 5) {
+          oc_free_string(&g_o_profile[index].salt);
+          oc_new_string(&g_o_profile[index].salt, oc_string(rep->value.string),
+                        oc_string_len(rep->value.string));
+        }
+        // contextId (6)
+        if (rep->iname == 6) {
+          oc_free_string(&g_o_profile[index].contextId);
+          oc_new_string(&g_o_profile[index].contextId,
+                        oc_string(rep->value.string),
+                        oc_string_len(rep->value.string));
       }
     } /*if */
 
@@ -573,7 +572,7 @@ oc_core_auth_at_x_delete_handler(oc_request_t *request,
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
-  cbor_encode_uint(&g_encoder, g_oscore_replaywindow);
+
 
   PRINT("oc_core_auth_at_x_delete_handler - done\n");
   oc_send_cbor_response(request, OC_STATUS_OK);
