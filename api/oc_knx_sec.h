@@ -49,31 +49,91 @@ typedef enum {
  *
  * scope : "coap_oscore" [OSCORE] or "coap_dtls"
  *
- * Key translation
- * | Json Key          | Integer Value | type    |
- * | ----------------- | ------------- |---------|
- * | access_token (id) | 0             | object  |
- * | profile           | 38            | string  |
- * | scope             | 9             | object  |
- * | cnf               | 8             | map     |
- * | osc               | 4             | map     |
- * | alg               | 4             | int     |
- * | id                | 0             | string  |
- * | ms                | x             | int     |
- * | kid               | 2             | string  |
- * | nbf  (optional)   | 5             | integer |
- * | sub               | 2             | string  |
- * | ms  (bytestring)  | 2             | string  |
+ *  https://www.iana.org/assignments/cwt/cwt.xhtml#confirmation-methods
+ *      
+ * | Name | Key | Value Type                       |
+ * |------|-----|----------------------------------|
+ * | iss  | 1   | text string                      |
+ * | sub  | 2   | text string                      |
+ * | aud  | 3   | text string                      |
+ * | exp  | 4   | integer or floating-point number |
+ * | nbf  | 5   | integer or floating-point number |
+ * | iat  | 6   | integer or floating-point number |
+ * | cti  | 7   | byte string                      |
+ * | cnf  | 8   | map                              |
+ * | scope | 9  | byte string                      |
+ *
+ * example of https://www.rfc-editor.org/rfc/rfc8747.html
+ *{
+ * /iss/ 1 : "coaps://server.example.com",
+ * /aud/ 3 : "coaps://client.example.org",
+ * /exp/ 4 : 1879067471,
+ * /cnf/ 8 :{
+  *  /COSE_Key/ 1 :{
+ *     /kty/ 1 : /EC2/ 2,
+ *     /crv/ -1 : /P-256/ 1,
+ *     /x/ -2 : h'd7cc072de2205bdc1537a543d53c60a6acb62eccd890c7fa27c9
+ *                e354089bbe13',
+ *     /y/ -3 : h'f95e1d4b851a2cc80fff87d8e23f22afb725d535e515d020731e
+ *                79a3b4e47120'
+ *    }
+ *  }
+ *}
+ *
+ * | Name     | CBOR Key | Value Type | Usage                  |
+ * |----------|----------|------------|------------------------|
+ * | cnf      | TBD (8)  | map        | token response         |
+ * | cnf      | TBD (8)  | map        | introspection response |
+ *
+ *     Note, maps are not stored.
  */
-typedef struct oc_oscore_cc_t
+typedef struct oc_oscore_cm_t
 {
-  oc_string_t at;
-  oc_cc_profile_t profile;
-  int *scope;
-  int sia;
-  oc_string_t alg;
+  oc_string_t iss;
+  oc_string_t sub;
+  oc_string_t aud;
+  int exp;
+  int nfb;
+  int iat;
+  oc_string_t cti;
+  oc_string_t scope;
+} oc_oscore_cm_t;
+
+
+/**
+ * Oscore profile
+ *
+ * https://datatracker.ietf.org/doc/html/draft-ietf-ace-oscore-profile-19#section-3.2.1
+ *
+ * | name      | CBOR label | CBOR type | description                      |
+ * | ----------| -----------| ----------| ---------------------------------|
+ * | id        | 0    | byte string | OSCORE Input Material Identifier     |
+ * | version   | 1    | unsigned integer | OSCORE   Version                |
+ * | ms        | 2    | byte string  | OSCORE Master Secret value          |
+ * | hkdf      | 3    | text string / integer | OSCORE HKDF value          |
+ * | alg       | 4    | text string / integer | OSCORE AEAD Algorithm value |
+ * | salt      | 5    | byte string | an input to  OSCORE Master Salt value|
+ * | contextId | 6    | byte string | OSCORE ID Context value              |
+ *
+ * {
+ *   "alg" : "AES-CCM-16-64-128",
+ *   "id" : b64'AQ=='
+ *   "ms" : b64'+a+Dg2jjU+eIiOFCa9lObw'
+ * }
+ *      
+ *     Note, maps are not stored.
+*/
+typedef struct oc_oscore_profile_t
+{
+  oc_string_t id;   // kid???
+  int version;
   oc_string_t ms;
-} oc_oscore_cc_t;
+  int hkdf;
+  oc_string_t alg;
+  oc_string_t salt;
+  oc_string_t contextId;
+} oc_oscore_profile_t;
+
 
 /**
  * @brief retrieve the replay window
