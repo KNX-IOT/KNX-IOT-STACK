@@ -344,11 +344,10 @@ oc_uri_get_wildcard_value_as_int(const char *uri_resource, size_t uri_len,
   return -1;
 }
 
-
 int
 oc_uri_get_wildcard_value_as_string(const char *uri_resource, size_t uri_len,
-                                    const char *uri_invoked,
-                                    size_t invoked_len, const char **value)
+                                    const char *uri_invoked, size_t invoked_len,
+                                    const char **value)
 {
   if (uri_resource[uri_len - 1] == '*') {
     if ((invoked_len + 1) >= uri_len) {
