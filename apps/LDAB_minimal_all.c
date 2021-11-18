@@ -293,25 +293,31 @@ post_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
 void
 register_resources(void)
 {
+  PRINT("Register Resource with local path \"/p/push\"\n");
+
+  PRINT("Light Switching Sensor 421 (LSSB) : SwitchOnOff \n");
+  PRINT("Data point 1.001 (DPT_Switch) \n");
 
   PRINT("Register Resource with local path \"/p/push\"\n");
-  oc_resource_t *res_352 = oc_new_resource("myname", "p/push", 1, 0);
-  oc_resource_bind_resource_type(res_352, "urn:knx:dpa.352.51");
-  oc_resource_bind_content_type(res_352, APPLICATION_CBOR);
-  oc_resource_bind_resource_interface(res_352, OC_IF_AC); /* if.a */
-  oc_resource_set_discoverable(res_352, true);
+
+  oc_resource_t *res_pushbutton = oc_new_resource("push button", "p/push", 2, 0);
+  oc_resource_bind_resource_type(res_pushbutton, "urn:knx:dpa.421");
+  oc_resource_bind_resource_type(res_pushbutton, "DPT_Switch");
+  oc_resource_bind_content_type(res_pushbutton, APPLICATION_CBOR);
+  oc_resource_bind_resource_interface(res_pushbutton, OC_IF_AC); /* if.a */
+  oc_resource_set_discoverable(res_pushbutton, true);
   /* periodic observable
      to be used when one wants to send an event per time slice
      period is 1 second */
-  oc_resource_set_periodic_observable(res_352, 1);
+  oc_resource_set_periodic_observable(res_pushbutton, 1);
   /* set observable
      events are send when oc_notify_observers(oc_resource_t *resource) is
     called. this function must be called when the value changes, preferable on
     an interrupt when something is read from the hardware. */
   /*oc_resource_set_observable(res_352, true); */
-  oc_resource_set_request_handler(res_352, OC_GET, get_dpa_352, NULL);
-  oc_resource_set_request_handler(res_352, OC_POST, post_dpa_352, NULL);
-  oc_add_resource(res_352);
+  oc_resource_set_request_handler(res_pushbutton, OC_GET, get_dpa_352, NULL);
+  oc_resource_set_request_handler(res_pushbutton, OC_POST, post_dpa_352, NULL);
+  oc_add_resource(res_pushbutton);
 
 }
 
@@ -431,7 +437,7 @@ main(void)
   sigaction(SIGINT, &sa, NULL);
 #endif
 
-  PRINT("KNX-IOT Server name : \"server_1599\"\n");
+  PRINT("KNX-IOT Server name : \"pushbutton\"\n");
 
   char buff[FILENAME_MAX];
   char *retbuf = NULL;
@@ -445,8 +451,8 @@ main(void)
    the folder is created in the makefile, with $target as name with _cred as
    post fix.
   */
-  PRINT("\tstorage at './simpleserver_all_creds' \n");
-  oc_storage_config("./simpleserver_all_creds");
+  PRINT("\tstorage at './pushbutton_all_creds' \n");
+  oc_storage_config("./pushbutton_all_creds");
 
   /*initialize the variables */
   initialize_variables();
@@ -485,7 +491,7 @@ main(void)
   PRINT("Security - Disabled\n");
 #endif /* OC_SECURITY */
 
-  PRINT("Server \"server_1599\" running, waiting on incoming "
+  PRINT("Server \"pushbutton\" running, waiting on incoming "
         "connections.\n");
 
 #ifdef WIN32
