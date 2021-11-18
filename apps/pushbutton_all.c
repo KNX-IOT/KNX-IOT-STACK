@@ -130,28 +130,29 @@ app_init(void)
 {
   int ret = oc_init_platform("Cascoda", NULL, NULL);
 
-  ret |= ock_add_device("blah", "1.0", "//", "012346", NULL, NULL);
+  ret |= ock_add_device("pushbutton", "1.0", "//", "000001", NULL, NULL);
 
   oc_device_info_t *device = oc_core_get_device_info(0);
   PRINT("Serial Number: %s\n", oc_string(device->serialnumber));
 
-  /* set the hardware version*/
-  oc_core_set_device_hwv(0, 5, 6, 7);
+  /* set the hardware version 1.0.0.0 */
+  oc_core_set_device_hwv(1, 0, 0, 0);
 
   /* set the firmware version*/
-  oc_core_set_device_fwv(0, 1, 2, 3);
-
-  /* set the internal address (ia) */
-  oc_core_set_device_ia(0, 5);
+  oc_core_set_device_fwv(1, 0, 0, 0);
 
   /* set the hardware type*/
-  oc_core_set_device_hwt(0, "hwt-mytype");
+  oc_core_set_device_hwt(0, "Pi");
 
   /* set the programming mode */
   oc_core_set_device_pm(0, true);
 
   /* set the model */
   oc_core_set_device_model(0, "my model");
+
+  
+  /* set the internal address (ia) */
+  oc_core_set_device_ia(0, 5);
 
   /* set the host name */
   oc_core_set_device_hostname(0, "my.hostname");
@@ -221,113 +222,6 @@ get_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
 }
 
 /**
- * get method for "/b" resource.
- * function is called to initialize the return values of the GET method.
- * initialization of the returned values are done from the global property
- * values. Resource Description: This Resource describes a binary switch
- * (on/off). The Property "value" is a boolean. A value of 'true' means that the
- * switch is on. A value of 'false' means that the switch is off.
- *
- * @param request the request representation.
- * @param interfaces the interface used for this call
- * @param user_data the user data.
- */
-STATIC void
-get_dpa_352b(oc_request_t *request, oc_interface_mask_t interfaces,
-             void *user_data)
-{
-  (void)user_data; /* variable not used */
-  /* TODO: SENSOR add here the code to talk to the HW if one implements a
-     sensor. the call to the HW needs to fill in the global variable before it
-     returns to this function here. alternative is to have a callback from the
-     hardware that sets the global variables.
-  */
-  bool error_state = false; /**< the error state, the generated code */
-  int oc_status_code = OC_STATUS_OK;
-
-  PRINT("-- Begin get_dpa_352b: interface %d\n", interfaces);
-  /* check if the accept header is CBOR */
-  if (request->accept != APPLICATION_CBOR) {
-    oc_send_response(request, OC_STATUS_BAD_OPTION);
-    return;
-  }
-
-  // set a string value
-  CborError error;
-  error = cbor_encode_text_stringz(&g_encoder, "blahblah");
-  if (error) {
-    oc_status_code = true;
-  }
-  PRINT("CBOR encoder size %d\n", oc_rep_get_encoded_payload_size());
-  error = cbor_encode_text_string(&g_encoder, "xyzxyz", 3);
-  if (error) {
-    // PRINT("CBOR error %s\n", cbor_error_string(error));
-    // oc_status_code = true;
-  }
-  PRINT("CBOR encoder size %d\n", oc_rep_get_encoded_payload_size());
-
-  if (error_state == false) {
-    oc_send_cbor_response(request, oc_status_code);
-  } else {
-    oc_send_response(request, OC_STATUS_BAD_OPTION);
-  }
-  PRINT("-- End get_dpa_352b\n");
-}
-
-/**
- * get method for "/p/c" resource.
- * function is called to initialize the return values of the GET method.
- * initialization of the returned values are done from the global property
- * values. Resource Description: This Resource describes a binary switch
- * (on/off). The Property "value" is a boolean. A value of 'true' means that the
- * switch is on. A value of 'false' means that the switch is off.
- *
- * @param request the request representation.
- * @param interfaces the interface used for this call
- * @param user_data the user data.
- */
-STATIC void
-get_dpa_353(oc_request_t *request, oc_interface_mask_t interfaces,
-            void *user_data)
-{
-  (void)user_data; /* variable not used */
-  /* TODO: SENSOR add here the code to talk to the HW if one implements a
-     sensor. the call to the HW needs to fill in the global variable before it
-     returns to this function here. alternative is to have a callback from the
-     hardware that sets the global variables.
-  */
-  bool error_state = false; /**< the error state, the generated code */
-  int oc_status_code = OC_STATUS_OK;
-
-  PRINT("-- Begin get_dpa_353: interface %d\n", interfaces);
-
-  /* check if the accept header is CBOR */
-  if (request->accept != APPLICATION_CBOR) {
-    PRINT(" accept %d", request->accept);
-    oc_send_response(request, OC_STATUS_BAD_OPTION);
-    return;
-  }
-
-  CborError error;
-  error = cbor_encode_int(&g_encoder, (int64_t)555);
-  if (error) {
-    oc_status_code = true;
-  }
-  PRINT("CBOR encoder size %d\n", oc_rep_get_encoded_payload_size());
-  error = cbor_encode_int(&g_encoder, (int64_t)666);
-  if (error) {
-    oc_status_code = true;
-  }
-  PRINT("CBOR encoder size %d\n", oc_rep_get_encoded_payload_size());
-  if (error_state == false) {
-    oc_send_cbor_response(request, oc_status_code);
-  } else {
-    oc_send_response(request, OC_STATUS_BAD_OPTION);
-  }
-  PRINT("-- End get_dpa_353\n");
-}
-
-/**
  * post method for "/p/a" resource.
  * The function has as input the request body, which are the input values of the
  POST method.
@@ -382,154 +276,6 @@ post_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
   PRINT("-- End post_dpa_352\n");
 }
 
-/**
- * post method for "/p/b" resource.
- * The function has as input the request body, which are the input values of the
- POST method.
- * The input values (as a set) are checked if all supplied values are correct.
- * If the input values are correct, they will be assigned to the global property
- values.
- * Resource Description:
-
- *
- * @param request the request representation.
- * @param interfaces the used interfaces during the request.
- * @param user_data the supplied user data.
- */
-STATIC void
-post_dpa_352b(oc_request_t *request, oc_interface_mask_t interfaces,
-              void *user_data)
-{
-  (void)interfaces;
-  (void)user_data;
-  bool error_state = false;
-  PRINT("-- Begin post_dpa_352b:\n");
-  // oc_rep_t *rep = request->request_payload;
-
-  /* loop over the request document for each required input field to check if
-   * all required input fields are present */
-  bool var_in_request = false;
-  // rep = request->request_payload;
-  //  while (rep != NULL) {
-  //    if (strcmp(oc_string(rep->name),
-  //               g_binaryswitch_RESOURCE_PROPERTY_NAME_value) == 0) {
-  //      var_in_request = true;
-  //    }
-  //    rep = rep->next;
-  //  }
-  if (var_in_request == false) {
-    error_state = true;
-    PRINT(" required property: 'value' not in request\n");
-  }
-  /* loop over the request document to check if all inputs are ok */
-  // rep = request->request_payload;
-
-  /* if the input is ok, then process the input document and assign the global
-   * variables */
-  if (error_state == false) {
-    switch (interfaces) {
-    default: {
-      /* loop over all the properties in the input document */
-      // oc_rep_t *rep = request->request_payload;
-
-      /* set the response */
-      PRINT("Set response \n");
-      oc_rep_start_root_object();
-      /*oc_process_baseline_interface(request->resource); */
-      // PRINT("   %s : %s", g_binaryswitch_RESOURCE_PROPERTY_NAME_value,
-      //        (char *)btoa(g_binaryswitch_value));
-      //  oc_rep_set_boolean(root, value, g_binaryswitch_value);
-
-      oc_rep_end_root_object();
-      /* TODO: ACTUATOR add here the code to talk to the HW if one implements an
-       actuator. one can use the global variables as input to those calls the
-       global values have been updated already with the data from the request */
-
-      oc_send_cbor_response(request, OC_STATUS_CHANGED);
-    }
-    }
-  } else {
-    PRINT("  Returning Error \n");
-    /* TODO: add error response, if any */
-    // oc_send_response(request, OC_STATUS_NOT_MODIFIED);
-    oc_send_response(request, OC_STATUS_BAD_REQUEST);
-  }
-  PRINT("-- End post_dpa_352b\n");
-}
-
-/**
- * post method for "/p/b" resource.
- * The function has as input the request body, which are the input values of the
- POST method.
- * The input values (as a set) are checked if all supplied values are correct.
- * If the input values are correct, they will be assigned to the global property
- values.
- * Resource Description:
-
- *
- * @param request the request representation.
- * @param interfaces the used interfaces during the request.
- * @param user_data the supplied user data.
- */
-STATIC void
-post_dpa_353(oc_request_t *request, oc_interface_mask_t interfaces,
-             void *user_data)
-{
-  (void)interfaces;
-  (void)user_data;
-  bool error_state = false;
-  PRINT("-- Begin post_dpa_353:\n");
-  // oc_rep_t *rep = request->request_payload;
-
-  /* loop over the request document for each required input field to check if
-   * all required input fields are present */
-  bool var_in_request = false;
-  // rep = request->request_payload;
-  //  while (rep != NULL) {
-  //    if (strcmp(oc_string(rep->name),
-  //               g_binaryswitch_RESOURCE_PROPERTY_NAME_value) == 0) {
-  //      var_in_request = true;
-  //    }
-  //    rep = rep->next;
-  //  }
-  if (var_in_request == false) {
-    error_state = true;
-    PRINT(" required property: 'value' not in request\n");
-  }
-  /* loop over the request document to check if all inputs are ok */
-  // rep = request->request_payload;
-
-  /* if the input is ok, then process the input document and assign the global
-   * variables */
-  if (error_state == false) {
-    switch (interfaces) {
-    default: {
-      /* loop over all the properties in the input document */
-      // oc_rep_t *rep = request->request_payload;
-
-      /* set the response */
-      PRINT("Set response \n");
-      oc_rep_start_root_object();
-      /*oc_process_baseline_interface(request->resource); */
-      // PRINT("   %s : %s", g_binaryswitch_RESOURCE_PROPERTY_NAME_value,
-      //        (char *)btoa(g_binaryswitch_value));
-      //  oc_rep_set_boolean(root, value, g_binaryswitch_value);
-
-      oc_rep_end_root_object();
-      /* TODO: ACTUATOR add here the code to talk to the HW if one implements an
-       actuator. one can use the global variables as input to those calls the
-       global values have been updated already with the data from the request */
-      oc_send_response(request, OC_STATUS_CHANGED);
-    }
-    }
-  } else {
-    PRINT("  Returning Error \n");
-    /* TODO: add error response, if any */
-    // oc_send_response(request, OC_STATUS_NOT_MODIFIED);
-    oc_send_cbor_response(request, OC_STATUS_NOT_MODIFIED);
-  }
-  PRINT("-- End post_dpa_353b\n");
-}
 
 /**
  * register all the resources to the stack
@@ -548,8 +294,8 @@ void
 register_resources(void)
 {
 
-  PRINT("Register Resource with local path \"/p/a\"\n");
-  oc_resource_t *res_352 = oc_new_resource("myname", "p/a", 1, 0);
+  PRINT("Register Resource with local path \"/p/push\"\n");
+  oc_resource_t *res_352 = oc_new_resource("myname", "p/push", 1, 0);
   oc_resource_bind_resource_type(res_352, "urn:knx:dpa.352.51");
   oc_resource_bind_content_type(res_352, APPLICATION_CBOR);
   oc_resource_bind_resource_interface(res_352, OC_IF_AC); /* if.a */
@@ -567,43 +313,6 @@ register_resources(void)
   oc_resource_set_request_handler(res_352, OC_POST, post_dpa_352, NULL);
   oc_add_resource(res_352);
 
-  PRINT("Register Resource with local path \"/p/b\"\n");
-  oc_resource_t *res_352b = oc_new_resource("myname_b", "p/b", 1, 0);
-  oc_resource_bind_resource_type(res_352b, "urn:knx:dpa.352.52");
-  oc_resource_bind_content_type(res_352b, APPLICATION_CBOR);
-  oc_resource_bind_resource_interface(res_352b, OC_IF_SE); /* if.s */
-  oc_resource_set_discoverable(res_352b, true);
-  /* periodic observable
-     to be used when one wants to send an event per time slice
-     period is 1 second */
-  oc_resource_set_periodic_observable(res_352b, 1);
-  /* set observable
-     events are send when oc_notify_observers(oc_resource_t *resource) is
-    called. this function must be called when the value changes, preferable on
-    an interrupt when something is read from the hardware. */
-  /*oc_resource_set_observable(res_352, true); */
-  oc_resource_set_request_handler(res_352b, OC_GET, get_dpa_352b, NULL);
-  oc_resource_set_request_handler(res_352b, OC_POST, post_dpa_352b, NULL);
-  oc_add_resource(res_352b);
-
-  PRINT("Register Resource with local path \"/p/c\"\n");
-  oc_resource_t *res_353 = oc_new_resource("myname_c", "p/c", 1, 0);
-  oc_resource_bind_resource_type(res_353, "urn:knx:dpa.353.52");
-  oc_resource_bind_content_type(res_353, APPLICATION_CBOR);
-  oc_resource_bind_resource_interface(res_353, OC_IF_SE); /* if.s */
-  oc_resource_set_discoverable(res_353, true);
-  /* periodic observable
-     to be used when one wants to send an event per time slice
-     period is 1 second */
-  oc_resource_set_periodic_observable(res_353, 1);
-  /* set observable
-     events are send when oc_notify_observers(oc_resource_t *resource) is
-    called. this function must be called when the value changes, preferable on
-    an interrupt when something is read from the hardware. */
-  /*oc_resource_set_observable(res_352, true); */
-  oc_resource_set_request_handler(res_353, OC_GET, get_dpa_353, NULL);
-  oc_resource_set_request_handler(res_353, OC_POST, post_dpa_353, NULL);
-  oc_add_resource(res_353);
 }
 
 /**
