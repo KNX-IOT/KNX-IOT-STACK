@@ -16,7 +16,7 @@ option(ENABLE_PROGRAMS "Build mbed TLS programs." OFF)
 option(ENABLE_TESTING "Build mbed TLS tests." OFF)
 
 set(OC_DYNAMIC_ALLOCATION_ENABLED ON CACHE BOOL "Enable dynamic memory allocation within the OCF stack and MBedtls.")
-set(OC_SECURITY_ENABLED ON CACHE BOOL "Enable security")
+#set(OC_SECURITY_ENABLED ON CACHE BOOL "Enable security")
 set(OC_PKI_ENABLED ON CACHE BOOL "Enable PKI security")
 set(OC_DEBUG_ENABLED OFF CACHE BOOL "Enable debug messages")
 
@@ -157,7 +157,7 @@ if(OC_DYNAMIC_ALLOCATION_ENABLED)
 endif()
 
 if(OC_SECURITY_ENABLED)
-    #target_compile_definitions(mbedcrypto PUBLIC OC_SECURITY)
+   # target_compile_definitions(mbedcrypto PUBLIC OC_SECURITY)
 endif()
 
 if(OC_PKI_ENABLED)
@@ -189,14 +189,14 @@ target_link_libraries(kis-server PRIVATE
 )
 target_link_libraries(kis-server PUBLIC kis-common)
 
-add_library(kis-server-client)
-target_compile_definitions(kis-server-client PUBLIC OC_SERVER OC_CLIENT)
-target_link_libraries(kis-server-client PRIVATE
+add_library(kisClientServer)
+target_compile_definitions(kisClientServer PUBLIC OC_SERVER OC_CLIENT)
+target_link_libraries(kisClientServer PRIVATE
     kis-coap
     kis-api
     kis-port
 )
-target_link_libraries(kis-server-client PUBLIC kis-common)
+target_link_libraries(kisClientServer PUBLIC kis-common)
 
 
 if(PROJECT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
@@ -207,6 +207,6 @@ if(PROJECT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     )
 endif()
 
-add_subdirectory(apps)
 add_subdirectory(port)
+add_subdirectory(apps)
 add_subdirectory(deps)
