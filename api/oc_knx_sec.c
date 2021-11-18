@@ -527,7 +527,7 @@ oc_core_auth_at_x_get_handler(oc_request_t *request,
   }
 
     // - find the id from the URL
-    char *value;
+    const char *value;
     int value_len = oc_uri_get_wildcard_value_as_string(
     oc_string(request->resource->uri), oc_string_len(request->resource->uri),
     request->uri_path, request->uri_path_len, &value);
@@ -624,7 +624,7 @@ oc_core_auth_at_x_delete_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  char *value;
+  const char *value;
   int value_len = -1;
 
   /* check if the accept header is cbor-format */
