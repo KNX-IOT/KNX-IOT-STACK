@@ -1,0 +1,18 @@
+@startuml
+skinparam componentStyle rectangle
+
+
+rectangle "Windows"  as host{
+        component "KNX-IOT(pushbutton)" as o1
+        component "KNX-IOT (actuator)" as cli
+        cli - o1 
+
+
+        note as N
+2 devices running 
+on windows
+end note
+
+}
+
+@enduml

@@ -1,0 +1,56 @@
+@startuml
+skinparam componentStyle rectangle
+
+
+node "PC (ETS)" as pc{
+ note as OC
+PC as configuration tool
+end note
+}
+
+node "Pi-BR" as cr{
+
+    rectangle "Pi-hat with Chili" as pih
+    
+ note as BR
+Thread border router
+Connects to outside network:
+- ethernet
+- wifi
+Connects devices to
+- thread
+end note
+}
+
+node "Pi as pushbutton" as c1{
+
+    rectangle "chili2D" as r1
+    rectangle "Pi-hat" as pi1
+ note as N3
+Thread Device
+Based on Pi
+- thread (via USB)
+- Buttons via Pihat
+end note
+}
+
+node "Pi as actuator" as c2{
+
+    rectangle "chili2D" as r2
+    rectangle "Pi-hat" as pi2
+     note as N2
+Thread Device
+Based on Pi
+- thread (via USB)
+- Buttons via Pihat
+end note
+}
+
+pc -- cr
+cr -- c1
+cr -- c2 
+c1 -- c2 
+
+[component]
+footer //Device and network configuration//
+@enduml
