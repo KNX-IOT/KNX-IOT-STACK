@@ -93,6 +93,10 @@ static struct timespec ts;
 
 #include <stdio.h> /* defines FILENAME_MAX */
 
+
+#define MY_NAME "Actuator (LSAB) 417"
+
+
 #ifdef WIN32
 /** windows specific code */
 #include <windows.h>
@@ -130,7 +134,7 @@ app_init(void)
 {
   int ret = oc_init_platform("Cascoda", NULL, NULL);
 
-  ret |= ock_add_device("pushbutton", "1.0", "//", "000001", NULL, NULL);
+  ret |= ock_add_device(MY_NAME, "1.0", "//", "000002", NULL, NULL);
 
   oc_device_info_t *device = oc_core_get_device_info(0);
   PRINT("Serial Number: %s\n", oc_string(device->serialnumber));
@@ -148,7 +152,7 @@ app_init(void)
   oc_core_set_device_pm(0, true);
 
   /* set the model */
-  oc_core_set_device_model(0, "my model");
+  oc_core_set_device_model(0, "Cascoda Actuator");
 
   
   /* set the internal address (ia) */
@@ -181,7 +185,7 @@ app_init(void)
  * @param user_data the user data.
  */
 STATIC void
-get_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
+get_dpa_417(oc_request_t *request, oc_interface_mask_t interfaces,
             void *user_data)
 {
   (void)user_data; /* variable not used */
@@ -194,7 +198,7 @@ get_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
   bool error_state = false; /**< the error state, the generated code */
   int oc_status_code = OC_STATUS_OK;
 
-  PRINT("-- Begin get_dpa_352: interface %d\n", interfaces);
+  PRINT("-- Begin get_dpa_417: interface %d\n", interfaces);
   /* check if the accept header is CBOR */
   if (request->accept != APPLICATION_CBOR) {
     oc_send_response(request, OC_STATUS_BAD_OPTION);
@@ -218,7 +222,7 @@ get_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
   } else {
     oc_send_response(request, OC_STATUS_BAD_OPTION);
   }
-  PRINT("-- End get_dpa_352\n");
+  PRINT("-- End get_dpa_417\n");
 }
 
 /**
@@ -236,7 +240,7 @@ get_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
  * @param user_data the supplied user data.
  */
 STATIC void
-post_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
+post_dpa_417(oc_request_t *request, oc_interface_mask_t interfaces,
              void *user_data)
 {
   (void)interfaces;
@@ -273,7 +277,7 @@ post_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
     // oc_send_response(request, OC_STATUS_NOT_MODIFIED);
     oc_send_response(request, OC_STATUS_BAD_REQUEST);
   }
-  PRINT("-- End post_dpa_352\n");
+  PRINT("-- End post_dpa_417\n");
 }
 
 
@@ -295,13 +299,13 @@ register_resources(void)
 {
   PRINT("Register Resource with local path \"/p/push\"\n");
 
-  PRINT("Light Switching Sensor 421 (LSSB) : SwitchOnOff \n");
+  PRINT("Light Switching Sensor 417 (LSAB) : SwitchOnOff \n");
   PRINT("Data point 1.001 (DPT_Switch) \n");
 
   PRINT("Register Resource with local path \"/p/push\"\n");
 
-  oc_resource_t *res_pushbutton = oc_new_resource("push button", "p/push", 2, 0);
-  oc_resource_bind_resource_type(res_pushbutton, "urn:knx:dpa.421");
+  oc_resource_t *res_pushbutton = oc_new_resource("light actuation", "p/push", 2, 0);
+  oc_resource_bind_resource_type(res_pushbutton, "urn:knx:dpa.417");
   oc_resource_bind_resource_type(res_pushbutton, "DPT_Switch");
   oc_resource_bind_content_type(res_pushbutton, APPLICATION_CBOR);
   oc_resource_bind_resource_interface(res_pushbutton, OC_IF_AC); /* if.a */
@@ -315,8 +319,8 @@ register_resources(void)
     called. this function must be called when the value changes, preferable on
     an interrupt when something is read from the hardware. */
   /*oc_resource_set_observable(res_352, true); */
-  oc_resource_set_request_handler(res_pushbutton, OC_GET, get_dpa_352, NULL);
-  oc_resource_set_request_handler(res_pushbutton, OC_POST, post_dpa_352, NULL);
+  oc_resource_set_request_handler(res_pushbutton, OC_GET, get_dpa_417, NULL);
+  oc_resource_set_request_handler(res_pushbutton, OC_POST, post_dpa_417, NULL);
   oc_add_resource(res_pushbutton);
 
 }
@@ -437,7 +441,7 @@ main(void)
   sigaction(SIGINT, &sa, NULL);
 #endif
 
-  PRINT("KNX-IOT Server name : \"pushbutton\"\n");
+  PRINT("KNX-IOT Server name : \"%s\"\n", MY_NAME);
 
   char buff[FILENAME_MAX];
   char *retbuf = NULL;
@@ -491,8 +495,8 @@ main(void)
   PRINT("Security - Disabled\n");
 #endif /* OC_SECURITY */
 
-  PRINT("Server \"pushbutton\" running, waiting on incoming "
-        "connections.\n");
+  PRINT("Server \"%s\" running, waiting on incoming "
+        "connections.\n", MY_NAME);
 
 #ifdef WIN32
   /* windows specific loop */

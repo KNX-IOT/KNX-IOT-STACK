@@ -29,13 +29,13 @@ target_link_libraries(LSSB_minimal_all
 
 
 # demo: actuator (e.g. receiving command)
-add_executable(LDAB_minimal_all
-    ${PROJECT_SOURCE_DIR}/LDAB_minimal_all.c
+add_executable(LSAB_minimal_all
+    ${PROJECT_SOURCE_DIR}/LSAB_minimal_all.c
 )
-target_link_libraries(LDAB_minimal_all
+target_link_libraries(LSAB_minimal_all
         kisClientServer
     )
-    file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/LDAB_minimal_all_creds)
+    file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/LSAB_minimal_all_creds)
 
 
 # copy credentials, used by example applications.
