@@ -549,6 +549,23 @@ oc_core_auth_at_x_get_handler(oc_request_t *request,
     }
     // return the data
 
+    oc_rep_begin_root_object();
+    // id 0
+    oc_rep_i_set_text_string(root, 0, oc_string(g_o_profile[index].id));
+
+    // version 1
+    oc_rep_i_set_int (root, 1,g_o_profile[index].version);
+    // ia - 12
+    //oc_rep_i_set_text_string(root, 11, oc_string(g_gpt[value].ia));
+    // path- 112
+    //oc_rep_i_set_text_string(root, 112, oc_string(g_gpt[value].path));
+    // url- 10
+    //oc_rep_i_set_text_string(root, 10, oc_string(g_gpt[value].url));
+    // ga - 7
+    //oc_rep_i_set_int_array(root, 7, g_gpt[value].ga, g_gpt[value].ga_len);
+
+    oc_rep_end_root_object();
+
 
 
   PRINT("oc_core_auth_at_x_get_handler - done\n");
