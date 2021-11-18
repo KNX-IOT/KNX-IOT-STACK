@@ -312,6 +312,23 @@ find_index_from_at(oc_string_t *at)
   return -1;
 }
 
+static int
+find_index_from_at_string(const char *at, int len_at)
+{
+  int len;
+  for (int i = 0; i < G_O_PROFILE_MAX_ENTRIES; i++) {
+    len = oc_string_len(g_o_profile[i].id);
+    PRINT("   find_index_from_at_string %s\n", oc_string(g_o_profile[i].id));
+    if (len > 0 && len == len_at &&
+        (strncmp(at, oc_string(g_o_profile[i].id), len) == 0)) {
+      PRINT("     found %d\n", i);
+      return i;
+    }
+  }
+
+  return -1;
+}
+
 /* finds 0 ==> id */
 static oc_string_t *
 find_access_token_from_payload(oc_rep_t *object)
@@ -372,8 +389,8 @@ oc_core_auth_at_get_handler(oc_request_t *request,
 
       length = oc_rep_add_line_to_buffer(oc_string(g_o_profile[i].contextId));
       response_length += length;
-
-      length = oc_rep_add_line_to_buffer(">;ct=50");
+      // return cbor
+      length = oc_rep_add_line_to_buffer(">;ct=60");
       response_length += length;
     }
   }
@@ -504,17 +521,57 @@ oc_core_auth_at_x_get_handler(oc_request_t *request,
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_CBOR) {
-    request->response->response_buffer->code =
-      oc_status_code(OC_STATUS_BAD_REQUEST);
+    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
-  cbor_encode_uint(&g_encoder, g_oscore_replaywindow);
+
+  // - find the id from the URL
+  const char *value;
+  int value_len = oc_uri_get_wildcard_value_as_string(
+    oc_string(request->resource->uri), oc_string_len(request->resource->uri),
+    request->uri_path, request->uri_path_len, &value);
+  // - delete the index.
+  if (value_len <= 0) {
+    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    PRINT("index (at) not found\n");
+    return;
+  }
+
+  PRINT(" id = %.*s\n", value_len, value);
+  // get the index
+  int index = find_index_from_at_string(value, value_len);
+  // - delete the index.
+  if (index < 0) {
+    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    PRINT("index in struct not found\n");
+    return;
+  }
+  // return the data
+
+  oc_rep_begin_root_object();
+  // id 0
+  oc_rep_i_set_text_string(root, 0, oc_string(g_o_profile[index].id));
+
+  // version 1
+  oc_rep_i_set_int(root, 1, g_o_profile[index].version);
+  // ia - 12
+  // oc_rep_i_set_text_string(root, 11, oc_string(g_gpt[value].ia));
+  // path- 112
+  // oc_rep_i_set_text_string(root, 112, oc_string(g_gpt[value].path));
+  // url- 10
+  // oc_rep_i_set_text_string(root, 10, oc_string(g_gpt[value].url));
+  // ga - 7
+  // oc_rep_i_set_int_array(root, 7, g_gpt[value].ga, g_gpt[value].ga_len);
+
+  oc_rep_end_root_object();
 
   PRINT("oc_core_auth_at_x_get_handler - done\n");
   oc_send_cbor_response(request, OC_STATUS_OK);
 }
 
 // probably no post handler needed
+// partial update?
+// how does that look like?
 void
 oc_core_auth_at_x_post_handler(oc_request_t *request,
                                oc_interface_mask_t iface_mask, void *data)
@@ -529,6 +586,8 @@ oc_core_auth_at_x_post_handler(oc_request_t *request,
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
+
+  PRINT("oc_core_auth_at_x_post_handler\n");
 
   bool changed = false;
   /* loop over the request document to check if all inputs are ok */
@@ -562,6 +621,8 @@ oc_core_auth_at_x_delete_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
+  const char *value;
+  int value_len = -1;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_CBOR) {
@@ -569,9 +630,33 @@ oc_core_auth_at_x_delete_handler(oc_request_t *request,
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
-  // todo
-  // - find the id from the url.
+
+  PRINT("oc_core_auth_at_x_delete_handler\n");
+
+  // - find the id from the URL
+  value_len = oc_uri_get_wildcard_value_as_string(
+    oc_string(request->resource->uri), oc_string_len(request->resource->uri),
+    request->uri_path, request->uri_path_len, &value);
   // - delete the index.
+  if (value_len <= 0) {
+    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    PRINT("index (at) not found\n");
+    return;
+  }
+
+  PRINT("  id = %.*s\n", value_len, value);
+  // get the index
+  int index = find_index_from_at_string(value, value_len);
+  // - delete the index.
+  if (index < 0) {
+    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    PRINT("index in struct not found\n");
+    return;
+  }
+  // actual delete of the context id so that this entry is seen as empty
+
+  oc_free_string(&g_o_profile[index].id);
+  oc_new_string(&g_o_profile[index].id, "", 0);
 
   PRINT("oc_core_auth_at_x_delete_handler - done\n");
   oc_send_cbor_response(request, OC_STATUS_OK);
@@ -580,7 +665,8 @@ oc_core_auth_at_x_delete_handler(oc_request_t *request,
 void
 oc_create_auth_at_x_resource(int resource_idx, size_t device)
 {
-  OC_DBG("oc_create_auth_at_resource\n");
+  OC_DBG("oc_create_auth_at_x_resource\n");
+  PRINT("oc_create_auth_at_x_resource\n");
   // "/a/sen"
   oc_core_lf_populate_resource(
     resource_idx, device, "/auth/at/*", OC_IF_LL | OC_IF_BASELINE,

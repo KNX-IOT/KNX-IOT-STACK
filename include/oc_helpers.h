@@ -333,6 +333,26 @@ int oc_uri_get_wildcard_value_as_int(const char *uri_resource, size_t uri_len,
                                      const char *uri_invoked,
                                      size_t invoked_len);
 
+/*
+ * @brief retrieve the wildcard value as string
+ * The invoked URI is checked against teh URI of a resource
+ * that might contain a wild card, if the resource URI contains a wild card
+ * then the invoked URI is compared against this URI and
+ * e.g.  resource URI: / abc / *
+ * invoked URI: / abc / 1
+ * return will be 1.
+ * @param uri_resource The URI with wildcard
+ * @param uri_len The lenght of the URI with wild card
+ * @param uri_invoked The URI that should match a wild card
+ * @param invoked_len The URI length of the invoked URI
+ * @param value the actual value that represents the wildcard
+ * @return int -1 is error, otherwise the value is the integer length of the
+ * string
+ */
+int oc_uri_get_wildcard_value_as_string(const char *uri_resource,
+                                        size_t uri_len, const char *uri_invoked,
+                                        size_t invoked_len, const char **value);
+
 #ifdef __cplusplus
 }
 #endif
