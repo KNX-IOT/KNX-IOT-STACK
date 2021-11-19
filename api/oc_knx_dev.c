@@ -59,7 +59,7 @@ oc_create_dev_sn_resource(int resource_idx, size_t device)
   // json rt :dpt.serNum
   oc_core_lf_populate_resource(
     resource_idx, device, "/dev/sn", OC_IF_D, APPLICATION_CBOR, OC_DISCOVERABLE,
-    oc_core_dev_sn_get_handler, 0, 0, 0, 1, ":dpa:0.11");
+    oc_core_dev_sn_get_handler, 0, 0, 0, 2, ":dpa:0.11", "dpt.serNum");
 }
 
 static void
@@ -138,9 +138,10 @@ void
 oc_create_dev_fwv_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_dev_fwv_resource\n");
-  oc_core_lf_populate_resource(
-    resource_idx, device, "/dev/fwv", OC_IF_D, APPLICATION_CBOR,
-    OC_DISCOVERABLE, oc_core_dev_fwv_get_handler, 0, 0, 0, 1, ":dpt.version");
+  oc_core_lf_populate_resource(resource_idx, device, "/dev/fwv", OC_IF_D,
+                               APPLICATION_CBOR, OC_DISCOVERABLE,
+                               oc_core_dev_fwv_get_handler, 0, 0, 0, 2,
+                               ":dpa .0.54", ":dpt.version");
 }
 
 static void
@@ -505,8 +506,8 @@ oc_create_dev_pm_resource(int resource_idx, size_t device)
   OC_DBG("oc_create_dev_pm_resource\n");
   oc_core_lf_populate_resource(
     resource_idx, device, "/dev/pm", OC_IF_D, APPLICATION_CBOR, OC_DISCOVERABLE,
-    oc_core_dev_pm_get_handler, oc_core_dev_pm_put_handler, 0, 0, 1,
-    ":dpa.0.54");
+    oc_core_dev_pm_get_handler, oc_core_dev_pm_put_handler, 0, 0, 2,
+    ":dpa.0.54", "dpa.binaryValue");
 }
 
 static void

@@ -5,7 +5,6 @@ The apps are intended to use in pairs, e.g. they are not full fledged applicatio
 
 The intention of the examples is to explain certain aspects of the stack.
 
-
 naming convention:
 
 - [filename]**_all* has code specific for linux and Windows OS
@@ -18,9 +17,30 @@ naming convention:
 
 Server example on Windows & Linux.
 
+- no KNX application
+- example to receive data to other device
 
 ### simpleclient_all.c
 
 Client example on Windows & Linux.
 
+- no KNX application
+- example to send data to other device
 
+### LSAB_minimal_all.c
+
+KNX-IOT example on Windows & Linux.
+capable of receiving commands for datapoint 417.61
+
+- Implements FB LSAB 417
+  - only datapoint 61
+  - e.g. dpa: 417.61
+
+### LSSB_minimal_all.c
+
+KNX-IOT example on Windows & Linux.
+capable of sending commands from datapoint 421.61
+
+- Implements FB LSSB 421
+  - only datapoint 61
+  - e.g. dpa: 421.61
