@@ -22,7 +22,7 @@
 
 /**
  * @file
- *  Example code for Function Block LSAB 
+ *  Example code for Function Block LSAB
  *  Implements only data point 61: switch on/off
  *  This implementation is a actuator, e.g. receives data
  */
@@ -95,9 +95,7 @@ static struct timespec ts;
 
 #include <stdio.h> /* defines FILENAME_MAX */
 
-
 #define MY_NAME "Actuator (LSAB) 417" /**< The name of the application */
-
 
 #ifdef WIN32
 /** windows specific code */
@@ -171,7 +169,7 @@ bool g_mystate = false;
  */
 STATIC void
 get_dpa_417_61(oc_request_t *request, oc_interface_mask_t interfaces,
-            void *user_data)
+               void *user_data)
 {
   (void)user_data; /* variable not used */
 
@@ -219,13 +217,13 @@ get_dpa_417_61(oc_request_t *request, oc_interface_mask_t interfaces,
  */
 STATIC void
 post_dpa_417_61(oc_request_t *request, oc_interface_mask_t interfaces,
-             void *user_data)
+                void *user_data)
 {
   (void)interfaces;
   (void)user_data;
   bool error_state = false;
   PRINT("-- Begin post_dpa_417_61:\n");
-  
+
   oc_rep_t *rep = request->request_payload;
   if ((rep != NULL) && (rep->type == OC_REP_BOOL)) {
     PRINT("  post_dpa_417_61 received : %d\n", rep->value.boolean);
@@ -238,7 +236,6 @@ post_dpa_417_61(oc_request_t *request, oc_interface_mask_t interfaces,
   oc_send_response(request, OC_STATUS_BAD_REQUEST);
   PRINT("-- End post_dpa_417_61\n");
 }
-
 
 /**
  * register all the resources to the stack
@@ -263,7 +260,8 @@ register_resources(void)
 
   PRINT("Register Resource with local path \"/p/light\"\n");
 
-  oc_resource_t *res_light = oc_new_resource("light actuation", "p/light", 2, 0);
+  oc_resource_t *res_light =
+    oc_new_resource("light actuation", "p/light", 2, 0);
   oc_resource_bind_resource_type(res_light, "urn:knx:dpa.417.61");
   oc_resource_bind_resource_type(res_light, "DPT_Switch");
   oc_resource_bind_content_type(res_light, APPLICATION_CBOR);
@@ -282,7 +280,7 @@ register_resources(void)
   oc_resource_set_request_handler(res_light, OC_GET, get_dpa_417_61, NULL);
   // set the POST handler
   oc_resource_set_request_handler(res_light, OC_POST, post_dpa_417_61, NULL);
-  // register this resource, 
+  // register this resource,
   // this means that the resource will be listed in /.well-known/core
   oc_add_resource(res_light);
 }
@@ -458,7 +456,8 @@ main(void)
 #endif /* OC_SECURITY */
 
   PRINT("Server \"%s\" running, waiting on incoming "
-        "connections.\n", MY_NAME);
+        "connections.\n",
+        MY_NAME);
 
 #ifdef WIN32
   /* windows specific loop */

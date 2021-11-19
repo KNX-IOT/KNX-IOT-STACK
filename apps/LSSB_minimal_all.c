@@ -151,7 +151,6 @@ app_init(void)
   return ret;
 }
 
-
 /** the state of the dpa 421.61 */
 bool g_mystate = false;
 
@@ -169,7 +168,7 @@ bool g_mystate = false;
  */
 STATIC void
 get_dpa_421_61(oc_request_t *request, oc_interface_mask_t interfaces,
-            void *user_data)
+               void *user_data)
 {
   (void)user_data; /* variable not used */
 
@@ -218,7 +217,7 @@ get_dpa_421_61(oc_request_t *request, oc_interface_mask_t interfaces,
  */
 void
 post_dpa_421_61(oc_request_t *request, oc_interface_mask_t interfaces,
-             void *user_data)
+                void *user_data)
 {
   (void)interfaces;
   (void)user_data;
@@ -261,7 +260,8 @@ register_resources(void)
 
   PRINT("Register Resource with local path \"/p/push\"\n");
 
-  oc_resource_t *res_pushbutton = oc_new_resource("push button", "p/push", 2, 0);
+  oc_resource_t *res_pushbutton =
+    oc_new_resource("push button", "p/push", 2, 0);
   oc_resource_bind_resource_type(res_pushbutton, "urn:knx:dpa.421.61");
   oc_resource_bind_resource_type(res_pushbutton, "DPT_Switch");
   oc_resource_bind_content_type(res_pushbutton, APPLICATION_CBOR);
@@ -277,9 +277,9 @@ register_resources(void)
     an interrupt when something is read from the hardware. */
   /*oc_resource_set_observable(res_352, true); */
   oc_resource_set_request_handler(res_pushbutton, OC_GET, get_dpa_421_61, NULL);
-  oc_resource_set_request_handler(res_pushbutton, OC_POST, post_dpa_421_61, NULL);
+  oc_resource_set_request_handler(res_pushbutton, OC_POST, post_dpa_421_61,
+                                  NULL);
   oc_add_resource(res_pushbutton);
-
 }
 
 /**
@@ -453,7 +453,8 @@ main(void)
 #endif /* OC_SECURITY */
 
   PRINT("Server \"%s\" running, waiting on incoming "
-        "connections.\n", MY_NAME);
+        "connections.\n",
+        MY_NAME);
 
 #ifdef WIN32
   /* windows specific loop */
