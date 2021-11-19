@@ -22,7 +22,9 @@
 
 /**
  * @file
- *  Example code
+ *  Example code for Function Block LSAB 
+ *  Implements only data point 61: switch on/off
+ *  This implementation is a actuator, e.g. receives data
  */
 /**
  * ## Application Design
@@ -94,7 +96,7 @@ static struct timespec ts;
 #include <stdio.h> /* defines FILENAME_MAX */
 
 
-#define MY_NAME "Actuator (LSAB) 417"
+#define MY_NAME "Actuator (LSAB) 417" /**< The name of the application */
 
 
 #ifdef WIN32
@@ -111,14 +113,7 @@ STATIC CRITICAL_SECTION cs;   /**< event loop variable */
 
 #define btoa(x) ((x) ? "true" : "false")
 
-#define MAX_STRING 30         /**< max size of the strings. */
-#define MAX_PAYLOAD_STRING 65 /**< max size strings in the payload */
-#define MAX_ARRAY 10          /**< max size of the array */
-/* Note: Magic numbers are derived from the resource definition, either from the
- * example or the definition.*/
-
 volatile int quit = 0; /**< stop variable, used by handle_signal */
-// STATIC const size_t DEVICE = 0; /**< default device index */
 
 /**
  * function to set up the device.
@@ -132,8 +127,10 @@ volatile int quit = 0; /**< stop variable, used by handle_signal */
 int
 app_init(void)
 {
+  /* set the manufactorer name */
   int ret = oc_init_platform("Cascoda", NULL, NULL);
 
+  /* set the application name, version, base url, device serial number */
   ret |= ock_add_device(MY_NAME, "1.0", "//", "000002", NULL, NULL);
 
   oc_device_info_t *device = oc_core_get_device_info(0);
@@ -154,26 +151,14 @@ app_init(void)
   /* set the model */
   oc_core_set_device_model(0, "Cascoda Actuator");
 
-  
-  /* set the internal address (ia) */
-  oc_core_set_device_ia(0, 5);
-
-  /* set the host name */
-  oc_core_set_device_hostname(0, "my.hostname");
-
-  /* set the installation id (iid) */
-  oc_core_set_device_iid(0, "my installation");
-
-  /* set the internal address */
-  oc_core_set_device_ia(0, 5);
-
-  oc_device_mode_display(0);
-
   return ret;
 }
 
+/** the state of the dpa 417.61 */
+bool g_mystate = false;
+
 /**
- * get method for "/p/a" resource.
+ * get method for "p/light" resource.
  * function is called to initialize the return values of the GET method.
  * initialization of the returned values are done from the global property
  * values. Resource Description: This Resource describes a binary switch
@@ -185,7 +170,7 @@ app_init(void)
  * @param user_data the user data.
  */
 STATIC void
-get_dpa_417(oc_request_t *request, oc_interface_mask_t interfaces,
+get_dpa_417_61(oc_request_t *request, oc_interface_mask_t interfaces,
             void *user_data)
 {
   (void)user_data; /* variable not used */
@@ -198,7 +183,7 @@ get_dpa_417(oc_request_t *request, oc_interface_mask_t interfaces,
   bool error_state = false; /**< the error state, the generated code */
   int oc_status_code = OC_STATUS_OK;
 
-  PRINT("-- Begin get_dpa_417: interface %d\n", interfaces);
+  PRINT("-- Begin get_dpa_417_61: interface %d\n", interfaces);
   /* check if the accept header is CBOR */
   if (request->accept != APPLICATION_CBOR) {
     oc_send_response(request, OC_STATUS_BAD_OPTION);
@@ -206,12 +191,7 @@ get_dpa_417(oc_request_t *request, oc_interface_mask_t interfaces,
   }
 
   CborError error;
-  error = cbor_encode_boolean(&g_encoder, true);
-  if (error) {
-    oc_status_code = true;
-  }
-  PRINT("CBOR encoder size %d\n", oc_rep_get_encoded_payload_size());
-  error = cbor_encode_boolean(&g_encoder, false);
+  error = cbor_encode_boolean(&g_encoder, g_mystate);
   if (error) {
     oc_status_code = true;
   }
@@ -222,62 +202,41 @@ get_dpa_417(oc_request_t *request, oc_interface_mask_t interfaces,
   } else {
     oc_send_response(request, OC_STATUS_BAD_OPTION);
   }
-  PRINT("-- End get_dpa_417\n");
+  PRINT("-- End get_dpa_417_61\n");
 }
 
 /**
- * post method for "/p/a" resource.
+ * post method for "p/light" resource.
  * The function has as input the request body, which are the input values of the
- POST method.
+ * POST method.
  * The input values (as a set) are checked if all supplied values are correct.
  * If the input values are correct, they will be assigned to the global property
- values.
- * Resource Description:
-
+ * values. Resource Description:
  *
  * @param request the request representation.
  * @param interfaces the used interfaces during the request.
  * @param user_data the supplied user data.
  */
 STATIC void
-post_dpa_417(oc_request_t *request, oc_interface_mask_t interfaces,
+post_dpa_417_61(oc_request_t *request, oc_interface_mask_t interfaces,
              void *user_data)
 {
   (void)interfaces;
   (void)user_data;
   bool error_state = false;
-  PRINT("-- Begin post_dpa_352:\n");
-  // oc_rep_t *rep = request->request_payload;
-
-  /* loop over the request document for each required input field to check if
-   * all required input fields are present */
-  bool var_in_request = false;
-  // rep = request->request_payload;
-  //  while (rep != NULL) {
-  //    if (strcmp(oc_string(rep->name),
-  //               g_binaryswitch_RESOURCE_PROPERTY_NAME_value) == 0) {
-  //      var_in_request = true;
-  //    }
-  //    rep = rep->next;
-  //  }
-  if (var_in_request == false) {
-    error_state = true;
-    PRINT(" required property: 'value' not in request\n");
+  PRINT("-- Begin post_dpa_417_61:\n");
+  
+  oc_rep_t *rep = request->request_payload;
+  if ((rep != NULL) && (rep->type == OC_REP_BOOL)) {
+    PRINT("  post_dpa_417_61 received : %d\n", rep->value.boolean);
+    g_mystate = rep->value.boolean;
+    oc_send_cbor_response(request, OC_STATUS_CHANGED);
+    PRINT("-- End post_dpa_417_61\n");
+    return;
   }
-  /* loop over the request document to check if all inputs are ok */
-  // rep = request->request_payload;
 
-  /* if the input is ok, then process the input document and assign the global
-   * variables */
-  if (error_state == false) {
-    oc_send_cbor_response(request, OC_STATUS_OK);
-  } else {
-    PRINT("  Returning Error \n");
-    /* TODO: add error response, if any */
-    // oc_send_response(request, OC_STATUS_NOT_MODIFIED);
-    oc_send_response(request, OC_STATUS_BAD_REQUEST);
-  }
-  PRINT("-- End post_dpa_417\n");
+  oc_send_response(request, OC_STATUS_BAD_REQUEST);
+  PRINT("-- End post_dpa_417_61\n");
 }
 
 
@@ -285,7 +244,7 @@ post_dpa_417(oc_request_t *request, oc_interface_mask_t interfaces,
  * register all the resources to the stack
  * this function registers all application level resources:
  * - each resource path is bind to a specific function for the supported methods
- * (GET, POST, PUT)
+ * (GET, POST, PUT, DELETE)
  * - each resource is
  *   - secure
  *   - observable
@@ -297,32 +256,35 @@ post_dpa_417(oc_request_t *request, oc_interface_mask_t interfaces,
 void
 register_resources(void)
 {
-  PRINT("Register Resource with local path \"/p/push\"\n");
+  PRINT("Register Resource with local path \"/p/light\"\n");
 
-  PRINT("Light Switching Sensor 417 (LSAB) : SwitchOnOff \n");
-  PRINT("Data point 1.001 (DPT_Switch) \n");
+  PRINT("Light Switching actuator 417 (LSAB) : SwitchOnOff \n");
+  PRINT("Data point 417.61 (DPT_Switch) \n");
 
-  PRINT("Register Resource with local path \"/p/push\"\n");
+  PRINT("Register Resource with local path \"/p/light\"\n");
 
-  oc_resource_t *res_pushbutton = oc_new_resource("light actuation", "p/push", 2, 0);
-  oc_resource_bind_resource_type(res_pushbutton, "urn:knx:dpa.417");
-  oc_resource_bind_resource_type(res_pushbutton, "DPT_Switch");
-  oc_resource_bind_content_type(res_pushbutton, APPLICATION_CBOR);
-  oc_resource_bind_resource_interface(res_pushbutton, OC_IF_AC); /* if.a */
-  oc_resource_set_discoverable(res_pushbutton, true);
+  oc_resource_t *res_light = oc_new_resource("light actuation", "p/light", 2, 0);
+  oc_resource_bind_resource_type(res_light, "urn:knx:dpa.417.61");
+  oc_resource_bind_resource_type(res_light, "DPT_Switch");
+  oc_resource_bind_content_type(res_light, APPLICATION_CBOR);
+  oc_resource_bind_resource_interface(res_light, OC_IF_AC); /* if.a */
+  oc_resource_set_discoverable(res_light, true);
   /* periodic observable
      to be used when one wants to send an event per time slice
      period is 1 second */
-  oc_resource_set_periodic_observable(res_pushbutton, 1);
+  oc_resource_set_periodic_observable(res_light, 1);
   /* set observable
      events are send when oc_notify_observers(oc_resource_t *resource) is
     called. this function must be called when the value changes, preferable on
     an interrupt when something is read from the hardware. */
-  /*oc_resource_set_observable(res_352, true); */
-  oc_resource_set_request_handler(res_pushbutton, OC_GET, get_dpa_417, NULL);
-  oc_resource_set_request_handler(res_pushbutton, OC_POST, post_dpa_417, NULL);
-  oc_add_resource(res_pushbutton);
-
+  // oc_resource_set_observable(res_352, true);
+  // set the GET handler
+  oc_resource_set_request_handler(res_light, OC_GET, get_dpa_417_61, NULL);
+  // set the POST handler
+  oc_resource_set_request_handler(res_light, OC_POST, post_dpa_417_61, NULL);
+  // register this resource, 
+  // this means that the resource will be listed in /.well-known/core
+  oc_add_resource(res_light);
 }
 
 /**
