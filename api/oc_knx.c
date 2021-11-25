@@ -216,7 +216,7 @@ oc_knx_lsm_state(size_t device_index)
 {
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device == NULL) {
-    OC_ERR("device not found %d", device_index)
+    OC_ERR("device not found %d", device_index);
     return LSM_UNLOADED;
   }
 

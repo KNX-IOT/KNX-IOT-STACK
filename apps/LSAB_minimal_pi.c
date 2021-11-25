@@ -165,6 +165,31 @@ void python_binding_init(void)
   }
 }
 
+void set_backlight(bool value)
+{
+  if (pSetBacklightFunc && PyCallable_Check(pSetBacklightFunc))
+  {
+    // When called from C, Python functions expect a single tuple argument
+    // containing the arguments defined in the API 
+    PyObject *pArgs = PyTuple_New(1);
+    PyObject *pArgTheZeroth = PyBool_FromLong(value);
+    PyTuple_SetItem(pArgs, 0, pArgTheZeroth);
+
+    PyObject *pReturn = PyObject_Call(pSetBacklightFunc, pArgs, NULL);
+    PyErr_Print();
+
+    // cleanup - must free every temporary Python object
+    Py_DECREF(pArgs);
+    Py_DECREF(pArgTheZeroth);
+    Py_DECREF(pReturn);
+  }
+  else
+  {
+    PyErr_Print();
+    fprintf(stderr, "set_backlight was not called successfully!");
+  }
+}
+
 
 /**
  * function to set up the device.
@@ -292,6 +317,7 @@ post_dpa_417_61(oc_request_t *request, oc_interface_mask_t interfaces,
   if ((rep != NULL) && (rep->type == OC_REP_BOOL)) {
     PRINT("  post_dpa_417_61 received : %d\n", rep->value.boolean);
     g_mystate = rep->value.boolean;
+    set_backlight(g_mystate);
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
     PRINT("-- End post_dpa_417_61\n");
     return;
@@ -499,7 +525,13 @@ main(void)
   oc_set_factory_presets_cb(factory_presets_cb, NULL);
 
   // Start the embedded Python interpreter and initialize the Python API
+  // Necessary for controlling the backlight
   python_binding_init();
+  // Set the backlight to the initial value
+  // set_backlight(g_mystate);
+
+  set_backlight(false);
+
   /* start the stack */
   init = oc_main_init(&handler);
 
