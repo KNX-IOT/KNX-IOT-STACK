@@ -581,6 +581,9 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
     return;
   }
 
+  // TODO: there might be more than url in the group table.
+  // hence retrieve a list of urls..
+
   oc_string_t myurl = oc_core_find_group_object_table_url_from_index(index);
   PRINT(" .knx : url %s\n", oc_string(myurl));
 
@@ -967,6 +970,10 @@ oc_is_s_mode_request(oc_request_t *request)
   if (request == NULL) {
     return false;
   }
+
+  // TODO: add code to check if the request is part of the same setup
+  // e.g. check idd of the device vs the data in the request
+
   PRINT("  oc_is_s_mode_request %.*s\n", request->uri_path_len,
         request->uri_path);
   if (strncmp(".knx", request->uri_path, request->uri_path_len) == 0) {
