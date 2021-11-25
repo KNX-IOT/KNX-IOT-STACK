@@ -121,7 +121,8 @@ PyObject *pModule;
 // Python function for turning the backlight of the LCD on or off.
 // Takes one boolean argument matching the desired state of the backlight
 PyObject *pSetBacklightFunc;
-void python_binding_init(void)
+void
+python_binding_init(void)
 {
   Py_Initialize();
 
@@ -137,40 +138,38 @@ void python_binding_init(void)
   pModule = PyImport_Import(pName);
   Py_DECREF(pName);
 
-  if (pModule)
-  {
+  if (pModule) {
     // Import the test function, to check the import is successful
     // & that we are importing the right script
-    PyObject *pPrintInPythonFunc = PyObject_GetAttrString(pModule, "print_in_python");
+    PyObject *pPrintInPythonFunc =
+      PyObject_GetAttrString(pModule, "print_in_python");
 
-    if (pPrintInPythonFunc && PyCallable_Check(pPrintInPythonFunc))
-    {
+    if (pPrintInPythonFunc && PyCallable_Check(pPrintInPythonFunc)) {
       // Ensure that the Python embedding is successful
       PyObject *pValue = PyObject_CallObject(pPrintInPythonFunc, NULL);
     }
-    // Do not need the test function anymore, so we decrement the reference counter
-    // so that the memory for this object can be garbage-collected
+    // Do not need the test function anymore, so we decrement the reference
+    // counter so that the memory for this object can be garbage-collected
     Py_DECREF(pPrintInPythonFunc);
 
     // Import the rest of the Python API
     pSetBacklightFunc = PyObject_GetAttrString(pModule, "set_backlight");
 
-  }
-  else
-  {
+  } else {
     PyErr_Print();
     fprintf(stderr, "Failed to load lsab_minimal\n");
-    fprintf(stderr, "Please ensure that lsab_minimal.py is in the directory you are running this executable from!\n");
+    fprintf(stderr, "Please ensure that lsab_minimal.py is in the directory "
+                    "you are running this executable from!\n");
     exit(1);
   }
 }
 
-void set_backlight(bool value)
+void
+set_backlight(bool value)
 {
-  if (pSetBacklightFunc && PyCallable_Check(pSetBacklightFunc))
-  {
+  if (pSetBacklightFunc && PyCallable_Check(pSetBacklightFunc)) {
     // When called from C, Python functions expect a single tuple argument
-    // containing the arguments defined in the API 
+    // containing the arguments defined in the API
     PyObject *pArgs = PyTuple_New(1);
     PyObject *pArgTheZeroth = PyBool_FromLong(value);
     PyTuple_SetItem(pArgs, 0, pArgTheZeroth);
@@ -182,14 +181,11 @@ void set_backlight(bool value)
     Py_DECREF(pArgs);
     Py_DECREF(pArgTheZeroth);
     Py_DECREF(pReturn);
-  }
-  else
-  {
+  } else {
     PyErr_Print();
     fprintf(stderr, "set_backlight was not called successfully!");
   }
 }
-
 
 /**
  * function to set up the device.
