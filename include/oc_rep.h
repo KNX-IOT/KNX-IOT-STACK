@@ -1370,12 +1370,20 @@ typedef enum {
   OC_REP_OBJECT_ARRAY = 0x0E
 } oc_rep_value_type_t;
 
+/**
+ * parsed entry of a cbor object
+ * This represents a link list of response values
+ * one can iterate over the responses to find values by
+ *   - tag name or tag identifier
+ *       when the tag name is NULL then the tag identifier is being used.
+ *   - type of the value
+ */
 typedef struct oc_rep_s
 {
   oc_rep_value_type_t type; ///< type of the data
   struct oc_rep_s *next;    ///< next in list
   oc_string_t name;         ///< name of the tag
-  int iname;                ///< integer as tag name
+  int iname;                ///< integer (identifier) as tag name
   union oc_rep_value {
     int64_t integer;
     bool boolean;
@@ -1384,14 +1392,17 @@ typedef struct oc_rep_s
     oc_array_t array;
     struct oc_rep_s *object;
     struct oc_rep_s *object_array;
-  } value; ///< values
+  } value; ///< the value as union
 } oc_rep_t;
 
+// internal function
 void oc_rep_set_pool(struct oc_memb *rep_objects_pool);
 
+// internal function
 int oc_parse_rep(const uint8_t *payload, int payload_size,
                  oc_rep_t **value_list);
 
+// internal function
 void oc_free_rep(oc_rep_t *rep);
 
 /**

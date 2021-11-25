@@ -95,7 +95,7 @@ typedef struct oc_group_object_table_t
  * [
  *    {
  *        "id": "1",
- *         ia": "<knx-installation-id>.<recipient’s IA>",
+ *         ia": "<knx-installation-id>.<recipientï¿½s IA>",
  *        "ga":[2305, 2401],
  *        "path": ".knx",
  *    },
@@ -128,8 +128,30 @@ typedef struct oc_group_rp_table_t
   int ga_len;       //< length of the array of ga identifiers
 } oc_group_rp_table_t;
 
+/**
+ * @brief find (first) index in the group address table
+ *
+ * @param group_address the group address
+ * @return int the index in the table or -1
+ */
 int oc_core_find_group_object_table_index(int group_address);
 
+/**
+ * @brief find next index in the group address table
+ *
+ * @param group_address the group address
+ * @param cur_index  the current index to start from.
+ * @return int the index in the table or -1
+ */
+int oc_core_find_next_group_object_table_index(int group_address,
+                                               int cur_index);
+
+/**
+ * @brief find the url (of the resource) that in the group object table entry.
+ *
+ * @param index the index in the table
+ * @return oc_string_t the url
+ */
 oc_string_t oc_core_find_group_object_table_url_from_index(int index);
 
 int oc_core_find_reciepient_table_index(int group_address);

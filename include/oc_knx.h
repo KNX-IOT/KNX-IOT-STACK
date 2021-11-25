@@ -50,12 +50,12 @@ extern "C" {
  */
 typedef struct oc_pase_t
 {
-  oc_string_t salt;
-  oc_string_t pa;
-  oc_string_t pb;
-  oc_string_t ca;
-  oc_string_t cb;
-  oc_string_t rnd;
+  oc_string_t salt; ///< salt
+  oc_string_t pa;   ///< pa
+  oc_string_t pb;   ///< pb
+  oc_string_t ca;   ///< ca
+  oc_string_t cb;   ///< cb
+  oc_string_t rnd;  ///< rnd
   int it;
 } oc_pase_t;
 
@@ -166,8 +166,22 @@ void oc_knx_set_crc(uint64_t crc);
  */
 void oc_knx_set_osn(uint64_t osn);
 
+/**
+ * @brief checks if the request is a redirected request from .knx
+ * all messages to .knx are s-mode messages with an encapsulating payload
+ *
+ * @param request the request to be checked
+ * @return true
+ * @return false
+ */
 bool oc_is_s_mode_request(oc_request_t *request);
 
+/**
+ * @brief parses out the value of the s-mode request.
+ *
+ * @param request the request
+ * @return oc_rep_t* the rep
+ */
 oc_rep_t *oc_s_mode_get_value(oc_request_t *request);
 
 /**
