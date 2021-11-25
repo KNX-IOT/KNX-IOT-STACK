@@ -115,6 +115,44 @@ STATIC CRITICAL_SECTION cs;   /**< event loop variable */
 
 volatile int quit = 0; /**< stop variable, used by handle_signal */
 
+PyObject *pModule, *pPrintInPythonFunc;
+void python_binding_init(void)
+{
+  Py_Initialize();
+
+  // Import the Python module that talks to the Displayotron HAT
+  PyObject *pName = PyUnicode_DecodeFSDefault("lsab_minimal");
+
+  // Add current directory to Python path, so that we may import the module
+  // located in the same folder as the executable
+  PyRun_SimpleString("import sys");
+  PyRun_SimpleString("import os");
+  PyRun_SimpleString("sys.path.append(os.getcwd())");
+
+  pModule = PyImport_Import(pName);
+  Py_DECREF(pName);
+
+  if (pModule)
+  {
+    pPrintInPythonFunc = PyObject_GetAttrString(pModule, "print_in_python");
+
+    if (pPrintInPythonFunc && PyCallable_Check(pPrintInPythonFunc))
+    {
+      // Ensure that the Python embedding is successful
+      PyObject *pValue = PyObject_CallObject(pPrintInPythonFunc, NULL);
+    }
+  }
+  else
+  {
+
+    PyErr_Print();
+    fprintf(stderr, "Failed to load lsab_minimal\n");
+    fprintf(stderr, "Please ensure that lsab_minimal.py is in the directory you are running this executable from!\n");
+    exit(1);
+  }
+}
+
+
 /**
  * function to set up the device.
  *
@@ -152,43 +190,6 @@ app_init(void)
   oc_core_set_device_model(0, "Cascoda Actuator");
 
   return ret;
-}
-
-PyObject *pModule, *pPrintInPythonFunc;
-void python_binding_init(void)
-{
-  Py_Initialize();
-
-  // Import the Python module that talks to the Displayotron HAT
-  PyObject *pName = PyUnicode_DecodeFSDefault("lsab_minimal");
-
-  // Add current directory to Python path, so that we may import the module
-  // located in the same folder as the executable
-  PyRun_SimpleString("import sys");
-  PyRun_SimpleString("import os");
-  PyRun_SimpleString("sys.path.append(os.getcwd())");
-
-  pModule = PyImport_Import(pName);
-  Py_DECREF(pName);
-
-  if (pModule)
-  {
-    pPrintInPythonFunc = PyObject_GetAttrString(pModule, "print_in_python");
-
-    if (pPrintInPythonFunc && PyCallable_Check(pPrintInPythonFunc))
-    {
-      // Ensure that the Python embedding is successful
-      PyObject *pValue = PyObject_CallObject(pPrintInPythonFunc, NULL);
-    }
-  }
-  else
-  {
-
-    PyErr_Print();
-    fprintf(stderr, "Failed to load lsab_minimal\n");
-    fprintf(stderr, "Please ensure that lsab_minimal.py is in the directory you are running this executable from!\n");
-    exit(1);
-  }
 }
 
 /** the state of the dpa 417.61 */
@@ -263,7 +264,18 @@ post_dpa_417_61(oc_request_t *request, oc_interface_mask_t interfaces,
   bool error_state = false;
   PRINT("-- Begin post_dpa_417_61:\n");
 
-  oc_rep_t *rep = request->request_payload;
+  oc_rep_t *rep = NULL;
+  // handle the different requests
+  if (oc_is_s_mode_request(request)) {
+    PRINT(" S-MODE\n");
+    // retrieve the value of the s-mode payload
+    rep = oc_s_mode_get_value(request);
+  } else {
+    // the regular payload
+    rep = request->request_payload;
+  }
+
+  // handle the type of payload correctly.
   if ((rep != NULL) && (rep->type == OC_REP_BOOL)) {
     PRINT("  post_dpa_417_61 received : %d\n", rep->value.boolean);
     g_mystate = rep->value.boolean;
