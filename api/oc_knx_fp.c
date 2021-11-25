@@ -288,7 +288,7 @@ oc_core_find_next_group_object_table_index(int group_address, int cur_index)
   if (cur_index == -1) {
     return -1;
   }
-  
+
   int i, j;
   for (i = cur_index; i < GAMT_MAX_ENTRIES; i++) {
 
@@ -302,7 +302,6 @@ oc_core_find_next_group_object_table_index(int group_address, int cur_index)
   }
   return -1;
 }
-
 
 oc_string_t
 oc_core_find_group_object_table_url_from_index(int index)

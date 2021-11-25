@@ -1373,7 +1373,7 @@ typedef enum {
 /**
  * parsed entry of a cbor object
  * This represents a link list of response values
- * one can iterate over the responses to find values by 
+ * one can iterate over the responses to find values by
  *   - tag name or tag identifier
  *       when the tag name is NULL then the tag identifier is being used.
  *   - type of the value
@@ -1398,7 +1398,7 @@ typedef struct oc_rep_s
 // internal function
 void oc_rep_set_pool(struct oc_memb *rep_objects_pool);
 
-// internal function 
+// internal function
 int oc_parse_rep(const uint8_t *payload, int payload_size,
                  oc_rep_t **value_list);
 
