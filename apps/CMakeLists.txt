@@ -62,6 +62,8 @@ target_link_libraries(LSAB_minimal_pi
     )
 file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/LSAB_minimal_pi_creds)
 
+# Python script that corresponds to the executable must be copied to the same folder
+file(COPY ${PROJECT_SOURCE_DIR}/lsab_minimal.py DESTINATION ${PROJECT_BINARY_DIR})
 
 # copy credentials, used by example applications.
 add_custom_target(copy-pki-certs ALL

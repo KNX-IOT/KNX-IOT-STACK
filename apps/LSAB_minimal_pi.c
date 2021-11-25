@@ -154,7 +154,7 @@ app_init(void)
   return ret;
 }
 
-PyObject *pModule, *pPrintFromPythonFunc;
+PyObject *pModule, *pPrintInPythonFunc;
 void python_binding_init(void)
 {
   Py_Initialize();
@@ -173,14 +173,14 @@ void python_binding_init(void)
 
   if (pModule)
   {
-    pPrintFromPythonFunc = PyObject_GetAttrString(pModule, "print_in_python");
+    pPrintInPythonFunc = PyObject_GetAttrString(pModule, "print_in_python");
 
-    if (pPrintFromPythonFunc && PyCallable_Check(pPrintFromPythonFunc))
+    if (pPrintInPythonFunc && PyCallable_Check(pPrintInPythonFunc))
     {
       PRINT("Python binding was successful!\n");
 
       // let's test the function
-      PyObject *pValue = PyObject_CallObject(pPrintFromPythonFunc, NULL);
+      PyObject *pValue = PyObject_CallObject(pPrintInPythonFunc, NULL);
     }
   }
   else
