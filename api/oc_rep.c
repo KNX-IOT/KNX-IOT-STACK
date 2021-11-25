@@ -1010,7 +1010,7 @@ oc_rep_to_json_format(oc_rep_t *rep, char *buf, size_t buf_size, int tab_depth,
           : snprintf(buf, buf_size, "\"%s\":", oc_string(rep->name));
       OC_JSON_UPDATE_BUFFER_AND_TOTAL;
     } else {
-      if (rep->iname > 0) {
+      if (rep->iname >= 0 && tab_depth > 0) {
         num_char_printed = (pretty_print)
                              ? snprintf(buf, buf_size, "\"%d\" : ", rep->iname)
                              : snprintf(buf, buf_size, "\"%d\":", rep->iname);
