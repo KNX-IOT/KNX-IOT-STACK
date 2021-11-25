@@ -177,16 +177,16 @@ void python_binding_init(void)
 
     if (pPrintInPythonFunc && PyCallable_Check(pPrintInPythonFunc))
     {
-      PRINT("Python binding was successful!\n");
-
-      // let's test the function
+      // Ensure that the Python embedding is successful
       PyObject *pValue = PyObject_CallObject(pPrintInPythonFunc, NULL);
     }
   }
   else
   {
+
     PyErr_Print();
     fprintf(stderr, "Failed to load lsab_minimal\n");
+    fprintf(stderr, "Please ensure that lsab_minimal.py is in the directory you are running this executable from!\n");
     exit(1);
   }
 }

@@ -62,6 +62,16 @@ target_link_libraries(LSAB_minimal_pi
     )
 file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/LSAB_minimal_pi_creds)
 
+add_custom_target(lsab_minimal_py)
+add_custom_command(
+    TARGET lsab_minimal_py POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy 
+    ${PROJECT_SOURCE_DIR}/lsab_minimal.py
+    ${PROJECT_BINARY_DIR}/lsab_minimal.py
+)
+
+add_dependencies(LSAB_minimal_pi lsab_minimal_py)
+
 # Python script that corresponds to the executable must be copied to the same folder
 file(COPY ${PROJECT_SOURCE_DIR}/lsab_minimal.py DESTINATION ${PROJECT_BINARY_DIR})
 
