@@ -223,8 +223,16 @@ post_dpa_421_61(oc_request_t *request, oc_interface_mask_t interfaces,
   (void)user_data;
   bool error_state = false;
   PRINT("-- Begin post_dpa_421_61:\n");
+  oc_rep_t *rep = NULL;
 
-  oc_rep_t *rep = request->request_payload;
+  if (oc_is_s_mode_request(request)) {
+    PRINT(" S-MODE\n");
+
+    rep = oc_s_mode_get_value(request);
+
+  } else {
+    rep = request->request_payload;
+  }
   if ((rep != NULL) && (rep->type == OC_REP_BOOL)) {
     PRINT("  post_dpa_421_61 received : %d\n", rep->value.boolean);
     g_mystate = rep->value.boolean;
@@ -261,7 +269,7 @@ register_resources(void)
   PRINT("Register Resource with local path \"/p/push\"\n");
 
   oc_resource_t *res_pushbutton =
-    oc_new_resource("push button", "p/push", 2, 0);
+  oc_new_resource("push button", "p/push", 2, 0);
   oc_resource_bind_resource_type(res_pushbutton, "urn:knx:dpa.421.61");
   oc_resource_bind_resource_type(res_pushbutton, "DPT_Switch");
   oc_resource_bind_content_type(res_pushbutton, APPLICATION_CBOR);
