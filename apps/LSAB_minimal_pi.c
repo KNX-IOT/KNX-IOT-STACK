@@ -154,6 +154,43 @@ app_init(void)
   return ret;
 }
 
+PyObject *pModule, *pPrintFromPythonFunc;
+void python_binding_init(void)
+{
+  Py_Initialize();
+
+  // Import the Python module that talks to the Displayotron HAT
+  PyObject *pName = PyUnicode_DecodeFSDefault("lsab_minimal");
+
+  // Add current directory to Python path, so that we may import the module
+  // located in the same folder as the executable
+  PyRun_SimpleString("import sys");
+  PyRun_SimpleString("import os");
+  PyRun_SimpleString("sys.path.append(os.getcwd())");
+
+  pModule = PyImport_Import(pName);
+  Py_DECREF(pName);
+
+  if (pModule)
+  {
+    pPrintFromPythonFunc = PyObject_GetAttrString(pModule, "print_in_python");
+
+    if (pPrintFromPythonFunc && PyCallable_Check(pPrintFromPythonFunc))
+    {
+      PRINT("Python binding was successful!\n");
+
+      // let's test the function
+      PyObject *pValue = PyObject_CallObject(pPrintFromPythonFunc, NULL);
+    }
+  }
+  else
+  {
+    PyErr_Print();
+    fprintf(stderr, "Failed to load lsab_minimal\n");
+    exit(1);
+  }
+}
+
 /** the state of the dpa 417.61 */
 bool g_mystate = false;
 
@@ -383,6 +420,8 @@ oc_ownership_status_cb(const oc_uuid_t *device_uuid, size_t device_index,
 int
 main(void)
 {
+  python_binding_init();
+
   int init;
   oc_clock_time_t next_event;
 
