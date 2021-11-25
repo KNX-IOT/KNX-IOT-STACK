@@ -224,7 +224,18 @@ post_dpa_417_61(oc_request_t *request, oc_interface_mask_t interfaces,
   bool error_state = false;
   PRINT("-- Begin post_dpa_417_61:\n");
 
-  oc_rep_t *rep = request->request_payload;
+  oc_rep_t *rep = NULL;
+  // handle the different requests
+  if (oc_is_s_mode_request(request)) {
+    PRINT(" S-MODE\n");
+    // retrieve the value of the s-mode payload
+    rep = oc_s_mode_get_value(request);
+  } else {
+    // the regular payload
+    rep = request->request_payload;
+  }
+
+  // handle the type of payload correctly.
   if ((rep != NULL) && (rep->type == OC_REP_BOOL)) {
     PRINT("  post_dpa_417_61 received : %d\n", rep->value.boolean);
     g_mystate = rep->value.boolean;
