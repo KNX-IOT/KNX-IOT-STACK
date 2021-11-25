@@ -836,7 +836,7 @@ oc_core_get_resource_by_uri(const char *uri, size_t device)
   }
 #endif /* OC_SECURITY */
   else {
-     return NULL;
+    return NULL;
   }
   size_t res = OCF_D * device + type;
   return &core_resources[res];

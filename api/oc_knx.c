@@ -572,7 +572,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
   }
 
   // handle the request
-  // loop over the group addresses of the /fp/r 
+  // loop over the group addresses of the /fp/r
   PRINT(" .knx : ga %d\n", g_received_notification.ga);
   int index = oc_core_find_group_object_table_index(g_received_notification.ga);
   PRINT(" .knx : index %d\n", index);
@@ -584,8 +584,8 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
   oc_string_t myurl = oc_core_find_group_object_table_url_from_index(index);
   PRINT(" .knx : url %s\n", oc_string(myurl));
 
- // oc_resource_t *my_resource =
- //   oc_core_get_resource_by_uri(oc_string(myurl), device_index);
+  // oc_resource_t *my_resource =
+  //   oc_core_get_resource_by_uri(oc_string(myurl), device_index);
 
   oc_resource_t *my_resource = oc_ri_get_app_resource_by_uri(
     oc_string(myurl), oc_string_len(myurl), device_index);
@@ -961,22 +961,22 @@ oc_knx_set_osn(uint64_t osn)
   g_osn = osn;
 }
 
-
 bool
 oc_is_s_mode_request(oc_request_t *request)
 {
   if (request == NULL) {
     return false;
   }
-  PRINT("  oc_is_s_mode_request %.*s\n", request->uri_path_len, request->uri_path); 
-  if (strncmp(".knx",request->uri_path, request->uri_path_len ) == 0) {
+  PRINT("  oc_is_s_mode_request %.*s\n", request->uri_path_len,
+        request->uri_path);
+  if (strncmp(".knx", request->uri_path, request->uri_path_len) == 0) {
     return true;
   }
   return false;
 }
 
 oc_rep_t *
-oc_s_mode_get_value(oc_request_t *request )
+oc_s_mode_get_value(oc_request_t *request)
 {
 
   /* loop over the request document to parse all the data */
@@ -1005,7 +1005,6 @@ oc_s_mode_get_value(oc_request_t *request )
   }
   return NULL;
 }
-
 
 void
 oc_create_knx_resources(size_t device_index)

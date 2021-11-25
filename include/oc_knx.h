@@ -166,8 +166,6 @@ void oc_knx_set_crc(uint64_t crc);
  */
 void oc_knx_set_osn(uint64_t osn);
 
-
-
 bool oc_is_s_mode_request(oc_request_t *request);
 
 oc_rep_t *oc_s_mode_get_value(oc_request_t *request);

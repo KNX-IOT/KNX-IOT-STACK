@@ -288,7 +288,6 @@ oc_core_find_group_object_table_url_from_index(int index)
   return g_got[index].href;
 }
 
-
 static void
 oc_core_fp_g_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
                          void *data)
@@ -648,13 +647,11 @@ oc_core_find_reciepient_table_index(int group_address)
   return -1;
 }
 
-oc_string_t 
+oc_string_t
 oc_core_find_reciepient_table_url_from_index(int index)
 {
   return g_gpt[index].url;
 }
-
-
 
 static void
 oc_core_fp_p_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,

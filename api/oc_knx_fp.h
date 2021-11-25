@@ -39,8 +39,6 @@ typedef enum {
   OC_CFLAG_INIT = 1 << 5    ///< false = Disable read after initialization.
 } oc_cflag_mask_t;
 
-
-  
 /**
  * @brief Group Object Table Resource (/fp/g)
  *
@@ -87,8 +85,6 @@ typedef struct oc_group_object_table_t
   oc_cflag_mask_t cflags; ///< contents of cflags as bitmap
 } oc_group_object_table_t;
 
-
-
 /**
  * @brief Function point Recipient - Publisher Table Resource (/fp/r) (/fp/p)
  *
@@ -132,12 +128,9 @@ typedef struct oc_group_rp_table_t
   int ga_len;       //< length of the array of ga identifiers
 } oc_group_rp_table_t;
 
-
-
 int oc_core_find_group_object_table_index(int group_address);
 
 oc_string_t oc_core_find_group_object_table_url_from_index(int index);
-
 
 int oc_core_find_reciepient_table_index(int group_address);
 oc_string_t oc_core_find_reciepient_table_url_from_index(int index);
@@ -148,9 +141,6 @@ oc_string_t oc_core_find_reciepient_table_url_from_index(int index);
 @param device index of the device to which the resource are to be created
 */
 void oc_create_knx_fp_resources(size_t device);
-
-
-
 
 #ifdef __cplusplus
 }
