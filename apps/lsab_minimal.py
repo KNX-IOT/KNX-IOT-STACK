@@ -3,4 +3,3 @@ def print_in_python():
 
 def set_backlight(value):
     print("Set backlight to {}".format(value))
-    backlight_state = value

@@ -115,7 +115,12 @@ STATIC CRITICAL_SECTION cs;   /**< event loop variable */
 
 volatile int quit = 0; /**< stop variable, used by handle_signal */
 
-PyObject *pModule, *pPrintInPythonFunc;
+// Python objects used for initialization
+PyObject *pModule;
+
+// Python function for turning the backlight of the LCD on or off.
+// Takes one boolean argument matching the desired state of the backlight
+PyObject *pSetBacklightFunc;
 void python_binding_init(void)
 {
   Py_Initialize();
@@ -134,17 +139,25 @@ void python_binding_init(void)
 
   if (pModule)
   {
-    pPrintInPythonFunc = PyObject_GetAttrString(pModule, "print_in_python");
+    // Import the test function, to check the import is successful
+    // & that we are importing the right script
+    PyObject *pPrintInPythonFunc = PyObject_GetAttrString(pModule, "print_in_python");
 
     if (pPrintInPythonFunc && PyCallable_Check(pPrintInPythonFunc))
     {
       // Ensure that the Python embedding is successful
       PyObject *pValue = PyObject_CallObject(pPrintInPythonFunc, NULL);
     }
+    // Do not need the test function anymore, so we decrement the reference counter
+    // so that the memory for this object can be garbage-collected
+    Py_DECREF(pPrintInPythonFunc);
+
+    // Import the rest of the Python API
+    pSetBacklightFunc = PyObject_GetAttrString(pModule, "set_backlight");
+
   }
   else
   {
-
     PyErr_Print();
     fprintf(stderr, "Failed to load lsab_minimal\n");
     fprintf(stderr, "Please ensure that lsab_minimal.py is in the directory you are running this executable from!\n");
@@ -432,7 +445,6 @@ oc_ownership_status_cb(const oc_uuid_t *device_uuid, size_t device_index,
 int
 main(void)
 {
-  python_binding_init();
 
   int init;
   oc_clock_time_t next_event;
@@ -486,6 +498,8 @@ main(void)
 
   oc_set_factory_presets_cb(factory_presets_cb, NULL);
 
+  // Start the embedded Python interpreter and initialize the Python API
+  python_binding_init();
   /* start the stack */
   init = oc_main_init(&handler);
 
