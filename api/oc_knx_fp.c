@@ -63,113 +63,8 @@ typedef struct oc_group_address_mapping_table_t
 #define GAMT_MAX_ENTRIES 20
 oc_group_address_mapping_table_t g_groups[GAMT_MAX_ENTRIES];
 
-/**
- * @brief cflag masks
- *
- *
- *
- */
-typedef enum {
-  OC_CFLAG_NONE = 0,       ///< Communication
-  OC_CFLAG_READ = 1 << 1,  ///< false = Group Object value cannot be read.
-  OC_CFLAG_WRITE = 1 << 2, ///< false = Group Object value cannot be written
-  OC_CFLAG_TRANSMISSION =
-    1 << 3,                 ///< false = Group Object value is not transmitted.
-  OC_CFLAG_UPDATE = 1 << 4, ///< false = Group Object value is not updated.
-  OC_CFLAG_INIT = 1 << 5    ///< false = Disable read after initialization.
-} oc_cflag_mask_t;
-
-/**
- * @brief Group Object Table Resource (/fp/g)
- *
- * array of objects (as json)
- * [
- *    {
- *        "id": "1",
- *        "href":"/LDSB1/SOO",
- *        "ga":[2305, 2401],
- *        "cflag":["r","w","t","u"]
- *    },
- *    {
- *        "id": "2",
- *        "href":"/LDSB1/RSC",
- *        "ga":[2306],
- *        "cflag":["t"]
- *     }
- * ]
- *
- * cflag translation
- * | string | Integer Value |
- * | ------ | ------------- |
- * | r      | 1             |
- * | w      | 2             |
- * | t      | 3             |
- * | u      | 4             |
- * | i      | 5             |
-
- * Key translation
- * | Json Key | Integer Value |
- * | -------- | ------------- |
- * | id       | 0             |
- * | href     | 11            |
- * | ga       | 7             |
- * | cflag    | 8             |
- *
- */
-typedef struct oc_group_object_table_t
-{
-  int id;                 ///< contents of id
-  oc_string_t href;       ///<  contents of href
-  int *ga;                ///< array of integers
-  int ga_len;             //< length of the array of ga identifiers
-  oc_cflag_mask_t cflags; ///< contents of cflags as bitmap
-} oc_group_object_table_t;
-
 #define GOT_MAX_ENTRIES 20
 oc_group_object_table_t g_got[GOT_MAX_ENTRIES];
-
-/**
- * @brief Function point Recipient - Publisher Table Resource (/fp/r) (/fp/p)
- *
- * the same table is used for recipient and publisher.
- * the only difference is the confirmable/not confirmable sending.
- *
- * array of objects (as json)
- * [
- *    {
- *        "id": "1",
- *        ia": "<knx-installation-id>.<recipient’s IA>",
- *        "ga":[2305, 2401],
- *        "path": ".knx",
- *    },
- *    {
- *        "id": "2",
- *        "url": "coap://<IP multicast, unicast address or fqdn>/<path>",
- *        "ga": [2305, 2306, 2307, 2308]
- *     }
- * ]
- *
- * Key translation
- * | Json Key | Integer Value |
- * | -------- | ------------- |
- * | id       | 0             |
- * | ia       | 12            |
- * | path     | 112           |
- * | url      | 10            |
- * | ga       | 7             |
- * | con      | -             |
- *
- */
-typedef struct oc_group_rp_table_t
-{
-  int id;           ///< contents of id
-  oc_string_t ia;   ///< contents of ia
-  oc_string_t path; ///< contents of path
-  oc_string_t url;  ///< contents of url
-  bool con;         ///< confirmed message, default = false
-  int *ga;          ///< array of integers
-  int ga_len;       //< length of the array of ga identifiers
-} oc_group_rp_table_t;
 
 #define GPT_MAX_ENTRIES 20
 oc_group_rp_table_t g_gpt[GPT_MAX_ENTRIES];
@@ -370,6 +265,28 @@ find_id_storage_index(oc_rep_t *object)
 }
 
 // -----------------------------------------------------------------------------
+int
+oc_core_find_group_object_table_index(int group_address)
+{
+  int i, j;
+  for (i = 0; i < GAMT_MAX_ENTRIES; i++) {
+
+    if (g_got[i].ga_len != 0) {
+      for (j = 0; j < g_got[i].ga_len; j++) {
+        if (group_address == g_got[i].ga[j]) {
+          return i;
+        }
+      }
+    }
+  }
+  return -1;
+}
+
+oc_string_t
+oc_core_find_group_object_table_url_from_index(int index)
+{
+  return g_got[index].href;
+}
 
 static void
 oc_core_fp_g_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
@@ -392,9 +309,9 @@ oc_core_fp_g_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   /* example entry: </fp/g/1>;ct=50 */
   for (i = 0; i < GAMT_MAX_ENTRIES; i++) {
 
-    if (g_got[i].ga_len != 0) {
+    if (g_got[i].ga_len > 0) {
       // index  in use
-
+      PRINT("  . adding %d\n", i);
       if (response_length > 0) {
         length = oc_rep_add_line_to_buffer(",\n");
         response_length += length;
@@ -457,6 +374,7 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
         oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
         return;
       }
+      PRINT("  storing at %d\n", index);
 
       object = rep->value.object;
 
@@ -525,10 +443,11 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
             if (g_got[index].ga != 0) {
               free(g_got[index].ga);
             }
+            PRINT("  ga size %d\n", array_size);
             g_got[index].ga_len = array_size;
             g_got[index].ga = new_array;
           }
-        } break;
+        }
 #endif
           if (object->iname == 8) {
             // g_got[index].id = object->value.integer;
@@ -562,6 +481,7 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
             if (g_got[index].ga != 0) {
               free(g_got[index].ga);
             }
+            PRINT("  storing index %d length %d", index, array_size);
             g_got[index].ga_len = array_size;
             g_got[index].ga = new_array;
           }
@@ -709,6 +629,29 @@ oc_create_fp_g_x_resource(int resource_idx, size_t device)
 }
 
 // ----------------------------------------------------------------------------
+
+int
+oc_core_find_reciepient_table_index(int group_address)
+{
+  int i, j;
+  for (i = 0; i < GAMT_MAX_ENTRIES; i++) {
+
+    if (g_gpt[i].ga_len != 0) {
+      for (j = 0; j < g_gpt[i].ga_len; j++) {
+        if (group_address == g_gpt[i].ga[j]) {
+          return i;
+        }
+      }
+    }
+  }
+  return -1;
+}
+
+oc_string_t
+oc_core_find_reciepient_table_url_from_index(int index)
+{
+  return g_gpt[index].url;
+}
 
 static void
 oc_core_fp_p_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,

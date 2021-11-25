@@ -16,6 +16,7 @@
 
 #include "oc_api.h"
 #include "oc_knx.h"
+#include "oc_knx_fp.h"
 #include "oc_core_res.h"
 #include <stdio.h>
 #include "oc_rep.h" // should not be needed
@@ -480,6 +481,9 @@ oc_core_knx_knx_get_handler(oc_request_t *request,
   PRINT("oc_core_knx_knx_get_handler - done\n");
 }
 
+/*
+ {sia: 5678, st: write, ga: 1, value: 100 }
+*/
 static void
 oc_core_knx_knx_post_handler(oc_request_t *request,
                              oc_interface_mask_t iface_mask, void *data)
@@ -502,9 +506,8 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
     return;
   }
 
-  /* loop over the request document to check if all inputs are ok */
+  /* loop over the request document to parse all the data */
   rep = request->request_payload;
-
   while (rep != NULL) {
     switch (rep->type) {
     case OC_REP_OBJECT: {
@@ -568,11 +571,28 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
     rep = rep->next;
   }
 
-  /* input was set, so create the response*/
-  // if (changed == true) {
-  // oc_rep_start_root_object();
-  // oc_rep_i_set_text_string(root, 3, oc_core_get_lsm_as_string(device->lsm));
-  // oc_rep_end_root_object();
+  // handle the request
+  // loop over the group addresses of the /fp/r
+  PRINT(" .knx : ga %d\n", g_received_notification.ga);
+  int index = oc_core_find_group_object_table_index(g_received_notification.ga);
+  PRINT(" .knx : index %d\n", index);
+  if (index == -1) {
+    oc_send_cbor_response(request, OC_STATUS_CHANGED);
+    return;
+  }
+
+  oc_string_t myurl = oc_core_find_group_object_table_url_from_index(index);
+  PRINT(" .knx : url %s\n", oc_string(myurl));
+
+  // oc_resource_t *my_resource =
+  //   oc_core_get_resource_by_uri(oc_string(myurl), device_index);
+
+  oc_resource_t *my_resource = oc_ri_get_app_resource_by_uri(
+    oc_string(myurl), oc_string_len(myurl), device_index);
+
+  if (my_resource != NULL) {
+    my_resource->post_handler.cb(request, iface_mask, data);
+  }
 
   oc_send_cbor_response(request, OC_STATUS_CHANGED);
 }
@@ -939,6 +959,51 @@ void
 oc_knx_set_osn(uint64_t osn)
 {
   g_osn = osn;
+}
+
+bool
+oc_is_s_mode_request(oc_request_t *request)
+{
+  if (request == NULL) {
+    return false;
+  }
+  PRINT("  oc_is_s_mode_request %.*s\n", request->uri_path_len,
+        request->uri_path);
+  if (strncmp(".knx", request->uri_path, request->uri_path_len) == 0) {
+    return true;
+  }
+  return false;
+}
+
+oc_rep_t *
+oc_s_mode_get_value(oc_request_t *request)
+{
+
+  /* loop over the request document to parse all the data */
+  oc_rep_t *rep = request->request_payload;
+  while (rep != NULL) {
+    switch (rep->type) {
+    case OC_REP_OBJECT: {
+      // find the storage index, e.g. for this object
+      oc_rep_t *object = rep->value.object;
+
+      object = rep->value.object;
+      while (object != NULL) {
+        // search for "value" (1)
+        if (object->iname == 1) {
+          return object;
+        }
+        object = object->next;
+      }
+    }
+    case OC_REP_NIL:
+      break;
+    default:
+      break;
+    }
+    rep = rep->next;
+  }
+  return NULL;
 }
 
 void
