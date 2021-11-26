@@ -20,6 +20,7 @@
 #endif
 
 #include "oc_api.h"
+#include "oc_knx.h"
 #include "port/oc_clock.h"
 #include <signal.h>
 #include <stdio.h>
@@ -155,12 +156,69 @@ discovery(const char *payload, int len, oc_endpoint_t *endpoint,
   return OC_STOP_DISCOVERY;
 }
 
+
+/* send a multicast s-mode message */
+static void 
+issue_requests_s_mode(void)
+{
+  int scope = 5;
+  PRINT(" issue_requests_s_mode\n");
+
+  oc_make_ipv6_endpoint(mcast, IPV6 | DISCOVERY, 5683, 0xff, scope, 0, 0, 0, 0,
+                        0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0xfd);
+
+  oc_group_object_notification_t send_notification;
+  send_notification.ga = 1;
+  send_notification.sia = 1;
+  //send_notification.st = 
+  bool value = true;
+
+
+  if (oc_init_put("/.knx", &mcast, NULL, NULL, HIGH_QOS,
+                  NULL)) {
+
+    /*
+    { 5: { 6: <st>, 7: <ga>, 1: <value> } } 
+    
+    */
+
+    oc_rep_begin_root_object();
+    oc_rep_i_set_key(&root_map, 5);
+    CborEncoder value_map;
+    cbor_encoder_create_map(&root_map, &value_map, CborIndefiniteLength);
+
+    oc_rep_i_set_int(value, 4, send_notification.sia);
+    // ga
+    oc_rep_i_set_int(value, 7, send_notification.ga);
+    // st M Service type code(write = w, read = r, response = rp) Enum : w, r,
+    // rp
+    //oc_rep_i_set_text_string(value, 6, oc_string(send_notification.st));
+
+    oc_rep_i_set_boolean(value, 1, value);
+
+    cbor_encoder_close_container_checked(&root_map, &value_map);
+
+    oc_rep_end_root_object();
+
+
+    if (oc_do_put_ex(APPLICATION_CBOR, APPLICATION_CBOR)) {
+      PRINT("  Sent PUT request\n");
+    } else {
+      PRINT("  Could not send PUT request\n");
+    }
+  }
+
+
+}
+
+/* do normal discovery */
 static void
 issue_requests(void)
 {
   PRINT("Discovering devices:\n");
 
   oc_do_wk_discovery_all("rt=urn:knx:dpa.*", 0x2, &discovery, NULL);
+
 }
 
 #ifdef WIN32
@@ -202,9 +260,19 @@ handle_signal(int signal)
 }
 
 int
-main(void)
+main(int argc, char *argv[])
 {
   int init;
+  //bool do_send_s_mode = false;
+  bool do_send_s_mode = true;
+
+  for (int i = 0; i < argc; i++) {
+    printf("argv[%d] = %s\n", i, argv[i]);
+  }
+  if (argc > 1) {
+    PRINT("s-mode: %s\n", argv[1]);
+    do_send_s_mode = true;
+  }
 
   PRINT("Simple Client:\n");
 
@@ -225,9 +293,17 @@ main(void)
   sigaction(SIGINT, &sa, NULL);
 #endif
 
-  static const oc_handler_t handler = { .init = app_init,
+
+ // static const oc_handler_t handler = { .init = app_init,
+  static  oc_handler_t handler = { .init = app_init,
                                         .signal_event_loop = signal_event_loop,
                                         .requests_entry = issue_requests };
+
+  
+  if (do_send_s_mode) {
+
+    handler.requests_entry = issue_requests_s_mode;
+  }
 
   oc_clock_time_t next_event;
 
