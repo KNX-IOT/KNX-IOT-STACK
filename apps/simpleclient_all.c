@@ -156,6 +156,16 @@ discovery(const char *payload, int len, oc_endpoint_t *endpoint,
   return OC_STOP_DISCOVERY;
 }
 
+oc_group_object_notification_t g_send_notification;
+bool g_bool_value = false;
+int g_int_value = 1;
+int g_float_value = 1.0;
+
+// 0 == boolean
+// 1 == int
+// 2 == float
+int g_value_type = 0;
+
 /* send a multicast s-mode message */
 static void
 issue_requests_s_mode(void)
@@ -166,17 +176,10 @@ issue_requests_s_mode(void)
   oc_make_ipv6_endpoint(mcast, IPV6 | DISCOVERY, 5683, 0xff, scope, 0, 0, 0, 0,
                         0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0xfd);
 
-  oc_group_object_notification_t send_notification;
-  send_notification.ga = 1;
-  send_notification.sia = 1;
-  // send_notification.st =
-  bool value = true;
-
-  if (oc_init_put("/.knx", &mcast, NULL, NULL, HIGH_QOS, NULL)) {
+  if (oc_init_post("/.knx", &mcast, NULL, NULL, HIGH_QOS, NULL)) {
 
     /*
     { 5: { 6: <st>, 7: <ga>, 1: <value> } }
-
     */
 
     oc_rep_begin_root_object();
@@ -184,14 +187,15 @@ issue_requests_s_mode(void)
     CborEncoder value_map;
     cbor_encoder_create_map(&root_map, &value_map, CborIndefiniteLength);
 
-    oc_rep_i_set_int(value, 4, send_notification.sia);
+    oc_rep_i_set_int(value, 4, g_send_notification.sia);
     // ga
-    oc_rep_i_set_int(value, 7, send_notification.ga);
+    oc_rep_i_set_int(value, 7, g_send_notification.ga);
     // st M Service type code(write = w, read = r, response = rp) Enum : w, r,
     // rp
     // oc_rep_i_set_text_string(value, 6, oc_string(send_notification.st));
-
-    oc_rep_i_set_boolean(value, 1, value);
+    if (g_value_type == 0) {
+      oc_rep_i_set_boolean(value, 1, g_bool_value);
+    }
 
     cbor_encoder_close_container_checked(&root_map, &value_map);
 
@@ -200,7 +204,7 @@ issue_requests_s_mode(void)
     if (oc_do_put_ex(APPLICATION_CBOR, APPLICATION_CBOR)) {
       PRINT("  Sent PUT request\n");
     } else {
-      PRINT("  Could not send PUT request\n");
+      PRINT("  Could not send POST request\n");
     }
   }
 }
@@ -256,15 +260,37 @@ int
 main(int argc, char *argv[])
 {
   int init;
-  // bool do_send_s_mode = false;
-  bool do_send_s_mode = true;
+  bool do_send_s_mode = false;
 
   for (int i = 0; i < argc; i++) {
     printf("argv[%d] = %s\n", i, argv[i]);
   }
   if (argc > 1) {
     PRINT("s-mode: %s\n", argv[1]);
-    do_send_s_mode = true;
+    if (strcmp(argv[1], "s-mode") == 0) {
+      do_send_s_mode = true;
+    }
+  }
+  if (argc > 2) {
+    g_send_notification.ga = atoi(argv[2]);
+    PRINT(" group address : %s [%d]\n", argv[2], g_send_notification.ga);
+  }
+
+  if (argc > 3) {
+    if (strcmp(argv[1], "boolean") == 0) {
+      g_value_type = 0;
+    }
+    PRINT(" value type : %s [%d]\n", argv[3], g_value_type);
+  }
+  if (argc > 3) {
+    PRINT(" value type : %s\n", argv[4]);
+    if (g_value_type == 0) {
+      g_bool_value = false;
+      if (strcmp(argv[4], "true") == 0) {
+        g_bool_value = true;
+        PRINT(" value type : %s [%d]\n", argv[4], g_bool_value);
+      }
+    }
   }
 
   PRINT("Simple Client:\n");
