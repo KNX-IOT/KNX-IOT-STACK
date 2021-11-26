@@ -282,7 +282,7 @@ main(int argc, char *argv[])
     }
     PRINT(" value type : %s [%d]\n", argv[3], g_value_type);
   }
-  if (argc > 3) {
+  if (argc > 4) {
     PRINT(" value type : %s\n", argv[4]);
     if (g_value_type == 0) {
       g_bool_value = false;
