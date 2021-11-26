@@ -156,9 +156,8 @@ discovery(const char *payload, int len, oc_endpoint_t *endpoint,
   return OC_STOP_DISCOVERY;
 }
 
-
 /* send a multicast s-mode message */
-static void 
+static void
 issue_requests_s_mode(void)
 {
   int scope = 5;
@@ -170,16 +169,14 @@ issue_requests_s_mode(void)
   oc_group_object_notification_t send_notification;
   send_notification.ga = 1;
   send_notification.sia = 1;
-  //send_notification.st = 
+  // send_notification.st =
   bool value = true;
 
-
-  if (oc_init_put("/.knx", &mcast, NULL, NULL, HIGH_QOS,
-                  NULL)) {
+  if (oc_init_put("/.knx", &mcast, NULL, NULL, HIGH_QOS, NULL)) {
 
     /*
-    { 5: { 6: <st>, 7: <ga>, 1: <value> } } 
-    
+    { 5: { 6: <st>, 7: <ga>, 1: <value> } }
+
     */
 
     oc_rep_begin_root_object();
@@ -192,7 +189,7 @@ issue_requests_s_mode(void)
     oc_rep_i_set_int(value, 7, send_notification.ga);
     // st M Service type code(write = w, read = r, response = rp) Enum : w, r,
     // rp
-    //oc_rep_i_set_text_string(value, 6, oc_string(send_notification.st));
+    // oc_rep_i_set_text_string(value, 6, oc_string(send_notification.st));
 
     oc_rep_i_set_boolean(value, 1, value);
 
@@ -200,15 +197,12 @@ issue_requests_s_mode(void)
 
     oc_rep_end_root_object();
 
-
     if (oc_do_put_ex(APPLICATION_CBOR, APPLICATION_CBOR)) {
       PRINT("  Sent PUT request\n");
     } else {
       PRINT("  Could not send PUT request\n");
     }
   }
-
-
 }
 
 /* do normal discovery */
@@ -218,7 +212,6 @@ issue_requests(void)
   PRINT("Discovering devices:\n");
 
   oc_do_wk_discovery_all("rt=urn:knx:dpa.*", 0x2, &discovery, NULL);
-
 }
 
 #ifdef WIN32
@@ -263,7 +256,7 @@ int
 main(int argc, char *argv[])
 {
   int init;
-  //bool do_send_s_mode = false;
+  // bool do_send_s_mode = false;
   bool do_send_s_mode = true;
 
   for (int i = 0; i < argc; i++) {
@@ -293,13 +286,11 @@ main(int argc, char *argv[])
   sigaction(SIGINT, &sa, NULL);
 #endif
 
+  // static const oc_handler_t handler = { .init = app_init,
+  static oc_handler_t handler = { .init = app_init,
+                                  .signal_event_loop = signal_event_loop,
+                                  .requests_entry = issue_requests };
 
- // static const oc_handler_t handler = { .init = app_init,
-  static  oc_handler_t handler = { .init = app_init,
-                                        .signal_event_loop = signal_event_loop,
-                                        .requests_entry = issue_requests };
-
-  
   if (do_send_s_mode) {
 
     handler.requests_entry = issue_requests_s_mode;
