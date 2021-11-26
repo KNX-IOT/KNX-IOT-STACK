@@ -167,9 +167,8 @@ int g_float_value = 1.0;
 // 2 == float
 int g_value_type = 0;
 
-
 /* send a multicast s-mode message */
-static void 
+static void
 issue_requests_s_mode(void)
 {
   int scope = 5;
@@ -204,9 +203,8 @@ issue_requests_s_mode(void)
 
     oc_rep_end_root_object();
 
-
-    if (oc_do_post_ex(APPLICATION_CBOR, APPLICATION_CBOR)) {
-      PRINT("  Sent POST request\n");
+    if (oc_do_put_ex(APPLICATION_CBOR, APPLICATION_CBOR)) {
+      PRINT("  Sent PUT request\n");
     } else {
       PRINT("  Could not send POST request\n");
     }
@@ -220,7 +218,6 @@ issue_requests(void)
   PRINT("Discovering devices:\n");
 
   oc_do_wk_discovery_all("rt=urn:knx:dpa.*", 0x2, &discovery, NULL);
-
 }
 
 #ifdef WIN32
@@ -266,6 +263,7 @@ main(int argc, char *argv[])
 {
   int init;
   bool do_send_s_mode = false;
+
 
   for (int i = 0; i < argc; i++) {
     printf("argv[%d] = %s\n", i, argv[i]);
@@ -318,13 +316,11 @@ main(int argc, char *argv[])
   sigaction(SIGINT, &sa, NULL);
 #endif
 
+  // static const oc_handler_t handler = { .init = app_init,
+  static oc_handler_t handler = { .init = app_init,
+                                  .signal_event_loop = signal_event_loop,
+                                  .requests_entry = issue_requests };
 
- // static const oc_handler_t handler = { .init = app_init,
-  static  oc_handler_t handler = { .init = app_init,
-                                        .signal_event_loop = signal_event_loop,
-                                        .requests_entry = issue_requests };
-
-  
   if (do_send_s_mode) {
 
     handler.requests_entry = issue_requests_s_mode;
