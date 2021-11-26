@@ -201,7 +201,7 @@ issue_requests_s_mode(void)
 
     oc_rep_end_root_object();
 
-    if (oc_do_put_ex(APPLICATION_CBOR, APPLICATION_CBOR)) {
+    if (oc_do_post_ex(APPLICATION_CBOR, APPLICATION_CBOR)) {
       PRINT("  Sent PUT request\n");
     } else {
       PRINT("  Could not send POST request\n");
