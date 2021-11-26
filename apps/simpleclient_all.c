@@ -161,7 +161,6 @@ bool g_bool_value = false;
 int g_int_value = 1;
 int g_float_value = 1.0;
 
-
 // 0 == boolean
 // 1 == int
 // 2 == float
@@ -177,11 +176,10 @@ issue_requests_s_mode(void)
   oc_make_ipv6_endpoint(mcast, IPV6 | DISCOVERY, 5683, 0xff, scope, 0, 0, 0, 0,
                         0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0xfd);
 
-  if (oc_init_post("/.knx", &mcast, NULL, NULL, HIGH_QOS,
-                  NULL)) {
+  if (oc_init_post("/.knx", &mcast, NULL, NULL, HIGH_QOS, NULL)) {
 
     /*
-    { 5: { 6: <st>, 7: <ga>, 1: <value> } } 
+    { 5: { 6: <st>, 7: <ga>, 1: <value> } }
     */
 
     oc_rep_begin_root_object();
@@ -194,7 +192,7 @@ issue_requests_s_mode(void)
     oc_rep_i_set_int(value, 7, g_send_notification.ga);
     // st M Service type code(write = w, read = r, response = rp) Enum : w, r,
     // rp
-    //oc_rep_i_set_text_string(value, 6, oc_string(send_notification.st));
+    // oc_rep_i_set_text_string(value, 6, oc_string(send_notification.st));
     if (g_value_type == 0) {
       oc_rep_i_set_boolean(value, 1, g_bool_value);
     }
@@ -264,7 +262,6 @@ main(int argc, char *argv[])
   int init;
   bool do_send_s_mode = false;
 
-
   for (int i = 0; i < argc; i++) {
     printf("argv[%d] = %s\n", i, argv[i]);
   }
@@ -295,7 +292,6 @@ main(int argc, char *argv[])
       }
     }
   }
-
 
   PRINT("Simple Client:\n");
 
