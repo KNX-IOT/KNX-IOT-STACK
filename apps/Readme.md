@@ -24,8 +24,11 @@ Server example on Windows & Linux.
 
 Client example on Windows & Linux.
 
-- no KNX application
-- example to send data to other device
+- KNX client application
+   example to send data to other device
+- can discover devices through well-known/core
+- can send s-mode multicast message (on all coap nodes)
+
 
 ### LSAB_minimal_all.c
 
