@@ -19,6 +19,66 @@
 #define STATIC static
 #endif
 
+
+/**
+ * @file
+ *  Demo application; examples for client code
+ */
+/**
+ * ## Application Design
+ *
+ * support functions:
+ *
+ * - app_init
+ *   initializes the stack values.
+ * - register_resources
+ *   function that registers all endpoints,
+ *   e.g. sets the GET/PUT/POST/DELETE
+ *      handlers for each end point
+ *  - register client sequence
+ *
+ * - main
+ *   starts the stack, with the registered resources.
+ *   can be compiled out with NO_MAIN
+ *
+ *  handlers for the implemented methods (get/post):
+ *   - get_[path]
+ *     function that is being called when a GET is called on [path]
+ *     set the global variables in the output
+ *   - post_[path]
+ *     function that is being called when a POST is called on [path]
+ *     checks the input data
+ *     if input data is correct
+ *       updates the global variables
+ *
+ * ## stack specific defines
+ *
+ *  - OC_SECURITY
+      enable security
+ * - __linux__
+ *   build for linux
+ * - WIN32
+ *   build for windows
+ *
+ * ## File specific defines
+ *
+ * - NO_MAIN
+ *   compile out the function main()
+ *
+ * # Usage
+ * Application can be used in 2 ways:
+ * - discovery of resources through well-known/core
+ *   this kicks off a sequence of commands (next one triggered on the previous response):
+ *   - issues a GET on /dev of the discovered device
+ *   - issues a PUT on /dev/pm
+ *     Note that performing a POST is identical as PUT.
+ * - issuing a multicast s-mode commands
+ *   issued through all coap nodes/.knx 
+ *   typical command:
+ *   
+ */
+
+
 #include "oc_api.h"
 #include "oc_knx.h"
 #include "port/oc_clock.h"
@@ -194,7 +254,16 @@ issue_requests_s_mode(void)
     // rp
     // oc_rep_i_set_text_string(value, 6, oc_string(send_notification.st));
     if (g_value_type == 0) {
+      // boolean
       oc_rep_i_set_boolean(value, 1, g_bool_value);
+    }
+    if (g_value_type == 1) {
+      // integer
+      oc_rep_i_set_int(value, 1, (int)g_int_value);
+    }
+    if (g_value_type == 2) {
+      // float
+      oc_rep_i_set_double(value, 1, (double)g_float_value);
     }
 
     cbor_encoder_close_container_checked(&root_map, &value_map);
@@ -256,6 +325,19 @@ handle_signal(int signal)
   quit = 1;
 }
 
+void print_usage(){
+  PRINT("Usage:\n");
+  PRINT("none : issue discovery request and perform a GET on /dev/pm and do an PUT /dev/pm\n");
+  PRINT("-help : this message\n");
+  PRINT("s-mode <group address> <type> <value>\n");
+  PRINT("  <group address> : integer\n");
+  PRINT("  <type> : boolean | int | double\n");
+  PRINT("  <value> : boolean : true | false\n");
+  PRINT("            int : integer e.g. 1 \n");
+  PRINT("            double : double value e.g. 3.14 \n");
+  exit(0);
+}
+
 int
 main(int argc, char *argv[])
 {
@@ -270,6 +352,9 @@ main(int argc, char *argv[])
     if (strcmp(argv[1], "s-mode") == 0) {
       do_send_s_mode = true;
     }
+    if (strcmp(argv[1], "-help") == 0) {
+      print_usage();
+    }
   }
   if (argc > 2) {
     g_send_notification.ga = atoi(argv[2]);
@@ -280,9 +365,16 @@ main(int argc, char *argv[])
     if (strcmp(argv[1], "boolean") == 0) {
       g_value_type = 0;
     }
+    if (strcmp(argv[1], "int") == 0) {
+      g_value_type = 1;
+    }
+    if (strcmp(argv[1], "double") == 0) {
+      g_value_type = 2;
+    }
     PRINT(" value type : %s [%d]\n", argv[3], g_value_type);
+
   }
-  if (argc > 3) {
+  if (argc > 4) {
     PRINT(" value type : %s\n", argv[4]);
     if (g_value_type == 0) {
       g_bool_value = false;
@@ -290,6 +382,17 @@ main(int argc, char *argv[])
         g_bool_value = true;
         PRINT(" value type : %s [%d]\n", argv[4], g_bool_value);
       }
+    }
+    if (g_value_type == 1) {
+      // integer
+      g_int_value = atoi(argv[4]);
+      PRINT(" value type : %s [%d]\n", argv[4], g_int_value);
+    }
+
+    if (g_value_type == 1) {
+      // double
+      g_float_value = atof(argv[4]);
+      PRINT(" value type : %s [%d]\n", argv[4], g_float_value);
     }
   }
 
