@@ -2,17 +2,9 @@
 
 static int numargs=0;
 
-/* Return the number of arguments of the application command line 
-static PyObject*
-emb_numargs(PyObject *self, PyObject *args)
-{
-    if(!PyArg_ParseTuple(args, ":numargs"))
-        return NULL;
-    return PyLong_FromLong(numargs);
-}
-*/
-
-/* Action to take on left button press */
+// Action to take on left button press
+// This is exposed in the corresponding Python script
+// as the knx.handle_left() function
 static PyObject*
 knx_handle_left(PyObject *self, PyObject *args)
 {
@@ -23,12 +15,15 @@ knx_handle_left(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
+// Definition of the methods within the knx module.
+// Extend this array if you need to add more Python->C functions
 static PyMethodDef KnxMethods[] = {
-    {"handle_left", knx_handle_left, METH_VARARGS,
+    {"handle_left", knx_handle_left, METH_NOARGS,
      "Inform the KNX stack that the left button has been pressed."},
     {NULL, NULL, 0, NULL}
 };
 
+// Boilerplate to initialize the knx module
 static PyModuleDef KnxModule = {
     PyModuleDef_HEAD_INIT, "knx", NULL, -1, KnxMethods,
     NULL, NULL, NULL, NULL
@@ -41,6 +36,7 @@ PyInit_knx(void)
 }
 
 int main(void) {
+    // Make Python aware of the knx module defined by KnxModule and KnxMethods
 	PyImport_AppendInittab("knx", PyInit_knx);
 
 	Py_Initialize();
@@ -53,11 +49,15 @@ int main(void) {
     PyObject *pModule = PyImport_Import(pName);
     Py_DECREF(pName);
 
+    // initialize the PiHat - prints stuff to the LCD
     PyRun_SimpleString("import simpleclient");
     PyRun_SimpleString("simpleclient.init()");
 
     while(1)
     {
+        // Wait for signals - this is how the button presses are detected
+        // 0.1 is the time to wait for (in seconds), before handing execution
+        // back to C.
         if (PyRun_SimpleString("signal.sigtimedwait([], 0.1)") != 0)
         {
             PyErr_Print();
