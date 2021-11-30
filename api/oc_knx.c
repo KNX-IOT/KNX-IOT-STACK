@@ -1022,15 +1022,15 @@ oc_s_mode_get_value(oc_request_t *request)
   return NULL;
 }
 
-static void oc_issue_s_mode(int sia_value, int group_address, char *rp,
-                            uint8_t *value_data, int value_size)
+static void
+oc_issue_s_mode(int sia_value, int group_address, char *rp, uint8_t *value_data,
+                int value_size)
 {
   int scope = 5;
   PRINT("  oc_issue_s_mode : scope %d\n", scope);
 
   oc_make_ipv6_endpoint(mcast, IPV6 | DISCOVERY | MULTICAST, 5683, 0xff, scope,
-                        0, 0, 0, 0,
-                        0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0xfd);
+                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0xfd);
 
   if (oc_init_post("/.knx", &mcast, NULL, NULL, HIGH_QOS, NULL)) {
 
@@ -1054,7 +1054,8 @@ static void oc_issue_s_mode(int sia_value, int group_address, char *rp,
 
     // set the "value" key
     oc_rep_i_set_key(&value_map, 5);
-    // copy the data, this is already in cbor from the fake response of the resource GET function
+    // copy the data, this is already in cbor from the fake response of the
+    // resource GET function
     oc_rep_encode_raw(value_data, value_size);
 
     cbor_encoder_close_container_checked(&root_map, &value_map);
@@ -1069,16 +1070,16 @@ static void oc_issue_s_mode(int sia_value, int group_address, char *rp,
   }
 }
 
-
 void
-oc_do_s_mode(char *resource_url, char* rp)
+oc_do_s_mode(char *resource_url, char *rp)
 {
 
   if (resource_url == NULL) {
     return;
   }
-  
-  oc_resource_t *my_resource = oc_ri_get_app_resource_by_uri(resource_url, strlen(resource_url), 0);
+
+  oc_resource_t *my_resource =
+    oc_ri_get_app_resource_by_uri(resource_url, strlen(resource_url), 0);
   if (my_resource == NULL) {
     PRINT(" oc_do_s_mode : error no URL found %s\n", resource_url);
     return;
@@ -1092,13 +1093,13 @@ oc_do_s_mode(char *resource_url, char* rp)
   uint8_t *buffer = malloc(100);
   if (!buffer) {
     OC_WRN("oc_do_s_mode: out of memory allocating buffer");
-  }    //! buffer
+  } //! buffer
 
   oc_request_t request = { 0 };
   oc_response_t response = { 0 };
   response.separate_response = 0;
   oc_response_buffer_t response_buffer;
-  //if (!response_buf && resource) {
+  // if (!response_buf && resource) {
   //  OC_DBG("coap_notify_observers: Issue GET request to resource %s\n\n",
   //         oc_string(resource->uri));
   response_buffer.buffer = buffer;
@@ -1134,9 +1135,9 @@ oc_do_s_mode(char *resource_url, char* rp)
   my_resource->get_handler.cb(&request, iface_mask, NULL);
 
   // get the data
-  //int value_size = request.response->response_buffer->buffer_size;
+  // int value_size = request.response->response_buffer->buffer_size;
   int value_size = oc_rep_get_encoded_payload_size();
-  uint8_t* value_data = request.response->response_buffer->buffer;
+  uint8_t *value_data = request.response->response_buffer->buffer;
 
   if (value_size == 0) {
     PRINT(" . ERROR: value size == 0");

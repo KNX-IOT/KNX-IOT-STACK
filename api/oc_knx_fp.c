@@ -306,12 +306,11 @@ oc_core_find_next_group_object_table_index(int group_address, int cur_index)
 oc_string_t
 oc_core_find_group_object_table_url_from_index(int index)
 {
-  //if (index < GAMT_MAX_ENTRIES) {
-    return g_got[index].href;
+  // if (index < GAMT_MAX_ENTRIES) {
+  return g_got[index].href;
   //}
-  //return oc_string_t();
+  // return oc_string_t();
 }
-
 
 int
 oc_core_find_group_object_table_number_group_entries(int index)
@@ -333,14 +332,13 @@ oc_core_find_group_object_table_group_entry(int index, int entry)
   return 0;
 }
 
-
 int
 oc_core_find_group_object_table_url(char *url)
 {
   int i;
   size_t url_len = strlen(url);
   for (i = 0; i < GAMT_MAX_ENTRIES; i++) {
-    if ( (url_len == oc_string_len(g_got[i].href)) &&
+    if ((url_len == oc_string_len(g_got[i].href)) &&
         (strcmp(url, oc_string(g_got[i].href)) == 0)) {
       return i;
     }
@@ -365,7 +363,6 @@ oc_core_find_next_group_object_table_url(char *url, int cur_index)
   }
   return -1;
 }
-
 
 static void
 oc_core_fp_g_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
@@ -1313,7 +1310,7 @@ dummy_test_data()
 {
   oc_new_string(&g_got[0].href, "/p/push", strlen("/p/push"));
   g_got[0].ga_len = 1;
-  
+
   int array_size = 2;
   int *new_array = (int *)malloc(array_size * sizeof(int));
 
@@ -1326,9 +1323,7 @@ dummy_test_data()
   PRINT("  ga size %d\n", array_size);
   g_got[0].ga_len = array_size;
   g_got[0].ga = new_array;
-
 }
-
 
 void
 oc_create_knx_fp_resources(size_t device_index)

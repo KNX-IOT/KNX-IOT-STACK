@@ -313,23 +313,15 @@ initialize_variables(void)
   /* initialize global variables for resources */
 }
 
-
-
-
-
-
-
 /* send a multicast s-mode message */
 static void
 issue_requests_s_mode(void)
 {
 
-   PRINT("TEST TEST \n\n");
+  PRINT("TEST TEST \n\n");
 
-   oc_do_s_mode("/p/push", "w");
+  oc_do_s_mode("/p/push", "w");
 }
-
-
 
 #ifndef NO_MAIN
 #ifdef WIN32
@@ -394,17 +386,16 @@ oc_ownership_status_cb(const oc_uuid_t *device_uuid, size_t device_index,
 }
 #endif /* OC_SECURITY */
 
-
 void
 print_usage()
 {
   PRINT("Usage:\n");
   PRINT("no arguments : starts the server\n");
   PRINT("-help : this message\n");
-  PRINT("s-mode: starts the server and issue a s-mode message at start up according the application/config\n");
+  PRINT("s-mode: starts the server and issue a s-mode message at start up "
+        "according the application/config\n");
   exit(0);
 }
-
 
 /**
  * main application.
@@ -437,7 +428,6 @@ main(int argc, char *argv[])
   sigaction(SIGINT, &sa, NULL);
 #endif
 
-  
   for (int i = 0; i < argc; i++) {
     printf("argv[%d] = %s\n", i, argv[i]);
   }
@@ -474,16 +464,14 @@ main(int argc, char *argv[])
 
   /* initializes the handlers structure */
   STATIC oc_handler_t handler = { .init = app_init,
-                                        .signal_event_loop = signal_event_loop,
-                                        .register_resources = register_resources,
-                                        .requests_entry = issue_requests_s_mode
-  };
+                                  .signal_event_loop = signal_event_loop,
+                                  .register_resources = register_resources,
+                                  .requests_entry = issue_requests_s_mode };
 
   if (do_send_s_mode) {
 
     handler.requests_entry = issue_requests_s_mode;
   }
-
 
   oc_set_factory_presets_cb(factory_presets_cb, NULL);
 
