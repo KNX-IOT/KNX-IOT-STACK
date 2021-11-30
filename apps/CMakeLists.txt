@@ -100,4 +100,5 @@ add_custom_command(
 )
 
 add_dependencies(simpleclient_hat simpleclient_py)
+add_dependencies(simpleclient_hat LSSB_minimal_pi)
 # add_dependencies(kis-port copy-pki-credentials)
