@@ -21,6 +21,8 @@
 
 #define TAGS_AS_STRINGS
 
+#define GOT_STORE "GOT_STORE"
+
 /**
  * @brief Group Address Mapping Table Resource
  *      data for mapping between KNX-IOT and KNX-classic
@@ -567,6 +569,8 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
         default:
           break;
         }
+        oc_print_group_object_table_entry(index);
+        oc_dump_group_object_table_entry(index);
         object = object->next;
       }
     }
@@ -680,17 +684,13 @@ oc_core_fp_g_x_del_handler(oc_request_t *request,
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
+  // delete the entry
+  oc_delete_group_object_table_entry(value);
 
-  g_got[value].id = 0;
-  oc_free_string(&g_got[value].href);
-  oc_new_string(&g_got[value].href, "", 0);
-  free(g_got[value].ga);
-  g_got[value].ga = NULL;
-  // oc_free_int_array(g_got[value].ga);
-  g_got[value].ga_len = 0;
+  // make the deletion persistent
+  oc_dump_group_object_table_entry(value);
 
   PRINT("oc_core_fp_g_x_del_handler - end\n");
-
   oc_send_cbor_response(request, OC_STATUS_DELETED);
 }
 
@@ -1306,23 +1306,161 @@ APPLICATION_LINK_FORMAT, OC_DISCOVERABLE, oc_core_p_get_handler, 0,
 */
 
 void
-dummy_test_data()
+oc_print_group_object_table_entry(int entry)
 {
-  oc_new_string(&g_got[0].href, "/p/push", strlen("/p/push"));
-  g_got[0].ga_len = 1;
 
-  int array_size = 2;
-  int *new_array = (int *)malloc(array_size * sizeof(int));
+  PRINT("  GOT [%d] - %d\n", entry, g_got[entry].ga_len);
+  if (g_got[entry].ga_len == 0) {
+    return;
+  }
 
-  for (int i = 0; i < array_size; i++) {
-    new_array[i] = i;
+  PRINT("    id %d\n", g_got[entry].id);
+  PRINT("    href  %s\n", oc_string(g_got[entry].href));
+  PRINT("    cflags  %d\n", g_got[entry].cflags);
+  PRINT("    ga [");
+  for (int i = 0; i < g_got[entry].ga_len; i++) {
+    PRINT(" %d", g_got[entry].ga[i]);
   }
-  if (g_got[0].ga != 0) {
-    free(g_got[0].ga);
+  PRINT(" ]\n");
+}
+
+void
+oc_dump_group_object_table_entry(int entry)
+{
+  char filename[20];
+  snprintf(filename, 20, "%s_%d", GOT_STORE, entry);
+
+  uint8_t *buf = malloc(OC_MAX_APP_DATA_SIZE);
+  if (!buf)
+    return;
+
+  oc_rep_new(buf, OC_MAX_APP_DATA_SIZE);
+  // write the data
+  oc_rep_begin_root_object();
+  // id 0
+  oc_rep_i_set_int(root, 0, g_got[entry].id);
+  // href- 11
+  oc_rep_i_set_text_string(root, 11, oc_string(g_got[entry].href));
+  // ga - 7
+  oc_rep_i_set_int_array(root, 7, g_got[entry].ga, g_got[entry].ga_len);
+
+  // cflags 8 /// this is different than the response on the wire
+  oc_rep_i_set_int(root, 8, g_got[entry].cflags);
+
+  oc_rep_end_root_object();
+
+  int size = oc_rep_get_encoded_payload_size();
+  if (size > 0) {
+    OC_DBG("dump_got: dumped current state [%s] [%d]: size %d", filename, entry,
+           size);
+    oc_storage_write(filename, buf, size);
   }
-  PRINT("  ga size %d\n", array_size);
-  g_got[0].ga_len = array_size;
-  g_got[0].ga = new_array;
+
+  free(buf);
+}
+
+void
+oc_load_group_object_table_entry(int entry)
+{
+  long ret = 0;
+  char filename[20];
+  snprintf(filename, 20, "%s_%d", GOT_STORE, entry);
+
+  oc_rep_t *rep, *head;
+
+  uint8_t *buf = malloc(OC_MAX_APP_DATA_SIZE);
+  if (!buf) {
+    return;
+  }
+
+  ret = oc_storage_read(filename, buf, OC_MAX_APP_DATA_SIZE);
+  if (ret > 0) {
+    struct oc_memb rep_objects = { sizeof(oc_rep_t), 0, 0, 0, 0 };
+    oc_rep_set_pool(&rep_objects);
+    int err = oc_parse_rep(buf, ret, &rep);
+    head = rep;
+    if (err == 0) {
+      while (rep != NULL) {
+        switch (rep->type) {
+
+        case OC_REP_INT:
+          if (rep->iname == 0) {
+            g_got[entry].id = (int)rep->value.integer;
+          }
+          if (rep->iname == 8) {
+            g_got[entry].cflags = (int)rep->value.integer;
+          }
+          break;
+        case OC_REP_STRING:
+          if (rep->iname == 11) {
+
+            oc_free_string(&g_got[entry].href);
+            oc_new_string(&g_got[entry].href, oc_string(rep->value.string),
+                          oc_string_len(rep->value.string));
+          }
+          break;
+        case OC_REP_INT_ARRAY:
+          if (rep->iname == 7) {
+            int64_t *arr = oc_int_array(rep->value.array);
+            int array_size = (int)oc_int_array_size(rep->value.array);
+            int *new_array = (int *)malloc(array_size * sizeof(int));
+            // int*  new_array;
+            // oc_new_int_array(&new_array, array_size);
+
+            for (int i = 0; i < array_size; i++) {
+              new_array[i] = arr[i];
+            }
+            if (g_got[entry].ga != 0) {
+              free(g_got[entry].ga);
+            }
+            PRINT("  ga size %d\n", array_size);
+            g_got[entry].ga_len = array_size;
+            g_got[entry].ga = new_array;
+          }
+          break;
+        default:
+          break;
+        }
+        rep = rep->next;
+      }
+    }
+    oc_free_rep(head);
+  }
+  free(buf);
+}
+
+void
+oc_load_group_object_table()
+{
+  PRINT("Loading Group Object Table from Persistent storage\n");
+  for (int i = 0; i < GOT_MAX_ENTRIES; i++) {
+    oc_load_group_object_table_entry(i);
+    oc_print_group_object_table_entry(i);
+  }
+}
+
+void
+oc_delete_group_object_table_entry(int entry)
+{
+  g_got[entry].id = 0;
+  oc_free_string(&g_got[entry].href);
+  oc_new_string(&g_got[entry].href, "", 0);
+  free(g_got[entry].ga);
+  g_got[entry].ga = NULL;
+  // oc_free_int_array(g_got[value].ga);
+  g_got[entry].ga_len = 0;
+  g_got[entry].cflags = 0;
+}
+
+void
+oc_delete_group_object_table()
+{
+  PRINT("Deleting Group Object Table from Persistent storage\n");
+  for (int i = 0; i < GOT_MAX_ENTRIES; i++) {
+    oc_delete_group_object_table_entry(i);
+    oc_print_group_object_table_entry(i);
+    oc_dump_group_object_table_entry(i);
+  }
 }
 
 void
@@ -1342,6 +1480,7 @@ oc_create_knx_fp_resources(size_t device_index)
   oc_create_fp_r_resource(OC_KNX_FP_R, device_index);
   oc_create_fp_r_x_resource(OC_KNX_FP_R_X, device_index);
 
+  oc_load_group_object_table();
   //  dummy_test_data();
   // note: /fp does not exist..
   // oc_create_fp_resource(OC_KNX_FP, device_index);
