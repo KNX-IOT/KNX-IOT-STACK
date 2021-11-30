@@ -567,6 +567,8 @@ oc_knx_device_storage_read(size_t device_index)
   char tempstring[20];
   bool pm;
 
+  PRINT("Loading Device Config from Persistent storage\n");
+
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device == NULL) {
     OC_ERR(" could not get device %d\n", device_index)
@@ -576,7 +578,7 @@ oc_knx_device_storage_read(size_t device_index)
   temp_size = oc_storage_read(KNX_STORAGE_IA, (uint8_t *)&ia, sizeof(ia));
   if (temp_size > 0) {
     device->ia = ia;
-    PRINT(" ia (storage) %ld\n", (long)ia);
+    PRINT("  ia (storage) %ld\n", (long)ia);
   }
 
   /* HOST NAME */
@@ -584,7 +586,7 @@ oc_knx_device_storage_read(size_t device_index)
   if (temp_size > 1) {
     tempstring[temp_size] = 0;
     oc_core_set_device_hostname(device_index, tempstring);
-    PRINT(" hostname (storage) %s\n", oc_string(device->hostname));
+    PRINT("  hostname (storage) %s\n", oc_string(device->hostname));
   }
 
   /* KNX_STORAGE_IID */
@@ -592,14 +594,14 @@ oc_knx_device_storage_read(size_t device_index)
   if (temp_size > 1) {
     tempstring[temp_size] = 0;
     oc_core_set_device_iid(device_index, tempstring);
-    PRINT(" idd (storage) %s\n", oc_string(device->iid));
+    PRINT("  idd (storage) %s\n", oc_string(device->iid));
   }
 
   /* KNX_STORAGE_PM */
   temp_size = oc_storage_read(KNX_STORAGE_PM, (uint8_t *)&pm, 1);
   if (temp_size > 0) {
     device->pm = pm;
-    PRINT(" pm (storage) %d\n", device->pm);
+    PRINT("  pm (storage) %d\n", device->pm);
   }
 }
 
@@ -616,6 +618,8 @@ oc_knx_device_storage_reset(size_t device_index)
   oc_storage_write(KNX_STORAGE_IID, (uint8_t *)&buf, 1);
 
   oc_storage_write(KNX_STORAGE_PM, (uint8_t *)0, 0);
+
+  oc_delete_got();
 }
 
 void
@@ -637,4 +641,7 @@ oc_create_knx_device_resources(size_t device_index)
   oc_create_dev_pm_resource(OC_DEV_PM, device_index);
   // should be last of the dev/xxx resources, it will list those.
   oc_create_dev_dev_resource(OC_DEV, device_index);
+
+  //PRINT("reading device storage\n");
+  //oc_knx_device_storage_read(device_index);
 }

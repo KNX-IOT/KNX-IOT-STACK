@@ -569,8 +569,8 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
         default:
           break;
         }
-        oc_print_got(index);
-        oc_dump_got(index);
+        oc_print_got_entry(index);
+        oc_dump_got_entry(index);
         object = object->next;
       }
     }
@@ -685,16 +685,13 @@ oc_core_fp_g_x_del_handler(oc_request_t *request,
     return;
   }
 
-  g_got[value].id = 0;
-  oc_free_string(&g_got[value].href);
-  oc_new_string(&g_got[value].href, "", 0);
-  free(g_got[value].ga);
-  g_got[value].ga = NULL;
-  // oc_free_int_array(g_got[value].ga);
-  g_got[value].ga_len = 0;
+  oc_delete_got_entry(value);
+
+
+  // delete the persistent entry
+  oc_dump_got_entry(value);
 
   PRINT("oc_core_fp_g_x_del_handler - end\n");
-
   oc_send_cbor_response(request, OC_STATUS_DELETED);
 }
 
@@ -1330,7 +1327,7 @@ dummy_test_data()
 }
 
 
-void oc_print_got(entry) {
+void oc_print_got_entry(entry) {
 
   PRINT("  GOT [%d] - %d\n", entry, g_got[entry].ga_len);
   if (g_got[entry].ga_len == 0) {
@@ -1348,7 +1345,7 @@ void oc_print_got(entry) {
 }
 
 void
-oc_dump_got(int entry)
+oc_dump_got_entry(int entry)
 {
   char filename[20];
   snprintf(filename, 20, "%s_%d", GOT_STORE, entry);
@@ -1383,7 +1380,7 @@ oc_dump_got(int entry)
 }
 
 void
-oc_load_got(int entry)
+oc_load_got_entry(int entry)
 {
   long ret = 0;
   char filename[20];
@@ -1453,17 +1450,39 @@ oc_load_got(int entry)
 }
 
 void
-oc_load_all_got()
+oc_load_got()
 {
-  PRINT("Loading Group Object Table from Disk\n");
+  PRINT("Loading Group Object Table from Persistent storage\n");
   for (int i=0; i< GOT_MAX_ENTRIES; i++) {
-    oc_load_got(i);
-    oc_print_got(i);
+    oc_load_got_entry(i);
+    oc_print_got_entry(i);
   }
 
 }
 
+void
+oc_delete_got_entry(int entry)
+{
+  g_got[entry].id = 0;
+  oc_free_string(&g_got[entry].href);
+  oc_new_string(&g_got[entry].href, "", 0);
+  free(g_got[entry].ga);
+  g_got[entry].ga = NULL;
+  // oc_free_int_array(g_got[value].ga);
+  g_got[entry].ga_len = 0;
+  g_got[entry].cflags = 0;
+}
 
+void
+oc_delete_got()
+{
+  PRINT("Deleting Group Object Table from Persistent storage\n");
+  for (int i = 0; i < GOT_MAX_ENTRIES; i++) {
+    oc_delete_got_entry(i);
+    oc_print_got_entry(i);
+    oc_dump_got_entry(i);
+  }
+}
 
 void
 oc_create_knx_fp_resources(size_t device_index)
@@ -1482,7 +1501,7 @@ oc_create_knx_fp_resources(size_t device_index)
   oc_create_fp_r_resource(OC_KNX_FP_R, device_index);
   oc_create_fp_r_x_resource(OC_KNX_FP_R_X, device_index);
 
-  oc_load_all_got();
+  oc_load_got();
   //  dummy_test_data();
   // note: /fp does not exist..
   // oc_create_fp_resource(OC_KNX_FP, device_index);

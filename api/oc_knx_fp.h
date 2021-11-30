@@ -194,10 +194,12 @@ oc_string_t oc_core_find_reciepient_table_url_from_index(int index);
 
 
 
-void oc_print_got(entry);
-void oc_dump_got(int entry);
-void oc_load_got(int entry);
-void oc_load_all_got();
+void oc_print_got_entry(entry);
+void oc_dump_got_entry(int entry);
+void oc_load_got_entry(int entry);
+void oc_load_got();
+void oc_delete_got_entry(int entry);
+void oc_delete_got();
 
 
 /**
