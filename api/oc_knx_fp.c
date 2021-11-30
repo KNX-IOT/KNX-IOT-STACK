@@ -290,7 +290,7 @@ oc_core_find_next_group_object_table_index(int group_address, int cur_index)
   }
 
   int i, j;
-  for (i = cur_index; i < GAMT_MAX_ENTRIES; i++) {
+  for (i = cur_index + 1; i < GAMT_MAX_ENTRIES; i++) {
 
     if (g_got[i].ga_len != 0) {
       for (j = 0; j < g_got[i].ga_len; j++) {
@@ -306,7 +306,62 @@ oc_core_find_next_group_object_table_index(int group_address, int cur_index)
 oc_string_t
 oc_core_find_group_object_table_url_from_index(int index)
 {
+  // if (index < GAMT_MAX_ENTRIES) {
   return g_got[index].href;
+  //}
+  // return oc_string_t();
+}
+
+int
+oc_core_find_group_object_table_number_group_entries(int index)
+{
+  if (index < GAMT_MAX_ENTRIES) {
+    return g_got[index].ga_len;
+  }
+  return 0;
+}
+
+int
+oc_core_find_group_object_table_group_entry(int index, int entry)
+{
+  if (index < GAMT_MAX_ENTRIES) {
+    if (entry < g_got[index].ga_len) {
+      return g_got[index].ga[entry];
+    }
+  }
+  return 0;
+}
+
+int
+oc_core_find_group_object_table_url(char *url)
+{
+  int i;
+  size_t url_len = strlen(url);
+  for (i = 0; i < GAMT_MAX_ENTRIES; i++) {
+    if ((url_len == oc_string_len(g_got[i].href)) &&
+        (strcmp(url, oc_string(g_got[i].href)) == 0)) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+int
+oc_core_find_next_group_object_table_url(char *url, int cur_index)
+{
+  if (cur_index == -1) {
+    return -1;
+  }
+
+  int i;
+  size_t url_len = strlen(url);
+  for (i = cur_index + 1; i < GAMT_MAX_ENTRIES; i++) {
+    if ((url_len == oc_string_len(g_got[i].href)) &&
+        (strcmp(url, oc_string(g_got[i].href)) == 0)) {
+      return i;
+    }
+  }
+  return -1;
 }
 
 static void
@@ -1251,6 +1306,26 @@ APPLICATION_LINK_FORMAT, OC_DISCOVERABLE, oc_core_p_get_handler, 0,
 */
 
 void
+dummy_test_data()
+{
+  oc_new_string(&g_got[0].href, "/p/push", strlen("/p/push"));
+  g_got[0].ga_len = 1;
+
+  int array_size = 2;
+  int *new_array = (int *)malloc(array_size * sizeof(int));
+
+  for (int i = 0; i < array_size; i++) {
+    new_array[i] = i;
+  }
+  if (g_got[0].ga != 0) {
+    free(g_got[0].ga);
+  }
+  PRINT("  ga size %d\n", array_size);
+  g_got[0].ga_len = array_size;
+  g_got[0].ga = new_array;
+}
+
+void
 oc_create_knx_fp_resources(size_t device_index)
 {
   OC_DBG("oc_create_knx_fp_resources");
@@ -1267,6 +1342,7 @@ oc_create_knx_fp_resources(size_t device_index)
   oc_create_fp_r_resource(OC_KNX_FP_R, device_index);
   oc_create_fp_r_x_resource(OC_KNX_FP_R_X, device_index);
 
+  dummy_test_data();
   // note: /fp does not exist..
   // oc_create_fp_resource(OC_KNX_FP, device_index);
 }

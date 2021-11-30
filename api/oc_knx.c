@@ -459,18 +459,21 @@ oc_core_knx_knx_get_handler(oc_request_t *request,
   }
 
   // g_received_notification
+  // { 4: "sia", 5: { 6: "st", 7: "ga", 1: "value" } }
 
   oc_rep_begin_root_object();
-  oc_rep_i_set_key(&root_map, 1);
+  // sia
+  oc_rep_i_set_int(root, 4, g_received_notification.sia);
+
+  oc_rep_i_set_key(&root_map, 5);
   CborEncoder value_map;
   cbor_encoder_create_map(&root_map, &value_map, CborIndefiniteLength);
-  // sia
-  oc_rep_i_set_int(value, 4, g_received_notification.sia);
+
   // ga
   oc_rep_i_set_int(value, 7, g_received_notification.ga);
   // st M Service type code(write = w, read = r, response = rp) Enum : w, r, rp
   oc_rep_i_set_text_string(value, 6, oc_string(g_received_notification.st));
-  // missing s (5) a map
+  // missing value
 
   cbor_encoder_close_container_checked(&root_map, &value_map);
 
@@ -482,7 +485,7 @@ oc_core_knx_knx_get_handler(oc_request_t *request,
 }
 
 /*
- {sia: 5678, st: write, ga: 1, value: 100 }
+ {sia: 5678, es: {st: write, ga: 1, value: 100 }}
 */
 static void
 oc_core_knx_knx_post_handler(oc_request_t *request,
@@ -510,6 +513,12 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
   rep = request->request_payload;
   while (rep != NULL) {
     switch (rep->type) {
+    case OC_REP_INT: {
+      // sia
+      if (rep->iname == 4) {
+        g_received_notification.sia = rep->value.integer;
+      }
+    } break;
     case OC_REP_OBJECT: {
       // find the storage index, e.g. for this object
       oc_rep_t *object = rep->value.object;
@@ -1011,6 +1020,149 @@ oc_s_mode_get_value(oc_request_t *request)
     rep = rep->next;
   }
   return NULL;
+}
+
+static void
+oc_issue_s_mode(int sia_value, int group_address, char *rp, uint8_t *value_data,
+                int value_size)
+{
+  int scope = 5;
+  PRINT("  oc_issue_s_mode : scope %d\n", scope);
+
+  oc_make_ipv6_endpoint(mcast, IPV6 | DISCOVERY | MULTICAST, 5683, 0xff, scope,
+                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0xfd);
+
+  if (oc_init_post("/.knx", &mcast, NULL, NULL, HIGH_QOS, NULL)) {
+
+    /*
+    { 4: <sia>, 5: { 6: <st>, 7: <ga>, 1: <value> } }
+    */
+
+    oc_rep_begin_root_object();
+
+    oc_rep_i_set_int(root, 4, sia_value);
+
+    oc_rep_i_set_key(&root_map, 5);
+    CborEncoder value_map;
+    cbor_encoder_create_map(&root_map, &value_map, CborIndefiniteLength);
+
+    // ga
+    oc_rep_i_set_int(value, 7, group_address);
+    // st M Service type code(write = w, read = r, response = rp) Enum : w, r,
+    // rp
+    oc_rep_i_set_text_string(value, 6, rp);
+
+    // set the "value" key
+    oc_rep_i_set_key(&value_map, 5);
+    // copy the data, this is already in cbor from the fake response of the
+    // resource GET function
+    oc_rep_encode_raw(value_data, value_size);
+
+    cbor_encoder_close_container_checked(&root_map, &value_map);
+
+    oc_rep_end_root_object();
+
+    if (oc_do_post_ex(APPLICATION_CBOR, APPLICATION_CBOR)) {
+      PRINT("  Sent POST request\n");
+    } else {
+      PRINT("  Could not send POST request\n");
+    }
+  }
+}
+
+void
+oc_do_s_mode(char *resource_url, char *rp)
+{
+
+  if (resource_url == NULL) {
+    return;
+  }
+
+  oc_resource_t *my_resource =
+    oc_ri_get_app_resource_by_uri(resource_url, strlen(resource_url), 0);
+  if (my_resource == NULL) {
+    PRINT(" oc_do_s_mode : error no URL found %s\n", resource_url);
+    return;
+  }
+
+  // get the sender ia
+  size_t device_index = 0;
+  oc_device_info_t *device = oc_core_get_device_info(device_index);
+  int sia_value = device->ia;
+
+  uint8_t *buffer = malloc(100);
+  if (!buffer) {
+    OC_WRN("oc_do_s_mode: out of memory allocating buffer");
+  } //! buffer
+
+  oc_request_t request = { 0 };
+  oc_response_t response = { 0 };
+  response.separate_response = 0;
+  oc_response_buffer_t response_buffer;
+  // if (!response_buf && resource) {
+  //  OC_DBG("coap_notify_observers: Issue GET request to resource %s\n\n",
+  //         oc_string(resource->uri));
+  response_buffer.buffer = buffer;
+  response_buffer.buffer_size = 100;
+
+  // same initialization as oc_ri.c
+  response_buffer.code = 0;
+  response_buffer.response_length = 0;
+  response_buffer.content_format = 0;
+
+  response.separate_response = NULL;
+  response.response_buffer = &response_buffer;
+
+  request.response = &response;
+  request.request_payload = NULL;
+  request.query = NULL;
+  request.query_len = 0;
+  request.resource = NULL;
+  request.origin = NULL;
+  request._payload = NULL;
+  request._payload_len = 0;
+
+  request.content_format = APPLICATION_CBOR;
+  request.accept = APPLICATION_CBOR;
+  request.uri_path = resource_url;
+  request.uri_path_len = strlen(resource_url);
+
+  oc_rep_new(response_buffer.buffer, response_buffer.buffer_size);
+
+  // get the value...oc_request_t request_obj;
+  oc_interface_mask_t iface_mask = OC_IF_NONE;
+  // void *data;
+  my_resource->get_handler.cb(&request, iface_mask, NULL);
+
+  // get the data
+  // int value_size = request.response->response_buffer->buffer_size;
+  int value_size = oc_rep_get_encoded_payload_size();
+  uint8_t *value_data = request.response->response_buffer->buffer;
+
+  if (value_size == 0) {
+    PRINT(" . ERROR: value size == 0");
+    return;
+  }
+
+  int group_address = 0;
+
+  // loop over all group addresses and issue the s-mode command
+  int index = oc_core_find_group_object_table_url(resource_url);
+  while (index != -1) {
+    PRINT("  index : %d\n", index);
+
+    int ga_len = oc_core_find_group_object_table_number_group_entries(index);
+    for (int j = 0; j < ga_len; j++) {
+      group_address = oc_core_find_group_object_table_group_entry(index, j);
+      PRINT("   ga : %d\n", group_address);
+      // issue the s-mode command
+      oc_issue_s_mode(sia_value, group_address, rp, value_data, value_size);
+    }
+    index = oc_core_find_next_group_object_table_url(resource_url, index);
+  }
+
+  // free buffer
+  // free(buffer);
 }
 
 void

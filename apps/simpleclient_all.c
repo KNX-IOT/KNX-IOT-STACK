@@ -19,7 +19,6 @@
 #define STATIC static
 #endif
 
-
 /**
  * @file
  *  Demo application; examples for client code
@@ -68,16 +67,16 @@
  * # Usage
  * Application can be used in 2 ways:
  * - discovery of resources through well-known/core
- *   this kicks off a sequence of commands (next one triggered on the previous response):
+ *   this kicks off a sequence of commands (next one triggered on the previous
+ response):
  *   - issues a GET on /dev of the discovered device
  *   - issues a PUT on /dev/pm
  *     Note that performing a POST is identical as PUT.
  * - issuing a multicast s-mode commands
- *   issued through all coap nodes/.knx 
+ *   issued through all coap nodes/.knx
  *   typical command:
- *   
+ *
  */
-
 
 #include "oc_api.h"
 #include "oc_knx.h"
@@ -233,8 +232,8 @@ issue_requests_s_mode(void)
   int scope = 5;
   PRINT(" issue_requests_s_mode\n");
 
-  oc_make_ipv6_endpoint(mcast, IPV6 | DISCOVERY, 5683, 0xff, scope, 0, 0, 0, 0,
-                        0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0xfd);
+  oc_make_ipv6_endpoint(mcast, IPV6 | DISCOVERY | MULTICAST, 5683, 0xff, scope,
+                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0xfd);
 
   if (oc_init_post("/.knx", &mcast, NULL, NULL, HIGH_QOS, NULL)) {
 
@@ -252,7 +251,8 @@ issue_requests_s_mode(void)
     oc_rep_i_set_int(value, 7, g_send_notification.ga);
     // st M Service type code(write = w, read = r, response = rp) Enum : w, r,
     // rp
-    // oc_rep_i_set_text_string(value, 6, oc_string(send_notification.st));
+    // oc_rep_i_set_text_string(value, 6, oc_string(g_send_notification.st));
+    oc_rep_i_set_text_string(value, 6, "w");
     if (g_value_type == 0) {
       // boolean
       oc_rep_i_set_boolean(value, 1, g_bool_value);
@@ -325,9 +325,12 @@ handle_signal(int signal)
   quit = 1;
 }
 
-void print_usage(){
+void
+print_usage()
+{
   PRINT("Usage:\n");
-  PRINT("none : issue discovery request and perform a GET on /dev/pm and do an PUT /dev/pm\n");
+  PRINT("none : issue discovery request and perform a GET on /dev/pm and do an "
+        "PUT /dev/pm\n");
   PRINT("-help : this message\n");
   PRINT("s-mode <group address> <type> <value>\n");
   PRINT("  <group address> : integer\n");
@@ -372,7 +375,6 @@ main(int argc, char *argv[])
       g_value_type = 2;
     }
     PRINT(" value type : %s [%d]\n", argv[3], g_value_type);
-
   }
   if (argc > 4) {
     PRINT(" value type : %s\n", argv[4]);

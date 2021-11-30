@@ -147,6 +147,23 @@ int oc_core_find_next_group_object_table_index(int group_address,
                                                int cur_index);
 
 /**
+ * @brief find (first) index in the group address table via url
+ *
+ * @param url the url to find
+ * @return int the index in the table or -1
+ */
+int oc_core_find_group_object_table_url(char *url);
+
+/**
+ * @brief find next index in the group address table via url
+ *
+ * @param  url the url to find
+ * @param cur_index  the current index to start from.
+ * @return int the index in the table or -1
+ */
+int oc_core_find_next_group_object_table_url(char *url, int cur_index);
+
+/**
  * @brief find the url (of the resource) that in the group object table entry.
  *
  * @param index the index in the table
@@ -154,6 +171,24 @@ int oc_core_find_next_group_object_table_index(int group_address,
  */
 oc_string_t oc_core_find_group_object_table_url_from_index(int index);
 
+/**
+ * @brief retrieve the number of group address entries for index
+ *
+ * @param index the index in the group address table
+ * @return int the number of group addresses
+ */
+int oc_core_find_group_object_table_number_group_entries(int index);
+
+/**
+ * @brief get group address of index, and entry (e.g. list)
+ *
+ * @param index the entry in the group address table
+ * @param entry the entry in the list of addresses at index
+ * @return int the group address
+ */
+int oc_core_find_group_object_table_group_entry(int index, int entry);
+
+// these are needed for the system with the broker
 int oc_core_find_reciepient_table_index(int group_address);
 oc_string_t oc_core_find_reciepient_table_url_from_index(int index);
 
