@@ -233,7 +233,8 @@ issue_requests_s_mode(void)
   int scope = 5;
   PRINT(" issue_requests_s_mode\n");
 
-  oc_make_ipv6_endpoint(mcast, IPV6 | DISCOVERY, 5683, 0xff, scope, 0, 0, 0, 0,
+  oc_make_ipv6_endpoint(mcast, IPV6 | DISCOVERY | MULTICAST, 5683, 0xff, scope,
+                        0, 0, 0, 0,
                         0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0xfd);
 
   if (oc_init_post("/.knx", &mcast, NULL, NULL, HIGH_QOS, NULL)) {

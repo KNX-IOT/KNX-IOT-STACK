@@ -61,17 +61,12 @@ typedef struct oc_pase_t
 
 /**
  * @brief Group Object Notification
- *
+ * Can be used for receiving messages or sending messages.
+ *      
+ *  generic structures: 
  *  { 5: { 6: "st value" , 7: "ga value", 1: "value" } }
  *
- *  {
- *    "value": {
- *      "sia": int,
- *      "s": {},
- *      "st": "string",
- *      "ga": int
- *    }
- *  }
+ *  { 4: "sia", 5: { 6: "st", 7: "ga", 1: "value" } }
  *
  * Key translation
  * | Json Key | Integer Value | type   |
@@ -84,11 +79,10 @@ typedef struct oc_pase_t
  */
 typedef struct oc_group_object_notification_t
 {
-  oc_string_t value;
-  int sia;
-  oc_string_t s;
-  oc_string_t st;
-  int ga;
+  oc_string_t value;   ///< generic value received.
+  int sia;             ///< (source id) sender individual address
+  oc_string_t st;      ///< Service type code (write=w, read=r, response=rp)
+  int ga;              ///< group address
 } oc_group_object_notification_t;
 
 /**
@@ -183,6 +177,11 @@ bool oc_is_s_mode_request(oc_request_t *request);
  * @return oc_rep_t* the rep
  */
 oc_rep_t *oc_s_mode_get_value(oc_request_t *request);
+
+
+
+
+void oc_do_s_mode(char *resource_url);
 
 /**
  * @brief Creation of the KNX device resources.

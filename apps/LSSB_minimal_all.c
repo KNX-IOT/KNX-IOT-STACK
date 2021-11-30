@@ -313,6 +313,24 @@ initialize_variables(void)
   /* initialize global variables for resources */
 }
 
+
+
+
+
+
+
+/* send a multicast s-mode message */
+static void
+issue_requests_s_mode(void)
+{
+
+   PRINT("TEST TEST \n\n");
+
+   oc_do_s_mode("/p/push");
+}
+
+
+
 #ifndef NO_MAIN
 #ifdef WIN32
 /**
@@ -376,6 +394,18 @@ oc_ownership_status_cb(const oc_uuid_t *device_uuid, size_t device_index,
 }
 #endif /* OC_SECURITY */
 
+
+void
+print_usage()
+{
+  PRINT("Usage:\n");
+  PRINT("no arguments : starts the server\n");
+  PRINT("-help : this message\n");
+  PRINT("s-mode: starts the server and issue a s-mode message at start up according the application/config\n");
+  exit(0);
+}
+
+
 /**
  * main application.
  *       * initializes the global variables
@@ -384,10 +414,11 @@ oc_ownership_status_cb(const oc_uuid_t *device_uuid, size_t device_index,
  * shuts down the stack
  */
 int
-main(void)
+main(int argc, char *argv[])
 {
   int init;
   oc_clock_time_t next_event;
+  bool do_send_s_mode = false;
 
 #ifdef WIN32
   /* windows specific */
@@ -406,8 +437,23 @@ main(void)
   sigaction(SIGINT, &sa, NULL);
 #endif
 
+  
+  for (int i = 0; i < argc; i++) {
+    printf("argv[%d] = %s\n", i, argv[i]);
+  }
+  if (argc > 1) {
+    PRINT("s-mode: %s\n", argv[1]);
+    if (strcmp(argv[1], "s-mode") == 0) {
+      do_send_s_mode = true;
+    }
+    if (strcmp(argv[1], "-help") == 0) {
+      print_usage();
+    }
+  }
+
   PRINT("KNX-IOT Server name : \"%s\"\n", MY_NAME);
 
+  // show the current working folder
   char buff[FILENAME_MAX];
   char *retbuf = NULL;
   retbuf = GetCurrentDir(buff, FILENAME_MAX);
@@ -427,14 +473,17 @@ main(void)
   initialize_variables();
 
   /* initializes the handlers structure */
-  STATIC const oc_handler_t handler = { .init = app_init,
+  STATIC oc_handler_t handler = { .init = app_init,
                                         .signal_event_loop = signal_event_loop,
-                                        .register_resources = register_resources
-#ifdef OC_CLIENT
-                                        ,
-                                        .requests_entry = 0
-#endif
+                                        .register_resources = register_resources,
+                                        .requests_entry = issue_requests_s_mode
   };
+
+  if (do_send_s_mode) {
+
+    handler.requests_entry = issue_requests_s_mode;
+  }
+
 
   oc_set_factory_presets_cb(factory_presets_cb, NULL);
 
