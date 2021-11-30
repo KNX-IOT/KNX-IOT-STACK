@@ -90,4 +90,14 @@ target_link_libraries(simpleclient_hat
     kisClientServer
     Python3::Python
 )
+
+add_custom_target(simpleclient_py)
+add_custom_command(
+    TARGET simpleclient_py POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy 
+    ${PROJECT_SOURCE_DIR}/simpleclient.py
+    ${PROJECT_BINARY_DIR}/simpleclient.py
+)
+
+add_dependencies(simpleclient_hat simpleclient_py)
 # add_dependencies(kis-port copy-pki-credentials)
