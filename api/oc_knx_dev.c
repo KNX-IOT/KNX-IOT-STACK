@@ -621,7 +621,7 @@ oc_knx_device_storage_reset(size_t device_index)
 
   oc_storage_write(KNX_STORAGE_PM, (uint8_t *)0, 0);
 
-  oc_delete_got();
+  oc_delete_group_object_table();
 }
 
 void
