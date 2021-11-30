@@ -5,7 +5,8 @@ import dothat.lcd as lcd
 import dothat.touch as touch
 
 IDLE_BL = (128, 128, 128)
-FULL_BL = (255, 255, 255)
+DARK_BL = (0, 0, 0)
+FULL_BL = (0, 255, 0)
 
 def init():
     backlight.rgb(*IDLE_BL)
@@ -15,21 +16,24 @@ def init():
 
 @touch.on(touch.LEFT)
 def handle_left(ch, evt):
+    backlight.rgb(*DARK_BL)
     backlight.left_rgb(*FULL_BL)
     # knx_handle_left()
-    backlight.left_rgb(*IDLE_BL)
+    backlight.rgb(*IDLE_BL)
 
 @touch.on(touch.BUTTON)
 def handle_mid(ch, evt):
+    backlight.rgb(*DARK_BL)
     backlight.mid_rgb(*FULL_BL)
     # knx_handle_mid()
-    backlight.mid_rgb(*IDLE_BL)
+    backlight.rgb(*IDLE_BL)
 
 @touch.on(touch.RIGHT)
 def handle_right(ch, evt):
+    backlight.rgb(*DARK_BL)
     backlight.right_rgb(*FULL_BL)
     # knx_handle_right()
-    backlight.right_rgb(*IDLE_BL)
+    backlight.rgb(*IDLE_BL)
 
 if __name__ == "__main__":
     init()
