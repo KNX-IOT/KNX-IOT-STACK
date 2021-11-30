@@ -1327,7 +1327,7 @@ dummy_test_data()
 }
 
 
-void oc_print_got_entry(entry) {
+void oc_print_got_entry(int entry) {
 
   PRINT("  GOT [%d] - %d\n", entry, g_got[entry].ga_len);
   if (g_got[entry].ga_len == 0) {
