@@ -192,6 +192,14 @@ int oc_core_find_group_object_table_group_entry(int index, int entry);
 int oc_core_find_reciepient_table_index(int group_address);
 oc_string_t oc_core_find_reciepient_table_url_from_index(int index);
 
+
+
+void oc_print_got(entry);
+void oc_dump_got(int entry);
+void oc_load_got(int entry);
+void oc_load_all_got();
+
+
 /**
 @brief Creation of the KNX feature point resources.
 
