@@ -338,7 +338,7 @@ int
 oc_core_find_group_object_table_url(char *url)
 {
   int i;
-  int url_len = strlen(url);
+  size_t url_len = strlen(url);
   for (i = 0; i < GAMT_MAX_ENTRIES; i++) {
     if ( (url_len == oc_string_len(g_got[i].href)) &&
         (strcmp(url, oc_string(g_got[i].href)) == 0)) {
@@ -356,7 +356,7 @@ oc_core_find_next_group_object_table_url(char *url, int cur_index)
   }
 
   int i;
-  int url_len = strlen(url);
+  size_t url_len = strlen(url);
   for (i = cur_index + 1; i < GAMT_MAX_ENTRIES; i++) {
     if ((url_len == oc_string_len(g_got[i].href)) &&
         (strcmp(url, oc_string(g_got[i].href)) == 0)) {
