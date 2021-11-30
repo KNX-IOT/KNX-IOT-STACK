@@ -326,7 +326,7 @@ issue_requests_s_mode(void)
 
    PRINT("TEST TEST \n\n");
 
-   oc_do_s_mode("/p/push");
+   oc_do_s_mode("/p/push", "w");
 }
 
 

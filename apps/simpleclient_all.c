@@ -253,7 +253,8 @@ issue_requests_s_mode(void)
     oc_rep_i_set_int(value, 7, g_send_notification.ga);
     // st M Service type code(write = w, read = r, response = rp) Enum : w, r,
     // rp
-    // oc_rep_i_set_text_string(value, 6, oc_string(send_notification.st));
+    //oc_rep_i_set_text_string(value, 6, oc_string(g_send_notification.st));
+    oc_rep_i_set_text_string(value, 6, "w");
     if (g_value_type == 0) {
       // boolean
       oc_rep_i_set_boolean(value, 1, g_bool_value);
