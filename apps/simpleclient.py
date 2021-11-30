@@ -29,14 +29,14 @@ def handle_left(ch, evt):
 @touch.on(touch.BUTTON)
 def handle_mid(ch, evt):
     backlight.mid_rgb(*FULL_BL)
-    # knx_handle_mid()
+    knx.handle_mid()
     sleep(BLINK_TIME_S)
     backlight.rgb(*IDLE_BL)
 
 @touch.on(touch.RIGHT)
 def handle_right(ch, evt):
     backlight.right_rgb(*FULL_BL)
-    # knx_handle_right()
+    knx.handle_right()
     sleep(BLINK_TIME_S)
     backlight.rgb(*IDLE_BL)
 
