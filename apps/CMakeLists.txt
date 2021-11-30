@@ -82,4 +82,12 @@ add_custom_target(copy-pki-certs ALL
     ${PROJECT_BINARY_DIR}/pki_certs
 )
 
+add_executable(simpleclient_hat
+    ${PROJECT_SOURCE_DIR}/simpleclient_displayotron.c
+)
+
+target_link_libraries(simpleclient_hat
+    kisClientServer
+    Python3::Python
+)
 # add_dependencies(kis-port copy-pki-credentials)
