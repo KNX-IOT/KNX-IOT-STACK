@@ -17,6 +17,7 @@
 #include "oc_api.h"
 #include "oc_knx.h"
 #include "oc_knx_fp.h"
+#include "oc_knx_dev.h"
 #include "oc_core_res.h"
 #include <stdio.h>
 #include "oc_rep.h" // should not be needed
@@ -58,6 +59,8 @@ int
 restart_device()
 {
   PRINT("restart device\n");
+
+  // do a reboot...
   return 0;
 }
 
@@ -65,6 +68,9 @@ int
 reset_device(int value)
 {
   PRINT("reset device: %d\n", value);
+
+  oc_knx_device_storage_reset(0);
+
   return 0;
 }
 
