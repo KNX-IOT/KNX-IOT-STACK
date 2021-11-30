@@ -644,6 +644,6 @@ oc_create_knx_device_resources(size_t device_index)
   // should be last of the dev/xxx resources, it will list those.
   oc_create_dev_dev_resource(OC_DEV, device_index);
 
-  //PRINT("reading device storage\n");
-  //oc_knx_device_storage_read(device_index);
+  // PRINT("reading device storage\n");
+  // oc_knx_device_storage_read(device_index);
 }

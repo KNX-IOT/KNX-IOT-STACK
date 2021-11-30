@@ -190,54 +190,48 @@ int oc_core_find_group_object_table_group_entry(int index, int entry);
 
 /**
  * @brief print the entry in the Group Object Table
- * 
+ *
  * @param entry the index of the entry in the Group Object Table
  */
 void oc_print_group_object_table_entry(int entry);
 
 /**
  * @brief dump the entry of the Group Object Table (to persistent) storage
- * 
+ *
  * @param entry the index of the entry in the Group Object Table
  */
 void oc_dump_group_object_table_entry(int entry);
 
 /**
  * @brief load the entry of the Group Object Table (from persistent) storage
- * 
+ *
  * @param entry the index of the entry in the Group Object Table
  */
 void oc_load_group_object_table_entry(int entry);
 
 /**
  * @brief load all entries of the Group Object Table (from persistent) storage
- * 
+ *
  */
 void oc_load_group_object_table();
 
 /**
- * @brief delete entry of the Group Object Table 
+ * @brief delete entry of the Group Object Table
  * does not make the change persistent
- * 
+ *
  * @param entry the index of the entry in the Group Object Table
  */
 void oc_delete_group_object_table_entry(int entry);
 
 /**
  * @brief delete all entries of the Group Object Table (from persistent) storage
- * 
+ *
  */
 void oc_delete_group_object_table();
-
-
-
 
 // these are needed for the system with the broker
 int oc_core_find_reciepient_table_index(int group_address);
 oc_string_t oc_core_find_reciepient_table_url_from_index(int index);
-
-
-
 
 /**
 @brief Creation of the KNX feature point resources.

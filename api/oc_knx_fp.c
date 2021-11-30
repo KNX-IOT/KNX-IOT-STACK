@@ -1330,7 +1330,6 @@ oc_dump_group_object_table_entry(int entry)
   char filename[20];
   snprintf(filename, 20, "%s_%d", GOT_STORE, entry);
 
-  
   uint8_t *buf = malloc(OC_MAX_APP_DATA_SIZE);
   if (!buf)
     return;
@@ -1352,7 +1351,8 @@ oc_dump_group_object_table_entry(int entry)
 
   int size = oc_rep_get_encoded_payload_size();
   if (size > 0) {
-    OC_DBG("dump_got: dumped current state [%s] [%d]: size %d", filename, entry, size);
+    OC_DBG("dump_got: dumped current state [%s] [%d]: size %d", filename, entry,
+           size);
     oc_storage_write(filename, buf, size);
   }
 
@@ -1404,8 +1404,8 @@ oc_load_group_object_table_entry(int entry)
             int64_t *arr = oc_int_array(rep->value.array);
             int array_size = (int)oc_int_array_size(rep->value.array);
             int *new_array = (int *)malloc(array_size * sizeof(int));
-            //int*  new_array;
-            //oc_new_int_array(&new_array, array_size);
+            // int*  new_array;
+            // oc_new_int_array(&new_array, array_size);
 
             for (int i = 0; i < array_size; i++) {
               new_array[i] = arr[i];
@@ -1433,11 +1433,10 @@ void
 oc_load_group_object_table()
 {
   PRINT("Loading Group Object Table from Persistent storage\n");
-  for (int i=0; i< GOT_MAX_ENTRIES; i++) {
+  for (int i = 0; i < GOT_MAX_ENTRIES; i++) {
     oc_load_group_object_table_entry(i);
     oc_print_group_object_table_entry(i);
   }
-
 }
 
 void
