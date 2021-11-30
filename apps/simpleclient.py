@@ -14,19 +14,19 @@ def init():
     lcd.write("KNX Client")
 
 @touch.on(touch.LEFT)
-def handle_left():
+def handle_left(ch, evt):
     backlight.left_rgb(*FULL_BL)
     # knx_handle_left()
     backlight.left_rgb(*IDLE_BL)
 
 @touch.on(touch.BUTTON)
-def handle_mid():
+def handle_mid(ch, evt):
     backlight.mid_rgb(*FULL_BL)
     # knx_handle_mid()
     backlight.mid_rgb(*IDLE_BL)
 
 @touch.on(touch.RIGHT)
-def handle_right():
+def handle_right(ch, evt):
     backlight.right_rgb(*FULL_BL)
     # knx_handle_right()
     backlight.right_rgb(*IDLE_BL)
