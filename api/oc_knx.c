@@ -180,14 +180,14 @@ oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   PRINT("  cmd   : %d\n", cmd);
   PRINT("  value : %d\n", value);
 
+  bool error = true;
+
   if (cmd == RESTART_DEVICE) {
     restart_device();
+    error = false;
   } else if (cmd == RESET_DEVICE) {
     reset_device(value);
-  } else {
-    PRINT(" invalid command\n");
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
-    return;
+    error = false;
   }
 
   // Before executing the reset function,
@@ -195,18 +195,26 @@ oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   // CHANGED and with payload containing Error Code and Process Time in seconds
   // as defined 691 for the Response to a Master Reset Request for KNX Classic
   // devices, see [10].
+  if (error == false) {
 
-  oc_rep_begin_root_object ();
-  //  oc_rep_start_root_object();
+    //oc_rep_begin_root_object ();
+    oc_rep_start_root_object();
 
-  // TODO note need to figure out how to fill in the correct response values
-  oc_rep_set_int(root, code, 5);
-  oc_rep_set_int(root, time, 2);
-  oc_rep_end_root_object();
+    // note need to figure out how to fill in the correct response values
+    oc_rep_set_int(root, code, 5);
+    oc_rep_set_int(root, time, 2);
+    oc_rep_end_root_object();
 
-  PRINT("oc_core_knx_post_handler %d - end\n",
-        oc_rep_get_encoded_payload_size());
-  oc_send_cbor_response(request, OC_STATUS_CHANGED);
+    PRINT("oc_core_knx_post_handler %d - end\n",
+          oc_rep_get_encoded_payload_size());
+    oc_send_cbor_response(request, OC_STATUS_CHANGED);
+    return;
+  }
+
+   PRINT(" invalid command\n");
+  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+  return;
+
 }
 
 void

@@ -427,8 +427,14 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_CBOR) {
-    request->response->response_buffer->code =
-      oc_status_code(OC_STATUS_BAD_REQUEST);
+    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    return;
+  }
+
+  size_t device_index = request->resource->device;
+  if (oc_knx_lsm_state(device_index) != LSM_LOADING) {
+    PRINT(" not in loading state\n");
+    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
 
@@ -677,6 +683,14 @@ oc_core_fp_g_x_del_handler(oc_request_t *request,
   int value = oc_uri_get_wildcard_value_as_int(
     oc_string(request->resource->uri), oc_string_len(request->resource->uri),
     request->uri_path, request->uri_path_len);
+
+  
+  size_t device_index = request->resource->device;
+  if (oc_knx_lsm_state(device_index) != LSM_LOADING) {
+    PRINT(" not in loading state\n");
+    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    return;
+  }
 
   PRINT(" deleting %d\n", value);
 
