@@ -410,7 +410,6 @@ oc_create_dev_hostname_resource(int resource_idx, size_t device)
     oc_core_dev_hostname_put_handler, 0, 0, 1, ":dpt.varString8859_1");
 }
 
-
 // -----------------------------------------------------------------------------
 
 static void
@@ -668,16 +667,13 @@ oc_knx_device_storage_reset(size_t device_index)
   oc_delete_group_object_table();
 }
 
-
-
 bool
 oc_knx_device_in_programming_mode(size_t device_index)
 {
 
-    oc_device_info_t *device = oc_core_get_device_info(device_index);
+  oc_device_info_t *device = oc_core_get_device_info(device_index);
   return device->pm;
 }
-
 
 void
 oc_create_knx_device_resources(size_t device_index)

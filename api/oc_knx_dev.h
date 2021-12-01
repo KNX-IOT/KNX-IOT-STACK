@@ -58,7 +58,7 @@ void oc_knx_device_storage_reset(size_t device_index);
  * - ia
  * - hostname
  * - idd
- * 
+ *
  * @param device_index the device index
  * @return true in programming mode
  * @return false not in programming mode
