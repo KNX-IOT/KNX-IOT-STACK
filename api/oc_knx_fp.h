@@ -234,10 +234,10 @@ int oc_core_find_reciepient_table_index(int group_address);
 oc_string_t oc_core_find_reciepient_table_url_from_index(int index);
 
 /**
-@brief Creation of the KNX feature point resources.
-
-@param device index of the device to which the resource are to be created
-*/
+ * @brief Creation of the KNX feature point resources.
+ *
+ * @param device index of the device to which the resource are to be created
+ */
 void oc_create_knx_fp_resources(size_t device);
 
 #ifdef __cplusplus

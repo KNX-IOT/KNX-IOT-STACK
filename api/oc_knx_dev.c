@@ -64,6 +64,8 @@ oc_create_dev_sn_resource(int resource_idx, size_t device)
     oc_core_dev_sn_get_handler, 0, 0, 0, 2, ":dpa:0.11", "dpt.serNum");
 }
 
+// -----------------------------------------------------------------------------
+
 static void
 oc_core_dev_hwv_get_handler(oc_request_t *request,
                             oc_interface_mask_t iface_mask, void *data)
@@ -104,6 +106,8 @@ oc_create_dev_hwv_resource(int resource_idx, size_t device)
     resource_idx, device, "/dev/hwv", OC_IF_D, APPLICATION_CBOR,
     OC_DISCOVERABLE, oc_core_dev_hwv_get_handler, 0, 0, 0, 1, ":dpt.version");
 }
+
+// -----------------------------------------------------------------------------
 
 static void
 oc_core_dev_fwv_get_handler(oc_request_t *request,
@@ -146,6 +150,8 @@ oc_create_dev_fwv_resource(int resource_idx, size_t device)
                                ":dpa .0.54", ":dpt.version");
 }
 
+// -----------------------------------------------------------------------------
+
 static void
 oc_core_dev_hwt_get_handler(oc_request_t *request,
                             oc_interface_mask_t iface_mask, void *data)
@@ -180,6 +186,8 @@ oc_create_dev_hwt_resource(int resource_idx, size_t device)
                                oc_core_dev_hwt_get_handler, 0, 0, 0, 1,
                                ":dpt.varString8859_1");
 }
+
+// -----------------------------------------------------------------------------
 
 void
 oc_core_dev_name_get_handler(oc_request_t *request,
@@ -216,6 +224,8 @@ oc_create_dev_name_resource(int resource_idx, size_t device)
     OC_DISCOVERABLE, oc_core_dev_name_get_handler, 0, 0, 0, 1, ":dpt.utf8");
 }
 
+// -----------------------------------------------------------------------------
+
 static void
 oc_core_dev_model_get_handler(oc_request_t *request,
                               oc_interface_mask_t iface_mask, void *data)
@@ -249,6 +259,8 @@ oc_create_dev_model_resource(int resource_idx, size_t device)
     resource_idx, device, "/dev/model", OC_IF_D, APPLICATION_CBOR,
     OC_DISCOVERABLE, oc_core_dev_model_get_handler, 0, 0, 0, 1, ":dpa.0.15");
 }
+
+// -----------------------------------------------------------------------------
 
 static void
 oc_core_dev_ia_get_handler(oc_request_t *request,
@@ -288,9 +300,16 @@ oc_core_dev_ia_put_handler(oc_request_t *request,
     return;
   }
 
+  // only set ia in programming mode
   size_t device_index = request->resource->device;
-  oc_rep_t *rep = request->request_payload;
+  if (oc_knx_device_in_programming_mode(device_index) == false) {
+    PRINT("oc_core_dev_ia_put_handler: not in programming mode\n");
+    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    return;
+  }
 
+  // parse the data.
+  oc_rep_t *rep = request->request_payload;
   if ((rep != NULL) && (rep->type == OC_REP_INT)) {
     int temp;
     PRINT("  oc_core_dev_ia_put_handler received : %d\n",
@@ -317,6 +336,8 @@ oc_create_dev_ia_resource(int resource_idx, size_t device)
     ":dpt.value2Ucount");
 }
 
+// -----------------------------------------------------------------------------
+
 static void
 oc_core_dev_hostname_put_handler(oc_request_t *request,
                                  oc_interface_mask_t iface_mask, void *data)
@@ -331,6 +352,13 @@ oc_core_dev_hostname_put_handler(oc_request_t *request,
   }
 
   size_t device_index = request->resource->device;
+  // only set ia in programming mode
+  if (oc_knx_device_in_programming_mode(device_index) == false) {
+    PRINT("oc_core_dev_hostname_put_handler: not in programming mode\n");
+    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    return;
+  }
+
   oc_rep_t *rep = request->request_payload;
   if ((rep != NULL) && (rep->type == OC_REP_STRING)) {
     PRINT("  oc_core_dev_hostname_put_handler received : %s\n",
@@ -382,6 +410,9 @@ oc_create_dev_hostname_resource(int resource_idx, size_t device)
     oc_core_dev_hostname_put_handler, 0, 0, 1, ":dpt.varString8859_1");
 }
 
+
+// -----------------------------------------------------------------------------
+
 static void
 oc_core_dev_iid_put_handler(oc_request_t *request,
                             oc_interface_mask_t iface_mask, void *data)
@@ -396,6 +427,13 @@ oc_core_dev_iid_put_handler(oc_request_t *request,
   }
 
   size_t device_index = request->resource->device;
+  // only set ia in programming mode
+  if (oc_knx_device_in_programming_mode(device_index) == false) {
+    PRINT("oc_core_dev_iid_put_handler: not in programming mode\n");
+    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    return;
+  }
+
   oc_rep_t *rep = request->request_payload;
   if ((rep != NULL) && (rep->type == OC_REP_STRING)) {
     PRINT("  oc_core_dev_iid_put_handler received : %s\n",
@@ -445,6 +483,8 @@ oc_create_dev_iid_resource(int resource_idx, size_t device)
     OC_DISCOVERABLE, oc_core_dev_iid_get_handler, oc_core_dev_iid_put_handler,
     0, 0, 1, ":dpt.value4Ucount ");
 }
+
+// -----------------------------------------------------------------------------
 
 static void
 oc_core_dev_pm_get_handler(oc_request_t *request,
@@ -512,6 +552,8 @@ oc_create_dev_pm_resource(int resource_idx, size_t device)
     ":dpa.0.54", "dpa.binaryValue");
 }
 
+// -----------------------------------------------------------------------------
+
 static void
 oc_core_dev_dev_get_handler(oc_request_t *request,
                             oc_interface_mask_t iface_mask, void *data)
@@ -559,6 +601,8 @@ oc_create_dev_dev_resource(int resource_idx, size_t device)
     resource_idx, device, "/dev", OC_IF_NONE, APPLICATION_LINK_FORMAT, 0,
     oc_core_dev_dev_get_handler, 0, 0, 0, 1, "urn:knx:fb.0");
 }
+
+// -----------------------------------------------------------------------------
 
 void
 oc_knx_device_storage_read(size_t device_index)
@@ -623,6 +667,17 @@ oc_knx_device_storage_reset(size_t device_index)
 
   oc_delete_group_object_table();
 }
+
+
+
+bool
+oc_knx_device_in_programming_mode(size_t device_index)
+{
+
+    oc_device_info_t *device = oc_core_get_device_info(device_index);
+  return device->pm;
+}
+
 
 void
 oc_create_knx_device_resources(size_t device_index)
