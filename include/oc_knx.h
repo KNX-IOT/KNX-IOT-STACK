@@ -192,6 +192,8 @@ oc_rep_t *oc_s_mode_get_value(oc_request_t *request);
  */
 void oc_do_s_mode(char *resource_url, char *rp);
 
+void oc_knx_load_state(size_t device_index);
+
 /**
  * @brief Creation of the KNX device resources.
  *

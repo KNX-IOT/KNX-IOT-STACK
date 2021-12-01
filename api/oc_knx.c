@@ -24,6 +24,7 @@
 
 #define TAGS_AS_STRINGS
 
+#define LSM_STORE "LSM_STORE"
 // ---------------------------Variables --------------------------------------
 
 oc_group_object_notification_t g_received_notification;
@@ -431,6 +432,8 @@ oc_core_knx_lsm_post_handler(oc_request_t *request,
     oc_rep_start_root_object();
     oc_rep_i_set_text_string(root, 3, oc_core_get_lsm_as_string(device->lsm));
     oc_rep_end_root_object();
+
+    oc_storage_write(LSM_STORE, (uint8_t *)&device->lsm, sizeof(device->lsm));
 
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
     return;
@@ -1180,6 +1183,27 @@ oc_do_s_mode(char *resource_url, char *rp)
 
   // free buffer
   // free(buffer);
+}
+
+void
+oc_knx_load_state(size_t device_index)
+{
+  int temp_size;
+
+  oc_lsm_state_t lsm;
+  PRINT("oc_knx_load_state: Loading Device Config from Persistent storage\n");
+
+  oc_device_info_t *device = oc_core_get_device_info(device_index);
+  if (device == NULL) {
+    OC_ERR(" could not get device %d\n", device_index)
+  }
+
+  temp_size = oc_storage_read(LSM_STORE, (uint8_t *)&lsm, sizeof(lsm));
+  if (temp_size > 0) {
+    device->lsm = lsm;
+    PRINT("  load state (storage) %ld [%s]\n", (long)lsm,
+          oc_core_get_lsm_as_string(lsm));
+  }
 }
 
 void
