@@ -260,7 +260,8 @@ issue_requests_s_mode(void)
   oc_set_delayed_callback(NULL, post_callback, 0);
 }
 
-oc_event_callback_retval_t post_callback(void *data)
+oc_event_callback_retval_t
+post_callback(void *data)
 {
   int scope = 5;
   PRINT(" issue_requests_s_mode\n");
@@ -291,7 +292,7 @@ oc_event_callback_retval_t post_callback(void *data)
     cbor_encoder_close_container_checked(&root_map, &value_map);
 
     oc_rep_end_root_object();
-    
+
     if (oc_do_post_ex(APPLICATION_CBOR, APPLICATION_CBOR)) {
       PRINT("  Sent PUT request\n");
     } else {
@@ -301,7 +302,6 @@ oc_event_callback_retval_t post_callback(void *data)
 
   return OC_EVENT_DONE;
 }
-
 
 PyObject *pModule;
 // Action to take on left button press
