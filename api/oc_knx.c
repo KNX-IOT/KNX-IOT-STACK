@@ -433,7 +433,6 @@ oc_core_knx_lsm_post_handler(oc_request_t *request,
     oc_rep_i_set_text_string(root, 3, oc_core_get_lsm_as_string(device->lsm));
     oc_rep_end_root_object();
 
-    
     oc_storage_write(LSM_STORE, (uint8_t *)&device->lsm, sizeof(device->lsm));
 
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
@@ -1186,8 +1185,6 @@ oc_do_s_mode(char *resource_url, char *rp)
   // free(buffer);
 }
 
-
-
 void
 oc_knx_load_state(size_t device_index)
 {
@@ -1207,7 +1204,6 @@ oc_knx_load_state(size_t device_index)
     PRINT("  load state (storage) %ld [%s]\n", (long)lsm,
           oc_core_get_lsm_as_string(lsm));
   }
-
 }
 
 void
