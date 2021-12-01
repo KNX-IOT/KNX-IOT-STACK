@@ -99,6 +99,6 @@ add_custom_command(
     ${PROJECT_BINARY_DIR}/simpleclient.py
 )
 
-add_dependencies(simpleclient_hat simpleclient_py)
-add_dependencies(simpleclient_hat LSSB_minimal_pi)
+add_dependencies(simpleclient_py simpleclient_py)
+add_dependencies(LSSB_minimal_pi simpleclient_py)
 # add_dependencies(kis-port copy-pki-credentials)

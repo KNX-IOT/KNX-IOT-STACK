@@ -307,6 +307,21 @@ PyInit_knx(void)
     return PyModule_Create(&KnxModule);
 }
 
+static void *poll_python(void *data)
+{
+  while(true)
+  {
+    pthread_mutex_lock(&mutex);
+    PyErr_CheckSignals();
+    if (PyRun_SimpleString("signal.sigtimedwait([], 0.01)") != 0)
+    {
+      PyErr_Print();
+      quit = 1;
+    }
+    pthread_mutex_unlock(&mutex);
+  }
+}
+
 /**
  * register all the resources to the stack
  * this function registers all application level resources:
@@ -525,6 +540,13 @@ main(void)
   PyRun_SimpleString("import simpleclient");
   PyRun_SimpleString("simpleclient.init()");
 
+  // create thread for polling the Python interpreter
+  pthread_t thread;
+  if (pthread_create(&thread, NULL, poll_python, NULL) != 0) {
+    printf("Failed to create python thread\n");
+    init = -1;
+    goto exit;
+  }
 #ifdef OC_SECURITY
   /* print out the current DI of the device */
   char uuid[37] = { 0 };
@@ -580,20 +602,11 @@ main(void)
       pthread_cond_timedwait(&cv, &mutex, &ts);
     }
     pthread_mutex_unlock(&mutex);
-    // Wait for signals - this is how the button presses are detected
-    // 0.1 is the time to wait for (in seconds), before handing execution
-    // back to C.
-    PyRun_SimpleString("print('asdf')");
-    if (PyRun_SimpleString("signal.sigtimedwait([], 0.1)") != 0)
-    {
-      PyErr_Print();
-      return -1;
-    }
   }
 #endif
 
   /* shut down the stack */
-
+exit:
   oc_main_shutdown();
   return 0;
 }
