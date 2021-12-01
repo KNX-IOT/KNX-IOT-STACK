@@ -143,6 +143,8 @@ oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   int cmd = -1;
   // int time;
   // int code;
+  
+  PRINT("oc_core_knx_post_handler\n");
 
   char buffer[200];
   memset(buffer, 200, 1);
@@ -175,8 +177,8 @@ oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     rep = rep->next;
   }
 
-  PRINT("  cmd   :%d\n", cmd);
-  PRINT("  value :%d\n", value);
+  PRINT("  cmd   : %d\n", cmd);
+  PRINT("  value : %d\n", value);
 
   if (cmd == RESTART_DEVICE) {
     restart_device();
@@ -194,14 +196,16 @@ oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   // as defined 691 for the Response to a Master Reset Request for KNX Classic
   // devices, see [10].
 
-  oc_rep_start_root_object();
+  oc_rep_begin_root_object ();
+  //  oc_rep_start_root_object();
 
   // TODO note need to figure out how to fill in the correct response values
   oc_rep_set_int(root, code, 5);
-  oc_rep_set_int(root, time, 15);
+  oc_rep_set_int(root, time, 2);
   oc_rep_end_root_object();
 
-  PRINT("oc_core_knx_post_handler - end\n");
+  PRINT("oc_core_knx_post_handler %d - end\n",
+        oc_rep_get_encoded_payload_size());
   oc_send_cbor_response(request, OC_STATUS_CHANGED);
 }
 

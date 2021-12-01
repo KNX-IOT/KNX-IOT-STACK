@@ -1309,7 +1309,7 @@ void
 oc_print_group_object_table_entry(int entry)
 {
 
-  PRINT("  GOT [%d] - %d\n", entry, g_got[entry].ga_len);
+  PRINT("  GOT [%d] -> %d\n", entry, g_got[entry].ga_len);
   if (g_got[entry].ga_len == 0) {
     return;
   }
