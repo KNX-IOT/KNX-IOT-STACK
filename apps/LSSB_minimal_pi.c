@@ -256,6 +256,7 @@ oc_event_callback_retval_t post_callback(void *data);
 static void
 issue_requests_s_mode(void)
 {
+  // Alex - delay by 1 second to make sure it is called from the main loop
   oc_set_delayed_callback(NULL, post_callback, 1);
   pthread_cond_signal(&cv);
 }
