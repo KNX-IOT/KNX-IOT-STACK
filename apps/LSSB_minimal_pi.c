@@ -246,6 +246,63 @@ post_dpa_421_61(oc_request_t *request, oc_interface_mask_t interfaces,
   oc_send_response(request, OC_STATUS_BAD_REQUEST);
   PRINT("-- End post_dpa_421_61\n");
 }
+
+oc_group_object_notification_t g_send_notification;
+bool g_bool_value = false;
+
+oc_event_callback_retval_t post_callback(void *data);
+
+/* send a multicast s-mode message */
+static void
+issue_requests_s_mode(void)
+{
+  pthread_cond_signal(&cv);
+  oc_set_delayed_callback(NULL, post_callback, 0);
+}
+
+oc_event_callback_retval_t post_callback(void *data)
+{
+  int scope = 5;
+  PRINT(" issue_requests_s_mode\n");
+
+  oc_make_ipv6_endpoint(mcast, IPV6 | DISCOVERY | MULTICAST, 5683, 0xff, scope,
+                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0xfd);
+
+  if (oc_init_post("/.knx", &mcast, NULL, NULL, HIGH_QOS, NULL)) {
+
+    /*
+    { 5: { 6: <st>, 7: <ga>, 1: <value> } }
+    */
+    CborEncoder value_map;
+
+    oc_rep_begin_root_object();
+    oc_rep_i_set_key(&root_map, 5);
+    cbor_encoder_create_map(&root_map, &value_map, CborIndefiniteLength);
+
+    oc_rep_i_set_int(value, 4, g_send_notification.sia);
+    // ga
+    oc_rep_i_set_int(value, 7, g_send_notification.ga);
+    // st M Service type code(write = w, read = r, response = rp) Enum : w, r,
+    // rp
+    // oc_rep_i_set_text_string(value, 6, oc_string(g_send_notification.st));
+    oc_rep_i_set_text_string(value, 6, "w");
+    // boolean
+    oc_rep_i_set_boolean(value, 1, g_bool_value);
+    cbor_encoder_close_container_checked(&root_map, &value_map);
+
+    oc_rep_end_root_object();
+    
+    if (oc_do_post_ex(APPLICATION_CBOR, APPLICATION_CBOR)) {
+      PRINT("  Sent PUT request\n");
+    } else {
+      PRINT("  Could not send POST request\n");
+    }
+  }
+
+  return OC_EVENT_DONE;
+}
+
+
 PyObject *pModule;
 // Action to take on left button press
 // This is exposed in the corresponding Python script
@@ -257,6 +314,8 @@ knx_handle_left(PyObject *self, PyObject *args)
   (void)self;
   (void)args;
   printf("Left from C!\n");
+  g_bool_value = false;
+  issue_requests_s_mode();
   Py_RETURN_NONE;
 }
 
@@ -283,6 +342,8 @@ knx_handle_right(PyObject *self, PyObject *args)
   (void)self;
   (void)args;
   printf("Right from C!\n");
+  g_bool_value = false;
+  issue_requests_s_mode();
   Py_RETURN_NONE;
 }
 
@@ -316,6 +377,7 @@ poll_python(void *data)
     pthread_mutex_lock(&mutex);
     PyErr_CheckSignals();
     if (PyRun_SimpleString("signal.sigtimedwait([], 0.01)") != 0) {
+      printf("Python poll error!\n");
       PyErr_Print();
       quit = 1;
     }
