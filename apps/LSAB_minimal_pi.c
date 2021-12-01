@@ -135,6 +135,7 @@ python_binding_init(void)
   PyRun_SimpleString("import os");
   PyRun_SimpleString("sys.path.append(os.getcwd())");
 
+
   pModule = PyImport_Import(pName);
   Py_DECREF(pName);
 
@@ -154,6 +155,10 @@ python_binding_init(void)
 
     // Import the rest of the Python API
     pSetBacklightFunc = PyObject_GetAttrString(pModule, "set_backlight");
+
+    // Initialize the state of the LCD
+    PyRun_SimpleString("import lsab_minimal");
+    PyRun_SimpleString("lsab_minimal.init()");
 
   } else {
     PyErr_Print();
