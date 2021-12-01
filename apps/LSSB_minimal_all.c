@@ -466,7 +466,7 @@ main(int argc, char *argv[])
   STATIC oc_handler_t handler = { .init = app_init,
                                   .signal_event_loop = signal_event_loop,
                                   .register_resources = register_resources,
-                                  .requests_entry = issue_requests_s_mode };
+                                  .requests_entry = NULL };
 
   if (do_send_s_mode) {
 

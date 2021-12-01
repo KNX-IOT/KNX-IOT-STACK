@@ -17,12 +17,14 @@
 #include "oc_api.h"
 #include "oc_knx.h"
 #include "oc_knx_fp.h"
+#include "oc_knx_dev.h"
 #include "oc_core_res.h"
 #include <stdio.h>
 #include "oc_rep.h" // should not be needed
 
 #define TAGS_AS_STRINGS
 
+#define LSM_STORE "LSM_STORE"
 // ---------------------------Variables --------------------------------------
 
 oc_group_object_notification_t g_received_notification;
@@ -58,6 +60,8 @@ int
 restart_device()
 {
   PRINT("restart device\n");
+
+  // do a reboot...
   return 0;
 }
 
@@ -65,6 +69,9 @@ int
 reset_device(int value)
 {
   PRINT("reset device: %d\n", value);
+
+  oc_knx_device_storage_reset(0);
+
   return 0;
 }
 
@@ -138,6 +145,8 @@ oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   // int time;
   // int code;
 
+  PRINT("oc_core_knx_post_handler\n");
+
   char buffer[200];
   memset(buffer, 200, 1);
   oc_rep_to_json(request->request_payload, (char *)&buffer, 200, true);
@@ -169,17 +178,17 @@ oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     rep = rep->next;
   }
 
-  PRINT("  cmd   :%d\n", cmd);
-  PRINT("  value :%d\n", value);
+  PRINT("  cmd   : %d\n", cmd);
+  PRINT("  value : %d\n", value);
+
+  bool error = true;
 
   if (cmd == RESTART_DEVICE) {
     restart_device();
+    error = false;
   } else if (cmd == RESET_DEVICE) {
     reset_device(value);
-  } else {
-    PRINT(" invalid command\n");
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
-    return;
+    error = false;
   }
 
   // Before executing the reset function,
@@ -187,16 +196,25 @@ oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   // CHANGED and with payload containing Error Code and Process Time in seconds
   // as defined 691 for the Response to a Master Reset Request for KNX Classic
   // devices, see [10].
+  if (error == false) {
 
-  oc_rep_start_root_object();
+    // oc_rep_begin_root_object ();
+    oc_rep_start_root_object();
 
-  // TODO note need to figure out how to fill in the correct response values
-  oc_rep_set_int(root, code, 5);
-  oc_rep_set_int(root, time, 15);
-  oc_rep_end_root_object();
+    // note need to figure out how to fill in the correct response values
+    oc_rep_set_int(root, code, 5);
+    oc_rep_set_int(root, time, 2);
+    oc_rep_end_root_object();
 
-  PRINT("oc_core_knx_post_handler - end\n");
-  oc_send_cbor_response(request, OC_STATUS_CHANGED);
+    PRINT("oc_core_knx_post_handler %d - end\n",
+          oc_rep_get_encoded_payload_size());
+    oc_send_cbor_response(request, OC_STATUS_CHANGED);
+    return;
+  }
+
+  PRINT(" invalid command\n");
+  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+  return;
 }
 
 void
@@ -414,6 +432,8 @@ oc_core_knx_lsm_post_handler(oc_request_t *request,
     oc_rep_start_root_object();
     oc_rep_i_set_text_string(root, 3, oc_core_get_lsm_as_string(device->lsm));
     oc_rep_end_root_object();
+
+    oc_storage_write(LSM_STORE, (uint8_t *)&device->lsm, sizeof(device->lsm));
 
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
     return;
@@ -1163,6 +1183,27 @@ oc_do_s_mode(char *resource_url, char *rp)
 
   // free buffer
   // free(buffer);
+}
+
+void
+oc_knx_load_state(size_t device_index)
+{
+  int temp_size;
+
+  oc_lsm_state_t lsm;
+  PRINT("oc_knx_load_state: Loading Device Config from Persistent storage\n");
+
+  oc_device_info_t *device = oc_core_get_device_info(device_index);
+  if (device == NULL) {
+    OC_ERR(" could not get device %d\n", device_index)
+  }
+
+  temp_size = oc_storage_read(LSM_STORE, (uint8_t *)&lsm, sizeof(lsm));
+  if (temp_size > 0) {
+    device->lsm = lsm;
+    PRINT("  load state (storage) %ld [%s]\n", (long)lsm,
+          oc_core_get_lsm_as_string(lsm));
+  }
 }
 
 void

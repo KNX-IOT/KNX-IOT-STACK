@@ -39,7 +39,31 @@ for the resources implemented / dev / *
 */
 void oc_knx_device_storage_read(size_t device);
 
+/**
+ * @brief clear the persistent storage
+ * clears device info:
+ * - internal address (ia)
+ * - hostname
+ * - Installation ID (iid)
+ * - programming mode (pm)
+ * - group object table
+ *
+ * @param device_index
+ */
 void oc_knx_device_storage_reset(size_t device_index);
+
+/**
+ * @brief function checks if the device is in programming mode
+ * the following resources can be changed when in programming mode
+ * - ia
+ * - hostname
+ * - idd
+ *
+ * @param device_index the device index
+ * @return true in programming mode
+ * @return false not in programming mode
+ */
+bool oc_knx_device_in_programming_mode(size_t device_index);
 
 #ifdef __cplusplus
 }
