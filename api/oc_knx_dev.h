@@ -39,6 +39,17 @@ for the resources implemented / dev / *
 */
 void oc_knx_device_storage_read(size_t device);
 
+/**
+ * @brief clear the persistent storage
+ * clears device info:
+ * - internal address (ia)
+ * - hostname
+ * - Installation ID (iid)
+ * - programming mode (pm)
+ * - group object table
+ *
+ * @param device_index
+ */
 void oc_knx_device_storage_reset(size_t device_index);
 
 #ifdef __cplusplus
