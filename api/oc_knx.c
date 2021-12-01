@@ -1195,7 +1195,7 @@ oc_knx_load_state(size_t device_index)
 
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device == NULL) {
-    OC_ERR(" could not get device %d\n", device_index)
+    OC_ERR(" could not get device %d\n", device_index);
   }
 
   temp_size = oc_storage_read(LSM_STORE, (uint8_t *)&lsm, sizeof(lsm));

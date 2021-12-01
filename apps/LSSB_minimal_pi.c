@@ -256,8 +256,8 @@ oc_event_callback_retval_t post_callback(void *data);
 static void
 issue_requests_s_mode(void)
 {
+  oc_set_delayed_callback(NULL, post_callback, 1);
   pthread_cond_signal(&cv);
-  oc_set_delayed_callback(NULL, post_callback, 0);
 }
 
 oc_event_callback_retval_t
@@ -269,7 +269,8 @@ post_callback(void *data)
   oc_make_ipv6_endpoint(mcast, IPV6 | DISCOVERY | MULTICAST, 5683, 0xff, scope,
                         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0xfd);
 
-  if (oc_init_post("/.knx", &mcast, NULL, NULL, HIGH_QOS, NULL)) {
+  // Alex - changed this to LOW_QOS - multicasts must not be acknowledged per the CoAP spec
+  if (oc_init_post("/.knx", &mcast, NULL, NULL, LOW_QOS, NULL)) {
 
     /*
     { 5: { 6: <st>, 7: <ga>, 1: <value> } }
