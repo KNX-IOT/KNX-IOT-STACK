@@ -143,7 +143,7 @@ oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   int cmd = -1;
   // int time;
   // int code;
-  
+
   PRINT("oc_core_knx_post_handler\n");
 
   char buffer[200];
@@ -197,7 +197,7 @@ oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   // devices, see [10].
   if (error == false) {
 
-    //oc_rep_begin_root_object ();
+    // oc_rep_begin_root_object ();
     oc_rep_start_root_object();
 
     // note need to figure out how to fill in the correct response values
@@ -211,10 +211,9 @@ oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     return;
   }
 
-   PRINT(" invalid command\n");
+  PRINT(" invalid command\n");
   oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
   return;
-
 }
 
 void

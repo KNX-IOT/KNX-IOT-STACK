@@ -684,7 +684,6 @@ oc_core_fp_g_x_del_handler(oc_request_t *request,
     oc_string(request->resource->uri), oc_string_len(request->resource->uri),
     request->uri_path, request->uri_path_len);
 
-  
   size_t device_index = request->resource->device;
   if (oc_knx_lsm_state(device_index) != LSM_LOADING) {
     PRINT(" not in loading state\n");
