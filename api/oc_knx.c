@@ -1066,7 +1066,10 @@ oc_issue_s_mode(int sia_value, int group_address, char *rp, uint8_t *value_data,
     { 4: <sia>, 5: { 6: <st>, 7: <ga>, 1: <value> } }
     */
 
+    PRINT("before subtract and encode: %d\n", oc_rep_get_encoded_payload_size());
     oc_rep_subtract_length(oc_rep_get_encoded_payload_size());
+    PRINT("after subtract, before encode: %d\n", oc_rep_get_encoded_payload_size());
+
     oc_rep_begin_root_object();
 
     oc_rep_i_set_int(root, 4, sia_value);
