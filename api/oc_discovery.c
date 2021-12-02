@@ -15,9 +15,7 @@
 // limitations under the License.
 */
 
-#ifdef OC_CLIENT
 #include "oc_client_state.h"
-#endif /* OC_CLIENT */
 
 #include "messaging/coap/oc_coap.h"
 #include "oc_api.h"
@@ -339,7 +337,6 @@ process_device_resources(CborEncoder *links, oc_request_t *request,
 
 #endif /* OC_SECURITY */
 
-#ifdef OC_SERVER
   oc_resource_t *resource = oc_ri_get_app_resources();
   for (; resource; resource = resource->next) {
     if (resource->device != device_index ||
@@ -350,14 +347,14 @@ process_device_resources(CborEncoder *links, oc_request_t *request,
                         device_index))
       matches++;
   }
-#endif /* OC_SERVER */
 
   oc_free_string(&anchor);
 
   return matches;
 }
 
-static void
+// remove this
+void
 oc_core_discovery_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
                           void *data)
 {
@@ -435,8 +432,6 @@ oc_core_discovery_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     request->response->response_buffer->code = OC_IGNORE;
   }
 }
-
-#ifdef OC_SERVER
 
 static void
 oc_wkcore_discovery_handler(oc_request_t *request,
@@ -544,7 +539,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
       frame_ep = true;
     }
     if (frame_ep) {
-      /* return <>; ep=”urn:knx:sn.<serial-number>”*/
+      /* return <>; ep="urn:knx:sn.<serial-number>"*/
       int size = oc_rep_add_line_to_buffer("<>;ep=urn:knx:sn.");
       response_length = response_length + size;
       size = oc_rep_add_line_to_buffer(oc_string(device->serialnumber));
@@ -583,13 +578,10 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   }
 }
 
-#endif /* OC_SERVER */
-
 void
 oc_create_discovery_resource(int resource_idx, size_t device)
 {
 
-#ifdef OC_SERVER
   if (resource_idx == WELLKNOWNCORE) {
 
     oc_core_lf_populate_resource(resource_idx, device, "/.well-known/core", 0,
@@ -598,14 +590,12 @@ oc_create_discovery_resource(int resource_idx, size_t device)
 
     return;
   }
-#endif /* OC_SERVER*/
 
-  oc_core_populate_resource(
-    resource_idx, device, "oic/res", OC_IF_LL | OC_IF_BASELINE, OC_IF_LL,
-    OC_DISCOVERABLE, oc_core_discovery_handler, 0, 0, 0, 1, "oic.wk.res");
+  // oc_core_populate_resource(
+  //   resource_idx, device, "oic/res", OC_IF_LL | OC_IF_BASELINE, OC_IF_LL,
+  //   OC_DISCOVERABLE, oc_core_discovery_handler, 0, 0, 0, 1, "oic.wk.res");
 }
 
-#ifdef OC_CLIENT
 oc_discovery_flags_t
 oc_ri_process_discovery_payload(uint8_t *payload, int len,
                                 oc_client_handler_t client_handler,
@@ -628,4 +618,3 @@ oc_ri_process_discovery_payload(uint8_t *payload, int len,
 
   return ret;
 }
-#endif /* OC_CLIENT */
