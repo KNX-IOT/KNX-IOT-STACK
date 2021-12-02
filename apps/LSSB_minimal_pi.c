@@ -257,8 +257,7 @@ static void
 issue_requests_s_mode(void)
 {
   // Alex - delay by 1 second to make sure it is called from the main loop
-  oc_set_delayed_callback(NULL, post_callback, 1);
-  pthread_cond_signal(&cv);
+  oc_set_delayed_callback(NULL, post_callback, 0);
 }
 
 oc_event_callback_retval_t
@@ -271,8 +270,9 @@ post_callback(void *data)
                         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0xfd);
 
   // Alex - changed this to LOW_QOS - multicasts must not be acknowledged per the CoAP spec
-  if (oc_init_post("/.knx", &mcast, NULL, NULL, LOW_QOS, NULL)) {
+  if (oc_init_post("/.knx", &mcast, NULL, NULL, HIGH_QOS, NULL)) {
 
+    g_send_notification.ga = 1;
     /*
     { 5: { 6: <st>, 7: <ga>, 1: <value> } }
     */
@@ -315,6 +315,7 @@ knx_handle_left(PyObject *self, PyObject *args)
   // don't care about args, so don't check them
   (void)self;
   (void)args;
+  pthread_cond_signal(&cv);
   printf("Left from C!\n");
   g_bool_value = false;
   issue_requests_s_mode();
@@ -330,6 +331,7 @@ knx_handle_mid(PyObject *self, PyObject *args)
   // don't care about args, so don't check them
   (void)self;
   (void)args;
+  pthread_cond_signal(&cv);
   printf("Mid from C!\n");
   Py_RETURN_NONE;
 }
@@ -343,6 +345,7 @@ knx_handle_right(PyObject *self, PyObject *args)
   // don't care about args, so don't check them
   (void)self;
   (void)args;
+  pthread_cond_signal(&cv);
   printf("Right from C!\n");
   g_bool_value = false;
   issue_requests_s_mode();
@@ -377,7 +380,7 @@ poll_python(void *data)
 {
   while (true) {
     pthread_mutex_lock(&mutex);
-    PyErr_CheckSignals();
+    //PyErr_CheckSignals();
     if (PyRun_SimpleString("signal.sigtimedwait([], 0.01)") != 0) {
       printf("Python poll error!\n");
       PyErr_Print();
