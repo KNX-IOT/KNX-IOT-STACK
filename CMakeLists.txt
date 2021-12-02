@@ -190,7 +190,7 @@ target_link_libraries(kis-server PRIVATE
 target_link_libraries(kis-server PUBLIC kis-common)
 
 add_library(kisClientServer)
-target_compile_definitions(kisClientServer PUBLIC OC_SERVER OC_CLIENT)
+target_compile_definitions(kisClientServer PUBLIC OC_SERVER=1 OC_CLIENT=1)
 target_link_libraries(kisClientServer PRIVATE
     kis-coap
     kis-api
@@ -198,6 +198,7 @@ target_link_libraries(kisClientServer PRIVATE
 )
 target_link_libraries(kisClientServer PUBLIC kis-common)
 
+add_compile_definitions(OC_CLIENT OC_SERVER)
 
 if(PROJECT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     # Add clang-format target

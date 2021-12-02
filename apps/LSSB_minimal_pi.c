@@ -144,7 +144,7 @@ app_init(void)
 }
 
 /** the state of the dpa 421.61 */
-bool g_mystate = false;
+volatile bool g_mystate = false;
 
 /**
  * get method for "p/push" resource.
@@ -307,7 +307,8 @@ knx_handle_left(PyObject *self, PyObject *args)
   (void)self;
   (void)args;
   printf("Left from C!\n");
-  g_bool_value = false;
+  g_mystate = false;
+  //g_bool_value = false;
   issue_requests_s_mode();
   Py_RETURN_NONE;
 }
@@ -335,7 +336,8 @@ knx_handle_right(PyObject *self, PyObject *args)
   (void)self;
   (void)args;
   printf("Right from C!\n");
-  g_bool_value = false;
+  g_mystate = true;
+  // g_bool_value = true;
   issue_requests_s_mode();
   Py_RETURN_NONE;
 }
