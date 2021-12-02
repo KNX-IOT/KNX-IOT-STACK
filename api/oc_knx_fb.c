@@ -22,13 +22,11 @@
 #include "oc_discovery.h"
 #include <stdio.h>
 
-
-
 // -----------------------------------------------------------------------------
 
 static void
 oc_core_fb_x_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
-                       void *data)
+                         void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -74,13 +72,11 @@ oc_create_fb_x_resource(int resource_idx, size_t device)
     oc_core_fb_x_get_handler, 0, 0, 0, 1, "urn:knx:fb.0");
 }
 
-
-
 // -----------------------------------------------------------------------------
 
 static void
-oc_core_fb_get_handler(oc_request_t *request,
-                            oc_interface_mask_t iface_mask, void *data)
+oc_core_fb_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
+                       void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -98,7 +94,7 @@ oc_core_fb_get_handler(oc_request_t *request,
 
   size_t device_index = request->resource->device;
 
-  oc_resource_t* resource = oc_ri_get_app_resources();
+  oc_resource_t *resource = oc_ri_get_app_resources();
   for (; resource; resource = resource->next) {
     if (resource->device != device_index ||
         !(resource->properties & OC_DISCOVERABLE)) {
@@ -109,14 +105,11 @@ oc_core_fb_get_handler(oc_request_t *request,
       char *t = oc_string_array_get_item(types, i);
       if (strncmp(t, ":dpa", 10) == 0) {
 
-      //  strncpy(a_light, uri, uri_len);
-      //  a_light[uri_len] = '\0';
+        //  strncpy(a_light, uri, uri_len);
+        //  a_light[uri_len] = '\0';
       }
     }
-
-    
   }
-
 
   if (matches > 0) {
     oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
@@ -138,8 +131,6 @@ oc_create_fb_resource(int resource_idx, size_t device)
     oc_core_fb_get_handler, 0, 0, 0, 1, "urn:knx:fb.0");
 }
 
-
-
 void
 oc_create_knx_fb_resources(size_t device_index)
 {
@@ -148,5 +139,4 @@ oc_create_knx_fb_resources(size_t device_index)
   oc_create_fb_resource(OC_KNX_F, device_index);
 
   // PRINT("reading device storage\n");
-
 }

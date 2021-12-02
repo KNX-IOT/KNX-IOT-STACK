@@ -278,7 +278,7 @@ register_resources(void)
   /* periodic observable
      to be used when one wants to send an event per time slice
      period is 1 second */
- // oc_resource_set_periodic_observable(res_pushbutton, 1);
+  // oc_resource_set_periodic_observable(res_pushbutton, 1);
   /* set observable
      events are send when oc_notify_observers(oc_resource_t *resource) is
     called. this function must be called when the value changes, preferable on

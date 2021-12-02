@@ -231,8 +231,8 @@ typedef enum {
   OC_KNX_FP_R_X,   ///< FP/R/X
   OC_KNX_P,        ///< P
 
-  OC_KNX_F,        ///< /f
-  OC_KNX_F_X,      ///< /f/X
+  OC_KNX_F,   ///< /f
+  OC_KNX_F_X, ///< /f/X
 
   OC_KNX_SWU_PROTOCOL,
   OC_KNX_SWU_MAXDEFER,

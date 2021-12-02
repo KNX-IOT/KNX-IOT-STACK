@@ -354,7 +354,7 @@ process_device_resources(CborEncoder *links, oc_request_t *request,
 }
 
 // remove this
- void
+void
 oc_core_discovery_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
                           void *data)
 {
@@ -591,9 +591,9 @@ oc_create_discovery_resource(int resource_idx, size_t device)
     return;
   }
 
- // oc_core_populate_resource(
- //   resource_idx, device, "oic/res", OC_IF_LL | OC_IF_BASELINE, OC_IF_LL,
- //   OC_DISCOVERABLE, oc_core_discovery_handler, 0, 0, 0, 1, "oic.wk.res");
+  // oc_core_populate_resource(
+  //   resource_idx, device, "oic/res", OC_IF_LL | OC_IF_BASELINE, OC_IF_LL,
+  //   OC_DISCOVERABLE, oc_core_discovery_handler, 0, 0, 0, 1, "oic.wk.res");
 }
 
 oc_discovery_flags_t

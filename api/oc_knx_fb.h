@@ -31,7 +31,6 @@ extern "C" {
  */
 void oc_create_knx_fb_resources(size_t device);
 
-
 #ifdef __cplusplus
 }
 #endif
