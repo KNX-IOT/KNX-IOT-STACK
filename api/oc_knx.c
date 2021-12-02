@@ -1064,6 +1064,7 @@ oc_issue_s_mode(int sia_value, int group_address, char *rp, uint8_t *value_data,
     { 4: <sia>, 5: { 6: <st>, 7: <ga>, 1: <value> } }
     */
 
+    oc_rep_subtract_length(oc_rep_get_encoded_payload_size());
     oc_rep_begin_root_object();
 
     oc_rep_i_set_int(root, 4, sia_value);
@@ -1087,6 +1088,8 @@ oc_issue_s_mode(int sia_value, int group_address, char *rp, uint8_t *value_data,
     cbor_encoder_close_container_checked(&root_map, &value_map);
 
     oc_rep_end_root_object();
+
+    PRINT("S-MODE Payload Size: %d\n", oc_rep_get_encoded_payload_size());
 
     if (oc_do_post_ex(APPLICATION_CBOR, APPLICATION_CBOR)) {
       PRINT("  Sent POST request\n");
@@ -1164,6 +1167,11 @@ oc_do_s_mode(char *resource_url, char *rp)
   // int value_size = request.response->response_buffer->buffer_size;
   int value_size = oc_rep_get_encoded_payload_size();
   uint8_t *value_data = request.response->response_buffer->buffer;
+
+  // Cache value data, as it gets overwritten in oc_issue_do_s_mode
+  uint8_t buf[100];
+  assert(value_size < 100);
+  memcpy(buf, value_data, value_size);
 
   if (value_size == 0) {
     PRINT(" . ERROR: value size == 0");

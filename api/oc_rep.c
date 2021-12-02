@@ -62,6 +62,13 @@ oc_rep_encode_raw(const uint8_t *data, size_t len)
   g_err = CborNoError;
 }
 
+void
+oc_rep_subtract_length(size_t len)
+{
+  g_encoder.data.ptr -= len;
+  g_err = CborNoError;
+}
+
 int
 oc_rep_add_line_to_buffer(const char *line)
 {
