@@ -1052,7 +1052,7 @@ oc_issue_s_mode(int sia_value, int group_address, char *rp, uint8_t *value_data,
   oc_make_ipv6_endpoint(mcast, IPV6 | DISCOVERY | MULTICAST, 5683, 0xff, scope,
                         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0xfd);
 
-  if (oc_init_post("/.knx", &mcast, NULL, NULL, HIGH_QOS, NULL)) {
+  if (oc_init_post("/.knx", &mcast, NULL, NULL, LOW_QOS, NULL)) {
 
     /*
     { 4: <sia>, 5: { 6: <st>, 7: <ga>, 1: <value> } }
