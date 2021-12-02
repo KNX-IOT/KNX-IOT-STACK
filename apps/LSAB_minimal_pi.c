@@ -511,7 +511,7 @@ main(void)
    post fix.
   */
   PRINT("\tstorage at './LSAB_minimal_pi' \n");
-  oc_storage_config("./LSAB_minimal_pi");
+  oc_storage_config("./LSAB_minimal_pi_creds");
 
   /*initialize the variables */
   initialize_variables();
