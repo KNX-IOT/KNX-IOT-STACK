@@ -85,16 +85,6 @@
 #include "external_header.h"
 #endif
 
-#ifdef __linux__
-/** linux specific code */
-#include <pthread.h>
-#ifndef NO_MAIN
-static pthread_mutex_t mutex;
-static pthread_cond_t cv;
-static struct timespec ts;
-#endif /* NO_MAIN */
-#endif
-
 #include <stdio.h> /* defines FILENAME_MAX */
 
 #define MY_NAME "Sensor (LSSB) 421.61" /**< The name of the application */
@@ -257,7 +247,8 @@ static void
 issue_requests_s_mode(void)
 {
   // Alex - delay by 1 second to make sure it is called from the main loop
-  oc_set_delayed_callback(NULL, post_callback, 0);
+  //post_callback(NULL);
+  oc_do_s_mode("p/push", "w");
 }
 
 oc_event_callback_retval_t
@@ -315,7 +306,6 @@ knx_handle_left(PyObject *self, PyObject *args)
   // don't care about args, so don't check them
   (void)self;
   (void)args;
-  pthread_cond_signal(&cv);
   printf("Left from C!\n");
   g_bool_value = false;
   issue_requests_s_mode();
@@ -331,7 +321,6 @@ knx_handle_mid(PyObject *self, PyObject *args)
   // don't care about args, so don't check them
   (void)self;
   (void)args;
-  pthread_cond_signal(&cv);
   printf("Mid from C!\n");
   Py_RETURN_NONE;
 }
@@ -345,7 +334,6 @@ knx_handle_right(PyObject *self, PyObject *args)
   // don't care about args, so don't check them
   (void)self;
   (void)args;
-  pthread_cond_signal(&cv);
   printf("Right from C!\n");
   g_bool_value = false;
   issue_requests_s_mode();
@@ -378,15 +366,11 @@ PyInit_knx(void)
 static void *
 poll_python(void *data)
 {
-  while (true) {
-    pthread_mutex_lock(&mutex);
-    //PyErr_CheckSignals();
-    if (PyRun_SimpleString("signal.sigtimedwait([], 0.01)") != 0) {
-      printf("Python poll error!\n");
-      PyErr_Print();
-      quit = 1;
-    }
-    pthread_mutex_unlock(&mutex);
+  PyErr_CheckSignals();
+  if (PyRun_SimpleString("signal.sigtimedwait([], 0.001)") != 0) {
+    printf("Python poll error!\n");
+    PyErr_Print();
+    quit = 1;
   }
 }
 
@@ -479,9 +463,6 @@ signal_event_loop(void)
 STATIC void
 signal_event_loop(void)
 {
-  pthread_mutex_lock(&mutex);
-  pthread_cond_signal(&cv);
-  pthread_mutex_unlock(&mutex);
 }
 #endif /* __linux__ */
 
@@ -493,7 +474,7 @@ void
 handle_signal(int signal)
 {
   (void)signal;
-  signal_event_loop();
+  printf("quit signal received");
   quit = 1;
 }
 
@@ -541,15 +522,15 @@ main(void)
   /* install Ctrl-C */
   signal(SIGINT, handle_signal);
 #endif
-#ifdef __linux__
-  /* Linux specific */
-  struct sigaction sa;
-  sigfillset(&sa.sa_mask);
-  sa.sa_flags = 0;
-  sa.sa_handler = handle_signal;
-  /* install Ctrl-C */
-  sigaction(SIGINT, &sa, NULL);
-#endif
+// #ifdef __linux__
+//   /* Linux specific */
+//   struct sigaction sa;
+//   sigfillset(&sa.sa_mask);
+//   sa.sa_flags = 0;
+//   sa.sa_handler = handle_signal;
+//   /* install Ctrl-C */
+//   sigaction(SIGINT, &sa, NULL);
+// #endif
 
   PRINT("KNX-IOT Server name : \"%s\"\n", MY_NAME);
 
@@ -608,13 +589,6 @@ main(void)
   PyRun_SimpleString("import simpleclient");
   PyRun_SimpleString("simpleclient.init()");
 
-  // create thread for polling the Python interpreter
-  pthread_t thread;
-  if (pthread_create(&thread, NULL, poll_python, NULL) != 0) {
-    printf("Failed to create python thread\n");
-    init = -1;
-    goto exit;
-  }
 #ifdef OC_SECURITY
   /* print out the current DI of the device */
   char uuid[37] = { 0 };
@@ -659,16 +633,8 @@ main(void)
 #ifdef __linux__
   /* Linux specific loop */
   while (quit != 1) {
-    next_event = oc_main_poll();
-    pthread_mutex_lock(&mutex);
-    if (next_event == 0) {
-      pthread_cond_wait(&cv, &mutex);
-    } else {
-      ts.tv_sec = (next_event / OC_CLOCK_SECOND);
-      ts.tv_nsec = (next_event % OC_CLOCK_SECOND) * 1.e09 / OC_CLOCK_SECOND;
-      pthread_cond_timedwait(&cv, &mutex, &ts);
-    }
-    pthread_mutex_unlock(&mutex);
+    oc_main_poll();
+    poll_python(NULL);
   }
 #endif
 
