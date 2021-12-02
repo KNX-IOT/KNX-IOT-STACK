@@ -521,7 +521,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
   oc_rep_to_json(request->request_payload, (char *)&buffer, 200, true);
   PRINT("%s", buffer);
 
-  PRINT("%d" request->_payload_len);
+  PRINT("%d", request->_payload_len);
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_CBOR) {
