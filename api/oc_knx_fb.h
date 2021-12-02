@@ -26,7 +26,7 @@ extern "C" {
 /**
  *@brief Creation of the KNX function block resources.
  * - /fb
- * - /fb/*
+ * - /fb/X
  *@param device index of the device to which the resource is to be created
  */
 void oc_create_knx_fb_resources(size_t device);
