@@ -353,7 +353,8 @@ process_device_resources(CborEncoder *links, oc_request_t *request,
   return matches;
 }
 
-static void
+// remove this
+ void
 oc_core_discovery_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
                           void *data)
 {
