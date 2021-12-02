@@ -515,6 +515,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
   (void)iface_mask;
   oc_rep_t *rep = NULL;
 
+  PRINT("KNX KNX Post Handler");
   char buffer[200];
   memset(buffer, 200, 1);
   oc_rep_to_json(request->request_payload, (char *)&buffer, 200, true);
