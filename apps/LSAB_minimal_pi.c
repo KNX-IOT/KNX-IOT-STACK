@@ -312,6 +312,10 @@ post_dpa_417_61(oc_request_t *request, oc_interface_mask_t interfaces,
     // the regular payload
     rep = request->request_payload;
   }
+  char buffer[200];
+  memset(buffer, 200, 1);
+  oc_rep_to_json(rep, (char *)&buffer, 200, true);
+  PRINT("%s", buffer);
 
   // handle the type of payload correctly.
   if ((rep != NULL) && (rep->type == OC_REP_BOOL)) {
