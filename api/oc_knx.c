@@ -518,14 +518,14 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_CBOR) {
     request->response->response_buffer->code =
-      oc_status_code(OC_STATUS_BAD_REQUEST);
+      oc_status_code(OC_IGNORE);
     return;
   }
 
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device == NULL) {
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    oc_send_cbor_response(request, OC_IGNORE);
     return;
   }
 
@@ -606,7 +606,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
   int index = oc_core_find_group_object_table_index(g_received_notification.ga);
   PRINT(" .knx : index %d\n", index);
   if (index == -1) {
-    oc_send_cbor_response(request, OC_STATUS_CHANGED);
+    oc_send_cbor_response(request, OC_IGNORE);
     return;
   }
 
@@ -626,7 +626,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
     my_resource->post_handler.cb(request, iface_mask, data);
   }
 
-  oc_send_cbor_response(request, OC_STATUS_CHANGED);
+  oc_send_cbor_response(request, OC_IGNORE);
 }
 
 void
