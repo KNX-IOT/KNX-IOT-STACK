@@ -1073,7 +1073,7 @@ oc_issue_s_mode(int sia_value, int group_address, char *rp, uint8_t *value_data,
 
     oc_rep_begin_root_object();
 
-    oc_rep_i_set_int(root, 4, sia_value);
+    // oc_rep_i_set_int(root, 4, sia_value);
 
     oc_rep_i_set_key(&root_map, 5);
     CborEncoder value_map;
