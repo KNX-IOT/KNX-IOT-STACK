@@ -519,9 +519,9 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
   char buffer[200];
   memset(buffer, 200, 1);
   oc_rep_to_json(request->request_payload, (char *)&buffer, 200, true);
-  PRINT("%s", buffer);
+  PRINT("Decoded Payload: %s\n", buffer);
 
-  PRINT("%d", request->_payload_len);
+  PRINT("Full Payload Size: %d\n", request->_payload_len);
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_CBOR) {
@@ -1067,7 +1067,8 @@ oc_issue_s_mode(int sia_value, int group_address, char *rp, uint8_t *value_data,
     */
 
     PRINT("before subtract and encode: %d\n", oc_rep_get_encoded_payload_size());
-    oc_rep_subtract_length(oc_rep_get_encoded_payload_size());
+    // oc_rep_new(response_buffer.buffer, response_buffer.buffer_size);
+    // oc_rep_subtract_length(oc_rep_get_encoded_payload_size());
     PRINT("after subtract, before encode: %d\n", oc_rep_get_encoded_payload_size());
 
     oc_rep_begin_root_object();
@@ -1088,7 +1089,7 @@ oc_issue_s_mode(int sia_value, int group_address, char *rp, uint8_t *value_data,
     oc_rep_i_set_key(&value_map, 5);
     // copy the data, this is already in cbor from the fake response of the
     // resource GET function
-    oc_rep_encode_raw(value_data, value_size);
+    oc_rep_encode_raw_encoder(&value_map, value_data, value_size);
 
     cbor_encoder_close_container_checked(&root_map, &value_map);
 
@@ -1195,7 +1196,7 @@ oc_do_s_mode(char *resource_url, char *rp)
       group_address = oc_core_find_group_object_table_group_entry(index, j);
       PRINT("   ga : %d\n", group_address);
       // issue the s-mode command
-      oc_issue_s_mode(sia_value, group_address, rp, value_data, value_size);
+      oc_issue_s_mode(sia_value, group_address, rp, buf, value_size);
     }
     index = oc_core_find_next_group_object_table_url(resource_url, index);
   }

@@ -246,8 +246,8 @@ oc_event_callback_retval_t post_callback(void *data);
 static void
 issue_requests_s_mode(void)
 {
-  //oc_do_s_mode("p/push", "w");
-  post_callback(NULL);
+  oc_do_s_mode("p/push", "w");
+  // post_callback(NULL);
 }
 
 oc_event_callback_retval_t
@@ -283,6 +283,8 @@ post_callback(void *data)
     cbor_encoder_close_container_checked(&root_map, &value_map);
 
     oc_rep_end_root_object();
+
+    PRINT("Encoded Payload Size: %d\n", oc_rep_get_encoded_payload_size());
 
     if (oc_do_post_ex(APPLICATION_CBOR, APPLICATION_CBOR)) {
       PRINT("  Sent PUT request\n");

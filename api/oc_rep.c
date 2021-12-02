@@ -63,9 +63,10 @@ oc_rep_encode_raw(const uint8_t *data, size_t len)
 }
 
 void
-oc_rep_subtract_length(size_t len)
+oc_rep_encode_raw_encoder(CborEncoder *encoder, const uint8_t *data, size_t len)
 {
-  g_encoder.data.ptr -= len;
+  memcpy(encoder->data.ptr, data, len);
+  encoder->data.ptr = encoder->data.ptr + len;
   g_err = CborNoError;
 }
 
