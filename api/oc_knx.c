@@ -515,6 +515,11 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
   (void)iface_mask;
   oc_rep_t *rep = NULL;
 
+  char buffer[200];
+  memset(buffer, 200, 1);
+  oc_rep_to_json(request->request_payload, (char *)&buffer, 200, true);
+  PRINT("%s", buffer);
+
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_CBOR) {
     request->response->response_buffer->code =
