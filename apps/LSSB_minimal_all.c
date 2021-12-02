@@ -137,7 +137,7 @@ app_init(void)
   oc_core_set_device_hwv(0, 1, 0, 0);
 
   /* set the firmware version 1.0.0 */
-  oc_core_set_device_fwv(0 , 1, 0, 0);
+  oc_core_set_device_fwv(0, 1, 0, 0);
 
   /* set the hardware type*/
   oc_core_set_device_hwt(0, "Pi");
