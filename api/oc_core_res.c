@@ -58,6 +58,7 @@ oc_core_init(void)
 #ifdef OC_DYNAMIC_ALLOCATION
   core_resources = (oc_resource_t *)calloc(1, sizeof(oc_resource_t));
   if (!core_resources) {
+    printf("COULD NOT ALLOCATE CORE RESOURCE\n\n\n\n\n");
     oc_abort("Insufficient memory");
   }
 
