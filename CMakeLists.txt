@@ -61,6 +61,7 @@ target_sources(kis-api INTERFACE
     ${PROJECT_SOURCE_DIR}/api/oc_uuid.c
     ${PROJECT_SOURCE_DIR}/api/oc_knx.c
     ${PROJECT_SOURCE_DIR}/api/oc_knx_dev.c
+    ${PROJECT_SOURCE_DIR}/api/oc_knx_fb.c
     ${PROJECT_SOURCE_DIR}/api/oc_knx_fp.c
     ${PROJECT_SOURCE_DIR}/api/oc_knx_sec.c
     ${PROJECT_SOURCE_DIR}/api/oc_knx_swu.c
@@ -199,6 +200,24 @@ target_link_libraries(kisClientServer PRIVATE
 target_link_libraries(kisClientServer PUBLIC kis-common)
 
 add_compile_definitions(OC_CLIENT OC_SERVER)
+include (GenerateExportHeader)
+
+add_library(kisClientServer_shared)
+GENERATE_EXPORT_HEADER( kisClientServer_shared
+             BASE_NAME kisClientServer_shared
+             EXPORT_MACRO_NAME kisClientServer_shared_EXPORT
+             EXPORT_FILE_NAME kisClientServer_shared_Export.h
+             STATIC_DEFINE kisClientServer_shared_BUILT_AS_STATIC
+)
+
+target_compile_definitions(kisClientServer_shared PUBLIC OC_SERVER OC_CLIENT)
+target_link_libraries(kisClientServer PRIVATE
+    kis-coap
+    kis-api
+    kis-port
+)
+target_link_libraries(kisClientServer_shared SHARED kis-common)
+
 
 if(PROJECT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     # Add clang-format target
