@@ -272,6 +272,7 @@ oc_process_resources(oc_request_t *request, size_t device_index,
   return matches;
 }
 
+// remove this
 int
 process_device_resources(CborEncoder *links, oc_request_t *request,
                          size_t device_index)
