@@ -246,7 +246,52 @@ oc_event_callback_retval_t post_callback(void *data);
 static void
 issue_requests_s_mode(void)
 {
-  oc_do_s_mode("p/push", "w");
+  //oc_do_s_mode("p/push", "w");
+  post_callback(NULL);
+}
+
+oc_event_callback_retval_t
+post_callback(void *data)
+{
+  int scope = 5;
+  PRINT(" issue_requests_s_mode\n");
+
+  oc_make_ipv6_endpoint(mcast, IPV6 | DISCOVERY | MULTICAST, 5683, 0xff, scope,
+                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0xfd);
+
+  if (oc_init_post("/.knx", &mcast, NULL, NULL, LOW_QOS, NULL)) {
+
+    g_send_notification.ga = 1;
+    /*
+    { 5: { 6: <st>, 7: <ga>, 1: <value> } }
+    */
+    CborEncoder value_map;
+
+    oc_rep_begin_root_object();
+    oc_rep_i_set_key(&root_map, 5);
+    cbor_encoder_create_map(&root_map, &value_map, CborIndefiniteLength);
+
+    oc_rep_i_set_int(value, 4, g_send_notification.sia);
+    // ga
+    oc_rep_i_set_int(value, 7, g_send_notification.ga);
+    // st M Service type code(write = w, read = r, response = rp) Enum : w, r,
+    // rp
+    // oc_rep_i_set_text_string(value, 6, oc_string(g_send_notification.st));
+    oc_rep_i_set_text_string(value, 6, "w");
+    // boolean
+    oc_rep_i_set_boolean(value, 1, g_mystate);
+    cbor_encoder_close_container_checked(&root_map, &value_map);
+
+    oc_rep_end_root_object();
+
+    if (oc_do_post_ex(APPLICATION_CBOR, APPLICATION_CBOR)) {
+      PRINT("  Sent PUT request\n");
+    } else {
+      PRINT("  Could not send POST request\n");
+    }
+  }
+
+  return OC_EVENT_DONE;
 }
 
 PyObject *pModule;
