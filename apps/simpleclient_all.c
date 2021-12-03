@@ -450,7 +450,7 @@ main(int argc, char *argv[])
   PRINT("Security - Disabled\n");
 #endif /* OC_SECURITY */
 
- PRINT("SimpleClient running, waiting on incoming "
+  PRINT("SimpleClient running, waiting on incoming "
         "connections.\n");
 
 #ifdef WIN32
