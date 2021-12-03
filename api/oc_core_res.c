@@ -328,6 +328,11 @@ oc_core_set_device_fwv(int device_index, int major, int minor, int minor2)
 int
 oc_core_set_device_hwv(int device_index, int major, int minor, int minor2)
 {
+  if (device_index >= oc_number_of_devices()) {
+   PRINT( "device_index %d to large\n", device_index);
+  return -1; 
+  }
+
   oc_device_info[device_index].hwv.major = major;
   oc_device_info[device_index].hwv.minor = minor;
   oc_device_info[device_index].hwv.third = minor2;
@@ -337,6 +342,11 @@ oc_core_set_device_hwv(int device_index, int major, int minor, int minor2)
 int
 oc_core_set_device_ia(int device_index, int ia)
 {
+  if (device_index >= oc_number_of_devices())
+    {
+   PRINT(  "device_index %d to large\n", device_index);
+  return -1;
+}
   oc_device_info[device_index].ia = ia;
   return 0;
 }
@@ -344,6 +354,10 @@ oc_core_set_device_ia(int device_index, int ia)
 int
 oc_core_set_device_hwt(int device_index, const char *hardwaretype)
 {
+  if (device_index >= oc_number_of_devices()) {
+    PRINT(  "device_index %d to large\n", device_index);
+    return -1;
+  }
 
   oc_free_string(&oc_device_info[device_index].hwt);
   oc_new_string(&oc_device_info[device_index].hwt, hardwaretype,
@@ -355,6 +369,10 @@ oc_core_set_device_hwt(int device_index, const char *hardwaretype)
 int
 oc_core_set_device_pm(int device_index, bool pm)
 {
+  if (device_index >= oc_number_of_devices()) {
+    PRINT("  device_index %d to large\n", device_index);
+    return -1;
+  }
 
   oc_device_info[device_index].pm = pm;
 
@@ -364,7 +382,10 @@ oc_core_set_device_pm(int device_index, bool pm)
 int
 oc_core_set_device_model(int device_index, const char *model)
 {
-
+    if (device_index >= oc_number_of_devices()) {
+    PRINT("  device_index %d to large\n", device_index);
+    return -1;
+  }
   oc_free_string(&oc_device_info[device_index].model);
   oc_new_string(&oc_device_info[device_index].model, model, strlen(model));
 
@@ -374,7 +395,10 @@ oc_core_set_device_model(int device_index, const char *model)
 int
 oc_core_set_device_hostname(int device_index, const char *hostname)
 {
-
+    if (device_index >= oc_number_of_devices()) {
+    PRINT("  device_index %d to large\n", device_index);
+    return -1;
+  }
   oc_free_string(&oc_device_info[device_index].hostname);
   oc_new_string(&oc_device_info[device_index].hostname, hostname,
                 strlen(hostname));
@@ -385,6 +409,10 @@ oc_core_set_device_hostname(int device_index, const char *hostname)
 int
 oc_core_set_device_iid(int device_index, const char *iid)
 {
+  if (device_index >= oc_number_of_devices()) {
+    PRINT("  device_index %d to large\n", device_index);
+    return -1;
+  }
   oc_free_string(&oc_device_info[device_index].iid);
   oc_new_string(&oc_device_info[device_index].iid, iid, strlen(iid));
 
@@ -912,4 +940,10 @@ oc_filter_resource_by_if(oc_resource_t *resource, oc_request_t *request)
     }
   } while (more_query_params);
   return match;
+}
+
+int
+oc_number_of_devices()
+{
+  return device_count;
 }
