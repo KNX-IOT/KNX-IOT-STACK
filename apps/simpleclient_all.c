@@ -235,18 +235,19 @@ issue_requests_s_mode(void)
   oc_make_ipv6_endpoint(mcast, IPV6 | DISCOVERY | MULTICAST, 5683, 0xff, scope,
                         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0xfd);
 
-  if (oc_init_post("/.knx", &mcast, NULL, NULL, HIGH_QOS, NULL)) {
+  if (oc_init_post("/.knx", &mcast, NULL, NULL, LOW_QOS, NULL)) {
 
     /*
-    { 5: { 6: <st>, 7: <ga>, 1: <value> } }
+    { 4: sia, 5: { 6: <st>, 7: <ga>, 1: <value> } }
     */
 
     oc_rep_begin_root_object();
+
+    oc_rep_i_set_int(root, 4, g_send_notification.sia);
+
     oc_rep_i_set_key(&root_map, 5);
     CborEncoder value_map;
     cbor_encoder_create_map(&root_map, &value_map, CborIndefiniteLength);
-
-    oc_rep_i_set_int(value, 4, g_send_notification.sia);
     // ga
     oc_rep_i_set_int(value, 7, g_send_notification.ga);
     // st M Service type code(write = w, read = r, response = rp) Enum : w, r,
@@ -271,7 +272,7 @@ issue_requests_s_mode(void)
     oc_rep_end_root_object();
 
     if (oc_do_post_ex(APPLICATION_CBOR, APPLICATION_CBOR)) {
-      PRINT("  Sent PUT request\n");
+      PRINT("  Sent POST request\n");
     } else {
       PRINT("  Could not send POST request\n");
     }
@@ -334,6 +335,7 @@ print_usage()
   PRINT("-help : this message\n");
   PRINT("s-mode <group address> <type> <value>\n");
   PRINT("  <group address> : integer\n");
+  PRINT("  <sender address> : integer\n");
   PRINT("  <type> : boolean | int | double\n");
   PRINT("  <value> : boolean : true | false\n");
   PRINT("            int : integer e.g. 1 \n");
@@ -365,36 +367,41 @@ main(int argc, char *argv[])
   }
 
   if (argc > 3) {
-    if (strcmp(argv[1], "boolean") == 0) {
+    g_send_notification.sia = atoi(argv[3]);
+    PRINT(" sender internal address (sia) : %s [%d]\n", argv[3],
+          g_send_notification.sia);
+  }
+
+  if (argc > 4) {
+    if (strcmp(argv[4], "boolean") == 0) {
       g_value_type = 0;
     }
-    if (strcmp(argv[1], "int") == 0) {
+    if (strcmp(argv[4], "int") == 0) {
       g_value_type = 1;
     }
-    if (strcmp(argv[1], "double") == 0) {
+    if (strcmp(argv[4], "double") == 0) {
       g_value_type = 2;
     }
-    PRINT(" value type : %s [%d]\n", argv[3], g_value_type);
+    PRINT(" value type : %s [%d]\n", argv[4], g_value_type);
   }
-  if (argc > 4) {
-    PRINT(" value type : %s\n", argv[4]);
+  if (argc > 5) {
+    PRINT(" value type : %s\n", argv[5]);
     if (g_value_type == 0) {
       g_bool_value = false;
-      if (strcmp(argv[4], "true") == 0) {
+      if (strcmp(argv[5], "true") == 0) {
         g_bool_value = true;
-        PRINT(" value type : %s [%d]\n", argv[4], g_bool_value);
+        PRINT(" value type : %s [%d]\n", argv[5], g_bool_value);
       }
     }
     if (g_value_type == 1) {
       // integer
-      g_int_value = atoi(argv[4]);
-      PRINT(" value type : %s [%d]\n", argv[4], g_int_value);
+      g_int_value = atoi(argv[5]);
+      PRINT(" value type : %s [%d]\n", argv[5], g_int_value);
     }
-
     if (g_value_type == 2) {
       // double
-      g_float_value = atof(argv[4]);
-      PRINT(" value type : %s [%d]\n", argv[4], g_float_value);
+      g_float_value = atof(argv[5]);
+      PRINT(" value type : %s [%d]\n", argv[5], g_float_value);
     }
   }
 

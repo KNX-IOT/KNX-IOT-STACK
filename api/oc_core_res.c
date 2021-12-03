@@ -202,7 +202,7 @@ oc_core_encode_interfaces_mask(CborEncoder *parent,
 }
 
 int
-oc_get_interfaces_mask(oc_interface_mask_t iface_mask)
+oc_frame_interfaces_mask_in_response(oc_interface_mask_t iface_mask)
 {
   int total_size = 0;
 

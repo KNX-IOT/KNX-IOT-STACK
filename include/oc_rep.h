@@ -78,6 +78,7 @@ const uint8_t *oc_rep_get_encoder_buf(void);
 
 /**
  * @brief Encode raw data, as if it was already encoded.
+ * using the global encoder.
  *
  * @param data Pointer to data to be encoded. Will be copied into the global
  * buffer.
@@ -85,6 +86,14 @@ const uint8_t *oc_rep_get_encoder_buf(void);
  */
 void oc_rep_encode_raw(const uint8_t *data, size_t len);
 
+/**
+ * @brief Encode raw data, as if it was already encoded.
+ *
+ * @param encoder The encoder to be used.
+ * @param data Pointer to data to be encoded. Will be copied into the global
+ * buffer.
+ * @param len Length of data.
+ */
 void oc_rep_encode_raw_encoder(CborEncoder *encoder, const uint8_t *data,
                                size_t len);
 

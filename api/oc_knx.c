@@ -504,6 +504,17 @@ oc_core_knx_knx_get_handler(oc_request_t *request,
   PRINT("oc_core_knx_knx_get_handler - done\n");
 }
 
+void
+oc_reset_g_received_notification()
+{
+  g_received_notification.sia = -1;
+  g_received_notification.ga = -1;
+  // g_received_notification.value =
+
+  oc_free_string(&g_received_notification.st);
+  oc_new_string(&g_received_notification.st, "", strlen(""));
+}
+
 /*
  {sia: 5678, es: {st: write, ga: 1, value: 100 }}
 */
@@ -525,16 +536,18 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_CBOR) {
-    request->response->response_buffer->code = oc_status_code(OC_IGNORE);
+    request->response->response_buffer->code =
+      oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
 
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device == NULL) {
-    oc_send_cbor_response(request, OC_IGNORE);
+    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
+  oc_reset_g_received_notification();
 
   /* loop over the request document to parse all the data */
   rep = request->request_payload;
@@ -609,11 +622,12 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
 
   // handle the request
   // loop over the group addresses of the /fp/r
-  PRINT(" .knx : ga %d\n", g_received_notification.ga);
+  PRINT(" .knx : sia   %d\n", g_received_notification.sia);
+  PRINT(" .knx : ga    %d\n", g_received_notification.ga);
   int index = oc_core_find_group_object_table_index(g_received_notification.ga);
   PRINT(" .knx : index %d\n", index);
   if (index == -1) {
-    oc_send_cbor_response(request, OC_IGNORE);
+    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
 
@@ -621,7 +635,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
   // hence retrieve a list of urls..
 
   oc_string_t myurl = oc_core_find_group_object_table_url_from_index(index);
-  PRINT(" .knx : url %s\n", oc_string(myurl));
+  PRINT(" .knx : url  %s\n", oc_string(myurl));
 
   // oc_resource_t *my_resource =
   //   oc_core_get_resource_by_uri(oc_string(myurl), device_index);
@@ -633,7 +647,14 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
     my_resource->post_handler.cb(request, iface_mask, data);
   }
 
-  oc_send_cbor_response(request, OC_IGNORE);
+  // don't send anything back on a multi cast message
+  if (request->origin && (request->origin->flags & MULTICAST)) {
+    oc_send_cbor_response(request, OC_IGNORE);
+    return;
+  }
+
+  // send the response
+  oc_send_cbor_response(request, OC_STATUS_OK);
 }
 
 void
@@ -1054,7 +1075,7 @@ oc_issue_s_mode(int sia_value, int group_address, char *rp, uint8_t *value_data,
                 int value_size)
 {
   int scope = 5;
-  (void)sia_value; /* variable not used */
+  //(void)sia_value; /* variable not used */
 
   PRINT("  oc_issue_s_mode : scope %d\n", scope);
 
@@ -1076,7 +1097,7 @@ oc_issue_s_mode(int sia_value, int group_address, char *rp, uint8_t *value_data,
 
     oc_rep_begin_root_object();
 
-    // oc_rep_i_set_int(root, 4, sia_value);
+    oc_rep_i_set_int(root, 4, sia_value);
 
     oc_rep_i_set_key(&root_map, 5);
     CborEncoder value_map;

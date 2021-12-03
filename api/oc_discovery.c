@@ -95,7 +95,7 @@ oc_add_resource_to_wk(oc_resource_t *resource, oc_request_t *request,
   if (resource->interfaces > 0) {
     length = oc_rep_add_line_to_buffer("if=");
     *response_length += length;
-    length = oc_get_interfaces_mask(resource->interfaces);
+    length = oc_frame_interfaces_mask_in_response(resource->interfaces);
     *response_length += length;
 
     length = oc_rep_add_line_to_buffer(";");
