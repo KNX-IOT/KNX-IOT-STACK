@@ -368,9 +368,9 @@ main(int argc, char *argv[])
 
   if (argc > 3) {
     g_send_notification.sia = atoi(argv[3]);
-    PRINT(" sender internal address (sia) : %s [%d]\n", argv[3], g_send_notification.sia);
+    PRINT(" sender internal address (sia) : %s [%d]\n", argv[3],
+          g_send_notification.sia);
   }
-
 
   if (argc > 4) {
     if (strcmp(argv[4], "boolean") == 0) {

@@ -509,12 +509,11 @@ oc_reset_g_received_notification()
 {
   g_received_notification.sia = -1;
   g_received_notification.ga = -1;
-  //g_received_notification.value = 
+  // g_received_notification.value =
 
   oc_free_string(&g_received_notification.st);
   oc_new_string(&g_received_notification.st, "", strlen(""));
 }
-
 
 /*
  {sia: 5678, es: {st: write, ga: 1, value: 100 }}

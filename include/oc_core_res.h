@@ -358,7 +358,7 @@ bool oc_filter_resource_by_if(oc_resource_t *resource, oc_request_t *request);
 
 /**
  * @brief frame the interface mask in the response, as string in the uri
- * 
+ *
  * @param iface_mask The interface masks to frame
  * @return int 0 = success
  */
