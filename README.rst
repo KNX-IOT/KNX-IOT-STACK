@@ -16,7 +16,7 @@
 .. image:: https://github.com/KNX-IOT/KNX-IOT-STACK/actions/workflows/check-format.yml/badge.svg
    :target: https://github.com/KNX-IOT/KNX-IOT-STACK/actions/workflows/check-format.yml
 
-.. image:: https://img.shields.io/github/v/release/KNX-IOT/KNX-IOT-STACK
+.. image:: https://img.shields.io/github/release/KNX-IOT/KNX-IOT-STACK
    :target: https://github.com/KNX-IOT/KNX-IOT-STACK/releases
 
 
