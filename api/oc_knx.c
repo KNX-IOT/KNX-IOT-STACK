@@ -649,10 +649,12 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
 
   // don't send anything back on a multi cast message
   if (request->origin && (request->origin->flags & MULTICAST)) {
+    PRINT(" .knx : Multicast - not sending response\n");
     oc_send_cbor_response(request, OC_IGNORE);
     return;
   }
 
+  PRINT(" .knx : Unicast - sending response\n");
   // send the response
   oc_send_cbor_response(request, OC_STATUS_OK);
 }
