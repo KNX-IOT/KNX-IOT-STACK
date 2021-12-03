@@ -155,6 +155,10 @@ python_binding_init(void)
     // Import the rest of the Python API
     pSetBacklightFunc = PyObject_GetAttrString(pModule, "set_backlight");
 
+    // Initialize the state of the LCD
+    PyRun_SimpleString("import lsab_minimal");
+    PyRun_SimpleString("lsab_minimal.init()");
+
   } else {
     PyErr_Print();
     fprintf(stderr, "Failed to load lsab_minimal\n");
@@ -208,11 +212,11 @@ app_init(void)
   oc_device_info_t *device = oc_core_get_device_info(0);
   PRINT("Serial Number: %s\n", oc_string(device->serialnumber));
 
-  /* set the hardware version 1.0.0.0 */
-  oc_core_set_device_hwv(1, 0, 0, 0);
+  /* set the hardware version 1.0.0 */
+  oc_core_set_device_hwv(0, 1, 0, 0);
 
   /* set the firmware version*/
-  oc_core_set_device_fwv(1, 0, 0, 0);
+  oc_core_set_device_fwv(0, 1, 0, 0);
 
   /* set the hardware type*/
   oc_core_set_device_hwt(0, "Pi");
@@ -308,6 +312,10 @@ post_dpa_417_61(oc_request_t *request, oc_interface_mask_t interfaces,
     // the regular payload
     rep = request->request_payload;
   }
+  char buffer[200];
+  memset(buffer, 200, 1);
+  oc_rep_to_json(rep, (char *)&buffer, 200, true);
+  PRINT("%s", buffer);
 
   // handle the type of payload correctly.
   if ((rep != NULL) && (rep->type == OC_REP_BOOL)) {
@@ -502,8 +510,8 @@ main(void)
    the folder is created in the makefile, with $target as name with _cred as
    post fix.
   */
-  PRINT("\tstorage at './pushbutton_all_creds' \n");
-  oc_storage_config("./pushbutton_all_creds");
+  PRINT("\tstorage at './LSAB_minimal_pi' \n");
+  oc_storage_config("./LSAB_minimal_pi_creds");
 
   /*initialize the variables */
   initialize_variables();

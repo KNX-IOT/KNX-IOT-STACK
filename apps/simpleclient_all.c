@@ -391,7 +391,7 @@ main(int argc, char *argv[])
       PRINT(" value type : %s [%d]\n", argv[4], g_int_value);
     }
 
-    if (g_value_type == 1) {
+    if (g_value_type == 2) {
       // double
       g_float_value = atof(argv[4]);
       PRINT(" value type : %s [%d]\n", argv[4], g_float_value);

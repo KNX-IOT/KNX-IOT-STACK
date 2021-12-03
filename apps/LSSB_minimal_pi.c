@@ -77,20 +77,12 @@
 #include "port/oc_clock.h"
 #include <signal.h>
 
+#include <Python.h>
+
 #ifdef INCLUDE_EXTERNAL
 /* import external definitions from header file*/
 /* this file should be externally supplied */
 #include "external_header.h"
-#endif
-
-#ifdef __linux__
-/** linux specific code */
-#include <pthread.h>
-#ifndef NO_MAIN
-static pthread_mutex_t mutex;
-static pthread_cond_t cv;
-static struct timespec ts;
-#endif /* NO_MAIN */
 #endif
 
 #include <stdio.h> /* defines FILENAME_MAX */
@@ -133,11 +125,11 @@ app_init(void)
   oc_device_info_t *device = oc_core_get_device_info(0);
   PRINT("Serial Number: %s\n", oc_string(device->serialnumber));
 
-  /* set the hardware version 1.0.0.0 */
-  oc_core_set_device_hwv(1, 0, 0, 0);
+  /* set the hardware version 1.0.0 */
+  oc_core_set_device_hwv(0, 1, 0, 0);
 
   /* set the firmware version*/
-  oc_core_set_device_fwv(1, 0, 0, 0);
+  oc_core_set_device_fwv(0, 1, 0, 0);
 
   /* set the hardware type*/
   oc_core_set_device_hwt(0, "Pi");
@@ -152,7 +144,7 @@ app_init(void)
 }
 
 /** the state of the dpa 421.61 */
-bool g_mystate = false;
+volatile bool g_mystate = false;
 
 /**
  * get method for "p/push" resource.
@@ -245,6 +237,145 @@ post_dpa_421_61(oc_request_t *request, oc_interface_mask_t interfaces,
   PRINT("-- End post_dpa_421_61\n");
 }
 
+oc_group_object_notification_t g_send_notification;
+bool g_bool_value = false;
+
+oc_event_callback_retval_t post_callback(void *data);
+
+/* send a multicast s-mode message */
+static void
+issue_requests_s_mode(void)
+{
+  oc_do_s_mode("p/push", "w");
+  // post_callback(NULL);
+}
+
+oc_event_callback_retval_t
+post_callback(void *data)
+{
+  int scope = 5;
+  PRINT(" issue_requests_s_mode\n");
+
+  oc_make_ipv6_endpoint(mcast, IPV6 | DISCOVERY | MULTICAST, 5683, 0xff, scope,
+                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0xfd);
+
+  if (oc_init_post("/.knx", &mcast, NULL, NULL, LOW_QOS, NULL)) {
+
+    g_send_notification.ga = 1;
+    /*
+    { 5: { 6: <st>, 7: <ga>, 1: <value> } }
+    */
+    CborEncoder value_map;
+
+    oc_rep_begin_root_object();
+    oc_rep_i_set_key(&root_map, 5);
+    cbor_encoder_create_map(&root_map, &value_map, CborIndefiniteLength);
+
+    oc_rep_i_set_int(value, 4, g_send_notification.sia);
+    // ga
+    oc_rep_i_set_int(value, 7, g_send_notification.ga);
+    // st M Service type code(write = w, read = r, response = rp) Enum : w, r,
+    // rp
+    // oc_rep_i_set_text_string(value, 6, oc_string(g_send_notification.st));
+    oc_rep_i_set_text_string(value, 6, "w");
+    // boolean
+    oc_rep_i_set_boolean(value, 1, g_mystate);
+    cbor_encoder_close_container_checked(&root_map, &value_map);
+
+    oc_rep_end_root_object();
+
+    PRINT("Encoded Payload Size: %d\n", oc_rep_get_encoded_payload_size());
+
+    if (oc_do_post_ex(APPLICATION_CBOR, APPLICATION_CBOR)) {
+      PRINT("  Sent PUT request\n");
+    } else {
+      PRINT("  Could not send POST request\n");
+    }
+  }
+
+  return OC_EVENT_DONE;
+}
+
+PyObject *pModule;
+// Action to take on left button press
+// This is exposed in the corresponding Python script
+// as the knx.handle_left() function
+static PyObject *
+knx_handle_left(PyObject *self, PyObject *args)
+{
+  // don't care about args, so don't check them
+  (void)self;
+  (void)args;
+  printf("Left from C!\n");
+  g_mystate = false;
+  //g_bool_value = false;
+  issue_requests_s_mode();
+  Py_RETURN_NONE;
+}
+
+// Action to take on left button press
+// This is exposed in the corresponding Python script
+// as the knx.handle_left() function
+static PyObject *
+knx_handle_mid(PyObject *self, PyObject *args)
+{
+  // don't care about args, so don't check them
+  (void)self;
+  (void)args;
+  printf("Mid from C!\n");
+  Py_RETURN_NONE;
+}
+
+// Action to take on left button press
+// This is exposed in the corresponding Python script
+// as the knx.handle_left() function
+static PyObject *
+knx_handle_right(PyObject *self, PyObject *args)
+{
+  // don't care about args, so don't check them
+  (void)self;
+  (void)args;
+  printf("Right from C!\n");
+  g_mystate = true;
+  // g_bool_value = true;
+  issue_requests_s_mode();
+  Py_RETURN_NONE;
+}
+
+// Definition of the methods within the knx module.
+// Extend this array if you need to add more Python->C functions
+static PyMethodDef KnxMethods[] = {
+  { "handle_left", knx_handle_left, METH_NOARGS,
+    "Inform KNX of left button press" },
+  { "handle_mid", knx_handle_mid, METH_NOARGS,
+    "Inform KNX of mid button press" },
+  { "handle_right", knx_handle_right, METH_NOARGS,
+    "Inform KNX of right button press" },
+  { NULL, NULL, 0, NULL }
+};
+
+// Boilerplate to initialize the knx module
+static PyModuleDef KnxModule = {
+  PyModuleDef_HEAD_INIT, "knx", NULL, -1, KnxMethods, NULL, NULL, NULL, NULL
+};
+
+static PyObject *
+PyInit_knx(void)
+{
+  return PyModule_Create(&KnxModule);
+}
+
+static void *
+poll_python(void *data)
+{
+  PyErr_CheckSignals();
+  if (PyRun_SimpleString("signal.sigtimedwait([], 0.001)") != 0) {
+    printf("Python poll error!\n");
+    PyErr_Print();
+    quit = 1;
+  }
+}
+
 /**
  * register all the resources to the stack
  * this function registers all application level resources:
@@ -334,9 +465,6 @@ signal_event_loop(void)
 STATIC void
 signal_event_loop(void)
 {
-  pthread_mutex_lock(&mutex);
-  pthread_cond_signal(&cv);
-  pthread_mutex_unlock(&mutex);
 }
 #endif /* __linux__ */
 
@@ -348,7 +476,7 @@ void
 handle_signal(int signal)
 {
   (void)signal;
-  signal_event_loop();
+  printf("quit signal received");
   quit = 1;
 }
 
@@ -396,15 +524,15 @@ main(void)
   /* install Ctrl-C */
   signal(SIGINT, handle_signal);
 #endif
-#ifdef __linux__
-  /* Linux specific */
-  struct sigaction sa;
-  sigfillset(&sa.sa_mask);
-  sa.sa_flags = 0;
-  sa.sa_handler = handle_signal;
-  /* install Ctrl-C */
-  sigaction(SIGINT, &sa, NULL);
-#endif
+// #ifdef __linux__
+//   /* Linux specific */
+//   struct sigaction sa;
+//   sigfillset(&sa.sa_mask);
+//   sa.sa_flags = 0;
+//   sa.sa_handler = handle_signal;
+//   /* install Ctrl-C */
+//   sigaction(SIGINT, &sa, NULL);
+// #endif
 
   PRINT("KNX-IOT Server name : \"%s\"\n", MY_NAME);
 
@@ -420,8 +548,8 @@ main(void)
    the folder is created in the makefile, with $target as name with _cred as
    post fix.
   */
-  PRINT("\tstorage at './LSSB_minimal_all_creds' \n");
-  oc_storage_config("./LSSB_minimal_all_creds");
+  PRINT("\tstorage at './LSSB_minimal_pi_creds' \n");
+  oc_storage_config("./LSSB_minimal_pi_creds");
 
   /*initialize the variables */
   initialize_variables();
@@ -445,6 +573,23 @@ main(void)
     PRINT("oc_main_init failed %d, exiting.\n", init);
     return init;
   }
+
+  // Make Python aware of the knx module defined by KnxModule and KnxMethods
+  PyImport_AppendInittab("knx", PyInit_knx);
+
+  Py_Initialize();
+  PyObject *pName = PyUnicode_DecodeFSDefault("simpleclient");
+  PyRun_SimpleString("import sys");
+  PyRun_SimpleString("import os");
+  PyRun_SimpleString("import signal");
+  PyRun_SimpleString("sys.path.append(os.getcwd())");
+
+  pModule = PyImport_Import(pName);
+  Py_DECREF(pName);
+
+  // initialize the PiHat - prints stuff to the LCD
+  PyRun_SimpleString("import simpleclient");
+  PyRun_SimpleString("simpleclient.init()");
 
 #ifdef OC_SECURITY
   /* print out the current DI of the device */
@@ -477,27 +622,26 @@ main(void)
           &cv, &cs, (DWORD)((next_event - now) * 1000 / OC_CLOCK_SECOND));
       }
     }
+    // Wait for signals - this is how the button presses are detected
+    // 0.1 is the time to wait for (in seconds), before handing execution
+    // back to C.
+    if (PyRun_SimpleString("signal.sigtimedwait([], 0.1)") != 0) {
+      PyErr_Print();
+      return -1;
+    }
   }
 #endif
 
 #ifdef __linux__
   /* Linux specific loop */
   while (quit != 1) {
-    next_event = oc_main_poll();
-    pthread_mutex_lock(&mutex);
-    if (next_event == 0) {
-      pthread_cond_wait(&cv, &mutex);
-    } else {
-      ts.tv_sec = (next_event / OC_CLOCK_SECOND);
-      ts.tv_nsec = (next_event % OC_CLOCK_SECOND) * 1.e09 / OC_CLOCK_SECOND;
-      pthread_cond_timedwait(&cv, &mutex, &ts);
-    }
-    pthread_mutex_unlock(&mutex);
+    oc_main_poll();
+    poll_python(NULL);
   }
 #endif
 
   /* shut down the stack */
-
+exit:
   oc_main_shutdown();
   return 0;
 }

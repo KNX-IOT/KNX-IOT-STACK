@@ -85,6 +85,8 @@ const uint8_t *oc_rep_get_encoder_buf(void);
  */
 void oc_rep_encode_raw(const uint8_t *data, size_t len);
 
+void oc_rep_encode_raw_encoder(CborEncoder *encoder, const uint8_t *data, size_t len);
+
 /**
  * @brief add a line to the response buffer
  * note updates the occupied size in the response buffer

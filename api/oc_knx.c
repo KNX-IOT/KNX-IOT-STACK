@@ -515,17 +515,25 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
   (void)iface_mask;
   oc_rep_t *rep = NULL;
 
+  PRINT("KNX KNX Post Handler");
+  char buffer[200];
+  memset(buffer, 200, 1);
+  oc_rep_to_json(request->request_payload, (char *)&buffer, 200, true);
+  PRINT("Decoded Payload: %s\n", buffer);
+
+  PRINT("Full Payload Size: %d\n", request->_payload_len);
+
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_CBOR) {
     request->response->response_buffer->code =
-      oc_status_code(OC_STATUS_BAD_REQUEST);
+      oc_status_code(OC_IGNORE);
     return;
   }
 
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device == NULL) {
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    oc_send_cbor_response(request, OC_IGNORE);
     return;
   }
 
@@ -606,7 +614,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
   int index = oc_core_find_group_object_table_index(g_received_notification.ga);
   PRINT(" .knx : index %d\n", index);
   if (index == -1) {
-    oc_send_cbor_response(request, OC_STATUS_CHANGED);
+    oc_send_cbor_response(request, OC_IGNORE);
     return;
   }
 
@@ -626,7 +634,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
     my_resource->post_handler.cb(request, iface_mask, data);
   }
 
-  oc_send_cbor_response(request, OC_STATUS_CHANGED);
+  oc_send_cbor_response(request, OC_IGNORE);
 }
 
 void
@@ -1052,15 +1060,20 @@ oc_issue_s_mode(int sia_value, int group_address, char *rp, uint8_t *value_data,
   oc_make_ipv6_endpoint(mcast, IPV6 | DISCOVERY | MULTICAST, 5683, 0xff, scope,
                         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0xfd);
 
-  if (oc_init_post("/.knx", &mcast, NULL, NULL, HIGH_QOS, NULL)) {
+  if (oc_init_post("/.knx", &mcast, NULL, NULL, LOW_QOS, NULL)) {
 
     /*
     { 4: <sia>, 5: { 6: <st>, 7: <ga>, 1: <value> } }
     */
 
+    PRINT("before subtract and encode: %d\n", oc_rep_get_encoded_payload_size());
+    // oc_rep_new(response_buffer.buffer, response_buffer.buffer_size);
+    // oc_rep_subtract_length(oc_rep_get_encoded_payload_size());
+    PRINT("after subtract, before encode: %d\n", oc_rep_get_encoded_payload_size());
+
     oc_rep_begin_root_object();
 
-    oc_rep_i_set_int(root, 4, sia_value);
+    // oc_rep_i_set_int(root, 4, sia_value);
 
     oc_rep_i_set_key(&root_map, 5);
     CborEncoder value_map;
@@ -1076,11 +1089,13 @@ oc_issue_s_mode(int sia_value, int group_address, char *rp, uint8_t *value_data,
     oc_rep_i_set_key(&value_map, 5);
     // copy the data, this is already in cbor from the fake response of the
     // resource GET function
-    oc_rep_encode_raw(value_data, value_size);
+    oc_rep_encode_raw_encoder(&value_map, value_data, value_size);
 
     cbor_encoder_close_container_checked(&root_map, &value_map);
 
     oc_rep_end_root_object();
+
+    PRINT("S-MODE Payload Size: %d\n", oc_rep_get_encoded_payload_size());
 
     if (oc_do_post_ex(APPLICATION_CBOR, APPLICATION_CBOR)) {
       PRINT("  Sent POST request\n");
@@ -1159,6 +1174,11 @@ oc_do_s_mode(char *resource_url, char *rp)
   int value_size = oc_rep_get_encoded_payload_size();
   uint8_t *value_data = request.response->response_buffer->buffer;
 
+  // Cache value data, as it gets overwritten in oc_issue_do_s_mode
+  uint8_t buf[100];
+  assert(value_size < 100);
+  memcpy(buf, value_data, value_size);
+
   if (value_size == 0) {
     PRINT(" . ERROR: value size == 0");
     return;
@@ -1176,7 +1196,7 @@ oc_do_s_mode(char *resource_url, char *rp)
       group_address = oc_core_find_group_object_table_group_entry(index, j);
       PRINT("   ga : %d\n", group_address);
       // issue the s-mode command
-      oc_issue_s_mode(sia_value, group_address, rp, value_data, value_size);
+      oc_issue_s_mode(sia_value, group_address, rp, buf, value_size);
     }
     index = oc_core_find_next_group_object_table_url(resource_url, index);
   }
@@ -1195,7 +1215,7 @@ oc_knx_load_state(size_t device_index)
 
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device == NULL) {
-    OC_ERR(" could not get device %d\n", device_index)
+    OC_ERR(" could not get device %d\n", device_index);
   }
 
   temp_size = oc_storage_read(LSM_STORE, (uint8_t *)&lsm, sizeof(lsm));
