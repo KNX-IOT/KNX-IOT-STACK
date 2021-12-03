@@ -334,8 +334,8 @@ int
 oc_core_set_device_hwv(int device_index, int major, int minor, int minor2)
 {
   if (device_index >= (int)oc_number_of_devices()) {
-   PRINT( "device_index %d to large\n", device_index);
-  return -1; 
+    PRINT("device_index %d to large\n", device_index);
+    return -1;
   }
 
   oc_device_info[device_index].hwv.major = major;
@@ -347,11 +347,10 @@ oc_core_set_device_hwv(int device_index, int major, int minor, int minor2)
 int
 oc_core_set_device_ia(int device_index, int ia)
 {
-  if (device_index >= (int)oc_number_of_devices())
-    {
-   PRINT(  "device_index %d to large\n", device_index);
-  return -1;
-}
+  if (device_index >= (int)oc_number_of_devices()) {
+    PRINT("device_index %d to large\n", device_index);
+    return -1;
+  }
   oc_device_info[device_index].ia = ia;
   return 0;
 }
@@ -360,7 +359,7 @@ int
 oc_core_set_device_hwt(int device_index, const char *hardwaretype)
 {
   if (device_index >= (int)oc_number_of_devices()) {
-    PRINT(  "device_index %d to large\n", device_index);
+    PRINT("device_index %d to large\n", device_index);
     return -1;
   }
 

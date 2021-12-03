@@ -408,7 +408,7 @@ int oc_core_get_latency(void);
 
 /**
  * @brief return the number of registered devices
- * 
+ *
  * @return size_t The number of registered devices
  */
 size_t oc_number_of_devices();

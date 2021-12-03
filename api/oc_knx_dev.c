@@ -614,11 +614,10 @@ oc_knx_device_storage_read(size_t device_index)
 
   PRINT("Loading Device Config from Persistent storage\n");
 
-if (device_index >= oc_number_of_devices()){
-   PRINT( "device_index %d to large\n", device_index);
-  return;
-}
-
+  if (device_index >= oc_number_of_devices()) {
+    PRINT("device_index %d to large\n", device_index);
+    return;
+  }
 
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device == NULL) {
@@ -677,10 +676,10 @@ bool
 oc_knx_device_in_programming_mode(size_t device_index)
 {
 
-if (device_index >= oc_number_of_devices()){
-   PRINT(  "device_index %d to large\n", device_index);
-  return false;
-}
+  if (device_index >= oc_number_of_devices()) {
+    PRINT("device_index %d to large\n", device_index);
+    return false;
+  }
 
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   return device->pm;
