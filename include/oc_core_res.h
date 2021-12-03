@@ -356,7 +356,13 @@ bool oc_filter_resource_by_rt(oc_resource_t *resource, oc_request_t *request);
  */
 bool oc_filter_resource_by_if(oc_resource_t *resource, oc_request_t *request);
 
-int oc_get_interfaces_mask(oc_interface_mask_t iface_mask);
+/**
+ * @brief frame the interface mask in the response, as string in the uri
+ * 
+ * @param iface_mask The interface masks to frame
+ * @return int 0 = success
+ */
+int oc_frame_interfaces_mask_in_response(oc_interface_mask_t iface_mask);
 
 /**
  * @brief determine if a resource is a Device Configuration Resource
@@ -391,7 +397,7 @@ bool oc_core_is_vertical_resource(oc_resource_t *resource, size_t device);
 /**
  * set the latency (lat) property in eps of oic.wk.res resource.
  * The latency is implemented globally e.g. for all the resource instances.
- * The default behaviour is that if nothing is set (e.g. value is 0) the lat
+ * The default behavior is that if nothing is set (e.g. value is 0) the lat
  * property will not be framed in the eps property. Setting the value on 0 will
  * cause that the lat property will not be framed in the eps property.
  * @param[in] latency the latency in seconds

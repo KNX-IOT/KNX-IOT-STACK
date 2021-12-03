@@ -663,6 +663,12 @@ oc_knx_device_storage_reset(size_t device_index)
   char buf[2] = "";
   int zero = 0;
 
+  
+  if (device_index >= oc_number_of_devices()) {
+    PRINT("oc_knx_device_storage_reset: device_index %d to large\n", (int)device_index);
+    return;
+  }
+
   oc_storage_write(KNX_STORAGE_IA, (uint8_t *)&zero, sizeof(int));
   oc_storage_write(KNX_STORAGE_HOSTNAME, (uint8_t *)&buf, 1);
   oc_storage_write(KNX_STORAGE_IID, (uint8_t *)&buf, 1);
@@ -690,8 +696,6 @@ oc_create_knx_device_resources(size_t device_index)
 {
   OC_DBG("oc_create_knx_device_resources");
 
-  // oc_knx_device_storage_read(device_index);
-
   oc_create_dev_sn_resource(OC_DEV_SN, device_index);
   oc_create_dev_hwv_resource(OC_DEV_HWV, device_index);
   oc_create_dev_fwv_resource(OC_DEV_FWV, device_index);
@@ -705,6 +709,4 @@ oc_create_knx_device_resources(size_t device_index)
   // should be last of the dev/xxx resources, it will list those.
   oc_create_dev_dev_resource(OC_DEV, device_index);
 
-  // PRINT("reading device storage\n");
-  // oc_knx_device_storage_read(device_index);
 }
