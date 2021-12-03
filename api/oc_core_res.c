@@ -942,8 +942,8 @@ oc_filter_resource_by_if(oc_resource_t *resource, oc_request_t *request)
   return match;
 }
 
-int
+size_t
 oc_number_of_devices()
 {
-  return device_count;
+  return (size_t)device_count;
 }
