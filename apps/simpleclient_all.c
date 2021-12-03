@@ -437,7 +437,7 @@ main(int argc, char *argv[])
   oc_clock_time_t next_event;
 
 #ifdef OC_STORAGE
-  oc_storage_config("./simpleclient_creds");
+  oc_storage_config("./simpleclient_all_creds");
 #endif /* OC_STORAGE */
 
   init = oc_main_init(&handler);
@@ -449,6 +449,9 @@ main(int argc, char *argv[])
 #else
   PRINT("Security - Disabled\n");
 #endif /* OC_SECURITY */
+
+ PRINT("SimpleClient running, waiting on incoming "
+        "connections.\n");
 
 #ifdef WIN32
   /* windows specific loop */

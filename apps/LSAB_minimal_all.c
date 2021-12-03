@@ -426,8 +426,8 @@ main(void)
    the folder is created in the makefile, with $target as name with _cred as
    post fix.
   */
-  PRINT("\tstorage at './pushbutton_all_creds' \n");
-  oc_storage_config("./pushbutton_all_creds");
+  PRINT("\tstorage at './LSAB_minimal_creds' \n");
+  oc_storage_config("./LSAB_minimal_creds");
 
   /*initialize the variables */
   initialize_variables();
