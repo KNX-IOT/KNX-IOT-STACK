@@ -663,9 +663,9 @@ oc_knx_device_storage_reset(size_t device_index)
   char buf[2] = "";
   int zero = 0;
 
-  
   if (device_index >= oc_number_of_devices()) {
-    PRINT("oc_knx_device_storage_reset: device_index %d to large\n", (int)device_index);
+    PRINT("oc_knx_device_storage_reset: device_index %d to large\n",
+          (int)device_index);
     return;
   }
 
@@ -708,5 +708,4 @@ oc_create_knx_device_resources(size_t device_index)
   oc_create_dev_pm_resource(OC_DEV_PM, device_index);
   // should be last of the dev/xxx resources, it will list those.
   oc_create_dev_dev_resource(OC_DEV, device_index);
-
 }

@@ -88,7 +88,7 @@ void oc_rep_encode_raw(const uint8_t *data, size_t len);
 
 /**
  * @brief Encode raw data, as if it was already encoded.
- * 
+ *
  * @param encoder The encoder to be used.
  * @param data Pointer to data to be encoded. Will be copied into the global
  * buffer.
