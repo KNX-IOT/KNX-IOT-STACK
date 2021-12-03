@@ -406,6 +406,13 @@ void oc_core_set_latency(int latency);
  */
 int oc_core_get_latency(void);
 
+/**
+ * @brief return the number of registered devices
+ *
+ * @return size_t The number of registered devices
+ */
+size_t oc_number_of_devices();
+
 #ifdef __cplusplus
 }
 #endif
