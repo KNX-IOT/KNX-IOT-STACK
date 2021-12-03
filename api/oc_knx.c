@@ -1055,6 +1055,8 @@ oc_issue_s_mode(int sia_value, int group_address, char *rp, uint8_t *value_data,
                 int value_size)
 {
   int scope = 5;
+  (void)sia_value; /* variable not used */
+
   PRINT("  oc_issue_s_mode : scope %d\n", scope);
 
   oc_make_ipv6_endpoint(mcast, IPV6 | DISCOVERY | MULTICAST, 5683, 0xff, scope,
