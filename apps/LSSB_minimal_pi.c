@@ -308,7 +308,7 @@ knx_handle_left(PyObject *self, PyObject *args)
   (void)args;
   printf("Left from C!\n");
   g_mystate = false;
-  //g_bool_value = false;
+  // g_bool_value = false;
   issue_requests_s_mode();
   Py_RETURN_NONE;
 }
@@ -524,15 +524,15 @@ main(void)
   /* install Ctrl-C */
   signal(SIGINT, handle_signal);
 #endif
-// #ifdef __linux__
-//   /* Linux specific */
-//   struct sigaction sa;
-//   sigfillset(&sa.sa_mask);
-//   sa.sa_flags = 0;
-//   sa.sa_handler = handle_signal;
-//   /* install Ctrl-C */
-//   sigaction(SIGINT, &sa, NULL);
-// #endif
+  // #ifdef __linux__
+  //   /* Linux specific */
+  //   struct sigaction sa;
+  //   sigfillset(&sa.sa_mask);
+  //   sa.sa_flags = 0;
+  //   sa.sa_handler = handle_signal;
+  //   /* install Ctrl-C */
+  //   sigaction(SIGINT, &sa, NULL);
+  // #endif
 
   PRINT("KNX-IOT Server name : \"%s\"\n", MY_NAME);
 

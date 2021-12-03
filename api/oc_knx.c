@@ -525,8 +525,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_CBOR) {
-    request->response->response_buffer->code =
-      oc_status_code(OC_IGNORE);
+    request->response->response_buffer->code = oc_status_code(OC_IGNORE);
     return;
   }
 
@@ -1068,10 +1067,12 @@ oc_issue_s_mode(int sia_value, int group_address, char *rp, uint8_t *value_data,
     { 4: <sia>, 5: { 6: <st>, 7: <ga>, 1: <value> } }
     */
 
-    PRINT("before subtract and encode: %d\n", oc_rep_get_encoded_payload_size());
+    PRINT("before subtract and encode: %d\n",
+          oc_rep_get_encoded_payload_size());
     // oc_rep_new(response_buffer.buffer, response_buffer.buffer_size);
     // oc_rep_subtract_length(oc_rep_get_encoded_payload_size());
-    PRINT("after subtract, before encode: %d\n", oc_rep_get_encoded_payload_size());
+    PRINT("after subtract, before encode: %d\n",
+          oc_rep_get_encoded_payload_size());
 
     oc_rep_begin_root_object();
 
