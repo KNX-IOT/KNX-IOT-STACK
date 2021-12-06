@@ -1494,7 +1494,6 @@ oc_create_knx_fp_resources(size_t device_index)
   oc_create_fp_r_x_resource(OC_KNX_FP_R_X, device_index);
 
   oc_load_group_object_table();
-  //  dummy_test_data();
   // note: /fp does not exist..
   // oc_create_fp_resource(OC_KNX_FP, device_index);
 }
