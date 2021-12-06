@@ -36,7 +36,8 @@ get_fp_from_dp(char* dpt)
 
   // dpa.352.51
   // urn:knx:dpa.352
-  if (dot = strchr(dpt, '.')) {
+  dot = strchr(dpt, '.');
+  if (dot) {
     return atoi(dot + 1);
   }
 
