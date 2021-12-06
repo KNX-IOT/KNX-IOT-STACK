@@ -24,6 +24,10 @@
 
 
 // -----------------------------------------------------------------------------
+#define ARRAY_SIZE 100
+int g_int_array[ARRAY_SIZE];
+int g_array_size = 0;
+
 int
 get_fp_from_dp(char* dpt)
 {
@@ -38,10 +42,6 @@ get_fp_from_dp(char* dpt)
 
   return -1;
 }
-
-#define ARRAY_SIZE 100
-int g_int_array[ARRAY_SIZE];
-int g_array_size = 0;
 
 bool
 is_in_array(int value)
@@ -68,10 +68,6 @@ store_in_array(int value)
 
 // -----------------------------------------------------------------------------
 
-
-
-
-
 static void
 oc_core_fb_x_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
                          void *data)
@@ -81,8 +77,6 @@ oc_core_fb_x_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   size_t response_length = 0;
   int i;
   int matches = 0;
-  int length = 0;
-  char number[5];
   PRINT("oc_core_fb_x_get_handler\n");
 
   /* check if the accept header is link-format */
@@ -113,7 +107,7 @@ oc_core_fb_x_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       if ((strncmp(t, ":dpa", 4) == 0) ||
           (strncmp(t, "urn:knx:dpa", 11) == 0)) {
         int fp_int = get_fp_from_dp(t);
-        if (fp_int > 0) {
+        if (fp_int == value) {
           frame_resource = true;
         }
       }
@@ -152,13 +146,11 @@ bool
 oc_add_function_blocks_to_response(oc_request_t *request, size_t device_index,
                                    size_t *response_length, int matches)
 {
-
+  (void)request;
   int length = 0;
   g_array_size = 0;
   char number[5];
   int i;
-
-  //size_t device_index = request->resource->device;
 
   oc_resource_t *resource = oc_ri_get_app_resources();
   for (; resource; resource = resource->next) {
@@ -216,8 +208,6 @@ oc_add_function_blocks_to_response(oc_request_t *request, size_t device_index,
   return false;
 }
 
-
-
 /*
  * return list of function blocks 
  */
@@ -228,11 +218,8 @@ oc_core_fb_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   (void)data;
   (void)iface_mask;
   size_t response_length = 0;
-  int i;
   int matches = 0;
-  int length = 0;
 
-  char number[5];
   PRINT("oc_core_fb_get_handler\n");
 
   /* check if the accept header is link-format */
@@ -244,10 +231,10 @@ oc_core_fb_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 
   size_t device_index = request->resource->device;
 
-  oc_add_function_blocks_to_response(request, device_index,
+  bool added = oc_add_function_blocks_to_response(request, device_index,
                                      &response_length, matches);
 
-  if (matches > 0) {
+  if (added) {
     oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
   } else {
     oc_send_linkformat_response(request, OC_STATUS_INTERNAL_SERVER_ERROR, 0);
