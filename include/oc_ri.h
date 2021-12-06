@@ -459,7 +459,7 @@ int oc_status_code(oc_status_t key);
  * @brief retrieve the resource by uri and device index
  *
  * @param uri the uri of the resource
- * @param uri_len the lenght of the uri
+ * @param uri_len the length of the uri
  * @param device the device index
  * @return oc_resource_t* the resource structure
  */

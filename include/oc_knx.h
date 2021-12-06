@@ -192,6 +192,13 @@ oc_rep_t *oc_s_mode_get_value(oc_request_t *request);
  */
 void oc_do_s_mode(char *resource_url, char *rp);
 
+/**
+ * @brief load the state of the device from persistent storage
+ * load data for:
+ * - load state machine (lsm)
+ *
+ * @param device_index the device index to load the data for
+ */
 void oc_knx_load_state(size_t device_index);
 
 /**

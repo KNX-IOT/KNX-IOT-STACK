@@ -627,24 +627,27 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
   int index = oc_core_find_group_object_table_index(g_received_notification.ga);
   PRINT(" .knx : index %d\n", index);
   if (index == -1) {
+    // if nothing is found (initially) then return a bad request.
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
+  while (index != -1) {
 
-  // TODO: there might be more than url in the group table.
-  // hence retrieve a list of urls..
-
-  oc_string_t myurl = oc_core_find_group_object_table_url_from_index(index);
-  PRINT(" .knx : url  %s\n", oc_string(myurl));
-
-  // oc_resource_t *my_resource =
-  //   oc_core_get_resource_by_uri(oc_string(myurl), device_index);
-
-  oc_resource_t *my_resource = oc_ri_get_app_resource_by_uri(
-    oc_string(myurl), oc_string_len(myurl), device_index);
-
-  if (my_resource != NULL) {
-    my_resource->post_handler.cb(request, iface_mask, data);
+    oc_string_t myurl = oc_core_find_group_object_table_url_from_index(index);
+    PRINT(" .knx : url  %s\n", oc_string(myurl));
+    if (oc_string_len(myurl) > 0) {
+      // get the resource to do the fake post on
+      oc_resource_t *my_resource = oc_ri_get_app_resource_by_uri(
+        oc_string(myurl), oc_string_len(myurl), device_index);
+      if (my_resource != NULL) {
+        my_resource->post_handler.cb(request, iface_mask, data);
+      }
+    }
+    // get the next index in the table to get the url from.
+    // this stops when the returned index == -1
+    int new_index = oc_core_find_next_group_object_table_index(
+      g_received_notification.ga, index);
+    index = new_index;
   }
 
   // don't send anything back on a multi cast message
