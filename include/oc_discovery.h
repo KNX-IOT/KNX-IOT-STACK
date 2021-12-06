@@ -51,14 +51,14 @@ bool oc_filter_resource(oc_resource_t *resource, oc_request_t *request,
 
 /**
  * @brief add the resource to the response in application link format
- * 
- * @param resource the resource 
+ *
+ * @param resource the resource
  * @param request  the request
  * @param device_index the device index
  * @param response_length the response lenght (to be increased)
  * @param matches current matches
- * @return true 
- * @return false 
+ * @return true
+ * @return false
  */
 bool oc_add_resource_to_wk(oc_resource_t *resource, oc_request_t *request,
                            size_t device_index, size_t *response_length,
