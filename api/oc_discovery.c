@@ -20,6 +20,7 @@
 #include "messaging/coap/oc_coap.h"
 #include "oc_api.h"
 #include "oc_discovery.h"
+#include "oc_knx_fb.h"
 
 #include "oc_core_res.h"
 #include "oc_endpoint.h"
