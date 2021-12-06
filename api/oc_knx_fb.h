@@ -23,6 +23,18 @@
 extern "C" {
 #endif
 
+/**
+ * @brief add functional blocks to the response
+ *
+ * adds the list of functional blocks for /f or ./well-known/core to the response
+ *      
+ * @param request the request 
+ * @param device_index the device index
+ * @param response_length the current response length
+ * @param matches number of matches (so far)
+ * @return true 
+ * @return false 
+ */
 bool oc_add_function_blocks_to_response(oc_request_t *request,
                                         size_t device_index,
                                         size_t *response_length, int matches);
@@ -34,6 +46,7 @@ bool oc_add_function_blocks_to_response(oc_request_t *request,
  *@param device index of the device to which the resource is to be created
  */
 void oc_create_knx_fb_resources(size_t device);
+
 
 #ifdef __cplusplus
 }
