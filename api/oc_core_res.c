@@ -23,6 +23,7 @@
 
 #include "oc_knx.h"
 #include "oc_knx_dev.h"
+#include "oc_knx_fb.h"
 #include "oc_knx_fp.h"
 #include "oc_knx_swu.h"
 #include "oc_knx_sec.h"
@@ -548,6 +549,7 @@ oc_core_add_device(const char *name, const char *version, const char *base,
   oc_create_knx_fp_resources(device_count);
   oc_create_knx_sec_resources(device_count);
   oc_create_knx_swu_resources(device_count);
+  oc_create_knx_fb_resources(device_count);
 
   oc_device_info[device_count].data = data;
 

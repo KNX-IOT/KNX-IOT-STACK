@@ -20,6 +20,7 @@
 #include "messaging/coap/oc_coap.h"
 #include "oc_api.h"
 #include "oc_discovery.h"
+#include "oc_knx_fb.h"
 
 #include "oc_core_res.h"
 #include "oc_endpoint.h"
@@ -83,6 +84,13 @@ oc_add_resource_to_wk(oc_resource_t *resource, oc_request_t *request,
       const char *t =
         (const char *)oc_string_array_get_item(resource->types, i);
       if (size > 0) {
+
+        if (i > 0) {
+          // white space as separator of the rt values
+          length = oc_rep_add_line_to_buffer(" ");
+          *response_length += length;
+        }
+
         length = oc_rep_add_line_size_to_buffer(t, size);
         *response_length += length;
       }
@@ -565,6 +573,15 @@ oc_wkcore_discovery_handler(oc_request_t *request,
 
   // oc_add_resource_to_wk(oc_core_get_resource_by_index(OC_SUB, device_index),
   //                      request, device_index, &response_length, matches);
+
+  if (request->origin && (request->origin->flags & MULTICAST) == 0) {
+    // only for unicast
+    bool added = oc_add_function_blocks_to_response(request, device_index,
+                                                    &response_length, matches);
+    if (added) {
+      matches++;
+    }
+  }
 
   request->response->response_buffer->content_format = APPLICATION_LINK_FORMAT;
 

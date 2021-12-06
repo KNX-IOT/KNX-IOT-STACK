@@ -23,6 +23,10 @@
 extern "C" {
 #endif
 
+bool oc_add_function_blocks_to_response(oc_request_t *request,
+                                        size_t device_index,
+                                        size_t *response_length, int matches);
+
 /**
  *@brief Creation of the KNX function block resources.
  * - /fb
