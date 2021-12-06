@@ -322,8 +322,9 @@ bool oc_uri_contains_wildcard(const char *uri);
  * e.g.  resource URI: / abc / *
  * invoked URI: / abc / 1
  * return will be 1.
- *      
- * NOTE: the wild card part of the URL should only contain a number, e.g. no prefix to the number
+ *
+ * NOTE: the wild card part of the URL should only contain a number, e.g. no
+ * prefix to the number
  * @param uri_resource The URI with wildcard
  * @param uri_len The length of the URI with wild card
  * @param uri_invoked The URI that should match a wild card

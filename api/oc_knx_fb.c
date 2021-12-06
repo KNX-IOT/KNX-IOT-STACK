@@ -22,16 +22,15 @@
 #include "oc_discovery.h"
 #include <stdio.h>
 
-
 // -----------------------------------------------------------------------------
 #define ARRAY_SIZE 100
 int g_int_array[ARRAY_SIZE];
 int g_array_size = 0;
 
 int
-get_fp_from_dp(char* dpt)
+get_fp_from_dp(char *dpt)
 {
-  //char *dpt = oc_string(oc_dpt);
+  // char *dpt = oc_string(oc_dpt);
   char *dot;
 
   // dpa.352.51
@@ -64,7 +63,7 @@ store_in_array(int value)
   }
   g_int_array[g_array_size] = value;
   g_array_size++;
-  //assert(g_array_size == ARRAY_SIZE);
+  // assert(g_array_size == ARRAY_SIZE);
 }
 
 // -----------------------------------------------------------------------------
@@ -117,7 +116,6 @@ oc_core_fb_x_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       oc_add_resource_to_wk(resource, request, device_index, &response_length,
                             matches);
       matches++;
-    
     }
   }
 
@@ -210,7 +208,7 @@ oc_add_function_blocks_to_response(oc_request_t *request, size_t device_index,
 }
 
 /*
- * return list of function blocks 
+ * return list of function blocks
  */
 static void
 oc_core_fb_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
@@ -233,7 +231,7 @@ oc_core_fb_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   size_t device_index = request->resource->device;
 
   bool added = oc_add_function_blocks_to_response(request, device_index,
-                                     &response_length, matches);
+                                                  &response_length, matches);
 
   if (added) {
     oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
