@@ -78,7 +78,6 @@ static struct timespec ts;
 #endif
 static int quit = 0;
 
-
 /**
  * structure with the callback
  *
@@ -95,8 +94,6 @@ struct py_cb_struct
  *
  */
 struct py_cb_struct my_CBFunctions;
-
-
 
 // -----------------------------------------------------------------------------
 
@@ -133,7 +130,6 @@ stringFromResponse(int code)
   return strings[code];
 }
 
-
 /**
  * function to print the returned cbor as JSON
  *
@@ -163,27 +159,25 @@ print_ep(oc_endpoint_t *ep)
   oc_free_string(&ip_str);
 }
 
-
-
 // -----------------------------------------------------------------------------
-
 
 /**
  * function to install callbacks, called from python
  *
  */
-void py_install_changedCB(changedCB changedCB)
+void
+py_install_changedCB(changedCB changedCB)
 {
   PRINT("[C]install_changedCB\n");
   my_CBFunctions.changedFCB = changedCB;
 }
 
-
 /**
  * function to install resource callbacks, called from python
  *
  */
-void py_install_resourceCB(resourceCB resourceCB)
+void
+py_install_resourceCB(resourceCB resourceCB)
 {
   PRINT("[C]install_resourceCB\n");
   my_CBFunctions.resourceFCB = resourceCB;
@@ -192,7 +186,8 @@ void py_install_resourceCB(resourceCB resourceCB)
  * function to install client callbacks, called from python
  *
  */
-void py_install_clientCB(clientCB clientCB)
+void
+py_install_clientCB(clientCB clientCB)
 {
   PRINT("[C]install_clientCB\n");
   my_CBFunctions.clientFCB = clientCB;
@@ -202,7 +197,7 @@ void py_install_clientCB(clientCB clientCB)
  * function to call the callback to python.
  *
  */
-void 
+void
 inform_python(const char *uuid, const char *state, const char *event)
 {
   // PRINT("[C]inform_python %p\n",my_CBFunctions.changedFCB);
@@ -228,12 +223,14 @@ inform_resource_python(const char *anchor, const char *uri, const char *types,
  *
  */
 void
-inform_client_python(const char *sn, const char *state, int payload_size, const char *payload)
+inform_client_python(const char *sn, const char *state, int payload_size,
+                     const char *payload)
 {
   PRINT("[C]inform_client_python %p\n", my_CBFunctions.clientFCB);
   if (my_CBFunctions.clientFCB != NULL) {
     PRINT("[C]inform_client_python %s %s %d \n", sn, state, payload_size);
-    my_CBFunctions.clientFCB((char *)sn, (char *)state, payload_size, (char*) payload);
+    my_CBFunctions.clientFCB((char *)sn, (char *)state, payload_size,
+                             (char *)payload);
   }
   PRINT("[C]inform_client_python -done \n");
 }
@@ -248,7 +245,7 @@ device_handle_t *
 py_getdevice_from_sn(char *sn)
 {
   device_handle_t *device = NULL;
- device = (device_handle_t *)oc_list_head(discovered_devices);
+  device = (device_handle_t *)oc_list_head(discovered_devices);
 
   int i = 0;
   while (device != NULL) {
@@ -275,7 +272,6 @@ app_init(void)
 
   return ret;
 }
-
 
 /**
  * event loop (window/linux) used for the python initiated thread.
@@ -361,7 +357,7 @@ func_event_thread(void *data)
 
 /* Application utility functions */
 static device_handle_t *
-is_device_in_list(char* sn, oc_list_t list)
+is_device_in_list(char *sn, oc_list_t list)
 {
   device_handle_t *device = (device_handle_t *)oc_list_head(list);
   while (device != NULL) {
@@ -376,10 +372,8 @@ is_device_in_list(char* sn, oc_list_t list)
 // -----------------------------------------------------------------------------
 
 static bool
-add_device_to_list(char *sn, const char *device_name,
-                  char* ip_address,
-                  oc_endpoint_t* ep,
-                  oc_list_t list)
+add_device_to_list(char *sn, const char *device_name, char *ip_address,
+                   oc_endpoint_t *ep, oc_list_t list)
 {
   device_handle_t *device = is_device_in_list(sn, list);
 
@@ -395,9 +389,9 @@ add_device_to_list(char *sn, const char *device_name,
     strcpy(device->ip_address, ip_address);
   }
   if (ep) {
-    //strcpy(device->ip_address, ip_address);
+    // strcpy(device->ip_address, ip_address);
     oc_endpoint_copy(&device->ep, ep);
-    //oc_endpoint_list_copy(&device->ep, ep);
+    // oc_endpoint_list_copy(&device->ep, ep);
   }
 
   if (device_name) {
@@ -424,7 +418,7 @@ empty_device_list(oc_list_t list)
 
 /* App invocations of APIs */
 
-#define buffer_size (8*1024)
+#define buffer_size (8 * 1024)
 char buffer[buffer_size];
 
 void
@@ -432,7 +426,7 @@ general_get_cb(oc_client_response_t *data)
 {
   oc_status_t status = data->code;
   PRINT("[C]general_get_cb: response status %d: %s \n", (int)status,
-        stringFromResponse((int) status));
+        stringFromResponse((int)status));
   PRINT("[C]  content format %d\n", data->content_format);
   PRINT("[C]  raw payload len %d\n", (int)data->_payload_len);
 
@@ -443,15 +437,14 @@ general_get_cb(oc_client_response_t *data)
   if (data->content_format == APPLICATION_LINK_FORMAT) {
     PRINT("[C]  [%.*s]\n", (int)data->_payload_len, (char *)data->_payload);
 
-    //inform_client_python("yy", "link_format", (int)data->_payload_len,
+    // inform_client_python("yy", "link_format", (int)data->_payload_len,
     //                     (char *)data->_payload);
-    inform_client_python("yy", "link_format", (int)data->_payload_len,
-                         buffer);
+    inform_client_python("yy", "link_format", (int)data->_payload_len, buffer);
   }
   if (data->content_format == APPLICATION_CBOR) {
     PRINT("[C]  CBOR :\n");
     print_rep(data->payload, false);
-    inform_client_python("yy", "cbor", (int)data->_payload_len, (char*)buffer);
+    inform_client_python("yy", "cbor", (int)data->_payload_len, (char *)buffer);
   }
 }
 
@@ -463,7 +456,7 @@ py_cbor_get(char *sn, char *uri, char *query)
 
   PRINT("[C]py_cbor_get: [%s], [%s]\n", sn, uri);
   ret = oc_do_get_ex(uri, &device->ep, query, general_get_cb, HIGH_QOS,
-                       APPLICATION_CBOR, APPLICATION_CBOR, NULL);
+                     APPLICATION_CBOR, APPLICATION_CBOR, NULL);
   if (ret >= 0) {
     PRINT("[C]Successfully issued GET request\n");
   } else {
@@ -472,7 +465,7 @@ py_cbor_get(char *sn, char *uri, char *query)
 }
 
 void
-py_linkformat_get(char *sn, char *uri, char* query)
+py_linkformat_get(char *sn, char *uri, char *query)
 {
   int ret = -1;
   oc_endpoint_t ep;
@@ -492,7 +485,7 @@ py_linkformat_get(char *sn, char *uri, char* query)
 }
 
 void
-py_issue_get(char *uri, char *query,  int content_format)
+py_issue_get(char *uri, char *query, int content_format)
 {
   int ret = -1;
   oc_endpoint_t ep;
@@ -500,31 +493,30 @@ py_issue_get(char *uri, char *query,  int content_format)
   oc_string_t path;
   oc_content_format_t ct = (oc_content_format_t)content_format;
 
-  PRINT("[C]py_issue_get: [%s], [%s] [%d]\n", uri,query, ct);
+  PRINT("[C]py_issue_get: [%s], [%s] [%d]\n", uri, query, ct);
 
   oc_new_string(&s, uri, strlen(uri));
   oc_string_to_endpoint(&s, &ep, &path);
   print_ep(&ep);
   PRINT("[C]py_issue_get: path  [%s]\n", oc_string(path));
   PRINT("[C]py_issue_get: query [%s]\n", query);
-  //py_mutex_lock(app_sync_lock);
+  // py_mutex_lock(app_sync_lock);
   if (&ep != NULL) {
-    //py_mutex_lock(app_sync_lock);
+    // py_mutex_lock(app_sync_lock);
     ret = oc_do_get_ex(oc_string(path), &ep, query, general_get_cb, HIGH_QOS,
                        ct, ct, NULL);
-    //py_mutex_unlock(app_sync_lock);
+    // py_mutex_unlock(app_sync_lock);
   }
   if (ret >= 0) {
     PRINT("[C]Successfully issued GET request\n");
   } else {
     PRINT("[C]ERROR issuing GET request\n");
   }
-  //py_mutex_unlock(app_sync_lock);
+  // py_mutex_unlock(app_sync_lock);
   oc_free_string(&s);
 }
 
 // -----------------------------------------------------------------------------
-
 
 char post_buffer[buffer_size];
 
@@ -558,13 +550,13 @@ general_post_cb(oc_client_response_t *data)
 }
 
 void
-py_cbor_post(char *sn, char *uri, char* query, int size, char* data)
+py_cbor_post(char *sn, char *uri, char *query, int size, char *data)
 {
   int ret = -1;
   device_handle_t *device = py_getdevice_from_sn(sn);
 
-  PRINT("[C]py_cbor_post: [%s], [%s] [%s] %d\n", sn,uri, query, size);
-    
+  PRINT("[C]py_cbor_post: [%s], [%s] [%s] %d\n", sn, uri, query, size);
+
   if (oc_init_post(uri, &device->ep, NULL, general_post_cb, HIGH_QOS, NULL)) {
     // encode the request data..it should already be cbor
     oc_rep_encode_raw(data, (size_t)size);
@@ -630,10 +622,7 @@ py_cbor_put(char *sn, char *uri, char *query, int size, char *data)
   }
 }
 
-
-
 // -----------------------------------------------------------------------------
-
 
 void
 general_delete_cb(oc_client_response_t *data)
@@ -672,18 +661,18 @@ py_cbor_delete(char *sn, char *uri, char *query)
 
   PRINT("[C]py_cbor_delete: [%s], [%s] [%s]\n", sn, uri, query);
 
-//  bool oc_do_delete(const char *uri, oc_endpoint_t *endpoint, const char *query,
-//                    oc_response_handler_t handler, oc_qos_t qos,
-//                    void *user_data);
+  //  bool oc_do_delete(const char *uri, oc_endpoint_t *endpoint, const char
+  //  *query,
+  //                    oc_response_handler_t handler, oc_qos_t qos,
+  //                    void *user_data);
 
-  if (oc_do_delete(uri, &device->ep, query, general_delete_cb, HIGH_QOS, NULL)) {
+  if (oc_do_delete(uri, &device->ep, query, general_delete_cb, HIGH_QOS,
+                   NULL)) {
     PRINT("  Sent DELETE request\n");
   } else {
     PRINT("  Could not send DELETE request\n");
   }
-
 }
-
 
 // -----------------------------------------------------------------------------
 
@@ -700,11 +689,11 @@ response_get_sn(oc_client_response_t *data)
 
   if ((rep != NULL) && (rep->type == OC_REP_STRING)) {
     char *my_sn = oc_string(rep->value.string);
-    PRINT("[C]  get_sn received :%s\n",  my_sn);
+    PRINT("[C]  get_sn received :%s\n", my_sn);
     PRINT("[C]  get_sn received (address) :%s\n", oc_string(my_address));
 
-    add_device_to_list(my_sn, NULL, oc_string(my_address),
-                       data->endpoint, discovered_devices);
+    add_device_to_list(my_sn, NULL, oc_string(my_address), data->endpoint,
+                       discovered_devices);
     inform_python(my_sn, oc_string(my_address), "discovered");
   }
   oc_free_string(&my_address);
@@ -714,7 +703,7 @@ response_get_sn(oc_client_response_t *data)
 
 static oc_discovery_flags_t
 discovery_cb(const char *payload, int len, oc_endpoint_t *endpoint,
-          void *user_data)
+             void *user_data)
 {
   //(void)anchor;
   (void)user_data;
@@ -754,7 +743,7 @@ discovery_cb(const char *payload, int len, oc_endpoint_t *endpoint,
   oc_do_get_ex("/dev/sn", endpoint, NULL, response_get_sn, HIGH_QOS,
                APPLICATION_CBOR, APPLICATION_CBOR, endpoint);
 
-  //oc_do_get_ex("/dev/iid", endpoint, NULL, response_get_sn, HIGH_QOS,
+  // oc_do_get_ex("/dev/iid", endpoint, NULL, response_get_sn, HIGH_QOS,
   //             APPLICATION_CBOR, APPLICATION_CBOR, endpoint);
 
   PRINT("[C] DISCOVERY- END\n");
@@ -815,7 +804,6 @@ get_device_name_from_sn(char *uuid)
   return " empty ";
 }
 
-
 /**
  * function to retrieve the sn of the discovered device
  *
@@ -837,7 +825,6 @@ py_get_sn(int index)
   return " empty ";
 }
 
-
 /**
  * function to retrieve the number of discovered device
  *
@@ -852,7 +839,8 @@ py_get_nr_devices(void)
  * function to reset the owned device
  *
  */
-void py_reset_device(char *sn)
+void
+py_reset_device(char *sn)
 {
   device_handle_t *device = py_getdevice_from_sn(sn);
 
@@ -861,14 +849,14 @@ void py_reset_device(char *sn)
     return;
   }
 
-  //py_mutex_lock(app_sync_lock);
-  //int ret = oc_obt_device_hard_reset(&device->uuid, reset_device_cb, device);
-  //if (ret >= 0) {
+  // py_mutex_lock(app_sync_lock);
+  // int ret = oc_obt_device_hard_reset(&device->uuid, reset_device_cb, device);
+  // if (ret >= 0) {
   //  PRINT("[C]\nSuccessfully issued request to perform hard RESET\n");
   //} else {
   //  PRINT("[C]\nERROR issuing request to perform hard RESET\n");
- // }
- // py_mutex_unlock(app_sync_lock);
+  // }
+  // py_mutex_unlock(app_sync_lock);
 }
 
 void
@@ -890,8 +878,6 @@ py_get_obt_uuid()
   strncpy(uuid, buffer, OC_UUID_LEN);
   return uuid;
 }
-
-
 
 // -----------------------------------------------------------------------------
 
@@ -932,7 +918,7 @@ py_main(void)
 #ifdef OC_STORAGE
   oc_storage_config("./onboarding_tool_creds");
 #endif /* OC_STORAGE */
- // oc_set_factory_presets_cb(factory_presets_cb, NULL);
+       // oc_set_factory_presets_cb(factory_presets_cb, NULL);
   oc_set_max_app_data_size(16384);
 
   init = oc_main_init(&handler);
@@ -940,8 +926,8 @@ py_main(void)
     return init;
 
 #if defined(_WIN32)
-  event_thread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)func_event_thread,
-                              NULL, 0, NULL);
+  event_thread = CreateThread(
+    NULL, 0, (LPTHREAD_START_ROUTINE)func_event_thread, NULL, 0, NULL);
   if (NULL == event_thread) {
     return -1;
   }
