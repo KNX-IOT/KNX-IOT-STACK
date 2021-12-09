@@ -16,9 +16,15 @@
 #ifndef OC_PYTHON_H
 #define OC_PYTHON_H
 
-#include "kisCS_Export.h"
-
 #ifdef DOXYGEN
+// Force doxygen to document to ignore kisCS_EXPORT
+#define kisCS_EXPORT 
+#endif
+
+#indef WIN32
+// use the (generated) DLL export macros
+#include "kisCS_Export.h"
+#else
 // Force doxygen to document to ignore kisCS_EXPORT
 #define kisCS_EXPORT 
 #endif
