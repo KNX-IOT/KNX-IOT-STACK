@@ -21,7 +21,7 @@
 #define kisCS_EXPORT 
 #endif
 
-#indef WIN32
+#ifdef WIN32
 // use the (generated) DLL export macros
 #include "kisCS_Export.h"
 #else
