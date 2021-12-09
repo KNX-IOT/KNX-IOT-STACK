@@ -125,7 +125,7 @@ volatile int quit = 0; /**< stop variable, used by handle_signal */
 int
 app_init(void)
 {
-  /* set the manufactorer name */
+  /* set the manufacturer name */
   int ret = oc_init_platform("Cascoda", NULL, NULL);
 
   /* set the application name, version, base url, device serial number */

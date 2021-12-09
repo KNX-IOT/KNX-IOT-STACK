@@ -202,21 +202,21 @@ target_link_libraries(kisClientServer PUBLIC kis-common)
 add_compile_definitions(OC_CLIENT OC_SERVER)
 include (GenerateExportHeader)
 
-add_library(kisClientServer_shared)
-GENERATE_EXPORT_HEADER( kisClientServer_shared
-             BASE_NAME kisClientServer_shared
-             EXPORT_MACRO_NAME kisClientServer_shared_EXPORT
-             EXPORT_FILE_NAME kisClientServer_shared_Export.h
-             STATIC_DEFINE kisClientServer_shared_BUILT_AS_STATIC
+add_library(kisCS SHARED pythonbinding/oc_python.c)
+GENERATE_EXPORT_HEADER( kisCS
+             BASE_NAME kisCS
+             EXPORT_MACRO_NAME kisCS_EXPORT
+             EXPORT_FILE_NAME kisCS_Export.h
+             STATIC_DEFINE kisCS_BUILT_AS_STATIC
 )
 
-target_compile_definitions(kisClientServer_shared PUBLIC OC_SERVER OC_CLIENT)
-target_link_libraries(kisClientServer PRIVATE
+target_compile_definitions(kisCS PUBLIC OC_SERVER OC_CLIENT)
+target_link_libraries(kisCS PUBLIC
     kis-coap
     kis-api
     kis-port
 )
-target_link_libraries(kisClientServer_shared SHARED kis-common)
+target_link_libraries(kisCS PUBLIC kis-common)
 
 
 if(PROJECT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
