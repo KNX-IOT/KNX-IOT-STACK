@@ -78,6 +78,7 @@ oc_core_dev_hwv_get_handler(oc_request_t *request,
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
+  PRINT("oc_core_dev_hwv_get_handler\n");
 
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
@@ -89,7 +90,7 @@ oc_core_dev_hwv_get_handler(oc_request_t *request,
     cbor_encode_int(&arrayEncoder, (int64_t)device->hwv.major);
     cbor_encode_int(&arrayEncoder, (int64_t)device->hwv.minor);
     cbor_encode_int(&arrayEncoder, (int64_t)device->hwv.third);
-    cbor_encoder_close_container(&g_encoder, &arrayEncoder);
+    cbor_encoder_close_container_checked(&g_encoder, &arrayEncoder);
 
     oc_send_cbor_response(request, OC_STATUS_OK);
     return;
@@ -121,17 +122,26 @@ oc_core_dev_fwv_get_handler(oc_request_t *request,
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
+
+  PRINT("oc_core_dev_fwv_get_handler\n");
+
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device != NULL) {
     // Content-Format: "application/cbor"
     // Payload: [ 1, 2, 3 ]
+
+    // oc_rep_add_int(&arrayEncoder, (int64_t)device->fwv.major);
+
+    // oc_rep_close_array(root, fibonacci);
+
     CborEncoder arrayEncoder;
+
     cbor_encoder_create_array(&g_encoder, &arrayEncoder, 3);
     cbor_encode_int(&arrayEncoder, (int64_t)device->fwv.major);
     cbor_encode_int(&arrayEncoder, (int64_t)device->fwv.minor);
     cbor_encode_int(&arrayEncoder, (int64_t)device->fwv.third);
-    cbor_encoder_close_container(&g_encoder, &arrayEncoder);
+    cbor_encoder_close_container_checked(&g_encoder, &arrayEncoder);
 
     oc_send_cbor_response(request, OC_STATUS_OK);
     return;

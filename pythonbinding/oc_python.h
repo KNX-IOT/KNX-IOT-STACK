@@ -38,7 +38,8 @@ typedef void (*changedCB)(char *uuid, char *state, char *event);
 typedef void (*resourceCB)(char *anchor, char *uri, char *types,
                            char *interfaces);
 
-typedef void (*clientCB)(char *sn, char *id, int payload_size, char *payload);
+typedef void (*clientCB)(char *sn, char *r_format, char *r_id, char *url,
+                         int payload_size, char *payload);
 
 /**
  * @brief returns the application max data size, e.g. data size for each call
@@ -82,8 +83,9 @@ kisCS_EXPORT void py_install_clientCB(clientCB clientCB);
  * @param sn the serial number of the device (is unique?)
  * @param uri the local path
  * @param query the query
+ * @param r_id the r_id (string)
  */
-kisCS_EXPORT void py_cbor_get(char *sn, char *uri, char *query);
+kisCS_EXPORT void py_cbor_get(char *sn, char *uri, char *query, char *r_id);
 
 /**
  * @brief issue a GET request with expected content type LINK-FORMAT
@@ -91,8 +93,10 @@ kisCS_EXPORT void py_cbor_get(char *sn, char *uri, char *query);
  * @param sn the serial number of the device (is unique?)
  * @param uri the local path
  * @param query the query
+ * @param r_id the r_id (string)
  */
-kisCS_EXPORT void py_linkformat_get(char *sn, char *uri, char *query);
+kisCS_EXPORT void py_linkformat_get(char *sn, char *uri, char *query,
+                                    char *r_id);
 
 /**
  * @brief issue a POST request, content type CBOR
@@ -100,11 +104,12 @@ kisCS_EXPORT void py_linkformat_get(char *sn, char *uri, char *query);
  * @param sn the serial number of the device (is unique?)
  * @param uri the local path
  * @param query the query
+ * @param r_id the r_id (string)
  * @param size the size of the data
  * @param data the request data (in cbor)
  */
-kisCS_EXPORT void py_cbor_post(char *sn, char *uri, char *query, int size,
-                               char *data);
+kisCS_EXPORT void py_cbor_post(char *sn, char *uri, char *query, char *r_id,
+                               int size, char *data);
 
 /**
  * @brief issue a PUT request, content type CBOR
@@ -112,11 +117,12 @@ kisCS_EXPORT void py_cbor_post(char *sn, char *uri, char *query, int size,
  * @param sn the serial number of the device (is unique?)
  * @param uri the local path
  * @param query the query
+ * @param r_id the r_id (string)
  * @param size the size of the data
  * @param data the request data (in cbor)
  */
-kisCS_EXPORT void py_cbor_put(char *sn, char *uri, char *query, int size,
-                              char *data);
+kisCS_EXPORT void py_cbor_put(char *sn, char *uri, char *query, char *r_id,
+                              int size, char *data);
 
 /**
  * @brief issue a DELETE request, content type CBOR
@@ -124,8 +130,9 @@ kisCS_EXPORT void py_cbor_put(char *sn, char *uri, char *query, int size,
  * @param sn the serial number of the device (is unique?)
  * @param uri the local path
  * @param query the query
+ * @param r_id the r_id (string)
  */
-kisCS_EXPORT void py_cbor_delete(char *sn, char *uri, char *query);
+kisCS_EXPORT void py_cbor_delete(char *sn, char *uri, char *query, char *r_id);
 
 /**
  * @brief discover KNX devices on the network

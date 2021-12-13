@@ -66,13 +66,14 @@ import copy
 
 unowned_return_list=[]
 
-unowned_event = threading.Event()
-owned_event = threading.Event()
-resource_event = threading.Event()
-diplomat_event = threading.Event()
-so_event = threading.Event()
+discover_event = threading.Event()
+#owned_event = threading.Event()
+#resource_event = threading.Event()
+#diplomat_event = threading.Event()
+#so_event = threading.Event()
 client_event = threading.Event()
-device_event = threading.Event()
+client_mutex = threading.Lock()
+#device_event = threading.Event()
 resource_mutex = threading.Lock()
 
 ten_spaces = "          "
@@ -471,19 +472,40 @@ def signal_event_loop():
 
 CHANGED_CALLBACK = CFUNCTYPE(None, c_char_p, c_char_p, c_char_p)
 RESOURCE_CALLBACK = CFUNCTYPE(None, c_char_p, c_char_p, c_char_p, c_char_p)
-CLIENT_CALLBACK = CFUNCTYPE(None, c_char_p, c_char_p, c_int, c_char_p)
+
+#typedef void (*clientCB)(char *sn, char* r_format, char *r_id, char *url, int payload_size, char *payload);
+CLIENT_CALLBACK = CFUNCTYPE(None, c_char_p, c_char_p, c_char_p, c_char_p, c_int, c_char_p)
 
 
 class Device():
 
-    def __init__(self,sn,ip_address=None,name="",resources=None,resource_array=None, credentials=None, last_event=None):
-        self.sn = sn
-        self.ip_address = ip_address
-        #self.owned_state = owned_state
-        self.name = name 
-        self.credentials = credentials
-        self.resource_array = []
-        self.last_event = last_event 
+    def __init__(self, sn, ip_address=None, name="", resources=None, resource_array=None, credentials=None, last_event=None):
+      self.sn = sn
+      self.ip_address = ip_address
+      #self.owned_state = owned_state
+      self.name = name 
+      self.credentials = credentials
+      self.resource_array = []
+      self.last_event = last_event 
+        
+    def __str__(self):
+      #Do whatever you want here
+      return ("Device Sn:{} r_id:{}".format(self.sn))
+
+
+class CoAPResponse():
+            
+    def __init__(self, sn, format, r_id, url, payload_size, payload):
+      self.sn = sn
+      self.r_id = r_id
+      self.url = url
+      self.payload_type = format
+      self.payload_size = payload_size
+      self.payload = payload
+
+    def __str__(self):
+      #Do whatever you want here
+      return ("Payload Sn:{} r_id:{}".format(self.sn ,self.r_id))
 
 
 class KNXIOTStack():
@@ -495,6 +517,11 @@ class KNXIOTStack():
 
     def convertcbor2json(self, payload, payload_len):
        print (type(payload))
+       print (" payload len :", payload_len)
+       print (" payload size:", len(payload))
+       if (len(payload) > payload_len):
+        print ("truncating payload")
+        payload = payload[:payload_len]
        print ("=========")
        print (payload)
        print ("=========")
@@ -528,37 +555,56 @@ class KNXIOTStack():
             print("Discovery Event:{}".format(cb_state))
             dev = Device(sn , ip_address=cb_state, name=name)
             self.device_array.append(dev)
-            owned_event.set()
+            discover_event.set()
     
     """ ********************************
     Call back handles client command callbacks.
     Client discovery/state
     **********************************"""
-    def clientCB(self, cb_sn, cb_state, cb_payload_size, cb_payload):
+    def clientCB(self, cb_sn, cb_format, cb_id, cb_url, cb_payload_size, cb_payload):
+        client_mutex.acquire()
+
         sn=""
-        state=""
+        c_format=""
+        r_id = ""
+        url = ""
         if len(cb_sn):
-            sn =  cb_sn.decode("utf-8")
-        if len(cb_state):
-            state = cb_state.decode("utf-8")
-        print("ClientCB: SN: {}, State:{}, size:{} ".format(sn, state, cb_payload_size ))
-        if state == "link_format" :
+          sn =  cb_sn.decode("utf-8")
+        if len(cb_format):
+          c_format = cb_format.decode("utf-8")
+        if len(cb_id):
+          r_id = cb_id.decode("utf-8")
+        if len(cb_url):
+          url = cb_url.decode("utf-8")
+        
+        print("ClientCB: SN:{}, format:{}, id:{}, url:{},  size:{} ".format(sn, c_format, r_id, url, cb_payload_size ))
+        
+        if c_format == "link_format" :
           if cb_payload is not None:
             print("ClientCB: link-format");
             payload = cb_payload.decode("utf-8")
-            print(payload)
-            #print(cb_payload)
-        if state == "cbor" :
+            print("p:", payload)
+        if c_format == "cbor" :
           print("ClientCB: cbor")
-          json_data = self.convertcbor2json(cb_payload, cb_payload_size)
-          print(json_data)
-          #if cb_payload is not None:
-            #payload = cb_payload.decode("utf-8")
-            #print(payload)
+          payload = self.convertcbor2json(cb_payload, cb_payload_size)
+          print("p:",payload)
+        if c_format == "json" :
+          print("ClientCB: json")
+          payload = cb_payload.decode("utf-8")
+          print("p:", payload)
+        if c_format == "error" :
+          print("ClientCB: error")
+          print("p:", cb_payload_size)
+
+        resp  = CoAPResponse(sn, c_format, r_id, url, cb_payload_size, payload)
+        self.response_array.append(resp)
+        client_event.set()
+        client_mutex.release()         
     
     """ ********************************
     Call back handles resource call backs tasks.
     Resources is an dictionary with sn of device
+    not used...
     **********************************"""
     def resourceCB(self, anchor, uri, rtypes, myjson):
         uuid = str(anchor)[8:-1]
@@ -609,6 +655,7 @@ class KNXIOTStack():
         print ("loading :", libname)
         libdir = os.path.dirname(__file__) 
         print ("at :", libdir)
+        self.timout = 3
        
         self.lib=ctl.load_library(libname, libdir)
         # python list of copied unowned devices on the local network
@@ -618,6 +665,8 @@ class KNXIOTStack():
         self.resourcelist = {}
 
         self.device_array = []
+        self.response_array = []
+
         print (self.lib)
         print ("...")
         self.debug=debug
@@ -625,6 +674,8 @@ class KNXIOTStack():
         #print("py_set_max_app_data_size- done")
         value = self.lib.py_get_max_app_data_size()
         print("py_get_max_app_data_size :", value)
+        
+        self.counter = 1
 
         self.changedCB = CHANGED_CALLBACK(self.changedCB)
         self.lib.py_install_changedCB(self.changedCB)
@@ -644,6 +695,11 @@ class KNXIOTStack():
         self.threadid.start()
         print ("...")
         
+    def get_r_id(self):
+        self.counter = self.counter + 1
+        return str(self.counter)
+
+
     def thread_function(self):
         """ starts the main function in C.
         this function is threaded in python.
@@ -656,7 +712,6 @@ class KNXIOTStack():
         self.lib.get_cb_result.restype = bool
         return self.lib.get_cb_result()
 
-
     def purge_device_array(self, sn):
         for index, device in enumerate(self.device_array):
             if device.sn == sn:
@@ -666,13 +721,14 @@ class KNXIOTStack():
     def discover_devices(self):
         print("Discover Devices")
         # application
+        discover_event.clear()
         ret = self.lib.py_discover_devices(c_int(0x02))
         #ret = self.lib.py_discover_devices(c_int(0x05))
         time.sleep(2)
         # python callback application
         print("[P] discovery- done")
         nr_discovered = self.lib.py_get_nr_devices()
-        unowned_event.wait(2)
+        discover_event.wait(self.timout)
         print("Discovered DEVICE ARRAY {}".format(self.device_array))
         return self.device_array
 
@@ -693,62 +749,101 @@ class KNXIOTStack():
     def return_devices_array(self):
         return self.device_array
 
+
+    def purge_response_by_id(self, r_id):
+        #return 
+        for index, resp in enumerate(self.response_array):
+          if resp.r_id == r_id:
+            print("purge_response: Remove: {}".format(response.r_id))
+            self.response_array.pop(index)
+
+    def purge_response(self, response):
+        if response is not None:
+          self.purge_response_by_id(response.r_id)
+
+    def find_response(self, r_id):
+        print("==> find response: ", r_id)
+        for item in self.response_array:
+           print("    find_response:", item.r_id)
+           if str(item.r_id) == str(r_id):
+               return item
+        return None
+
     def issue_cbor_get(self, sn, uri, query=None) :
-        print(" issue_cbor_get", sn, uri, query)
-        self.lib.py_cbor_get.argtypes = [String, String, String]
+        r_id = self.get_r_id()
+        print("issue_cbor_get", sn, uri, query, r_id)
+        self.lib.py_cbor_get.argtypes = [String, String, String, String]
         #self.lib.py_general_get.restype = c_int
-        self.lib.py_cbor_get(sn, uri, query)
+        client_event.clear()
+        self.lib.py_cbor_get(sn, uri, query, r_id)
+        client_event.wait(self.timout)
+        response =  self.find_response(r_id)
+        if response is None :
+            client_event.wait(self.timout)
+        return self.find_response(r_id)
 
     def issue_linkformat_get(self, sn, uri, query=None) :
-        print(" issue_linkformat_get", sn, uri, query)
-        self.lib.py_linkformat_get.argtypes = [String, String, String]
+        r_id = self.get_r_id()
+        print("issue_linkformat_get", sn, uri, query, r_id)
+        self.lib.py_linkformat_get.argtypes = [String, String, String, String]
         #self.lib.py_general_get.restype = c_int
-        self.lib.py_linkformat_get(sn, uri, query)
+        
+        client_event.clear()
+        self.lib.py_linkformat_get(sn, uri, query, r_id)
+        client_event.wait(self.timout)
+        return self.find_response(r_id)
 
     def issue_cbor_post(self, sn, uri, content, query=None) :
         # kisCS_EXPORT void py_cbor_post(char *sn, char *uri, char *query, int size,
         #                        char *data);
         
-        print(" issue_cbor_post", sn, uri, query)
+        r_id = self.get_r_id()
+        
+        client_event.clear()
+        print(" issue_cbor_post", sn, uri, query, r_id)
         try:
           payload = cbor.dumps(content)
           payload_len = len(payload)
           print(" len :", payload_len)
           print(" cbor :", payload)
 
-          self.lib.py_cbor_post.argtypes = [String, String, String, c_int, String]
-          self.lib.py_cbor_post(sn, uri, query, payload_len, payload)
+          self.lib.py_cbor_post.argtypes = [String, String, String, String, c_int, String]
+          self.lib.py_cbor_post(sn, uri, query, r_id, payload_len, payload)
         except:
             pass
-        print(" issue_cbor_post - done")
+        # print(" issue_cbor_post - done")
+        client_event.wait(self.timout)
+        return self.find_response(r_id)
 
         
     def issue_cbor_put(self, sn, uri, content, query=None) :
-        # kisCS_EXPORT void py_cbor_post(char *sn, char *uri, char *query, int size,
-        #                        char *data);
+        r_id = self.get_r_id()
         
-        print(" issue_cbor_put", sn, uri, query)
+        client_event.clear()
+        print(" issue_cbor_put", sn, uri, query, r_id)
         try:
           payload = cbor.dumps(content)
           payload_len = len(payload)
           print(" len :", payload_len)
           print(" cbor :", payload)
 
-          self.lib.py_cbor_put.argtypes = [String, String, String, c_int, String]
-          self.lib.py_cbor_put(sn, uri, query, payload_len, payload)
+          self.lib.py_cbor_put.argtypes = [String, String, String, String, c_int, String]
+          self.lib.py_cbor_put(sn, uri, query, r_id, payload_len, payload)
         except:
             pass
         print(" issue_cbor_put - done")
+        client_event.wait(self.timout)
+        return self.find_response(r_id)
+
         
     def issue_cbor_delete(self, sn, uri, query=None) :
-        # kisCS_EXPORT void py_cbor_post(char *sn, char *uri, char *query, int size,
-        #                        char *data);
+        r_id = self.get_r_id()
         
-        print(" issue_cbor_delete", sn, uri, query)
+        client_event.clear()
+        print(" issue_cbor_delete", sn, uri, query, r_id)
         try:
-
-          self.lib.py_cbor_delete.argtypes = [String, String, String]
-          self.lib.py_cbor_delete(sn, uri, query )
+          self.lib.py_cbor_delete.argtypes = [String, String, String, String]
+          self.lib.py_cbor_delete(sn, uri, query, r_id)
         except:
             pass
         print(" issue_cbor_delete - done")
@@ -761,7 +856,6 @@ class KNXIOTStack():
         time.sleep(1)
         self.quit()
         sys.exit()
-
 
     def get_nr_devices(self):
         # retrieves the number of discovered devices
@@ -780,28 +874,43 @@ if __name__ == "__main__":
 
     # need this sleep, because it takes a while to start the stack in C in a Thread
     time.sleep(1)
-    my_stack.discover_devices()
-    time.sleep(1)
+    devices = my_stack.discover_devices()
+    #'time.sleep(1)
     if my_stack.get_nr_devices() > 0:
         print ("SN :", my_stack.device_array[0].sn)
-        #my_stack.issue_cbor_get(my_stack.device_array[0].sn, "/dev/iid")
-        my_stack.issue_linkformat_get(my_stack.device_array[0].sn, "/dev")
-        my_stack.issue_cbor_get(my_stack.device_array[0].sn, "/p/a")
-        time.sleep(1)
-        content = {"cmd": "startLoading"}
-        my_stack.issue_cbor_post(my_stack.device_array[0].sn, "/a/lsm", content)
-
-
+        response = my_stack.issue_linkformat_get(my_stack.device_array[0].sn, "/dev")
+        print ("response:", response)
+        my_stack.purge_response(response)
+        
+        #response = my_stack.issue_cbor_get(my_stack.device_array[0].sn, "/p/a")
+        #print (response)
+        #my_stack.purge_response(response)
+        
+        print("Get IA :");
+        response = my_stack.issue_cbor_get(my_stack.device_array[0].sn, "/dev/ia")
+        print ("response:", response)
+        my_stack.purge_response(response)
+        
+        print("Get HW Type :");
+        response = my_stack.issue_cbor_get(my_stack.device_array[0].sn, "/dev/hwt")
+        print ("response:", response)
+        my_stack.purge_response(response)
+        
+        #print("Get HWVersion :");
+        #response = my_stack.issue_cbor_get(my_stack.device_array[0].sn, "/dev/hwv")
+        #print (response)
+        #my_stack.purge_response(response)
+        
         #time.sleep(1)
-        #my_stack.issue_get(my_stack.device_array[0].ip_address+"/p/a", None, 60)
-        #time.sleep(3)
-        #my_stack.issue_get(my_stack.device_array[0].ip_address+"/dev", None, 40)
+        content = {"cmd": "startLoading"}
+        response = my_stack.issue_cbor_post(my_stack.device_array[0].sn, "/a/lsm", content)
+        print ("response:", response)
+        my_stack.purge_response(response)
+
         #time.sleep(3)
         #my_stack.issue_get(my_stack.device_array[0].ip_address+"/dev/sn", None, 60)
         time.sleep(2)
         my_stack.quit()
-
-    #my_stack.test_discovery()
 
 
 
