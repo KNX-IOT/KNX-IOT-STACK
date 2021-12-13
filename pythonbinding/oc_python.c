@@ -100,15 +100,11 @@ typedef struct user_struct_t
   char r_id[200];
 } user_struct_t;
 
-
-
-
 /**
  * global declaration of the callback
  *
  */
 struct py_cb_struct my_CBFunctions;
-
 
 // -----------------------------------------------------------------------------
 
@@ -238,14 +234,12 @@ inform_resource_python(const char *anchor, const char *uri, const char *types,
  *
  */
 void
-inform_client_python(const char *sn, const char *format, const char* r_id, const char* url, int payload_size,
-                     const char *payload)
+inform_client_python(const char *sn, const char *format, const char *r_id,
+                     const char *url, int payload_size, const char *payload)
 {
   if (my_CBFunctions.clientFCB != NULL) {
     my_CBFunctions.clientFCB((char *)sn, (char *)format, (char *)r_id,
-                             (char *)url, 
-                             payload_size,
-                             (char *)payload);
+                             (char *)url, payload_size, (char *)payload);
   }
 }
 
@@ -442,8 +436,7 @@ general_get_cb(oc_client_response_t *data)
   user_struct_t *my_data = (user_struct_t *)data->user_data;
   if (my_data) {
     PRINT(" [C]general_get_cb: response status (%d) [%s] [%s] [%s] \n",
-          (int)status, my_data->sn, my_data->r_id,
-          my_data->url);
+          (int)status, my_data->sn, my_data->r_id, my_data->url);
   } else {
     PRINT(" [C]general_get_cb: response status %d: %s \n", (int)status,
           stringFromResponse((int)status));
@@ -452,18 +445,16 @@ general_get_cb(oc_client_response_t *data)
   if (data->content_format == APPLICATION_LINK_FORMAT) {
     py_mutex_lock(app_sync_lock);
     memset(buffer, buffer_size, 1);
-    memcpy(&buffer, (char*)data->_payload, (int)data->_payload_len);
+    memcpy(&buffer, (char *)data->_payload, (int)data->_payload_len);
 
     inform_client_python((char *)my_data->sn, "link_format",
                          (char *)my_data->r_id, (char *)my_data->url,
-                         (int)data->_payload_len,
-                         buffer);
+                         (int)data->_payload_len, buffer);
     py_mutex_unlock(app_sync_lock);
   } else if (data->content_format == APPLICATION_CBOR) {
     py_mutex_lock(app_sync_lock);
     memset(buffer, buffer_size, 1);
-    oc_rep_to_json(data->payload, (char *)&buffer, buffer_size,
-                   false);
+    oc_rep_to_json(data->payload, (char *)&buffer, buffer_size, false);
     inform_client_python((char *)my_data->sn, "json", (char *)my_data->r_id,
                          (char *)my_data->url, (int)data->_payload_len,
                          (char *)buffer);
@@ -471,18 +462,16 @@ general_get_cb(oc_client_response_t *data)
   } else {
     PRINT(" [C]informing python with error \n");
     inform_client_python((char *)my_data->sn, "error", (char *)my_data->r_id,
-                         (char *)my_data->url, status,
-                          "");
+                         (char *)my_data->url, status, "");
   }
 
   if (data->user_data != NULL) {
     free(data->user_data);
   }
-
 }
 
 void
-py_cbor_get(char *sn, char *uri, char *query, char* cbdata)
+py_cbor_get(char *sn, char *uri, char *query, char *cbdata)
 {
   int ret = -1;
   device_handle_t *device = py_getdevice_from_sn(sn);
@@ -505,13 +494,14 @@ py_cbor_get(char *sn, char *uri, char *query, char* cbdata)
 }
 
 void
-py_linkformat_get(char *sn, char *uri, char *query, char* cbdata)
+py_linkformat_get(char *sn, char *uri, char *query, char *cbdata)
 {
   int ret = -1;
   oc_endpoint_t ep;
   device_handle_t *device = py_getdevice_from_sn(sn);
 
-  PRINT("  [C]py_linkformat_get: [%s], [%s] [%s] [%s]\n", sn, uri, query, cbdata);
+  PRINT("  [C]py_linkformat_get: [%s], [%s] [%s] [%s]\n", sn, uri, query,
+        cbdata);
 
   user_struct_t *new_cbdata;
   new_cbdata = (user_struct_t *)malloc(sizeof(user_struct_t));
@@ -537,13 +527,13 @@ py_linkformat_get(char *sn, char *uri, char *query, char* cbdata)
 // -----------------------------------------------------------------------------
 
 void
-py_cbor_post(char *sn, char *uri, char *query, char *id, int size,
-             char *data)
+py_cbor_post(char *sn, char *uri, char *query, char *id, int size, char *data)
 {
   int ret = -1;
   device_handle_t *device = py_getdevice_from_sn(sn);
 
-  PRINT("  [C]py_cbor_post: [%s], [%s] [%s] [%s] %d\n", sn, uri, id, query, size);
+  PRINT("  [C]py_cbor_post: [%s], [%s] [%s] [%s] %d\n", sn, uri, id, query,
+        size);
 
   user_struct_t *new_cbdata;
   new_cbdata = (user_struct_t *)malloc(sizeof(user_struct_t));
@@ -569,13 +559,13 @@ py_cbor_post(char *sn, char *uri, char *query, char *id, int size,
 // -----------------------------------------------------------------------------
 
 void
-py_cbor_put(char *sn, char *uri, char *query, char *id, int size,
-            char *data)
+py_cbor_put(char *sn, char *uri, char *query, char *id, int size, char *data)
 {
   int ret = -1;
   device_handle_t *device = py_getdevice_from_sn(sn);
 
-  PRINT("  [C]py_cbor_put: [%s], [%s] [%s] [%s] %d\n", sn, uri, id, query, size);
+  PRINT("  [C]py_cbor_put: [%s], [%s] [%s] [%s] %d\n", sn, uri, id, query,
+        size);
 
   user_struct_t *new_cbdata;
   new_cbdata = (user_struct_t *)malloc(sizeof(user_struct_t));
@@ -584,9 +574,9 @@ py_cbor_put(char *sn, char *uri, char *query, char *id, int size,
     strcpy(new_cbdata->url, uri);
     strcpy(new_cbdata->sn, sn);
   }
- 
+
   if (oc_init_put(uri, &device->ep, NULL, general_get_cb, HIGH_QOS,
-                  (char*)new_cbdata)) {
+                  (char *)new_cbdata)) {
     // encode the request data..it should already be cbor
     oc_rep_encode_raw(data, (size_t)size);
 
@@ -599,7 +589,6 @@ py_cbor_put(char *sn, char *uri, char *query, char *id, int size,
 }
 
 // -----------------------------------------------------------------------------
-
 
 void
 py_cbor_delete(char *sn, char *uri, char *query, char *id)

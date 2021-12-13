@@ -130,11 +130,11 @@ oc_core_dev_fwv_get_handler(oc_request_t *request,
   if (device != NULL) {
     // Content-Format: "application/cbor"
     // Payload: [ 1, 2, 3 ]
-    
-    //oc_rep_add_int(&arrayEncoder, (int64_t)device->fwv.major);
 
-    //oc_rep_close_array(root, fibonacci);
-    
+    // oc_rep_add_int(&arrayEncoder, (int64_t)device->fwv.major);
+
+    // oc_rep_close_array(root, fibonacci);
+
     CborEncoder arrayEncoder;
 
     cbor_encoder_create_array(&g_encoder, &arrayEncoder, 3);
