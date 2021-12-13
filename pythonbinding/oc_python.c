@@ -435,8 +435,9 @@ general_get_cb(oc_client_response_t *data)
   oc_status_t status = data->code;
   user_struct_t *my_data = (user_struct_t *)data->user_data;
   if (my_data) {
-    PRINT(" [C]general_get_cb: response status (%d) [%s] [%s] [%s] \n",
-          (int)status, my_data->sn, my_data->r_id, my_data->url);
+    PRINT(" [C]general_get_cb: response status (%d) (%d) [%s] [%s] [%s] \n",
+          (int)status, data->content_format, my_data->sn, my_data->r_id,
+          my_data->url);
   } else {
     PRINT(" [C]general_get_cb: response status %d: %s \n", (int)status,
           stringFromResponse((int)status));

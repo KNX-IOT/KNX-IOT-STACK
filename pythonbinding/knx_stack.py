@@ -568,6 +568,7 @@ class KNXIOTStack():
         c_format=""
         r_id = ""
         url = ""
+        payload = ""
         if len(cb_sn):
           sn =  cb_sn.decode("utf-8")
         if len(cb_format):
@@ -754,7 +755,7 @@ class KNXIOTStack():
         #return 
         for index, resp in enumerate(self.response_array):
           if resp.r_id == r_id:
-            print("purge_response: Remove: {}".format(response.r_id))
+            print("purge_response: Remove: {}".format(resp.r_id))
             self.response_array.pop(index)
 
     def purge_response(self, response):

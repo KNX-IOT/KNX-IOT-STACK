@@ -772,7 +772,7 @@ oc_lf_get_entry_uri(const char *payload, int payload_len, int entry,
 
   oc_lf_get_line(payload, payload_len, entry, &line, &line_len);
 
-  PRINT(" LINE: %.*s\n", line_len, line);
+  // PRINT(" LINE: %.*s\n", line_len, line);
 
   for (i = 0; i < line_len; i++) {
     if (line[i] == '<') {
