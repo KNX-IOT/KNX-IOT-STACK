@@ -477,6 +477,66 @@ RESOURCE_CALLBACK = CFUNCTYPE(None, c_char_p, c_char_p, c_char_p, c_char_p)
 CLIENT_CALLBACK = CFUNCTYPE(None, c_char_p, c_char_p, c_char_p, c_char_p, c_int, c_char_p)
 
 
+#----------LinkFormat parsing ---------------
+
+class LinkFormat():
+
+    def __init__(self, response):
+        self.response = response
+        self.lines = response.splitlines() 
+
+    def get_nr_lines(self):
+        return len(self.lines)
+    
+    def get_line(self, index):
+        return self.lines[index]
+        #return len(self.lines)
+
+    def get_lines(self):
+        return self.lines
+
+    def get_url(self, line):
+        data = line.split(">")
+        url = data[0]
+        return url[1:]
+
+    def get_ct(self, line):
+        tagvalues = line.split(";")
+        for tag in tagvalues:
+           if tag.startswith("ct"):
+              ct_value_all = tag.split("=")
+              ct_value = ct_value_all[1].split(",")
+              return ct_value[0]
+        return ""
+
+    def get_rt(self, line):
+        tagvalues = line.split(";")
+        for tag in tagvalues:
+           if tag.startswith("rt"):
+              ct_value_all = tag.split("=")
+              ct_value = ct_value_all[1].split(",")
+              return ct_value[0]
+        return ""
+
+    def get_base(self, url):
+        # python3 knxcoapclient.py -o GET -p coap://[fe80::6513:3050:71a7:5b98]:63914/a -c 50
+        my_url = url.replace("coap://","")
+        mybase = my_url.split("/")
+        return mybase[0]
+
+    def get_base_from_link(self, payload):
+        print("get_base_from_link\n")
+        global paths
+        global paths_extend
+        lines = payload.splitlines()
+    
+        # add the 
+        if len(paths) == 0:
+            my_base = get_base(get_url(lines[0]))
+            return my_base
+
+#----------Devices ---------------
+
 class Device():
 
     def __init__(self, sn, ip_address=None, name="", resources=None, resource_array=None, credentials=None, last_event=None):
@@ -489,9 +549,10 @@ class Device():
       self.last_event = last_event 
         
     def __str__(self):
-      #Do whatever you want here
       return ("Device Sn:{} r_id:{}".format(self.sn))
 
+
+#----------Responses ---------------
 
 class CoAPResponse():
             
@@ -504,9 +565,9 @@ class CoAPResponse():
       self.payload = payload
 
     def __str__(self):
-      #Do whatever you want here
       return ("Payload Sn:{} r_id:{}".format(self.sn ,self.r_id))
 
+#----------The Stack ---------------
 
 class KNXIOTStack():
     """ ********************************
@@ -612,7 +673,6 @@ class KNXIOTStack():
         uuid_new = copy.deepcopy(uuid)
         my_uri = str(uri)[2:-1]
 
- 
         if self.debug is not None and 'resources' in self.debug:
             print(colored("          Resource Event          \n",'green',attrs=['underline']))
             print(colored("UUID:{}, \nURI:{}",'green').format(uuid_new,my_uri))
@@ -671,8 +731,6 @@ class KNXIOTStack():
         print (self.lib)
         print ("...")
         self.debug=debug
-        #self.lib.py_set_max_app_data_size(c_size_t(16384));
-        #print("py_set_max_app_data_size- done")
         value = self.lib.py_get_max_app_data_size()
         print("py_get_max_app_data_size :", value)
         
@@ -707,7 +765,6 @@ class KNXIOTStack():
         """
         print ("thread_function: thread started")
         init = self.lib.py_main()
-        #print ("thread_function", init)
             
     def get_result(self): 
         self.lib.get_cb_result.restype = bool
@@ -716,15 +773,14 @@ class KNXIOTStack():
     def purge_device_array(self, sn):
         for index, device in enumerate(self.device_array):
             if device.sn == sn:
-                print("Remove: {}".format(device.sn))
+                #print("Remove: {}".format(device.sn))
                 self.device_array.pop(index)
         
-    def discover_devices(self):
-        print("Discover Devices")
+    def discover_devices(self, scope=2):
+        print("Discover Devices: scope", scope)
         # application
         discover_event.clear()
-        ret = self.lib.py_discover_devices(c_int(0x02))
-        #ret = self.lib.py_discover_devices(c_int(0x05))
+        ret = self.lib.py_discover_devices(c_int(scope))
         time.sleep(2)
         # python callback application
         print("[P] discovery- done")
@@ -755,7 +811,7 @@ class KNXIOTStack():
         #return 
         for index, resp in enumerate(self.response_array):
           if resp.r_id == r_id:
-            print("purge_response: Remove: {}".format(resp.r_id))
+            #print("purge_response: Remove: {}".format(resp.r_id))
             self.response_array.pop(index)
 
     def purge_response(self, response):
@@ -763,9 +819,9 @@ class KNXIOTStack():
           self.purge_response_by_id(response.r_id)
 
     def find_response(self, r_id):
-        print("==> find response: ", r_id)
+        #print("==> find response: ", r_id)
         for item in self.response_array:
-           print("    find_response:", item.r_id)
+           # print("    find_response:", item.r_id)
            if str(item.r_id) == str(r_id):
                return item
         return None
@@ -795,9 +851,6 @@ class KNXIOTStack():
         return self.find_response(r_id)
 
     def issue_cbor_post(self, sn, uri, content, query=None) :
-        # kisCS_EXPORT void py_cbor_post(char *sn, char *uri, char *query, int size,
-        #                        char *data);
-        
         r_id = self.get_r_id()
         
         client_event.clear()
@@ -873,45 +926,40 @@ if __name__ == "__main__":
     my_stack = KNXIOTStack()
     signal.signal(signal.SIGINT, my_stack.sig_handler)
 
-    # need this sleep, because it takes a while to start the stack in C in a Thread
-    time.sleep(1)
-    devices = my_stack.discover_devices()
-    #'time.sleep(1)
-    if my_stack.get_nr_devices() > 0:
-        print ("SN :", my_stack.device_array[0].sn)
-        response = my_stack.issue_linkformat_get(my_stack.device_array[0].sn, "/dev")
-        print ("response:", response)
-        my_stack.purge_response(response)
-        
-        #response = my_stack.issue_cbor_get(my_stack.device_array[0].sn, "/p/a")
-        #print (response)
-        #my_stack.purge_response(response)
-        
-        print("Get IA :");
-        response = my_stack.issue_cbor_get(my_stack.device_array[0].sn, "/dev/ia")
-        print ("response:", response)
-        my_stack.purge_response(response)
-        
-        print("Get HW Type :");
-        response = my_stack.issue_cbor_get(my_stack.device_array[0].sn, "/dev/hwt")
-        print ("response:", response)
-        my_stack.purge_response(response)
-        
-        #print("Get HWVersion :");
-        #response = my_stack.issue_cbor_get(my_stack.device_array[0].sn, "/dev/hwv")
-        #print (response)
-        #my_stack.purge_response(response)
-        
-        #time.sleep(1)
-        content = {"cmd": "startLoading"}
-        response = my_stack.issue_cbor_post(my_stack.device_array[0].sn, "/a/lsm", content)
-        print ("response:", response)
-        my_stack.purge_response(response)
+    try:
+        # need this sleep, because it takes a while to start the stack in C in a Thread
+        time.sleep(1)
+        devices = my_stack.discover_devices()
 
-        #time.sleep(3)
-        #my_stack.issue_get(my_stack.device_array[0].ip_address+"/dev/sn", None, 60)
-        time.sleep(2)
-        my_stack.quit()
+        if my_stack.get_nr_devices() > 0:
+            # do some calls
+
+            print ("SN :", my_stack.device_array[0].sn)
+            response = my_stack.issue_linkformat_get(my_stack.device_array[0].sn, "/dev")
+            print ("response:", response)
+            my_stack.purge_response(response)
+        
+            print("Get IA :");
+            response = my_stack.issue_cbor_get(my_stack.device_array[0].sn, "/dev/ia")
+            print ("response:", response)
+            my_stack.purge_response(response)
+        
+            print("Get HW Type :");
+            response = my_stack.issue_cbor_get(my_stack.device_array[0].sn, "/dev/hwt")
+            print ("response:", response)
+            my_stack.purge_response(response)
+        
+            content = {"cmd": "startLoading"}
+            response = my_stack.issue_cbor_post(my_stack.device_array[0].sn, "/a/lsm", content)
+            print ("response:", response)
+            my_stack.purge_response(response)
+
+    except:
+           traceback.print_exc()
+
+    # close down the stack
+    time.sleep(2)
+    my_stack.quit()
 
 
 
