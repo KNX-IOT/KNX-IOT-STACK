@@ -41,138 +41,127 @@ sys.path.append(parentdir)
 import knx_stack
 
     
-def test_discover(my_stack):
+def do_discover(my_stack):
   time.sleep(1)
   devices = my_stack.discover_devices()
   if my_stack.get_nr_devices() > 0:
      print ("SN :", my_stack.device_array[0].sn)
 
 
-def install(my_base):
-    sn = get_sn(my_base)
+def do_install_device(my_stack, sn, ia, iid, fp_content):
+   # sensor, e.g sending  
+   print ("--------------------")
+   print ("Installing SN: ", sn)
+   
+   content = { 2: "reset"}
+   print("reset :", content);
+   response =  my_stack.issue_cbor_post(sn,"/.well-known/knx",content)
+   print ("response:",response)
+   my_stack.purge_response(response)
+   
+   content = True
+   print("set PM :", content);
+   response =  my_stack.issue_cbor_put(sn,"/dev/pm",content)
+   print ("response:",response)
+   my_stack.purge_response(response)
+   
+   
+   content = ia
+   print("set IA :", content)
+   response =  my_stack.issue_cbor_put(sn,"/dev/ia",content)
+   print ("response:",response)
+   my_stack.purge_response(response)
+   
+   content = iid
+   response =  my_stack.issue_cbor_put(sn,"/dev/iid",content)
+   print ("response:",response)
+   my_stack.purge_response(response)
+   
+   content = { 2: "startLoading"}
+   print("lsm :", content);
+   response =  my_stack.issue_cbor_post(sn,"/a/lsm",content)
+   print ("response:",response)
+   my_stack.purge_response(response)
+   
+   response =  my_stack.issue_cbor_get(sn,"/a/lsm")
+   print ("response:",response)
+   my_stack.purge_response(response)
+   
+   
+   # group object table
+   # id (0)= 1
+   # url (11)= /p/light
+   # ga (7 )= 1
+   # cflags (8) = ["r" ] ; read = 1, write = 2, transmit = 3 update = 4
+   content = [ {0: 1, 11: "p/push", 7:[1], 8: [2] } ] 
+   content = fp_content
+   response =  my_stack.issue_cbor_post(sn,"/fp/g",content)
+   print ("response:",response)
+   my_stack.purge_response(response)
+   
+   response =  my_stack.issue_linkformat_get(sn,"/fp/g")
+   print ("response:",response)
+   my_stack.purge_response(response)
+   
+   
+   # recipient table
+   # id (0)= 1
+   # ia (12)
+   # url (11)= .knx
+   # ga (7 )= 1
+   # cflags (8) = ["r" ] ; read = 1, write = 2, transmit = 3 update = 4
+   content = [ {0: 1, 11: "/p/push", 7:[1], 12 :"blah.blah" } ] 
+   response =  my_stack.issue_cbor_post(sn,"/fp/r",content)
+   print ("response:",response)
+   my_stack.purge_response(response)
+   
+   
+   content = False
+   print("set PM :", content);
+   response =  my_stack.issue_cbor_put(sn,"/dev/pm",content)
+   print ("response:",response)
+   my_stack.purge_response(response)
+   
+   content = { 2: "loadComplete"}
+   print("lsm :", content);
+   response =  my_stack.issue_cbor_post(sn,"/a/lsm",content)
+   print ("response:",response)
+   my_stack.purge_response(response)
+   
+   response =  my_stack.issue_cbor_get(sn,"/a/lsm")
+   print ("response:",response)
+   my_stack.purge_response(response)
+
+
+def do_install(my_stack):
+    sn = my_stack.device_array[0].sn
     print (" SN : ", sn)
     iid = "5"  # installation id
-    if "000001" == sn :
-       # sensor, e.g sending  
-       print ("--------------------")
-       print ("Installing SN: ", sn)
-       
-       content = { 2: "reset"}
-       print("reset :", content);
-       execute_post("coap://"+my_base+"/.well-known/knx", 60, 60, content)
-       
-       content = True
-       print("set PM :", content);
-       execute_put("coap://"+my_base+"/dev/pm", 60, 60, content)
-       content = 1
-       print("set IA :", content);
-       execute_put("coap://"+my_base+"/dev/ia", 60, 60, content)
-       content = iid
-       execute_put("coap://"+my_base+"/dev/iid", 60, 60, content)
-       
-       
-       content = { 2: "startLoading"}
-       print("lsm :", content);
-       execute_post("coap://"+my_base+"/a/lsm", 60, 60, content)
-       execute_get("coap://"+my_base+"/a/lsm", 60)
-       # group object table
-       # id (0)= 1
-       # url (11)= /p/light
-       # ga (7 )= 1
-       # cflags (8) = ["r" ] ; read = 1, write = 2, transmit = 3 update = 4
-       content = [ {0: 1, 11: "p/push", 7:[1], 8: [2] } ] 
-       execute_post("coap://"+my_base+"/fp/g", 60, 60, content)
-       
-       execute_get("coap://"+my_base+"/fp/g", 40)
-       
-       
-       # recipient table
-       # id (0)= 1
-       # ia (12)
-       # url (11)= .knx
-       # ga (7 )= 1
-       # cflags (8) = ["r" ] ; read = 1, write = 2, transmit = 3 update = 4
-       content = [ {0: 1, 11: "/p/push", 7:[1], 12 :"blah.blah" } ] 
-       execute_post("coap://"+my_base+"/fp/r", 60, 60, content)
-       
-       content = False
-       print("set PM :", content);
-       execute_put("coap://"+my_base+"/dev/pm", 60, 60, content)
-       
-       content = { 2: "loadComplete"}
-       print("lsm :", content);
-       execute_post("coap://"+my_base+"/a/lsm", 60, 60, content)
-       execute_get("coap://"+my_base+"/a/lsm", 60)
-       
-       
-    if "000002" == sn :
-       # actuator ==> receipient
-       # should use /fp/r
-       print ("--------------------")
-       print ("installing SN: ", sn)
-       content = True
-       print("set PM :", content);
-       execute_put("coap://"+my_base+"/dev/pm", 60, 60, content)
-       content = 2
-       print("set IA :", content);
-       execute_put("coap://"+my_base+"/dev/ia", 60, 60, content)
-       content = iid
-       execute_put("coap://"+my_base+"/dev/iid", 60, 60, content)
-       
-       
-       content = { 2: "startLoading"}
-       print("lsm :", content);
-       execute_post("coap://"+my_base+"/a/lsm", 60, 60, content)
-       execute_get("coap://"+my_base+"/a/lsm", 60)
-       
-       # group object table
-       # id (0)= 1
-       # url (11)= /p/light
-       # ga (7 )= 1
-       # cflags (8) = ["r" ] ; read = 1, write = 2, transmit = 3 update = 4
-       content = [ { 0: 1, 11: "/p/light", 7:[1], 8: [1] } ] 
-       execute_post("coap://"+my_base+"/fp/g", 60, 60, content)
-       
-       execute_get("coap://"+my_base+"/fp/g", 40)
-       # publisher table
-       # id (0)= 1
-       # ia (12)
-       # url (11)= .knx
-       # ga (7 )= 1
-       # cflags (8) = ["r" ] ; read = 1, write = 2, transmit = 3 update = 4
-       content = [ {0: 1, 11: ".knx", 7:[1], 12 :"blah.blah" } ] 
-       execute_post("coap://"+my_base+"/fp/p", 60, 60, content)
-       
-       content = False
-       print("set PM :", content);
-       execute_put("coap://"+my_base+"/dev/pm", 60, 60, content)
-       
-       content = { 2: "loadComplete"}
-       print("lsm :", content);
-       execute_post("coap://"+my_base+"/a/lsm", 60, 60, content)
-       execute_get("coap://"+my_base+"/a/lsm", 60)
-       
-       
-
-    # do a post
-    content = {"sia": 5678, "st": 55, "ga": 1, "value": 100 }
-    content = { 4: 5678, "st": 55, 7: 1, "value": 100 }
-    #                 st       ga       value (1)
-    #content = { 5: { 6: 1, 7: 1, 1: True } } 
-    #execute_post("coap://"+my_base+"/.knx", 60, 60, content)
+    ia = 0
+    fp_content = []
     
-    content = {4: 5678, 5: { 6: 1, 7: 1, 1: False } } 
-    execute_post("coap://"+my_base+"/.knx", 60, 60, content)
-    #execute_post("coap://[FF02::FD]:5683/.knx", 60, 60, content)
+    if "000001" == sn :
+       ia = 1
+       fp_content = [ {0: 1, 11: "p/push", 7:[1], 8: [2] } ] 
+    if "000002" == sn :
+       ia = 2
+       fp_content = [ { 0: 1, 11: "/p/light", 7:[1], 8: [1] } ] 
+       
+    do_install_device(my_stack, sn, ia, iid, fp_content )
+       
         
 if __name__ == '__main__':  # pragma: no cover
 
     my_stack = knx_stack.KNXIOTStack()
     signal.signal(signal.SIGINT, my_stack.sig_handler)
     
-    test_discover(my_stack)
-    install(my_stack)
     
+    try: 
+      do_discover(my_stack)
+      do_install(my_stack)
+    except:
+      traceback.print_exc()
+     
     time.sleep(2)
     my_stack.quit()
     sys.exit()
