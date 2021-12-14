@@ -702,7 +702,6 @@ py_discover_devices(int scope)
   signal_event_loop();
 }
 
-
 // -----------------------------------------------------------------------------
 
 /* send a multicast s-mode message */
