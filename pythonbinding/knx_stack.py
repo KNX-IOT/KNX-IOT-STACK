@@ -711,8 +711,10 @@ class KNXIOTStack():
     def __init__(self, debug=True):
         print ("loading ...")
         resource_mutex.acquire()
-        libname = "kisCS.so"
-        libname = "kisCS.dll"
+        if sys.platform == 'linux':
+            libname = "libkisCS.so"
+        else:
+            libname = "kisCS.dll"
         print ("loading :", libname)
         libdir = os.path.dirname(__file__) 
         print ("at :", libdir)
