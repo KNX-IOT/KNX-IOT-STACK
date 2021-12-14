@@ -115,7 +115,7 @@ STATIC CRITICAL_SECTION cs;   /**< event loop variable */
 
 volatile int quit = 0; /**< stop variable, used by handle_signal */
 
-volatile g_p_a_bool = true;
+volatile bool g_p_a_bool = true;
 
 /**
  * function to set up the device.
