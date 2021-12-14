@@ -874,7 +874,6 @@ class KNXIOTStack():
         
     def issue_cbor_put(self, sn, uri, content, query=None) :
         r_id = self.get_r_id()
-        
         client_event.clear()
         print(" issue_cbor_put", sn, uri, query, r_id)
         try:
@@ -894,7 +893,6 @@ class KNXIOTStack():
         
     def issue_cbor_delete(self, sn, uri, query=None) :
         r_id = self.get_r_id()
-        
         client_event.clear()
         print(" issue_cbor_delete", sn, uri, query, r_id)
         try:
@@ -903,6 +901,17 @@ class KNXIOTStack():
         except:
             pass
         print(" issue_cbor_delete - done")
+        client_event.wait(self.timout)
+        return self.find_response(r_id)
+
+    def issue_s_mode(self, scope, sia, ga, st, value_type, value) :
+        print(" issue_s_mode: scope:{} sia:{} ga:{} value_type:{} value:{}".format(scope, sia, ga, value_type, value))
+        try:
+          self.lib.py_issue_requests_s_mode.argtypes = [c_int, c_int, c_int, String, c_int, String]
+          self.lib.py_issue_requests_s_mode(int(scope), int(sia), int(ga), str(st), int(value_type), str(value))
+        except:
+            traceback.print_exc()
+        print(" issue_s_mode - done")
 
     def quit(self):
         self.lib.py_exit(c_int(0))

@@ -30,6 +30,7 @@ import time
 import traceback
 import os
 import signal
+import argparse
 
 
 #add parent directory to path so we can import from there
@@ -62,17 +63,53 @@ def do_reset(my_stack):
     my_stack.purge_response(response)
     
 
+
+#
+#  
+# {sia: 5678, es: {st: write, ga: 1, value: 100 }}
+#
+#
 if __name__ == '__main__':  # pragma: no cover
 
+    parser = argparse.ArgumentParser()
+
+
+    # input (files etc.)
+    parser.add_argument("-scope", "--scope", default=2,
+                    help="scope of the multicast request", nargs='?', const="", required=False)
+    parser.add_argument("-sia", "--sia", default=2,
+                    help="sending internal address", nargs='?', const="", required=False)
+    parser.add_argument("-st", "--st", default="w",
+                    help="send target ,e.g w,r,rp", nargs='?', const="", required=False)
+    parser.add_argument("-ga", "--ga", default=1,
+                    help="group address", nargs='?', const="", required=False)
+    parser.add_argument("-valuetype", "--valuetype", default=1,
+                    help="1=boolean, 2=int, 3=float", nargs='?', const="", required=False)
+    parser.add_argument("-value", "--value", default=True,
+                    help="value of the valuetype ", nargs='?', const="", required=False)
+
+    # (args) supports batch scripts providing arguments
+    print(sys.argv)
+    args = parser.parse_args()
+
+    print("scope      :" + str(args.scope))
+    print("sia        :" + str(args.sia))
+    print("st         :" + str(args.st))
+    print("ga         :" + str(args.ga))
+    print("valuetype  :" + str(args.valuetype))
+    print("value      :" + str(args.value))
+
+
     my_stack = knx_stack.KNXIOTStack()
+    
     signal.signal(signal.SIGINT, my_stack.sig_handler)
+    time.sleep(2)
     
     try:
-      test_discover(my_stack)
-      do_reset(my_stack)
+      my_stack.issue_s_mode(args.scope, args.sia, args.ga, str(args.st), args.valuetype, str(args.value))
     except:
       traceback.print_exc()
-      
+        
     time.sleep(2)
     my_stack.quit()
     sys.exit()
