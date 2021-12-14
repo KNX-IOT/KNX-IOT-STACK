@@ -21,9 +21,17 @@ python -m pip install -r requirements.txt
 Only tested on Windows based systems.
 
 
-## Build Shared Library Windows
+## Build Shared Library on Windows
 
-run the following command from this folder:
+run the following command from the build directory:
+
+```
+cmake .
+```
+Assuming the build directory has been configured correctly, this command ensures that the latest
+version of the scripts are copied into the build dir. Since the scripts are copied at configure time,
+you need to use this command whenever you want to test a change to the scripts, or you will see the
+old behaviour instead.
 
 ```
 start_shell.bat
@@ -34,10 +42,18 @@ in this shell issue the command:
 build_so_windows.sh
 ```
 
-This command builds the windows shared library .
+This command builds the windows shared library.
 Hence the python code can be used directly from this folder.
 
 ```
+python knx_stack.py
+```
+
+## Build Shared Library on Linux
+Within the build directory:
+```
+cmake .
+make
 python knx_stack.py
 ```
 
