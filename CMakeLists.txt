@@ -202,7 +202,7 @@ target_link_libraries(kisClientServer PUBLIC kis-common)
 add_compile_definitions(OC_CLIENT OC_SERVER)
 include (GenerateExportHeader)
 
-add_library(kisCS SHARED pythonbinding/oc_python.c)
+add_library(kisCS SHARED ${PROJECT_SOURCE_DIR}/pythonbinding/oc_python.c)
 GENERATE_EXPORT_HEADER( kisCS
              BASE_NAME kisCS
              EXPORT_MACRO_NAME kisCS_EXPORT
@@ -218,6 +218,11 @@ target_link_libraries(kisCS PUBLIC
 )
 target_link_libraries(kisCS PUBLIC kis-common)
 
+# copy Python binding files to build directory
+file(COPY "${PROJECT_SOURCE_DIR}/pythonbinding/knx_stack.py" DESTINATION ${PROJECT_BINARY_DIR}/)
+file(COPY "${PROJECT_SOURCE_DIR}/pythonbinding/start_shell.bat" DESTINATION ${PROJECT_BINARY_DIR}/)
+file(COPY "${PROJECT_SOURCE_DIR}/pythonbinding/build_so_windows.sh" DESTINATION ${PROJECT_BINARY_DIR}/)
+file(COPY ${PROJECT_SOURCE_DIR}/pythonbinding/test DESTINATION ${PROJECT_BINARY_DIR})
 
 if(PROJECT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     # Add clang-format target
