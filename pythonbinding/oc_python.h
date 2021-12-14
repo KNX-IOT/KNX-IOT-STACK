@@ -134,6 +134,12 @@ kisCS_EXPORT void py_cbor_put(char *sn, char *uri, char *query, char *r_id,
  */
 kisCS_EXPORT void py_cbor_delete(char *sn, char *uri, char *query, char *r_id);
 
+// py_issue_requests_s_mode(int scope, int sia, int ga, char *st, int
+// value_type,
+//                         char *value)
+kisCS_EXPORT void py_issue_requests_s_mode(int scope, int sia, int ga, char *st,
+                                           int value_type, char *value);
+
 /**
  * @brief discover KNX devices on the network
  *

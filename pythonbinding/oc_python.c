@@ -704,6 +704,65 @@ py_discover_devices(int scope)
 
 // -----------------------------------------------------------------------------
 
+/* send a multicast s-mode message */
+void
+py_issue_requests_s_mode(int scope, int sia, int ga, char *st, int value_type,
+                         char *value)
+{
+  PRINT(" [C] py_issue_requests_s_mode\n");
+
+  oc_make_ipv6_endpoint(mcast, IPV6 | DISCOVERY | MULTICAST, 5683, 0xff, scope,
+                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0xfd);
+
+  if (oc_init_post("/.knx", &mcast, NULL, NULL, LOW_QOS, NULL)) {
+    /*
+    { 4: sia, 5: { 6: <st>, 7: <ga>, 1: <value> } }
+    */
+    oc_rep_begin_root_object();
+    oc_rep_i_set_int(root, 4, sia);
+    oc_rep_i_set_key(&root_map, 5);
+    CborEncoder value_map;
+    cbor_encoder_create_map(&root_map, &value_map, CborIndefiniteLength);
+    // ga
+    oc_rep_i_set_int(value, 7, ga);
+    // st M Service type code(write = w, read = r, response = rp) Enum : w, r,
+    // rp
+    // oc_rep_i_set_text_string(value, 6, oc_string(g_send_notification.st));
+    oc_rep_i_set_text_string(value, 6, st);
+    if (value_type == 0) {
+      // boolean
+      bool bool_value = false;
+      if (strcmp(value, "true") == 0) {
+        bool_value = true;
+      }
+      if (strcmp(value, "false") == 0) {
+        bool_value = false;
+      }
+      oc_rep_i_set_boolean(value, 1, bool_value);
+    }
+    if (value_type == 1) {
+      // integer
+      int int_value = atoi(value);
+      oc_rep_i_set_int(value, 1, (int)int_value);
+    }
+    if (value_type == 2) {
+      // float
+      int float_value = atof(value);
+      oc_rep_i_set_double(value, 1, (double)float_value);
+    }
+    cbor_encoder_close_container_checked(&root_map, &value_map);
+    oc_rep_end_root_object();
+
+    if (oc_do_post_ex(APPLICATION_CBOR, APPLICATION_CBOR)) {
+      PRINT("  Sent POST request\n");
+    } else {
+      PRINT("  Could not send POST request\n");
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+
 /**
  * function to retrieve the device name of the owned/unowned device
  *
