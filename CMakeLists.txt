@@ -218,6 +218,8 @@ target_link_libraries(kisCS PUBLIC
 )
 target_link_libraries(kisCS PUBLIC kis-common)
 
+target_include_directories(kisCS PRIVATE ${PROJECT_BINARY_DIR})
+
 # copy Python binding files to build directory
 file(COPY "${PROJECT_SOURCE_DIR}/pythonbinding/knx_stack.py" DESTINATION ${PROJECT_BINARY_DIR}/)
 file(COPY "${PROJECT_SOURCE_DIR}/pythonbinding/start_shell.bat" DESTINATION ${PROJECT_BINARY_DIR}/)
