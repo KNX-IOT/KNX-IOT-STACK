@@ -114,7 +114,8 @@ STATIC CRITICAL_SECTION cs;   /**< event loop variable */
  * example or the definition.*/
 
 volatile int quit = 0; /**< stop variable, used by handle_signal */
-// STATIC const size_t DEVICE = 0; /**< default device index */
+
+volatile bool g_p_a_bool = true;
 
 /**
  * function to set up the device.
@@ -201,15 +202,12 @@ get_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
   }
 
   CborError error;
-  error = cbor_encode_boolean(&g_encoder, true);
+  error = cbor_encode_boolean(&g_encoder, g_p_a_bool);
   if (error) {
     oc_status_code = true;
   }
   PRINT("CBOR encoder size %d\n", oc_rep_get_encoded_payload_size());
-  error = cbor_encode_boolean(&g_encoder, false);
-  if (error) {
-    oc_status_code = true;
-  }
+
   PRINT("CBOR encoder size %d\n", oc_rep_get_encoded_payload_size());
 
   if (error_state == false) {
@@ -353,21 +351,26 @@ post_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
 
   /* loop over the request document for each required input field to check if
    * all required input fields are present */
-  bool var_in_request = false;
-  // rep = request->request_payload;
-  //  while (rep != NULL) {
-  //    if (strcmp(oc_string(rep->name),
-  //               g_binaryswitch_RESOURCE_PROPERTY_NAME_value) == 0) {
-  //      var_in_request = true;
-  //    }
-  //    rep = rep->next;
-  //  }
-  if (var_in_request == false) {
-    error_state = true;
-    PRINT(" required property: 'value' not in request\n");
+
+  oc_rep_t *rep = NULL;
+  // handle the different requests
+  if (oc_is_s_mode_request(request)) {
+    PRINT(" S-MODE\n");
+    // retrieve the value of the s-mode payload
+    rep = oc_s_mode_get_value(request);
+  } else {
+    // the regular payload
+    rep = request->request_payload;
   }
-  /* loop over the request document to check if all inputs are ok */
-  // rep = request->request_payload;
+
+  // handle the type of payload correctly.
+  if ((rep != NULL) && (rep->type == OC_REP_BOOL)) {
+    PRINT("  post_dpa_417_61 received : %d\n", rep->value.boolean);
+    g_p_a_bool = rep->value.boolean;
+    oc_send_cbor_response(request, OC_STATUS_CHANGED);
+    PRINT("-- End post_dpa_417_61\n");
+    return;
+  }
 
   /* if the input is ok, then process the input document and assign the global
    * variables */

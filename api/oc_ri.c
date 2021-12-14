@@ -1520,7 +1520,8 @@ oc_ri_invoke_client_cb(void *response, oc_client_cb_t *cb,
                        oc_endpoint_t *endpoint)
 #endif /* OC_BLOCK_WISE */
 {
-  oc_content_format_t cf = 0;
+  // to be checked, default is not CBOR being returned.
+  oc_content_format_t cf = 60;
   coap_get_header_content_format(response, &cf);
 
   cb->ref_count = 1;
