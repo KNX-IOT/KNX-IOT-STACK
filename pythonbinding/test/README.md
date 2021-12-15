@@ -38,3 +38,14 @@ script to do a installation, e.g. configure /fp/g
 ```bash
 python install_devices.py
 ```
+
+### s-mode.py
+
+script to issue an s-mode command
+
+- works on multicast all coap nodes
+- has option to set the various values in the command.
+
+```bash
+python s-mode.py 
+```
