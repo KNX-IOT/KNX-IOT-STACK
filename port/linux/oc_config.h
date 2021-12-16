@@ -55,6 +55,8 @@ typedef uint64_t oc_clock_time_t;
 
 // The maximum size of a response to an OBSERVE request, in bytes
 #define OC_MAX_OBSERVE_SIZE 512
+// TODO this should probably go in CMakeCache
+#define OC_SPAKE2PLUS
 
 #else /* OC_DYNAMIC_ALLOCATION */
 /* List of constraints below for a build that does not employ dynamic
