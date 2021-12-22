@@ -150,10 +150,26 @@ kisCS_EXPORT void py_issue_requests_s_mode(int scope, int sia, int ga, char *st,
 
 /**
  * @brief discover KNX devices on the network
+ *  e.g. issues a request with query param: rt=urn:knx:dpa.*
  *
  * @param scope the scope (2 or 5 site local)
  */
 kisCS_EXPORT void py_discover_devices(int scope);
+
+/**
+ * @brief discover KNX devices on the network
+ * function can be used for discovery with serial number:
+ * - ?ep=urn:knx:sn.[serial-number] :device with specific serial-number
+ * - ?if=urn:knx:ia.[Individual Address] :device with specific Individual
+ * Address
+ * - ?if=urn:knx:if.pm  :devices in programming mode
+ * - ?if=urn:knx:if.o : devices with specific interface (e.g. if.o)
+ * - ?d=urn:knx:g.s.[ga] : devices belong to a specific group address
+ *
+ * @param scope the scope (2 or 5 site local)
+ * @param query the query
+ */
+kisCS_EXPORT void py_discover_devices_with_query(int scope, const char *query);
 
 /**
  * @brief retrieve the amount of discovered devices

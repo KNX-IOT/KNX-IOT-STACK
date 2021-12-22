@@ -605,6 +605,9 @@ main(void)
   PRINT("Security - Disabled\n");
 #endif /* OC_SECURITY */
 
+  oc_device_info_t *device = oc_core_get_device_info(0);
+  PRINT("serial number: %s", device->serialnumber);
+
   PRINT("Server \"%s\" running, waiting on incoming "
         "connections.\n",
         MY_NAME);
