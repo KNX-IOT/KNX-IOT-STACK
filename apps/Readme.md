@@ -22,6 +22,7 @@ naming convention:
 | LSSB_minimal_all  | 000003 |
 | LSSB_minimal_pi   | 000004 |
 | simpleserver_all  | 000005 |
+| simpleclient_all  | 000006 |
 
 
 ### simpleserver_all.c
