@@ -1168,6 +1168,7 @@ oc_issue_s_mode(int sia_value, int group_address, char *rp, uint8_t *value_data,
 void
 oc_do_s_mode_internal(char *resource_url, char *rp, int x)
 {
+  (void)x;
 
   if (resource_url == NULL) {
     return;
