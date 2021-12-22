@@ -516,11 +516,10 @@ oc_reset_g_received_notification()
 }
 
 void
-oc_core_smode_rp(oc_request_t *request )
+oc_core_smode_rp(oc_request_t *request)
 {
   (void)request;
 }
-
 
 /*
  {sia: 5678, es: {st: write, ga: 1, value: 100 }}
@@ -662,14 +661,14 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
 
       if (my_resource != NULL) {
         if (do_write) {
-           // write the value to the resource
-           my_resource->post_handler.cb(request, iface_mask, data);
+          // write the value to the resource
+          my_resource->post_handler.cb(request, iface_mask, data);
         }
         if (do_read) {
-            // do the actual read from the resource and 
-            // send the reply
-            oc_do_s_mode(oc_string(my_resource->uri), "rp");
-         }
+          // do the actual read from the resource and
+          // send the reply
+          oc_do_s_mode(oc_string(my_resource->uri), "rp");
+        }
       }
     }
     // get the next index in the table to get the url from.
@@ -1165,7 +1164,6 @@ oc_issue_s_mode(int sia_value, int group_address, char *rp, uint8_t *value_data,
   }
 }
 
-
 void
 oc_do_s_mode_internal(char *resource_url, char *rp, int x)
 {
@@ -1267,8 +1265,6 @@ oc_do_s_mode_internal(char *resource_url, char *rp, int x)
   // free(buffer);
 }
 
-
-
 void
 oc_do_s_mode(char *resource_url, char *rp)
 {
@@ -1368,8 +1364,6 @@ oc_do_s_mode(char *resource_url, char *rp)
   // free buffer
   // free(buffer);
 }
-
-
 
 // ----------------------------------------------------------------------------
 

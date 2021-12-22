@@ -703,10 +703,8 @@ py_discover_devices(int scope)
   signal_event_loop();
 }
 
-
-
 void
-py_discover_devices_with_query(int scope, const char* query)
+py_discover_devices_with_query(int scope, const char *query)
 {
   // PRINT("[C]discover_devices: scope %d\n", scope);
   py_mutex_lock(app_sync_lock);
