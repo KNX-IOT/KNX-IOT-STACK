@@ -518,6 +518,7 @@ oc_reset_g_received_notification()
 void
 oc_core_smode_rp(oc_request_t *request )
 {
+  (void)request;
 }
 
 
