@@ -31,7 +31,6 @@ import ctypes, os, sys
 from ctypes import *
 
 import signal
-
 import time
 import os
 import json
@@ -479,6 +478,7 @@ CLIENT_CALLBACK = CFUNCTYPE(None, c_char_p, c_char_p, c_char_p, c_char_p, c_int,
 
 #----------LinkFormat parsing ---------------
 
+
 class LinkFormat():
 
     def __init__(self, response):
@@ -519,21 +519,10 @@ class LinkFormat():
         return ""
 
     def get_base(self, url):
-        # python3 knxcoapclient.py -o GET -p coap://[fe80::6513:3050:71a7:5b98]:63914/a -c 50
         my_url = url.replace("coap://","")
+        my_url = my_url.replace("coaps://","")
         mybase = my_url.split("/")
         return mybase[0]
-
-    def get_base_from_link(self, payload):
-        print("get_base_from_link\n")
-        global paths
-        global paths_extend
-        lines = payload.splitlines()
-    
-        # add the 
-        if len(paths) == 0:
-            my_base = get_base(get_url(lines[0]))
-            return my_base
 
 #----------Devices ---------------
 
@@ -783,6 +772,21 @@ class KNXIOTStack():
         # application
         discover_event.clear()
         ret = self.lib.py_discover_devices(c_int(scope))
+        time.sleep(2)
+        # python callback application
+        print("[P] discovery- done")
+        nr_discovered = self.lib.py_get_nr_devices()
+        discover_event.wait(self.timout)
+        print("Discovered DEVICE ARRAY {}".format(self.device_array))
+        return self.device_array
+
+    
+    def discover_devices_with_query(self, query, scope=2):
+        print("Discover Devices with Query: scope", scope, query)
+        # application
+        discover_event.clear()
+        self.lib.py_discover_devices_with_query.argtypes = [c_int, String ]
+        ret = self.lib.py_discover_devices_with_query(scope, query)
         time.sleep(2)
         # python callback application
         print("[P] discovery- done")

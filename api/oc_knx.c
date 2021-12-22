@@ -515,6 +515,12 @@ oc_reset_g_received_notification()
   oc_new_string(&g_received_notification.st, "", strlen(""));
 }
 
+void
+oc_core_smode_rp(oc_request_t *request )
+{
+}
+
+
 /*
  {sia: 5678, es: {st: write, ga: 1, value: 100 }}
 */
@@ -620,10 +626,23 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
     rep = rep->next;
   }
 
+  bool do_write = false;
+  bool do_read = false;
   // handle the request
   // loop over the group addresses of the /fp/r
   PRINT(" .knx : sia   %d\n", g_received_notification.sia);
   PRINT(" .knx : ga    %d\n", g_received_notification.ga);
+  PRINT(" .knx : st    %s\n", oc_string(g_received_notification.st));
+  if (strcmp(oc_string(g_received_notification.st), "w") == 0) {
+    do_write = true;
+  } else if (strcmp(oc_string(g_received_notification.st), "r") == 0) {
+    do_read = true;
+  } else {
+    PRINT(" .knx : st : no reading/writing: ignoring request\n");
+    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    return;
+  }
+
   int index = oc_core_find_group_object_table_index(g_received_notification.ga);
   PRINT(" .knx : index %d\n", index);
   if (index == -1) {
@@ -631,16 +650,25 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
-  while (index != -1) {
 
+  while (index != -1) {
     oc_string_t myurl = oc_core_find_group_object_table_url_from_index(index);
     PRINT(" .knx : url  %s\n", oc_string(myurl));
     if (oc_string_len(myurl) > 0) {
       // get the resource to do the fake post on
       oc_resource_t *my_resource = oc_ri_get_app_resource_by_uri(
         oc_string(myurl), oc_string_len(myurl), device_index);
+
       if (my_resource != NULL) {
-        my_resource->post_handler.cb(request, iface_mask, data);
+        if (do_write) {
+           // write the value to the resource
+           my_resource->post_handler.cb(request, iface_mask, data);
+        }
+        if (do_read) {
+            // do the actual read from the resource and 
+            // send the reply
+            oc_do_s_mode(oc_string(my_resource->uri), "rp");
+         }
       }
     }
     // get the next index in the table to get the url from.
@@ -1026,6 +1054,8 @@ oc_knx_set_osn(uint64_t osn)
   g_osn = osn;
 }
 
+// ----------------------------------------------------------------------------
+
 bool
 oc_is_s_mode_request(oc_request_t *request)
 {
@@ -1134,6 +1164,109 @@ oc_issue_s_mode(int sia_value, int group_address, char *rp, uint8_t *value_data,
   }
 }
 
+
+void
+oc_do_s_mode_internal(char *resource_url, char *rp, int x)
+{
+
+  if (resource_url == NULL) {
+    return;
+  }
+
+  oc_resource_t *my_resource =
+    oc_ri_get_app_resource_by_uri(resource_url, strlen(resource_url), 0);
+  if (my_resource == NULL) {
+    PRINT(" oc_do_s_mode : error no URL found %s\n", resource_url);
+    return;
+  }
+
+  // get the sender ia
+  size_t device_index = 0;
+  oc_device_info_t *device = oc_core_get_device_info(device_index);
+  int sia_value = device->ia;
+
+  uint8_t *buffer = malloc(100);
+  if (!buffer) {
+    OC_WRN("oc_do_s_mode: out of memory allocating buffer");
+  } //! buffer
+
+  oc_request_t request = { 0 };
+  oc_response_t response = { 0 };
+  response.separate_response = 0;
+  oc_response_buffer_t response_buffer;
+  // if (!response_buf && resource) {
+  //  OC_DBG("coap_notify_observers: Issue GET request to resource %s\n\n",
+  //         oc_string(resource->uri));
+  response_buffer.buffer = buffer;
+  response_buffer.buffer_size = 100;
+
+  // same initialization as oc_ri.c
+  response_buffer.code = 0;
+  response_buffer.response_length = 0;
+  response_buffer.content_format = 0;
+
+  response.separate_response = NULL;
+  response.response_buffer = &response_buffer;
+
+  request.response = &response;
+  request.request_payload = NULL;
+  request.query = NULL;
+  request.query_len = 0;
+  request.resource = NULL;
+  request.origin = NULL;
+  request._payload = NULL;
+  request._payload_len = 0;
+
+  request.content_format = APPLICATION_CBOR;
+  request.accept = APPLICATION_CBOR;
+  request.uri_path = resource_url;
+  request.uri_path_len = strlen(resource_url);
+
+  oc_rep_new(response_buffer.buffer, response_buffer.buffer_size);
+
+  // get the value...oc_request_t request_obj;
+  oc_interface_mask_t iface_mask = OC_IF_NONE;
+  // void *data;
+  my_resource->get_handler.cb(&request, iface_mask, NULL);
+
+  // get the data
+  // int value_size = request.response->response_buffer->buffer_size;
+  int value_size = oc_rep_get_encoded_payload_size();
+  uint8_t *value_data = request.response->response_buffer->buffer;
+
+  // Cache value data, as it gets overwritten in oc_issue_do_s_mode
+  uint8_t buf[100];
+  assert(value_size < 100);
+  memcpy(buf, value_data, value_size);
+
+  if (value_size == 0) {
+    PRINT(" . ERROR: value size == 0");
+    return;
+  }
+
+  int group_address = 0;
+
+  // loop over all group addresses and issue the s-mode command
+  int index = oc_core_find_group_object_table_url(resource_url);
+  while (index != -1) {
+    PRINT("  index : %d\n", index);
+
+    int ga_len = oc_core_find_group_object_table_number_group_entries(index);
+    for (int j = 0; j < ga_len; j++) {
+      group_address = oc_core_find_group_object_table_group_entry(index, j);
+      PRINT("   ga : %d\n", group_address);
+      // issue the s-mode command
+      oc_issue_s_mode(sia_value, group_address, rp, buf, value_size);
+    }
+    index = oc_core_find_next_group_object_table_url(resource_url, index);
+  }
+
+  // free buffer
+  // free(buffer);
+}
+
+
+
 void
 oc_do_s_mode(char *resource_url, char *rp)
 {
@@ -1233,6 +1366,10 @@ oc_do_s_mode(char *resource_url, char *rp)
   // free buffer
   // free(buffer);
 }
+
+
+
+// ----------------------------------------------------------------------------
 
 void
 oc_knx_load_state(size_t device_index)

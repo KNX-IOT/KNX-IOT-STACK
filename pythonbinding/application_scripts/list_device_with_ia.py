@@ -30,7 +30,7 @@ import time
 import traceback
 import os
 import signal
-
+import argparse
 
 #add parent directory to path so we can import from there
 currentdir = os.path.dirname(os.path.realpath(__file__))
@@ -40,9 +40,10 @@ sys.path.append(parentdir)
 import knx_stack
 
     
-def test_discover(my_stack):
+def do_discover(my_stack, serial_number, scope = 2):
   time.sleep(1)
-  devices = my_stack.discover_devices()
+  query = "if=urn:knx:ia."+str(serial_number)
+  devices = my_stack.discover_devices_with_query( query, int(scope))
   if my_stack.get_nr_devices() > 0:
      print ("SN :", my_stack.device_array[0].sn)
 
@@ -55,20 +56,35 @@ def get_sn(my_stack):
 
     
 def do_reset(my_stack):
-    sn = my_stack.device_array[0].sn
-    content = {2: "reset"}
-    response =  my_stack.issue_cbor_post(sn,"/a/sen",content)
-    print ("response:",response)
-    my_stack.purge_response(response)
+    if my_stack.get_nr_devices() > 0:
+        sn = my_stack.device_array[0].sn
+        content = {2: "reset"}
+        response =  my_stack.issue_cbor_post(sn,"/a/sen",content)
+        print ("response:",response)
+        my_stack.purge_response(response)
     
 
 if __name__ == '__main__':  # pragma: no cover
+
+    parser = argparse.ArgumentParser()
+
+    # input (files etc.)
+    parser.add_argument("-ia", "--internal_address",
+                    help="internal address of the device", nargs='?', const=1, required=True)
+    parser.add_argument("-scope", "--scope",
+                    help="scope of the multicast request [2,5]", nargs='?', default=2, const=1, required=False)
+    # (args) supports batch scripts providing arguments
+    print(sys.argv)
+    args = parser.parse_args()
+
+    print("scope            :" + str(args.scope))
+    print("internal address :" + str(args.internal_address))
 
     my_stack = knx_stack.KNXIOTStack()
     signal.signal(signal.SIGINT, my_stack.sig_handler)
     
     try:
-      test_discover(my_stack)
+      do_discover(my_stack, args.internal_address, args.scope)
       do_reset(my_stack)
     except:
       traceback.print_exc()
