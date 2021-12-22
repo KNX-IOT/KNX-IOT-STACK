@@ -169,7 +169,7 @@ kisCS_EXPORT void py_discover_devices(int scope);
  * @param scope the scope (2 or 5 site local)
  * @param query the query 
  */
-kisCS_EXPORT void py_discover_devices_with_query(int scope, char *query);
+kisCS_EXPORT void py_discover_devices_with_query(int scope, const char *query);
 
 /**
  * @brief retrieve the amount of discovered devices
