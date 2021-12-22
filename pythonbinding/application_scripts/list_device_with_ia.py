@@ -40,9 +40,9 @@ sys.path.append(parentdir)
 import knx_stack
 
     
-def do_discover(my_stack, serial_number, scope = 2):
+def do_discover(my_stack, internal_address, scope = 2):
   time.sleep(1)
-  query = "if=urn:knx:ia."+str(serial_number)
+  query = "if=urn:knx:ia."+str(internal_address)
   devices = my_stack.discover_devices_with_query( query, int(scope))
   if my_stack.get_nr_devices() > 0:
      print ("SN :", my_stack.device_array[0].sn)
