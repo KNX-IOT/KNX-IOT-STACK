@@ -13,11 +13,22 @@ naming convention:
 
 ## Example applications
 
+### serial numbers
+
+| Application       | serial number |
+| ----------------- | ----------- |
+| LSAB_minimal_all  | 000001 |
+| LSAB_minimal_pi   | 000002 |
+| LSSB_minimal_all  | 000003 |
+| LSSB_minimal_pi   | 000004 |
+| simpleserver_all  | 000005 |
+
+
 ### simpleserver_all.c
 
 Server example on Windows & Linux.
 
-- no KNX application
+- no KNX compliant application
 - example to receive data to other device
 
 ### simpleclient_all.c
@@ -53,7 +64,7 @@ over multicast "all coap nodes"
 
 Note: can be configured to send commands to LSAB_minimal_all.
 
-### LSAB_minimal_p.c
+### LSAB_minimal_pi.c
 
 KNX-IOT example on Linux.
 capable of receiving commands for datapoint 417.61

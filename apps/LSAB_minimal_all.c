@@ -129,7 +129,7 @@ app_init(void)
   int ret = oc_init_platform("Cascoda", NULL, NULL);
 
   /* set the application name, version, base url, device serial number */
-  ret |= ock_add_device(MY_NAME, "1.0", "//", "000002", NULL, NULL);
+  ret |= ock_add_device(MY_NAME, "1.0", "//", "000001", NULL, NULL);
 
   oc_device_info_t *device = oc_core_get_device_info(0);
   PRINT("Serial Number: %s\n", oc_string(device->serialnumber));

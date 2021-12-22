@@ -141,11 +141,23 @@ def do_install(my_stack):
     fp_content = []
     
     if "000001" == sn :
-       ia = 1
-       fp_content = [ {0: 1, 11: "p/push", 7:[1], 8: [2] } ] 
-    if "000002" == sn :
+       # LSAB
        ia = 2
        fp_content = [ { 0: 1, 11: "/p/light", 7:[1], 8: [1] } ] 
+    if "000003" == sn :
+       # LSSB
+        ia = 1
+       fp_content = [ {0: 1, 11: "p/push", 7:[1], 8: [2] } ] 
+       
+       
+    if "000002" == sn :
+       # LSAB-PI
+       ia = 2
+       fp_content = [ { 0: 1, 11: "/p/light", 7:[1], 8: [1] } ] 
+    if "000004" == sn :
+       # LSSB-PI
+       ia = 1
+       fp_content = [ {0: 1, 11: "p/push", 7:[1], 8: [2] } ] 
        
     do_install_device(my_stack, sn, ia, iid, fp_content )
        

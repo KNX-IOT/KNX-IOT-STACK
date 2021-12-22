@@ -131,7 +131,7 @@ app_init(void)
 {
   int ret = oc_init_platform("Cascoda", NULL, NULL);
 
-  ret |= ock_add_device("blah", "1.0", "//", "012346", NULL, NULL);
+  ret |= ock_add_device("blah", "1.0", "//", "000005", NULL, NULL);
 
   oc_device_info_t *device = oc_core_get_device_info(0);
   PRINT("Serial Number: %s\n", oc_string(device->serialnumber));
@@ -725,7 +725,7 @@ main(void)
   sigaction(SIGINT, &sa, NULL);
 #endif
 
-  PRINT("KNX-IOT Server name : \"server_1599\"\n");
+  PRINT("KNX-IOT Server name : \"simple_server_all\"\n");
 
   char buff[FILENAME_MAX];
   char *retbuf = NULL;
@@ -782,7 +782,7 @@ main(void)
   oc_device_info_t *device = oc_core_get_device_info(0);
   PRINT("serial number: %s", device->serialnumber);
 
-  PRINT("Server \"server_1599\" running, waiting on incoming "
+  PRINT("Server \"simple_server_all\" running, waiting on incoming "
         "connections.\n");
 
 #ifdef WIN32
