@@ -224,7 +224,7 @@ target_include_directories(kisCS PRIVATE ${PROJECT_BINARY_DIR})
 file(COPY "${PROJECT_SOURCE_DIR}/pythonbinding/knx_stack.py" DESTINATION ${PROJECT_BINARY_DIR}/)
 file(COPY "${PROJECT_SOURCE_DIR}/pythonbinding/start_shell.bat" DESTINATION ${PROJECT_BINARY_DIR}/)
 file(COPY "${PROJECT_SOURCE_DIR}/pythonbinding/build_so_windows.sh" DESTINATION ${PROJECT_BINARY_DIR}/)
-file(COPY "${PROJECT_SOURCE_DIR}/pythonbinding/Readme.md" DESTINATION ${PROJECT_BINARY_DIR}/)
+file(COPY "${PROJECT_SOURCE_DIR}/pythonbinding/README.md" DESTINATION ${PROJECT_BINARY_DIR}/)
 file(COPY ${PROJECT_SOURCE_DIR}/pythonbinding/application_scripts DESTINATION ${PROJECT_BINARY_DIR})
 
 if(PROJECT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
