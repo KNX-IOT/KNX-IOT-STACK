@@ -10,22 +10,18 @@ The python code uses the device to interact with other KNX-IOT devices on the ne
 - windows based machine (Win10 or Win11)
 - visual studio compiler (can be community edition)
 - cmake environment
-- python (32 bit version)
+- python
 
 ### install python requirements
 
 python -m pip install -r requirements.txt
 
-## limitations
 
-Only tested on Windows based systems.
+## Build Shared Library on Windows for debugging
 
+run the following command from the build directory in a git bash shell:
 
-## Build Shared Library on Windows
-
-run the following command from the build directory:
-
-```
+```bash
 cmake .
 ```
 Assuming the build directory has been configured correctly, this command ensures that the latest
@@ -38,7 +34,8 @@ start_shell.bat
 ```
 This command opens a windows developer shell that knows all paths of visual studio.
 in this shell issue the command:
-```
+
+```bash
 build_so_windows.sh
 ```
 
@@ -59,6 +56,9 @@ python knx_stack.py
 
 ### known issues
 
-Note that the windows dll is build for win32.
-Hence the python interpreter MUST be a win32 version.
-e.g. install a 32-bit python version. 
+Note that the windows dll is build for win32 or x64, depending on the default installation of visual studio
+Hence the python interpreter MUST match that.
+
+Both combinations (win32 and x64) are known to work.
+
+For more information: https://stackoverflow.com/questions/48000185/python-ctypes-dll-is-not-a-valid-win32-application

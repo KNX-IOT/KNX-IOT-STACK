@@ -3,59 +3,44 @@ out/*
 
 # pythonbindings
 
-pythonbinding/CMakefiles
-pythonbinding/depts
-pythonbinding/port
-pythonbinding/.vs
+
+pythonbinding/apps/**
+pythonbinding/CMakefiles/**
+pythonbinding/deps/**
+pythonbinding/port/**
+pythonbinding/.vs/**
+pythonbinding/__pycache__/**
+pythonbinding/kis-client.lib
+pythonbinding/kis-server.lib
+pythonbinding/kisClientServer.lib
+pythonbinding/kisCS*
+pythonbinding/Makefile
+pythonbinding/oc_python_export.h
+pythonbinding/cmake_install.cmake
+
+
+# dependend subprojects
+deps/gtest**
+deps/mbedtls**
 
 # various ports
 
-port/android/client
-port/android/server
-port/android/temp_sensor
-port/android/simpleclient
-port/android/simpleserver
-port/android/server_collections_linux
-port/android/client_collections_linux
-port/android/client_block_linux
-port/android/server_block_linux
-port/android/smart_home_server_linux
-port/android/multi_device_client
-port/android/multi_device_server
-port/android/onboarding_tool
-port/android/server_multithread_linux
-port/android/client_multithread_linux
-port/android/smart_lock
-port/android/libiotivity-lite-client.*
-port/android/libiotivity-lite-server.*
-port/android/libiotivity-lite-client-server.*
-port/android/*.so
-
 port/linux/client
 port/linux/server
-port/linux/temp_sensor
 port/linux/simpleclient
 port/linux/simpleserver
-port/linux/server_collections_linux
-port/linux/client_collections_linux
-port/linux/client_block_linux
-port/linux/server_block_linux
-port/linux/smart_home_server_linux
-port/linux/multi_device_client
-port/linux/multi_device_server
-port/linux/onboarding_tool
-port/linux/server_multithread_linux
-port/linux/client_multithread_linux
-port/linux/libiotivity-lite-client.*
-port/linux/libiotivity-lite-server.*
-port/linux/libiotivity-lite-client-server.*
-port/linux/iotivity-lite-server.pc
-port/linux/iotivity-lite-client.pc
-port/linux/iotivity-lite-client-server.pc
+port/linux/libkis-client.*
+port/linux/libkis-lite-server.*
+port/linux/libkis-lite-client-server.*
+port/linux/kis-lite-server.pc
+port/linux/kis-client.pc
+port/linux/kis-client-server.pc
 port/linux/tests/*
 port/linux/obj/
 port/linux/onboarding_tool_creds/
-port/linux/smart_lock
+
+
+
 port/windows/vs2015/.vs/
 port/windows/vs2015/Debug/
 port/windows/vs2015/Release/
