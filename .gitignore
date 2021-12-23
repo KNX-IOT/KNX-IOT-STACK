@@ -25,15 +25,17 @@ deps/mbedtls**
 
 # various ports
 
+port/linux/pki_certs/**
 port/linux/client
 port/linux/server
-port/linux/simpleclient
-port/linux/simpleserver
+port/linux/simpleclient*
+port/linux/simpleserver*
 port/linux/libkis-client.*
-port/linux/libkis-lite-server.*
-port/linux/libkis-lite-client-server.*
+port/linux/libkis-server.*
+port/linux/libkis-client-server.*
 port/linux/kis-lite-server.pc
 port/linux/kis-client.pc
+port/linux/kis-server.pc
 port/linux/kis-client-server.pc
 port/linux/tests/*
 port/linux/obj/
