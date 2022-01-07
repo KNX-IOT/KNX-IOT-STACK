@@ -445,7 +445,7 @@ general_get_cb(oc_client_response_t *data)
 
   if (data->content_format == APPLICATION_LINK_FORMAT) {
     py_mutex_lock(app_sync_lock);
-    memset(buffer, buffer_size, 1);
+    memset(buffer, 0, buffer_size);
     memcpy(&buffer, (char *)data->_payload, (int)data->_payload_len);
 
     inform_client_python((char *)my_data->sn, "link_format",
@@ -454,7 +454,7 @@ general_get_cb(oc_client_response_t *data)
     py_mutex_unlock(app_sync_lock);
   } else if (data->content_format == APPLICATION_CBOR) {
     py_mutex_lock(app_sync_lock);
-    memset(buffer, buffer_size, 1);
+    memset(buffer, 0, buffer_size);
     oc_rep_to_json(data->payload, (char *)&buffer, buffer_size, false);
     inform_client_python((char *)my_data->sn, "json", (char *)my_data->r_id,
                          (char *)my_data->url, (int)data->_payload_len,

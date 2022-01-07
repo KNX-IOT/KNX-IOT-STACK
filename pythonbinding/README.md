@@ -1,5 +1,4 @@
-# Python bindings 
-
+# Python bindings
 
 The python bindings are based on ctypes.
 The python code is using the shared library containing an KNX-IOT stack based device that can act as an client.
@@ -16,7 +15,6 @@ The python code uses the device to interact with other KNX-IOT devices on the ne
 
 python -m pip install -r requirements.txt
 
-
 ## Build Shared Library on Windows for debugging
 
 run the following command from the build directory in a git bash shell:
@@ -24,31 +22,35 @@ run the following command from the build directory in a git bash shell:
 ```bash
 cmake .
 ```
+
 Assuming the build directory has been configured correctly, this command ensures that the latest
 version of the scripts are copied into the build dir. Since the scripts are copied at configure time,
 you need to use this command whenever you want to test a change to the scripts, or you will see the
 old behaviour instead.
 
-```
+```bash
 start_shell.bat
 ```
+
 This command opens a windows developer shell that knows all paths of visual studio.
-in this shell issue the command:
+in this shell issue the commands to build in this folder.
 
 ```bash
-build_so_windows.sh
+cmake -G"NMake Makefiles" ..
+nmake
 ```
 
 This command builds the windows shared library.
-Hence the python code can be used directly from this folder.
+Therefore the python code can be used directly from this folder.
 
-```
+```bash
 python knx_stack.py
 ```
 
 ## Build Shared Library on Linux
 Within the build directory:
-```
+
+```bash
 cmake .
 make
 python knx_stack.py
