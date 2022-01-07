@@ -1,5 +1,12 @@
 #!/usr/bin/python
 
+# pylint: disable=C0103
+# pylint: disable=C0114
+# pylint: disable=C0116
+# pylint: disable=W0613
+# pylint: disable=W1508
+# pylint: disable=R1732
+
 import os
 import sys
 import platform
@@ -62,19 +69,19 @@ def build_all(flag, extra_option_str):
 def build_linux(flag, extra_option_str):
     print ("*********** Build for linux ************")
     build_options = build_option_param
-    extra_option_str += ' SECURE=1';
+    extra_option_str += ' SECURE=1'
     call_make(build_options, extra_option_str)
 
 def build_linux_test(flag, extra_option_str):
     print ("*********** Build for linux ************")
-    extra_option_str += ' SECURE=1';
+    extra_option_str += ' SECURE=1'
     build_linux("true", "test" + extra_option_str)
 
 
 def build_linux_unsecured(flag, extra_option_str):
     print ("*********** Build for linux ************")
     build_options = build_option_param
-    extra_option_str += ' SECURE=0';
+    extra_option_str += ' SECURE=0'
     call_make(build_options, extra_option_str)
 
 def build_linux_unsecured_test(flag, extra_option_str):
@@ -138,6 +145,6 @@ elif arg_num == 2:
     else:
         helpmsg(script_name)
 else:
-        helpmsg(script_name)
+    helpmsg(script_name)
 
 print ("===================== done =====================")
