@@ -299,7 +299,7 @@ def do_sequence_f(my_stack):
         print(" -------------------------")
         print(" url :", lf.get_url(line))
         print(" ct  :", lf.get_ct(line))
-        print(" ct  :", lf.get_rt(line))
+        print(" rt  :", lf.get_rt(line))
         if lf.get_ct(line) == "40" :
             response2 =  my_stack.issue_cbor_get(sn, lf.get_url(line))
             print ("response2:",response2)
