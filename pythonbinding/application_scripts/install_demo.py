@@ -157,16 +157,17 @@ def load_json_file(filename, my_dir=None):
     json_dict = json.loads(linestring, object_pairs_hook=OrderedDict)
     return json_dict
 
-def do_install(my_stack, filename):
-    json_data = load_json_file(filename)
-    if json_data is None:
-        return
+def do_install(my_stack):
+    #json_data = load_json_file(filename)
+    #if json_data is None:
+    #    return
 
     sn = my_stack.device_array[0].sn
     print (" SN : ", sn)
-    iid = json_data["iid"] # "5"
-    ia = json_data["ia"]
-    fp_content = json_data["got"]
+    iid = 5
+    #iid = json_data["iid"] # "5"
+    #ia = json_data["ia"]
+    #fp_content = json_data["got"]
 
     if "000001" == sn :
         # LSAB
@@ -192,29 +193,29 @@ if __name__ == '__main__':  # pragma: no cover
     parser = argparse.ArgumentParser()
 
     # input (files etc.)
-    parser.add_argument("-sn", "--serialnumber",
-                    help="serial number of the device", nargs='?',
-                    const=1, required=True)
+    #parser.add_argument("-sn", "--serialnumber",
+    #                help="serial number of the device", nargs='?',
+    #                const=1, required=True)
     parser.add_argument("-scope", "--scope",
                     help="scope of the multicast request [2,5]", nargs='?',
                     default=2, const=1, required=False)
-    parser.add_argument("-file", "--file",
-                    help="filename of the configuration", nargs='?',
-                    default=2, const=1, required=True)
+    #parser.add_argument("-file", "--file",
+    #                help="filename of the configuration", nargs='?',
+    #                default=2, const=1, required=True)
     # (args) supports batch scripts providing arguments
     print(sys.argv)
     args = parser.parse_args()
 
     print("scope         :" + str(args.scope))
-    print("serial number :" + str(args.serialnumber))
-    print("filename      :" + str(args.file))
+    #print("serial number :" + str(args.serialnumber))
+    #print("filename      :" + str(args.file))
 
     the_stack = knx_stack.KNXIOTStack()
     signal.signal(signal.SIGINT, the_stack.sig_handler)
 
     try:
         do_discover(the_stack)
-        do_install(the_stack, args.filename)
+        do_install(the_stack)
     except:
         traceback.print_exc()
 
