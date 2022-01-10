@@ -37,7 +37,6 @@ oc_pase_t g_pase;
 oc_string_t g_idevid;
 oc_string_t g_ldevid;
 
-
 // ----------------------------------------------------------------------------
 
 oc_add_s_mode_response_cb_t m_s_mode_cb = NULL;
@@ -710,7 +709,6 @@ oc_create_knx_knx_resource(int resource_idx, size_t device)
     oc_core_knx_knx_post_handler, 0, 1, "urn:knx:g.s");
 }
 
-
 bool
 oc_set_s_mode_response_cb(oc_add_s_mode_response_cb_t my_func)
 {
@@ -1184,7 +1182,7 @@ oc_issue_s_mode(int sia_value, int group_address, char *rp, uint8_t *value_data,
 int
 oc_do_s_mode_internal(char *resource_url, char *rp, uint8_t *buf, int buf_size)
 {
-  (void) rp;
+  (void)rp;
 
   if (resource_url == NULL) {
     return 0;
@@ -1198,9 +1196,9 @@ oc_do_s_mode_internal(char *resource_url, char *rp, uint8_t *buf, int buf_size)
   }
 
   // get the sender ia
-  //size_t device_index = 0;
-  //oc_device_info_t *device = oc_core_get_device_info(device_index);
-  //int sia_value = device->ia;
+  // size_t device_index = 0;
+  // oc_device_info_t *device = oc_core_get_device_info(device_index);
+  // int sia_value = device->ia;
 
   uint8_t *buffer = malloc(100);
   if (!buffer) {
@@ -1252,11 +1250,11 @@ oc_do_s_mode_internal(char *resource_url, char *rp, uint8_t *buf, int buf_size)
   uint8_t *value_data = request.response->response_buffer->buffer;
 
   // Cache value data, as it gets overwritten in oc_issue_do_s_mode
-  //uint8_t buf[100];
+  // uint8_t buf[100];
   if (value_size < buf_size) {
     memcpy(buf, value_data, value_size);
     return value_size;
-  } 
+  }
   OC_ERR(" allocated buf too small to contain s-mode value");
   return 0;
 }

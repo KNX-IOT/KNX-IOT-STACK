@@ -170,7 +170,6 @@ oc_process_resources(oc_request_t *request, size_t device_index,
   return matches;
 }
 
-
 static void
 oc_wkcore_discovery_handler(oc_request_t *request,
                             oc_interface_mask_t iface_mask, void *data)
@@ -235,9 +234,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   if (d_len > 13 && strncmp(d_request, "urn:knx:g.s.", 13) == 0) {
     int group_address = atoi(&d_request[12]);
     PRINT(" group address: %d\n", group_address);
-
   }
-
 
   if (oc_is_device_mode_in_programming(device_index)) {
     // add only the serial number when the interface is if.pm && device is in

@@ -159,9 +159,8 @@ void oc_knx_set_crc(uint64_t crc);
  */
 void oc_knx_set_osn(uint64_t osn);
 
-
-
-typedef void (*oc_add_s_mode_response_cb_t)(char *url, oc_rep_t *rep, oc_rep_t *rep_value);
+typedef void (*oc_add_s_mode_response_cb_t)(char *url, oc_rep_t *rep,
+                                            oc_rep_t *rep_value);
 
 bool oc_set_s_mode_response_cb(oc_add_s_mode_response_cb_t my_func);
 
