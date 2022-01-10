@@ -1668,6 +1668,7 @@ oc_delete_group_rp_table_entry(int entry, char *Store,
                              oc_group_rp_table_t *rp_table, int max_size)
 {
   (void)max_size;
+  (void)Store;
   rp_table[entry].id = 0;
   oc_free_string(&rp_table[entry].ia);
   oc_new_string(&rp_table[entry].ia, "", 0);
