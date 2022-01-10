@@ -144,116 +144,6 @@ oc_filter_resource(oc_resource_t *resource, oc_request_t *request,
                                matches);
 }
 
-static bool
-filter_resource(oc_resource_t *resource, oc_request_t *request,
-                const char *anchor, CborEncoder *links, size_t device_index)
-{
-  if (!oc_filter_resource_by_rt(resource, request)) {
-    return false;
-  }
-
-  if (!(resource->properties & OC_DISCOVERABLE)) {
-    return false;
-  }
-
-#ifdef OC_SECURITY
-  bool owned_for_SVRs =
-    (oc_core_is_SVR(resource, device_index) &&
-     (((oc_sec_get_pstat(device_index))->s != OC_DOS_RFOTM) ||
-      oc_tls_num_peers(device_index) != 0));
-#endif /* OC_SECURITY */
-
-  oc_rep_start_object(links, link);
-
-  // rel
-  if (oc_core_get_resource_by_index(OCF_RES, resource->device) == resource) {
-    oc_rep_set_array(link, rel);
-    oc_rep_add_text_string(rel, "self");
-    oc_rep_close_array(link, rel);
-  }
-
-  // anchor
-  oc_rep_set_text_string(link, anchor, anchor);
-
-  // uri
-  oc_rep_set_text_string(link, href, oc_string(resource->uri));
-
-  // rt
-  oc_rep_set_array(link, rt);
-  int i;
-  for (i = 0; i < (int)oc_string_array_get_allocated_size(resource->types);
-       i++) {
-    size_t size = oc_string_array_get_item_size(resource->types, i);
-    const char *t = (const char *)oc_string_array_get_item(resource->types, i);
-    if (size > 0)
-      oc_rep_add_text_string(rt, t);
-  }
-  oc_rep_close_array(link, rt);
-
-  // if
-  oc_core_encode_interfaces_mask(oc_rep_object(link), resource->interfaces);
-
-  // p
-  oc_rep_set_object(link, p);
-  oc_rep_set_uint(p, bm,
-                  (uint8_t)(resource->properties & ~(OC_PERIODIC | OC_SECURE)));
-  oc_rep_close_object(link, p);
-
-  // eps
-  oc_rep_set_array(link, eps);
-  oc_endpoint_t *eps = oc_connectivity_get_endpoints(device_index);
-  while (eps != NULL) {
-    /*  If this resource has been explicitly tagged as SECURE on the
-     *  application layer, skip all coap:// endpoints, and only include
-     *  coaps:// endpoints.
-     *  Also, exclude all endpoints that are not associated with the interface
-     *  through which this request arrived. This is achieved by checking if the
-     *  interface index matches.
-     */
-    if (((resource->properties & OC_SECURE
-#ifdef OC_SECURITY
-          || owned_for_SVRs
-#endif /* OC_SECURITY */
-          ) &&
-         !(eps->flags & SECURED)) ||
-        (request->origin && request->origin->interface_index != -1 &&
-         request->origin->interface_index != eps->interface_index)) {
-      goto next_eps;
-    }
-    if (request->origin &&
-        (((request->origin->flags & IPV4) && (eps->flags & IPV6)) ||
-         ((request->origin->flags & IPV6) && (eps->flags & IPV4)))) {
-      goto next_eps;
-    }
-    oc_rep_object_array_start_item(eps);
-    oc_string_t ep;
-    if (oc_endpoint_to_string(eps, &ep) == 0) {
-      oc_rep_set_text_string(eps, ep, oc_string(ep));
-      oc_free_string(&ep);
-    }
-    if (oc_core_get_latency() > 0)
-      oc_rep_set_uint(eps, lat, oc_core_get_latency());
-    oc_rep_object_array_end_item(eps);
-  next_eps:
-    eps = eps->next;
-  }
-#ifdef OC_OSCORE
-  if (resource->properties & OC_SECURE_MCAST) {
-    oc_rep_object_array_start_item(eps);
-#ifdef OC_IPV4
-    oc_rep_set_text_string(eps, ep, "coap://224.0.1.187:5683");
-#endif /* OC_IPV4 */
-    oc_rep_set_text_string(eps, ep, "coap://[ff02::158]:5683");
-    oc_rep_object_array_end_item(eps);
-  }
-#endif /* OC_OSCORE */
-  oc_rep_close_array(link, eps);
-
-  oc_rep_end_object(links, link);
-
-  return true;
-}
-
 int
 oc_process_resources(oc_request_t *request, size_t device_index,
                      size_t *response_length)
@@ -278,168 +168,6 @@ oc_process_resources(oc_request_t *request, size_t device_index,
   }
 
   return matches;
-}
-
-// remove this
-int
-process_device_resources(CborEncoder *links, oc_request_t *request,
-                         size_t device_index)
-{
-  int matches = 0;
-  char uuid[OC_UUID_LEN];
-  oc_uuid_to_str(oc_core_get_device_id(device_index), uuid, OC_UUID_LEN);
-  oc_string_t anchor;
-  oc_concat_strings(&anchor, "ocf://", uuid);
-
-  if (filter_resource(oc_core_get_resource_by_index(OCF_P, 0), request,
-                      oc_string(anchor), links, device_index))
-    matches++;
-
-  if (filter_resource(oc_core_get_resource_by_index(OCF_RES, device_index),
-                      request, oc_string(anchor), links, device_index))
-    matches++;
-
-  if (filter_resource(oc_core_get_resource_by_index(OCF_D, device_index),
-                      request, oc_string(anchor), links, device_index))
-    matches++;
-
-#ifdef OC_SECURITY
-  if (filter_resource(oc_core_get_resource_by_index(OCF_SEC_DOXM, device_index),
-                      request, oc_string(anchor), links, device_index))
-    matches++;
-
-  if (filter_resource(
-        oc_core_get_resource_by_index(OCF_SEC_PSTAT, device_index), request,
-        oc_string(anchor), links, device_index))
-    matches++;
-
-  if (filter_resource(oc_core_get_resource_by_index(OCF_SEC_ACL, device_index),
-                      request, oc_string(anchor), links, device_index))
-    matches++;
-
-  if (filter_resource(oc_core_get_resource_by_index(OCF_SEC_AEL, device_index),
-                      request, oc_string(anchor), links, device_index))
-    matches++;
-
-  if (filter_resource(oc_core_get_resource_by_index(OCF_SEC_CRED, device_index),
-                      request, oc_string(anchor), links, device_index))
-    matches++;
-
-  if (filter_resource(oc_core_get_resource_by_index(OCF_SEC_SP, device_index),
-                      request, oc_string(anchor), links, device_index))
-    matches++;
-
-#ifdef OC_PKI
-  if (filter_resource(oc_core_get_resource_by_index(OCF_SEC_CSR, device_index),
-                      request, oc_string(anchor), links, device_index))
-    matches++;
-
-  if (filter_resource(
-        oc_core_get_resource_by_index(OCF_SEC_ROLES, device_index), request,
-        oc_string(anchor), links, device_index))
-    matches++;
-#endif /* OC_PKI */
-
-  if (filter_resource(oc_core_get_resource_by_index(OCF_SEC_SDI, device_index),
-                      request, oc_string(anchor), links, device_index))
-    matches++;
-
-#endif /* OC_SECURITY */
-
-  oc_resource_t *resource = oc_ri_get_app_resources();
-  for (; resource; resource = resource->next) {
-    if (resource->device != device_index ||
-        !(resource->properties & OC_DISCOVERABLE))
-      continue;
-
-    if (filter_resource(resource, request, oc_string(anchor), links,
-                        device_index))
-      matches++;
-  }
-
-  oc_free_string(&anchor);
-
-  return matches;
-}
-
-// remove this
-void
-oc_core_discovery_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
-                          void *data)
-{
-  (void)data;
-  int matches = 0;
-  size_t device = request->resource->device;
-
-  // for dev without SVRs, ignore queries for backward compatibility
-#ifdef OC_SECURITY
-  char *q;
-  int ql = oc_get_query_value(request, "sduuid", &q);
-  if (ql > 0) {
-    oc_sec_sdi_t *s = oc_sec_get_sdi(device);
-    if (s->priv) {
-      oc_ignore_request(request);
-      OC_DBG("private sdi");
-      return;
-    } else {
-      char uuid[OC_UUID_LEN];
-      oc_uuid_to_str(&s->uuid, uuid, OC_UUID_LEN);
-      if (ql != (OC_UUID_LEN - 1)) {
-        oc_ignore_request(request);
-        OC_DBG("uuid mismatch: ql %d", ql);
-        return;
-      }
-      if (strncasecmp(q, uuid, OC_UUID_LEN - 1) != 0) {
-        oc_ignore_request(request);
-        OC_DBG("uuid mismatch: %s", uuid);
-        return;
-      }
-    }
-  }
-#endif
-
-  switch (iface_mask) {
-  case OC_IF_LL: {
-    oc_rep_start_links_array();
-    matches += process_device_resources(oc_rep_array(links), request, device);
-    oc_rep_end_links_array();
-  } break;
-  case OC_IF_BASELINE: {
-    oc_rep_start_links_array();
-    oc_rep_start_object(oc_rep_array(links), props);
-    memcpy(&root_map, &props_map, sizeof(CborEncoder));
-    oc_process_baseline_interface(
-      oc_core_get_resource_by_index(OCF_RES, device));
-#ifdef OC_SECURITY
-    oc_sec_sdi_t *s = oc_sec_get_sdi(device);
-    if (!s->priv) {
-      char uuid[OC_UUID_LEN];
-      oc_uuid_to_str(&s->uuid, uuid, OC_UUID_LEN);
-      oc_rep_set_text_string(root, sduuid, uuid);
-      oc_rep_set_text_string(root, sdname, oc_string(s->name));
-    }
-#endif
-    oc_rep_set_array(root, links);
-    matches += process_device_resources(oc_rep_array(links), request, device);
-    oc_rep_close_array(root, links);
-    memcpy(&props_map, &root_map, sizeof(CborEncoder));
-    oc_rep_end_object(oc_rep_array(links), props);
-    oc_rep_end_links_array();
-  } break;
-  default:
-    break;
-  }
-  int response_length = oc_rep_get_encoded_payload_size();
-  request->response->response_buffer->content_format = APPLICATION_VND_OCF_CBOR;
-  if (matches && response_length > 0) {
-    request->response->response_buffer->response_length = response_length;
-    request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
-  } else if (request->origin && (request->origin->flags & MULTICAST) == 0) {
-    request->response->response_buffer->code =
-      oc_status_code(OC_STATUS_BAD_REQUEST);
-  } else {
-    request->response->response_buffer->code = OC_IGNORE;
-  }
 }
 
 static void
@@ -471,6 +199,8 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   int ep_len = 0;
   char *if_request = 0;
   int if_len = 0;
+  char *d_request = 0;
+  int d_len = 0;
 
   value_len = -1;
   oc_init_query_iterator();
@@ -487,12 +217,24 @@ oc_wkcore_discovery_handler(oc_request_t *request,
       if_request = value;
       if_len = (int)value_len;
     }
+    if (strncmp(key, "d", key_len) == 0) {
+      d_request = value;
+      d_len = (int)value_len;
+    }
   }
-  /* d */
 
   // get the device structure from the request.
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
+
+  /* if device is belongs to a group address
+     ?d=urn:knx:g.s.[ga]
+     list the data points to which the group address applies to
+  */
+  if (d_len > 13 && strncmp(d_request, "urn:knx:g.s.", 13) == 0) {
+    int group_address = atoi(&d_request[12]);
+    PRINT(" group address: %d\n", group_address);
+  }
 
   if (oc_is_device_mode_in_programming(device_index)) {
     // add only the serial number when the interface is if.pm && device is in
@@ -599,19 +341,11 @@ oc_wkcore_discovery_handler(oc_request_t *request,
 void
 oc_create_discovery_resource(int resource_idx, size_t device)
 {
-
   if (resource_idx == WELLKNOWNCORE) {
-
     oc_core_lf_populate_resource(resource_idx, device, "/.well-known/core", 0,
                                  APPLICATION_LINK_FORMAT, OC_DISCOVERABLE,
                                  oc_wkcore_discovery_handler, 0, 0, 0, 1, "wk");
-
-    return;
   }
-
-  // oc_core_populate_resource(
-  //   resource_idx, device, "oic/res", OC_IF_LL | OC_IF_BASELINE, OC_IF_LL,
-  //   OC_DISCOVERABLE, oc_core_discovery_handler, 0, 0, 0, 1, "oic.wk.res");
 }
 
 oc_discovery_flags_t

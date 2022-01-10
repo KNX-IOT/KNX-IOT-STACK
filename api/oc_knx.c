@@ -39,6 +39,10 @@ oc_string_t g_ldevid;
 
 // ----------------------------------------------------------------------------
 
+oc_add_s_mode_response_cb_t m_s_mode_cb = NULL;
+
+// ----------------------------------------------------------------------------
+
 #define RESTART_DEVICE 2
 #define RESET_DEVICE 1
 
@@ -515,12 +519,6 @@ oc_reset_g_received_notification()
   oc_new_string(&g_received_notification.st, "", strlen(""));
 }
 
-void
-oc_core_smode_rp(oc_request_t *request)
-{
-  (void)request;
-}
-
 /*
  {sia: 5678, es: {st: write, ga: 1, value: 100 }}
 */
@@ -531,6 +529,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
   (void)data;
   (void)iface_mask;
   oc_rep_t *rep = NULL;
+  oc_rep_t *rep_value = NULL;
 
   PRINT("KNX KNX Post Handler");
   char buffer[200];
@@ -628,6 +627,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
 
   bool do_write = false;
   bool do_read = false;
+  bool do_response = false;
   // handle the request
   // loop over the group addresses of the /fp/r
   PRINT(" .knx : sia   %d\n", g_received_notification.sia);
@@ -638,9 +638,9 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
   } else if (strcmp(oc_string(g_received_notification.st), "r") == 0) {
     do_read = true;
   } else {
+    do_response = true;
     PRINT(" .knx : st : no reading/writing: ignoring request\n");
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
-    return;
   }
 
   int index = oc_core_find_group_object_table_index(g_received_notification.ga);
@@ -668,6 +668,14 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
           // do the actual read from the resource and
           // send the reply
           oc_do_s_mode(oc_string(my_resource->uri), "rp");
+        }
+        if (do_response) {
+          // send the response to the callback
+          if (m_s_mode_cb) {
+            rep = request->request_payload;
+            rep_value = oc_s_mode_get_value(request);
+            m_s_mode_cb(oc_string(my_resource->uri), rep, rep_value);
+          }
         }
       }
     }
@@ -699,6 +707,13 @@ oc_create_knx_knx_resource(int resource_idx, size_t device)
     resource_idx, device, "/.knx", OC_IF_LL | OC_IF_BASELINE, APPLICATION_CBOR,
     OC_DISCOVERABLE, oc_core_knx_knx_get_handler, 0,
     oc_core_knx_knx_post_handler, 0, 1, "urn:knx:g.s");
+}
+
+bool
+oc_set_s_mode_response_cb(oc_add_s_mode_response_cb_t my_func)
+{
+  m_s_mode_cb = my_func;
+  return true;
 }
 
 // ----------------------------------------------------------------------------
@@ -1164,26 +1179,26 @@ oc_issue_s_mode(int sia_value, int group_address, char *rp, uint8_t *value_data,
   }
 }
 
-void
-oc_do_s_mode_internal(char *resource_url, char *rp, int x)
+int
+oc_do_s_mode_internal(char *resource_url, char *rp, uint8_t *buf, int buf_size)
 {
-  (void)x;
+  (void)rp;
 
   if (resource_url == NULL) {
-    return;
+    return 0;
   }
 
   oc_resource_t *my_resource =
     oc_ri_get_app_resource_by_uri(resource_url, strlen(resource_url), 0);
   if (my_resource == NULL) {
     PRINT(" oc_do_s_mode : error no URL found %s\n", resource_url);
-    return;
+    return 0;
   }
 
   // get the sender ia
-  size_t device_index = 0;
-  oc_device_info_t *device = oc_core_get_device_info(device_index);
-  int sia_value = device->ia;
+  // size_t device_index = 0;
+  // oc_device_info_t *device = oc_core_get_device_info(device_index);
+  // int sia_value = device->ia;
 
   uint8_t *buffer = malloc(100);
   if (!buffer) {
@@ -1235,43 +1250,29 @@ oc_do_s_mode_internal(char *resource_url, char *rp, int x)
   uint8_t *value_data = request.response->response_buffer->buffer;
 
   // Cache value data, as it gets overwritten in oc_issue_do_s_mode
-  uint8_t buf[100];
-  assert(value_size < 100);
-  memcpy(buf, value_data, value_size);
-
-  if (value_size == 0) {
-    PRINT(" . ERROR: value size == 0");
-    return;
+  // uint8_t buf[100];
+  if (value_size < buf_size) {
+    memcpy(buf, value_data, value_size);
+    return value_size;
   }
-
-  int group_address = 0;
-
-  // loop over all group addresses and issue the s-mode command
-  int index = oc_core_find_group_object_table_url(resource_url);
-  while (index != -1) {
-    PRINT("  index : %d\n", index);
-
-    int ga_len = oc_core_find_group_object_table_number_group_entries(index);
-    for (int j = 0; j < ga_len; j++) {
-      group_address = oc_core_find_group_object_table_group_entry(index, j);
-      PRINT("   ga : %d\n", group_address);
-      // issue the s-mode command
-      oc_issue_s_mode(sia_value, group_address, rp, buf, value_size);
-    }
-    index = oc_core_find_next_group_object_table_url(resource_url, index);
-  }
-
-  // free buffer
-  // free(buffer);
+  OC_ERR(" allocated buf too small to contain s-mode value");
+  return 0;
 }
 
 void
 oc_do_s_mode(char *resource_url, char *rp)
 {
-
+  int value_size;
   if (resource_url == NULL) {
     return;
   }
+
+  uint8_t *buffer = malloc(100);
+  if (!buffer) {
+    OC_WRN("oc_do_s_mode: out of memory allocating buffer");
+  } //! buffer
+
+  value_size = oc_do_s_mode_internal(resource_url, rp, buffer, 100);
 
   oc_resource_t *my_resource =
     oc_ri_get_app_resource_by_uri(resource_url, strlen(resource_url), 0);
@@ -1285,65 +1286,6 @@ oc_do_s_mode(char *resource_url, char *rp)
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   int sia_value = device->ia;
 
-  uint8_t *buffer = malloc(100);
-  if (!buffer) {
-    OC_WRN("oc_do_s_mode: out of memory allocating buffer");
-  } //! buffer
-
-  oc_request_t request = { 0 };
-  oc_response_t response = { 0 };
-  response.separate_response = 0;
-  oc_response_buffer_t response_buffer;
-  // if (!response_buf && resource) {
-  //  OC_DBG("coap_notify_observers: Issue GET request to resource %s\n\n",
-  //         oc_string(resource->uri));
-  response_buffer.buffer = buffer;
-  response_buffer.buffer_size = 100;
-
-  // same initialization as oc_ri.c
-  response_buffer.code = 0;
-  response_buffer.response_length = 0;
-  response_buffer.content_format = 0;
-
-  response.separate_response = NULL;
-  response.response_buffer = &response_buffer;
-
-  request.response = &response;
-  request.request_payload = NULL;
-  request.query = NULL;
-  request.query_len = 0;
-  request.resource = NULL;
-  request.origin = NULL;
-  request._payload = NULL;
-  request._payload_len = 0;
-
-  request.content_format = APPLICATION_CBOR;
-  request.accept = APPLICATION_CBOR;
-  request.uri_path = resource_url;
-  request.uri_path_len = strlen(resource_url);
-
-  oc_rep_new(response_buffer.buffer, response_buffer.buffer_size);
-
-  // get the value...oc_request_t request_obj;
-  oc_interface_mask_t iface_mask = OC_IF_NONE;
-  // void *data;
-  my_resource->get_handler.cb(&request, iface_mask, NULL);
-
-  // get the data
-  // int value_size = request.response->response_buffer->buffer_size;
-  int value_size = oc_rep_get_encoded_payload_size();
-  uint8_t *value_data = request.response->response_buffer->buffer;
-
-  // Cache value data, as it gets overwritten in oc_issue_do_s_mode
-  uint8_t buf[100];
-  assert(value_size < 100);
-  memcpy(buf, value_data, value_size);
-
-  if (value_size == 0) {
-    PRINT(" . ERROR: value size == 0");
-    return;
-  }
-
   int group_address = 0;
 
   // loop over all group addresses and issue the s-mode command
@@ -1356,7 +1298,7 @@ oc_do_s_mode(char *resource_url, char *rp)
       group_address = oc_core_find_group_object_table_group_entry(index, j);
       PRINT("   ga : %d\n", group_address);
       // issue the s-mode command
-      oc_issue_s_mode(sia_value, group_address, rp, buf, value_size);
+      oc_issue_s_mode(sia_value, group_address, rp, buffer, value_size);
     }
     index = oc_core_find_next_group_object_table_url(resource_url, index);
   }

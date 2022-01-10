@@ -40,8 +40,8 @@ void oc_create_discovery_resource(int resource_idx, size_t device);
  * @param resource the resource to be included
  * @param request  the request, with all query parameters
  * @param device_index the device index on the request is being made
- * @param response_length the current response lenght
- * @param matches if there are already resources addded to the response
+ * @param response_length the current response length
+ * @param matches if there are already resources added to the response
  * @return true resource added (as entry) to the response
  * @return false resource not added to the response
  */
@@ -55,7 +55,7 @@ bool oc_filter_resource(oc_resource_t *resource, oc_request_t *request,
  * @param resource the resource
  * @param request  the request
  * @param device_index the device index
- * @param response_length the response lenght (to be increased)
+ * @param response_length the response length (to be increased)
  * @param matches current matches
  * @return true
  * @return false
