@@ -83,7 +83,8 @@ static void oc_print_group_rp_table_entry(int entry, char *Store,
                                           int max_size);
 
 static void oc_dump_group_rp_table_entry(int entry, char *Store,
-                                  oc_group_rp_table_t *rp_table, int max_size);
+                                         oc_group_rp_table_t *rp_table,
+                                         int max_size);
 
 // -----------------------------------------------------------------------------
 
@@ -1027,7 +1028,6 @@ oc_core_fp_p_x_del_handler(oc_request_t *request,
 
   PRINT("oc_core_fp_p_x_del_handler - end\n");
 
-
   oc_send_cbor_response(request, OC_STATUS_DELETED);
 }
 
@@ -1473,7 +1473,6 @@ oc_load_group_object_table()
     oc_load_group_object_table_entry(i);
     oc_print_group_object_table_entry(i);
   }
-
 }
 
 void
@@ -1503,8 +1502,8 @@ oc_delete_group_object_table()
 // -----------------------------------------------------------------------------
 
 static void
-oc_print_group_rp_table_entry(int entry, char* Store, oc_group_rp_table_t *rp_table,
-                               int max_size)
+oc_print_group_rp_table_entry(int entry, char *Store,
+                              oc_group_rp_table_t *rp_table, int max_size)
 {
   (void)max_size;
 
@@ -1517,7 +1516,7 @@ oc_print_group_rp_table_entry(int entry, char* Store, oc_group_rp_table_t *rp_ta
   PRINT("    ia    %s\n", oc_string(rp_table[entry].ia));
   PRINT("    path  %s\n", oc_string(rp_table[entry].url));
   PRINT("    url  %s\n", oc_string(rp_table[entry].path));
-  //PRINT("    cflags  %d\n", rp_table[entry].cflags);
+  // PRINT("    cflags  %d\n", rp_table[entry].cflags);
   PRINT("    ga [");
   for (int i = 0; i < rp_table[entry].ga_len; i++) {
     PRINT(" %d", rp_table[entry].ga[i]);
@@ -1526,8 +1525,8 @@ oc_print_group_rp_table_entry(int entry, char* Store, oc_group_rp_table_t *rp_ta
 }
 
 static void
-oc_dump_group_rp_table_entry(int entry, char* Store, oc_group_rp_table_t *rp_table,
-                               int max_size)
+oc_dump_group_rp_table_entry(int entry, char *Store,
+                             oc_group_rp_table_t *rp_table, int max_size)
 {
   (void)max_size;
   char filename[20];
@@ -1552,14 +1551,14 @@ oc_dump_group_rp_table_entry(int entry, char* Store, oc_group_rp_table_t *rp_tab
   oc_rep_i_set_int_array(root, 7, rp_table[entry].ga, rp_table[entry].ga_len);
 
   // cflags 8 /// this is different than the response on the wire
-  //oc_rep_i_set_int(root, 8, rp_table[entry].cflags);
+  // oc_rep_i_set_int(root, 8, rp_table[entry].cflags);
 
   oc_rep_end_root_object();
 
   int size = oc_rep_get_encoded_payload_size();
   if (size > 0) {
-    OC_DBG("dump_grp: dumped current state [%s] [%s] [%d]: size %d", filename, Store, entry,
-           size);
+    OC_DBG("dump_grp: dumped current state [%s] [%s] [%d]: size %d", filename,
+           Store, entry, size);
     oc_storage_write(filename, buf, size);
   }
 
@@ -1596,7 +1595,7 @@ oc_load_group_rp_table_entry(int entry, char *Store,
           if (rep->iname == 0) {
             rp_table[entry].id = (int)rep->value.integer;
           }
-          //if (rep->iname == 8) {
+          // if (rep->iname == 8) {
           //  rp_table[entry].cflags = (int)rep->value.integer;
           // }
           break;
@@ -1665,7 +1664,7 @@ oc_load_rp_object_table()
 
 static void
 oc_delete_group_rp_table_entry(int entry, char *Store,
-                             oc_group_rp_table_t *rp_table, int max_size)
+                               oc_group_rp_table_t *rp_table, int max_size)
 {
   (void)max_size;
   (void)Store;
@@ -1680,7 +1679,7 @@ oc_delete_group_rp_table_entry(int entry, char *Store,
   rp_table[entry].ga = NULL;
   // oc_free_int_array(g_got[value].ga);
   rp_table[entry].ga_len = 0;
-  //rp_table[entry].cflags = 0;
+  // rp_table[entry].cflags = 0;
 }
 
 void
