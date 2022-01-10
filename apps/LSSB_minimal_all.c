@@ -113,6 +113,14 @@ STATIC CRITICAL_SECTION cs;   /**< event loop variable */
 
 volatile int quit = 0; /**< stop variable, used by handle_signal */
 
+
+void
+oc_add_s_mode_response_cb(char *url, oc_rep_t *rep, oc_rep_t *rep_value)
+{
+  PRINT("oc_add_s_mode_response_cb %s\n", url);
+}
+
+
 /**
  * function to set up the device.
  *
@@ -147,6 +155,8 @@ app_init(void)
 
   /* set the model */
   oc_core_set_device_model(0, "my model");
+
+  oc_set_s_mode_response_cb(oc_add_s_mode_response_cb);
 
   return ret;
 }
