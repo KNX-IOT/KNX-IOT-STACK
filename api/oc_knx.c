@@ -1182,7 +1182,7 @@ oc_issue_s_mode(int sia_value, int group_address, char *rp, uint8_t *value_data,
 }
 
 int
-oc_do_s_mode_internal(char *resource_url, char *rp, char* buf, int buf_size)
+oc_do_s_mode_internal(char *resource_url, char *rp, uint8_t *buf, int buf_size)
 {
   (void) rp;
 
