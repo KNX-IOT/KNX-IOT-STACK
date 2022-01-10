@@ -1506,6 +1506,7 @@ static void
 oc_print_group_rp_table_entry(int entry, char* Store, oc_group_rp_table_t *rp_table,
                                int max_size)
 {
+  (void)max_size;
 
   PRINT("  %s [%d] --> [%d]\n", Store, entry, rp_table[entry].ga_len);
   if (rp_table[entry].ga_len == 0) {
@@ -1528,6 +1529,7 @@ static void
 oc_dump_group_rp_table_entry(int entry, char* Store, oc_group_rp_table_t *rp_table,
                                int max_size)
 {
+  (void)max_size;
   char filename[20];
   snprintf(filename, 20, "%s_%d", Store, entry);
 
@@ -1568,6 +1570,7 @@ void
 oc_load_group_rp_table_entry(int entry, char *Store,
                              oc_group_rp_table_t *rp_table, int max_size)
 {
+  (void)max_size;
   long ret = 0;
   char filename[20];
   snprintf(filename, 20, "%s_%d", Store, entry);
@@ -1664,6 +1667,7 @@ static void
 oc_delete_group_rp_table_entry(int entry, char *Store,
                              oc_group_rp_table_t *rp_table, int max_size)
 {
+  (void)max_size;
   rp_table[entry].id = 0;
   oc_free_string(&rp_table[entry].ia);
   oc_new_string(&rp_table[entry].ia, "", 0);
