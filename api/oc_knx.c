@@ -715,6 +715,7 @@ bool
 oc_set_s_mode_response_cb(oc_add_s_mode_response_cb_t my_func)
 {
   m_s_mode_cb = my_func;
+  return true;
 }
 
 // ----------------------------------------------------------------------------
@@ -1183,15 +1184,17 @@ oc_issue_s_mode(int sia_value, int group_address, char *rp, uint8_t *value_data,
 int
 oc_do_s_mode_internal(char *resource_url, char *rp, char* buf, int buf_size)
 {
+  (void) rp;
+
   if (resource_url == NULL) {
-    return;
+    return 0;
   }
 
   oc_resource_t *my_resource =
     oc_ri_get_app_resource_by_uri(resource_url, strlen(resource_url), 0);
   if (my_resource == NULL) {
     PRINT(" oc_do_s_mode : error no URL found %s\n", resource_url);
-    return;
+    return 0;
   }
 
   // get the sender ia
@@ -1250,9 +1253,12 @@ oc_do_s_mode_internal(char *resource_url, char *rp, char* buf, int buf_size)
 
   // Cache value data, as it gets overwritten in oc_issue_do_s_mode
   //uint8_t buf[100];
-  assert(value_size < 100);
-  memcpy(buf, value_data, value_size);
-  return value_size;
+  if (value_size < buf_size) {
+    memcpy(buf, value_data, value_size);
+    return value_size;
+  } 
+  OC_ERR(" allocated buf too small to contain s-mode value");
+  return 0;
 }
 
 void
@@ -1267,7 +1273,6 @@ oc_do_s_mode(char *resource_url, char *rp)
   if (!buffer) {
     OC_WRN("oc_do_s_mode: out of memory allocating buffer");
   } //! buffer
-
 
   value_size = oc_do_s_mode_internal(resource_url, rp, buffer, 100);
 
