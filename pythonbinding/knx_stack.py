@@ -452,7 +452,7 @@ def signal_event_loop():
 
 CHANGED_CALLBACK = CFUNCTYPE(None, c_char_p, c_char_p, c_char_p)
 RESOURCE_CALLBACK = CFUNCTYPE(None, c_char_p, c_char_p, c_char_p, c_char_p)
-CLIENT_CALLBACK = CFUNCTYPE(None, c_char_p, c_char_p, c_char_p, c_char_p, c_int, c_char_p)
+CLIENT_CALLBACK = CFUNCTYPE(None, c_char_p, c_int, c_char_p, c_char_p, c_char_p, c_int, c_char_p)
 
 #----------LinkFormat parsing ---------------
 
@@ -524,10 +524,11 @@ class Device():
 
 class CoAPResponse():
 
-    def __init__(self, sn, payload_format, r_id, url, payload_size, payload):
+    def __init__(self, sn, status, payload_format, r_id, url, payload_size, payload):
         self.sn = sn
         self.r_id = r_id
         self.url = url
+        self.status = status
         self.payload_type = payload_format
         self.payload_size = payload_size
         self.payload = payload
@@ -540,18 +541,18 @@ class CoAPResponse():
 
     def print_payload(self):
         if self.payload_type == "json":
-            print("::",self.payload[1:-1])
+            print("::",self.get_payload_dict())
             return
         print(";:",self.payload)
 
     def get_payload(self):
         if self.payload_type == "json":
-            return self.payload[1:-1]
+            return self.payload
         return self.payload
 
     def get_payload_string(self):
         if self.payload_type == "json":
-            return self.payload[2:-2]
+            return self.payload
         return self.payload
 
     def get_payload_boolean(self):
@@ -561,7 +562,7 @@ class CoAPResponse():
                 return True
             if my_string == "false":
                 return False
-            return self.payload[2:-2]
+            return self.payload
         return self.payload
 
     def get_payload_int(self):
@@ -571,13 +572,31 @@ class CoAPResponse():
         return self.payload
 
     def get_payload_dict(self):
+        """
+          note that this is a bit of a fudge...
+          the json is wrapped in the python layer above the stack
+          this is not complete json due to that there is no good way of
+          using cbor with and without {}
+        """
         if self.payload_type == "json":
             my_string = str(self.payload)
             #print ("get_payload_dict", my_string)
             try:
                 return json.loads(my_string)
             except:
-                pass
+                #print("get_payload_dict: replacing {x with {:")
+                my_str = my_string.replace("{x","{")
+                try:
+                    return json.loads(my_str)
+                except:
+                    #print("get_payload_dict: replacing {x with {'0':")
+                    my_str = my_string.replace("{x",'{"0":')
+                    try:
+                       #print (my_str)
+                       return json.loads(my_str)
+                    except:
+                       pass
+        #print("get_payload_dict: defaulting")
         return self.payload
 
 #----------The Stack ---------------
@@ -626,7 +645,7 @@ class KNXIOTStack():
             self.device_array.append(dev)
             discover_event.set()
 
-    def clientCB(self, cb_sn, cb_format, cb_id, cb_url, cb_payload_size, cb_payload):
+    def clientCB(self, cb_sn, cb_status, cb_format, cb_id, cb_url, cb_payload_size, cb_payload):
         """ ********************************
         Call back handles client command callbacks.
         Client discovery/state
@@ -646,27 +665,27 @@ class KNXIOTStack():
         if len(cb_url):
             url = cb_url.decode("utf-8")
 
-        print("ClientCB: SN:{}, format:{}, id:{}, url:{},  size:{} ".
-               format(sn, c_format, r_id, url, cb_payload_size ))
+        print("ClientCB: SN:{}, status:{}, format:{}, id:{}, url:{},  size:{} ".
+               format(sn, cb_status, c_format, r_id, url, cb_payload_size ))
 
         if c_format == "link_format" :
             if cb_payload is not None:
                 print("ClientCB: link-format")
                 payload = cb_payload.decode("utf-8")
-                print("p:", payload)
+                #print("p:", payload)
         if c_format == "cbor" :
             print("ClientCB: cbor")
             payload = self.convertcbor2json(cb_payload, cb_payload_size)
-            print("p:",payload)
+            #print("p:",payload)
         if c_format == "json" :
             print("ClientCB: json")
             payload = cb_payload.decode("utf-8")
-            print("p:", payload)
+            #print("p:", payload)
         if c_format == "error" :
             print("ClientCB: error")
             print("p:", cb_payload_size)
 
-        resp  = CoAPResponse(sn, c_format, r_id, url, cb_payload_size, payload)
+        resp  = CoAPResponse(sn, cb_status, c_format, r_id, url, cb_payload_size, payload)
         self.response_array.append(resp)
         client_event.set()
         client_mutex.release()

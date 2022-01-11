@@ -38,7 +38,7 @@ typedef void (*changedCB)(char *uuid, char *state, char *event);
 typedef void (*resourceCB)(char *anchor, char *uri, char *types,
                            char *interfaces);
 
-typedef void (*clientCB)(char *sn, char *r_format, char *r_id, char *url,
+typedef void (*clientCB)(char *sn, int status, char *r_format, char *r_id, char *url,
                          int payload_size, char *payload);
 
 /**
