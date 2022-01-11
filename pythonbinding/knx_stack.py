@@ -592,10 +592,10 @@ class CoAPResponse():
                     #print("get_payload_dict: replacing {x with {'0':")
                     my_str = my_string.replace("{x",'{"0":')
                     try:
-                       #print (my_str)
-                       return json.loads(my_str)
+                        #print (my_str)
+                        return json.loads(my_str)
                     except:
-                       pass
+                        pass
         #print("get_payload_dict: defaulting")
         return self.payload
 
