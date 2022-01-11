@@ -1364,14 +1364,13 @@ py_oc_rep_to_json(oc_rep_t *rep, char *buf, size_t buf_size, bool pretty_print)
                                       : snprintf(buf, buf_size, "{");
     OC_JSON_UPDATE_BUFFER_AND_TOTAL;
   }
-  // num_char_printed = (pretty_print)
-  //                     ? snprintf(buf, buf_size, (object_array) ? "[\n" :
-  //                     "{\n") : snprintf(buf, buf_size, (object_array) ? "[" :
-  //                     "{");
+
   num_char_printed =
     oc_rep_to_json_format(rep, buf, buf_size, tab, pretty_print);
   OC_JSON_UPDATE_BUFFER_AND_TOTAL;
 
+  // note that the python layer above this function will fix the {x with the appropriate sequence:
+  // { or { "0": e.g. what ever will make it correct json
   char *found = strchr((const char *)my_buf, ':');
   if (found != NULL) {
     object = true;
@@ -1379,10 +1378,6 @@ py_oc_rep_to_json(oc_rep_t *rep, char *buf, size_t buf_size, bool pretty_print)
     my_buf[1] = 'x';
   }
 
-  // num_char_printed = (pretty_print)
-  //                     ? snprintf(buf, buf_size, (object_array) ? "]\n" :
-  //                     "}\n") : snprintf(buf, buf_size, (object_array) ? "]" :
-  //                     "}");
   if (object_array) {
     num_char_printed = (pretty_print) ? snprintf(buf, buf_size, "]\n")
                                       : snprintf(buf, buf_size, "]");
