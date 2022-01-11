@@ -105,7 +105,7 @@ oc_core_fp_gm_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
-  /* example entry: </fp/gm/1>;ct=50 */
+  /* example entry: </fp/gm/1>;ct=60 (cbor)*/
   for (i = 0; i < GAMT_MAX_ENTRIES; i++) {
     if (i > 0) {
       length = oc_rep_add_line_to_buffer(",\n");
@@ -123,7 +123,7 @@ oc_core_fp_gm_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     length = oc_rep_add_line_to_buffer(string);
     response_length += length;
 
-    length = oc_rep_add_line_to_buffer(";ct=50");
+    length = oc_rep_add_line_to_buffer(";ct=60");
     response_length += length;
   }
 
@@ -396,7 +396,7 @@ oc_core_fp_g_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     return;
   }
 
-  /* example entry: </fp/g/1>;ct=50 */
+  /* example entry: </fp/g/1>;ct=60   (cbor)*/
   for (i = 0; i < GAMT_MAX_ENTRIES; i++) {
 
     if (g_got[i].ga_len > 0) {
@@ -410,11 +410,11 @@ oc_core_fp_g_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       length = oc_rep_add_line_to_buffer("<fp/g/");
       response_length += length;
       char string[10];
-      sprintf((char *)&string, "%d", i);
+      sprintf((char *)&string, "%d>", i);
       length = oc_rep_add_line_to_buffer(string);
       response_length += length;
 
-      length = oc_rep_add_line_to_buffer(";ct=50");
+      length = oc_rep_add_line_to_buffer(";ct=60");
       response_length += length;
     }
   }
@@ -771,7 +771,7 @@ oc_core_fp_p_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
-  /* example entry: </fp/p/1>;ct=50 */
+  /* example entry: </fp/p/1>;ct=60 */
   for (i = 0; i < GPT_MAX_ENTRIES; i++) {
 
     if (g_gpt[i].ga_len != 0) {
@@ -785,11 +785,11 @@ oc_core_fp_p_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       length = oc_rep_add_line_to_buffer("<fp/p/");
       response_length += length;
       char string[10];
-      sprintf((char *)&string, "%d", i);
+      sprintf((char *)&string, "%d>", i);
       length = oc_rep_add_line_to_buffer(string);
       response_length += length;
 
-      length = oc_rep_add_line_to_buffer(";ct=50");
+      length = oc_rep_add_line_to_buffer(";ct=60");
       response_length += length;
     }
   }
@@ -1060,7 +1060,7 @@ oc_core_fp_r_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
-  /* example entry: </fp/r/1>;ct=50 */
+  /* example entry: </fp/r/1>;ct=60 (cbor) */
   for (i = 0; i < GRT_MAX_ENTRIES; i++) {
 
     if (g_grt[i].ga_len != 0) {
@@ -1074,11 +1074,11 @@ oc_core_fp_r_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       length = oc_rep_add_line_to_buffer("<fp/r/");
       response_length += length;
       char string[10];
-      sprintf((char *)&string, "%d", i + 1);
+      sprintf((char *)&string, "%d>", i + 1);
       length = oc_rep_add_line_to_buffer(string);
       response_length += length;
 
-      length = oc_rep_add_line_to_buffer(";ct=50");
+      length = oc_rep_add_line_to_buffer(";ct=60");
       response_length += length;
     }
   }
