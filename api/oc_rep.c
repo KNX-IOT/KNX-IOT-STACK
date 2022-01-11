@@ -1314,7 +1314,9 @@ oc_rep_to_json(oc_rep_t *rep, char *buf, size_t buf_size, bool pretty_print)
   num_char_printed = (pretty_print)
                        ? snprintf(buf, buf_size, (object_array) ? "[\n" : "{\n")
                        : snprintf(buf, buf_size, (object_array) ? "[" : "{");
-   num_char_printed = oc_rep_to_json_format(rep, buf, buf_size, 0, pretty_print);
+  OC_JSON_UPDATE_BUFFER_AND_TOTAL;
+  
+  num_char_printed = oc_rep_to_json_format(rep, buf, buf_size, 0, pretty_print);
   OC_JSON_UPDATE_BUFFER_AND_TOTAL;
 
   num_char_printed = (pretty_print)
