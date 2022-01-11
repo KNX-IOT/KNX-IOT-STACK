@@ -537,6 +537,50 @@ class CoAPResponse():
 
     def get_sn(self):
         return self.sn
+    
+    def print_payload(self):
+        if self.payload_type == "json":
+            print("::",self.payload[1:-1])
+            return
+        print(";:",self.payload)
+
+    def get_payload(self):
+        if self.payload_type == "json":
+            return self.payload[1:-1]
+        return self.payload
+
+    def get_payload_string(self):
+        if self.payload_type == "json":
+            return self.payload[2:-2]
+        return self.payload
+
+    def get_payload_boolean(self):
+        if self.payload_type == "json":
+            my_string = self.get_payload()
+            if my_string == "true":
+                return True
+            if my_string == "false":
+                return False
+            return self.payload[2:-2]
+        return self.payload
+
+    def get_payload_int(self):
+        if self.payload_type == "json":
+            my_string = self.get_payload()
+            return int(my_string)
+        return self.payload
+        
+    def get_payload_dict(self):
+        if self.payload_type == "json":
+            my_string = str(self.payload)
+            print ("get_payload_dict", my_string)
+            try:
+              return json.loads(my_string)
+            except:
+              pass
+        return self.payload
+
+
 
 #----------The Stack ---------------
 
