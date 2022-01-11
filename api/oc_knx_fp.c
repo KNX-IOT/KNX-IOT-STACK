@@ -1595,9 +1595,6 @@ oc_load_group_rp_table_entry(int entry, char *Store,
           if (rep->iname == 0) {
             rp_table[entry].id = (int)rep->value.integer;
           }
-          // if (rep->iname == 8) {
-          //  rp_table[entry].cflags = (int)rep->value.integer;
-          // }
           break;
         case OC_REP_STRING:
           if (rep->iname == 12) {
@@ -1621,9 +1618,6 @@ oc_load_group_rp_table_entry(int entry, char *Store,
             int64_t *arr = oc_int_array(rep->value.array);
             int array_size = (int)oc_int_array_size(rep->value.array);
             int *new_array = (int *)malloc(array_size * sizeof(int));
-            // int*  new_array;
-            // oc_new_int_array(&new_array, array_size);
-
             for (int i = 0; i < array_size; i++) {
               new_array[i] = arr[i];
             }
@@ -1677,7 +1671,7 @@ oc_delete_group_rp_table_entry(int entry, char *Store,
   oc_new_string(&rp_table[entry].url, "", 0);
   free(rp_table[entry].ga);
   rp_table[entry].ga = NULL;
-  // oc_free_int_array(g_got[value].ga);
+
   rp_table[entry].ga_len = 0;
   // rp_table[entry].cflags = 0;
 }
