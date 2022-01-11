@@ -65,7 +65,6 @@ def compare_dict(dict1, dict2):
         print("compare_dict diff2:", diff2)
         return False
     # compare the values
-    
     dictv1_set = set(dict1.values())
     dictv2_set = set(dict2.values())
     # compare the keys
@@ -128,7 +127,6 @@ def do_sequence_dev(my_stack):
     #print ("response:",response)
     response.print_payload()
     my_stack.purge_response(response)
-    content = False
 
     print("-------------------")
     my_stack.purge_response(response)
@@ -400,18 +398,16 @@ def do_sequence(my_stack):
         do_sequence_dev(my_stack)
         do_sequence_dev_programming_mode(my_stack)
         do_sequence_dev_programming_mode_fail(my_stack)
-        
+
         do_sequence_f(my_stack)
         do_sequence_lsm(my_stack)
         return
-        do_sequence_lsm_int(my_stack)
         # .knx
-        do_sequence_knx_knx_int(my_stack)
-        do_sequence_knx_crc(my_stack)
-        do_sequence_knx_osn(my_stack)
-        do_sequence_core_knx(my_stack)
-        do_sequence_a_sen(my_stack)
-        #do_sequence_f(my_stack)
+        #do_sequence_knx_knx_int(my_stack)
+        #do_sequence_knx_crc(my_stack)
+        #do_sequence_knx_osn(my_stack)
+        #do_sequence_core_knx(my_stack)
+        #do_sequence_a_sen(my_stack)
 
 if __name__ == '__main__':  # pragma: no cover
     the_stack = knx_stack.KNXIOTStack()

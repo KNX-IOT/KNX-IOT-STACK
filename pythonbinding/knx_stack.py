@@ -575,9 +575,9 @@ class CoAPResponse():
             my_string = str(self.payload)
             #print ("get_payload_dict", my_string)
             try:
-              return json.loads(my_string)
+                return json.loads(my_string)
             except:
-              pass
+                pass
         return self.payload
 
 #----------The Stack ---------------
