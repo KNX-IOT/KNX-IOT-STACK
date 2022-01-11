@@ -38,8 +38,8 @@ typedef void (*changedCB)(char *uuid, char *state, char *event);
 typedef void (*resourceCB)(char *anchor, char *uri, char *types,
                            char *interfaces);
 
-typedef void (*clientCB)(char *sn, int status, char *r_format, char *r_id, char *url,
-                         int payload_size, char *payload);
+typedef void (*clientCB)(char *sn, int status, char *r_format, char *r_id,
+                         char *url, int payload_size, char *payload);
 
 /**
  * @brief returns the application max data size, e.g. data size for each call

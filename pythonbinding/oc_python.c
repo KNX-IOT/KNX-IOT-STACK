@@ -234,8 +234,9 @@ inform_resource_python(const char *anchor, const char *uri, const char *types,
  *
  */
 void
-inform_client_python(const char *sn, int status, const char *format, const char *r_id,
-                     const char *url, int payload_size, const char *payload)
+inform_client_python(const char *sn, int status, const char *format,
+                     const char *r_id, const char *url, int payload_size,
+                     const char *payload)
 {
   if (my_CBFunctions.clientFCB != NULL) {
     my_CBFunctions.clientFCB((char *)sn, status, (char *)format, (char *)r_id,
@@ -435,7 +436,8 @@ general_get_cb(oc_client_response_t *data)
   oc_status_t status = data->code;
   user_struct_t *my_data = (user_struct_t *)data->user_data;
   if (my_data) {
-    PRINT(" [C]general_get_cb: response status:(%d) fmt:(%d) sn:[%s] r_id:[%s] url:[%s]\n",
+    PRINT(" [C]general_get_cb: response status:(%d) fmt:(%d) sn:[%s] r_id:[%s] "
+          "url:[%s]\n",
           (int)status, data->content_format, my_data->sn, my_data->r_id,
           my_data->url);
   } else {
@@ -456,14 +458,15 @@ general_get_cb(oc_client_response_t *data)
     py_mutex_lock(app_sync_lock);
     memset(buffer, 0, buffer_size);
     py_oc_rep_to_json(data->payload, (char *)&buffer, buffer_size, false);
-    inform_client_python((char *)my_data->sn, status, "json", (char *)my_data->r_id,
-                         (char *)my_data->url, (int)data->_payload_len,
-                         (char *)buffer);
+    inform_client_python((char *)my_data->sn, status, "json",
+                         (char *)my_data->r_id, (char *)my_data->url,
+                         (int)data->_payload_len, (char *)buffer);
     py_mutex_unlock(app_sync_lock);
   } else {
     PRINT(" [C]informing python with error \n");
-    inform_client_python((char *)my_data->sn, status, "error", (char *)my_data->r_id,
-                         (char *)my_data->url, status, "");
+    inform_client_python((char *)my_data->sn, status, "error",
+                         (char *)my_data->r_id, (char *)my_data->url, status,
+                         "");
   }
 
   if (data->user_data != NULL) {
