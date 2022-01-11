@@ -55,13 +55,27 @@ import knx_stack
 def compare_dict(dict1, dict2):
     dict1_set = set(dict1.keys())
     dict2_set = set(dict2.keys())
+    # compare the keys
     diff1 = dict1_set.difference(dict2_set)
     if len(diff1) > 0:
-        print("compare_dict diff1", diff1)
+        print("compare_dict diff1:", diff1)
         return False
     diff2 = dict2_set.difference(dict1_set)
     if len(diff2) > 0:
-        print("compare_dict diff2", diff2)
+        print("compare_dict diff2:", diff2)
+        return False
+    # compare the values
+    
+    dictv1_set = set(dict1.values())
+    dictv2_set = set(dict2.values())
+    # compare the keys
+    diffv1 = dictv1_set.difference(dictv2_set)
+    if len(diffv1) > 0:
+        print("compare_dict diffv1:", diffv1)
+        return False
+    diffv2 = dictv2_set.difference(dictv1_set)
+    if len(diffv2) > 0:
+        print("compare_dict difvf2:", diffv2)
         return False
     return True
 
@@ -260,7 +274,7 @@ def do_sequence_dev_programming_mode_fail(my_stack):
 
 
 # cmd ==> 2
-def do_sequence_lsm_int(my_stack):
+def do_sequence_lsm(my_stack):
     print("========lsm=========")
     sn = my_stack.device_array[0].sn
 
@@ -268,41 +282,41 @@ def do_sequence_lsm_int(my_stack):
     response =  my_stack.issue_cbor_get(sn, "/a/lsm")
     print ("response:",response)
     my_stack.purge_response(response)
-    
+
     print("-------------------")
     content = {2 : "startLoading"}
-    expect = { 3: "loading"}
-    response =  my_stack.issue_cbor_put(sn,"/a/lsm",content)
+    expect = { "3": "loading"}
+    response =  my_stack.issue_cbor_post(sn,"/a/lsm",content)
     print ("response:",response)
-    #if content == response.get_payload_dict():
-    #    print("PASS : / ", content)
     my_stack.purge_response(response)
     response =  my_stack.issue_cbor_get(sn, "/a/lsm")
     print ("response:",response)
     if compare_dict(expect, response.get_payload_dict()):
         print("PASS : /a/lsm ", expect, response.get_payload_dict())
     my_stack.purge_response(response)
-    
+
     print("-------------------")
     content = {2 : "loadComplete"}
-    response =  my_stack.issue_cbor_put(sn,"/a/lsm",content)
+    expect  = { "3": "loaded"}
+    response =  my_stack.issue_cbor_post(sn,"/a/lsm",content)
     print ("response:",response)
     my_stack.purge_response(response)
-    
-    print("-------------------")
     response =  my_stack.issue_cbor_get(sn, "/a/lsm")
     print ("response:",response)
+    if compare_dict(expect, response.get_payload_dict()):
+        print("PASS : /a/lsm ", expect, response.get_payload_dict())
     my_stack.purge_response(response)
-    
+
     print("-------------------")
     content = {2 : "unload"}
-    response =  my_stack.issue_cbor_put(sn,"/a/lsm",content)
+    expect  = { "3": "unloaded"}
+    response =  my_stack.issue_cbor_post(sn,"/a/lsm",content)
     print ("response:",response)
     my_stack.purge_response(response)
-    
-    print("-------------------")
     response =  my_stack.issue_cbor_get(sn, "/a/lsm")
     print ("response:",response)
+    if compare_dict(expect, response.get_payload_dict()):
+        print("PASS : /a/lsm ", expect, response.get_payload_dict())
     my_stack.purge_response(response)
     print("-------------------")
 
@@ -388,7 +402,7 @@ def do_sequence(my_stack):
         do_sequence_dev_programming_mode_fail(my_stack)
         
         do_sequence_f(my_stack)
-        do_sequence_lsm_int(my_stack)
+        do_sequence_lsm(my_stack)
         return
         do_sequence_lsm_int(my_stack)
         # .knx
