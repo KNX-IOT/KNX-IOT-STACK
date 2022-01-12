@@ -72,6 +72,7 @@ from termcolor import colored
 unowned_return_list=[]
 
 discover_event = threading.Event()
+discover_data_event = threading.Event()
 client_event = threading.Event()
 client_mutex = threading.Lock()
 resource_mutex = threading.Lock()
@@ -453,6 +454,7 @@ def signal_event_loop():
 CHANGED_CALLBACK = CFUNCTYPE(None, c_char_p, c_char_p, c_char_p)
 RESOURCE_CALLBACK = CFUNCTYPE(None, c_char_p, c_char_p, c_char_p, c_char_p)
 CLIENT_CALLBACK = CFUNCTYPE(None, c_char_p, c_int, c_char_p, c_char_p, c_char_p, c_int, c_char_p)
+DISCOVERY_CALLBACK = CFUNCTYPE(None, c_int, c_char_p)
 
 #----------LinkFormat parsing ---------------
 
@@ -738,6 +740,17 @@ class KNXIOTStack():
         if self.debug is not None and 'resources' in self.debug:
             print(colored("Resources {}",'yellow').format(self.resourcelist))
 
+    def discoveryCB(self, cb_payload_size, cb_payload):
+        """ ********************************
+        Call back handles discovery callbacks.
+        Client discovery/state
+        **********************************"""
+        print("discoveryCB", cb_payload_size);
+        data = cb_payload[:cb_payload_size]
+        #print(data)
+        self.discovery_data = data.decode("utf-8")
+        discover_data_event.set()
+
     def __init__(self, debug=True):
         print ("loading ...")
         resource_mutex.acquire()
@@ -758,7 +771,7 @@ class KNXIOTStack():
 
         self.device_array = []
         self.response_array = []
-
+        self.discovery_data = None
         print (self.lib)
         print ("...")
         self.debug=debug
@@ -775,6 +788,10 @@ class KNXIOTStack():
         self.lib.py_install_resourceCB(self.resourceCBFunc)
         self.clientCBFunc = CLIENT_CALLBACK(self.clientCB)
         self.lib.py_install_clientCB(self.clientCBFunc)
+        
+        self.discoveryCBFunc = DISCOVERY_CALLBACK(self.discoveryCB)
+        self.lib.py_install_discoveryCB(self.discoveryCBFunc)
+
         print ("...")
         self.threadid = threading.Thread(target=self.thread_function, args=())
         self.threadid.start()
@@ -806,7 +823,7 @@ class KNXIOTStack():
         # application
         discover_event.clear()
         self.lib.py_discover_devices(c_int(scope))
-        time.sleep(2)
+        time.sleep(self.timout)
         # python callback application
         print("[P] discovery- done")
         self.lib.py_get_nr_devices()
@@ -820,13 +837,28 @@ class KNXIOTStack():
         discover_event.clear()
         self.lib.py_discover_devices_with_query.argtypes = [c_int, String ]
         self.lib.py_discover_devices_with_query(scope, query)
-        time.sleep(2)
+        time.sleep(self.timout)
         # python callback application
         print("[P] discovery- done")
         self.lib.py_get_nr_devices()
         discover_event.wait(self.timout)
         print("Discovered DEVICE ARRAY {}".format(self.device_array))
         return self.device_array
+    
+    def discover_devices_with_query_data(self, query, scope=2):
+        print("Discover Devices with Query: scope", scope, query)
+        # application
+        discover_data_event.clear()
+        self.discovery_data = None
+        self.lib.py_discover_devices_with_query.argtypes = [c_int, String ]
+        self.lib.py_discover_devices_with_query(scope, query)
+        time.sleep(self.timout)
+        # python callback application
+        print("[P] discovery- done")
+        self.lib.py_get_nr_devices()
+        discover_data_event.wait(self.timout)
+        print("Discovered DEVICE ARRAY {}".format(self.device_array))
+        return self.discovery_data
 
     def device_array_contains(self, sn):
         contains = False
