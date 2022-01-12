@@ -209,7 +209,8 @@ py_install_clientCB(clientCB clientCB)
  * function to install discovery callbacks, called from python
  *
  */
-void py_install_discoveryCB(discoveryCB discoveryCB)
+void
+py_install_discoveryCB(discoveryCB discoveryCB)
 {
   PRINT("[C]installdiscoveryCB\n");
   my_CBFunctions.discoveryFCB = discoveryCB;
@@ -260,11 +261,10 @@ inform_client_python(const char *sn, int status, const char *format,
  *
  */
 void
-inform_discovery_python(int payload_size,
-                     const char *payload)
+inform_discovery_python(int payload_size, const char *payload)
 {
   if (my_CBFunctions.discoveryFCB != NULL) {
-    my_CBFunctions.discoveryFCB( payload_size, (char *)payload);
+    my_CBFunctions.discoveryFCB(payload_size, (char *)payload);
   }
 }
 
@@ -657,7 +657,8 @@ response_get_sn(oc_client_response_t *data)
 
   if ((rep != NULL) && (rep->type == OC_REP_STRING)) {
     char *my_sn = oc_string(rep->value.string);
-    PRINT("[C]  get_sn received %s (address) :%s\n", my_sn, oc_string(my_address));
+    PRINT("[C]  get_sn received %s (address) :%s\n", my_sn,
+          oc_string(my_address));
 
     add_device_to_list(my_sn, NULL, oc_string(my_address), data->endpoint,
                        discovered_devices);
@@ -720,7 +721,6 @@ py_discover_devices(int scope)
   py_mutex_unlock(app_sync_lock);
   signal_event_loop();
 }
-
 
 void
 py_discover_devices_with_query(int scope, const char *query)
