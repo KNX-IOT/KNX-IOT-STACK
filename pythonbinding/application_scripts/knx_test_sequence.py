@@ -597,7 +597,6 @@ def do_discovery_tests(my_stack):
     print(" -------------------------")
     print (data)
     print(" -------------------------")
-    
 
 def do_sequence(my_stack):
     if my_stack.get_nr_devices() > 0:
@@ -605,11 +604,9 @@ def do_sequence(my_stack):
         do_sequence_dev(my_stack)
         do_sequence_dev_programming_mode(my_stack)
         do_sequence_dev_programming_mode_fail(my_stack)
-
         do_sequence_f(my_stack)
         do_sequence_lsm(my_stack)
         do_sequence_fp_programming(my_stack)
-        
         do_sequence_knx_crc(my_stack)
         do_sequence_knx_osn(my_stack)
         do_sequence_core_knx(my_stack)
