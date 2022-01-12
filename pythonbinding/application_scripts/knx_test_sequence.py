@@ -384,7 +384,7 @@ def do_check_table(my_stack, sn, table_url, content):
     if lf.get_nr_lines() == 0:
         print("PASS : (after delete)", table_url)
     else:
-        message = table_url + " delete failed" 
+        message = table_url + " delete failed"
         print_fail(msg=message)
 
 # cmd ==> 2
@@ -438,10 +438,12 @@ def do_sequence_fp_programming(my_stack):
     content = [ { 0: 1, 11: "p/push", 7:[1], 8: [2] } , {0: 2, 11: "p/light", 7:[2], 8: [2,4] }]
     do_check_table(my_stack, sn, "/fp/g",content)
 
-    content = [ {0: 1, 11: "/p/push", 7:[1], 12 :"blah.blah" }, {0: 5, 11: "/p/pushxx", 7:[1], 12 :"ss.blah.blah" } ]
+    content = [ {0: 1, 11: "/p/push", 7:[1], 12 :"blah.blah" },
+                {0: 5, 11: "/p/pushxx", 7:[1], 12 :"ss.blah.blah" } ]
     do_check_table(my_stack, sn, "/fp/r",content)
 
-    content = [ {0: 1, 11: "/p/pushpp", 7:[1], 12 :"blah.blahxx" }, {0: 5, 11: "/p/pushxx", 7:[1], 12 :"ss.blah.blah" } ]
+    content = [ {0: 1, 11: "/p/pushpp", 7:[1], 12 :"blah.blahxx" },
+                {0: 5, 11: "/p/pushxx", 7:[1], 12 :"ss.blah.blah" } ]
     do_check_table(my_stack, sn, "/fp/p",content)
 
     content = False
