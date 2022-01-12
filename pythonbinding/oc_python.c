@@ -468,29 +468,30 @@ general_get_cb(oc_client_response_t *data)
     PRINT(" [C]general_get_cb: response status %d: %s \n", (int)status,
           stringFromResponse((int)status));
   }
+  if (my_data) {
+    if (data->content_format == APPLICATION_LINK_FORMAT) {
+      py_mutex_lock(app_sync_lock);
+      memset(buffer, 0, buffer_size);
+      memcpy(&buffer, (char *)data->_payload, (int)data->_payload_len);
 
-  if (data->content_format == APPLICATION_LINK_FORMAT) {
-    py_mutex_lock(app_sync_lock);
-    memset(buffer, 0, buffer_size);
-    memcpy(&buffer, (char *)data->_payload, (int)data->_payload_len);
-
-    inform_client_python((char *)my_data->sn, status, "link_format",
-                         (char *)my_data->r_id, (char *)my_data->url,
-                         (int)data->_payload_len, buffer);
-    py_mutex_unlock(app_sync_lock);
-  } else if (data->content_format == APPLICATION_CBOR) {
-    py_mutex_lock(app_sync_lock);
-    memset(buffer, 0, buffer_size);
-    py_oc_rep_to_json(data->payload, (char *)&buffer, buffer_size, false);
-    inform_client_python((char *)my_data->sn, status, "json",
-                         (char *)my_data->r_id, (char *)my_data->url,
-                         (int)data->_payload_len, (char *)buffer);
-    py_mutex_unlock(app_sync_lock);
-  } else {
-    PRINT(" [C]informing python with error \n");
-    inform_client_python((char *)my_data->sn, status, "error",
-                         (char *)my_data->r_id, (char *)my_data->url, status,
-                         "");
+      inform_client_python((char *)my_data->sn, status, "link_format",
+                           (char *)my_data->r_id, (char *)my_data->url,
+                           (int)data->_payload_len, buffer);
+      py_mutex_unlock(app_sync_lock);
+    } else if (data->content_format == APPLICATION_CBOR) {
+      py_mutex_lock(app_sync_lock);
+      memset(buffer, 0, buffer_size);
+      py_oc_rep_to_json(data->payload, (char *)&buffer, buffer_size, false);
+      inform_client_python((char *)my_data->sn, status, "json",
+                           (char *)my_data->r_id, (char *)my_data->url,
+                           (int)data->_payload_len, (char *)buffer);
+      py_mutex_unlock(app_sync_lock);
+    } else {
+      PRINT(" [C]informing python with error \n");
+      inform_client_python((char *)my_data->sn, status, "error",
+                           (char *)my_data->r_id, (char *)my_data->url, status,
+                           "");
+    }
   }
 
   if (data->user_data != NULL) {
