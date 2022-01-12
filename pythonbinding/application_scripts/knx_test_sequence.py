@@ -532,12 +532,10 @@ def do_sequence_f(my_stack):
             response2 =  my_stack.issue_linkformat_get(sn, lf.get_url(line))
             print ("response2:",response2)
             my_stack.purge_response(response2)
-
     my_stack.purge_response(response)
 
 
 def do_discovery_tests(my_stack):
-    sn = my_stack.device_array[0].sn
     print("========discovery=========")
     # all devices
     data = my_stack.discover_devices_with_query_data("rt=urn:knx:dpa.*")
@@ -574,31 +572,26 @@ def do_discovery_tests(my_stack):
     print(" -------------------------")
     print (data)
     print(" -------------------------")
-    
     # devices programming mode filtering
     data = my_stack.discover_devices_with_query_data("if=urn:knx:if.pm")
     print(" -------------------------")
     print (data)
     print(" -------------------------")
-    
     # compound filtering actuator datapoint
     data = my_stack.discover_devices_with_query_data("if=urn:knx:if.a&rt=urn:knx:dpa.353*")
     print(" -------------------------")
     print (data)
     print(" -------------------------")
-    
     # compound filtering sensor and data point
     data = my_stack.discover_devices_with_query_data("if=urn:knx:if.s&rt=urn:knx:dpa.352*")
     print(" -------------------------")
     print (data)
     print(" -------------------------")
-
     # serial number wild card
     data = my_stack.discover_devices_with_query_data("ep=urn:knx:sn.*")
     print(" -------------------------")
     print (data)
     print(" -------------------------")
-    
     # serial specific value
     data = my_stack.discover_devices_with_query_data("ep=urn:knx:sn.012346")
     print(" -------------------------")
