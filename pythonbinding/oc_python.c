@@ -87,6 +87,7 @@ typedef struct py_cb_struct
   changedCB changedFCB;
   resourceCB resourceFCB;
   clientCB clientFCB;
+  discoveryCB discoveryFCB;
 } py_cb_struct_t;
 
 /**
@@ -205,6 +206,17 @@ py_install_clientCB(clientCB clientCB)
 }
 
 /**
+ * function to install discovery callbacks, called from python
+ *
+ */
+void
+py_install_discoveryCB(discoveryCB discoveryCB)
+{
+  PRINT("[C]installdiscoveryCB\n");
+  my_CBFunctions.discoveryFCB = discoveryCB;
+}
+
+/**
  * function to call the callback to python.
  *
  */
@@ -241,6 +253,18 @@ inform_client_python(const char *sn, int status, const char *format,
   if (my_CBFunctions.clientFCB != NULL) {
     my_CBFunctions.clientFCB((char *)sn, status, (char *)format, (char *)r_id,
                              (char *)url, payload_size, (char *)payload);
+  }
+}
+
+/**
+ * function to call the callback for discovery to python.
+ *
+ */
+void
+inform_discovery_python(int payload_size, const char *payload)
+{
+  if (my_CBFunctions.discoveryFCB != NULL) {
+    my_CBFunctions.discoveryFCB(payload_size, (char *)payload);
   }
 }
 
@@ -444,29 +468,30 @@ general_get_cb(oc_client_response_t *data)
     PRINT(" [C]general_get_cb: response status %d: %s \n", (int)status,
           stringFromResponse((int)status));
   }
+  if (my_data) {
+    if (data->content_format == APPLICATION_LINK_FORMAT) {
+      py_mutex_lock(app_sync_lock);
+      memset(buffer, 0, buffer_size);
+      memcpy(&buffer, (char *)data->_payload, (int)data->_payload_len);
 
-  if (data->content_format == APPLICATION_LINK_FORMAT) {
-    py_mutex_lock(app_sync_lock);
-    memset(buffer, 0, buffer_size);
-    memcpy(&buffer, (char *)data->_payload, (int)data->_payload_len);
-
-    inform_client_python((char *)my_data->sn, status, "link_format",
-                         (char *)my_data->r_id, (char *)my_data->url,
-                         (int)data->_payload_len, buffer);
-    py_mutex_unlock(app_sync_lock);
-  } else if (data->content_format == APPLICATION_CBOR) {
-    py_mutex_lock(app_sync_lock);
-    memset(buffer, 0, buffer_size);
-    py_oc_rep_to_json(data->payload, (char *)&buffer, buffer_size, false);
-    inform_client_python((char *)my_data->sn, status, "json",
-                         (char *)my_data->r_id, (char *)my_data->url,
-                         (int)data->_payload_len, (char *)buffer);
-    py_mutex_unlock(app_sync_lock);
-  } else {
-    PRINT(" [C]informing python with error \n");
-    inform_client_python((char *)my_data->sn, status, "error",
-                         (char *)my_data->r_id, (char *)my_data->url, status,
-                         "");
+      inform_client_python((char *)my_data->sn, status, "link_format",
+                           (char *)my_data->r_id, (char *)my_data->url,
+                           (int)data->_payload_len, buffer);
+      py_mutex_unlock(app_sync_lock);
+    } else if (data->content_format == APPLICATION_CBOR) {
+      py_mutex_lock(app_sync_lock);
+      memset(buffer, 0, buffer_size);
+      py_oc_rep_to_json(data->payload, (char *)&buffer, buffer_size, false);
+      inform_client_python((char *)my_data->sn, status, "json",
+                           (char *)my_data->r_id, (char *)my_data->url,
+                           (int)data->_payload_len, (char *)buffer);
+      py_mutex_unlock(app_sync_lock);
+    } else {
+      PRINT(" [C]informing python with error \n");
+      inform_client_python((char *)my_data->sn, status, "error",
+                           (char *)my_data->r_id, (char *)my_data->url, status,
+                           "");
+    }
   }
 
   if (data->user_data != NULL) {
@@ -623,9 +648,8 @@ py_cbor_delete(char *sn, char *uri, char *query, char *id)
 void
 response_get_sn(oc_client_response_t *data)
 {
-  PRINT("[C]response_get_sn:\n");
-  PRINT("[C]  content format %d\n", data->content_format);
-  PRINT("[C]  %.*s\n", (int)data->_payload_len, data->_payload);
+  PRINT("[C]response_get_sn: content format %d  %.*s\n", data->content_format,
+        (int)data->_payload_len, data->_payload);
   oc_rep_t *rep = data->payload;
   oc_string_t my_address;
 
@@ -633,8 +657,8 @@ response_get_sn(oc_client_response_t *data)
 
   if ((rep != NULL) && (rep->type == OC_REP_STRING)) {
     char *my_sn = oc_string(rep->value.string);
-    PRINT("[C]  get_sn received :%s\n", my_sn);
-    PRINT("[C]  get_sn received (address) :%s\n", oc_string(my_address));
+    PRINT("[C]  get_sn received %s (address) :%s\n", my_sn,
+          oc_string(my_address));
 
     add_device_to_list(my_sn, NULL, oc_string(my_address), data->endpoint,
                        discovered_devices);
@@ -657,38 +681,30 @@ discovery_cb(const char *payload, int len, oc_endpoint_t *endpoint,
   const char *param;
   int param_len;
 
-  PRINT("[C]DISCOVERY:\n");
-  PRINT("[C]%.*s\n", len, payload);
-
+  PRINT("[C]DISCOVERY: %.*s\n", len, payload);
   int nr_entries = oc_lf_number_of_entries(payload, len);
   PRINT("[C] entries %d\n", nr_entries);
 
   for (int i = 0; i < nr_entries; i++) {
 
     oc_lf_get_entry_uri(payload, len, i, &uri, &uri_len);
-
     PRINT("[C] DISCOVERY URL %.*s\n", uri_len, uri);
-
     // oc_string_to_endpoint()
-
     oc_lf_get_entry_param(payload, len, i, "rt", &param, &param_len);
     PRINT("[C] DISCOVERY RT %.*s\n", param_len, param);
-
     oc_lf_get_entry_param(payload, len, i, "if", &param, &param_len);
     PRINT("[C] DISCOVERY IF %.*s\n", param_len, param);
-
     oc_lf_get_entry_param(payload, len, i, "ct", &param, &param_len);
     PRINT("[C] DISCOVERY CT %.*s\n", param_len, param);
   }
+
+  inform_discovery_python(len, payload);
 
   PRINT("[C] issue get on /dev/sn\n");
   print_ep(endpoint);
 
   oc_do_get_ex("/dev/sn", endpoint, NULL, response_get_sn, HIGH_QOS,
                APPLICATION_CBOR, APPLICATION_CBOR, endpoint);
-
-  // oc_do_get_ex("/dev/iid", endpoint, NULL, response_get_sn, HIGH_QOS,
-  //             APPLICATION_CBOR, APPLICATION_CBOR, endpoint);
 
   PRINT("[C] DISCOVERY- END\n");
   return OC_CONTINUE_DISCOVERY;

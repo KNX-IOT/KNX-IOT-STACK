@@ -487,7 +487,8 @@ def do_sequence_knx_osn(my_stack):
     sn = my_stack.device_array[0].sn
     print("========knx/osn=========")
     response =  my_stack.issue_cbor_get(sn, "/.well-known/knx/osn")
-    print ("response:",response)
+    print("response:",response)
+    print("   value:", response.get_payload_int())
     my_stack.purge_response(response)
 
 def do_sequence_knx_crc(my_stack):
@@ -496,18 +497,15 @@ def do_sequence_knx_crc(my_stack):
     print("========knx/crc=========")
     response =  my_stack.issue_cbor_get(sn, "/.well-known/knx/crc")
     print ("response:",response)
+    print("   value:", response.get_payload_int())
     my_stack.purge_response(response)
 
 def do_sequence_core_knx(my_stack):
     sn = my_stack.device_array[0].sn
-    print("========.well-known/knx=========")
+    print("=get=======.well-known/knx=========")
     response =  my_stack.issue_cbor_get(sn, "/.well-known/knx")
     print ("response:",response)
-    my_stack.purge_response(response)
-
-    content = { 1 : 5, 2: "reset"}
-    response =  my_stack.issue_cbor_post(sn,"/.well-known/knx",content)
-    print ("response:",response)
+    print ("    value:", response.get_payload_dict())
     my_stack.purge_response(response)
 
 def do_sequence_a_sen(my_stack):
@@ -534,8 +532,71 @@ def do_sequence_f(my_stack):
             response2 =  my_stack.issue_linkformat_get(sn, lf.get_url(line))
             print ("response2:",response2)
             my_stack.purge_response(response2)
-
     my_stack.purge_response(response)
+
+
+def do_discovery_tests(my_stack):
+    print("========discovery=========")
+    # all devices
+    data = my_stack.discover_devices_with_query_data("rt=urn:knx:dpa.*")
+    print(" -------------------------")
+    print (data)
+    print(" -------------------------")
+    # devices with 353
+    data = my_stack.discover_devices_with_query_data("rt=urn:knx:dpa.353*")
+    print(" -------------------------")
+    print (data)
+    print(" -------------------------")
+    # devices with 352
+    data = my_stack.discover_devices_with_query_data("rt=urn:knx:dpa.352*")
+    print(" -------------------------")
+    print (data)
+    print(" -------------------------")
+    # devices with ia = 5
+    data = my_stack.discover_devices_with_query_data("if=urn:knx:ia.5")
+    print(" -------------------------")
+    print (data)
+    print(" -------------------------")
+    # devices with all interfaces
+    data = my_stack.discover_devices_with_query_data("if=urn:knx:if.*")
+    print(" -------------------------")
+    print (data)
+    print(" -------------------------")
+    # devices with sensor interfaces
+    data = my_stack.discover_devices_with_query_data("if=urn:knx:if.s")
+    print(" -------------------------")
+    print (data)
+    print(" -------------------------")
+    # devices with actuator interfaces
+    data = my_stack.discover_devices_with_query_data("if=urn:knx:if.a")
+    print(" -------------------------")
+    print (data)
+    print(" -------------------------")
+    # devices programming mode filtering
+    data = my_stack.discover_devices_with_query_data("if=urn:knx:if.pm")
+    print(" -------------------------")
+    print (data)
+    print(" -------------------------")
+    # compound filtering actuator datapoint
+    data = my_stack.discover_devices_with_query_data("if=urn:knx:if.a&rt=urn:knx:dpa.353*")
+    print(" -------------------------")
+    print (data)
+    print(" -------------------------")
+    # compound filtering sensor and data point
+    data = my_stack.discover_devices_with_query_data("if=urn:knx:if.s&rt=urn:knx:dpa.352*")
+    print(" -------------------------")
+    print (data)
+    print(" -------------------------")
+    # serial number wild card
+    data = my_stack.discover_devices_with_query_data("ep=urn:knx:sn.*")
+    print(" -------------------------")
+    print (data)
+    print(" -------------------------")
+    # serial specific value
+    data = my_stack.discover_devices_with_query_data("ep=urn:knx:sn.012346")
+    print(" -------------------------")
+    print (data)
+    print(" -------------------------")
 
 def do_sequence(my_stack):
     if my_stack.get_nr_devices() > 0:
@@ -543,16 +604,16 @@ def do_sequence(my_stack):
         do_sequence_dev(my_stack)
         do_sequence_dev_programming_mode(my_stack)
         do_sequence_dev_programming_mode_fail(my_stack)
-
         do_sequence_f(my_stack)
         do_sequence_lsm(my_stack)
         do_sequence_fp_programming(my_stack)
+        do_sequence_knx_crc(my_stack)
+        do_sequence_knx_osn(my_stack)
+        do_sequence_core_knx(my_stack)
+        do_discovery_tests(my_stack)
         return
         # .knx
         #do_sequence_knx_knx_int(my_stack)
-        #do_sequence_knx_crc(my_stack)
-        #do_sequence_knx_osn(my_stack)
-        #do_sequence_core_knx(my_stack)
         #do_sequence_a_sen(my_stack)
 
 if __name__ == '__main__':  # pragma: no cover

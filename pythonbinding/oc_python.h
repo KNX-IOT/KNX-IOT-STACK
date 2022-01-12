@@ -35,6 +35,8 @@ extern "C" {
 
 typedef void (*changedCB)(char *uuid, char *state, char *event);
 
+typedef void (*discoveryCB)(int payload_size, char *payload);
+
 typedef void (*resourceCB)(char *anchor, char *uri, char *types,
                            char *interfaces);
 
@@ -76,6 +78,13 @@ kisCS_EXPORT void py_install_resourceCB(resourceCB resourceCB);
  * @param clientCB the client callback
  */
 kisCS_EXPORT void py_install_clientCB(clientCB clientCB);
+
+/**
+ * @brief install the discovery callback
+ * This function is called for a response on a discovery request.
+ * @param discoveryCB the discovery callback
+ */
+kisCS_EXPORT void py_install_discoveryCB(discoveryCB discoveryCB);
 
 /**
  * @brief issue a GET request with expected content type CBOR

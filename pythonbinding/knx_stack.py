@@ -30,6 +30,7 @@
 # pylint: disable=C0116
 # pylint: disable=C0201
 # pylint: disable=C0209
+# pylint: disable=C0302
 # pylint: disable=C0413
 # pylint: disable=R0201
 # pylint: disable=R0202
@@ -72,6 +73,7 @@ from termcolor import colored
 unowned_return_list=[]
 
 discover_event = threading.Event()
+discover_data_event = threading.Event()
 client_event = threading.Event()
 client_mutex = threading.Lock()
 resource_mutex = threading.Lock()
@@ -453,6 +455,7 @@ def signal_event_loop():
 CHANGED_CALLBACK = CFUNCTYPE(None, c_char_p, c_char_p, c_char_p)
 RESOURCE_CALLBACK = CFUNCTYPE(None, c_char_p, c_char_p, c_char_p, c_char_p)
 CLIENT_CALLBACK = CFUNCTYPE(None, c_char_p, c_int, c_char_p, c_char_p, c_char_p, c_int, c_char_p)
+DISCOVERY_CALLBACK = CFUNCTYPE(None, c_int, c_char_p)
 
 #----------LinkFormat parsing ---------------
 
@@ -524,7 +527,6 @@ class Device():
         return self.sn
 
 #----------Responses ---------------
-
 class CoAPResponse():
 
     def __init__(self, sn, status, payload_format, r_id, url, payload_size, payload):
@@ -595,15 +597,12 @@ class CoAPResponse():
                     #print("get_payload_dict: replacing {x with {'0':")
                     my_str = my_string.replace("{x",'{"0":')
                     try:
-                        #print (my_str)
                         return json.loads(my_str)
                     except:
                         pass
-        #print("get_payload_dict: defaulting")
         return self.payload
 
 #----------The Stack ---------------
-
 class KNXIOTStack():
     """ ********************************
     Call back handles general task like device
@@ -618,9 +617,6 @@ class KNXIOTStack():
         if len(payload) > payload_len:
             print ("truncating payload")
             payload = payload[:payload_len]
-        print ("=========")
-        print (payload)
-        print ("=========")
         json_string = ""
         try:
             json_data = cbor.loads(payload)
@@ -637,7 +633,6 @@ class KNXIOTStack():
         name = ""
         if sn is not None:
             sn = sn.decode("utf-8")
-            #name = self.get_device_name(uuid)
         if cb_state is not  None:
             cb_state = cb_state.decode("utf-8")
         if cb_event is not  None:
@@ -667,27 +662,21 @@ class KNXIOTStack():
             r_id = cb_id.decode("utf-8")
         if len(cb_url):
             url = cb_url.decode("utf-8")
-
         print("ClientCB: SN:{}, status:{}, format:{}, id:{}, url:{},  size:{} ".
                format(sn, cb_status, c_format, r_id, url, cb_payload_size ))
-
         if c_format == "link_format" :
             if cb_payload is not None:
                 print("ClientCB: link-format")
                 payload = cb_payload.decode("utf-8")
-                #print("p:", payload)
         if c_format == "cbor" :
             print("ClientCB: cbor")
             payload = self.convertcbor2json(cb_payload, cb_payload_size)
-            #print("p:",payload)
         if c_format == "json" :
             print("ClientCB: json")
             payload = cb_payload.decode("utf-8")
-            #print("p:", payload)
         if c_format == "error" :
             print("ClientCB: error")
             print("p:", cb_payload_size)
-
         resp  = CoAPResponse(sn, cb_status, c_format, r_id, url, cb_payload_size, payload)
         self.response_array.append(resp)
         client_event.set()
@@ -702,15 +691,12 @@ class KNXIOTStack():
         uuid = str(anchor)[8:-1]
         uuid_new = copy.deepcopy(uuid)
         my_uri = str(uri)[2:-1]
-
         if self.debug is not None and 'resources' in self.debug:
             print(colored("          Resource Event          \n",'green',attrs=['underline']))
             print(colored("UUID:{}, \nURI:{}",'green').format(uuid_new,my_uri))
         my_str = str(myjson)[2:-1]
         my_str = json.loads(my_str)
-
         duplicate_uri = False
-
         if self.resourcelist.get(uuid_new) is None:
             mylist = [ my_str ]
             #don't add duplicate resources lists
@@ -729,14 +715,22 @@ class KNXIOTStack():
                 self.resourcelist[uuid_new] = mylist
         if self.debug is not None and 'resources' in self.debug:
             print(colored(" -----resourcelist {}",'cyan').format(mylist))
-
         #Look for zero length uri...this means discovery is complete
         #if len(my_uri) <=0:
         #    resource_event.set()
         #    print("ALL resources gathered")
-
         if self.debug is not None and 'resources' in self.debug:
             print(colored("Resources {}",'yellow').format(self.resourcelist))
+
+    def discoveryCB(self, cb_payload_size, cb_payload):
+        """ ********************************
+        Call back handles discovery callbacks.
+        Client discovery/state
+        **********************************"""
+        print("discoveryCB", cb_payload_size)
+        data = cb_payload[:cb_payload_size]
+        self.discovery_data = data.decode("utf-8")
+        discover_data_event.set()
 
     def __init__(self, debug=True):
         print ("loading ...")
@@ -753,12 +747,10 @@ class KNXIOTStack():
         # python list of copied unowned devices on the local network
         # will be updated from the C layer automatically by the CHANGED_CALLBACK
         self.discovered_devices = []
-        # resource list
         self.resourcelist = {}
-
         self.device_array = []
         self.response_array = []
-
+        self.discovery_data = None
         print (self.lib)
         print ("...")
         self.debug=debug
@@ -767,14 +759,14 @@ class KNXIOTStack():
         self.counter = 1
         self.changedCBFunc = CHANGED_CALLBACK(self.changedCB)
         self.lib.py_install_changedCB(self.changedCBFunc)
-
         #ret = self.lib.oc_storage_config("./onboarding_tool_creds");
         #print("oc_storage_config : {}".format(ret))
-
         self.resourceCBFunc = RESOURCE_CALLBACK(self.resourceCB)
         self.lib.py_install_resourceCB(self.resourceCBFunc)
         self.clientCBFunc = CLIENT_CALLBACK(self.clientCB)
         self.lib.py_install_clientCB(self.clientCBFunc)
+        self.discoveryCBFunc = DISCOVERY_CALLBACK(self.discoveryCB)
+        self.lib.py_install_discoveryCB(self.discoveryCBFunc)
         print ("...")
         self.threadid = threading.Thread(target=self.thread_function, args=())
         self.threadid.start()
@@ -798,7 +790,6 @@ class KNXIOTStack():
     def purge_device_array(self, sn):
         for index, device in enumerate(self.device_array):
             if device.sn == sn:
-                #print("Remove: {}".format(device.sn))
                 self.device_array.pop(index)
 
     def discover_devices(self, scope=2):
@@ -806,7 +797,7 @@ class KNXIOTStack():
         # application
         discover_event.clear()
         self.lib.py_discover_devices(c_int(scope))
-        time.sleep(2)
+        time.sleep(self.timout)
         # python callback application
         print("[P] discovery- done")
         self.lib.py_get_nr_devices()
@@ -820,13 +811,28 @@ class KNXIOTStack():
         discover_event.clear()
         self.lib.py_discover_devices_with_query.argtypes = [c_int, String ]
         self.lib.py_discover_devices_with_query(scope, query)
-        time.sleep(2)
+        time.sleep(self.timout)
         # python callback application
         print("[P] discovery- done")
         self.lib.py_get_nr_devices()
         discover_event.wait(self.timout)
         print("Discovered DEVICE ARRAY {}".format(self.device_array))
         return self.device_array
+
+    def discover_devices_with_query_data(self, query, scope=2):
+        print("Discover Devices with Query: scope", scope, query)
+        # application
+        discover_data_event.clear()
+        self.discovery_data = None
+        self.lib.py_discover_devices_with_query.argtypes = [c_int, String ]
+        self.lib.py_discover_devices_with_query(scope, query)
+        time.sleep(self.timout)
+        # python callback application
+        print("[P] discovery- done")
+        self.lib.py_get_nr_devices()
+        discover_data_event.wait(self.timout)
+        print("Discovered DEVICE ARRAY {}".format(self.device_array))
+        return self.discovery_data
 
     def device_array_contains(self, sn):
         contains = False
@@ -855,9 +861,7 @@ class KNXIOTStack():
             self.purge_response_by_id(my_response.r_id)
 
     def find_response(self, r_id):
-        #print("==> find response: ", r_id)
         for item in self.response_array:
-            # print("    find_response:", item.r_id)
             if str(item.r_id) == str(r_id):
                 return item
         return None
@@ -866,7 +870,6 @@ class KNXIOTStack():
         r_id = self.get_r_id()
         print("issue_cbor_get", sn, uri, query, r_id)
         self.lib.py_cbor_get.argtypes = [String, String, String, String]
-        #self.lib.py_general_get.restype = c_int
         client_event.clear()
         self.lib.py_cbor_get(sn, uri, query, r_id)
         client_event.wait(self.timout)
@@ -879,7 +882,6 @@ class KNXIOTStack():
         r_id = self.get_r_id()
         print("issue_linkformat_get", sn, uri, query, r_id)
         self.lib.py_linkformat_get.argtypes = [String, String, String, String]
-        #self.lib.py_general_get.restype = c_int
         client_event.clear()
         self.lib.py_linkformat_get(sn, uri, query, r_id)
         client_event.wait(self.timout)
@@ -960,14 +962,9 @@ class KNXIOTStack():
         self.lib.py_get_nr_devices.restype = c_int
         return self.lib.py_get_nr_devices()
 
-    def my_sleep(self):
-        while True:
-            time.sleep(3)
-
 if __name__ == "__main__":
     my_stack = KNXIOTStack()
     signal.signal(signal.SIGINT, my_stack.sig_handler)
-
     try:
         # need this sleep, because it takes a while to start the stack in C in a Thread
         time.sleep(1)
@@ -980,16 +977,6 @@ if __name__ == "__main__":
             my_stack.purge_response(response)
             print("Get IA :")
             response = my_stack.issue_cbor_get(my_stack.device_array[0].sn, "/dev/ia")
-            print ("response:", response)
-            my_stack.purge_response(response)
-            print("Get HW Type :")
-            response = my_stack.issue_cbor_get(my_stack.device_array[0].sn, "/dev/hwt")
-            print ("response:", response)
-            my_stack.purge_response(response)
-            content = {"cmd": "startLoading"}
-            response = my_stack.issue_cbor_post(my_stack.device_array[0].sn, "/a/lsm", content)
-            print ("response:", response)
-            my_stack.purge_response(response)
     except:
         traceback.print_exc()
 
