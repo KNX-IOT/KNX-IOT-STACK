@@ -52,6 +52,9 @@ sys.path.append(parentdir)
 #from knx_stack import KNXIOTStack
 import knx_stack
 
+def print_fail(msg = None):
+  print(f"Failure {sys._getframe().f_back.f_lineno}: {msg if msg is not None else ''}")
+
 def compare_dict(dict1, dict2):
     dict1_set = set(dict1.keys())
     dict2_set = set(dict2.keys())
@@ -174,6 +177,8 @@ def do_sequence_dev_programming_mode(my_stack):
     response.print_payload()
     if content == response.get_payload_int():
         print("PASS : /dev/ia ", content)
+    else:
+        print_fail(msg="/dev/ia")
     my_stack.purge_response(response)
 
     print("-------------------")
@@ -186,6 +191,8 @@ def do_sequence_dev_programming_mode(my_stack):
     print ("response:",response)
     if content == response.get_payload_string():
         print("PASS : /dev/hostname ", content)
+    else:
+        print_fail(msg="/dev/hostname")
     my_stack.purge_response(response)
 
     print("-------------------")
@@ -197,7 +204,9 @@ def do_sequence_dev_programming_mode(my_stack):
     response =  my_stack.issue_cbor_get(sn,"/dev/iid")
     print ("response:",response)
     if content == response.get_payload_string():
-        print("PASS : /dev/idd ", content)
+        print("PASS : /dev/iid ", content)
+    else:
+        print_fail(msg="/dev/iid")
     my_stack.purge_response(response)
     print("-------------------")
 
@@ -211,6 +220,8 @@ def do_sequence_dev_programming_mode(my_stack):
     response.print_payload()
     if content == response.get_payload_boolean():
         print("PASS : /dev/pm ", content)
+    else:
+        print_fail(msg="/dev/pm")
     my_stack.purge_response(response)
     print("-------------------")
 
@@ -230,6 +241,8 @@ def do_sequence_dev_programming_mode_fail(my_stack):
     response.print_payload()
     if content == response.get_payload_boolean():
         print("PASS : /dev/pm ", content)
+    else:
+        print_fail(msg="/dev/pm")
     my_stack.purge_response(response)
 
     print("-------------------")
@@ -243,6 +256,8 @@ def do_sequence_dev_programming_mode_fail(my_stack):
     response.print_payload()
     if content != response.get_payload_int():
         print("PASS : /dev/ia ", content, " != ", response.get_payload_int())
+    else:
+        print_fail(msg="/dev/ia")
     my_stack.purge_response(response)
 
     print("-------------------")
@@ -255,6 +270,8 @@ def do_sequence_dev_programming_mode_fail(my_stack):
     print ("response:",response)
     if content != response.get_payload_string():
         print("PASS : /dev/hostname ", content, " != ", response.get_payload_string())
+    else:
+        print_fail(msg="/dev/hostname")
     my_stack.purge_response(response)
 
     print("-------------------")
@@ -266,7 +283,9 @@ def do_sequence_dev_programming_mode_fail(my_stack):
     response =  my_stack.issue_cbor_get(sn,"/dev/iid")
     print ("response:",response)
     if content != response.get_payload_string():
-        print("PASS : /dev/idd ", content, " != ", response.get_payload_string())
+        print("PASS : /dev/iid ", content, " != ", response.get_payload_string())
+    else:
+        print_fail(msg="/dev/iid")
     my_stack.purge_response(response)
     print("-------------------")
 
@@ -291,6 +310,8 @@ def do_sequence_lsm(my_stack):
     print ("response:",response)
     if compare_dict(expect, response.get_payload_dict()):
         print("PASS : /a/lsm ", expect, response.get_payload_dict())
+    else:
+        print_fail(msg="/a/lsm")
     my_stack.purge_response(response)
 
     print("-------------------")
@@ -303,6 +324,8 @@ def do_sequence_lsm(my_stack):
     print ("response:",response)
     if compare_dict(expect, response.get_payload_dict()):
         print("PASS : /a/lsm ", expect, response.get_payload_dict())
+    else:
+        print_fail(msg="/a/lsm")
     my_stack.purge_response(response)
 
     print("-------------------")
@@ -315,8 +338,128 @@ def do_sequence_lsm(my_stack):
     print ("response:",response)
     if compare_dict(expect, response.get_payload_dict()):
         print("PASS : /a/lsm ", expect, response.get_payload_dict())
+    else:
+        print_fail(msg="/a/lsm")
     my_stack.purge_response(response)
     print("-------------------")
+
+
+def do_check_table(my_stack, sn, table_url, content):
+    response =  my_stack.issue_cbor_post(sn,table_url,content)
+    print ("response:",response.get_payload())
+    my_stack.purge_response(response)
+
+    response =  my_stack.issue_linkformat_get(sn,table_url)
+    print ("response:",response)
+    lf = knx_stack.LinkFormat(response.payload)
+    print(" lines:", lf.get_nr_lines())
+    # list the response
+    for line in lf.get_lines():
+        print(" -get------------------------", line)
+        print(" url :", lf.get_url(line))
+        print(" ct  :", lf.get_ct(line))
+        print(" rt  :", lf.get_rt(line))
+        # print the cbor data from the entry
+        if lf.get_ct(line) == "60" :
+            response2 =  my_stack.issue_cbor_get(sn, lf.get_url(line))
+            response2.print_payload()
+            print ("response2:",response2)
+            my_stack.purge_response(response2)
+    # delete the entries
+    for line in lf.get_lines():
+        if lf.get_ct(line) == "60" :
+            print(" -delete------------------------", line)
+            response2 =  my_stack.issue_cbor_delete(sn, lf.get_url(line))
+            response2.print_payload()
+            print ("response2:",response2)
+            my_stack.purge_response(response2)
+    my_stack.purge_response(response)
+
+    response =  my_stack.issue_linkformat_get(sn,table_url)
+    print ("response:",response)
+    lf = knx_stack.LinkFormat(response.payload)
+    print(" lines:", lf.get_nr_lines())
+    for line in lf.get_lines():
+        print(" line :", line)
+    if lf.get_nr_lines() == 0:
+        print("PASS : (after delete)", table_url)
+    else:
+        message = table_url + " delete failed" 
+        print_fail(msg=message)
+       
+# cmd ==> 2
+def do_sequence_fp_programming(my_stack):
+    print("========fp programming=========")
+    sn = my_stack.device_array[0].sn
+
+    print("-------------------")
+    content = { 2: "reset"}
+    print("reset :", content)
+    response =  my_stack.issue_cbor_post(sn,"/.well-known/knx",content)
+    print ("response:",response)
+    my_stack.purge_response(response)
+
+    print("-------------------")
+    content = True
+    print("set PM :", content)
+    response =  my_stack.issue_cbor_put(sn,"/dev/pm",content)
+    print ("response:",response)
+    my_stack.purge_response(response)
+
+    print("-------------------")
+    content = 455
+    print("set IA :", content)
+    response =  my_stack.issue_cbor_put(sn,"/dev/ia",content)
+    print ("response:",response)
+    my_stack.purge_response(response)
+
+    print("-------------------")
+    content = 555
+    response =  my_stack.issue_cbor_put(sn,"/dev/iid",content)
+    print ("response:",response)
+    my_stack.purge_response(response)
+
+    print("-------------------")
+    content = { 2: "startLoading"}
+    print("lsm :", content)
+    response =  my_stack.issue_cbor_post(sn,"/a/lsm",content)
+    print ("response:",response)
+    my_stack.purge_response(response)
+
+    response =  my_stack.issue_cbor_get(sn,"/a/lsm")
+    print ("response:",response)
+    my_stack.purge_response(response)
+
+    # group object table
+    # id (0)= 1
+    # url (11)= /p/light
+    # ga (7 )= 1
+    # cflags (8) = ["r" ] ; read = 1, write = 2, transmit = 3 update = 4
+    content = [ { 0: 1, 11: "p/push", 7:[1], 8: [2] } , {0: 2, 11: "p/light", 7:[2], 8: [2,4] }]
+    do_check_table(my_stack, sn, "/fp/g",content) 
+
+    content = [ {0: 1, 11: "/p/push", 7:[1], 12 :"blah.blah" }, {0: 5, 11: "/p/pushxx", 7:[1], 12 :"ss.blah.blah" } ]
+    do_check_table(my_stack, sn, "/fp/r",content) 
+
+    content = [ {0: 1, 11: "/p/pushpp", 7:[1], 12 :"blah.blahxx" }, {0: 5, 11: "/p/pushxx", 7:[1], 12 :"ss.blah.blah" } ]
+    do_check_table(my_stack, sn, "/fp/p",content) 
+
+    content = False
+    print("set PM :", content)
+    response =  my_stack.issue_cbor_put(sn,"/dev/pm",content)
+    print ("response:",response)
+    my_stack.purge_response(response)
+
+    content = { 2: "loadComplete"}
+    print("lsm :", content)
+    response =  my_stack.issue_cbor_post(sn,"/a/lsm",content)
+    print ("response:", response)
+    my_stack.purge_response(response)
+
+    response =  my_stack.issue_cbor_get(sn,"/a/lsm")
+    print ("response:", response)
+    my_stack.purge_response(response)
+
 
 # ./knx resource
 # sia ==> 4
@@ -401,6 +544,7 @@ def do_sequence(my_stack):
 
         do_sequence_f(my_stack)
         do_sequence_lsm(my_stack)
+        do_sequence_fp_programming(my_stack)
         return
         # .knx
         #do_sequence_knx_knx_int(my_stack)

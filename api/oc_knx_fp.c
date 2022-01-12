@@ -1074,7 +1074,7 @@ oc_core_fp_r_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       length = oc_rep_add_line_to_buffer("<fp/r/");
       response_length += length;
       char string[10];
-      sprintf((char *)&string, "%d>", i + 1);
+      sprintf((char *)&string, "%d>", i);
       length = oc_rep_add_line_to_buffer(string);
       response_length += length;
 
@@ -1301,6 +1301,7 @@ oc_core_fp_r_x_del_handler(oc_request_t *request,
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
+  PRINT("oc_core_fp_r_x_del_handler: deleting %d\n", value);
 
   g_grt[value].id = 0;
   oc_free_string(&g_grt[value].url);
