@@ -463,7 +463,7 @@ class LinkFormat():
         self.lines = self.response.splitlines()
 
     def get_nr_lines(self):
-        # make sure that the string is zero, e.g. remove leading/trailing white space 
+        # make sure that the string is zero, e.g. remove leading/trailing white space
         if len(self.response.strip()) == 0:
             return 0
         return len(self.lines)

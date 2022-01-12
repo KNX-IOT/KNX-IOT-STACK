@@ -37,6 +37,7 @@
 # pylint: disable=R1732
 # pylint: disable=W0702
 # pylint: disable=W1514
+# pylint: disable=W0212
 
 import os
 import signal
@@ -53,7 +54,7 @@ sys.path.append(parentdir)
 import knx_stack
 
 def print_fail(msg = None):
-  print(f"Failure {sys._getframe().f_back.f_lineno}: {msg if msg is not None else ''}")
+    print(f"Failure {sys._getframe().f_back.f_lineno}: {msg if msg is not None else ''}")
 
 def compare_dict(dict1, dict2):
     dict1_set = set(dict1.keys())
@@ -343,7 +344,6 @@ def do_sequence_lsm(my_stack):
     my_stack.purge_response(response)
     print("-------------------")
 
-
 def do_check_table(my_stack, sn, table_url, content):
     response =  my_stack.issue_cbor_post(sn,table_url,content)
     print ("response:",response.get_payload())
@@ -386,7 +386,7 @@ def do_check_table(my_stack, sn, table_url, content):
     else:
         message = table_url + " delete failed" 
         print_fail(msg=message)
-       
+
 # cmd ==> 2
 def do_sequence_fp_programming(my_stack):
     print("========fp programming=========")
@@ -436,13 +436,13 @@ def do_sequence_fp_programming(my_stack):
     # ga (7 )= 1
     # cflags (8) = ["r" ] ; read = 1, write = 2, transmit = 3 update = 4
     content = [ { 0: 1, 11: "p/push", 7:[1], 8: [2] } , {0: 2, 11: "p/light", 7:[2], 8: [2,4] }]
-    do_check_table(my_stack, sn, "/fp/g",content) 
+    do_check_table(my_stack, sn, "/fp/g",content)
 
     content = [ {0: 1, 11: "/p/push", 7:[1], 12 :"blah.blah" }, {0: 5, 11: "/p/pushxx", 7:[1], 12 :"ss.blah.blah" } ]
-    do_check_table(my_stack, sn, "/fp/r",content) 
+    do_check_table(my_stack, sn, "/fp/r",content)
 
     content = [ {0: 1, 11: "/p/pushpp", 7:[1], 12 :"blah.blahxx" }, {0: 5, 11: "/p/pushxx", 7:[1], 12 :"ss.blah.blah" } ]
-    do_check_table(my_stack, sn, "/fp/p",content) 
+    do_check_table(my_stack, sn, "/fp/p",content)
 
     content = False
     print("set PM :", content)
