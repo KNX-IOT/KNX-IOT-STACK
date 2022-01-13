@@ -435,8 +435,8 @@ def do_sequence_fp_programming(my_stack):
     # url (11)= /p/light
     # ga (7 )= 1
     # cflags (8) = ["r" ] ; read = 1, write = 2, transmit = 3 update = 4
-    content = [ {0: 5, 11: "p/push5", 7:[1], 8: [2] } , 
-                {0: 2, 11: "p/light2", 7:[2], 8: [2,4] }, 
+    content = [ {0: 5, 11: "p/push5", 7:[1], 8: [2] } ,
+                {0: 2, 11: "p/light2", 7:[2], 8: [2,4] },
                 {0: 225, 11: "p/light255", 7:[2], 8: [2,4] }]
     do_check_table(my_stack, sn, "/fp/g",content)
 
