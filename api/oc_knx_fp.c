@@ -284,8 +284,8 @@ table_find_id_from_rep(oc_rep_t *object)
 
 // -----------------------------------------------------------------------------
 
-
-int find_empty_slot_in_group_object_table(int id)
+int
+find_empty_slot_in_group_object_table(int id)
 {
   int index = -1;
   if (id < 0) {
@@ -1569,7 +1569,6 @@ oc_delete_group_object_table()
 
 // -----------------------------------------------------------------------------
 
-
 int
 oc_core_find_index_in_rp_table_from_id(int id, oc_group_rp_table_t *rp_table,
                                        int max_size)
@@ -1581,7 +1580,6 @@ oc_core_find_index_in_rp_table_from_id(int id, oc_group_rp_table_t *rp_table,
   }
   return -1;
 }
-
 
 static void
 oc_print_group_rp_table_entry(int entry, char *Store,

@@ -97,7 +97,7 @@ typedef struct oc_group_object_table_t
  *
  * the same table is used for recipient and publisher.
  * the only difference is the confirmable/not confirmable flag.
- * There will be 2 arrays of the structure to store the /fp/r or /fp/p data 
+ * There will be 2 arrays of the structure to store the /fp/r or /fp/p data
  *
  * array of objects (as json)
  * [
@@ -142,7 +142,6 @@ typedef struct oc_group_rp_table_t
   int *ga;          ///< array of integers
   int ga_len;       //< length of the array of ga identifiers
 } oc_group_rp_table_t;
-
 
 /**
  * @brief find index belonging to the id
