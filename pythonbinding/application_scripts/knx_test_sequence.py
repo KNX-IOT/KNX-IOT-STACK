@@ -435,15 +435,19 @@ def do_sequence_fp_programming(my_stack):
     # url (11)= /p/light
     # ga (7 )= 1
     # cflags (8) = ["r" ] ; read = 1, write = 2, transmit = 3 update = 4
-    content = [ { 0: 1, 11: "p/push", 7:[1], 8: [2] } , {0: 2, 11: "p/light", 7:[2], 8: [2,4] }]
+    content = [ {0: 5, 11: "p/push5", 7:[1], 8: [2] } , 
+                {0: 2, 11: "p/light2", 7:[2], 8: [2,4] }, 
+                {0: 225, 11: "p/light255", 7:[2], 8: [2,4] }]
     do_check_table(my_stack, sn, "/fp/g",content)
 
-    content = [ {0: 1, 11: "/p/push", 7:[1], 12 :"blah.blah" },
-                {0: 5, 11: "/p/pushxx", 7:[1], 12 :"ss.blah.blah" } ]
+    content = [ {0: 1, 11: "/p/push1", 7:[1], 12 :"blah.blah" },
+                {0: 5, 11: "/p/push5", 7:[1], 12 :"ss.blah.blah.5" },
+                {0: 255, 11: "/p/push255", 7:[1], 12 :"ss.blah.blah.255" } ]
     do_check_table(my_stack, sn, "/fp/r",content)
 
     content = [ {0: 1, 11: "/p/pushpp", 7:[1], 12 :"blah.blahxx" },
-                {0: 5, 11: "/p/pushxx", 7:[1], 12 :"ss.blah.blah" } ]
+                {0: 5, 11: "/p/push5", 7:[1], 12 :"ss.blah.blah5" },
+                {0: 235, 11: "/p/push235", 7:[1], 12 :"ss.blah.blah.235" } ]
     do_check_table(my_stack, sn, "/fp/p",content)
 
     content = False
@@ -607,6 +611,7 @@ def do_sequence(my_stack):
         do_sequence_f(my_stack)
         do_sequence_lsm(my_stack)
         do_sequence_fp_programming(my_stack)
+        #return
         do_sequence_knx_crc(my_stack)
         do_sequence_knx_osn(my_stack)
         do_sequence_core_knx(my_stack)

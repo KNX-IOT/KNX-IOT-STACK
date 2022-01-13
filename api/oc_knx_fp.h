@@ -128,6 +128,15 @@ typedef struct oc_group_rp_table_t
   int ga_len;       //< length of the array of ga identifiers
 } oc_group_rp_table_t;
 
+
+/**
+ * @brief find index belonging to the id
+ *
+ * @param the identifier of the entry
+ * @return int the index in the table or -1
+ */
+int oc_core_find_index_in_group_object_table_from_id(int id);
+
 /**
  * @brief find (first) index in the group address table
  *
