@@ -86,6 +86,10 @@ static void oc_dump_group_rp_table_entry(int entry, char *Store,
                                          oc_group_rp_table_t *rp_table,
                                          int max_size);
 
+static int oc_core_find_index_in_rp_table_from_id(int id,
+                                                  oc_group_rp_table_t *rp_table,
+                                                  int max_size);
+
 // -----------------------------------------------------------------------------
 
 static void
@@ -248,24 +252,24 @@ oc_create_fp_gm_x_resource(int resource_idx, size_t device)
 // -----------------------------------------------------------------------------
 
 static int
-find_id_storage_index(oc_rep_t *object)
+table_find_id_from_rep(oc_rep_t *object)
 {
-  int index = -1;
+  int id = -1;
   while (object != NULL) {
     switch (object->type) {
     case OC_REP_INT: {
 #ifdef TAGS_AS_STRINGS
       if ((oc_string_len(object->name) == 2 &&
            memcmp(oc_string(object->name), "id", 2) == 0)) {
-        index = object->value.integer;
-        PRINT("  find_id_storage_index storing at %d \n", index);
-        return index;
+        id = object->value.integer;
+        PRINT("  table_find_id_from_rep id=%d \n", id);
+        return id;
       }
 #endif
       if (oc_string_len(object->name) == 0 && object->iname == 0) {
-        index = object->value.integer;
-        PRINT(" find_id_storage_index storing at %d \n", index);
-        return index;
+        id = object->value.integer;
+        PRINT(" table_find_id_from_rep id=%d \n", id);
+        return id;
       }
     } break;
     case OC_REP_NIL:
@@ -274,16 +278,51 @@ find_id_storage_index(oc_rep_t *object)
       break;
     } /* switch */
   }   /* while */
-  PRINT("  find_id_storage_index ERR: storing at %d \n", index);
-  return index;
+  PRINT("  table_find_id_from_rep ERR: id=%d \n", id);
+  return id;
 }
 
 // -----------------------------------------------------------------------------
+
+int
+find_empty_slot_in_group_object_table(int id)
+{
+  int index = -1;
+  if (id < 0) {
+    // should be a positive number
+    return index;
+  }
+  index = oc_core_find_index_in_group_object_table_from_id(id);
+  if (index > -1) {
+    // overwrite existing index
+    return index;
+  }
+
+  // empty slot
+  for (int i = 0; i < GOT_MAX_ENTRIES; i++) {
+    if (g_got[i].ga_len == 0) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+int
+oc_core_find_index_in_group_object_table_from_id(int id)
+{
+  for (int i = 0; i < GOT_MAX_ENTRIES; i++) {
+    if (g_got[i].id == id) {
+      return i;
+    }
+  }
+  return -1;
+}
+
 int
 oc_core_find_group_object_table_index(int group_address)
 {
   int i, j;
-  for (i = 0; i < GAMT_MAX_ENTRIES; i++) {
+  for (i = 0; i < GOT_MAX_ENTRIES; i++) {
 
     if (g_got[i].ga_len != 0) {
       for (j = 0; j < g_got[i].ga_len; j++) {
@@ -304,7 +343,7 @@ oc_core_find_next_group_object_table_index(int group_address, int cur_index)
   }
 
   int i, j;
-  for (i = cur_index + 1; i < GAMT_MAX_ENTRIES; i++) {
+  for (i = cur_index + 1; i < GOT_MAX_ENTRIES; i++) {
 
     if (g_got[i].ga_len != 0) {
       for (j = 0; j < g_got[i].ga_len; j++) {
@@ -320,7 +359,7 @@ oc_core_find_next_group_object_table_index(int group_address, int cur_index)
 oc_string_t
 oc_core_find_group_object_table_url_from_index(int index)
 {
-  // if (index < GAMT_MAX_ENTRIES) {
+  // if (index < GOT_MAX_ENTRIES) {
   return g_got[index].href;
   //}
   // return oc_string_t();
@@ -329,7 +368,7 @@ oc_core_find_group_object_table_url_from_index(int index)
 int
 oc_core_find_group_object_table_number_group_entries(int index)
 {
-  if (index < GAMT_MAX_ENTRIES) {
+  if (index < GOT_MAX_ENTRIES) {
     return g_got[index].ga_len;
   }
   return 0;
@@ -338,7 +377,7 @@ oc_core_find_group_object_table_number_group_entries(int index)
 int
 oc_core_find_group_object_table_group_entry(int index, int entry)
 {
-  if (index < GAMT_MAX_ENTRIES) {
+  if (index < GOT_MAX_ENTRIES) {
     if (entry < g_got[index].ga_len) {
       return g_got[index].ga[entry];
     }
@@ -351,7 +390,7 @@ oc_core_find_group_object_table_url(char *url)
 {
   int i;
   size_t url_len = strlen(url);
-  for (i = 0; i < GAMT_MAX_ENTRIES; i++) {
+  for (i = 0; i < GOT_MAX_ENTRIES; i++) {
     if ((url_len == oc_string_len(g_got[i].href)) &&
         (strcmp(url, oc_string(g_got[i].href)) == 0)) {
       return i;
@@ -369,7 +408,7 @@ oc_core_find_next_group_object_table_url(char *url, int cur_index)
 
   int i;
   size_t url_len = strlen(url);
-  for (i = cur_index + 1; i < GAMT_MAX_ENTRIES; i++) {
+  for (i = cur_index + 1; i < GOT_MAX_ENTRIES; i++) {
     if ((url_len == oc_string_len(g_got[i].href)) &&
         (strcmp(url, oc_string(g_got[i].href)) == 0)) {
       return i;
@@ -397,7 +436,7 @@ oc_core_fp_g_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   }
 
   /* example entry: </fp/g/1>;ct=60   (cbor)*/
-  for (i = 0; i < GAMT_MAX_ENTRIES; i++) {
+  for (i = 0; i < GOT_MAX_ENTRIES; i++) {
 
     if (g_got[i].ga_len > 0) {
       // index  in use
@@ -410,7 +449,7 @@ oc_core_fp_g_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       length = oc_rep_add_line_to_buffer("<fp/g/");
       response_length += length;
       char string[10];
-      sprintf((char *)&string, "%d>", i);
+      sprintf((char *)&string, "%d>", g_got[i].id);
       length = oc_rep_add_line_to_buffer(string);
       response_length += length;
 
@@ -456,15 +495,22 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   PRINT("%s", buffer);
 
   int index = -1;
+  int id;
   oc_rep_t *rep = request->request_payload;
 
   while (rep != NULL) {
     switch (rep->type) {
     case OC_REP_OBJECT: {
 
-      // find the storage index, e.g. for this object
+      // find id and the storage index for this object
       oc_rep_t *object = rep->value.object;
-      index = find_id_storage_index(object);
+      id = table_find_id_from_rep(object);
+      if (id == -1) {
+        PRINT("  ERROR id %d\n", index);
+        oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+        return;
+      }
+      index = find_empty_slot_in_group_object_table(id);
       if (index == -1) {
         PRINT("  ERROR index %d\n", index);
         oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
@@ -632,17 +678,17 @@ oc_core_fp_g_x_get_handler(oc_request_t *request,
     return;
   }
 
-  int value = oc_uri_get_wildcard_value_as_int(
+  int id = oc_uri_get_wildcard_value_as_int(
     oc_string(request->resource->uri), oc_string_len(request->resource->uri),
     request->uri_path, request->uri_path_len);
-  PRINT("  index = %d\n", value);
-
-  if (value >= GOT_MAX_ENTRIES) {
+  int index = oc_core_find_index_in_group_object_table_from_id(id);
+  PRINT("  id=%d index = %d\n", id, index);
+  if (index >= GOT_MAX_ENTRIES) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
 
-  if (&g_got[value].ga_len == 0) {
+  if (&g_got[index].ga_len == 0) {
     // it is empty
     oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
     return;
@@ -650,28 +696,28 @@ oc_core_fp_g_x_get_handler(oc_request_t *request,
 
   oc_rep_begin_root_object();
   // id 0
-  oc_rep_i_set_int(root, 0, g_got[value].id);
+  oc_rep_i_set_int(root, 0, g_got[index].id);
   // href- 11
-  oc_rep_i_set_text_string(root, 11, oc_string(g_got[value].href));
+  oc_rep_i_set_text_string(root, 11, oc_string(g_got[index].href));
   // ga - 7
-  oc_rep_i_set_int_array(root, 7, g_got[value].ga, g_got[value].ga_len);
+  oc_rep_i_set_int_array(root, 7, g_got[index].ga, g_got[index].ga_len);
 
   // cflags 8
   oc_rep_i_set_key(&root_map, 8);
   oc_rep_begin_array(&root_map, cflags);
-  if (g_got[value].cflags & OC_CFLAG_READ) {
+  if (g_got[index].cflags & OC_CFLAG_READ) {
     oc_rep_add_int(cflags, 1);
   }
-  if (g_got[value].cflags & OC_CFLAG_WRITE) {
+  if (g_got[index].cflags & OC_CFLAG_WRITE) {
     oc_rep_add_int(cflags, 2);
   }
-  if (g_got[value].cflags & OC_CFLAG_TRANSMISSION) {
+  if (g_got[index].cflags & OC_CFLAG_TRANSMISSION) {
     oc_rep_add_int(cflags, 3);
   }
-  if (g_got[value].cflags & OC_CFLAG_UPDATE) {
+  if (g_got[index].cflags & OC_CFLAG_UPDATE) {
     oc_rep_add_int(cflags, 4);
   }
-  if (g_got[value].cflags & OC_CFLAG_INIT) {
+  if (g_got[index].cflags & OC_CFLAG_INIT) {
     oc_rep_add_int(cflags, 5);
   }
   oc_rep_close_array(root, cflags);
@@ -692,9 +738,11 @@ oc_core_fp_g_x_del_handler(oc_request_t *request,
   (void)iface_mask;
   PRINT("oc_core_fp_g_x_del_handler\n");
 
-  int value = oc_uri_get_wildcard_value_as_int(
+  int id = oc_uri_get_wildcard_value_as_int(
     oc_string(request->resource->uri), oc_string_len(request->resource->uri),
     request->uri_path, request->uri_path_len);
+  int index = oc_core_find_index_in_group_object_table_from_id(id);
+  PRINT("  id=%d index = %d\n", id, index);
 
   size_t device_index = request->resource->device;
   if (oc_knx_lsm_state(device_index) != LSM_LOADING) {
@@ -703,17 +751,17 @@ oc_core_fp_g_x_del_handler(oc_request_t *request,
     return;
   }
 
-  PRINT(" deleting %d\n", value);
+  PRINT(" deleting %d\n", index);
 
-  if (value >= GOT_MAX_ENTRIES) {
+  if (index >= GOT_MAX_ENTRIES) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
   // delete the entry
-  oc_delete_group_object_table_entry(value);
+  oc_delete_group_object_table_entry(index);
 
   // make the deletion persistent
-  oc_dump_group_object_table_entry(value);
+  oc_dump_group_object_table_entry(index);
 
   PRINT("oc_core_fp_g_x_del_handler - end\n");
   oc_send_cbor_response(request, OC_STATUS_DELETED);
@@ -785,7 +833,7 @@ oc_core_fp_p_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       length = oc_rep_add_line_to_buffer("<fp/p/");
       response_length += length;
       char string[10];
-      sprintf((char *)&string, "%d>", i);
+      sprintf((char *)&string, "%d>", g_gpt[i].id);
       length = oc_rep_add_line_to_buffer(string);
       response_length += length;
 
@@ -824,6 +872,7 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   PRINT("%s", buffer);
 
   int index = -1;
+  int id;
   oc_rep_t *rep = request->request_payload;
 
   while (rep != NULL) {
@@ -831,13 +880,14 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     case OC_REP_OBJECT: {
       // find the storage index, e.g. for this object
       oc_rep_t *object = rep->value.object;
-      index = find_id_storage_index(object);
+      id = table_find_id_from_rep(object);
+      index = find_empty_slot_in_group_object_table(id);
       if (index == -1) {
         PRINT("  ERROR index %d\n", index);
         oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
         return;
       }
-      g_gpt[index].id = index;
+      g_gpt[index].id = id;
 
       object = rep->value.object;
       while (object != NULL) {
@@ -962,17 +1012,19 @@ oc_core_fp_p_x_get_handler(oc_request_t *request,
     return;
   }
 
-  int value = oc_uri_get_wildcard_value_as_int(
+  int id = oc_uri_get_wildcard_value_as_int(
     oc_string(request->resource->uri), oc_string_len(request->resource->uri),
     request->uri_path, request->uri_path_len);
-  PRINT("  index = %d\n", value);
+  int index =
+    oc_core_find_index_in_rp_table_from_id(id, g_gpt, GPT_MAX_ENTRIES);
+  PRINT("  id:%d index = %d\n", id, index);
 
-  if (value >= GPT_MAX_ENTRIES) {
+  if (index >= GPT_MAX_ENTRIES) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
 
-  if (g_gpt[value].ga_len == 0) {
+  if (g_gpt[index].ga_len == 0) {
     // it is empty
     oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
     return;
@@ -980,15 +1032,15 @@ oc_core_fp_p_x_get_handler(oc_request_t *request,
 
   oc_rep_begin_root_object();
   // id 0
-  oc_rep_i_set_int(root, 0, g_gpt[value].id);
+  oc_rep_i_set_int(root, 0, g_gpt[index].id);
   // ia - 12
-  oc_rep_i_set_text_string(root, 11, oc_string(g_gpt[value].ia));
+  oc_rep_i_set_text_string(root, 11, oc_string(g_gpt[index].ia));
   // path- 112
-  oc_rep_i_set_text_string(root, 112, oc_string(g_gpt[value].path));
+  oc_rep_i_set_text_string(root, 112, oc_string(g_gpt[index].path));
   // url- 10
-  oc_rep_i_set_text_string(root, 10, oc_string(g_gpt[value].url));
+  oc_rep_i_set_text_string(root, 10, oc_string(g_gpt[index].url));
   // ga - 7
-  oc_rep_i_set_int_array(root, 7, g_gpt[value].ga, g_gpt[value].ga_len);
+  oc_rep_i_set_int_array(root, 7, g_gpt[index].ga, g_gpt[index].ga_len);
 
   oc_rep_end_root_object();
 
@@ -1006,25 +1058,27 @@ oc_core_fp_p_x_del_handler(oc_request_t *request,
   (void)iface_mask;
   PRINT("oc_core_fp_p_x_del_handler\n");
 
-  int value = oc_uri_get_wildcard_value_as_int(
+  int id = oc_uri_get_wildcard_value_as_int(
     oc_string(request->resource->uri), oc_string_len(request->resource->uri),
     request->uri_path, request->uri_path_len);
+  int index =
+    oc_core_find_index_in_rp_table_from_id(id, g_gpt, GPT_MAX_ENTRIES);
 
-  if (value >= GRT_MAX_ENTRIES) {
+  if (index >= GRT_MAX_ENTRIES) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
 
-  g_gpt[value].id = 0;
-  oc_free_string(&g_gpt[value].url);
-  oc_new_string(&g_gpt[value].url, "", 0);
-  // oc_free_int_array(g_gpt[value].ga);
-  free(g_gpt[value].ga);
-  g_gpt[value].ga = NULL;
-  g_gpt[value].ga_len = 0;
+  g_gpt[index].id = 0;
+  oc_free_string(&g_gpt[index].url);
+  oc_new_string(&g_gpt[index].url, "", 0);
+  // oc_free_int_array(g_gpt[index].ga);
+  free(g_gpt[index].ga);
+  g_gpt[index].ga = NULL;
+  g_gpt[index].ga_len = 0;
 
   // make the change persistent
-  oc_dump_group_rp_table_entry(value, GPT_STORE, g_gpt, GPT_MAX_ENTRIES);
+  oc_dump_group_rp_table_entry(index, GPT_STORE, g_gpt, GPT_MAX_ENTRIES);
 
   PRINT("oc_core_fp_p_x_del_handler - end\n");
 
@@ -1074,7 +1128,7 @@ oc_core_fp_r_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       length = oc_rep_add_line_to_buffer("<fp/r/");
       response_length += length;
       char string[10];
-      sprintf((char *)&string, "%d>", i);
+      sprintf((char *)&string, "%d>", g_grt[i].id);
       length = oc_rep_add_line_to_buffer(string);
       response_length += length;
 
@@ -1112,6 +1166,7 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   PRINT("%s", buffer);
 
   int index = -1;
+  int id = -1;
   oc_rep_t *rep = request->request_payload;
 
   while (rep != NULL) {
@@ -1119,13 +1174,20 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     case OC_REP_OBJECT: {
       // find the storage index, e.g. for this object
       oc_rep_t *object = rep->value.object;
-      index = find_id_storage_index(object);
+      id = table_find_id_from_rep(object);
+      if (id == -1) {
+        PRINT("  ERROR id %d\n", index);
+        oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+        return;
+      }
+      index = find_empty_slot_in_group_object_table(id);
       if (index == -1) {
         PRINT("  ERROR index %d\n", index);
         oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
         return;
       }
-      g_grt[index].id = index;
+      PRINT("  storing at %d\n", index);
+      g_grt[index].id = id;
 
       object = rep->value.object;
       while (object != NULL) {
@@ -1249,17 +1311,20 @@ oc_core_fp_r_x_get_handler(oc_request_t *request,
     return;
   }
 
-  int value = oc_uri_get_wildcard_value_as_int(
+  int id = oc_uri_get_wildcard_value_as_int(
     oc_string(request->resource->uri), oc_string_len(request->resource->uri),
     request->uri_path, request->uri_path_len);
-  PRINT("  index = %d\n", value);
+  int index =
+    oc_core_find_index_in_rp_table_from_id(id, g_grt, GRT_MAX_ENTRIES);
 
-  if (value >= GRT_MAX_ENTRIES) {
+  PRINT("  id:%d index = %d\n", id, index);
+
+  if (index >= GRT_MAX_ENTRIES) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
 
-  if (g_grt[value].ga_len == 0) {
+  if (g_grt[index].ga_len == 0) {
     // it is empty
     oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
     return;
@@ -1267,15 +1332,15 @@ oc_core_fp_r_x_get_handler(oc_request_t *request,
 
   oc_rep_begin_root_object();
   // id 0
-  oc_rep_i_set_int(root, 0, g_grt[value].id);
+  oc_rep_i_set_int(root, 0, g_grt[index].id);
   // ia - 12
-  oc_rep_i_set_text_string(root, 11, oc_string(g_grt[value].ia));
+  oc_rep_i_set_text_string(root, 11, oc_string(g_grt[index].ia));
   // path- 112
-  oc_rep_i_set_text_string(root, 112, oc_string(g_grt[value].path));
+  oc_rep_i_set_text_string(root, 112, oc_string(g_grt[index].path));
   // url- 10
-  oc_rep_i_set_text_string(root, 10, oc_string(g_grt[value].url));
+  oc_rep_i_set_text_string(root, 10, oc_string(g_grt[index].url));
   // ga - 7
-  oc_rep_i_set_int_array(root, 7, g_grt[value].ga, g_grt[value].ga_len);
+  oc_rep_i_set_int_array(root, 7, g_grt[index].ga, g_grt[index].ga_len);
 
   oc_rep_end_root_object();
 
@@ -1293,26 +1358,28 @@ oc_core_fp_r_x_del_handler(oc_request_t *request,
   (void)iface_mask;
   PRINT("oc_core_fp_r_x_del_handler\n");
 
-  int value = oc_uri_get_wildcard_value_as_int(
+  int id = oc_uri_get_wildcard_value_as_int(
     oc_string(request->resource->uri), oc_string_len(request->resource->uri),
     request->uri_path, request->uri_path_len);
+  int index =
+    oc_core_find_index_in_rp_table_from_id(id, g_grt, GRT_MAX_ENTRIES);
 
-  if (value >= GRT_MAX_ENTRIES) {
+  if (index >= GRT_MAX_ENTRIES) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
-  PRINT("oc_core_fp_r_x_del_handler: deleting %d\n", value);
+  PRINT("oc_core_fp_r_x_del_handler: deleting id %d at index %d\n", id, index);
 
-  g_grt[value].id = 0;
-  oc_free_string(&g_grt[value].url);
-  oc_new_string(&g_grt[value].url, "", 0);
-  // oc_free_int_array(g_grt[value].ga);
-  free(g_grt[value].ga);
-  g_grt[value].ga = NULL;
-  g_grt[value].ga_len = 0;
+  g_grt[index].id = 0;
+  oc_free_string(&g_grt[index].url);
+  oc_new_string(&g_grt[index].url, "", 0);
+  // oc_free_int_array(g_grt[index].ga);
+  free(g_grt[index].ga);
+  g_grt[index].ga = NULL;
+  g_grt[index].ga_len = 0;
 
   // make the change persistent
-  oc_dump_group_rp_table_entry(value, GRT_STORE, g_grt, GRT_MAX_ENTRIES);
+  oc_dump_group_rp_table_entry(index, GRT_STORE, g_grt, GRT_MAX_ENTRIES);
 
   PRINT("oc_core_fp_r_x_del_handler - end\n");
 
@@ -1501,6 +1568,18 @@ oc_delete_group_object_table()
 }
 
 // -----------------------------------------------------------------------------
+
+int
+oc_core_find_index_in_rp_table_from_id(int id, oc_group_rp_table_t *rp_table,
+                                       int max_size)
+{
+  for (int i = 0; i < max_size; i++) {
+    if (rp_table[i].id == id) {
+      return i;
+    }
+  }
+  return -1;
+}
 
 static void
 oc_print_group_rp_table_entry(int entry, char *Store,

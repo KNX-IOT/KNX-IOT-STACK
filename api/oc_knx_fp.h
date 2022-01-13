@@ -42,7 +42,7 @@ typedef enum {
 /**
  * @brief Group Object Table Resource (/fp/g)
  *
- * array of objects (as json)
+ * the will be an array of objects (as json):
  * [
  *    {
  *        "id": "1",
@@ -75,6 +75,13 @@ typedef enum {
  * | ga       | 7             |
  * | cflag    | 8             |
  *
+ * The structure stores the information.
+ * The structure will be used as an array.
+ * There are function to find
+ * - empty index in the array
+ * - find the index with a specific id
+ * - delete an index, e.g. free the array entry of data
+ * - make the entry persistent
  */
 typedef struct oc_group_object_table_t
 {
@@ -89,13 +96,14 @@ typedef struct oc_group_object_table_t
  * @brief Function point Recipient - Publisher Table Resource (/fp/r) (/fp/p)
  *
  * the same table is used for recipient and publisher.
- * the only difference is the confirmable/not confirmable sending.
+ * the only difference is the confirmable/not confirmable flag.
+ * There will be 2 arrays of the structure to store the /fp/r or /fp/p data
  *
  * array of objects (as json)
  * [
  *    {
  *        "id": "1",
- *         ia": "<knx-installation-id>.<recipient�s IA>",
+ *         ia": "<knx-installation-id>.<recipient's IA>",
  *        "ga":[2305, 2401],
  *        "path": ".knx",
  *    },
@@ -116,6 +124,13 @@ typedef struct oc_group_object_table_t
  * | ga       | 7             |
  * | con      | -             |
  *
+ * The structure stores the information.
+ * The structure will be used as an array.
+ * There are function to find:
+ * - empty index in the array
+ * - find the index with a specific id
+ * - delete an index, e.g. free the array entry of data
+ * - make the entry persistent
  */
 typedef struct oc_group_rp_table_t
 {
@@ -127,6 +142,14 @@ typedef struct oc_group_rp_table_t
   int *ga;          ///< array of integers
   int ga_len;       //< length of the array of ga identifiers
 } oc_group_rp_table_t;
+
+/**
+ * @brief find index belonging to the id
+ *
+ * @param the identifier of the entry
+ * @return int the index in the table or -1
+ */
+int oc_core_find_index_in_group_object_table_from_id(int id);
 
 /**
  * @brief find (first) index in the group address table
