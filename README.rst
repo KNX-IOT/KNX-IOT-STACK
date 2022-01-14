@@ -20,17 +20,25 @@
 Introduction
 ------------
 
-KNX-IOT is an open-source, reference implementation of the KNX standards for the Internet of Things (IoT). 
+KNX-IOT stack is an open-source, reference implementation of the KNX standards for the Internet of Things (IoT). 
 Specifically, the stack realizes all the functionalities of the KNX-IOT specification.
-
 
 .. image:: ./images/knxstack-v1.png
    :scale: 100%
    :alt: Architecture
    :align: center
 
+The responsibilities between the stack and an actual KNX-IOT device implementation is depicted in the following diagram:
+
+.. image:: ./images/application.png
+   :scale: 100%
+   :alt: application vs stack
+   :align: center
+
 
 Please review the following resources for more details:
+
+TODO: link to spec??
 
 The project was created to bring together the open-source community to accelerate the development of the framework and services required to connect the growing number of IoT devices. 
 The  project offers device vendors and application developers royalty-free access  under the `Apache 2.0 license <https://github.com/KNX-IOT/KNX-IOT-STACK/blob/main/LICENSE.md>`_.
@@ -117,7 +125,8 @@ Grab source and dependencies using:
 
 Please check here for build instructions:
 
-
+windows: https://github.com/KNX-IOT/knx-iot.github.io/blob/main/_pages/building_linux.md
+linux: https://github.com/KNX-IOT/knx-iot.github.io/blob/main/_pages/building_linux.md
 
 
 Send Feedback
