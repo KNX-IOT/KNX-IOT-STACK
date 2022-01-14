@@ -1,8 +1,10 @@
 # Python bindings
 
-The python bindings are based on ctypes.
-The python code is using the shared library containing an KNX-IOT stack based device that can act as an client.
+The python bindings are based on python ctypes.
+The python code is using the shared library (dll) containing an KNX-IOT stack based device that can act as an client.
 The python code uses the device to interact with other KNX-IOT devices on the network.
+
+![python architecture}](../images/python-architecture.png)
 
 ## requirements
 
