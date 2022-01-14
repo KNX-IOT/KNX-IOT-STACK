@@ -1798,3 +1798,20 @@ oc_create_knx_fp_resources(size_t device_index)
   // note: /fp does not exist..
   // oc_create_fp_resource(OC_KNX_FP, device_index);
 }
+
+
+// -----------------------------------------------------------------------------
+
+bool
+oc_add_points_int_group_object_table_to_response(oc_request_t *request, size_t device_index,
+                                   size_t *response_length, int matches)
+{
+  (void)request;
+  (void)device_index;
+  (void)response_length;
+  (void)matches;
+  // todo
+  // list all datapoints that belongs to a specific group.
+
+  return false;
+}

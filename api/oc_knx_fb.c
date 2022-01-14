@@ -147,9 +147,11 @@ oc_add_function_blocks_to_response(oc_request_t *request, size_t device_index,
 {
   (void)request;
   int length = 0;
-  g_array_size = 0;
   char number[5];
   int i;
+
+  // use global variable
+  g_array_size = 0;
 
   oc_resource_t *resource = oc_ri_get_app_resources();
   for (; resource; resource = resource->next) {

@@ -234,6 +234,16 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   if (d_len > 13 && strncmp(d_request, "urn:knx:g.s.", 13) == 0) {
     int group_address = atoi(&d_request[12]);
     PRINT(" group address: %d\n", group_address);
+    // if not loaded the we can just return
+    oc_lsm_state_t lsm = oc_knx_lsm_state(device_index);
+    if (lsm != LSM_LOADED) {
+      /* handle bad request..
+      note below layer ignores this message if it is a multi cast request */
+      request->response->response_buffer->code =
+        oc_status_code(OC_STATUS_BAD_REQUEST);
+      return;
+    }
+    // create the response
   }
 
   if (oc_is_device_mode_in_programming(device_index)) {
