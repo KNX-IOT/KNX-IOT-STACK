@@ -123,7 +123,8 @@ Grab source and dependencies using:
 
 Please check here for build instructions:
 
-windows: https://github.com/KNX-IOT/knx-iot.github.io/blob/main/_pages/building_linux.md
+windows: https://github.com/KNX-IOT/knx-iot.github.io/blob/main/_pages/building_windows.md
+
 linux: https://github.com/KNX-IOT/knx-iot.github.io/blob/main/_pages/building_linux.md
 
 
