@@ -899,7 +899,7 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
         } break;
         case OC_REP_STRING: {
 #ifdef TAGS_AS_STRINGS
-          //if (oc_string_len(object->name) == 2 &&
+          // if (oc_string_len(object->name) == 2 &&
           //    memcmp(oc_string(object->name), "ia", 2) == 0) {
           //  oc_free_string(&g_gpt[index].ia);
           //  oc_new_string(&g_gpt[index].ia, oc_string(object->value.string),
@@ -918,7 +918,7 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
                           oc_string_len(object->value.string));
           }
 #endif
-          //if (object->iname == 12) {
+          // if (object->iname == 12) {
           //  oc_free_string(&g_gpt[index].ia);
           //  oc_new_string(&g_gpt[index].ia, oc_string(object->value.string),
           //                oc_string_len(object->value.string));
@@ -1040,8 +1040,8 @@ oc_core_fp_p_x_get_handler(oc_request_t *request,
   oc_rep_i_set_int(root, 0, g_gpt[index].id);
   // ia - 12
   if (g_gpt[index].ia > -1) {
-   // oc_rep_i_set_text_string(root, 11, oc_string(g_gpt[index].ia));
-   oc_rep_i_set_int(root, 11, g_gpt[index].ia);
+    // oc_rep_i_set_text_string(root, 11, oc_string(g_gpt[index].ia));
+    oc_rep_i_set_int(root, 11, g_gpt[index].ia);
   }
 
   // frame url as ia exist.
@@ -1216,12 +1216,12 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
             //  oc_free_string(&g_grt[index].ia);
             //  oc_new_string(&g_grt[index].ia, oc_string(object->value.string),
             //                oc_string_len(object->value.string));
-            }
+          }
         } break;
 
         case OC_REP_STRING: {
 #ifdef TAGS_AS_STRINGS
-          //if (oc_string_len(object->name) == 2 &&
+          // if (oc_string_len(object->name) == 2 &&
           //    memcmp(oc_string(object->name), "ia", 2) == 0) {
           //  oc_free_string(&g_grt[index].ia);
           //  oc_new_string(&g_grt[index].ia, oc_string(object->value.string),
@@ -1240,7 +1240,7 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
                           oc_string_len(object->value.string));
           }
 #endif
-          //if (object->iname == 12) {
+          // if (object->iname == 12) {
           //  oc_free_string(&g_grt[index].ia);
           //  oc_new_string(&g_grt[index].ia, oc_string(object->value.string),
           //                oc_string_len(object->value.string));
@@ -1771,8 +1771,8 @@ oc_delete_group_rp_table_entry(int entry, char *Store,
   (void)Store;
   rp_table[entry].id = -1;
   rp_table[entry].ia = -1;
-  //oc_free_string(&rp_table[entry].ia);
-  //oc_new_string(&rp_table[entry].ia, "", 0);
+  // oc_free_string(&rp_table[entry].ia);
+  // oc_new_string(&rp_table[entry].ia, "", 0);
   oc_free_string(&rp_table[entry].path);
   oc_new_string(&rp_table[entry].path, "", 0);
   oc_free_string(&rp_table[entry].url);
@@ -1802,8 +1802,9 @@ oc_delete_group_rp_table()
   }
 }
 
-
-void oc_init_tables() {
+void
+oc_init_tables()
+{
   for (int i = 0; i < GPT_MAX_ENTRIES; i++) {
     oc_delete_group_rp_table_entry(i, GPT_STORE, g_gpt, GPT_MAX_ENTRIES);
   }
@@ -1814,7 +1815,6 @@ void oc_init_tables() {
     oc_delete_group_object_table_entry(i);
   }
 }
-
 
 // -----------------------------------------------------------------------------
 
@@ -1842,12 +1842,13 @@ oc_create_knx_fp_resources(size_t device_index)
   // oc_create_fp_resource(OC_KNX_FP, device_index);
 }
 
-
 // -----------------------------------------------------------------------------
 
 bool
-oc_add_points_int_group_object_table_to_response(oc_request_t *request, size_t device_index,
-                                   size_t *response_length, int matches)
+oc_add_points_int_group_object_table_to_response(oc_request_t *request,
+                                                 size_t device_index,
+                                                 size_t *response_length,
+                                                 int matches)
 {
   (void)request;
   (void)device_index;
