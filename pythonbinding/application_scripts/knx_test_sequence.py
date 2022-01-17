@@ -440,14 +440,14 @@ def do_sequence_fp_programming(my_stack):
                 {0: 225, 11: "p/light255", 7:[2], 8: [2,4] }]
     do_check_table(my_stack, sn, "/fp/g",content)
 
-    content = [ {0: 1, 11: "/p/push1", 7:[1], 12 :"blah.blah" },
-                {0: 5, 11: "/p/push5", 7:[1], 12 :"ss.blah.blah.5" },
-                {0: 255, 11: "/p/push255", 7:[1], 12 :"ss.blah.blah.255" } ]
+    content = [ {0: 1, 11: "/p/push1", 7:[1], 12 :3 },
+                {0: 5, 11: "/p/push5", 7:[1], 12 : 4 },
+                {0: 255, 11: "/p/push255", 7:[1], 12 :5 } ]
     do_check_table(my_stack, sn, "/fp/r",content)
 
-    content = [ {0: 1, 11: "/p/pushpp", 7:[1], 12 :"blah.blahxx" },
-                {0: 5, 11: "/p/push5", 7:[1], 12 :"ss.blah.blah5" },
-                {0: 235, 11: "/p/push235", 7:[1], 12 :"ss.blah.blah.235" } ]
+    content = [ {0: 1, 11: "/p/pushpp", 7:[1], 12 :6 },
+                {0: 5, 11: "/p/push5", 7:[1], 12 : 7 },
+                {0: 235, 11: "/p/push235", 7:[1], 12 :8 } ]
     do_check_table(my_stack, sn, "/fp/p",content)
 
     content = False

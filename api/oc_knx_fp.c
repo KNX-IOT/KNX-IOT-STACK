@@ -892,14 +892,19 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       object = rep->value.object;
       while (object != NULL) {
         switch (object->type) {
+        case OC_REP_INT: {
+          if (object->iname == 12) {
+            &g_gpt[index].ia, object->value.integer;
+          }
+        } break;
         case OC_REP_STRING: {
 #ifdef TAGS_AS_STRINGS
-          if (oc_string_len(object->name) == 2 &&
-              memcmp(oc_string(object->name), "ia", 2) == 0) {
-            oc_free_string(&g_gpt[index].ia);
-            oc_new_string(&g_gpt[index].ia, oc_string(object->value.string),
-                          oc_string_len(object->value.string));
-          }
+          //if (oc_string_len(object->name) == 2 &&
+          //    memcmp(oc_string(object->name), "ia", 2) == 0) {
+          //  oc_free_string(&g_gpt[index].ia);
+          //  oc_new_string(&g_gpt[index].ia, oc_string(object->value.string),
+          //                oc_string_len(object->value.string));
+          //}
           if (oc_string_len(object->name) == 4 &&
               memcmp(oc_string(object->name), "path", 4) == 0) {
             oc_free_string(&g_gpt[index].path);
@@ -913,11 +918,11 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
                           oc_string_len(object->value.string));
           }
 #endif
-          if (object->iname == 12) {
-            oc_free_string(&g_gpt[index].ia);
-            oc_new_string(&g_gpt[index].ia, oc_string(object->value.string),
-                          oc_string_len(object->value.string));
-          }
+          //if (object->iname == 12) {
+          //  oc_free_string(&g_gpt[index].ia);
+          //  oc_new_string(&g_gpt[index].ia, oc_string(object->value.string),
+          //                oc_string_len(object->value.string));
+          //}
           if (object->iname == 112) {
             oc_free_string(&g_gpt[index].path);
             oc_new_string(&g_gpt[index].path, oc_string(object->value.string),
@@ -1034,11 +1039,23 @@ oc_core_fp_p_x_get_handler(oc_request_t *request,
   // id 0
   oc_rep_i_set_int(root, 0, g_gpt[index].id);
   // ia - 12
-  oc_rep_i_set_text_string(root, 11, oc_string(g_gpt[index].ia));
-  // path- 112
-  oc_rep_i_set_text_string(root, 112, oc_string(g_gpt[index].path));
-  // url- 10
-  oc_rep_i_set_text_string(root, 10, oc_string(g_gpt[index].url));
+  if (g_gpt[index].ia > -1) {
+   // oc_rep_i_set_text_string(root, 11, oc_string(g_gpt[index].ia));
+   oc_rep_i_set_int(root, 11, g_gpt[index].ia);
+  }
+
+  // frame url as ia exist.
+  if (g_gpt[index].ia > -1) {
+    if (oc_string_len(g_gpt[index].path) > 0) {
+      // set the path only if it not empty
+      // path- 112
+      oc_rep_i_set_text_string(root, 112, oc_string(g_gpt[index].path));
+    }
+  } else {
+    // url- 10
+    oc_rep_i_set_text_string(root, 10, oc_string(g_gpt[index].url));
+  }
+
   // ga - 7
   oc_rep_i_set_int_array(root, 7, g_gpt[index].ga, g_gpt[index].ga_len);
 
@@ -1192,14 +1209,24 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       object = rep->value.object;
       while (object != NULL) {
         switch (object->type) {
+
+        case OC_REP_INT: {
+          if (object->iname == 12) {
+            g_grt[index].ia = object->value.integer;
+            //  oc_free_string(&g_grt[index].ia);
+            //  oc_new_string(&g_grt[index].ia, oc_string(object->value.string),
+            //                oc_string_len(object->value.string));
+            }
+        } break;
+
         case OC_REP_STRING: {
 #ifdef TAGS_AS_STRINGS
-          if (oc_string_len(object->name) == 2 &&
-              memcmp(oc_string(object->name), "ia", 2) == 0) {
-            oc_free_string(&g_grt[index].ia);
-            oc_new_string(&g_grt[index].ia, oc_string(object->value.string),
-                          oc_string_len(object->value.string));
-          }
+          //if (oc_string_len(object->name) == 2 &&
+          //    memcmp(oc_string(object->name), "ia", 2) == 0) {
+          //  oc_free_string(&g_grt[index].ia);
+          //  oc_new_string(&g_grt[index].ia, oc_string(object->value.string),
+          //                oc_string_len(object->value.string));
+          //}
           if (oc_string_len(object->name) == 4 &&
               memcmp(oc_string(object->name), "path", 4) == 0) {
             oc_free_string(&g_grt[index].path);
@@ -1213,11 +1240,11 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
                           oc_string_len(object->value.string));
           }
 #endif
-          if (object->iname == 12) {
-            oc_free_string(&g_grt[index].ia);
-            oc_new_string(&g_grt[index].ia, oc_string(object->value.string),
-                          oc_string_len(object->value.string));
-          }
+          //if (object->iname == 12) {
+          //  oc_free_string(&g_grt[index].ia);
+          //  oc_new_string(&g_grt[index].ia, oc_string(object->value.string),
+          //                oc_string_len(object->value.string));
+          //}
           if (object->iname == 112) {
             oc_free_string(&g_grt[index].path);
             oc_new_string(&g_grt[index].path, oc_string(object->value.string),
@@ -1334,7 +1361,7 @@ oc_core_fp_r_x_get_handler(oc_request_t *request,
   // id 0
   oc_rep_i_set_int(root, 0, g_grt[index].id);
   // ia - 12
-  oc_rep_i_set_text_string(root, 11, oc_string(g_grt[index].ia));
+  oc_rep_i_set_int(root, 11, g_grt[index].ia);
   // path- 112
   oc_rep_i_set_text_string(root, 112, oc_string(g_grt[index].path));
   // url- 10
@@ -1546,7 +1573,7 @@ oc_load_group_object_table()
 void
 oc_delete_group_object_table_entry(int entry)
 {
-  g_got[entry].id = 0;
+  g_got[entry].id = -1;
   oc_free_string(&g_got[entry].href);
   oc_new_string(&g_got[entry].href, "", 0);
   free(g_got[entry].ga);
@@ -1593,7 +1620,7 @@ oc_print_group_rp_table_entry(int entry, char *Store,
   }
 
   PRINT("    id %d\n", rp_table[entry].id);
-  PRINT("    ia    %s\n", oc_string(rp_table[entry].ia));
+  PRINT("    ia    %d\n", rp_table[entry].ia);
   PRINT("    path  %s\n", oc_string(rp_table[entry].url));
   PRINT("    url  %s\n", oc_string(rp_table[entry].path));
   // PRINT("    cflags  %d\n", rp_table[entry].cflags);
@@ -1622,7 +1649,7 @@ oc_dump_group_rp_table_entry(int entry, char *Store,
   // id 0
   oc_rep_i_set_int(root, 0, rp_table[entry].id);
   // href- 11
-  oc_rep_i_set_text_string(root, 12, oc_string(rp_table[entry].ia));
+  oc_rep_i_set_int(root, 12, rp_table[entry].ia);
   // href- 11
   oc_rep_i_set_text_string(root, 112, oc_string(rp_table[entry].path));
   // href- 11
@@ -1675,13 +1702,11 @@ oc_load_group_rp_table_entry(int entry, char *Store,
           if (rep->iname == 0) {
             rp_table[entry].id = (int)rep->value.integer;
           }
+          if (rep->iname == 12) {
+            rp_table[entry].ia = (int)rep->value.integer;
+          }
           break;
         case OC_REP_STRING:
-          if (rep->iname == 12) {
-            oc_free_string(&rp_table[entry].ia);
-            oc_new_string(&rp_table[entry].ia, oc_string(rep->value.string),
-                          oc_string_len(rep->value.string));
-          }
           if (rep->iname == 112) {
             oc_free_string(&rp_table[entry].path);
             oc_new_string(&rp_table[entry].path, oc_string(rep->value.string),
@@ -1698,8 +1723,10 @@ oc_load_group_rp_table_entry(int entry, char *Store,
             int64_t *arr = oc_int_array(rep->value.array);
             int array_size = (int)oc_int_array_size(rep->value.array);
             int *new_array = (int *)malloc(array_size * sizeof(int));
-            for (int i = 0; i < array_size; i++) {
-              new_array[i] = arr[i];
+            if (new_array != 0) {
+              for (int i = 0; i < array_size; i++) {
+                new_array[i] = arr[i];
+              }
             }
             if (rp_table[entry].ga != 0) {
               free(rp_table[entry].ga);
@@ -1742,9 +1769,10 @@ oc_delete_group_rp_table_entry(int entry, char *Store,
 {
   (void)max_size;
   (void)Store;
-  rp_table[entry].id = 0;
-  oc_free_string(&rp_table[entry].ia);
-  oc_new_string(&rp_table[entry].ia, "", 0);
+  rp_table[entry].id = -1;
+  rp_table[entry].ia = -1;
+  //oc_free_string(&rp_table[entry].ia);
+  //oc_new_string(&rp_table[entry].ia, "", 0);
   oc_free_string(&rp_table[entry].path);
   oc_new_string(&rp_table[entry].path, "", 0);
   oc_free_string(&rp_table[entry].url);
@@ -1774,6 +1802,20 @@ oc_delete_group_rp_table()
   }
 }
 
+
+void oc_init_tables() {
+  for (int i = 0; i < GPT_MAX_ENTRIES; i++) {
+    oc_delete_group_rp_table_entry(i, GPT_STORE, g_gpt, GPT_MAX_ENTRIES);
+  }
+  for (int i = 0; i < GRT_MAX_ENTRIES; i++) {
+    oc_delete_group_rp_table_entry(i, GRT_STORE, g_grt, GRT_MAX_ENTRIES);
+  }
+  for (int i = 0; i < GOT_MAX_ENTRIES; i++) {
+    oc_delete_group_object_table_entry(i, GOT_MAX_ENTRIES);
+  }
+}
+
+
 // -----------------------------------------------------------------------------
 
 void
@@ -1793,6 +1835,7 @@ oc_create_knx_fp_resources(size_t device_index)
   oc_create_fp_r_resource(OC_KNX_FP_R, device_index);
   oc_create_fp_r_x_resource(OC_KNX_FP_R_X, device_index);
 
+  oc_init_tables();
   oc_load_group_object_table();
   oc_load_rp_object_table();
   // note: /fp does not exist..

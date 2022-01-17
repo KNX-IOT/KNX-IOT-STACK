@@ -103,7 +103,7 @@ typedef struct oc_group_object_table_t
  * [
  *    {
  *        "id": "1",
- *         ia": "<knx-installation-id>.<recipient's IA>",
+ *         ia": 5,
  *        "ga":[2305, 2401],
  *        "path": ".knx",
  *    },
@@ -135,8 +135,8 @@ typedef struct oc_group_object_table_t
 typedef struct oc_group_rp_table_t
 {
   int id;           ///< contents of id
-  oc_string_t ia;   ///< contents of ia
-  oc_string_t path; ///< contents of path
+  int ia;           ///< contents of ia (internal address)
+  oc_string_t path; ///< contents of path, default path = ".knx"
   oc_string_t url;  ///< contents of url
   bool con;         ///< confirmed message, default = false
   int *ga;          ///< array of integers
