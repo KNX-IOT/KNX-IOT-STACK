@@ -140,18 +140,6 @@ script to issue an s-mode command
 python s-mode.py 
 ```
 
-## test scripts
-
-### knx_test_sequence
-
-script to test functionallity
-
-- POST to /a/sen with the reset command
-
-```bash
-python knx_test_sequence.py
-```
-
 ### install_demo.py
 
 convieniance script to install the LSAB + LSSB demo.
