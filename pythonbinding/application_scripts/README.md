@@ -73,7 +73,7 @@ python install_config.py -sn 000003 -ia 1 -file LSAB_config.json
 The configuration file is a json formatted file.
 config data:
 - installation id: key = "iid"
-- group object table: Key = ""
+- group object table: Key = "groupobject"
 - recipient table: Key = "recipient"
 - publisher table: Key = "publisher"
 
@@ -81,6 +81,53 @@ The content of the tables are the items in an array.
 The items have the json keys (e.g. "id" instead of 0)
 The application converts the json data in to data with integer keys and then convert the contents to cbor.
 
+##### group object table
+
+The group object table contains the json keys for an Group Object Table entry.
+
+```bash
+"groupobject" : [ 
+    { "id": 1, "href": "p/push", "ga" :[1], "cflag" : ["w"] },
+    { "id": 1, "href": "p/push", "ga" :[1], "cflag" : ["r"] }] 
+```
+
+##### publisher table
+The group object table contains the json keys for an Publisher entry.
+note that this table contains the info of the sending side.
+Note that the ia (and path) needs to be defined or the url.
+if ia is defined and path is not there, the path will have the default value ".knx".
+
+```bash
+"publisher" : [ 
+      {
+         "id": "1",
+          ia": 5,
+         "ga":[2305, 2401],
+         "path": ".knx",
+     },
+     {
+         "id": "2",
+         "url": "coap://<IP multicast, unicast address or fqdn>/<path>",
+         "ga": [2305, 2306, 2307, 2308]
+      }] 
+```
+
+##### recipient table
+The group object table contains the json keys for an Publisher entry.
+note that this table contains the info of the receiving side.
+Note that the ia (and path) needs to be defined or the url.
+if ia is defined and path is not there, the path will have the default value ".knx".
+
+```bash
+"recipient" : [ 
+ *    {
+ *       "id": "1", ia": 5, "ga":[2305, 2401], "path": ".knx",
+ *    },
+ *    {
+ *        "id": "2","url": "coap://<IP multicast, unicast address or fqdn>/<path>", 
+ * "ga": [2305, 2306, 2307, 2308]
+ *     }] 
+```
 
 ### s-mode.py
 
