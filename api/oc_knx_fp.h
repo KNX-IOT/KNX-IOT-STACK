@@ -252,9 +252,16 @@ void oc_delete_group_object_table_entry(int entry);
  */
 void oc_delete_group_object_table();
 
+
+//int oc_core_send_message_recipient_table_index(int index, int group_address);
+int oc_core_send_message_recipient_table_index(int index, int group_address,
+                                               oc_rep_t *rep);
+
+int oc_core_get_recipient_table_size();
+
 // these are needed for the system with the broker
-int oc_core_find_reciepient_table_index(int group_address);
-oc_string_t oc_core_find_reciepient_table_url_from_index(int index);
+//int oc_core_find_recipient_table_index(int group_address);
+//oc_string_t oc_core_find_recipient_table_url_from_index(int index);
 
 /**
  * @brief Creation of the KNX feature point resources.
