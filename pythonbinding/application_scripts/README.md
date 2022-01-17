@@ -94,7 +94,8 @@ The group object table contains the json keys for an Group Object Table entry.
 ##### publisher table
 The group object table contains the json keys for an Publisher entry.
 note that this table contains the info of the sending side.
-Note that the ia + path needs to be defined or the url.
+Note that the ia (and path) needs to be defined or the url.
+if ia is defined and path is not there, the path will have the default value ".knx".
 
 ```bash
 "publisher" : [ 
@@ -114,7 +115,8 @@ Note that the ia + path needs to be defined or the url.
 ##### recipient table
 The group object table contains the json keys for an Publisher entry.
 note that this table contains the info of the receiving side.
-Note that the ia + path needs to be defined or the url.
+Note that the ia (and path) needs to be defined or the url.
+if ia is defined and path is not there, the path will have the default value ".knx".
 
 ```bash
 "recipient" : [ 
