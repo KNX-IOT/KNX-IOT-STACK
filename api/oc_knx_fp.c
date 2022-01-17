@@ -894,7 +894,7 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
         switch (object->type) {
         case OC_REP_INT: {
           if (object->iname == 12) {
-            &g_gpt[index].ia, object->value.integer;
+            g_gpt[index].ia = object->value.integer;
           }
         } break;
         case OC_REP_STRING: {
@@ -1811,7 +1811,7 @@ void oc_init_tables() {
     oc_delete_group_rp_table_entry(i, GRT_STORE, g_grt, GRT_MAX_ENTRIES);
   }
   for (int i = 0; i < GOT_MAX_ENTRIES; i++) {
-    oc_delete_group_object_table_entry(i, GOT_MAX_ENTRIES);
+    oc_delete_group_object_table_entry(i);
   }
 }
 
