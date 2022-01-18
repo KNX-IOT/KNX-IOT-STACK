@@ -554,7 +554,8 @@ def do_sequence_knx_knx_recipient(my_stack):
                 {0: 10, 12: 1, 7:[2] },
                 {0: 225, 10: "coap://p/light255", 7:[2] }]
     response =  my_stack.issue_cbor_post(sn,"/fp/r",content)
-    print ("response:",response.get_payload())
+    if response is not None:
+        print ("response:",response.get_payload())
     my_stack.purge_response(response)
     #do_check_table(my_stack, sn, "/fp/g",content)
 

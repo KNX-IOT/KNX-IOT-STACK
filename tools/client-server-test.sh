@@ -31,7 +31,8 @@ kill $serverPID
 
 echo "---python output------"
 
-cat $mydir/python_out.txt | xargs echo -e
+#cat $mydir/python_out.txt | xargs echo -e
+cat -v $mydir/python_out.txt
 
 echo "---Collecting Failures------"
 
