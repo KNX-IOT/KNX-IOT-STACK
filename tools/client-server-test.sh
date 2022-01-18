@@ -30,9 +30,11 @@ kill $serverPID
 
 echo "---Collecting Failures------"
 
-if grep -q$mydir/python_out.txt; then
+if grep -q $mydir/python_out.txt; then
     echo Failures found
+    exit 1
 else
     echo no failures found
+    exit 0
 fi
 
