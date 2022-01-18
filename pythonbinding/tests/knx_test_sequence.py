@@ -39,6 +39,7 @@
 # pylint: disable=W1514
 # pylint: disable=W0212
 
+import argparse
 import os
 import signal
 import sys
@@ -716,6 +717,27 @@ def do_sequence(my_stack):
         #do_sequence_a_sen(my_stack)
 
 if __name__ == '__main__':  # pragma: no cover
+
+
+
+    parser = argparse.ArgumentParser()
+
+    # input (files etc.)
+    #parser.add_argument("-sn", "--serialnumber",
+    #                help="serial number of the device", nargs='?',
+    #                const=1, required=True)
+    parser.add_argument("-scope", "--scope",
+                    help="scope of the multicast request [2,5]", nargs='?',
+                    default=2, const=1, required=False)
+    parser.add_argument("-sleep", "--sleep",
+                    help="sleep in seconds", nargs='?',
+                    default=0, const=1, required=False)
+    print(sys.argv)
+    args = parser.parse_args()
+    print("scope         :" + str(args.scope))
+    print("sleep         :" + str(args.sleep))
+    time.sleep(int(args.sleep))
+
     the_stack = knx_stack.KNXIOTStack()
     signal.signal(signal.SIGINT, the_stack.sig_handler)
 
