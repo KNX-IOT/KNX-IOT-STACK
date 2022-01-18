@@ -739,7 +739,7 @@ main(void)
 #endif /* OC_SECURITY */
 
   oc_device_info_t *device = oc_core_get_device_info(0);
-  PRINT("serial number: %s", device->serialnumber);
+  PRINT("serial number: %s", oc_string(device->serialnumber));
 
   PRINT("Server \"simple_server_all\" running, waiting on incoming "
         "connections.\n");
