@@ -35,6 +35,6 @@ jobs:
           cd linuxbuild_clientserver
           cmake ../.
           make all
-          chmod a+x chmod +x "${GITHUB_WORKSPACE}/tools/client-server-test.sh"
+          chmod a+x "${GITHUB_WORKSPACE}/tools/client-server-test.sh"
           "${GITHUB_WORKSPACE}/tools/client-server-test.sh"
           
