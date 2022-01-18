@@ -261,7 +261,7 @@ int oc_core_get_recipient_table_size();
 
 
 
-bool oc_add_points_int_group_object_table_to_response(oc_request_t *request,
+bool oc_add_points_in_group_object_table_to_response(oc_request_t *request,
                                                       size_t device_index,
                                                       int group_address,
                                                       size_t *response_length,
