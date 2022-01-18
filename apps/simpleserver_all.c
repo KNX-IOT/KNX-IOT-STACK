@@ -427,7 +427,6 @@ post_dpa_352_52(oc_request_t *request, oc_interface_mask_t interfaces,
 {
   (void)interfaces;
   (void)user_data;
-  bool error_state = false;
   PRINT("-- Begin post_dpa_352_52:\n");
   // oc_rep_t *rep = request->request_payload;
 
@@ -443,7 +442,7 @@ post_dpa_352_52(oc_request_t *request, oc_interface_mask_t interfaces,
   }
   /* loop over the request document to check if all inputs are ok */
   if ((rep != NULL) && (rep->type == OC_REP_BOOL)) {
-    PRINT("  post_dpa_352b received : %d\n", rep->value.boolean);
+    PRINT("  post_dpa_352_52 received : %d\n", rep->value.boolean);
     g_352_52_state = rep->value.boolean;
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
     PRINT("-- End post_dpa_352_52\n");
