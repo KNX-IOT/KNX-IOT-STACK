@@ -91,6 +91,9 @@ static int oc_core_find_index_in_rp_table_from_id(int id,
                                                   oc_group_rp_table_t *rp_table,
                                                   int max_size);
 
+int find_empty_slot_in_rp_table(int id, oc_group_rp_table_t *rp_table,
+                                int max_size);
+
 // -----------------------------------------------------------------------------
 
 static void
@@ -1414,7 +1417,9 @@ oc_create_fp_r_x_resource(int resource_idx, size_t device)
 int
 oc_core_send_message_recipient_table_index(int index, int group_address, oc_rep_t* rep)
 {
+  (void)rep;
   bool found = false;
+
   if (index >= GRT_MAX_ENTRIES)
   {
     return -1;
@@ -1915,7 +1920,7 @@ is_in_array(int value, int* array, int array_size)
 
 
 bool
-oc_add_points_int_group_object_table_to_response(oc_request_t *request,
+oc_add_points_in_group_object_table_to_response(oc_request_t *request,
                                                  size_t device_index,
                                                  int group_address,
                                                  size_t *response_length,
@@ -1925,19 +1930,23 @@ oc_add_points_int_group_object_table_to_response(oc_request_t *request,
   (void)device_index;
   (void)response_length;
   (void)matches;
-  int length = 0;
+ // int length = 0;
+
+  PRINT("oc_add_points_in_group_object_table_to_response %d\n", group_address);
 
   int index;
   for (index = 0; index < GOT_MAX_ENTRIES; index++) {
     if (g_got[index].ga_len > 0) {
       if (is_in_array(group_address, g_got[index].ga, g_got[index].ga_len)) {
-          // add the resource
+        // add the resource
+        PRINT("oc_add_points_in_group_object_table_to_response %s\n",
+              oc_string(g_got[index].href));
         oc_add_resource_to_wk(
             oc_ri_get_app_resource_by_uri(oc_string(g_got[index].href),
                                           oc_string_len(g_got[index].href),
                                           device_index),
             request,
-          device_index, &response_length, matches);
+          device_index, response_length, matches);
         }
       }
     }

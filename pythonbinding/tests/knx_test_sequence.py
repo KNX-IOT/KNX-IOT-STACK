@@ -623,6 +623,11 @@ def do_sequence_f(my_stack):
 
 def do_discovery_tests(my_stack):
     print("========discovery=========")
+    # group address
+    data = my_stack.discover_devices_with_query_data("d=urn:knx:g.s.1")
+    print(" -------------------------")
+    print (data)
+    print(" -------------------------")
     # all devices
     data = my_stack.discover_devices_with_query_data("rt=urn:knx:dpa.*")
     print(" -------------------------")
@@ -684,13 +689,15 @@ def do_discovery_tests(my_stack):
     print (data)
     print(" -------------------------")
 
+
 def do_sequence(my_stack):
     if my_stack.get_nr_devices() > 0:
         get_sn(my_stack)
-
+        #do_discovery_tests(my_stack)
+        #return
         #do_sequence_knx_knx_s_mode(my_stack)
         do_sequence_knx_knx_recipient(my_stack)
-        return
+        #return
         do_sequence_dev(my_stack)
         do_sequence_dev_programming_mode(my_stack)
         do_sequence_dev_programming_mode_fail(my_stack)

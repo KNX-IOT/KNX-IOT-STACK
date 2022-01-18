@@ -38,6 +38,15 @@ oc_add_resource_to_wk(oc_resource_t *resource, oc_request_t *request,
   (void)device_index; /* variable not used */
   int length;
 
+  if (resource == NULL) {
+    return false;
+  }
+
+  if ((oc_string_len(resource->uri) == 0)) {
+    return false;
+  }
+
+
   if (matches > 0) {
     length = oc_rep_add_line_to_buffer(",\n");
     *response_length += length;
@@ -231,7 +240,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
      ?d=urn:knx:g.s.[ga]
      list the data points to which the group address applies to
   */
-  if (d_len > 13 && strncmp(d_request, "urn:knx:g.s.", 13) == 0) {
+  if (d_len > 12 && strncmp(d_request, "urn:knx:g.s.", 12) == 0){
     int group_address = atoi(&d_request[12]);
     PRINT(" group address: %d\n", group_address);
     // if not loaded the we can just return
@@ -244,6 +253,11 @@ oc_wkcore_discovery_handler(oc_request_t *request,
       return;
     }
     // create the response
+    bool added = oc_add_points_in_group_object_table_to_response(
+      request, device_index, group_address, &response_length, matches);
+    request->response->response_buffer->response_length = response_length;
+    request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
+    return;
   }
 
   if (oc_is_device_mode_in_programming(device_index)) {
