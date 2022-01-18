@@ -111,6 +111,8 @@ STATIC CRITICAL_SECTION cs;   /**< event loop variable */
 
 #define btoa(x) ((x) ? "true" : "false")
 
+/** the state of the dpa 421.61 */
+bool g_mystate = false;
 volatile int quit = 0; /**< stop variable, used by handle_signal */
 
 void
@@ -158,9 +160,6 @@ app_init(void)
 
   return ret;
 }
-
-/** the state of the dpa 421.61 */
-bool g_mystate = false;
 
 /**
  * get method for "p/push" resource.

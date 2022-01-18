@@ -471,9 +471,91 @@ def do_sequence_fp_programming(my_stack):
 # sia ==> 4
 # ga ==> 7
 # st ==> 6
-def do_sequence_knx_knx_int(my_stack):
+def do_sequence_knx_knx_s_mode(my_stack):
     sn = my_stack.device_array[0].sn
-    print("========.knx=========")
+    print("========.knx=s-mode========")
+    print("-------------------")
+    content = { 2: "startLoading"}
+    print("lsm :", content)
+    response =  my_stack.issue_cbor_post(sn,"/a/lsm",content)
+    print ("response:",response)
+    my_stack.purge_response(response)
+
+    # group object table
+    # id (0)= 1
+    # url (11)= /p/light
+    # ga (7 )= 1
+    # cflags (8) = ["r" ] ; read = 1, write = 2, transmit = 3 update = 4
+    content = [ {0: 5, 11: "p/push5", 7:[1], 8: [2] } ,
+                {0: 2, 11: "p/light2", 7:[2], 8: [2,4] },
+                {0: 225, 11: "p/light255", 7:[2], 8: [2,4] }]
+    response =  my_stack.issue_cbor_post(sn,"/fp/g",content)
+    print ("response:",response.get_payload())
+    my_stack.purge_response(response)
+    #do_check_table(my_stack, sn, "/fp/g",content)
+
+    content = { 2: "loadComplete"}
+    print("lsm :", content)
+    response =  my_stack.issue_cbor_post(sn,"/a/lsm",content)
+    print ("response:", response)
+    my_stack.purge_response(response)
+
+    response =  my_stack.issue_cbor_get(sn, "/.knx")
+    print ("response:",response)
+    my_stack.purge_response(response)
+
+    content = {"value": { 4 : 5, 7: 7777 , 6 : "w"}}
+    response =  my_stack.issue_cbor_post(sn,"/a/lsm",content)
+    print ("response:",response)
+    my_stack.purge_response(response)
+
+    response =  my_stack.issue_cbor_get(sn, "/.knx")
+    print ("response:",response)
+    my_stack.purge_response(response)
+
+    content = {"value": { 4 : 5, 7: 7777 , 6 : "r"}}
+    response =  my_stack.issue_cbor_post(sn,"/a/lsm",content)
+    print ("response:",response)
+    my_stack.purge_response(response)
+
+    response =  my_stack.issue_cbor_get(sn, "/.knx")
+    print ("response:",response)
+    my_stack.purge_response(response)
+
+# ./knx resource
+# sia ==> 4
+# ga ==> 7
+# st ==> 6
+def do_sequence_knx_knx_recipient(my_stack):
+    sn = my_stack.device_array[0].sn
+    print("========.knx=recipient========")
+    print("-------------------")
+    content = { 2: "startLoading"}
+    print("lsm :", content)
+    response =  my_stack.issue_cbor_post(sn,"/a/lsm",content)
+    print ("response:",response)
+    my_stack.purge_response(response)
+
+    # recipient table, setting the destination
+    # id (0)= 1
+    # ia (12) = 1 + path (112)= .knx
+    # url (10)= /p/light
+    # ga (7 )= 1
+    content = [ {0: 5, 12: 1, 112: ".knx", 7:[1] } ,
+                {0: 2, 12: 1, 112: ".knx-temp", 7:[2] },
+                {0: 10, 12: 1, 7:[2] },
+                {0: 225, 10: "coap://p/light255", 7:[2] }]
+    response =  my_stack.issue_cbor_post(sn,"/fp/r",content)
+    print ("response:",response.get_payload())
+    my_stack.purge_response(response)
+    #do_check_table(my_stack, sn, "/fp/g",content)
+
+    content = { 2: "loadComplete"}
+    print("lsm :", content)
+    response =  my_stack.issue_cbor_post(sn,"/a/lsm",content)
+    print ("response:", response)
+    my_stack.purge_response(response)
+
     response =  my_stack.issue_cbor_get(sn, "/.knx")
     print ("response:",response)
     my_stack.purge_response(response)
@@ -541,6 +623,11 @@ def do_sequence_f(my_stack):
 
 def do_discovery_tests(my_stack):
     print("========discovery=========")
+    # group address
+    data = my_stack.discover_devices_with_query_data("d=urn:knx:g.s.1")
+    print(" -------------------------")
+    print (data)
+    print(" -------------------------")
     # all devices
     data = my_stack.discover_devices_with_query_data("rt=urn:knx:dpa.*")
     print(" -------------------------")
@@ -602,9 +689,15 @@ def do_discovery_tests(my_stack):
     print (data)
     print(" -------------------------")
 
+
 def do_sequence(my_stack):
     if my_stack.get_nr_devices() > 0:
         get_sn(my_stack)
+        #do_discovery_tests(my_stack)
+        #return
+        #do_sequence_knx_knx_s_mode(my_stack)
+        do_sequence_knx_knx_recipient(my_stack)
+        #return
         do_sequence_dev(my_stack)
         do_sequence_dev_programming_mode(my_stack)
         do_sequence_dev_programming_mode_fail(my_stack)
@@ -616,9 +709,10 @@ def do_sequence(my_stack):
         do_sequence_knx_osn(my_stack)
         do_sequence_core_knx(my_stack)
         do_discovery_tests(my_stack)
+        do_sequence_knx_knx_s_mode(my_stack)
+        do_sequence_knx_knx_recipient(my_stack)
         return
         # .knx
-        #do_sequence_knx_knx_int(my_stack)
         #do_sequence_a_sen(my_stack)
 
 if __name__ == '__main__':  # pragma: no cover

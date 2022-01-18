@@ -44,7 +44,7 @@ get_fp_from_dp(char *dpt)
 }
 
 bool
-is_in_array(int value)
+is_in_g_array(int value)
 {
   int i;
   for (i = 0; i < g_array_size; i++) {
@@ -166,7 +166,7 @@ oc_add_function_blocks_to_response(oc_request_t *request, size_t device_index,
       if ((strncmp(t, ":dpa", 4) == 0) ||
           (strncmp(t, "urn:knx:dpa", 11) == 0)) {
         int fp_int = get_fp_from_dp(t);
-        if ((fp_int > 0) && (is_in_array(fp_int) == false)) {
+        if ((fp_int > 0) && (is_in_g_array(fp_int) == false)) {
           store_in_array(fp_int);
         }
       }

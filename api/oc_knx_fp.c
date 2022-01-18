@@ -16,6 +16,7 @@
 
 #include "oc_api.h"
 #include "api/oc_knx_fp.h"
+#include "oc_discovery.h"
 #include "oc_core_res.h"
 #include <stdio.h>
 
@@ -89,6 +90,9 @@ static void oc_dump_group_rp_table_entry(int entry, char *Store,
 static int oc_core_find_index_in_rp_table_from_id(int id,
                                                   oc_group_rp_table_t *rp_table,
                                                   int max_size);
+
+int find_empty_slot_in_rp_table(int id, oc_group_rp_table_t *rp_table,
+                                int max_size);
 
 // -----------------------------------------------------------------------------
 
@@ -881,7 +885,7 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       // find the storage index, e.g. for this object
       oc_rep_t *object = rep->value.object;
       id = table_find_id_from_rep(object);
-      index = find_empty_slot_in_group_object_table(id);
+      index = find_empty_slot_in_rp_table(id, g_gpt, GPT_MAX_ENTRIES);
       if (index == -1) {
         PRINT("  ERROR index %d\n", index);
         oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
@@ -1197,7 +1201,7 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
         oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
         return;
       }
-      index = find_empty_slot_in_group_object_table(id);
+      index = find_empty_slot_in_rp_table(id, g_grt, GRT_MAX_ENTRIES);
       if (index == -1) {
         PRINT("  ERROR index %d\n", index);
         oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
@@ -1213,20 +1217,11 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
         case OC_REP_INT: {
           if (object->iname == 12) {
             g_grt[index].ia = object->value.integer;
-            //  oc_free_string(&g_grt[index].ia);
-            //  oc_new_string(&g_grt[index].ia, oc_string(object->value.string),
-            //                oc_string_len(object->value.string));
           }
         } break;
 
         case OC_REP_STRING: {
 #ifdef TAGS_AS_STRINGS
-          // if (oc_string_len(object->name) == 2 &&
-          //    memcmp(oc_string(object->name), "ia", 2) == 0) {
-          //  oc_free_string(&g_grt[index].ia);
-          //  oc_new_string(&g_grt[index].ia, oc_string(object->value.string),
-          //                oc_string_len(object->value.string));
-          //}
           if (oc_string_len(object->name) == 4 &&
               memcmp(oc_string(object->name), "path", 4) == 0) {
             oc_free_string(&g_grt[index].path);
@@ -1240,11 +1235,6 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
                           oc_string_len(object->value.string));
           }
 #endif
-          // if (object->iname == 12) {
-          //  oc_free_string(&g_grt[index].ia);
-          //  oc_new_string(&g_grt[index].ia, oc_string(object->value.string),
-          //                oc_string_len(object->value.string));
-          //}
           if (object->iname == 112) {
             oc_free_string(&g_grt[index].path);
             oc_new_string(&g_grt[index].path, oc_string(object->value.string),
@@ -1423,18 +1413,49 @@ oc_create_fp_r_x_resource(int resource_idx, size_t device)
     "urn:knx:if.c");
 }
 
-// -----------------------------------------------------------------------------
-
-/*
-void
-oc_create_fp_resource(int resource_idx, size_t device)
+int
+oc_core_send_message_recipient_table_index(int index, int group_address,
+                                           oc_rep_t *rep)
 {
-  OC_DBG("oc_create_fp_resource\n");
-  oc_core_lf_populate_resource(resource_idx, device, "/fp", OC_IF_LL,
-APPLICATION_LINK_FORMAT, OC_DISCOVERABLE, oc_core_p_get_handler, 0,
-                            oc_core_p_post_handler, 0, 1, "urn:knx:if.c");
+  (void)rep;
+  bool found = false;
+
+  if (index >= GRT_MAX_ENTRIES) {
+    return -1;
+  }
+  for (int i = 0; g_grt[index].ga_len; i++) {
+    int ga = g_grt[index].ga[i];
+    if (ga == group_address) {
+      found = true;
+      break;
+    }
+  }
+  if (found) {
+    if (g_grt[index].ia > -1) {
+      PRINT("oc_core_send_message_recipient_table_index: ia %d\n",
+            g_grt[index].ia);
+      if (oc_string_len(g_grt[index].path) > 0) {
+        PRINT("      sending to %s\n", g_grt[index].path);
+
+      } else {
+        // do .knx
+        PRINT("      sending to (default) %s\n", ".knx");
+      }
+
+    } else {
+      if (oc_string_len(g_grt[index].url) > 0) {
+        //
+        PRINT("      sending to %s\n", g_grt[index].url);
+      }
+    }
+
+    return 0;
+  }
+
+  return -1;
 }
-*/
+
+// -----------------------------------------------------------------------------
 
 void
 oc_print_group_object_table_entry(int entry)
@@ -1482,9 +1503,14 @@ oc_dump_group_object_table_entry(int entry)
 
   int size = oc_rep_get_encoded_payload_size();
   if (size > 0) {
-    OC_DBG("dump_got: dumped current state [%s] [%d]: size %d", filename, entry,
-           size);
-    oc_storage_write(filename, buf, size);
+    OC_DBG("oc_dump_group_object_table_entry: dumped current state [%s] [%d]: "
+           "size %d",
+           filename, entry, size);
+    long written_size = oc_storage_write(filename, buf, size);
+    if (written_size != (long)size) {
+      PRINT("oc_dump_group_object_table_entry: written %d != %d (towrite)\n",
+            (int)written_size, size);
+    }
   }
 
   free(buf);
@@ -1638,10 +1664,13 @@ oc_dump_group_rp_table_entry(int entry, char *Store,
   (void)max_size;
   char filename[20];
   snprintf(filename, 20, "%s_%d", Store, entry);
+  PRINT("oc_dump_group_rp_table_entry %s, fname=%s\n", Store, filename);
 
   uint8_t *buf = malloc(OC_MAX_APP_DATA_SIZE);
-  if (!buf)
+  if (!buf) {
+    PRINT("oc_dump_group_rp_table_entry: no allocated mem\n");
     return;
+  }
 
   oc_rep_new(buf, OC_MAX_APP_DATA_SIZE);
   // write the data
@@ -1664,9 +1693,14 @@ oc_dump_group_rp_table_entry(int entry, char *Store,
 
   int size = oc_rep_get_encoded_payload_size();
   if (size > 0) {
-    OC_DBG("dump_grp: dumped current state [%s] [%s] [%d]: size %d", filename,
-           Store, entry, size);
-    oc_storage_write(filename, buf, size);
+    OC_DBG("oc_dump_group_rp_table_entry: dumped current state [%s] [%s] [%d]: "
+           "size %d",
+           filename, Store, entry, size);
+    long written_size = oc_storage_write(filename, buf, size);
+    if (written_size != (long)size) {
+      PRINT("oc_dump_group_rp_table_entry: written %d != %d (towrite)\n",
+            (int)written_size, size);
+    }
   }
 
   free(buf);
@@ -1759,7 +1793,7 @@ oc_load_rp_object_table()
   PRINT("Loading Group Publisher Table from Persistent storage\n");
   for (int i = 0; i < GPT_MAX_ENTRIES; i++) {
     oc_load_group_rp_table_entry(i, GPT_STORE, g_gpt, GPT_MAX_ENTRIES);
-    oc_print_group_rp_table_entry(i, GRT_STORE, g_grt, GRT_MAX_ENTRIES);
+    oc_print_group_rp_table_entry(i, GPT_STORE, g_gpt, GPT_MAX_ENTRIES);
   }
 }
 
@@ -1802,6 +1836,38 @@ oc_delete_group_rp_table()
   }
 }
 
+int
+find_empty_slot_in_rp_table(int id, oc_group_rp_table_t *rp_table, int max_size)
+{
+  int index = -1;
+  if (id < 0) {
+    // should be a positive number
+    return index;
+  }
+  index = oc_core_find_index_in_rp_table_from_id(id, rp_table, max_size);
+  if (index > -1) {
+    // overwrite existing index
+    return index;
+  }
+
+  // empty slot
+  for (int i = 0; i < max_size; i++) {
+    if (rp_table[i].ga_len == 0) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+int
+oc_core_get_recipient_table_size()
+{
+  return GRT_MAX_ENTRIES;
+}
+
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+
 void
 oc_init_tables()
 {
@@ -1838,24 +1904,48 @@ oc_create_knx_fp_resources(size_t device_index)
   oc_init_tables();
   oc_load_group_object_table();
   oc_load_rp_object_table();
-  // note: /fp does not exist..
-  // oc_create_fp_resource(OC_KNX_FP, device_index);
 }
 
 // -----------------------------------------------------------------------------
+bool
+is_in_array(int value, int *array, int array_size)
+{
+  for (int i = 0; i < array_size; i++) {
+    if (array[i] == value) {
+      return true;
+    }
+  }
+  return false;
+}
 
 bool
-oc_add_points_int_group_object_table_to_response(oc_request_t *request,
-                                                 size_t device_index,
-                                                 size_t *response_length,
-                                                 int matches)
+oc_add_points_in_group_object_table_to_response(oc_request_t *request,
+                                                size_t device_index,
+                                                int group_address,
+                                                size_t *response_length,
+                                                int matches)
 {
   (void)request;
   (void)device_index;
   (void)response_length;
   (void)matches;
-  // todo
-  // list all datapoints that belongs to a specific group.
+  // int length = 0;
 
+  PRINT("oc_add_points_in_group_object_table_to_response %d\n", group_address);
+
+  int index;
+  for (index = 0; index < GOT_MAX_ENTRIES; index++) {
+    if (g_got[index].ga_len > 0) {
+      if (is_in_array(group_address, g_got[index].ga, g_got[index].ga_len)) {
+        // add the resource
+        PRINT("oc_add_points_in_group_object_table_to_response %s\n",
+              oc_string(g_got[index].href));
+        oc_add_resource_to_wk(oc_ri_get_app_resource_by_uri(
+                                oc_string(g_got[index].href),
+                                oc_string_len(g_got[index].href), device_index),
+                              request, device_index, response_length, matches);
+      }
+    }
+  }
   return false;
 }
