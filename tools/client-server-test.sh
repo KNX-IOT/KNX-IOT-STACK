@@ -28,6 +28,11 @@ sleep 60
 kill $pythonPID
 kill $serverPID
 
+
+echo "---python output------"
+
+cat $mydir/python_out.txt | xargs echo
+
 echo "---Collecting Failures------"
 
 if grep -q $mydir/python_out.txt; then
