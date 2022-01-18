@@ -256,8 +256,25 @@ void oc_delete_group_object_table();
 int oc_core_send_message_recipient_table_index(int index, int group_address,
                                                oc_rep_t *rep);
 
+/**
+ * @brief return the size of the recipient table
+ *
+ * @return int the size of the table
+ */
 int oc_core_get_recipient_table_size();
 
+/**
+ * @brief add points to the well-known core discovery response
+ *  when the request has query option
+ * .well-known/core?d=urn:knx:g.s.[group-address].
+ * @param request The request
+ * @param device_index The device index
+ * @param group_address the parsed group address from the query option
+ * @param response_length the response lenght
+ * @param matches if there are matches
+ * @return true
+ * @return false
+ */
 bool oc_add_points_in_group_object_table_to_response(oc_request_t *request,
                                                      size_t device_index,
                                                      int group_address,
