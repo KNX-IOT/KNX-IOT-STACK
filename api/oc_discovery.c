@@ -47,7 +47,6 @@ oc_add_resource_to_wk(oc_resource_t *resource, oc_request_t *request,
     return false;
   }
 
-
   if (matches > 0) {
     length = oc_rep_add_line_to_buffer(",\n");
     *response_length += length;
@@ -241,7 +240,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
      ?d=urn:knx:g.s.[ga]
      list the data points to which the group address applies to
   */
-  if (d_len > 12 && strncmp(d_request, "urn:knx:g.s.", 12) == 0){
+  if (d_len > 12 && strncmp(d_request, "urn:knx:g.s.", 12) == 0) {
     int group_address = atoi(&d_request[12]);
     PRINT(" group address: %d\n", group_address);
     // if not loaded the we can just return

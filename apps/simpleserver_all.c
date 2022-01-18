@@ -113,12 +113,10 @@ STATIC CRITICAL_SECTION cs;   /**< event loop variable */
 /* Note: Magic numbers are derived from the resource definition, either from the
  * example or the definition.*/
 
-
 bool g_352_51_state = false;
 bool g_352_52_state = false;
 bool g_353_52_state = false;
 volatile int quit = 0; /**< stop variable, used by handle_signal */
-
 
 void
 oc_add_s_mode_response_cb(char *url, oc_rep_t *rep, oc_rep_t *rep_value)
@@ -176,7 +174,6 @@ app_init(void)
 
   oc_device_mode_display(0);
 
-  
   oc_set_s_mode_response_cb(oc_add_s_mode_response_cb);
 
   return ret;
@@ -196,7 +193,7 @@ app_init(void)
  */
 STATIC void
 get_dpa_352_51(oc_request_t *request, oc_interface_mask_t interfaces,
-            void *user_data)
+               void *user_data)
 {
   (void)user_data; /* variable not used */
 
@@ -244,7 +241,7 @@ get_dpa_352_51(oc_request_t *request, oc_interface_mask_t interfaces,
  */
 STATIC void
 get_dpa_352_52(oc_request_t *request, oc_interface_mask_t interfaces,
-             void *user_data)
+               void *user_data)
 {
   (void)user_data; /* variable not used */
   /* TODO: SENSOR add here the code to talk to the HW if one implements a
@@ -263,16 +260,16 @@ get_dpa_352_52(oc_request_t *request, oc_interface_mask_t interfaces,
   }
 
   // set a string value
-  //CborError error;
-  //error = cbor_encode_text_stringz(&g_encoder, "blahblah");
-  //if (error) {
+  // CborError error;
+  // error = cbor_encode_text_stringz(&g_encoder, "blahblah");
+  // if (error) {
   //  oc_status_code = true;
   // }
-  //PRINT("CBOR encoder size %d\n", oc_rep_get_encoded_payload_size());
-  //error = cbor_encode_text_string(&g_encoder, "xyzxyz", 3);
-  //if (error) {
-    // PRINT("CBOR error %s\n", cbor_error_string(error));
-    // oc_status_code = true;
+  // PRINT("CBOR encoder size %d\n", oc_rep_get_encoded_payload_size());
+  // error = cbor_encode_text_string(&g_encoder, "xyzxyz", 3);
+  // if (error) {
+  // PRINT("CBOR error %s\n", cbor_error_string(error));
+  // oc_status_code = true;
   //}
 
   CborError error;
@@ -304,7 +301,7 @@ get_dpa_352_52(oc_request_t *request, oc_interface_mask_t interfaces,
  */
 STATIC void
 get_dpa_353_52(oc_request_t *request, oc_interface_mask_t interfaces,
-            void *user_data)
+               void *user_data)
 {
   (void)user_data; /* variable not used */
   /* TODO: SENSOR add here the code to talk to the HW if one implements a
@@ -325,13 +322,13 @@ get_dpa_353_52(oc_request_t *request, oc_interface_mask_t interfaces,
   }
 
   CborError error;
-  //error = cbor_encode_int(&g_encoder, (int64_t)555);
-  //if (error) {
+  // error = cbor_encode_int(&g_encoder, (int64_t)555);
+  // if (error) {
   //  oc_status_code = true;
   //}
-  //PRINT("CBOR encoder size %d\n", oc_rep_get_encoded_payload_size());
-  //error = cbor_encode_int(&g_encoder, (int64_t)666);
-  //if (error) {
+  // PRINT("CBOR encoder size %d\n", oc_rep_get_encoded_payload_size());
+  // error = cbor_encode_int(&g_encoder, (int64_t)666);
+  // if (error) {
   //  oc_status_code = true;
   //}
   error = cbor_encode_boolean(&g_encoder, g_352_52_state);
@@ -363,7 +360,7 @@ get_dpa_353_52(oc_request_t *request, oc_interface_mask_t interfaces,
  */
 STATIC void
 post_dpa_352_51(oc_request_t *request, oc_interface_mask_t interfaces,
-             void *user_data)
+                void *user_data)
 {
   (void)interfaces;
   (void)user_data;
@@ -423,7 +420,7 @@ post_dpa_352_51(oc_request_t *request, oc_interface_mask_t interfaces,
  */
 STATIC void
 post_dpa_352_52(oc_request_t *request, oc_interface_mask_t interfaces,
-              void *user_data)
+                void *user_data)
 {
   (void)interfaces;
   (void)user_data;
@@ -467,7 +464,7 @@ post_dpa_352_52(oc_request_t *request, oc_interface_mask_t interfaces,
  */
 STATIC void
 post_dpa_353_52(oc_request_t *request, oc_interface_mask_t interfaces,
-             void *user_data)
+                void *user_data)
 {
   (void)interfaces;
   (void)user_data;
@@ -475,7 +472,6 @@ post_dpa_353_52(oc_request_t *request, oc_interface_mask_t interfaces,
   PRINT("-- Begin post_dpa_353_52:\n");
   // oc_rep_t *rep = request->request_payload;
 
-  
   if (oc_is_s_mode_request(request)) {
     PRINT(" S-MODE\n");
 

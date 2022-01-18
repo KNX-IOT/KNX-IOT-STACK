@@ -885,7 +885,7 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       // find the storage index, e.g. for this object
       oc_rep_t *object = rep->value.object;
       id = table_find_id_from_rep(object);
-      index = find_empty_slot_in_rp_table(id, g_gpt, GPT_MAX_ENTRIES );
+      index = find_empty_slot_in_rp_table(id, g_gpt, GPT_MAX_ENTRIES);
       if (index == -1) {
         PRINT("  ERROR index %d\n", index);
         oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
@@ -1413,15 +1413,14 @@ oc_create_fp_r_x_resource(int resource_idx, size_t device)
     "urn:knx:if.c");
 }
 
-
 int
-oc_core_send_message_recipient_table_index(int index, int group_address, oc_rep_t* rep)
+oc_core_send_message_recipient_table_index(int index, int group_address,
+                                           oc_rep_t *rep)
 {
   (void)rep;
   bool found = false;
 
-  if (index >= GRT_MAX_ENTRIES)
-  {
+  if (index >= GRT_MAX_ENTRIES) {
     return -1;
   }
   for (int i = 0; g_grt[index].ga_len; i++) {
@@ -1437,7 +1436,7 @@ oc_core_send_message_recipient_table_index(int index, int group_address, oc_rep_
             g_grt[index].ia);
       if (oc_string_len(g_grt[index].path) > 0) {
         PRINT("      sending to %s\n", g_grt[index].path);
-      
+
       } else {
         // do .knx
         PRINT("      sending to (default) %s\n", ".knx");
@@ -1447,7 +1446,7 @@ oc_core_send_message_recipient_table_index(int index, int group_address, oc_rep_
       if (oc_string_len(g_grt[index].url) > 0) {
         //
         PRINT("      sending to %s\n", g_grt[index].url);
-      } 
+      }
     }
 
     return 0;
@@ -1504,8 +1503,9 @@ oc_dump_group_object_table_entry(int entry)
 
   int size = oc_rep_get_encoded_payload_size();
   if (size > 0) {
-    OC_DBG("oc_dump_group_object_table_entry: dumped current state [%s] [%d]: size %d", filename, entry,
-           size);
+    OC_DBG("oc_dump_group_object_table_entry: dumped current state [%s] [%d]: "
+           "size %d",
+           filename, entry, size);
     long written_size = oc_storage_write(filename, buf, size);
     if (written_size != (long)size) {
       PRINT("oc_dump_group_object_table_entry: written %d != %d (towrite)\n",
@@ -1693,11 +1693,13 @@ oc_dump_group_rp_table_entry(int entry, char *Store,
 
   int size = oc_rep_get_encoded_payload_size();
   if (size > 0) {
-    OC_DBG("oc_dump_group_rp_table_entry: dumped current state [%s] [%s] [%d]: size %d", filename,
-           Store, entry, size);
+    OC_DBG("oc_dump_group_rp_table_entry: dumped current state [%s] [%s] [%d]: "
+           "size %d",
+           filename, Store, entry, size);
     long written_size = oc_storage_write(filename, buf, size);
     if (written_size != (long)size) {
-      PRINT("oc_dump_group_rp_table_entry: written %d != %d (towrite)\n", (int)written_size, size);
+      PRINT("oc_dump_group_rp_table_entry: written %d != %d (towrite)\n",
+            (int)written_size, size);
     }
   }
 
@@ -1863,10 +1865,8 @@ oc_core_get_recipient_table_size()
   return GRT_MAX_ENTRIES;
 }
 
-
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
-
 
 void
 oc_init_tables()
@@ -1908,7 +1908,7 @@ oc_create_knx_fp_resources(size_t device_index)
 
 // -----------------------------------------------------------------------------
 bool
-is_in_array(int value, int* array, int array_size)
+is_in_array(int value, int *array, int array_size)
 {
   for (int i = 0; i < array_size; i++) {
     if (array[i] == value) {
@@ -1918,19 +1918,18 @@ is_in_array(int value, int* array, int array_size)
   return false;
 }
 
-
 bool
 oc_add_points_in_group_object_table_to_response(oc_request_t *request,
-                                                 size_t device_index,
-                                                 int group_address,
-                                                 size_t *response_length,
-                                                 int matches)
+                                                size_t device_index,
+                                                int group_address,
+                                                size_t *response_length,
+                                                int matches)
 {
   (void)request;
   (void)device_index;
   (void)response_length;
   (void)matches;
- // int length = 0;
+  // int length = 0;
 
   PRINT("oc_add_points_in_group_object_table_to_response %d\n", group_address);
 
@@ -1941,14 +1940,12 @@ oc_add_points_in_group_object_table_to_response(oc_request_t *request,
         // add the resource
         PRINT("oc_add_points_in_group_object_table_to_response %s\n",
               oc_string(g_got[index].href));
-        oc_add_resource_to_wk(
-            oc_ri_get_app_resource_by_uri(oc_string(g_got[index].href),
-                                          oc_string_len(g_got[index].href),
-                                          device_index),
-            request,
-          device_index, response_length, matches);
-        }
+        oc_add_resource_to_wk(oc_ri_get_app_resource_by_uri(
+                                oc_string(g_got[index].href),
+                                oc_string_len(g_got[index].href), device_index),
+                              request, device_index, response_length, matches);
       }
     }
+  }
   return false;
 }
