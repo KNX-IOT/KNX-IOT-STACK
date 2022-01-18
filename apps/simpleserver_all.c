@@ -113,6 +113,8 @@ STATIC CRITICAL_SECTION cs;   /**< event loop variable */
 /* Note: Magic numbers are derived from the resource definition, either from the
  * example or the definition.*/
 
+
+bool g_mystate = false;
 volatile int quit = 0; /**< stop variable, used by handle_signal */
 
 volatile bool g_p_a_bool = true;
@@ -120,6 +122,8 @@ volatile bool g_p_a_bool = true;
 void
 oc_add_s_mode_response_cb(char *url, oc_rep_t *rep, oc_rep_t *rep_value)
 {
+  (void)rep;
+  (void)rep_value;
   PRINT("oc_add_s_mode_response_cb %s\n", url);
 }
 
@@ -483,49 +487,29 @@ post_dpa_353(oc_request_t *request, oc_interface_mask_t interfaces,
   (void)interfaces;
   (void)user_data;
   bool error_state = false;
+  oc_rep_t *rep = NULL;
   PRINT("-- Begin post_dpa_353:\n");
   // oc_rep_t *rep = request->request_payload;
 
-  /* loop over the request document for each required input field to check if
-   * all required input fields are present */
-  bool var_in_request = false;
+  
+  if (oc_is_s_mode_request(request)) {
+    PRINT(" S-MODE\n");
 
-  if (var_in_request == false) {
-    error_state = true;
-    PRINT(" required property: 'value' not in request\n");
-  }
-  /* loop over the request document to check if all inputs are ok */
-  // rep = request->request_payload;
+    rep = oc_s_mode_get_value(request);
 
-  /* if the input is ok, then process the input document and assign the global
-   * variables */
-  if (error_state == false) {
-    switch (interfaces) {
-    default: {
-      /* loop over all the properties in the input document */
-      // oc_rep_t *rep = request->request_payload;
-
-      /* set the response */
-      PRINT("Set response \n");
-      oc_rep_start_root_object();
-      /*oc_process_baseline_interface(request->resource); */
-      // PRINT("   %s : %s", g_binaryswitch_RESOURCE_PROPERTY_NAME_value,
-      //        (char *)btoa(g_binaryswitch_value));
-      //  oc_rep_set_boolean(root, value, g_binaryswitch_value);
-
-      oc_rep_end_root_object();
-      /* TODO: ACTUATOR add here the code to talk to the HW if one implements an
-       actuator. one can use the global variables as input to those calls the
-       global values have been updated already with the data from the request */
-      oc_send_response(request, OC_STATUS_CHANGED);
-    }
-    }
   } else {
-    PRINT("  Returning Error \n");
-    /* TODO: add error response, if any */
-    // oc_send_response(request, OC_STATUS_NOT_MODIFIED);
-    oc_send_cbor_response(request, OC_STATUS_NOT_MODIFIED);
+    rep = request->request_payload;
   }
+  if ((rep != NULL) && (rep->type == OC_REP_BOOL)) {
+    PRINT("  post_dpa_353 received : %d\n", rep->value.boolean);
+    g_mystate = rep->value.boolean;
+    oc_send_cbor_response(request, OC_STATUS_CHANGED);
+    PRINT("-- End post_dpa_421_61\n");
+    return;
+  }
+
+  oc_send_response(request, OC_STATUS_BAD_REQUEST);
+
   PRINT("-- End post_dpa_353b\n");
 }
 
