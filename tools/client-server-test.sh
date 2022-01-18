@@ -17,7 +17,7 @@ ls ../../linuxbuild_clientserver/apps
 ../../linuxbuild_clientserver/apps/simpleserver_all &
 serverPID=$!
 
-sleep 20
+sleep 60
 
 kill $pythonPID
 kill $serverPID

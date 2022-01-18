@@ -94,7 +94,8 @@ def get_sn(my_stack):
     sn = my_stack.device_array[0].sn
     response = my_stack.issue_cbor_get(sn, "/dev/sn")
     print ("response:", response)
-    response.print_payload()
+    if response is not None:
+        response.print_payload()
     my_stack.purge_response(response)
 
 # no json tags as strings
