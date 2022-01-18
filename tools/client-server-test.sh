@@ -2,13 +2,14 @@
 
 echo `pwd`
 ls -l
+mydir=$(mktemp -d "${TMPDIR:-/tmp/}$(basename $0).XXXXXXXXXXXX")
 
 python -m pip install -r ../pythonbinding/requirements.txt
 
 cp ./libkisCS.so ../pythonbinding/
 
 cd ../pythonbinding/tests
-python knx_test_sequence.py -sleep 2 &
+python knx_test_sequence.py -sleep > $mydir/python_out.txt 2>&1 2&
 pythonPID=$!
 ps
 
@@ -21,4 +22,7 @@ sleep 60
 
 kill $pythonPID
 kill $serverPID
+
+echo "---------"
+grep Failure $mydir/python_out.txt
 
