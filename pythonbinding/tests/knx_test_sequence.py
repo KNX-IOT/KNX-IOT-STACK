@@ -57,6 +57,12 @@ import knx_stack
 def print_fail(msg = None):
     print(f"Failure {sys._getframe().f_back.f_lineno}: {msg if msg is not None else ''}")
 
+def safe_print(response):
+    if response is not None:
+        response.print_payload()
+    else:
+        print("no response")
+
 def compare_dict(dict1, dict2):
     dict1_set = set(dict1.keys())
     dict2_set = set(dict2.keys())
@@ -95,7 +101,7 @@ def get_sn(my_stack):
     response = my_stack.issue_cbor_get(sn, "/dev/sn")
     print ("response:", response)
     if response is not None:
-        response.print_payload()
+        safe_print(response)
     my_stack.purge_response(response)
 
 # no json tags as strings
@@ -105,7 +111,7 @@ def do_sequence_dev(my_stack):
     print("Get HWT :")
     response = my_stack.issue_cbor_get(sn, "/dev/hwt")
     print ("response:",response)
-    response.print_payload()
+    safe_print(response)
     my_stack.purge_response(response)
 
     #print("===================")
@@ -125,20 +131,20 @@ def do_sequence_dev(my_stack):
     print("Get Model :")
     response =  my_stack.issue_cbor_get(sn,"/dev/model")
     print ("response:",response)
-    response.print_payload()
+    safe_print(response)
     my_stack.purge_response(response)
 
     print("-------------------")
     response =  my_stack.issue_cbor_get(sn,"/dev/pm")
     #print ("response:",response)
-    response.print_payload()
+    safe_print(response)
     my_stack.purge_response(response)
 
     print("-------------------")
     my_stack.purge_response(response)
     response =  my_stack.issue_cbor_get(sn,"/dev/ia")
     #print ("response:",response)
-    response.print_payload()
+    safe_print(response)
     my_stack.purge_response(response)
 
     print("-------------------")
@@ -164,7 +170,7 @@ def do_sequence_dev_programming_mode(my_stack):
     my_stack.purge_response(response)
     response =  my_stack.issue_cbor_get(sn,"/dev/pm")
     print ("response:",response)
-    response.print_payload()
+    safe_print(response)
     if content == response.get_payload_boolean():
         print("PASS : /dev/pm ", content)
     my_stack.purge_response(response)
@@ -177,7 +183,7 @@ def do_sequence_dev_programming_mode(my_stack):
     my_stack.purge_response(response)
     response =  my_stack.issue_cbor_get(sn,"/dev/ia")
     print ("response:",response)
-    response.print_payload()
+    safe_print(response)
     if content == response.get_payload_int():
         print("PASS : /dev/ia ", content)
     else:
@@ -220,7 +226,7 @@ def do_sequence_dev_programming_mode(my_stack):
     my_stack.purge_response(response)
     response =  my_stack.issue_cbor_get(sn,"/dev/pm")
     print ("response:",response)
-    response.print_payload()
+    safe_print(response)
     if content == response.get_payload_boolean():
         print("PASS : /dev/pm ", content)
     else:
@@ -241,7 +247,7 @@ def do_sequence_dev_programming_mode_fail(my_stack):
     my_stack.purge_response(response)
     response =  my_stack.issue_cbor_get(sn,"/dev/pm")
     print ("response:",response)
-    response.print_payload()
+    safe_print(response)
     if content == response.get_payload_boolean():
         print("PASS : /dev/pm ", content)
     else:
@@ -256,7 +262,7 @@ def do_sequence_dev_programming_mode_fail(my_stack):
     my_stack.purge_response(response)
     response =  my_stack.issue_cbor_get(sn,"/dev/ia")
     print ("response:",response)
-    response.print_payload()
+    safe_print(response)
     if content != response.get_payload_int():
         print("PASS : /dev/ia ", content, " != ", response.get_payload_int())
     else:
