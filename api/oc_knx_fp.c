@@ -16,6 +16,7 @@
 
 #include "oc_api.h"
 #include "api/oc_knx_fp.h"
+#include "oc_discovery.h"
 #include "oc_core_res.h"
 #include <stdio.h>
 
@@ -1452,17 +1453,6 @@ oc_core_send_message_recipient_table_index(int index, int group_address, oc_rep_
 
 // -----------------------------------------------------------------------------
 
-/*
-void
-oc_create_fp_resource(int resource_idx, size_t device)
-{
-  OC_DBG("oc_create_fp_resource\n");
-  oc_core_lf_populate_resource(resource_idx, device, "/fp", OC_IF_LL,
-APPLICATION_LINK_FORMAT, OC_DISCOVERABLE, oc_core_p_get_handler, 0,
-                            oc_core_p_post_handler, 0, 1, "urn:knx:if.c");
-}
-*/
-
 void
 oc_print_group_object_table_entry(int entry)
 {
@@ -1909,15 +1899,25 @@ oc_create_knx_fp_resources(size_t device_index)
   oc_init_tables();
   oc_load_group_object_table();
   oc_load_rp_object_table();
-  // note: /fp does not exist..
-  // oc_create_fp_resource(OC_KNX_FP, device_index);
 }
 
 // -----------------------------------------------------------------------------
+bool
+is_in_array(int value, int* array, int array_size)
+{
+  for (int i = 0; i < array_size; i++) {
+    if (array[i] == value) {
+      return true;
+    }
+  }
+  return false;
+}
+
 
 bool
 oc_add_points_int_group_object_table_to_response(oc_request_t *request,
                                                  size_t device_index,
+                                                 int group_address,
                                                  size_t *response_length,
                                                  int matches)
 {
@@ -1925,8 +1925,21 @@ oc_add_points_int_group_object_table_to_response(oc_request_t *request,
   (void)device_index;
   (void)response_length;
   (void)matches;
-  // todo
-  // list all datapoints that belongs to a specific group.
+  int length = 0;
 
+  int index;
+  for (index = 0; index < GOT_MAX_ENTRIES; index++) {
+    if (g_got[index].ga_len > 0) {
+      if (is_in_array(group_address, g_got[index].ga, g_got[index].ga_len)) {
+          // add the resource
+        oc_add_resource_to_wk(
+            oc_ri_get_app_resource_by_uri(oc_string(g_got[index].href),
+                                          oc_string_len(g_got[index].href),
+                                          device_index),
+            request,
+          device_index, &response_length, matches);
+        }
+      }
+    }
   return false;
 }

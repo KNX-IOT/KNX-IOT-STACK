@@ -474,7 +474,6 @@ def do_sequence_fp_programming(my_stack):
 def do_sequence_knx_knx_s_mode(my_stack):
     sn = my_stack.device_array[0].sn
     print("========.knx=s-mode========")
-    
     print("-------------------")
     content = { 2: "startLoading"}
     print("lsm :", content)
@@ -513,7 +512,7 @@ def do_sequence_knx_knx_s_mode(my_stack):
     response =  my_stack.issue_cbor_get(sn, "/.knx")
     print ("response:",response)
     my_stack.purge_response(response)
-    
+
     content = {"value": { 4 : 5, 7: 7777 , 6 : "r"}}
     response =  my_stack.issue_cbor_post(sn,"/a/lsm",content)
     print ("response:",response)
@@ -522,8 +521,7 @@ def do_sequence_knx_knx_s_mode(my_stack):
     response =  my_stack.issue_cbor_get(sn, "/.knx")
     print ("response:",response)
     my_stack.purge_response(response)
-    
-    
+
 # ./knx resource
 # sia ==> 4
 # ga ==> 7
@@ -531,7 +529,6 @@ def do_sequence_knx_knx_s_mode(my_stack):
 def do_sequence_knx_knx_recipient(my_stack):
     sn = my_stack.device_array[0].sn
     print("========.knx=recipient========")
-    
     print("-------------------")
     content = { 2: "startLoading"}
     print("lsm :", content)
@@ -558,7 +555,7 @@ def do_sequence_knx_knx_recipient(my_stack):
     response =  my_stack.issue_cbor_post(sn,"/a/lsm",content)
     print ("response:", response)
     my_stack.purge_response(response)
-    
+
     response =  my_stack.issue_cbor_get(sn, "/.knx")
     print ("response:",response)
     my_stack.purge_response(response)
@@ -690,7 +687,7 @@ def do_discovery_tests(my_stack):
 def do_sequence(my_stack):
     if my_stack.get_nr_devices() > 0:
         get_sn(my_stack)
-        
+
         #do_sequence_knx_knx_s_mode(my_stack)
         do_sequence_knx_knx_recipient(my_stack)
         return
