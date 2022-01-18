@@ -114,10 +114,11 @@ STATIC CRITICAL_SECTION cs;   /**< event loop variable */
  * example or the definition.*/
 
 
-bool g_mystate = false;
+bool g_352_51_state = false;
+bool g_352_52_state = false;
+bool g_353_52_state = false;
 volatile int quit = 0; /**< stop variable, used by handle_signal */
 
-volatile bool g_p_a_bool = true;
 
 void
 oc_add_s_mode_response_cb(char *url, oc_rep_t *rep, oc_rep_t *rep_value)
@@ -194,7 +195,7 @@ app_init(void)
  * @param user_data the user data.
  */
 STATIC void
-get_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
+get_dpa_352_51(oc_request_t *request, oc_interface_mask_t interfaces,
             void *user_data)
 {
   (void)user_data; /* variable not used */
@@ -207,7 +208,7 @@ get_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
   bool error_state = false; /**< the error state, the generated code */
   int oc_status_code = OC_STATUS_OK;
 
-  PRINT("-- Begin get_dpa_352: interface %d\n", interfaces);
+  PRINT("-- Begin get_dpa_352_51: interface %d\n", interfaces);
   /* check if the accept header is CBOR */
   if (request->accept != APPLICATION_CBOR) {
     oc_send_response(request, OC_STATUS_BAD_OPTION);
@@ -215,7 +216,7 @@ get_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
   }
 
   CborError error;
-  error = cbor_encode_boolean(&g_encoder, g_p_a_bool);
+  error = cbor_encode_boolean(&g_encoder, g_352_51_state);
   if (error) {
     oc_status_code = true;
   }
@@ -226,7 +227,7 @@ get_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
   } else {
     oc_send_response(request, OC_STATUS_BAD_OPTION);
   }
-  PRINT("-- End get_dpa_352\n");
+  PRINT("-- End get_dpa_352_51\n");
 }
 
 /**
@@ -242,7 +243,7 @@ get_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
  * @param user_data the user data.
  */
 STATIC void
-get_dpa_352b(oc_request_t *request, oc_interface_mask_t interfaces,
+get_dpa_352_52(oc_request_t *request, oc_interface_mask_t interfaces,
              void *user_data)
 {
   (void)user_data; /* variable not used */
@@ -254,7 +255,7 @@ get_dpa_352b(oc_request_t *request, oc_interface_mask_t interfaces,
   bool error_state = false; /**< the error state, the generated code */
   int oc_status_code = OC_STATUS_OK;
 
-  PRINT("-- Begin get_dpa_352b: interface %d\n", interfaces);
+  PRINT("-- Begin get_dpa_352_52: interface %d\n", interfaces);
   /* check if the accept header is CBOR */
   if (request->accept != APPLICATION_CBOR) {
     oc_send_response(request, OC_STATUS_BAD_OPTION);
@@ -262,16 +263,22 @@ get_dpa_352b(oc_request_t *request, oc_interface_mask_t interfaces,
   }
 
   // set a string value
-  CborError error;
-  error = cbor_encode_text_stringz(&g_encoder, "blahblah");
-  if (error) {
-    oc_status_code = true;
-  }
-  PRINT("CBOR encoder size %d\n", oc_rep_get_encoded_payload_size());
-  error = cbor_encode_text_string(&g_encoder, "xyzxyz", 3);
-  if (error) {
+  //CborError error;
+  //error = cbor_encode_text_stringz(&g_encoder, "blahblah");
+  //if (error) {
+  //  oc_status_code = true;
+  // }
+  //PRINT("CBOR encoder size %d\n", oc_rep_get_encoded_payload_size());
+  //error = cbor_encode_text_string(&g_encoder, "xyzxyz", 3);
+  //if (error) {
     // PRINT("CBOR error %s\n", cbor_error_string(error));
     // oc_status_code = true;
+  //}
+
+  CborError error;
+  error = cbor_encode_boolean(&g_encoder, g_352_52_state);
+  if (error) {
+    oc_status_code = true;
   }
   PRINT("CBOR encoder size %d\n", oc_rep_get_encoded_payload_size());
 
@@ -280,7 +287,7 @@ get_dpa_352b(oc_request_t *request, oc_interface_mask_t interfaces,
   } else {
     oc_send_response(request, OC_STATUS_BAD_OPTION);
   }
-  PRINT("-- End get_dpa_352b\n");
+  PRINT("-- End get_dpa_352_52\n");
 }
 
 /**
@@ -296,7 +303,7 @@ get_dpa_352b(oc_request_t *request, oc_interface_mask_t interfaces,
  * @param user_data the user data.
  */
 STATIC void
-get_dpa_353(oc_request_t *request, oc_interface_mask_t interfaces,
+get_dpa_353_52(oc_request_t *request, oc_interface_mask_t interfaces,
             void *user_data)
 {
   (void)user_data; /* variable not used */
@@ -308,7 +315,7 @@ get_dpa_353(oc_request_t *request, oc_interface_mask_t interfaces,
   bool error_state = false; /**< the error state, the generated code */
   int oc_status_code = OC_STATUS_OK;
 
-  PRINT("-- Begin get_dpa_353: interface %d\n", interfaces);
+  PRINT("-- Begin get_dpa_353_52: interface %d\n", interfaces);
 
   /* check if the accept header is CBOR */
   if (request->accept != APPLICATION_CBOR) {
@@ -318,12 +325,16 @@ get_dpa_353(oc_request_t *request, oc_interface_mask_t interfaces,
   }
 
   CborError error;
-  error = cbor_encode_int(&g_encoder, (int64_t)555);
-  if (error) {
-    oc_status_code = true;
-  }
-  PRINT("CBOR encoder size %d\n", oc_rep_get_encoded_payload_size());
-  error = cbor_encode_int(&g_encoder, (int64_t)666);
+  //error = cbor_encode_int(&g_encoder, (int64_t)555);
+  //if (error) {
+  //  oc_status_code = true;
+  //}
+  //PRINT("CBOR encoder size %d\n", oc_rep_get_encoded_payload_size());
+  //error = cbor_encode_int(&g_encoder, (int64_t)666);
+  //if (error) {
+  //  oc_status_code = true;
+  //}
+  error = cbor_encode_boolean(&g_encoder, g_352_52_state);
   if (error) {
     oc_status_code = true;
   }
@@ -333,7 +344,7 @@ get_dpa_353(oc_request_t *request, oc_interface_mask_t interfaces,
   } else {
     oc_send_response(request, OC_STATUS_BAD_OPTION);
   }
-  PRINT("-- End get_dpa_353\n");
+  PRINT("-- End get_dpa_353_52\n");
 }
 
 /**
@@ -351,13 +362,13 @@ get_dpa_353(oc_request_t *request, oc_interface_mask_t interfaces,
  * @param user_data the supplied user data.
  */
 STATIC void
-post_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
+post_dpa_352_51(oc_request_t *request, oc_interface_mask_t interfaces,
              void *user_data)
 {
   (void)interfaces;
   (void)user_data;
   bool error_state = false;
-  PRINT("-- Begin post_dpa_352:\n");
+  PRINT("-- Begin post_dpa_352_51:\n");
   // oc_rep_t *rep = request->request_payload;
 
   /* loop over the request document for each required input field to check if
@@ -376,10 +387,10 @@ post_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
 
   // handle the type of payload correctly.
   if ((rep != NULL) && (rep->type == OC_REP_BOOL)) {
-    PRINT("  post_dpa_417_61 received : %d\n", rep->value.boolean);
-    g_p_a_bool = rep->value.boolean;
+    PRINT("  post_dpa_352_51 received : %d\n", rep->value.boolean);
+    g_352_51_state = rep->value.boolean;
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
-    PRINT("-- End post_dpa_417_61\n");
+    PRINT("-- End post_dpa_352_51\n");
     return;
   }
 
@@ -393,7 +404,7 @@ post_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
     // oc_send_response(request, OC_STATUS_NOT_MODIFIED);
     oc_send_response(request, OC_STATUS_BAD_REQUEST);
   }
-  PRINT("-- End post_dpa_352\n");
+  PRINT("-- End post_dpa_352_51\n");
 }
 
 /**
@@ -411,13 +422,13 @@ post_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
  * @param user_data the supplied user data.
  */
 STATIC void
-post_dpa_352b(oc_request_t *request, oc_interface_mask_t interfaces,
+post_dpa_352_52(oc_request_t *request, oc_interface_mask_t interfaces,
               void *user_data)
 {
   (void)interfaces;
   (void)user_data;
   bool error_state = false;
-  PRINT("-- Begin post_dpa_352b:\n");
+  PRINT("-- Begin post_dpa_352_52:\n");
   // oc_rep_t *rep = request->request_payload;
 
   oc_rep_t *rep = NULL;
@@ -431,39 +442,14 @@ post_dpa_352b(oc_request_t *request, oc_interface_mask_t interfaces,
     rep = request->request_payload;
   }
   /* loop over the request document to check if all inputs are ok */
-  // rep = request->request_payload;
-
-  /* if the input is ok, then process the input document and assign the global
-   * variables */
-  if (error_state == false) {
-    switch (interfaces) {
-    default: {
-      /* loop over all the properties in the input document */
-      // oc_rep_t *rep = request->request_payload;
-
-      /* set the response */
-      PRINT("Set response \n");
-      oc_rep_start_root_object();
-      /*oc_process_baseline_interface(request->resource); */
-      // PRINT("   %s : %s", g_binaryswitch_RESOURCE_PROPERTY_NAME_value,
-      //        (char *)btoa(g_binaryswitch_value));
-      //  oc_rep_set_boolean(root, value, g_binaryswitch_value);
-
-      oc_rep_end_root_object();
-      /* TODO: ACTUATOR add here the code to talk to the HW if one implements an
-       actuator. one can use the global variables as input to those calls the
-       global values have been updated already with the data from the request */
-
-      oc_send_cbor_response(request, OC_STATUS_CHANGED);
-    }
-    }
-  } else {
-    PRINT("  Returning Error \n");
-    /* TODO: add error response, if any */
-    // oc_send_response(request, OC_STATUS_NOT_MODIFIED);
-    oc_send_response(request, OC_STATUS_BAD_REQUEST);
+  if ((rep != NULL) && (rep->type == OC_REP_BOOL)) {
+    PRINT("  post_dpa_352b received : %d\n", rep->value.boolean);
+    g_352_52_state = rep->value.boolean;
+    oc_send_cbor_response(request, OC_STATUS_CHANGED);
+    PRINT("-- End post_dpa_352_52\n");
+    return;
   }
-  PRINT("-- End post_dpa_352b\n");
+  PRINT("-- End post_dpa_352_52\n");
 }
 
 /**
@@ -481,13 +467,13 @@ post_dpa_352b(oc_request_t *request, oc_interface_mask_t interfaces,
  * @param user_data the supplied user data.
  */
 STATIC void
-post_dpa_353(oc_request_t *request, oc_interface_mask_t interfaces,
+post_dpa_353_52(oc_request_t *request, oc_interface_mask_t interfaces,
              void *user_data)
 {
   (void)interfaces;
   (void)user_data;
   oc_rep_t *rep = NULL;
-  PRINT("-- Begin post_dpa_353:\n");
+  PRINT("-- Begin post_dpa_353_52:\n");
   // oc_rep_t *rep = request->request_payload;
 
   
@@ -500,16 +486,16 @@ post_dpa_353(oc_request_t *request, oc_interface_mask_t interfaces,
     rep = request->request_payload;
   }
   if ((rep != NULL) && (rep->type == OC_REP_BOOL)) {
-    PRINT("  post_dpa_353 received : %d\n", rep->value.boolean);
-    g_mystate = rep->value.boolean;
+    PRINT("  post_dpa_353_52 received : %d\n", rep->value.boolean);
+    g_353_52_state = rep->value.boolean;
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
-    PRINT("-- End post_dpa_421_61\n");
+    PRINT("-- End post_dpa_353_52\n");
     return;
   }
 
   oc_send_response(request, OC_STATUS_BAD_REQUEST);
 
-  PRINT("-- End post_dpa_353b\n");
+  PRINT("-- End post_dpa_353_52\n");
 }
 
 /**
@@ -544,8 +530,8 @@ register_resources(void)
     called. this function must be called when the value changes, preferable on
     an interrupt when something is read from the hardware. */
   /*oc_resource_set_observable(res_352, true); */
-  oc_resource_set_request_handler(res_352, OC_GET, get_dpa_352, NULL);
-  oc_resource_set_request_handler(res_352, OC_POST, post_dpa_352, NULL);
+  oc_resource_set_request_handler(res_352, OC_GET, get_dpa_352_51, NULL);
+  oc_resource_set_request_handler(res_352, OC_POST, post_dpa_352_51, NULL);
   oc_add_resource(res_352);
 
   PRINT("Register Resource with local path \"/p/b\"\n");
@@ -563,8 +549,8 @@ register_resources(void)
     called. this function must be called when the value changes, preferable on
     an interrupt when something is read from the hardware. */
   /*oc_resource_set_observable(res_352, true); */
-  oc_resource_set_request_handler(res_352b, OC_GET, get_dpa_352b, NULL);
-  oc_resource_set_request_handler(res_352b, OC_POST, post_dpa_352b, NULL);
+  oc_resource_set_request_handler(res_352b, OC_GET, get_dpa_352_52, NULL);
+  oc_resource_set_request_handler(res_352b, OC_POST, post_dpa_352_52, NULL);
   oc_add_resource(res_352b);
 
   PRINT("Register Resource with local path \"/p/c\"\n");
@@ -582,8 +568,8 @@ register_resources(void)
     called. this function must be called when the value changes, preferable on
     an interrupt when something is read from the hardware. */
   /*oc_resource_set_observable(res_352, true); */
-  oc_resource_set_request_handler(res_353, OC_GET, get_dpa_353, NULL);
-  oc_resource_set_request_handler(res_353, OC_POST, post_dpa_353, NULL);
+  oc_resource_set_request_handler(res_353, OC_GET, get_dpa_353_52, NULL);
+  oc_resource_set_request_handler(res_353, OC_POST, post_dpa_353_52, NULL);
   oc_add_resource(res_353);
 }
 
