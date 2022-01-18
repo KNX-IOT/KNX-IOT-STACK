@@ -486,7 +486,6 @@ post_dpa_353(oc_request_t *request, oc_interface_mask_t interfaces,
 {
   (void)interfaces;
   (void)user_data;
-  bool error_state = false;
   oc_rep_t *rep = NULL;
   PRINT("-- Begin post_dpa_353:\n");
   // oc_rep_t *rep = request->request_payload;
