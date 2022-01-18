@@ -1302,8 +1302,8 @@ oc_do_s_mode(char *resource_url, char *rp)
 
       // loop over the full recipient table and send a message if the group is there
       for (int j; j < oc_core_get_recipient_table_size(); j++) {
-        oc_core_send_message_recipient_table_index(index, j,
-                                                   buffer, value_size);
+        //oc_core_send_message_recipient_table_index(index, j,
+        //                                           buffer, value_size);
       }
     }
     index = oc_core_find_next_group_object_table_url(resource_url, index);
