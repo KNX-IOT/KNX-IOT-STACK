@@ -117,6 +117,12 @@ volatile int quit = 0; /**< stop variable, used by handle_signal */
 
 volatile bool g_p_a_bool = true;
 
+void
+oc_add_s_mode_response_cb(char *url, oc_rep_t *rep, oc_rep_t *rep_value)
+{
+  PRINT("oc_add_s_mode_response_cb %s\n", url);
+}
+
 /**
  * function to set up the device.
  *
@@ -165,6 +171,9 @@ app_init(void)
 
   oc_device_mode_display(0);
 
+  
+  oc_set_s_mode_response_cb(oc_add_s_mode_response_cb);
+
   return ret;
 }
 
@@ -206,8 +215,6 @@ get_dpa_352(oc_request_t *request, oc_interface_mask_t interfaces,
   if (error) {
     oc_status_code = true;
   }
-  PRINT("CBOR encoder size %d\n", oc_rep_get_encoded_payload_size());
-
   PRINT("CBOR encoder size %d\n", oc_rep_get_encoded_payload_size());
 
   if (error_state == false) {
@@ -409,20 +416,15 @@ post_dpa_352b(oc_request_t *request, oc_interface_mask_t interfaces,
   PRINT("-- Begin post_dpa_352b:\n");
   // oc_rep_t *rep = request->request_payload;
 
-  /* loop over the request document for each required input field to check if
-   * all required input fields are present */
-  bool var_in_request = false;
-  // rep = request->request_payload;
-  //  while (rep != NULL) {
-  //    if (strcmp(oc_string(rep->name),
-  //               g_binaryswitch_RESOURCE_PROPERTY_NAME_value) == 0) {
-  //      var_in_request = true;
-  //    }
-  //    rep = rep->next;
-  //  }
-  if (var_in_request == false) {
-    error_state = true;
-    PRINT(" required property: 'value' not in request\n");
+  oc_rep_t *rep = NULL;
+  // handle the different requests
+  if (oc_is_s_mode_request(request)) {
+    PRINT(" S-MODE\n");
+    // retrieve the value of the s-mode payload
+    rep = oc_s_mode_get_value(request);
+  } else {
+    // the regular payload
+    rep = request->request_payload;
   }
   /* loop over the request document to check if all inputs are ok */
   // rep = request->request_payload;
@@ -487,14 +489,7 @@ post_dpa_353(oc_request_t *request, oc_interface_mask_t interfaces,
   /* loop over the request document for each required input field to check if
    * all required input fields are present */
   bool var_in_request = false;
-  // rep = request->request_payload;
-  //  while (rep != NULL) {
-  //    if (strcmp(oc_string(rep->name),
-  //               g_binaryswitch_RESOURCE_PROPERTY_NAME_value) == 0) {
-  //      var_in_request = true;
-  //    }
-  //    rep = rep->next;
-  //  }
+
   if (var_in_request == false) {
     error_state = true;
     PRINT(" required property: 'value' not in request\n");
