@@ -662,10 +662,14 @@ oc_ownership_status_cb(const oc_uuid_t *device_uuid, size_t device_index,
  * shuts down the stack
  */
 int
-main(void)
+main(int argc, char *argv[])
 {
   int init;
   oc_clock_time_t next_event;
+
+  for (int i = 0; i < argc; i++) {
+    printf("argv[%d] = %s\n", i, argv[i]);
+  }
 
 #ifdef WIN32
   /* windows specific */
@@ -739,7 +743,7 @@ main(void)
 #endif /* OC_SECURITY */
 
   oc_device_info_t *device = oc_core_get_device_info(0);
-  PRINT("serial number: %s", device->serialnumber);
+  PRINT("serial number: %s", oc_string(device->serialnumber));
 
   PRINT("Server \"simple_server_all\" running, waiting on incoming "
         "connections.\n");

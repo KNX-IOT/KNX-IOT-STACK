@@ -39,6 +39,7 @@
 # pylint: disable=W1514
 # pylint: disable=W0212
 
+import argparse
 import os
 import signal
 import sys
@@ -55,6 +56,12 @@ import knx_stack
 
 def print_fail(msg = None):
     print(f"Failure {sys._getframe().f_back.f_lineno}: {msg if msg is not None else ''}")
+
+def safe_print(response):
+    if response is not None:
+        response.print_payload()
+    else:
+        print("no response")
 
 def compare_dict(dict1, dict2):
     dict1_set = set(dict1.keys())
@@ -93,7 +100,8 @@ def get_sn(my_stack):
     sn = my_stack.device_array[0].sn
     response = my_stack.issue_cbor_get(sn, "/dev/sn")
     print ("response:", response)
-    response.print_payload()
+    if response is not None:
+        safe_print(response)
     my_stack.purge_response(response)
 
 # no json tags as strings
@@ -103,7 +111,7 @@ def do_sequence_dev(my_stack):
     print("Get HWT :")
     response = my_stack.issue_cbor_get(sn, "/dev/hwt")
     print ("response:",response)
-    response.print_payload()
+    safe_print(response)
     my_stack.purge_response(response)
 
     #print("===================")
@@ -123,20 +131,20 @@ def do_sequence_dev(my_stack):
     print("Get Model :")
     response =  my_stack.issue_cbor_get(sn,"/dev/model")
     print ("response:",response)
-    response.print_payload()
+    safe_print(response)
     my_stack.purge_response(response)
 
     print("-------------------")
     response =  my_stack.issue_cbor_get(sn,"/dev/pm")
     #print ("response:",response)
-    response.print_payload()
+    safe_print(response)
     my_stack.purge_response(response)
 
     print("-------------------")
     my_stack.purge_response(response)
     response =  my_stack.issue_cbor_get(sn,"/dev/ia")
     #print ("response:",response)
-    response.print_payload()
+    safe_print(response)
     my_stack.purge_response(response)
 
     print("-------------------")
@@ -162,7 +170,7 @@ def do_sequence_dev_programming_mode(my_stack):
     my_stack.purge_response(response)
     response =  my_stack.issue_cbor_get(sn,"/dev/pm")
     print ("response:",response)
-    response.print_payload()
+    safe_print(response)
     if content == response.get_payload_boolean():
         print("PASS : /dev/pm ", content)
     my_stack.purge_response(response)
@@ -175,7 +183,7 @@ def do_sequence_dev_programming_mode(my_stack):
     my_stack.purge_response(response)
     response =  my_stack.issue_cbor_get(sn,"/dev/ia")
     print ("response:",response)
-    response.print_payload()
+    safe_print(response)
     if content == response.get_payload_int():
         print("PASS : /dev/ia ", content)
     else:
@@ -218,7 +226,7 @@ def do_sequence_dev_programming_mode(my_stack):
     my_stack.purge_response(response)
     response =  my_stack.issue_cbor_get(sn,"/dev/pm")
     print ("response:",response)
-    response.print_payload()
+    safe_print(response)
     if content == response.get_payload_boolean():
         print("PASS : /dev/pm ", content)
     else:
@@ -239,7 +247,7 @@ def do_sequence_dev_programming_mode_fail(my_stack):
     my_stack.purge_response(response)
     response =  my_stack.issue_cbor_get(sn,"/dev/pm")
     print ("response:",response)
-    response.print_payload()
+    safe_print(response)
     if content == response.get_payload_boolean():
         print("PASS : /dev/pm ", content)
     else:
@@ -254,7 +262,7 @@ def do_sequence_dev_programming_mode_fail(my_stack):
     my_stack.purge_response(response)
     response =  my_stack.issue_cbor_get(sn,"/dev/ia")
     print ("response:",response)
-    response.print_payload()
+    safe_print(response)
     if content != response.get_payload_int():
         print("PASS : /dev/ia ", content, " != ", response.get_payload_int())
     else:
@@ -546,7 +554,8 @@ def do_sequence_knx_knx_recipient(my_stack):
                 {0: 10, 12: 1, 7:[2] },
                 {0: 225, 10: "coap://p/light255", 7:[2] }]
     response =  my_stack.issue_cbor_post(sn,"/fp/r",content)
-    print ("response:",response.get_payload())
+    if response is not None:
+        print ("response:",response.get_payload())
     my_stack.purge_response(response)
     #do_check_table(my_stack, sn, "/fp/g",content)
 
@@ -716,6 +725,27 @@ def do_sequence(my_stack):
         #do_sequence_a_sen(my_stack)
 
 if __name__ == '__main__':  # pragma: no cover
+
+
+
+    parser = argparse.ArgumentParser()
+
+    # input (files etc.)
+    #parser.add_argument("-sn", "--serialnumber",
+    #                help="serial number of the device", nargs='?',
+    #                const=1, required=True)
+    parser.add_argument("-scope", "--scope",
+                    help="scope of the multicast request [2,5]", nargs='?',
+                    default=2, const=1, required=False)
+    parser.add_argument("-sleep", "--sleep",
+                    help="sleep in seconds", nargs='?',
+                    default=0, const=1, required=False)
+    print(sys.argv)
+    args = parser.parse_args()
+    print("scope         :" + str(args.scope))
+    print("sleep         :" + str(args.sleep))
+    time.sleep(int(args.sleep))
+
     the_stack = knx_stack.KNXIOTStack()
     signal.signal(signal.SIGINT, the_stack.sig_handler)
 

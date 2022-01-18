@@ -1435,7 +1435,7 @@ oc_core_send_message_recipient_table_index(int index, int group_address,
       PRINT("oc_core_send_message_recipient_table_index: ia %d\n",
             g_grt[index].ia);
       if (oc_string_len(g_grt[index].path) > 0) {
-        PRINT("      sending to %s\n", g_grt[index].path);
+        PRINT("      sending to %s\n", oc_string(g_grt[index].path));
 
       } else {
         // do .knx
@@ -1445,7 +1445,7 @@ oc_core_send_message_recipient_table_index(int index, int group_address,
     } else {
       if (oc_string_len(g_grt[index].url) > 0) {
         //
-        PRINT("      sending to %s\n", g_grt[index].url);
+        PRINT("      sending to %s\n", oc_string(g_grt[index].url));
       }
     }
 
