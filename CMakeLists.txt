@@ -226,6 +226,7 @@ file(COPY "${PROJECT_SOURCE_DIR}/pythonbinding/start_shell.bat" DESTINATION ${PR
 file(COPY "${PROJECT_SOURCE_DIR}/pythonbinding/build_so_windows.sh" DESTINATION ${PROJECT_BINARY_DIR}/)
 file(COPY "${PROJECT_SOURCE_DIR}/pythonbinding/README.md" DESTINATION ${PROJECT_BINARY_DIR}/)
 file(COPY ${PROJECT_SOURCE_DIR}/pythonbinding/application_scripts DESTINATION ${PROJECT_BINARY_DIR})
+file(COPY ${PROJECT_SOURCE_DIR}/pythonbinding/tests DESTINATION ${PROJECT_BINARY_DIR})
 
 if(PROJECT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     # Add clang-format target
