@@ -25,18 +25,27 @@
 
 // ----------------------------------------------------------------------------
 
+
 typedef struct ia_userdata
 {
-  int ia;
-  oc_discover_ia_cb_t cb_func;
+  int ia;       //!< internal address of the destination
+  char path[20]; //< the path on the device designated with ia
+  int ga;        //!< group address to use
+  int mode;     //!< mode to send the message "w"  = 1  "r" = 2  "rp" = 3
+  char resource_url[20]; //< the url to pull the data from.
 } ia_userdata;
-
-
 
 
 // ----------------------------------------------------------------------------
 
 oc_s_mode_response_cb_t m_s_mode_cb = NULL;
+
+
+// ----------------------------------------------------------------------------
+
+static void oc_send_s_mode(oc_endpoint_t *endpoint, char *path, int sia_value,
+                           int group_address, char *rp, uint8_t *value_data,
+                           int value_size);
 
 
 // ----------------------------------------------------------------------------
@@ -53,27 +62,52 @@ discovery_ia_cb(const char *payload, int len, oc_endpoint_t *endpoint,
   oc_endpoint_print(endpoint);
 
   ia_userdata *cb_data = (ia_userdata *)user_data;
-  if (cb_data && cb_data->cb_func) {
-    PRINT("discovery_ia_cb: calling function\n");
-    cb_data->cb_func(cb_data->ia, endpoint);
+
+  int value_size;
+  if (cb_data->resource_url == NULL) {
+    return;
   }
-  if (cb_data) {
-    free(user_data);
-  }
+
+  uint8_t *buffer = malloc(100);
+  if (!buffer) {
+    OC_WRN("discovery_ia_cb: out of memory allocating buffer");
+  } //! buffer
+
+  value_size =
+    oc_s_mode_get_resource_value(cb_data->resource_url, "r", buffer, 100);
+
+
+  oc_send_s_mode(endpoint, char *path, int sia_value,
+                 int group_address, char *rp, uint8_t *value_data,
+                 int value_size)
+
+
+  //if (cb_data) {
+  //  free(user_data);
+ // }
 
   return OC_STOP_DISCOVERY;
 }
 
 
 int
-oc_knx_client_get_endpoint_from_ia(int ia, oc_discover_ia_cb_t my_func)
+oc_knx_client_do_broker_request(int ia, char *resource_url, char *rp)
 {
   char query[20];
   snprintf(query, 20, "if=urn:knx:ia.%d", ia);
   
   ia_userdata * cb_data = (ia_userdata *)malloc(sizeof(ia_userdata));
   cb_data->ia = ia;
-  cb_data->cb_func = my_func;
+  if (strcmp(rp, "w") == 0) {
+    cb_data->mode = 1;
+  } else if (strcmp(rp, "r") == 0) {
+    cb_data->mode = 2;
+  } else if (strcmp(rp, "rp") == 0) {
+    cb_data->mode = 3;
+  }
+
+
+  strncpy(cb_data->resource_url, resource_url, 20);
 
   oc_do_wk_discovery_all(query, 2, discovery_ia_cb, cb_data);
   oc_do_wk_discovery_all(query, 3, discovery_ia_cb, cb_data);
@@ -82,6 +116,7 @@ oc_knx_client_get_endpoint_from_ia(int ia, oc_discover_ia_cb_t my_func)
 }
 
 
+// ----------------------------------------------------------------------------
 
 bool
 oc_is_s_mode_request(oc_request_t *request)
@@ -132,6 +167,7 @@ oc_s_mode_get_value(oc_request_t *request)
   return NULL;
 }
 
+
 static void
 oc_issue_s_mode(int sia_value, int group_address, char *rp, uint8_t *value_data,
                 int value_size)
@@ -144,7 +180,24 @@ oc_issue_s_mode(int sia_value, int group_address, char *rp, uint8_t *value_data,
   oc_make_ipv6_endpoint(mcast, IPV6 | DISCOVERY | MULTICAST, 5683, 0xff, scope,
                         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0xfd);
 
-  if (oc_init_post("/.knx", &mcast, NULL, NULL, LOW_QOS, NULL)) {
+  oc_send_s_mode(&mcast,"/.knx", sia_value, group_address, rp,
+                 value_data, value_size);
+}
+
+static void
+oc_send_s_mode(oc_endpoint_t *endpoint, char* path, int sia_value, int group_address,
+               char *rp, uint8_t *value_data,
+                int value_size)
+{
+  int scope = 5;
+  //(void)sia_value; /* variable not used */
+
+  PRINT("  oc_issue_s_mode : scope %d\n", scope);
+
+  oc_make_ipv6_endpoint(mcast, IPV6 | DISCOVERY | MULTICAST, 5683, 0xff, scope,
+                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0xfd);
+
+  if (oc_init_post(path, endpoint, NULL, NULL, LOW_QOS, NULL)) {
 
     /*
     { 4: <sia>, 5: { 6: <st>, 7: <ga>, 1: <value> } }
@@ -192,7 +245,7 @@ oc_issue_s_mode(int sia_value, int group_address, char *rp, uint8_t *value_data,
 }
 
 int
-oc_do_s_mode_internal(char *resource_url, char *rp, uint8_t *buf, int buf_size)
+oc_s_mode_get_resource_value(char *resource_url, char *rp, uint8_t *buf, int buf_size)
 {
   (void)rp;
 
@@ -284,7 +337,7 @@ oc_do_s_mode(char *resource_url, char *rp)
     OC_WRN("oc_do_s_mode: out of memory allocating buffer");
   } //! buffer
 
-  value_size = oc_do_s_mode_internal(resource_url, rp, buffer, 100);
+  value_size = oc_s_mode_get_resource_value(resource_url, rp, buffer, 100);
 
   oc_resource_t *my_resource =
     oc_ri_get_app_resource_by_uri(resource_url, strlen(resource_url), 0);
@@ -315,8 +368,16 @@ oc_do_s_mode(char *resource_url, char *rp)
       // loop over the full recipient table and send a message if the group is
       // there
       for (int j = 0; j < oc_core_get_recipient_table_size(); j++) {
-        // oc_core_send_message_recipient_table_index(index, j,
-        //                                           buffer, value_size);
+        bool found =
+          oc_core_check_recipient_index_on_group_address(j, group_address);
+        if (found) {
+          char *url = oc_core_get_recipient_index_url_or_path(j);
+          if (url) {
+            PRINT(" broker send: %s\n", url);
+            int ia = oc_core_get_recipient_ia(j);
+            oc_knx_client_do_broker_request(ia, resource_url, rp);
+          }
+        }
       }
     }
     index = oc_core_find_next_group_object_table_url(resource_url, index);
@@ -335,3 +396,5 @@ oc_set_s_mode_response_cb(oc_s_mode_response_cb_t my_func)
 oc_s_mode_response_cb_t oc_get_s_mode_response_cb() {
   return m_s_mode_cb;
 }
+
+// ----------------------------------------------------------------------------

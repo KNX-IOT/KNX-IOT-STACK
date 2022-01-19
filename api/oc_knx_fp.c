@@ -1413,46 +1413,58 @@ oc_create_fp_r_x_resource(int resource_idx, size_t device)
     "urn:knx:if.c");
 }
 
-int
-oc_core_send_message_recipient_table_index(int index, int group_address,
-                                           oc_rep_t *rep)
+bool
+oc_core_check_recipient_index_on_group_address(int index, int group_address)
 {
-  (void)rep;
-  bool found = false;
-
   if (index >= GRT_MAX_ENTRIES) {
     return -1;
   }
   for (int i = 0; g_grt[index].ga_len; i++) {
-    int ga = g_grt[index].ga[i];
-    if (ga == group_address) {
-      found = true;
-      break;
+    if (g_grt[index].ga[i] == group_address) {
+      return true;
     }
   }
-  if (found) {
-    if (g_grt[index].ia > -1) {
-      PRINT("oc_core_send_message_recipient_table_index: ia %d\n",
-            g_grt[index].ia);
-      if (oc_string_len(g_grt[index].path) > 0) {
-        PRINT("      sending to %s\n", oc_string(g_grt[index].path));
+  return false;
+}
 
-      } else {
-        // do .knx
-        PRINT("      sending to (default) %s\n", ".knx");
-      }
+int
+oc_core_get_recipient_ia(int index)
+{
+  if (index >= GRT_MAX_ENTRIES) {
+    return -1;
+  }
+
+  return g_grt[index].ia;
+}
+
+char*
+oc_core_get_recipient_index_url_or_path(int index)
+{
+  if (index >= GRT_MAX_ENTRIES) {
+    return NULL;
+  }
+
+  if (g_grt[index].ia > -1) {
+    PRINT("oc_core_get_recipient_index_url_or_path: ia %d\n",
+          g_grt[index].ia);
+    if (oc_string_len(g_grt[index].path) > 0) {
+      PRINT("      oc_core_get_recipient_index_url_or_path path %s\n", oc_string(g_grt[index].path));
+      return oc_string(g_grt[index].path);
 
     } else {
-      if (oc_string_len(g_grt[index].url) > 0) {
-        //
-        PRINT("      sending to %s\n", oc_string(g_grt[index].url));
-      }
+      // do .knx
+      PRINT("      oc_core_get_recipient_index_url_or_patho (default) %s\n", ".knx");
+      return ".knx";
     }
 
-    return 0;
+  } else {
+    if (oc_string_len(g_grt[index].url) > 0) {
+      //
+      PRINT("      oc_core_get_recipient_index_url_or_path url %s\n", oc_string(g_grt[index].url));
+      return oc_string(g_grt[index].url);
+    }
   }
-
-  return -1;
+  return NULL;
 }
 
 // -----------------------------------------------------------------------------
