@@ -666,9 +666,10 @@ oc_knx_device_storage_read(size_t device_index)
 }
 
 void
-oc_knx_device_storage_reset(size_t device_index)
+oc_knx_device_storage_reset(size_t device_index, int reset_mode)
 {
   (void)device_index;
+  (void)reset_mode;
 
   char buf[2] = "";
   int zero = 0;
@@ -679,6 +680,7 @@ oc_knx_device_storage_reset(size_t device_index)
     return;
   }
 
+  // writing the empty values 
   oc_storage_write(KNX_STORAGE_IA, (uint8_t *)&zero, sizeof(int));
   oc_storage_write(KNX_STORAGE_HOSTNAME, (uint8_t *)&buf, 1);
   oc_storage_write(KNX_STORAGE_IID, (uint8_t *)&buf, 1);
@@ -686,6 +688,7 @@ oc_knx_device_storage_reset(size_t device_index)
   oc_storage_write(KNX_STORAGE_PM, (uint8_t *)0, 0);
 
   oc_delete_group_object_table();
+  oc_delete_group_rp_table();
 }
 
 bool
