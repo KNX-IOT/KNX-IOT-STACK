@@ -3,6 +3,8 @@
 echo `pwd`
 ls -l
 mydir=$(mktemp -d "${TMPDIR:-/tmp/}$(basename $0).XXXXXXXXXXXX")
+mydir=.
+echo $mydir
 
 python -m pip install -r ../pythonbinding/requirements.txt
 
