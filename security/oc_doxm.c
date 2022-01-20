@@ -142,16 +142,16 @@ oc_sec_doxm_default(size_t device)
   oc_new_string(&doxm[device].devicecheck, "", 0);
   oc_free_string(&doxm[device].devicecheck);
 
-  //oc_string_t spakecontext;
+  // oc_string_t spakecontext;
   char *spctx = "OCF Spake2plus,Version:1.0";
   oc_free_string(&doxm[device].spakecontext);
   oc_new_string(&doxm[device].spakecontext, spctx, strlen(spctx));
 
-  //oc_string_t spakesalt;
+  // oc_string_t spakesalt;
   oc_free_string(&doxm[device].obtshare);
   oc_new_string(&doxm[device].obtshare, "", 0);
 
-  //int spakeiterations = 0;
+  // int spakeiterations = 0;
 #endif
   oc_sec_dump_doxm(device);
 }
