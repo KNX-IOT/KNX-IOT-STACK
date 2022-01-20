@@ -253,7 +253,8 @@ void oc_delete_group_object_table_entry(int entry);
 void oc_delete_group_object_table();
 
 /**
- * @brief delete all entries of the Recipient and Publisher Object Table (from persistent) storage
+ * @brief delete all entries of the Recipient and Publisher Object Table (from
+ * persistent) storage
  *
  */
 void oc_delete_group_rp_table();

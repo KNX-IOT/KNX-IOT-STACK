@@ -22,24 +22,20 @@
 #include "oc_discovery.h"
 #include <stdio.h>
 
-
 // ----------------------------------------------------------------------------
-
 
 typedef struct broker_s_mode_userdata_t
 {
-  int ia;           //!< internal address of the destination
-  char path[20];    //< the path on the device designated with ia
-  int ga;           //!< group address to use
-  char rp_type[3];  //!< mode to send the message "w"  = 1  "r" = 2  "rp" = 3
+  int ia;          //!< internal address of the destination
+  char path[20];   //< the path on the device designated with ia
+  int ga;          //!< group address to use
+  char rp_type[3]; //!< mode to send the message "w"  = 1  "r" = 2  "rp" = 3
   char resource_url[20]; //< the url to pull the data from.
 } broker_s_mode_userdata_t;
-
 
 // ----------------------------------------------------------------------------
 
 oc_s_mode_response_cb_t m_s_mode_cb = NULL;
-
 
 // ----------------------------------------------------------------------------
 
@@ -47,15 +43,14 @@ static void oc_send_s_mode(oc_endpoint_t *endpoint, char *path, int sia_value,
                            int group_address, char *rp, uint8_t *value_data,
                            int value_size);
 
-
-static int oc_s_mode_get_resource_value(char *resource_url, char *rp, uint8_t *buf,
-                                 int buf_size);
+static int oc_s_mode_get_resource_value(char *resource_url, char *rp,
+                                        uint8_t *buf, int buf_size);
 
 // ----------------------------------------------------------------------------
 
 static oc_discovery_flags_t
 discovery_ia_cb(const char *payload, int len, oc_endpoint_t *endpoint,
-             void *user_data)
+                void *user_data)
 {
   //(void)anchor;
   (void)payload;
@@ -64,11 +59,9 @@ discovery_ia_cb(const char *payload, int len, oc_endpoint_t *endpoint,
   PRINT("discovery_ia_cb\n");
   oc_endpoint_print(endpoint);
 
-  
   size_t device_index = 0;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   int sender_ia = device->ia;
-
 
   broker_s_mode_userdata_t *cb_data = (broker_s_mode_userdata_t *)user_data;
 
@@ -88,12 +81,8 @@ discovery_ia_cb(const char *payload, int len, oc_endpoint_t *endpoint,
   value_size =
     oc_s_mode_get_resource_value(cb_data->resource_url, "r", buffer, 100);
 
-
   oc_send_s_mode(endpoint, cb_data->path, sender_ia, cb_data->ga,
-                 cb_data->rp_type,
-                 buffer,
-                 value_size);
-
+                 cb_data->rp_type, buffer, value_size);
 
   if (cb_data) {
     free(user_data);
@@ -102,18 +91,18 @@ discovery_ia_cb(const char *payload, int len, oc_endpoint_t *endpoint,
   return OC_STOP_DISCOVERY;
 }
 
-
 int
 oc_knx_client_do_broker_request(char *resource_url, int ia, char *destination,
                                 char *rp)
 {
   char query[20];
   snprintf(query, 20, "if=urn:knx:ia.%d", ia);
-  
-  // not sure if we should use a malloc here, what would happen if there are no devices found?
+
+  // not sure if we should use a malloc here, what would happen if there are no
+  // devices found?
   broker_s_mode_userdata_t *cb_data =
     (broker_s_mode_userdata_t *)malloc(sizeof(broker_s_mode_userdata_t));
-  memset(cb_data,0, sizeof(broker_s_mode_userdata_t));
+  memset(cb_data, 0, sizeof(broker_s_mode_userdata_t));
   cb_data->ia = ia;
   strncpy(cb_data->rp_type, rp, 2);
   strncpy(cb_data->resource_url, resource_url, 20);
@@ -124,7 +113,6 @@ oc_knx_client_do_broker_request(char *resource_url, int ia, char *destination,
   oc_do_wk_discovery_all(query, 5, discovery_ia_cb, cb_data);
   return 0;
 }
-
 
 // ----------------------------------------------------------------------------
 
@@ -177,7 +165,6 @@ oc_s_mode_get_value(oc_request_t *request)
   return NULL;
 }
 
-
 static void
 oc_issue_s_mode(int sia_value, int group_address, char *rp, uint8_t *value_data,
                 int value_size)
@@ -190,14 +177,13 @@ oc_issue_s_mode(int sia_value, int group_address, char *rp, uint8_t *value_data,
   oc_make_ipv6_endpoint(mcast, IPV6 | DISCOVERY | MULTICAST, 5683, 0xff, scope,
                         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0xfd);
 
-  oc_send_s_mode(&mcast,"/.knx", sia_value, group_address, rp,
-                 value_data, value_size);
+  oc_send_s_mode(&mcast, "/.knx", sia_value, group_address, rp, value_data,
+                 value_size);
 }
 
 static void
-oc_send_s_mode(oc_endpoint_t *endpoint, char* path, int sia_value, int group_address,
-               char *rp, uint8_t *value_data,
-                int value_size)
+oc_send_s_mode(oc_endpoint_t *endpoint, char *path, int sia_value,
+               int group_address, char *rp, uint8_t *value_data, int value_size)
 {
   int scope = 5;
 
@@ -250,7 +236,8 @@ oc_send_s_mode(oc_endpoint_t *endpoint, char* path, int sia_value, int group_add
 }
 
 static int
-oc_s_mode_get_resource_value(char *resource_url, char *rp, uint8_t *buf, int buf_size)
+oc_s_mode_get_resource_value(char *resource_url, char *rp, uint8_t *buf,
+                             int buf_size)
 {
   (void)rp;
 
@@ -398,7 +385,9 @@ oc_set_s_mode_response_cb(oc_s_mode_response_cb_t my_func)
   return true;
 }
 
-oc_s_mode_response_cb_t oc_get_s_mode_response_cb() {
+oc_s_mode_response_cb_t
+oc_get_s_mode_response_cb()
+{
   return m_s_mode_cb;
 }
 

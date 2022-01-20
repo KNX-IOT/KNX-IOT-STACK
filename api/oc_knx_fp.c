@@ -1437,7 +1437,7 @@ oc_core_get_recipient_ia(int index)
   return g_grt[index].ia;
 }
 
-char*
+char *
 oc_core_get_recipient_index_url_or_path(int index)
 {
   if (index >= GRT_MAX_ENTRIES) {
@@ -1445,22 +1445,24 @@ oc_core_get_recipient_index_url_or_path(int index)
   }
 
   if (g_grt[index].ia > -1) {
-    PRINT("oc_core_get_recipient_index_url_or_path: ia %d\n",
-          g_grt[index].ia);
+    PRINT("oc_core_get_recipient_index_url_or_path: ia %d\n", g_grt[index].ia);
     if (oc_string_len(g_grt[index].path) > 0) {
-      PRINT("      oc_core_get_recipient_index_url_or_path path %s\n", oc_string(g_grt[index].path));
+      PRINT("      oc_core_get_recipient_index_url_or_path path %s\n",
+            oc_string(g_grt[index].path));
       return oc_string(g_grt[index].path);
 
     } else {
       // do .knx
-      PRINT("      oc_core_get_recipient_index_url_or_patho (default) %s\n", ".knx");
+      PRINT("      oc_core_get_recipient_index_url_or_patho (default) %s\n",
+            ".knx");
       return ".knx";
     }
 
   } else {
     if (oc_string_len(g_grt[index].url) > 0) {
       //
-      PRINT("      oc_core_get_recipient_index_url_or_path url %s\n", oc_string(g_grt[index].url));
+      PRINT("      oc_core_get_recipient_index_url_or_path url %s\n",
+            oc_string(g_grt[index].url));
       return oc_string(g_grt[index].url);
     }
   }

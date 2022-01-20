@@ -23,11 +23,8 @@
 extern "C" {
 #endif
 
-
-  
-
 typedef void (*oc_s_mode_response_cb_t)(char *url, oc_rep_t *rep,
-                                            oc_rep_t *rep_value);
+                                        oc_rep_t *rep_value);
 
 bool oc_set_s_mode_response_cb(oc_s_mode_response_cb_t my_func);
 
@@ -69,7 +66,6 @@ void oc_do_s_mode(char *resource_url, char *rp);
 typedef void (*oc_discover_ia_cb_t)(int ia, oc_endpoint_t *endpoint);
 
 int oc_knx_client_get_endpoint_from_ia(int ia, oc_discover_ia_cb_t my_func);
-
 
 #ifdef __cplusplus
 }

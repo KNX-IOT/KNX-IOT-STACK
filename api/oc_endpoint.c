@@ -654,7 +654,6 @@ oc_endpoint_set_local_address(oc_endpoint_t *ep, int interface_index)
 }
 #endif /* OC_CLIENT */
 
-
 /**
  * function to print the returned cbor as JSON
  *

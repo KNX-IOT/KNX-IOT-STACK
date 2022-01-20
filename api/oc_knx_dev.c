@@ -680,7 +680,7 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
     return;
   }
 
-  // writing the empty values 
+  // writing the empty values
   oc_storage_write(KNX_STORAGE_IA, (uint8_t *)&zero, sizeof(int));
   oc_storage_write(KNX_STORAGE_HOSTNAME, (uint8_t *)&buf, 1);
   oc_storage_write(KNX_STORAGE_IID, (uint8_t *)&buf, 1);
