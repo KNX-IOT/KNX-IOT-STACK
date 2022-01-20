@@ -210,6 +210,8 @@ void oc_endpoint_copy(oc_endpoint_t *dst, oc_endpoint_t *src);
  */
 void oc_endpoint_list_copy(oc_endpoint_t **dst, oc_endpoint_t *src);
 
+void oc_endpoint_print(oc_endpoint_t *ep);
+
 #ifdef __cplusplus
 }
 #endif

@@ -47,10 +47,13 @@ void oc_knx_device_storage_read(size_t device);
  * - Installation ID (iid)
  * - programming mode (pm)
  * - group object table
+ * - recipient object table
+ * - publisher object table
  *
- * @param device_index
+ * @param device_index The device index
+ * @param reset_mode the KNX reset mode
  */
-void oc_knx_device_storage_reset(size_t device_index);
+void oc_knx_device_storage_reset(size_t device_index, int reset_mode);
 
 /**
  * @brief function checks if the device is in programming mode

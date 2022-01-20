@@ -653,3 +653,16 @@ oc_endpoint_set_local_address(oc_endpoint_t *ep, int interface_index)
   }
 }
 #endif /* OC_CLIENT */
+
+/**
+ * function to print the returned cbor as JSON
+ *
+ */
+void
+oc_endpoint_print(oc_endpoint_t *ep)
+{
+  oc_string_t ip_str;
+  oc_endpoint_to_string(ep, &ip_str);
+  PRINT("IP address (ep) to: %s\n", oc_string(ip_str));
+  oc_free_string(&ip_str);
+}

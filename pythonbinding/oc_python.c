@@ -158,19 +158,6 @@ print_rep(oc_rep_t *rep, bool pretty_print)
   free(json);
 }
 
-/**
- * function to print the returned cbor as JSON
- *
- */
-void
-print_ep(oc_endpoint_t *ep)
-{
-  oc_string_t ip_str;
-  oc_endpoint_to_string(ep, &ip_str);
-  PRINT("  [C] IP address (ep) to: %s\n", oc_string(ip_str));
-  oc_free_string(&ip_str);
-}
-
 // -----------------------------------------------------------------------------
 
 /**
@@ -540,7 +527,7 @@ py_linkformat_get(char *sn, char *uri, char *query, char *cbdata)
     strcpy(new_cbdata->sn, sn);
   }
 
-  print_ep(&device->ep);
+  oc_endpoint_print(&device->ep);
   if (&ep != NULL) {
     ret = oc_do_get_ex(uri, &device->ep, query, general_get_cb, HIGH_QOS,
                        APPLICATION_LINK_FORMAT, APPLICATION_LINK_FORMAT,
@@ -701,7 +688,7 @@ discovery_cb(const char *payload, int len, oc_endpoint_t *endpoint,
   inform_discovery_python(len, payload);
 
   PRINT("[C] issue get on /dev/sn\n");
-  print_ep(endpoint);
+  oc_endpoint_print(endpoint);
 
   oc_do_get_ex("/dev/sn", endpoint, NULL, response_get_sn, HIGH_QOS,
                APPLICATION_CBOR, APPLICATION_CBOR, endpoint);

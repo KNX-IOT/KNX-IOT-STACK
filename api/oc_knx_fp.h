@@ -252,9 +252,19 @@ void oc_delete_group_object_table_entry(int entry);
  */
 void oc_delete_group_object_table();
 
-// int oc_core_send_message_recipient_table_index(int index, int group_address);
-int oc_core_send_message_recipient_table_index(int index, int group_address,
-                                               oc_rep_t *rep);
+/**
+ * @brief delete all entries of the Recipient and Publisher Object Table (from
+ * persistent) storage
+ *
+ */
+void oc_delete_group_rp_table();
+
+bool oc_core_check_recipient_index_on_group_address(int index,
+                                                    int group_address);
+
+char *oc_core_get_recipient_index_url_or_path(int index);
+
+int oc_core_get_recipient_ia(int index);
 
 /**
  * @brief return the size of the recipient table

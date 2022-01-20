@@ -10,6 +10,7 @@ if(OC_REAPPLY_MBEDTLS_PATCHES)
          FORCE
     )
 endif()
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/tools)
 
 # Do not build anything except for the library
 option(ENABLE_PROGRAMS "Build mbed TLS programs." OFF)
@@ -60,6 +61,7 @@ target_sources(kis-api INTERFACE
     ${PROJECT_SOURCE_DIR}/api/oc_session_events.c
     ${PROJECT_SOURCE_DIR}/api/oc_uuid.c
     ${PROJECT_SOURCE_DIR}/api/oc_knx.c
+    ${PROJECT_SOURCE_DIR}/api/oc_knx_client.c
     ${PROJECT_SOURCE_DIR}/api/oc_knx_dev.c
     ${PROJECT_SOURCE_DIR}/api/oc_knx_fb.c
     ${PROJECT_SOURCE_DIR}/api/oc_knx_fp.c
@@ -226,7 +228,6 @@ file(COPY "${PROJECT_SOURCE_DIR}/pythonbinding/start_shell.bat" DESTINATION ${PR
 file(COPY "${PROJECT_SOURCE_DIR}/pythonbinding/build_so_windows.sh" DESTINATION ${PROJECT_BINARY_DIR}/)
 file(COPY "${PROJECT_SOURCE_DIR}/pythonbinding/README.md" DESTINATION ${PROJECT_BINARY_DIR}/)
 file(COPY ${PROJECT_SOURCE_DIR}/pythonbinding/application_scripts DESTINATION ${PROJECT_BINARY_DIR})
-file(COPY ${PROJECT_SOURCE_DIR}/pythonbinding/tests DESTINATION ${PROJECT_BINARY_DIR})
 
 if(PROJECT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     # Add clang-format target
@@ -235,6 +236,15 @@ if(PROJECT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
     )
 endif()
+
+# https://stackoverflow.com/questions/37957583/how-to-use-gcov-with-cmake
+if (CMAKE_BUILD_TYPE STREQUAL "Coverage")
+    include(CodeCoverage)
+    setup_target_for_coverage(${PROJECT_NAME}_coverage ${TEST_TARGET} coverage)
+
+    SET(CMAKE_CXX_FLAGS "-g -O0 -fprofile-arcs -ftest-coverage")
+    SET(CMAKE_C_FLAGS "-g -O0 -fprofile-arcs -ftest-coverage")
+endif() #CMAKE_BUILD_TYPE STREQUAL "Coverage"
 
 add_subdirectory(port)
 add_subdirectory(apps)
