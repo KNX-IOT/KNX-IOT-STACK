@@ -11,19 +11,25 @@ python -m pip install -r ../pythonbinding/requirements.txt
 cp ./libkisCS.so ../pythonbinding/
 
 
+#cd ../pythonbinding/tests
+#python knx_test_sequence.py -sleep > $mydir/python_out.txt 2>&1 &
+#pythonPID=$!
+#ps
+
+echo "--listing apps----"
+ls ../linuxbuild_clientserver/apps
+
+echo "--Starting simpleserver_all----"
+../linuxbuild_clientserver/apps/simpleserver_all 2>&1 |tee  $mydir/app_out.txt &
+serverPID=$!
+
+
 echo "--Starting Python----"
 
 cd ../pythonbinding/tests
-python knx_test_sequence.py -sleep > $mydir/python_out.txt 2>&1 &
+python knx_test_sequence.py 2>&1 | tee  $mydir/python_out.txt &
 pythonPID=$!
 ps
-
-echo "--listing apps----"
-ls ../../linuxbuild_clientserver/apps
-
-echo "--Starting simpleserver_all----"
-../../linuxbuild_clientserver/apps/simpleserver_all > $mydir/app_out.txt 2>&1 &
-serverPID=$!
 
 sleep 60
 
