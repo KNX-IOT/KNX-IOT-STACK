@@ -12,7 +12,7 @@ cp ./libkisCS.so ../pythonbinding/
 echo "--Starting Python----"
 
 cd ../pythonbinding/tests
-python knx_test_sequence.py -sleep > $mydir/python_out.txt 2>&1 2&
+python knx_test_sequence.py -sleep > $mydir/python_out.txt 2>&1 &
 pythonPID=$!
 ps
 
@@ -20,7 +20,7 @@ echo "--listing apps----"
 ls ../../linuxbuild_clientserver/apps
 
 echo "--Starting simpleserver_all----"
-../../linuxbuild_clientserver/apps/simpleserver_all &
+../../linuxbuild_clientserver/apps/simpleserver_all > $mydir/app_out.txt 2>&1 &
 serverPID=$!
 
 sleep 60
@@ -33,6 +33,9 @@ echo "---python output------"
 
 #cat $mydir/python_out.txt | xargs echo -e
 cat -v $mydir/python_out.txt
+
+echo "---app output------"
+cat -v $mydir/app_out.txt
 
 echo "---Collecting Failures------"
 

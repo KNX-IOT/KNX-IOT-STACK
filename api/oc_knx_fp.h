@@ -259,11 +259,31 @@ void oc_delete_group_object_table();
  */
 void oc_delete_group_rp_table();
 
+/**
+ * @brief checks if the group address is part of the recipient table at index
+ *
+ * @param index the index in the recipient table
+ * @param group_address the group address to check fo
+ * @return true is part of the recipient entry
+ * @return false is not part of the recipient entry
+ */
 bool oc_core_check_recipient_index_on_group_address(int index,
                                                     int group_address);
 
+/**
+ * @brief get the destination (path or url) of the recipient table at index
+ *
+ * @param index the index in the table
+ * @return char* NULL or path or url of the destination
+ */
 char *oc_core_get_recipient_index_url_or_path(int index);
 
+/**
+ * @brief retrieve the internal address of the recipient in the table
+ *
+ * @param index the index number in the recipient table
+ * @return int -1 does not exit otherwise the ia
+ */
 int oc_core_get_recipient_ia(int index);
 
 /**
@@ -290,10 +310,6 @@ bool oc_add_points_in_group_object_table_to_response(oc_request_t *request,
                                                      int group_address,
                                                      size_t *response_length,
                                                      int matches);
-
-// these are needed for the system with the broker
-// int oc_core_find_recipient_table_index(int group_address);
-// oc_string_t oc_core_find_recipient_table_url_from_index(int index);
 
 /**
  * @brief Creation of the KNX feature point resources.
