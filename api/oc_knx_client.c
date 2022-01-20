@@ -48,6 +48,9 @@ static void oc_send_s_mode(oc_endpoint_t *endpoint, char *path, int sia_value,
                            int value_size);
 
 
+static int oc_s_mode_get_resource_value(char *resource_url, char *rp, uint8_t *buf,
+                                 int buf_size);
+
 // ----------------------------------------------------------------------------
 
 static oc_discovery_flags_t
@@ -71,10 +74,10 @@ discovery_ia_cb(const char *payload, int len, oc_endpoint_t *endpoint,
 
   int value_size;
   if (cb_data->resource_url == NULL) {
-    return;
+    return OC_STOP_DISCOVERY;
   }
   if (cb_data->path == NULL) {
-    return;
+    return OC_STOP_DISCOVERY;
   }
 
   uint8_t *buffer = malloc(100);
@@ -197,13 +200,8 @@ oc_send_s_mode(oc_endpoint_t *endpoint, char* path, int sia_value, int group_add
                 int value_size)
 {
   int scope = 5;
-  //(void)sia_value; /* variable not used */
 
   PRINT("  oc_issue_s_mode : scope %d\n", scope);
-
-  oc_make_ipv6_endpoint(mcast, IPV6 | DISCOVERY | MULTICAST, 5683, 0xff, scope,
-                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0xfd);
-
   if (oc_init_post(path, endpoint, NULL, NULL, LOW_QOS, NULL)) {
 
     /*
@@ -251,7 +249,7 @@ oc_send_s_mode(oc_endpoint_t *endpoint, char* path, int sia_value, int group_add
   }
 }
 
-int
+static int
 oc_s_mode_get_resource_value(char *resource_url, char *rp, uint8_t *buf, int buf_size)
 {
   (void)rp;
