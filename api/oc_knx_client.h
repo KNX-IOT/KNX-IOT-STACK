@@ -29,7 +29,7 @@ typedef void (*oc_s_mode_response_cb_t)(char *url, oc_rep_t *rep,
 /**
  * @brief set the s-mode response callback
  * e.g. function to be called when a s-mode response is comming back
- * 
+ *
  * @param my_func the callback function
  * @return true function set
  * @return false function set failed
@@ -37,8 +37,8 @@ typedef void (*oc_s_mode_response_cb_t)(char *url, oc_rep_t *rep,
 bool oc_set_s_mode_response_cb(oc_s_mode_response_cb_t my_func);
 
 /**
- * @brief retrieve the callback function 
- * 
+ * @brief retrieve the callback function
+ *
  * @return oc_s_mode_response_cb_t the callback function that has been set
  */
 oc_s_mode_response_cb_t oc_get_s_mode_response_cb();
@@ -71,11 +71,11 @@ oc_rep_t *oc_s_mode_get_value(oc_request_t *request);
  * url (path) if more than one entry in the group object table, then all group
  * address are used to send the POST request too.
  *
- * @param resource_url URI of the resource (e.g. implemented on the device that is calling this function)
+ * @param resource_url URI of the resource (e.g. implemented on the device that
+ * is calling this function)
  * @param rp the "st" value to send e.g. "w" | "rp" | "r"
  */
 void oc_do_s_mode(char *resource_url, char *rp);
-
 
 #ifdef __cplusplus
 }
