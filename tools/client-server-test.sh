@@ -27,13 +27,14 @@ serverPID=$!
 echo "--Starting Python----"
 
 cd ../pythonbinding/tests
-python knx_test_sequence.py 2>&1 | tee  $mydir/python_out.txt
-#pythonPID=$!
+python knx_test_sequence.py 2>&1 | tee  $mydir/python_out.txt &
+pythonPID=$!
 ps
 
+sleep 60
 
 echo "---killing applications------"
-#kill $pythonPID
+kill $pythonPID
 kill $serverPID
 
 echo "---python output------"
