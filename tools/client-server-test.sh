@@ -13,10 +13,10 @@ cp ./libkisCS.so ../pythonbinding/
 
 echo "--Starting Python----"
 
-cd ../pythonbinding/tests
-python knx_test_sequence.py -sleep > $mydir/python_out.txt 2>&1 &
-pythonPID=$!
-ps
+#cd ../pythonbinding/tests
+#python knx_test_sequence.py -sleep > $mydir/python_out.txt 2>&1 &
+#pythonPID=$!
+#ps
 
 echo "--listing apps----"
 ls ../../linuxbuild_clientserver/apps
@@ -25,10 +25,14 @@ echo "--Starting simpleserver_all----"
 ../../linuxbuild_clientserver/apps/simpleserver_all > $mydir/app_out.txt 2>&1 &
 serverPID=$!
 
-sleep 60
+cd ../pythonbinding/tests
+python knx_test_sequence.py -sleep > $mydir/python_out.txt 2>&1 
+#pythonPID=$!
+ps
+
 
 echo "---killing applications------"
-kill $pythonPID
+#kill $pythonPID
 kill $serverPID
 
 echo "---python output------"
