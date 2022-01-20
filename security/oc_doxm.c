@@ -129,6 +129,30 @@ oc_sec_doxm_default(size_t device)
   oc_device_info_t *d = oc_core_get_device_info(device);
   oc_gen_uuid(&doxm[device].deviceuuid);
   memcpy(d->di.id, doxm[device].deviceuuid.id, 16);
+#ifdef OC_SPAKE2PLUS
+  oc_free_string(&doxm[device].obtshare);
+  oc_new_string(&doxm[device].obtshare, "", 0);
+
+  oc_new_string(&doxm[device].deviceshare, "", 0);
+  oc_free_string(&doxm[device].deviceshare);
+
+  oc_new_string(&doxm[device].obtcheck, "", 0);
+  oc_free_string(&doxm[device].obtcheck);
+
+  oc_new_string(&doxm[device].devicecheck, "", 0);
+  oc_free_string(&doxm[device].devicecheck);
+
+  // oc_string_t spakecontext;
+  char *spctx = "OCF Spake2plus,Version:1.0";
+  oc_free_string(&doxm[device].spakecontext);
+  oc_new_string(&doxm[device].spakecontext, spctx, strlen(spctx));
+
+  // oc_string_t spakesalt;
+  oc_free_string(&doxm[device].obtshare);
+  oc_new_string(&doxm[device].obtshare, "", 0);
+
+  // int spakeiterations = 0;
+#endif
   oc_sec_dump_doxm(device);
 }
 
@@ -162,6 +186,21 @@ oc_sec_encode_doxm(size_t device, oc_interface_mask_t iface_mask,
   /* rowneruuid */
   oc_uuid_to_str(&doxm[device].rowneruuid, uuid, OC_UUID_LEN);
   oc_rep_set_text_string(root, rowneruuid, uuid);
+  /* obtshare */
+  oc_rep_set_text_string(root, obtshare, oc_string(doxm[device].obtshare));
+  /* deviceshare */
+  oc_rep_set_text_string(root, deviceshare,
+                         oc_string(doxm[device].deviceshare));
+  /* obtcheck */
+  oc_rep_set_text_string(root, obtcheck, oc_string(doxm[device].obtcheck));
+  /* devicecheck */
+  oc_rep_set_text_string(root, devicecheck,
+                         oc_string(doxm[device].devicecheck));
+  /* spakecontext */
+  oc_rep_set_text_string(root, spakecontext,
+                         oc_string(doxm[device].spakecontext));
+  /* spakeiterations */
+  oc_rep_set_int(root, spakeiterations, doxm[device].spakeiterations);
   oc_rep_end_root_object();
 }
 
@@ -230,6 +269,7 @@ oc_sec_decode_doxm(oc_rep_t *rep, bool from_storage, bool doc, size_t device)
       }
       break;
     /* oxmsel and sct */
+    /* spakeiterations */
     case OC_REP_INT:
       if (len == 6 && memcmp(oc_string(t->name), "oxmsel", 6) == 0) {
         if (!from_storage) {
@@ -257,12 +297,24 @@ oc_sec_decode_doxm(oc_rep_t *rep, bool from_storage, bool doc, size_t device)
         }
       } else if (from_storage && len == 3 &&
                  memcmp(oc_string(t->name), "sct", 3) == 0) {
+      } else if (len == 15 &&
+                 memcmp(oc_string(t->name), "spakeiterations", 15) == 0) {
+        if (ps->s != OC_DOS_RFOTM) {
+          OC_ERR("oc_doxm: Can set spakeiterations property only in RFOTM");
+          return false;
+        }
+        if (!doc) {
+          OC_ERR("oc_doxm: cannot set sct property outside DOC");
+          return false;
+        }
       } else {
         OC_ERR("oc_doxm: Unknown property %s", oc_string(t->name));
         return false;
       }
       break;
     /* deviceuuid, devowneruuid and rowneruuid */
+    /* obtshare, deviceshare, obtcheck, devicecheck,
+     * spakesalt, spakecontext */
     case OC_REP_STRING:
       if (len == 10 && memcmp(oc_string(t->name), "deviceuuid", 10) == 0) {
         if (!from_storage) {
@@ -296,6 +348,86 @@ oc_sec_decode_doxm(oc_rep_t *rep, bool from_storage, bool doc, size_t device)
           }
           if (!doc) {
             OC_ERR("oc_doxm: cannot set rowneruuid outside DOC");
+            return false;
+          }
+        }
+      } else if (len == 8 && memcmp(oc_string(t->name), "obtshare", 8) == 0) {
+        if (!from_storage) {
+          if (ps->s != OC_DOS_RFOTM) {
+            OC_ERR("oc_doxm: can set obtshare property only in RFOTM");
+            return false;
+          }
+          if (!doc) {
+            OC_ERR("oc_doxm: cannot set obtshare outside DOC");
+            return false;
+          }
+        }
+      } else if (len == 11 &&
+                 memcmp(oc_string(t->name), "deviceshare", 11) == 0) {
+        if (!from_storage) {
+          if (ps->s != OC_DOS_RFOTM) {
+            OC_ERR("oc_doxm: can set deviceshare property only in RFOTM");
+            return false;
+          }
+          if (!doc) {
+            OC_ERR("oc_doxm: cannot set deviceshare outside DOC");
+            return false;
+          }
+        }
+      } else if (len == 8 && memcmp(oc_string(t->name), "obtcheck", 8) == 0) {
+        if (!from_storage) {
+          if (ps->s != OC_DOS_RFOTM) {
+            OC_ERR("oc_doxm: can set obtcheck property only in RFOTM");
+            return false;
+          }
+          if (!doc) {
+            OC_ERR("oc_doxm: cannot set obtcheck outside DOC");
+            return false;
+          }
+        }
+      } else if (len == 11 &&
+                 memcmp(oc_string(t->name), "devicecheck", 11) == 0) {
+        if (!from_storage) {
+          if (ps->s != OC_DOS_RFOTM) {
+            OC_ERR("oc_doxm: can set devicecheck property only in RFOTM");
+            return false;
+          }
+          if (!doc) {
+            OC_ERR("oc_doxm: cannot set devicecheck outside DOC");
+            return false;
+          }
+        }
+      } else if (len == 8 && memcmp(oc_string(t->name), "obtshare", 8) == 0) {
+        if (!from_storage) {
+          if (ps->s != OC_DOS_RFOTM) {
+            OC_ERR("oc_doxm: can set obtshare property only in RFOTM");
+            return false;
+          }
+          if (!doc) {
+            OC_ERR("oc_doxm: cannot set obtshare outside DOC");
+            return false;
+          }
+        }
+      } else if (len == 9 && memcmp(oc_string(t->name), "spakesalt", 9) == 0) {
+        if (!from_storage) {
+          if (ps->s != OC_DOS_RFOTM) {
+            OC_ERR("oc_doxm: can set spakesalt property only in RFOTM");
+            return false;
+          }
+          if (!doc) {
+            OC_ERR("oc_doxm: cannot set spakesalt outside DOC");
+            return false;
+          }
+        }
+      } else if (len == 12 &&
+                 memcmp(oc_string(t->name), "spakecontext", 12) == 0) {
+        if (!from_storage) {
+          if (ps->s != OC_DOS_RFOTM) {
+            OC_ERR("oc_doxm: can set spakecontext property only in RFOTM");
+            return false;
+          }
+          if (!doc) {
+            OC_ERR("oc_doxm: cannot set spakecontext outside DOC");
             return false;
           }
         }
@@ -347,6 +479,8 @@ oc_sec_decode_doxm(oc_rep_t *rep, bool from_storage, bool doc, size_t device)
       }
       break;
     /* deviceuuid, devowneruuid and rowneruuid */
+    /* obtshare, deviceshare, obtcheck, devicecheck,
+     * spakesalt, spakecontext */
     case OC_REP_STRING:
       if (len == 10 && memcmp(oc_string(rep->name), "deviceuuid", 10) == 0) {
         oc_str_to_uuid(oc_string(rep->value.string), &doxm[device].deviceuuid);
@@ -359,6 +493,46 @@ oc_sec_decode_doxm(oc_rep_t *rep, bool from_storage, bool doc, size_t device)
       } else if (len == 10 &&
                  memcmp(oc_string(rep->name), "rowneruuid", 10) == 0) {
         oc_str_to_uuid(oc_string(rep->value.string), &doxm[device].rowneruuid);
+      } else if (len == 8 && memcmp(oc_string(rep->name), "obtshare", 8) == 0) {
+
+        oc_string_t *s = &doxm[device].obtshare;
+        oc_free_string(s);
+        oc_new_string(s, oc_string(rep->value.string),
+                      strlen(oc_string(rep->value.string)));
+      } else if (len == 12 &&
+                 memcmp(oc_string(rep->name), "deviceshare", 12) == 0) {
+
+        oc_string_t *s = &doxm[device].deviceshare;
+        oc_free_string(s);
+        oc_new_string(s, oc_string(rep->value.string),
+                      strlen(oc_string(rep->value.string)));
+      } else if (len == 8 && memcmp(oc_string(rep->name), "obtcheck", 8) == 0) {
+
+        oc_string_t *s = &doxm[device].obtcheck;
+        oc_free_string(s);
+        oc_new_string(s, oc_string(rep->value.string),
+                      strlen(oc_string(rep->value.string)));
+      } else if (len == 11 &&
+                 memcmp(oc_string(rep->name), "devicecheck", 11) == 0) {
+
+        oc_string_t *s = &doxm[device].devicecheck;
+        oc_free_string(s);
+        oc_new_string(s, oc_string(rep->value.string),
+                      strlen(oc_string(rep->value.string)));
+      } else if (len == 9 &&
+                 memcmp(oc_string(rep->name), "spakesalt", 9) == 0) {
+
+        oc_string_t *s = &doxm[device].spakesalt;
+        oc_free_string(s);
+        oc_new_string(s, oc_string(rep->value.string),
+                      strlen(oc_string(rep->value.string)));
+      } else if (len == 12 &&
+                 memcmp(oc_string(rep->name), "spakecontext", 12) == 0) {
+
+        oc_string_t *s = &doxm[device].spakecontext;
+        oc_free_string(s);
+        oc_new_string(s, oc_string(rep->value.string),
+                      strlen(oc_string(rep->value.string)));
       }
       break;
     default:

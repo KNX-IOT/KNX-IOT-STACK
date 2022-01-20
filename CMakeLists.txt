@@ -12,6 +12,11 @@ if(OC_REAPPLY_MBEDTLS_PATCHES)
 endif()
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/tools)
 
+# Enable missing algoritms
+# TODO add this to Makefiles, or regenerate mbedtls patches
+add_compile_definitions(MBEDTLS_HKDF_C)
+add_compile_options(-fPIC)
+
 # Do not build anything except for the library
 option(ENABLE_PROGRAMS "Build mbed TLS programs." OFF)
 option(ENABLE_TESTING "Build mbed TLS tests." OFF)
@@ -122,6 +127,7 @@ target_sources(kis-common INTERFACE
     ${PROJECT_SOURCE_DIR}/security/oc_roles.c
     ${PROJECT_SOURCE_DIR}/security/oc_sdi.c
     ${PROJECT_SOURCE_DIR}/security/oc_sp.c
+    ${PROJECT_SOURCE_DIR}/security/oc_spake2plus.c
     ${PROJECT_SOURCE_DIR}/security/oc_store.c
     ${PROJECT_SOURCE_DIR}/security/oc_svr.c
     ${PROJECT_SOURCE_DIR}/security/oc_tls.c

@@ -74,6 +74,13 @@ if(UNIX)
 
     add_dependencies(LSAB_minimal_pi lsab_minimal_py)
 
+    add_executable(spaketest
+        ${PROJECT_SOURCE_DIR}/spaketest.c
+    )
+    target_link_libraries(spaketest
+        kisClientServer
+    )
+
     # Python script that corresponds to the executable must be copied to the same folder
     file(COPY ${PROJECT_SOURCE_DIR}/lsab_minimal.py DESTINATION ${PROJECT_BINARY_DIR})
 
