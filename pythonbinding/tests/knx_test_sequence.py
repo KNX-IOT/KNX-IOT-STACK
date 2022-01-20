@@ -720,8 +720,7 @@ def do_sequence(my_stack):
         return
         # .knx
         #do_sequence_a_sen(my_stack)
-        
-        
+
 def do_all(my_stack):
     if my_stack.get_nr_devices() > 0:
         do_sequence(my_stack)
@@ -733,8 +732,6 @@ def do_all(my_stack):
         #do_sequence_a_sen(my_stack)
 
 if __name__ == '__main__':  # pragma: no cover
-
-
 
     parser = argparse.ArgumentParser()
 
