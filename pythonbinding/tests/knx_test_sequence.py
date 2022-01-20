@@ -717,6 +717,14 @@ def do_sequence(my_stack):
         do_sequence_knx_crc(my_stack)
         do_sequence_knx_osn(my_stack)
         do_sequence_core_knx(my_stack)
+        return
+        # .knx
+        #do_sequence_a_sen(my_stack)
+        
+        
+def do_all(my_stack):
+    if my_stack.get_nr_devices() > 0:
+        do_sequence(my_stack)
         do_discovery_tests(my_stack)
         do_sequence_knx_knx_s_mode(my_stack)
         do_sequence_knx_knx_recipient(my_stack)
@@ -740,10 +748,14 @@ if __name__ == '__main__':  # pragma: no cover
     parser.add_argument("-sleep", "--sleep",
                     help="sleep in seconds", nargs='?',
                     default=0, const=1, required=False)
+    parser.add_argument("-all", "--all",
+                    help="do all tests", nargs='?',
+                    default=False, const=1, required=False)
     print(sys.argv)
     args = parser.parse_args()
     print("scope         :" + str(args.scope))
     print("sleep         :" + str(args.sleep))
+    print("all           :" + str(args.all))
     time.sleep(int(args.sleep))
 
     the_stack = knx_stack.KNXIOTStack()
@@ -751,7 +763,10 @@ if __name__ == '__main__':  # pragma: no cover
 
     try:
         test_discover(the_stack)
-        do_sequence(the_stack)
+        if args.all:
+            do_all(the_stack)
+        else:
+            do_sequence(the_stack)
     except:
         traceback.print_exc()
 
