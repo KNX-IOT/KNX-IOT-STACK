@@ -344,8 +344,8 @@ int oc_uri_get_wildcard_value_as_int(const char *uri_resource, size_t uri_len,
  * @param uri_len The length of the URI with wild card
  * @param uri_invoked The URI that should match a wild card
  * @param invoked_len The URI length of the invoked URI
- * @return true 
- * @return false 
+ * @return true
+ * @return false
  */
 bool oc_uri_contains_wildcard_value_underscore(const char *uri_resource,
                                                size_t uri_len,
@@ -359,7 +359,7 @@ bool oc_uri_contains_wildcard_value_underscore(const char *uri_resource,
  * @param uri_len The length of the URI with wild card
  * @param uri_invoked The URI that should match a wild card
  * @param invoked_len The URI length of the invoked URI
- * @return int 
+ * @return int
  */
 int oc_uri_get_wildcard_value_as_int_after_underscore(const char *uri_resource,
                                                       size_t uri_len,
