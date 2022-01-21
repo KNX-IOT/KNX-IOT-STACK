@@ -110,6 +110,7 @@ _alloc_rep(void)
   oc_rep_t *rep = oc_memb_alloc(rep_objects);
   if (rep != NULL) {
     rep->name.size = 0;
+    rep->iname = -1;  // TODO
   }
 #ifdef OC_DEBUG
   oc_assert(rep != NULL);

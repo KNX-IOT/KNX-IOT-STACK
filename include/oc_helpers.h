@@ -336,6 +336,18 @@ int oc_uri_get_wildcard_value_as_int(const char *uri_resource, size_t uri_len,
                                      const char *uri_invoked,
                                      size_t invoked_len);
 
+
+
+bool oc_uri_contains_wildcard_value_underscore(const char *uri_resource,
+                                               size_t uri_len,
+                                               const char *uri_invoked,
+                                               size_t invoked_len);
+
+int oc_uri_get_wildcard_value_as_int_after_underscore(const char *uri_resource,
+                                                       size_t uri_len,
+                                                       const char *uri_invoked,
+                                                       size_t invoked_len);
+
 /*
  * @brief retrieve the wildcard value as string
  * The invoked URI is checked against the URI of a resource
@@ -356,6 +368,8 @@ int oc_uri_get_wildcard_value_as_int(const char *uri_resource, size_t uri_len,
 int oc_uri_get_wildcard_value_as_string(const char *uri_resource,
                                         size_t uri_len, const char *uri_invoked,
                                         size_t invoked_len, const char **value);
+
+
 
 #ifdef __cplusplus
 }
