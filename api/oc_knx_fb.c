@@ -24,7 +24,7 @@
 
 // -----------------------------------------------------------------------------
 #define ARRAY_SIZE 50
-int g_int_array[2][ARRAY_SIZE];  
+int g_int_array[2][ARRAY_SIZE];
 int g_array_size = 0;
 
 int
@@ -48,8 +48,7 @@ is_in_g_array(int value, int instance)
 {
   int i;
   for (i = 0; i < g_array_size; i++) {
-    if (value == g_int_array[0][i] && 
-        instance == g_int_array[1][i]) {
+    if (value == g_int_array[0][i] && instance == g_int_array[1][i]) {
       return true;
     }
   }

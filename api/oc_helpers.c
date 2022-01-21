@@ -345,14 +345,16 @@ oc_uri_get_wildcard_value_as_int(const char *uri_resource, size_t uri_len,
 }
 
 bool
-oc_uri_contains_wildcard_value_underscore(const char *uri_resource, size_t uri_len,
-                                 const char *uri_invoked, size_t invoked_len)
+oc_uri_contains_wildcard_value_underscore(const char *uri_resource,
+                                          size_t uri_len,
+                                          const char *uri_invoked,
+                                          size_t invoked_len)
 {
   if (uri_resource[uri_len - 1] == '*') {
     if ((invoked_len + 1) >= uri_len) {
       char *underscore = strchr(&uri_invoked[uri_len - 2], '_');
       if (underscore) {
-        int value = atoi(underscore+1);
+        int value = atoi(underscore + 1);
         return value;
       }
     }
@@ -361,11 +363,10 @@ oc_uri_contains_wildcard_value_underscore(const char *uri_resource, size_t uri_l
   return false;
 }
 
-
-
-int oc_uri_get_wildcard_value_as_int_after_underscore(const char *uri_resource,
-                                                      size_t uri_len,
-                                                      const char *uri_invoked,
+int
+oc_uri_get_wildcard_value_as_int_after_underscore(const char *uri_resource,
+                                                  size_t uri_len,
+                                                  const char *uri_invoked,
                                                   size_t invoked_len)
 {
   if (uri_resource[uri_len - 1] == '*') {

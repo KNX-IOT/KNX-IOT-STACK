@@ -349,7 +349,8 @@ oc_resource_set_periodic_observable(oc_resource_t *resource, uint16_t seconds)
 }
 
 void
-oc_resource_set_function_block_instance(oc_resource_t *resource, uint8_t instance)
+oc_resource_set_function_block_instance(oc_resource_t *resource,
+                                        uint8_t instance)
 {
   resource->fb_instance = instance;
 }

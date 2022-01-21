@@ -242,7 +242,7 @@ get_dpa_352_51(oc_request_t *request, oc_interface_mask_t interfaces,
  */
 STATIC void
 get_dpa_352_51_1(oc_request_t *request, oc_interface_mask_t interfaces,
-               void *user_data)
+                 void *user_data)
 {
   (void)user_data; /* variable not used */
 
@@ -453,7 +453,6 @@ post_dpa_352_51(oc_request_t *request, oc_interface_mask_t interfaces,
   PRINT("-- End post_dpa_352_51\n");
 }
 
-
 /**
  * post method for "/p/a" resource.
  * The function has as input the request body, which are the input values of the
@@ -470,7 +469,7 @@ post_dpa_352_51(oc_request_t *request, oc_interface_mask_t interfaces,
  */
 STATIC void
 post_dpa_352_51_1(oc_request_t *request, oc_interface_mask_t interfaces,
-                void *user_data)
+                  void *user_data)
 {
   (void)interfaces;
   (void)user_data;
@@ -627,7 +626,6 @@ register_resources(void)
   oc_resource_bind_resource_interface(res_352, OC_IF_AC); /* if.a */
   oc_resource_set_discoverable(res_352, true);
 
-
   /* periodic observable
      to be used when one wants to send an event per time slice
      period is 1 second */
@@ -640,7 +638,7 @@ register_resources(void)
   oc_resource_set_request_handler(res_352, OC_GET, get_dpa_352_51, NULL);
   oc_resource_set_request_handler(res_352, OC_POST, post_dpa_352_51, NULL);
   oc_add_resource(res_352);
-    
+
   oc_resource_t *res_352_1 = oc_new_resource("myname", "p/a_1", 1, 0);
   oc_resource_bind_resource_type(res_352_1, "urn:knx:dpa.352.51");
   oc_resource_bind_content_type(res_352_1, APPLICATION_CBOR);
