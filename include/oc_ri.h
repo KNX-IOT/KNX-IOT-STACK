@@ -218,7 +218,7 @@ typedef enum {
   OC_KNX_LDEVID,   ///< LDevID
   OC_KNX_LSM,      ///< load state machine
   OC_KNX_DOT_KNX,  ///< .knx resource
-  OC_KNX_CRC,      ///< CRC value of loaded contents
+  OC_KNX_FINGERPRINT,      ///< FINGERPRINT value of loaded contents
   OC_KNX_OSN,      ///< .well-known / knx / osn
   OC_KNX,          ///< .well-known / knx
   OC_KNX_FP_GM,    ///< FP/GM

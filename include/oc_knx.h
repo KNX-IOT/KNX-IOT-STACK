@@ -146,11 +146,29 @@ void oc_knx_set_idevid(const char *idevid, int len);
 void oc_knx_set_ldevid(char *idevid, int len);
 
 /**
- * @brief sets the crc value (of the loaded materials)
+ * @brief sets the fingerprint value (of the loaded materials)
  *
- * @param crc The crc value
+ * @param fingerprint The fingerprint value
  */
-void oc_knx_set_crc(uint64_t crc);
+void oc_knx_set_fingerprint(uint64_t fingerprint);
+
+/**
+ * @brief increase the finger print value
+ * 
+ */
+void oc_knx_increase_fingerprint();
+
+/**
+ * @brief load the fingerprint value from storage
+ * 
+ */
+void oc_knx_load_fingerprint();
+
+/**
+ * @brief dump the fingerprint value to storage
+ * 
+ */
+void oc_knx_dump_fingerprint();
 
 /**
  * @brief sets the oscore sequence number
@@ -176,7 +194,7 @@ void oc_knx_load_state(size_t device_index);
  * - /.knx
  * - /.well-known/knx
  * - /.well-known/knx/osn
- * - /.well-known/knx/crc
+ * - /.well-known/knx/f (fingerprint)
  * - /.well-known/knx/ldevid
  * - /.well-known/knx/idevid
  * - /.well-known/knx/spake
