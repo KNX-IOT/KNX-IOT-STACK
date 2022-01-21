@@ -712,7 +712,7 @@ oc_create_knx_knx_resource(int resource_idx, size_t device)
 
 static void
 oc_core_knx_fingerprint_get_handler(oc_request_t *request,
-                            oc_interface_mask_t iface_mask, void *data)
+                                    oc_interface_mask_t iface_mask, void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -734,9 +734,9 @@ void
 oc_create_knx_fingerprint_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_fingerprint_resource\n");
-  oc_core_lf_populate_resource(resource_idx, device, "/.well-known/knx/f",
-                               OC_IF_LL, APPLICATION_CBOR, OC_DISCOVERABLE,
-                               oc_core_knx_fingerprint_get_handler, 0, 0, 0, 0, "");
+  oc_core_lf_populate_resource(
+    resource_idx, device, "/.well-known/knx/f", OC_IF_LL, APPLICATION_CBOR,
+    OC_DISCOVERABLE, oc_core_knx_fingerprint_get_handler, 0, 0, 0, 0, "");
 }
 
 // ----------------------------------------------------------------------------
@@ -1083,7 +1083,6 @@ oc_knx_increase_fingerprint()
   oc_knx_dump_fingerprint();
 }
 
-
 // ----------------------------------------------------------------------------
 
 void
@@ -1123,5 +1122,4 @@ oc_create_knx_resources(size_t device_index)
   oc_create_knx_idevid_resource(OC_KNX_IDEVID, device_index);
   oc_create_knx_spake_resource(OC_KNX_SPAKE, device_index);
   oc_create_knx_resource(OC_KNX, device_index);
-
 }

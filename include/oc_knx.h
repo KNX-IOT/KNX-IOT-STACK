@@ -154,19 +154,19 @@ void oc_knx_set_fingerprint(uint64_t fingerprint);
 
 /**
  * @brief increase the finger print value
- * 
+ *
  */
 void oc_knx_increase_fingerprint();
 
 /**
  * @brief load the fingerprint value from storage
- * 
+ *
  */
 void oc_knx_load_fingerprint();
 
 /**
  * @brief dump the fingerprint value to storage
- * 
+ *
  */
 void oc_knx_dump_fingerprint();
 
