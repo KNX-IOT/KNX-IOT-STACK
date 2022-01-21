@@ -589,8 +589,8 @@ def do_sequence_knx_osn(my_stack):
 def do_sequence_knx_crc(my_stack):
     #  url, content, accept, contents
     sn = my_stack.device_array[0].sn
-    print("========knx/crc=========")
-    response =  my_stack.issue_cbor_get(sn, "/.well-known/knx/crc")
+    print("========knx/fingerprint=========")
+    response =  my_stack.issue_cbor_get(sn, "/.well-known/knx/f")
     print ("response:",response)
     print("   value:", response.get_payload_int())
     my_stack.purge_response(response)

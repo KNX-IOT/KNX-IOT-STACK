@@ -653,6 +653,7 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     rep = rep->next;
   };
 
+  oc_knx_increase_fingerprint();
   PRINT("oc_core_fp_g_post_handler - end\n");
   oc_send_cbor_response(request, OC_STATUS_CHANGED);
 }
@@ -992,6 +993,7 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     rep = rep->next;
   };
 
+  oc_knx_increase_fingerprint();
   PRINT("oc_core_fp_p_post_handler - end\n");
   oc_send_cbor_response(request, OC_STATUS_OK);
 }
@@ -1101,6 +1103,7 @@ oc_core_fp_p_x_del_handler(oc_request_t *request,
   // make the change persistent
   oc_dump_group_rp_table_entry(index, GPT_STORE, g_gpt, GPT_MAX_ENTRIES);
 
+  oc_knx_increase_fingerprint();
   PRINT("oc_core_fp_p_x_del_handler - end\n");
 
   oc_send_cbor_response(request, OC_STATUS_DELETED);
@@ -1299,6 +1302,8 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     rep = rep->next;
   };
 
+  oc_knx_increase_fingerprint();
+
   PRINT("oc_core_fp_r_post_handler - end\n");
   oc_send_cbor_response(request, OC_STATUS_OK);
 }
@@ -1397,6 +1402,8 @@ oc_core_fp_r_x_del_handler(oc_request_t *request,
 
   // make the change persistent
   oc_dump_group_rp_table_entry(index, GRT_STORE, g_grt, GRT_MAX_ENTRIES);
+
+  oc_knx_increase_fingerprint();
 
   PRINT("oc_core_fp_r_x_del_handler - end\n");
 

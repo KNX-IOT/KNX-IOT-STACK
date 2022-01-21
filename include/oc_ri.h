@@ -209,27 +209,27 @@ typedef enum {
   OC_DEV_NAME,  ///< Device name. Name may can be changed w/ MaC.
   OC_DEV_MODEL, ///< Device model
   OC_DEV_IA,    ///< Device individual address
-  OC_DEV_HOSTNAME, ///< Device host name for DNS resolution.
-  OC_DEV_IID,      ///< KNX installation ID
-  OC_DEV_PM,       ///< Programming Mode
-  OC_DEV,          ///< core link
-  OC_KNX_SPAKE,    ///< spake
-  OC_KNX_IDEVID,   ///< IDevID
-  OC_KNX_LDEVID,   ///< LDevID
-  OC_KNX_LSM,      ///< load state machine
-  OC_KNX_DOT_KNX,  ///< .knx resource
-  OC_KNX_CRC,      ///< CRC value of loaded contents
-  OC_KNX_OSN,      ///< .well-known / knx / osn
-  OC_KNX,          ///< .well-known / knx
-  OC_KNX_FP_GM,    ///< FP/GM
-  OC_KNX_FP_GM_X,  ///< FP/GM/X
-  OC_KNX_FP_G,     ///< FP/G
-  OC_KNX_FP_G_X,   ///< FP/G/X
-  OC_KNX_FP_P,     ///< FP/P
-  OC_KNX_FP_P_X,   ///< FP/P/X
-  OC_KNX_FP_R,     ///< FP/R
-  OC_KNX_FP_R_X,   ///< FP/R/X
-  OC_KNX_P,        ///< P
+  OC_DEV_HOSTNAME,    ///< Device host name for DNS resolution.
+  OC_DEV_IID,         ///< KNX installation ID
+  OC_DEV_PM,          ///< Programming Mode
+  OC_DEV,             ///< core link
+  OC_KNX_SPAKE,       ///< spake
+  OC_KNX_IDEVID,      ///< IDevID
+  OC_KNX_LDEVID,      ///< LDevID
+  OC_KNX_LSM,         ///< load state machine
+  OC_KNX_DOT_KNX,     ///< .knx resource
+  OC_KNX_FINGERPRINT, ///< FINGERPRINT value of loaded contents
+  OC_KNX_OSN,         ///< .well-known / knx / osn
+  OC_KNX,             ///< .well-known / knx
+  OC_KNX_FP_GM,       ///< FP/GM
+  OC_KNX_FP_GM_X,     ///< FP/GM/X
+  OC_KNX_FP_G,        ///< FP/G
+  OC_KNX_FP_G_X,      ///< FP/G/X
+  OC_KNX_FP_P,        ///< FP/P
+  OC_KNX_FP_P_X,      ///< FP/P/X
+  OC_KNX_FP_R,        ///< FP/R
+  OC_KNX_FP_R_X,      ///< FP/R/X
+  OC_KNX_P,           ///< P
 
   OC_KNX_F,   ///< /f
   OC_KNX_F_X, ///< /f/X

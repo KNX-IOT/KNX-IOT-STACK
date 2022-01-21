@@ -26,11 +26,12 @@
 #define TAGS_AS_STRINGS
 
 #define LSM_STORE "LSM_STORE"
+#define FINGERPRINT_STORE "dev_knx_fingerprint"
 // ---------------------------Variables --------------------------------------
 
 oc_group_object_notification_t g_received_notification;
 
-uint64_t g_crc = 0;
+uint64_t g_fingerprint = 0;
 uint64_t g_osn = 0;
 
 oc_pase_t g_pase;
@@ -710,12 +711,12 @@ oc_create_knx_knx_resource(int resource_idx, size_t device)
 // ----------------------------------------------------------------------------
 
 static void
-oc_core_knx_crc_get_handler(oc_request_t *request,
-                            oc_interface_mask_t iface_mask, void *data)
+oc_core_knx_fingerprint_get_handler(oc_request_t *request,
+                                    oc_interface_mask_t iface_mask, void *data)
 {
   (void)data;
   (void)iface_mask;
-  PRINT("oc_core_knx_crc_get_handler\n");
+  PRINT("oc_core_knx_fingerprint_get_handler\n");
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_CBOR) {
@@ -723,19 +724,19 @@ oc_core_knx_crc_get_handler(oc_request_t *request,
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
-  cbor_encode_uint(&g_encoder, g_crc);
+  cbor_encode_uint(&g_encoder, g_fingerprint);
 
-  PRINT("oc_core_knx_crc_get_handler - done\n");
+  PRINT("oc_core_knx_fingerprint_get_handler - done\n");
   oc_send_cbor_response(request, OC_STATUS_OK);
 }
 
 void
-oc_create_knx_crc_resource(int resource_idx, size_t device)
+oc_create_knx_fingerprint_resource(int resource_idx, size_t device)
 {
-  OC_DBG("oc_create_knx_crc_resource\n");
-  oc_core_lf_populate_resource(resource_idx, device, "/.well-known/knx/crc",
-                               OC_IF_LL, APPLICATION_CBOR, OC_DISCOVERABLE,
-                               oc_core_knx_crc_get_handler, 0, 0, 0, 0, "");
+  OC_DBG("oc_create_knx_fingerprint_resource\n");
+  oc_core_lf_populate_resource(
+    resource_idx, device, "/.well-known/knx/f", OC_IF_LL, APPLICATION_CBOR,
+    OC_DISCOVERABLE, oc_core_knx_fingerprint_get_handler, 0, 0, 0, 0, "");
 }
 
 // ----------------------------------------------------------------------------
@@ -1049,15 +1050,37 @@ oc_knx_set_ldevid(char *idevid, int len)
 }
 
 void
-oc_knx_set_crc(uint64_t crc)
-{
-  g_crc = crc;
-}
-
-void
 oc_knx_set_osn(uint64_t osn)
 {
   g_osn = osn;
+}
+
+void
+oc_knx_load_fingerprint()
+{
+  g_fingerprint = 0;
+  oc_storage_read(FINGERPRINT_STORE, (uint8_t *)&g_fingerprint,
+                  sizeof(g_fingerprint));
+}
+
+void
+oc_knx_dump_fingerprint()
+{
+  oc_storage_write(FINGERPRINT_STORE, (uint8_t *)&g_fingerprint,
+                   sizeof(g_fingerprint));
+}
+
+void
+oc_knx_set_fingerprint(uint64_t fingerprint)
+{
+  g_fingerprint = fingerprint;
+}
+
+void
+oc_knx_increase_fingerprint()
+{
+  g_fingerprint++;
+  oc_knx_dump_fingerprint();
 }
 
 // ----------------------------------------------------------------------------
@@ -1082,6 +1105,8 @@ oc_knx_load_state(size_t device_index)
     PRINT("  load state (storage) %ld [%s]\n", (long)lsm,
           oc_core_get_lsm_as_string(lsm));
   }
+
+  oc_knx_load_fingerprint();
 }
 
 void
@@ -1091,7 +1116,7 @@ oc_create_knx_resources(size_t device_index)
 
   oc_create_knx_lsm_resource(OC_KNX_LSM, device_index);
   oc_create_knx_knx_resource(OC_KNX_DOT_KNX, device_index);
-  oc_create_knx_crc_resource(OC_KNX_CRC, device_index);
+  oc_create_knx_fingerprint_resource(OC_KNX_FINGERPRINT, device_index);
   oc_create_knx_osn_resource(OC_KNX_OSN, device_index);
   oc_create_knx_ldevid_resource(OC_KNX_LDEVID, device_index);
   oc_create_knx_idevid_resource(OC_KNX_IDEVID, device_index);
