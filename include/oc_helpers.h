@@ -336,11 +336,31 @@ int oc_uri_get_wildcard_value_as_int(const char *uri_resource, size_t uri_len,
                                      const char *uri_invoked,
                                      size_t invoked_len);
 
+/**
+ * @brief function to check if in the wildcard section is a "_" (underscore)
+ * underscores can be used in functional block uri to have more than 1 instance
+ * e.g. fb* as wild card and fb333_1 as url
+ * @param uri_resource The URI with wildcard
+ * @param uri_len The length of the URI with wild card
+ * @param uri_invoked The URI that should match a wild card
+ * @param invoked_len The URI length of the invoked URI
+ * @return true
+ * @return false
+ */
 bool oc_uri_contains_wildcard_value_underscore(const char *uri_resource,
                                                size_t uri_len,
                                                const char *uri_invoked,
                                                size_t invoked_len);
 
+/**
+ * @brief retrieve the integer after the "_" (underscore)
+ * e.g. retrieve 1 from fb333_1 as url and fb* as wildcard
+ * @param uri_resource The URI with wildcard
+ * @param uri_len The length of the URI with wild card
+ * @param uri_invoked The URI that should match a wild card
+ * @param invoked_len The URI length of the invoked URI
+ * @return int
+ */
 int oc_uri_get_wildcard_value_as_int_after_underscore(const char *uri_resource,
                                                       size_t uri_len,
                                                       const char *uri_invoked,
