@@ -114,6 +114,7 @@ STATIC CRITICAL_SECTION cs;   /**< event loop variable */
  * example or the definition.*/
 
 bool g_352_51_state = false;
+bool g_352_51_1_state = false;
 bool g_352_52_state = false;
 bool g_353_52_state = false;
 volatile int quit = 0; /**< stop variable, used by handle_signal */
@@ -225,6 +226,54 @@ get_dpa_352_51(oc_request_t *request, oc_interface_mask_t interfaces,
     oc_send_response(request, OC_STATUS_BAD_OPTION);
   }
   PRINT("-- End get_dpa_352_51\n");
+}
+
+/**
+ * get method for "/p/a_1" resource.
+ * function is called to initialize the return values of the GET method.
+ * initialization of the returned values are done from the global property
+ * values. Resource Description: This Resource describes a binary switch
+ * (on/off). The Property "value" is a boolean. A value of 'true' means that the
+ * switch is on. A value of 'false' means that the switch is off.
+ *
+ * @param request the request representation.
+ * @param interfaces the interface used for this call
+ * @param user_data the user data.
+ */
+STATIC void
+get_dpa_352_51_1(oc_request_t *request, oc_interface_mask_t interfaces,
+                 void *user_data)
+{
+  (void)user_data; /* variable not used */
+
+  /* TODO: SENSOR add here the code to talk to the HW if one implements a
+     sensor. the call to the HW needs to fill in the global variable before it
+     returns to this function here. alternative is to have a callback from the
+     hardware that sets the global variables.
+  */
+  bool error_state = false; /**< the error state, the generated code */
+  int oc_status_code = OC_STATUS_OK;
+
+  PRINT("-- Begin get_dpa_352_51_1: interface %d\n", interfaces);
+  /* check if the accept header is CBOR */
+  if (request->accept != APPLICATION_CBOR) {
+    oc_send_response(request, OC_STATUS_BAD_OPTION);
+    return;
+  }
+
+  CborError error;
+  error = cbor_encode_boolean(&g_encoder, g_352_51_1_state);
+  if (error) {
+    oc_status_code = true;
+  }
+  PRINT("CBOR encoder size %d\n", oc_rep_get_encoded_payload_size());
+
+  if (error_state == false) {
+    oc_send_cbor_response(request, oc_status_code);
+  } else {
+    oc_send_response(request, OC_STATUS_BAD_OPTION);
+  }
+  PRINT("-- End get_dpa_352_51_1\n");
 }
 
 /**
@@ -405,6 +454,66 @@ post_dpa_352_51(oc_request_t *request, oc_interface_mask_t interfaces,
 }
 
 /**
+ * post method for "/p/a" resource.
+ * The function has as input the request body, which are the input values of the
+ POST method.
+ * The input values (as a set) are checked if all supplied values are correct.
+ * If the input values are correct, they will be assigned to the global property
+ values.
+ * Resource Description:
+
+ *
+ * @param request the request representation.
+ * @param interfaces the used interfaces during the request.
+ * @param user_data the supplied user data.
+ */
+STATIC void
+post_dpa_352_51_1(oc_request_t *request, oc_interface_mask_t interfaces,
+                  void *user_data)
+{
+  (void)interfaces;
+  (void)user_data;
+  bool error_state = false;
+  PRINT("-- Begin post_dpa_352_51_1:\n");
+  // oc_rep_t *rep = request->request_payload;
+
+  /* loop over the request document for each required input field to check if
+   * all required input fields are present */
+
+  oc_rep_t *rep = NULL;
+  // handle the different requests
+  if (oc_is_s_mode_request(request)) {
+    PRINT(" S-MODE\n");
+    // retrieve the value of the s-mode payload
+    rep = oc_s_mode_get_value(request);
+  } else {
+    // the regular payload
+    rep = request->request_payload;
+  }
+
+  // handle the type of payload correctly.
+  if ((rep != NULL) && (rep->type == OC_REP_BOOL)) {
+    PRINT("  post_dpa_352_51_1 received : %d\n", rep->value.boolean);
+    g_352_51_1_state = rep->value.boolean;
+    oc_send_cbor_response(request, OC_STATUS_CHANGED);
+    PRINT("-- End post_dpa_352_51_1\n");
+    return;
+  }
+
+  /* if the input is ok, then process the input document and assign the global
+   * variables */
+  if (error_state == false) {
+    oc_send_cbor_response(request, OC_STATUS_OK);
+  } else {
+    PRINT("  Returning Error \n");
+    /* TODO: add error response, if any */
+    // oc_send_response(request, OC_STATUS_NOT_MODIFIED);
+    oc_send_response(request, OC_STATUS_BAD_REQUEST);
+  }
+  PRINT("-- End post_dpa_352_51_1\n");
+}
+
+/**
  * post method for "/p/b" resource.
  * The function has as input the request body, which are the input values of the
  POST method.
@@ -516,6 +625,7 @@ register_resources(void)
   oc_resource_bind_content_type(res_352, APPLICATION_CBOR);
   oc_resource_bind_resource_interface(res_352, OC_IF_AC); /* if.a */
   oc_resource_set_discoverable(res_352, true);
+
   /* periodic observable
      to be used when one wants to send an event per time slice
      period is 1 second */
@@ -528,6 +638,17 @@ register_resources(void)
   oc_resource_set_request_handler(res_352, OC_GET, get_dpa_352_51, NULL);
   oc_resource_set_request_handler(res_352, OC_POST, post_dpa_352_51, NULL);
   oc_add_resource(res_352);
+
+  oc_resource_t *res_352_1 = oc_new_resource("myname", "p/a_1", 1, 0);
+  oc_resource_bind_resource_type(res_352_1, "urn:knx:dpa.352.51");
+  oc_resource_bind_content_type(res_352_1, APPLICATION_CBOR);
+  oc_resource_bind_resource_interface(res_352_1, OC_IF_AC); /* if.a */
+  oc_resource_set_discoverable(res_352_1, true);
+  oc_resource_set_function_block_instance(res_352_1, 1);
+
+  oc_resource_set_request_handler(res_352_1, OC_GET, get_dpa_352_51_1, NULL);
+  oc_resource_set_request_handler(res_352_1, OC_POST, post_dpa_352_51_1, NULL);
+  oc_add_resource(res_352_1);
 
   PRINT("Register Resource with local path \"/p/b\"\n");
   oc_resource_t *res_352b = oc_new_resource("myname_b", "p/b", 1, 0);

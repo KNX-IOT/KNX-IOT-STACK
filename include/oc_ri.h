@@ -359,13 +359,14 @@ typedef struct oc_resource_defaults_data_t
  */
 struct oc_resource_s
 {
-  struct oc_resource_s *next;            ///< next resource
-  size_t device;                         ///< device index
-  oc_string_t name;                      ///< name of the resource (e.g. "n")
-  oc_string_t uri;                       ///< uri of the resource
-  oc_string_array_t types;               ///< "rt" types of the resource
-  oc_interface_mask_t interfaces;        ///< supported interfaces
-  oc_interface_mask_t default_interface; ///< default interface
+  struct oc_resource_s *next;     ///< next resource
+  size_t device;                  ///< device index
+  oc_string_t name;               ///< name of the resource (e.g. "n")
+  oc_string_t uri;                ///< uri of the resource
+  oc_string_array_t types;        ///< "rt" types of the resource
+  oc_interface_mask_t interfaces; ///< supported interfaces
+  oc_interface_mask_t
+    default_interface; ///< default interface  // TODO: can be removed
   oc_content_format_t content_type;    ///< the content format that the resource
                                        ///< supports, e.g. only 1 at the moment
   oc_resource_properties_t properties; ///< properties (as bit mask)
@@ -377,6 +378,7 @@ struct oc_resource_s
   oc_properties_cb_t set_properties;   ///< callback for set properties
   uint8_t num_observers;               ///< amount of observers
   uint16_t observe_period_seconds;     ///< observe period in seconds
+  uint8_t fb_instance;                 ///< function block instance, default = 0
 };
 
 typedef struct oc_link_s oc_link_t;

@@ -619,13 +619,21 @@ def do_sequence_f(my_stack):
     lf = knx_stack.LinkFormat(response.payload)
     print(" lines:", lf.get_nr_lines())
     for line in lf.get_lines():
+        print(line)
+    for line in lf.get_lines():
         print(" -------------------------")
         print(" url :", lf.get_url(line))
         print(" ct  :", lf.get_ct(line))
         print(" rt  :", lf.get_rt(line))
         if lf.get_ct(line) == "40" :
             response2 =  my_stack.issue_linkformat_get(sn, lf.get_url(line))
+            lf2 = knx_stack.LinkFormat(response2.payload)
             print ("response2:",response2)
+            for line2 in lf2.get_lines():
+                print("    -------------------------",lf.get_url(line) )
+                print("    url :", lf2.get_url(line2))
+                print("    ct  :", lf2.get_ct(line2))
+                print("    rt  :", lf2.get_rt(line2))
             my_stack.purge_response(response2)
     my_stack.purge_response(response)
 
@@ -731,6 +739,19 @@ def do_all(my_stack):
         # .knx
         #do_sequence_a_sen(my_stack)
 
+
+def do_discovery(my_stack):
+    """
+    fb discovery recursive
+    """
+    if my_stack.get_nr_devices() > 0:
+        data = my_stack.discover_devices_with_query_data("rt=urn:knx:dpa.*")
+        print(" -------------------------")
+        print (data)
+        print(" -------------------------")
+        do_sequence_f(my_stack)
+
+
 if __name__ == '__main__':  # pragma: no cover
 
     parser = argparse.ArgumentParser()
@@ -748,11 +769,15 @@ if __name__ == '__main__':  # pragma: no cover
     parser.add_argument("-all", "--all",
                     help="do all tests", nargs='?',
                     default=False, const=1, required=False)
+    parser.add_argument("-disc", "--discovery",
+                    help="do discovery", nargs='?',
+                    default=False, const=1, required=False)
     print(sys.argv)
     args = parser.parse_args()
     print("scope         :" + str(args.scope))
     print("sleep         :" + str(args.sleep))
     print("all           :" + str(args.all))
+    print("discovery     :" + str(args.discovery))
     time.sleep(int(args.sleep))
 
     the_stack = knx_stack.KNXIOTStack()
@@ -762,6 +787,8 @@ if __name__ == '__main__':  # pragma: no cover
         test_discover(the_stack)
         if args.all:
             do_all(the_stack)
+        elif args.discovery:
+            do_discovery(the_stack)
         else:
             do_sequence(the_stack)
     except:

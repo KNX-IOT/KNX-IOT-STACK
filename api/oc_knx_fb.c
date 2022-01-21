@@ -23,8 +23,8 @@
 #include <stdio.h>
 
 // -----------------------------------------------------------------------------
-#define ARRAY_SIZE 100
-int g_int_array[ARRAY_SIZE];
+#define ARRAY_SIZE 50
+int g_int_array[2][ARRAY_SIZE];
 int g_array_size = 0;
 
 int
@@ -44,11 +44,11 @@ get_fp_from_dp(char *dpt)
 }
 
 bool
-is_in_g_array(int value)
+is_in_g_array(int value, int instance)
 {
   int i;
   for (i = 0; i < g_array_size; i++) {
-    if (value == g_int_array[i]) {
+    if (value == g_int_array[0][i] && instance == g_int_array[1][i]) {
       return true;
     }
   }
@@ -56,12 +56,13 @@ is_in_g_array(int value)
 }
 
 void
-store_in_array(int value)
+store_in_array(int value, int instance)
 {
   if (value == -1) {
     return;
   }
-  g_int_array[g_array_size] = value;
+  g_int_array[0][g_array_size] = value;
+  g_int_array[1][g_array_size] = instance;
   g_array_size++;
   // assert(g_array_size == ARRAY_SIZE);
 }
@@ -86,9 +87,18 @@ oc_core_fb_x_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     return;
   }
 
+  int instance = 0;
   int value = oc_uri_get_wildcard_value_as_int(
     oc_string(request->resource->uri), oc_string_len(request->resource->uri),
     request->uri_path, request->uri_path_len);
+  bool has_instance = oc_uri_contains_wildcard_value_underscore(
+    oc_string(request->resource->uri), oc_string_len(request->resource->uri),
+    request->uri_path, request->uri_path_len);
+  if (has_instance) {
+    instance = oc_uri_get_wildcard_value_as_int_after_underscore(
+      oc_string(request->resource->uri), oc_string_len(request->resource->uri),
+      request->uri_path, request->uri_path_len);
+  }
 
   size_t device_index = request->resource->device;
 
@@ -100,6 +110,7 @@ oc_core_fb_x_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     }
 
     bool frame_resource = false;
+    int instance_resource = resource->fb_instance;
 
     oc_string_array_t types = resource->types;
     for (i = 0; i < (int)oc_string_array_get_allocated_size(types); i++) {
@@ -107,7 +118,7 @@ oc_core_fb_x_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       if ((strncmp(t, ":dpa", 4) == 0) ||
           (strncmp(t, "urn:knx:dpa", 11) == 0)) {
         int fp_int = get_fp_from_dp(t);
-        if (fp_int == value) {
+        if (fp_int == value && instance_resource == instance) {
           frame_resource = true;
         }
       }
@@ -147,7 +158,7 @@ oc_add_function_blocks_to_response(oc_request_t *request, size_t device_index,
 {
   (void)request;
   int length = 0;
-  char number[5];
+  char number[24];
   int i;
 
   // use global variable
@@ -166,8 +177,9 @@ oc_add_function_blocks_to_response(oc_request_t *request, size_t device_index,
       if ((strncmp(t, ":dpa", 4) == 0) ||
           (strncmp(t, "urn:knx:dpa", 11) == 0)) {
         int fp_int = get_fp_from_dp(t);
-        if ((fp_int > 0) && (is_in_g_array(fp_int) == false)) {
-          store_in_array(fp_int);
+        int instance = resource->fb_instance;
+        if ((fp_int > 0) && (is_in_g_array(fp_int, instance) == false)) {
+          store_in_array(fp_int, instance);
         }
       }
     }
@@ -182,7 +194,11 @@ oc_add_function_blocks_to_response(oc_request_t *request, size_t device_index,
 
     length = oc_rep_add_line_to_buffer("</f/");
     *response_length += length;
-    snprintf(number, 5, "%d", g_int_array[i]);
+    if (g_int_array[1][i] > 0) {
+      snprintf(number, 23, "%3d_%2d", g_int_array[0][i], g_int_array[1][i]);
+    } else {
+      snprintf(number, 5, "%d", g_int_array[0][i]);
+    }
     length = oc_rep_add_line_to_buffer(number);
     *response_length += length;
     length = oc_rep_add_line_to_buffer(">;");
@@ -193,6 +209,7 @@ oc_add_function_blocks_to_response(oc_request_t *request, size_t device_index,
     *response_length += length;
     length = oc_rep_add_line_to_buffer("fb.");
     *response_length += length;
+    snprintf(number, 5, "%d", g_int_array[0][i]);
     length = oc_rep_add_line_to_buffer(number);
     *response_length += length;
     length = oc_rep_add_line_to_buffer("\";");

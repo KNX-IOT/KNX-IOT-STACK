@@ -889,6 +889,9 @@ void oc_resource_set_properties_cbs(oc_resource_t *resource,
  */
 void oc_resource_set_secure_mcast(oc_resource_t *resource, bool supported);
 
+void oc_resource_set_function_block_instance(oc_resource_t *resource,
+                                             uint8_t instance);
+
 /**
  * Add a resource to the stack.
  *
