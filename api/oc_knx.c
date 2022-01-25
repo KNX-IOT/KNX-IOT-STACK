@@ -43,6 +43,17 @@ oc_string_t g_ldevid;
 
 // ----------------------------------------------------------------------------
 
+enum SpakeKeys {
+  SPAKE_SALT = 5,
+  SPAKE_PA = 10,
+  SPAKE_PB = 11,
+  SPAKE_PBKDF2 = 12,
+  SPAKE_CB = 13,
+  SPAKE_CA = 14,
+  SPAKE_RND = 15,
+  SPAKE_IT = 16,
+};
+
 #define RESTART_DEVICE 2
 #define RESET_DEVICE 1
 
@@ -881,24 +892,34 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
   while (rep != NULL) {
     switch (rep->type) {
     case OC_REP_BYTE_STRING: {
-      // ca == 14
-      if (rep->iname == 14) {
-        valid_request = 14;
+      if (rep->iname == SPAKE_SALT) {
+        valid_request = SPAKE_SALT;
       }
-      // pa == 10
-      if (rep->iname == 10) {
-        valid_request = 10;
+      if (rep->iname == SPAKE_PA) {
+        valid_request = SPAKE_PA;
       }
-      // rnd == 15
-      if (rep->iname == 15) {
-        valid_request = 15;
+      if (rep->iname == SPAKE_PB) {
+        valid_request = SPAKE_PB;
+      }
+      if (rep->iname == SPAKE_CA) {
+        valid_request = SPAKE_CA;
+      }
+      if (rep->iname == SPAKE_CB) {
+        valid_request = SPAKE_CB;
+      }
+      if (rep->iname == SPAKE_RND) {
+        valid_request = SPAKE_RND;
       }
     } break;
     case OC_REP_OBJECT: {
-      // pbkdf2 == 12
       // not sure if we need this
-      if (rep->iname == 12) {
-        valid_request = 12;
+      if (rep->iname == SPAKE_PBKDF2) {
+        valid_request = SPAKE_PBKDF2;
+      }
+    } break;
+    case OC_REP_INT: {
+      if (rep->iname == SPAKE_IT) {
+        valid_request = SPAKE_IT;
       }
     } break;
     case OC_REP_NIL:
