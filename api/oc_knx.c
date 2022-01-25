@@ -907,6 +907,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
       if (rep->iname == SPAKE_CB) {
         valid_request = SPAKE_CB;
       }
+      // do we need this? does it not go inside pbkdf2?
       if (rep->iname == SPAKE_RND) {
         valid_request = SPAKE_RND;
       }
@@ -918,6 +919,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
       }
     } break;
     case OC_REP_INT: {
+      // do we need this? does it not go inside pbkdf2?
       if (rep->iname == SPAKE_IT) {
         valid_request = SPAKE_IT;
       }
@@ -939,19 +941,19 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     switch (rep->type) {
     case OC_REP_BYTE_STRING: {
       // ca == 14
-      if (rep->iname == 14) {
+      if (rep->iname == SPAKE_CA) {
         oc_free_string(&g_pase.ca);
         oc_new_string(&g_pase.ca, oc_string(rep->value.string),
                       oc_string_len(rep->value.string));
       }
       // pa == 10
-      if (rep->iname == 10) {
+      if (rep->iname == SPAKE_PA) {
         oc_free_string(&g_pase.pa);
         oc_new_string(&g_pase.pa, oc_string(rep->value.string),
                       oc_string_len(rep->value.string));
       }
       // rnd == 15
-      if (rep->iname == 15) {
+      if (rep->iname == SPAKE_RND) {
         oc_free_string(&g_pase.rnd);
         oc_new_string(&g_pase.rnd, oc_string(rep->value.string),
                       oc_string_len(rep->value.string));
@@ -966,13 +968,13 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     } break;
     case OC_REP_OBJECT: {
       // pbkdf2 == 12
-      if (rep->iname == 12) {
+      if (rep->iname == SPAKE_PBKDF2) {
         oc_rep_t *object = rep->value.object;
         while (object != NULL) {
           switch (object->type) {
           case OC_REP_BYTE_STRING: {
             // salt
-            if (object->iname == 5) {
+            if (object->iname == SPAKE_SALT) {
               oc_free_string(&g_pase.salt);
               oc_new_string(&g_pase.salt, oc_string(object->value.string),
                             oc_string_len(object->value.string));
@@ -980,7 +982,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
           } break;
           case OC_REP_INT: {
             // it
-            if (object->iname == 16) {
+            if (object->iname == SPAKE_IT) {
               g_pase.it = object->value.integer;
             }
           } break;
@@ -1003,40 +1005,40 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
 
   PRINT("oc_core_knx_spake_post_handler valid_request: %d\n", valid_request);
   // on ca
-  if (valid_request == 14) {
+  if (valid_request == SPAKE_CA) {
     // return changed, no payload
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
     return;
   }
   // on pa
-  if (valid_request == 10) {
+  if (valid_request == SPAKE_PA) {
     // return changed, frame pb (11) & cb (13)
     // TODO: probably we need to calculate them...
 
     oc_rep_begin_root_object();
     // pb (11)
-    oc_rep_i_set_text_string(root, 11, oc_string(g_pase.pb));
+    oc_rep_i_set_text_string(root, SPAKE_PB, oc_string(g_pase.pb));
     // cb (13)
-    oc_rep_i_set_text_string(root, 13, oc_string(g_pase.cb));
+    oc_rep_i_set_text_string(root, SPAKE_CB, oc_string(g_pase.cb));
     oc_rep_end_root_object();
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
     return;
   }
   // on rnd
-  if (valid_request == 15) {
+  if (valid_request == SPAKE_RND) {
     // return changed, frame rnd (15) & pbkdf2 (12 containing (16, 5))
     // TODO: probably we need to calculate them...
 
     oc_rep_begin_root_object();
     // rnd (15)
-    oc_rep_i_set_text_string(root, 15, oc_string(g_pase.rnd));
+    oc_rep_i_set_text_string(root, SPAKE_RND, oc_string(g_pase.rnd));
     // pbkdf2
-    oc_rep_i_set_key(&root_map, 12);
+    oc_rep_i_set_key(&root_map, SPAKE_PBKDF2);
     oc_rep_begin_object(&root_map, pbkdf2);
     // it 16
-    oc_rep_i_set_int(pbkdf2, 16, g_pase.it);
+    oc_rep_i_set_int(pbkdf2, SPAKE_IT, g_pase.it);
     // salt 5
-    oc_rep_i_set_text_string(pbkdf2, 5, oc_string(g_pase.salt));
+    oc_rep_i_set_text_string(pbkdf2, SPAKE_SALT, oc_string(g_pase.salt));
     oc_rep_end_object(&root_map, pbkdf2);
     oc_rep_end_root_object();
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
