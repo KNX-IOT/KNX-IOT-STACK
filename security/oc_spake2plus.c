@@ -1,10 +1,12 @@
 #include "mbedtls/md.h"
 #include "mbedtls/ecp.h"
-#include "mbedtls/bignum.h"
 #include "mbedtls/entropy.h"
 #include "mbedtls/ctr_drbg.h"
 #include "mbedtls/hkdf.h"
+#include "mbedtls/pkcs5.h"
 #include <assert.h>
+
+#include "oc_spake2plus.h"
 
 static mbedtls_entropy_context entropy_ctx;
 static mbedtls_ctr_drbg_context ctr_drbg_ctx;
@@ -54,6 +56,44 @@ free_context(void)
   mbedtls_ctr_drbg_free(&ctr_drbg_ctx);
   mbedtls_entropy_free(&entropy_ctx);
   return 0;
+}
+
+int calculate_w0_w1(size_t len_pw, const uint8_t pw[], const uint8_t salt[32], int it, mbedtls_mpi *w0, mbedtls_mpi *w1)
+{
+  // Hmm, SPAKE2+ mandates this be 40 bytes or longer,
+  // but KNX-IoT says it's 32 bytes.
+  int ret;
+  mbedtls_md_context_t ctx;
+  mbedtls_ecp_group grp;
+
+  const size_t output_len = 40;
+  uint8_t output[output_len];
+
+  mbedtls_mpi w0s, w1s;
+
+  mbedtls_md_init(&ctx);
+  mbedtls_ecp_group_init(&grp);
+  mbedtls_mpi_init(&w0s);
+  mbedtls_mpi_init(&w1s);
+
+  MBEDTLS_MPI_CHK(mbedtls_md_setup(&ctx, mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), 1));
+  MBEDTLS_MPI_CHK(mbedtls_pkcs5_pbkdf2_hmac(&ctx, pw, len_pw, salt, 32, it, output_len, output));
+
+  // extract w0s and w1s from the output
+  MBEDTLS_MPI_CHK(mbedtls_mpi_read_binary(&w0s, output, output_len/2));
+  MBEDTLS_MPI_CHK(mbedtls_mpi_read_binary(&w1s, output + output_len/2, output_len/2));
+
+  // calculate w0 and w1
+  // the cofactor of P-256 is 1, so the order of the group is equal to the large prime p
+  MBEDTLS_MPI_CHK(mbedtls_ecp_group_load(&grp, MBEDTLS_ECP_DP_SECP256R1));
+  MBEDTLS_MPI_CHK(mbedtls_mpi_mod_mpi(w0, &w0s, &grp.N));
+  MBEDTLS_MPI_CHK(mbedtls_mpi_mod_mpi(w1, &w1s, &grp.N));
+
+cleanup:
+  mbedtls_md_free(&ctx);
+  mbedtls_ecp_group_free(&grp);
+  mbedtls_mpi_free(&w0s);
+  mbedtls_mpi_free(&w1s);
 }
 
 // mbedtls_ecp_gen_keypair(&grp, a, &pubA, mbedtls_ctr_drbg_random,

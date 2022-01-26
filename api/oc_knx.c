@@ -898,12 +898,14 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
       if (rep->iname == SPAKE_PA) {
         valid_request = SPAKE_PA;
       }
+      // Do we need this? server only sends pB as a response
       if (rep->iname == SPAKE_PB) {
         valid_request = SPAKE_PB;
       }
       if (rep->iname == SPAKE_CA) {
         valid_request = SPAKE_CA;
       }
+      // Do we need this? server only sends cB as a response
       if (rep->iname == SPAKE_CB) {
         valid_request = SPAKE_CB;
       }
