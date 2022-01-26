@@ -276,7 +276,7 @@ oc_core_get_lsm_as_string(oc_lsm_state_t lsm)
   if (lsm == LSM_STARTLOADING) {
     return "startLoading";
   }
-  if (lsm == LSM_lOADCOMPLETE) {
+  if (lsm == LSM_LOADCOMPLETE) {
     return "loadComplete";
   }
 
@@ -337,7 +337,7 @@ oc_core_lsm_parse_string(const char *lsm)
     return LSM_STARTLOADING;
   }
   if (len == 12 && strncmp(lsm, "loadComplete", 12) == 0) {
-    return LSM_lOADCOMPLETE;
+    return LSM_LOADCOMPLETE;
   }
 
   return LSM_UNLOADED;
@@ -349,7 +349,7 @@ oc_core_lsm_cmd_to_state(oc_lsm_state_t cmd)
   if (cmd == LSM_STARTLOADING) {
     return LSM_LOADING;
   }
-  if (cmd == LSM_lOADCOMPLETE) {
+  if (cmd == LSM_LOADCOMPLETE) {
     return LSM_LOADED;
   }
   if (cmd == LSM_UNLOAD) {

@@ -91,7 +91,7 @@ typedef struct oc_group_object_notification_t
 typedef enum {
   LSM_UNLOADED = 0, ///< state is unloaded, e.g. ready for loading
   LSM_LOADED,       ///< state is LOADED, e.g. normal operation
-  LSM_lOADCOMPLETE, ///< cmd loading complete, state will be LOADED
+  LSM_LOADCOMPLETE, ///< cmd loading complete, state will be LOADED
   LSM_STARTLOADING, ///< cmd loading started, state will be LOADING
   LSM_LOADING,      ///< state loading.
   LSM_UNLOAD        ///< cmd unload: state will be UNLOADED

@@ -34,7 +34,7 @@ TEST(KNXLSM, LSMConstToStr)
   mystring = oc_core_get_lsm_as_string(LSM_LOADED);
   EXPECT_STREQ("loaded", mystring);
 
-  mystring = oc_core_get_lsm_as_string(LSM_lOADCOMPLETE);
+  mystring = oc_core_get_lsm_as_string(LSM_LOADCOMPLETE);
   EXPECT_STREQ("loadComplete", mystring);
 
   mystring = oc_core_get_lsm_as_string(LSM_STARTLOADING);
@@ -98,7 +98,7 @@ TEST(KNXLSM, LSMStrToConst)
   EXPECT_EQ(mystate, LSM_STARTLOADING);
 
   mystate = oc_core_lsm_parse_string("loadComplete");
-  EXPECT_EQ(mystate, LSM_lOADCOMPLETE);
+  EXPECT_EQ(mystate, LSM_LOADCOMPLETE);
 
   // errors
   mystate = oc_core_lsm_parse_string("load");
