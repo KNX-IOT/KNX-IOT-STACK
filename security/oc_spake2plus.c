@@ -60,12 +60,12 @@ free_context(void)
 
 int calculate_w0_w1(size_t len_pw, const uint8_t pw[], const uint8_t salt[32], int it, mbedtls_mpi *w0, mbedtls_mpi *w1)
 {
-  // Hmm, SPAKE2+ mandates this be 40 bytes or longer,
-  // but KNX-IoT says it's 32 bytes.
   int ret;
   mbedtls_md_context_t ctx;
   mbedtls_ecp_group grp;
 
+  // Hmm, SPAKE2+ mandates this be 40 bytes or longer,
+  // but KNX-IoT says it's 32 bytes maybe?
   const size_t output_len = 40;
   uint8_t output[output_len];
 
