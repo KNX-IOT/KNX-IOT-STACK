@@ -195,6 +195,12 @@ typedef enum {
 
 const char *get_interface_string(oc_interface_mask_t mask);
 
+int oc_total_interface_in_mask(oc_interface_mask_t iface_mask);
+
+int oc_get_interface_in_mask_in_string_array(oc_interface_mask_t iface_mask, int nr_entries, oc_string_array_t interface_array);
+
+
+
 /**
  * @brief core resource numbers
  *

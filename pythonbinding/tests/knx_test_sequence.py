@@ -638,6 +638,77 @@ def do_sequence_f(my_stack):
     my_stack.purge_response(response)
 
 
+def do_auth_at(my_stack):
+    sn = my_stack.device_array[0].sn
+    print("========/auth/at=========")
+    response =  my_stack.issue_linkformat_get(sn, "/auth/at")
+    print ("response:", response)
+    lf = knx_stack.LinkFormat(response.payload)
+    print(" lines:", lf.get_nr_lines())
+    my_stack.purge_response(response)
+    
+    # DTLS
+    #Req : Content-Format: "application/cbor"
+    #Payload:
+    #[{ 
+    #"accessToken": "BC6BLLhk56...",         (0)
+    #"scope": ["<if.scope>"],                (9)
+    #"ace_profile": "coap_dtls",              (19)
+    #"sub": {"dnsName": "<.inst1.local>"},   (2) 
+    #"cnf": {                                 (8)
+    #"kty": "x509",                         
+    #"kid": "<trust list [X.509]fingerprint>"  (2)
+    #}}]
+    #
+    # 0 = id (token)
+    # 9 = scope
+    # 8 = cnf (configuration)
+    #
+    # OSCORE payload
+    # {
+    #"access_token": "23451.",       (0)
+    #"profile": "coap_oscore",       (19)
+    #"scope": ["if.sec"],             (9)
+    #"cnf": {                         (8)
+    #"osc": {                         (4)
+    #"alg": "AES-CCM-16-64-128",     (4) - string
+    #"id": "<kid>",                  (6)
+    #"ms": "ca5….4dd43e4c"           (2)
+    #}}}
+    
+    #{
+    #"0": "OC5BLLhkAG...",
+    #"2": "<asn-system-id.ldevid>",  ==> on level 8?
+    # "8": {
+    # "3": "<kid>"
+    # },
+    # "9": ["if.sec"],
+    # "19": "coap_dtls"
+    #}
+    content = [ { 0: "my_509_token", 9 : ["if.a", "if.c", "if.sec"], 19: "coap_dtls", 8 : {3: "mykid", 2: "x509" } },
+                { 0: "my_oscore_token", 9 : ["if.a", "if.pm"], 19:"coap_oscore", 8 : { 4: { 6: "mykid", 2: "my_ms", 4:"AES-CCM-16-64-128" } } }
+              ]
+    response =  my_stack.issue_cbor_post(sn,"/auth/at",content)
+    my_stack.purge_response(response)
+    
+    response =  my_stack.issue_linkformat_get(sn, "/auth/at")
+    print ("response:", response)
+    lf = knx_stack.LinkFormat(response.payload)
+    print(" lines:", lf.get_nr_lines())
+    for line in lf.get_lines():
+        print(line)
+    for line in lf.get_lines():
+        print(" -------------------------")
+        print(" url :", lf.get_url(line))
+        print(" ct  :", lf.get_ct(line))
+        print(" rt  :", lf.get_rt(line))
+        response3 =  my_stack.issue_cbor_get(sn, lf.get_url(line))
+        print ("response:",response3)
+        print ("    value:", response3.get_payload_dict())
+        my_stack.purge_response(response3)
+    
+    
+    
 def do_discovery_tests(my_stack):
     print("========discovery=========")
     # group address
@@ -729,17 +800,6 @@ def do_sequence(my_stack):
         # .knx
         #do_sequence_a_sen(my_stack)
 
-def do_all(my_stack):
-    if my_stack.get_nr_devices() > 0:
-        do_sequence(my_stack)
-        do_discovery_tests(my_stack)
-        do_sequence_knx_knx_s_mode(my_stack)
-        do_sequence_knx_knx_recipient(my_stack)
-        return
-        # .knx
-        #do_sequence_a_sen(my_stack)
-
-
 def do_discovery(my_stack):
     """
     fb discovery recursive
@@ -751,6 +811,23 @@ def do_discovery(my_stack):
         print(" -------------------------")
         do_sequence_f(my_stack)
 
+
+def do_security(my_stack):
+    """
+    do security tests
+    """
+    if my_stack.get_nr_devices() > 0:
+        do_auth_at(my_stack)
+
+def do_all(my_stack):
+    if my_stack.get_nr_devices() > 0:
+        do_sequence(my_stack)
+        do_discovery_tests(my_stack)
+        do_sequence_knx_knx_s_mode(my_stack)
+        do_sequence_knx_knx_recipient(my_stack)
+        return
+        # .knx
+        #do_sequence_a_sen(my_stack)
 
 if __name__ == '__main__':  # pragma: no cover
 
@@ -772,12 +849,16 @@ if __name__ == '__main__':  # pragma: no cover
     parser.add_argument("-disc", "--discovery",
                     help="do discovery", nargs='?',
                     default=False, const=1, required=False)
+    parser.add_argument("-sec", "--security",
+                    help="do security", nargs='?',
+                    default=False, const=1, required=False)
     print(sys.argv)
     args = parser.parse_args()
     print("scope         :" + str(args.scope))
     print("sleep         :" + str(args.sleep))
     print("all           :" + str(args.all))
     print("discovery     :" + str(args.discovery))
+    print("security     :" + str(args.security))
     time.sleep(int(args.sleep))
 
     the_stack = knx_stack.KNXIOTStack()
@@ -789,6 +870,8 @@ if __name__ == '__main__':  # pragma: no cover
             do_all(the_stack)
         elif args.discovery:
             do_discovery(the_stack)
+        elif args.security:
+            do_security(the_stack)
         else:
             do_sequence(the_stack)
     except:

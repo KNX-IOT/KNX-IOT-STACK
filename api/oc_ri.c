@@ -197,6 +197,121 @@ get_interface_string(oc_interface_mask_t mask)
   return "";
 }
 
+
+
+int
+oc_total_interface_in_mask(oc_interface_mask_t iface_mask)
+{
+  int total_masks = 0;
+
+  if (iface_mask & OC_IF_I) {
+    total_masks++;
+  }
+  if (iface_mask & OC_IF_O) {
+    total_masks++;
+  }
+  if (iface_mask & OC_IF_G) {
+    // TODO note: this must be extended with a number...
+    total_masks++;
+  }
+  if (iface_mask & OC_IF_C) {
+    total_masks++;
+  }
+  if (iface_mask & OC_IF_P) {
+    total_masks++;
+  }
+  if (iface_mask & OC_IF_D) {
+    total_masks++;
+  }
+  if (iface_mask & OC_IF_AC) {
+    total_masks++;
+  }
+  if (iface_mask & OC_IF_SE) {
+    total_masks++;
+  }
+  if (iface_mask & OC_IF_LIL) {
+    total_masks++;
+  }
+  if (iface_mask & OC_IF_BA) {
+    total_masks++;
+  }
+  if (iface_mask & OC_IF_SEC) {
+    total_masks++;
+  }
+  if (iface_mask & OC_IF_SWU) {
+    total_masks++;
+  }
+  if (iface_mask & OC_IF_PM) {
+    total_masks++;
+  }
+  return total_masks;
+}
+
+
+int
+oc_get_interface_in_mask_in_string_array(oc_interface_mask_t iface_mask,
+                                         int nr_entries,
+                                         oc_string_array_t interface_array)
+{
+
+  int total_masks = 0;
+  if (iface_mask & OC_IF_I) {
+    oc_string_array_add_item(interface_array, get_interface_string(OC_IF_I));
+    total_masks++;
+  }
+  if (iface_mask & OC_IF_O) {
+    oc_string_array_add_item(interface_array, get_interface_string(OC_IF_O));
+    total_masks++;
+  }
+  if (iface_mask & OC_IF_G) {
+    oc_string_array_add_item(interface_array, get_interface_string(OC_IF_G));
+    total_masks++;
+  }
+  if (iface_mask & OC_IF_C) {
+    oc_string_array_add_item(interface_array, get_interface_string(OC_IF_C));
+    total_masks++;
+  }
+  if (iface_mask & OC_IF_P) {
+    oc_string_array_add_item(interface_array, get_interface_string(OC_IF_P));
+    total_masks++;
+  }
+  if (iface_mask & OC_IF_D) {
+    oc_string_array_add_item(interface_array, get_interface_string(OC_IF_D));
+    total_masks++;
+  }
+  if (iface_mask & OC_IF_AC) {
+    oc_string_array_add_item(interface_array, get_interface_string(OC_IF_AC));
+    total_masks++;
+  }
+  if (iface_mask & OC_IF_SE) {
+    oc_string_array_add_item(interface_array, get_interface_string(OC_IF_SE));
+    total_masks++;
+  }
+  if (iface_mask & OC_IF_LIL) {
+    oc_string_array_add_item(interface_array, get_interface_string(OC_IF_LIL));
+    total_masks++;
+  }
+  if (iface_mask & OC_IF_BA) {
+    oc_string_array_add_item(interface_array, get_interface_string(OC_IF_BA));
+  }
+  if (iface_mask & OC_IF_SEC) {
+    oc_string_array_add_item(interface_array, get_interface_string(OC_IF_SEC));
+    total_masks++;
+  }
+  if (iface_mask & OC_IF_SWU) {
+    oc_string_array_add_item(interface_array, get_interface_string(OC_IF_SWU));
+    total_masks++;
+  }
+  if (iface_mask & OC_IF_PM) {
+    oc_string_array_add_item(interface_array, get_interface_string(OC_IF_PM));
+    total_masks++;
+  }
+  return total_masks;
+}
+
+
+
+
 #ifdef OC_SERVER
 oc_resource_t *
 oc_ri_get_app_resources(void)
