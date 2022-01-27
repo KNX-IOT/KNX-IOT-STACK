@@ -166,8 +166,8 @@ get_ael(oc_request_t *request, oc_interface_mask_t iface_mask, void *data)
   (void)data;
   if (request) {
     switch (iface_mask) {
-    case OC_IF_BASELINE:
-    case OC_IF_RW:
+    //case OC_IF_BASELINE:
+    case OC_IF_NONE:
       if (oc_sec_ael_encode(request->resource->device, iface_mask, false)) {
         oc_send_response(request, OC_STATUS_OK);
       } else {
@@ -192,8 +192,8 @@ post_ael(oc_request_t *request, oc_interface_mask_t iface_mask, void *data)
       return;
     }
     switch (iface_mask) {
-    case OC_IF_BASELINE:
-    case OC_IF_RW:
+    //case OC_IF_BASELINE:
+    case OC_IF_NONE:
       if (oc_sec_ael_decode(request->resource->device, request->request_payload,
                             false)) {
         oc_send_response(request, OC_STATUS_CHANGED);
@@ -215,7 +215,7 @@ oc_sec_ael_encode(size_t device, oc_interface_mask_t iface_mask,
   oc_sec_ael_t *a = &ael[device];
   char tmpstr[64];
   oc_rep_start_root_object();
-  if (to_storage || iface_mask & OC_IF_BASELINE) {
+  if (to_storage || iface_mask & OC_IF_NONE) {
     oc_process_baseline_interface(
       oc_core_get_resource_by_index(OCF_SEC_AEL, device));
   }

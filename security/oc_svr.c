@@ -33,14 +33,14 @@
 void
 oc_sec_create_svr(void)
 {
-  oc_sec_doxm_init();
-  oc_sec_pstat_init();
-  oc_sec_cred_init();
-  oc_sec_acl_init();
-  oc_sec_ael_init();
-  oc_sec_sp_init();
-  oc_sec_sdi_init();
-
+  //oc_sec_doxm_init();
+  //oc_sec_pstat_init();
+  //oc_sec_cred_init();
+  //oc_sec_acl_init();
+  //oc_sec_ael_init();
+  //oc_sec_sp_init();
+  //oc_sec_sdi_init();
+/*
   size_t i;
   for (i = 0; i < oc_core_get_num_devices(); i++) {
     oc_core_populate_resource(
@@ -76,7 +76,8 @@ oc_sec_create_svr(void)
                               OC_IF_RW | OC_IF_BASELINE, OC_IF_RW,
                               OC_DISCOVERABLE | OC_SECURE, get_cred, 0,
                               post_cred, delete_cred, 1, "oic.r.roles");
-#endif /* OC_PKI */
+#endif // OC_PKI 
+*/
   }
 }
 

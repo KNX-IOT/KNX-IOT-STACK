@@ -172,7 +172,7 @@ void
 oc_sec_encode_sp(size_t device, oc_interface_mask_t iface_mask, bool to_storage)
 {
   oc_rep_start_root_object();
-  if (to_storage || iface_mask & OC_IF_BASELINE) {
+  if (to_storage || iface_mask & OC_IF_NONE) {
     oc_process_baseline_interface(
       oc_core_get_resource_by_index(OCF_SEC_SP, device));
   }
@@ -206,8 +206,8 @@ get_sp(oc_request_t *request, oc_interface_mask_t iface_mask, void *data)
 {
   (void)data;
   switch (iface_mask) {
-  case OC_IF_RW:
-  case OC_IF_BASELINE: {
+  //case OC_IF_RW:
+  case OC_IF_NONE: {
     oc_sec_encode_sp(request->resource->device, iface_mask, false);
     oc_send_response(request, OC_STATUS_OK);
   } break;
