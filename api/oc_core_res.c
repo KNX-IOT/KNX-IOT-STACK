@@ -741,8 +741,11 @@ oc_core_get_resource_by_uri(const char *uri, size_t device)
       type = OCF_D;
     }
   } else if ((strlen(uri) - skip) == 7 &&
-             memcmp(uri + skip, "oic/res", 7) == 0) {
-    type = OCF_RES;
+             memcmp(uri + skip, ".well-known/core", 17) == 0) {
+    type = WELLKNOWNCORE;
+  } else if ((strlen(uri) - skip) == 7 &&
+             memcmp(uri + skip, ".well-known/knx", 15) == 0) {
+    type = OC_KNX;
   }
 
 #ifdef OC_SECURITY
