@@ -77,8 +77,8 @@ oc_sec_create_svr(void)
                               OC_DISCOVERABLE | OC_SECURE, get_cred, 0,
                               post_cred, delete_cred, 1, "oic.r.roles");
 #endif // OC_PKI 
-*/
   }
+  */
 }
 
 #endif /* OC_SECURITY */
