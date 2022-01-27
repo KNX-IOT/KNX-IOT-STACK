@@ -230,8 +230,6 @@ oc_frame_interfaces_mask_in_response(oc_interface_mask_t iface_mask)
   return total_size;
 }
 
-
-
 size_t
 oc_core_get_num_devices(void)
 {
@@ -370,7 +368,7 @@ oc_core_add_new_device(const char *uri, const char *rt, const char *name,
     OC_ERR("device limit reached");
     return NULL;
   }
-#else // !OC_DYNAMIC_ALLOCATION 
+#else // !OC_DYNAMIC_ALLOCATION
   size_t new_num = 1 + OCF_D * (device_count + 1);
   core_resources =
     (oc_resource_t *)realloc(core_resources, new_num * sizeof(oc_resource_t));
@@ -389,11 +387,11 @@ oc_core_add_new_device(const char *uri, const char *rt, const char *name,
   }
   memset(&oc_device_info[device_count], 0, sizeof(oc_device_info_t));
 
-#endif // OC_DYNAMIC_ALLOCATION 
+#endif // OC_DYNAMIC_ALLOCATION
 
   oc_gen_uuid(&oc_device_info[device_count].di);
 
-  // Construct device resource 
+  // Construct device resource
   //int properties = OC_DISCOVERABLE;
 
  // if (strlen(rt) == 8 && strncmp(rt, "oic.wk.d", 8) == 0) {
@@ -537,11 +535,11 @@ oc_core_init_platform(const char *mfg_name, oc_core_init_platform_cb_t init_cb,
   }
 
   /* Populating resource object */
- // int properties = OC_DISCOVERABLE;
+  // int properties = OC_DISCOVERABLE;
 
- // oc_core_populate_resource(OCF_P, 0, "oic/p", OC_IF_R | OC_IF_BASELINE,
-  //                          OC_IF_R, properties, oc_core_platform_handler, 0, 0,
-  //                          0, 1, "oic.wk.p");
+  // oc_core_populate_resource(OCF_P, 0, "oic/p", OC_IF_R | OC_IF_BASELINE,
+  //                          OC_IF_R, properties, oc_core_platform_handler, 0,
+  //                          0, 0, 1, "oic.wk.p");
 
   oc_gen_uuid(&oc_platform_info.pi);
 

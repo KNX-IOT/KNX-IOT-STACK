@@ -31,8 +31,8 @@
 
 static size_t query_iterator;
 
-//int
-//oc_add_device(const char *uri, const char *rt, const char *name,
+// int
+// oc_add_device(const char *uri, const char *rt, const char *name,
 //              const char *spec_version, const char *data_model_version,
 //              oc_add_device_cb_t add_device_cb, void *data)
 //{

@@ -117,7 +117,7 @@ oc_platform_info_t *oc_core_init_platform(const char *mfg_name,
 
 /**
  * @brief Add device to the platform
- * 
+ *
  * @param name the name of the device
  * @param version the version of the KNX spec
  * @param base the base url

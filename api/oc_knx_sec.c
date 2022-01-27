@@ -307,9 +307,9 @@ oc_create_a_sen_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_a_sen_resource\n");
   // "/a/sen"
-  oc_core_lf_populate_resource(
-    resource_idx, device, "/a/sen", OC_IF_LI, APPLICATION_CBOR,
-    OC_DISCOVERABLE, 0, 0, oc_core_a_sen_post_handler, 0, 0, "");
+  oc_core_lf_populate_resource(resource_idx, device, "/a/sen", OC_IF_LI,
+                               APPLICATION_CBOR, OC_DISCOVERABLE, 0, 0,
+                               oc_core_a_sen_post_handler, 0, 0, "");
 }
 
 // ----------------------------------------------------------------------------
@@ -763,10 +763,10 @@ oc_create_auth_at_x_resource(int resource_idx, size_t device)
   OC_DBG("oc_create_auth_at_x_resource\n");
   PRINT("oc_create_auth_at_x_resource\n");
   // "/a/sen"
-  oc_core_lf_populate_resource(
-    resource_idx, device, "/auth/at/*", OC_IF_LI,
-    APPLICATION_CBOR, OC_DISCOVERABLE, oc_core_auth_at_x_get_handler, 0, 0,
-    oc_core_auth_at_x_delete_handler, 1, "dpt.a[n]");
+  oc_core_lf_populate_resource(resource_idx, device, "/auth/at/*", OC_IF_LI,
+                               APPLICATION_CBOR, OC_DISCOVERABLE,
+                               oc_core_auth_at_x_get_handler, 0, 0,
+                               oc_core_auth_at_x_delete_handler, 1, "dpt.a[n]");
 }
 
 // ----------------------------------------------------------------------------
@@ -1037,7 +1037,6 @@ oc_create_knx_sec_resources(size_t device_index)
   oc_create_knx_auth_resource(OC_KNX_AUTH, device_index);
 }
 
-
 // ----------------------------------------------------------------------------
 
 static bool
@@ -1046,7 +1045,8 @@ method_allowed(oc_method_t method, oc_resource_t *resource)
   return oc_if_method_allowed_according_to_mask(resource->interfaces, method);
 }
 
-bool oc_knx_sec_check_acl(oc_method_t method, oc_resource_t *resource,
+bool
+oc_knx_sec_check_acl(oc_method_t method, oc_resource_t *resource,
                      oc_endpoint_t *endpoint)
 {
   (void)endpoint;

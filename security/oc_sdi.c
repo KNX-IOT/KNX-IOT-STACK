@@ -190,7 +190,7 @@ get_sdi(oc_request_t *request, oc_interface_mask_t iface_mask, void *data)
 
     oc_send_response(request, OC_STATUS_OK);
   } break;
-  //case OC_IF_RW: {
+  // case OC_IF_RW: {
   //  oc_sec_encode_sdi(request->resource->device, true);
   //  oc_send_response(request, OC_STATUS_OK);
   //} break;

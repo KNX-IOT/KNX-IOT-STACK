@@ -173,7 +173,7 @@ uint64_t oc_oscore_get_osndelay();
 void oc_create_knx_sec_resources(size_t device);
 
 bool oc_knx_sec_check_acl(oc_method_t method, oc_resource_t *resource,
-                      oc_endpoint_t *endpoint);
+                          oc_endpoint_t *endpoint);
 
 #ifdef __cplusplus
 }

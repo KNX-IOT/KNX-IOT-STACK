@@ -307,8 +307,8 @@ oc_get_interface_in_mask_in_string_array(oc_interface_mask_t iface_mask,
   return total_masks;
 }
 
-
-bool oc_if_method_allowed_according_to_mask(oc_interface_mask_t iface_mask,
+bool
+oc_if_method_allowed_according_to_mask(oc_interface_mask_t iface_mask,
                                        oc_method_t method)
 {
   if (iface_mask & OC_IF_I) {
@@ -372,7 +372,7 @@ bool oc_if_method_allowed_according_to_mask(oc_interface_mask_t iface_mask,
     if (method == OC_GET)
       return true;
   }
-  if (iface_mask & OC_IF_BA) { 
+  if (iface_mask & OC_IF_BA) {
     // batch
     if (method == OC_GET)
       return true;
@@ -869,8 +869,8 @@ oc_observe_notification_delayed(void *data)
 #endif
 
 //#ifdef OC_SERVER
-//static oc_event_callback_retval_t
-//oc_observe_notification_resource_defaults_delayed(void *data)
+// static oc_event_callback_retval_t
+// oc_observe_notification_resource_defaults_delayed(void *data)
 //{
 //  oc_resource_defaults_data_t *resource_defaults_data =
 //    (oc_resource_defaults_data_t *)data;
@@ -1016,21 +1016,20 @@ does_interface_support_method(oc_interface_mask_t iface_mask,
   (void)method;
   bool supported = true;
   switch (iface_mask) {
-  /* Per section 7.5.3 of the OCF Core spec, the following three interfaces
-   * are RETRIEVE-only.
-   */
-  //case OC_IF_LL:
-  //case OC_IF_S:
- // case OC_IF_R:
- //   if (method != OC_GET)
- //     supported = false;
- //   break;
-  /* Per section 7.5.3 of the OCF Core spec, the following three interfaces
-   * support RETRIEVE, UPDATE.
-   * TODO: Refine logic below after adding logic that identifies
-   * and handles CREATE requests using PUT/POST.
-   */
-
+    /* Per section 7.5.3 of the OCF Core spec, the following three interfaces
+     * are RETRIEVE-only.
+     */
+    // case OC_IF_LL:
+    // case OC_IF_S:
+    // case OC_IF_R:
+    //   if (method != OC_GET)
+    //     supported = false;
+    //   break;
+    /* Per section 7.5.3 of the OCF Core spec, the following three interfaces
+     * support RETRIEVE, UPDATE.
+     * TODO: Refine logic below after adding logic that identifies
+     * and handles CREATE requests using PUT/POST.
+     */
 
   case OC_IF_I:
   case OC_IF_O:
@@ -1539,7 +1538,7 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
      */
     if (cur_resource && (method == OC_PUT || method == OC_POST) &&
         response_buffer.code < oc_status_code(OC_STATUS_BAD_REQUEST)) {
-      //if ((iface_mask == OC_IF_STARTUP) ||
+      // if ((iface_mask == OC_IF_STARTUP) ||
       //    (iface_mask == OC_IF_STARTUP_REVERT)) {
       //  oc_resource_defaults_data_t *resource_defaults_data =
       //    oc_ri_alloc_resource_defaults();
@@ -1548,10 +1547,10 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
       //  oc_ri_add_timed_event_callback_ticks(
       //    resource_defaults_data,
       //    &oc_observe_notification_resource_defaults_delayed, 0);
-      //} else 
+      //} else
       //{
-        oc_ri_add_timed_event_callback_ticks(
-          cur_resource, &oc_observe_notification_delayed, 0);
+      oc_ri_add_timed_event_callback_ticks(cur_resource,
+                                           &oc_observe_notification_delayed, 0);
       //}
     }
 

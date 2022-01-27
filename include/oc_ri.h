@@ -165,21 +165,21 @@ typedef struct oc_response_t
  *
  */
 typedef enum {
-  OC_IF_NONE = 0,                ///< no interface defined
-  OC_IF_I = 1 << 1,              ///< if.i
-  OC_IF_O = 1 << 2,              ///< if.o
-  OC_IF_G = 1 << 3,              ///< if.g.s.[ga]
-  OC_IF_C = 1 << 4,              ///< if.c
-  OC_IF_P = 1 << 5,              ///< if.p
-  OC_IF_D = 1 << 6,              ///< if.d
-  OC_IF_A = 1 << 7,             ///< if.a
-  OC_IF_S = 1 << 8,             ///< if.s
-  OC_IF_LI = 1 << 9,            ///< if.ll
-  OC_IF_BA = 1 << 10,            ///< if.b
-  OC_IF_SEC = 1 << 11,           ///< if.sec
-  OC_IF_SWU = 1 << 12,           ///< if.swu
-  OC_IF_PM = 1 << 13,            ///< if.pm
-  OC_IF_M = 1 << 14              ///< if.m (manufactorer)
+  OC_IF_NONE = 0,      ///< no interface defined
+  OC_IF_I = 1 << 1,    ///< if.i
+  OC_IF_O = 1 << 2,    ///< if.o
+  OC_IF_G = 1 << 3,    ///< if.g.s.[ga]
+  OC_IF_C = 1 << 4,    ///< if.c
+  OC_IF_P = 1 << 5,    ///< if.p
+  OC_IF_D = 1 << 6,    ///< if.d
+  OC_IF_A = 1 << 7,    ///< if.a
+  OC_IF_S = 1 << 8,    ///< if.s
+  OC_IF_LI = 1 << 9,   ///< if.ll
+  OC_IF_BA = 1 << 10,  ///< if.b
+  OC_IF_SEC = 1 << 11, ///< if.sec
+  OC_IF_SWU = 1 << 12, ///< if.swu
+  OC_IF_PM = 1 << 13,  ///< if.pm
+  OC_IF_M = 1 << 14    ///< if.m (manufactorer)
 } oc_interface_mask_t;
 
 /**
@@ -200,10 +200,11 @@ int oc_total_interface_in_mask(oc_interface_mask_t iface_mask);
 
 /**
  * @brief sets all interfaces in the mask in the string array
- * 
+ *
  * @param iface_mask the interface mask
  * @param nr_entries expected number of entries in the array
- * @param interface_array the string array to place the individual interface names in
+ * @param interface_array the string array to place the individual interface
+ * names in
  * @return int the amount of interfaces filled in the interface_arry
  */
 int oc_get_interface_in_mask_in_string_array(oc_interface_mask_t iface_mask,
@@ -212,13 +213,14 @@ int oc_get_interface_in_mask_in_string_array(oc_interface_mask_t iface_mask,
 
 /**
  * @brief is the method allowed according to the interface mask
- * 
+ *
  * @param iface_mask the interface mask
  * @param method the method to be checked
  * @return true method allowed
  * @return false method not allowed
  */
-bool oc_if_method_allowed_according_to_mask(oc_interface_mask_t iface_mask, oc_method_t method);
+bool oc_if_method_allowed_according_to_mask(oc_interface_mask_t iface_mask,
+                                            oc_method_t method);
 
 /**
  * @brief core resource numbers

@@ -39,9 +39,9 @@ static int
 app_init(void)
 {
   int ret = oc_init_platform("Samsung", NULL, NULL);
-  //ret |= oc_add_device("/oic/d", "oic.d.light", "Lamp", "ocf.1.0.0",
+  // ret |= oc_add_device("/oic/d", "oic.d.light", "Lamp", "ocf.1.0.0",
   //                     "ocf.res.1.0.0", NULL, NULL);
-  ret |=ock_add_device("myhname", "1.0", "//", "000001", NULL, NULL);
+  ret |= ock_add_device("myhname", "1.0", "//", "000001", NULL, NULL);
   return ret;
 }
 
@@ -63,7 +63,7 @@ protected:
     }
     ASSERT_NE(NULL, ep);
     target_ep = ep;
-	PRINT("HEELOEEE\n");
+    PRINT("HEELOEEE\n");
   }
 
   static void TearDownTestCase() { oc_main_shutdown(); }

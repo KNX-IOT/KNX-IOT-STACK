@@ -356,7 +356,7 @@ coap_notify_observers(oc_resource_t *resource,
   }
 #endif /* OC_SECURITY */
 
-  //bool resource_is_collection = false;
+  // bool resource_is_collection = false;
   coap_observer_t *obs = NULL;
   if (resource->num_observers > 0) {
 #ifdef OC_BLOCK_WISE
@@ -406,11 +406,11 @@ coap_notify_observers(oc_resource_t *resource,
         obs = obs->next;
         continue;
       } // obs->resource != resource || endpoint != obs->endpoint
-      //if (resource_is_collection && obs->iface_mask != OC_IF_BASELINE) {
+      // if (resource_is_collection && obs->iface_mask != OC_IF_BASELINE) {
       //  obs = obs->next;
       //  continue;
       //}
-      //if (obs->iface_mask == OC_IF_STARTUP) {
+      // if (obs->iface_mask == OC_IF_STARTUP) {
       //  OC_DBG("coap_notify_observers: Skipping startup established observe");
       //  obs = obs->next;
       //  continue;
@@ -450,8 +450,9 @@ coap_notify_observers(oc_resource_t *resource,
           coap_packet_t notification[1];
           bool is_revert = false;
           uint8_t status_code = CONTENT_2_05;
-          //if (obs->iface_mask == OC_IF_STARTUP_REVERT) {
-          //  OC_DBG("coap_notify_observers: Setting Valid response for a REVERT "
+          // if (obs->iface_mask == OC_IF_STARTUP_REVERT) {
+          //  OC_DBG("coap_notify_observers: Setting Valid response for a REVERT
+          //  "
           //         "notification");
           //  status_code = VALID_2_03;
           //  response_buf->code = VALID_2_03;
@@ -661,7 +662,7 @@ notify_resource_defaults_observer(oc_resource_t *resource,
       if (response_buf) {
         coap_packet_t notification[1];
         uint8_t status_code = CONTENT_2_05;
-        //if (obs->iface_mask == OC_IF_STARTUP_REVERT) {
+        // if (obs->iface_mask == OC_IF_STARTUP_REVERT) {
         //  status_code = VALID_2_03;
         //}
 #ifdef OC_TCP

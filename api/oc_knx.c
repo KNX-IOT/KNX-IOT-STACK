@@ -223,10 +223,10 @@ void
 oc_create_knx_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_resource\n");
-  oc_core_lf_populate_resource(
-    resource_idx, device, "/.well-known/knx", OC_IF_LI ,
-    APPLICATION_LINK_FORMAT, OC_DISCOVERABLE, oc_core_knx_get_handler, 0,
-    oc_core_knx_post_handler, 0, 0, "");
+  oc_core_lf_populate_resource(resource_idx, device, "/.well-known/knx",
+                               OC_IF_LI, APPLICATION_LINK_FORMAT,
+                               OC_DISCOVERABLE, oc_core_knx_get_handler, 0,
+                               oc_core_knx_post_handler, 0, 0, "");
 }
 
 // ----------------------------------------------------------------------------
@@ -449,10 +449,9 @@ oc_create_knx_lsm_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_lsm_resource\n");
   // "/a/lsm"
-  oc_core_lf_populate_resource(resource_idx, device, "/a/lsm", OC_IF_LI,
-                               APPLICATION_CBOR,
-                               OC_DISCOVERABLE, oc_core_knx_lsm_get_handler, 0,
-                               oc_core_knx_lsm_post_handler, 0, 0, "");
+  oc_core_lf_populate_resource(
+    resource_idx, device, "/a/lsm", OC_IF_LI, APPLICATION_CBOR, OC_DISCOVERABLE,
+    oc_core_knx_lsm_get_handler, 0, oc_core_knx_lsm_post_handler, 0, 0, "");
 }
 
 // ----------------------------------------------------------------------------
@@ -703,9 +702,9 @@ oc_create_knx_knx_resource(int resource_idx, size_t device)
   OC_DBG("oc_create_knx_knx_resource\n");
   // "/a/lsm"
   oc_core_lf_populate_resource(
-    resource_idx, device, "/.knx", OC_IF_LI, APPLICATION_CBOR,
-    OC_DISCOVERABLE, oc_core_knx_knx_get_handler, 0,
-    oc_core_knx_knx_post_handler, 0, 1, "urn:knx:g.s");
+    resource_idx, device, "/.knx", OC_IF_LI, APPLICATION_CBOR, OC_DISCOVERABLE,
+    oc_core_knx_knx_get_handler, 0, oc_core_knx_knx_post_handler, 0, 1,
+    "urn:knx:g.s");
 }
 
 // ----------------------------------------------------------------------------
