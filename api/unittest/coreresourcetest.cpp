@@ -72,7 +72,10 @@ TEST_F(TestCoreResource, CoreDevice_P)
 
   return;
 
-  addcoredevice = oc_core_add_new_device(DEVICE_URI, DEVICE_TYPE, DEVICE_NAME,
+  //ock_add_device
+
+  addcoredevice =
+      ock_add_device(DEVICE_URI, DEVICE_TYPE, DEVICE_NAME,
                                          OCF_SPEC_VERSION,
                                          OCF_DATA_MODEL_VERSION, NULL, NULL);
   ASSERT_NE(addcoredevice, NULL);
