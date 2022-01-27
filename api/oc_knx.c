@@ -1010,7 +1010,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
   PRINT("oc_core_knx_spake_post_handler valid_request: %d\n", valid_request);
   // on ca
   if (valid_request == SPAKE_CA) {
-    // return changed, no payload
+    // check key confirmation!!! don't just send status changed!!!
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
     return;
   }
@@ -1018,6 +1018,10 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
   if (valid_request == SPAKE_PA) {
     // return changed, frame pb (11) & cb (13)
     // TODO: probably we need to calculate them...
+
+    // the password is necessary at this point, so add some functions
+    // to obtain the password from wherever it is stored (persistent storage?)
+    // For testing, use hardcoded password, or pass as CLI argument from app
 
     oc_rep_begin_root_object();
     // pb (11)
@@ -1030,10 +1034,6 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
   }
   // on rnd
   if (valid_request == SPAKE_RND) {
-    // the password is necessary at this point, so add some functions
-    // to obtain the password from wherever it is stored (persistent storage?)
-    // For testing, use hardcoded password, or pass as CLI argument from app
-
     oc_spake_gen_rnd(&g_pase.rnd, &g_pase.salt, &g_pase.it);
 
     // TODO start calculation of handshake parameters here, while you wait the
