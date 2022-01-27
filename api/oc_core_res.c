@@ -124,39 +124,6 @@ oc_core_encode_interfaces_mask(CborEncoder *parent,
 {
   oc_rep_set_key((parent), "if");
   oc_rep_start_array((parent), if);
-  if (iface_mask & OC_IF_R) {
-    oc_rep_add_text_string(if, "oic.if.r");
-  }
-  if (iface_mask & OC_IF_RW) {
-    oc_rep_add_text_string(if, "oic.if.rw");
-  }
-  if (iface_mask & OC_IF_A) {
-    oc_rep_add_text_string(if, "oic.if.a");
-  }
-  if (iface_mask & OC_IF_S) {
-    oc_rep_add_text_string(if, "oic.if.s");
-  }
-  if (iface_mask & OC_IF_LL) {
-    oc_rep_add_text_string(if, "oic.if.ll");
-  }
-  if (iface_mask & OC_IF_CREATE) {
-    oc_rep_add_text_string(if, "oic.if.create");
-  }
-  if (iface_mask & OC_IF_B) {
-    oc_rep_add_text_string(if, "oic.if.b");
-  }
-  if (iface_mask & OC_IF_BASELINE) {
-    oc_rep_add_text_string(if, "oic.if.baseline");
-  }
-  if (iface_mask & OC_IF_W) {
-    oc_rep_add_text_string(if, "oic.if.w");
-  }
-  if (iface_mask & OC_IF_STARTUP) {
-    oc_rep_add_text_string(if, "oic.if.startup");
-  }
-  if (iface_mask & OC_IF_STARTUP_REVERT) {
-    oc_rep_add_text_string(if, "oic.if.startup.revert");
-  }
 
   if (iface_mask & OC_IF_I) {
     oc_rep_add_text_string(if, "if.i");
@@ -177,13 +144,13 @@ oc_core_encode_interfaces_mask(CborEncoder *parent,
   if (iface_mask & OC_IF_D) {
     oc_rep_add_text_string(if, "if.d");
   }
-  if (iface_mask & OC_IF_AC) {
+  if (iface_mask & OC_IF_A) {
     oc_rep_add_text_string(if, "if.a");
   }
-  if (iface_mask & OC_IF_SE) {
+  if (iface_mask & OC_IF_S) {
     oc_rep_add_text_string(if, "if.s");
   }
-  if (iface_mask & OC_IF_LIL) {
+  if (iface_mask & OC_IF_LI) {
     oc_rep_add_text_string(if, "if.ll");
   }
   if (iface_mask & OC_IF_BA) {
@@ -232,15 +199,15 @@ oc_frame_interfaces_mask_in_response(oc_interface_mask_t iface_mask)
     oc_rep_encode_raw((uint8_t *)"if.d", 4);
     total_size += 4;
   }
-  if (iface_mask & OC_IF_AC) {
+  if (iface_mask & OC_IF_A) {
     oc_rep_encode_raw((uint8_t *)"if.a", 4);
     total_size += 4;
   }
-  if (iface_mask & OC_IF_SE) {
+  if (iface_mask & OC_IF_S) {
     oc_rep_encode_raw((uint8_t *)"if.s", 4);
     total_size += 4;
   }
-  if (iface_mask & OC_IF_LIL) {
+  if (iface_mask & OC_IF_LI) {
     oc_rep_encode_raw((uint8_t *)"if.ll", 5);
     total_size += 5;
   }
@@ -261,44 +228,6 @@ oc_frame_interfaces_mask_in_response(oc_interface_mask_t iface_mask)
     total_size += 5;
   }
   return total_size;
-}
-
-static void
-oc_core_device_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
-                       void *data)
-{
-  (void)data;
-  size_t device = request->resource->device;
-  oc_rep_start_root_object();
-
-  char di[OC_UUID_LEN], piid[OC_UUID_LEN];
-  oc_uuid_to_str(&oc_device_info[device].di, di, OC_UUID_LEN);
-  if (request->origin) {
-    oc_uuid_to_str(&oc_device_info[device].piid, piid, OC_UUID_LEN);
-  }
-
-  switch (iface_mask) {
-  case OC_IF_BASELINE:
-    oc_process_baseline_interface(request->resource);
-  /* fall through */
-  case OC_IF_R: {
-    oc_rep_set_text_string(root, di, di);
-    if (request->origin) {
-      oc_rep_set_text_string(root, piid, piid);
-    }
-    oc_rep_set_text_string(root, n, oc_string(oc_device_info[device].name));
-    oc_rep_set_text_string(root, icv, oc_string(oc_device_info[device].icv));
-    oc_rep_set_text_string(root, dmv, oc_string(oc_device_info[device].dmv));
-    if (oc_device_info[device].add_device_cb) {
-      oc_device_info[device].add_device_cb(oc_device_info[device].data);
-    }
-  } break;
-  default:
-    break;
-  }
-
-  oc_rep_end_root_object();
-  oc_send_response(request, OC_STATUS_OK);
 }
 
 size_t
@@ -425,18 +354,21 @@ oc_core_set_device_iid(int device_index, const char *iid)
   return 0;
 }
 
+/*
 oc_device_info_t *
 oc_core_add_new_device(const char *uri, const char *rt, const char *name,
                        const char *spec_version, const char *data_model_version,
                        oc_core_add_device_cb_t add_device_cb, void *data)
 {
   (void)data;
+  (void)uri;
+  (void)rt;
 #ifndef OC_DYNAMIC_ALLOCATION
   if (device_count == OC_MAX_NUM_DEVICES) {
     OC_ERR("device limit reached");
     return NULL;
   }
-#else /* !OC_DYNAMIC_ALLOCATION */
+#else // !OC_DYNAMIC_ALLOCATION
   size_t new_num = 1 + OCF_D * (device_count + 1);
   core_resources =
     (oc_resource_t *)realloc(core_resources, new_num * sizeof(oc_resource_t));
@@ -455,22 +387,22 @@ oc_core_add_new_device(const char *uri, const char *rt, const char *name,
   }
   memset(&oc_device_info[device_count], 0, sizeof(oc_device_info_t));
 
-#endif /* OC_DYNAMIC_ALLOCATION */
+#endif // OC_DYNAMIC_ALLOCATION
 
   oc_gen_uuid(&oc_device_info[device_count].di);
 
-  /* Construct device resource */
-  int properties = OC_DISCOVERABLE;
+  // Construct device resource
+  //int properties = OC_DISCOVERABLE;
 
-  if (strlen(rt) == 8 && strncmp(rt, "oic.wk.d", 8) == 0) {
-    oc_core_populate_resource(OCF_D, device_count, uri,
-                              OC_IF_R | OC_IF_BASELINE, OC_IF_R, properties,
-                              oc_core_device_handler, 0, 0, 0, 1, rt);
-  } else {
-    oc_core_populate_resource(
-      OCF_D, device_count, uri, OC_IF_R | OC_IF_BASELINE, OC_IF_R, properties,
-      oc_core_device_handler, 0, 0, 0, 2, rt, "oic.wk.d");
-  }
+ // if (strlen(rt) == 8 && strncmp(rt, "oic.wk.d", 8) == 0) {
+ //   oc_core_populate_resource(OCF_D, device_count, uri,
+ //                             OC_IF_R | OC_IF_BASELINE, OC_IF_R, properties,
+//                              oc_core_device_handler, 0, 0, 0, 1, rt);
+//  } else {
+//    oc_core_populate_resource(
+//      OCF_D, device_count, uri, OC_IF_R | OC_IF_BASELINE, OC_IF_R, properties,
+ //     oc_core_device_handler, 0, 0, 0, 2, rt, "oic.wk.d");
+//  }
 
   oc_gen_uuid(&oc_device_info[device_count].piid);
 
@@ -495,6 +427,7 @@ oc_core_add_new_device(const char *uri, const char *rt, const char *name,
 
   return &oc_device_info[device_count - 1];
 }
+*/
 
 oc_device_info_t *
 oc_core_add_device(const char *name, const char *version, const char *base,
@@ -593,35 +526,6 @@ oc_device_bind_resource_type(size_t device, const char *type)
   oc_device_bind_rt(device, type);
 }
 
-static void
-oc_core_platform_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
-                         void *data)
-{
-  (void)data;
-  oc_rep_start_root_object();
-
-  char pi[OC_UUID_LEN];
-  oc_uuid_to_str(&oc_platform_info.pi, pi, OC_UUID_LEN);
-
-  switch (iface_mask) {
-  case OC_IF_BASELINE:
-    oc_process_baseline_interface(request->resource);
-  /* fall through */
-  case OC_IF_R: {
-    oc_rep_set_text_string(root, pi, pi);
-    oc_rep_set_text_string(root, mnmn, oc_string(oc_platform_info.mfg_name));
-    if (oc_platform_info.init_platform_cb) {
-      oc_platform_info.init_platform_cb(oc_platform_info.data);
-    }
-  } break;
-  default:
-    break;
-  }
-
-  oc_rep_end_root_object();
-  oc_send_response(request, OC_STATUS_OK);
-}
-
 oc_platform_info_t *
 oc_core_init_platform(const char *mfg_name, oc_core_init_platform_cb_t init_cb,
                       void *data)
@@ -631,11 +535,11 @@ oc_core_init_platform(const char *mfg_name, oc_core_init_platform_cb_t init_cb,
   }
 
   /* Populating resource object */
-  int properties = OC_DISCOVERABLE;
+  // int properties = OC_DISCOVERABLE;
 
-  oc_core_populate_resource(OCF_P, 0, "oic/p", OC_IF_R | OC_IF_BASELINE,
-                            OC_IF_R, properties, oc_core_platform_handler, 0, 0,
-                            0, 1, "oic.wk.p");
+  // oc_core_populate_resource(OCF_P, 0, "oic/p", OC_IF_R | OC_IF_BASELINE,
+  //                          OC_IF_R, properties, oc_core_platform_handler, 0,
+  //                          0, 0, 1, "oic.wk.p");
 
   oc_gen_uuid(&oc_platform_info.pi);
 
@@ -835,8 +739,11 @@ oc_core_get_resource_by_uri(const char *uri, size_t device)
       type = OCF_D;
     }
   } else if ((strlen(uri) - skip) == 7 &&
-             memcmp(uri + skip, "oic/res", 7) == 0) {
-    type = OCF_RES;
+             memcmp(uri + skip, ".well-known/core", 17) == 0) {
+    type = WELLKNOWNCORE;
+  } else if ((strlen(uri) - skip) == 7 &&
+             memcmp(uri + skip, ".well-known/knx", 15) == 0) {
+    type = OC_KNX;
   }
 
 #ifdef OC_SECURITY

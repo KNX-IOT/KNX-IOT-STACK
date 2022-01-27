@@ -31,16 +31,16 @@
 
 static size_t query_iterator;
 
-int
-oc_add_device(const char *uri, const char *rt, const char *name,
-              const char *spec_version, const char *data_model_version,
-              oc_add_device_cb_t add_device_cb, void *data)
-{
-  if (!oc_core_add_new_device(uri, rt, name, spec_version, data_model_version,
-                              add_device_cb, data))
-    return -1;
-  return 0;
-}
+// int
+// oc_add_device(const char *uri, const char *rt, const char *name,
+//              const char *spec_version, const char *data_model_version,
+//              oc_add_device_cb_t add_device_cb, void *data)
+//{
+//  if (!oc_core_add_new_device(uri, rt, name, spec_version, data_model_version,
+//                              add_device_cb, data))
+//    return -1;
+//  return 0;
+//}
 
 int
 ock_add_device(const char *name, const char *version, const char *base,
@@ -278,8 +278,8 @@ oc_new_resource(const char *name, const char *uri, uint8_t num_resource_types,
 {
   oc_resource_t *resource = oc_ri_alloc_resource();
   if (resource) {
-    resource->interfaces = OC_IF_BASELINE;
-    resource->default_interface = OC_IF_BASELINE;
+    resource->interfaces = OC_IF_NONE;
+    resource->default_interface = OC_IF_NONE;
     resource->observe_period_seconds = 0;
     resource->num_observers = 0;
     oc_populate_resource_object(resource, name, uri, num_resource_types,

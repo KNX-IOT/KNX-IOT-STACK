@@ -180,11 +180,11 @@ get_interface_string(oc_interface_mask_t mask)
     return interface_strings[15];
   if (mask & OC_IF_D)
     return interface_strings[16];
-  if (mask & OC_IF_AC)
+  if (mask & OC_IF_A)
     return interface_strings[17];
-  if (mask & OC_IF_SE)
+  if (mask & OC_IF_S)
     return interface_strings[18];
-  if (mask & OC_IF_LIL)
+  if (mask & OC_IF_LI)
     return interface_strings[19];
   if (mask & OC_IF_BA)
     return interface_strings[20];
@@ -221,13 +221,13 @@ oc_total_interface_in_mask(oc_interface_mask_t iface_mask)
   if (iface_mask & OC_IF_D) {
     total_masks++;
   }
-  if (iface_mask & OC_IF_AC) {
+  if (iface_mask & OC_IF_A) {
     total_masks++;
   }
-  if (iface_mask & OC_IF_SE) {
+  if (iface_mask & OC_IF_S) {
     total_masks++;
   }
-  if (iface_mask & OC_IF_LIL) {
+  if (iface_mask & OC_IF_LI) {
     total_masks++;
   }
   if (iface_mask & OC_IF_BA) {
@@ -277,16 +277,16 @@ oc_get_interface_in_mask_in_string_array(oc_interface_mask_t iface_mask,
     oc_string_array_add_item(interface_array, get_interface_string(OC_IF_D));
     total_masks++;
   }
-  if (iface_mask & OC_IF_AC) {
-    oc_string_array_add_item(interface_array, get_interface_string(OC_IF_AC));
+  if (iface_mask & OC_IF_A) {
+    oc_string_array_add_item(interface_array, get_interface_string(OC_IF_A));
     total_masks++;
   }
-  if (iface_mask & OC_IF_SE) {
-    oc_string_array_add_item(interface_array, get_interface_string(OC_IF_SE));
+  if (iface_mask & OC_IF_S) {
+    oc_string_array_add_item(interface_array, get_interface_string(OC_IF_S));
     total_masks++;
   }
-  if (iface_mask & OC_IF_LIL) {
-    oc_string_array_add_item(interface_array, get_interface_string(OC_IF_LIL));
+  if (iface_mask & OC_IF_LI) {
+    oc_string_array_add_item(interface_array, get_interface_string(OC_IF_LI));
     total_masks++;
   }
   if (iface_mask & OC_IF_BA) {
@@ -305,6 +305,115 @@ oc_get_interface_in_mask_in_string_array(oc_interface_mask_t iface_mask,
     total_masks++;
   }
   return total_masks;
+}
+
+bool
+oc_if_method_allowed_according_to_mask(oc_interface_mask_t iface_mask,
+                                       oc_method_t method)
+{
+  if (iface_mask & OC_IF_I) {
+    // logical input
+    if (method == OC_POST)
+      return true;
+    if (method == OC_PUT)
+      return true;
+  }
+  if (iface_mask & OC_IF_O) {
+    // Logical Output
+    if (method == OC_GET)
+      return true;
+    if (method == OC_POST)
+      return true;
+  }
+  if (iface_mask & OC_IF_G) {
+    // Group Address
+    if (method == OC_POST)
+      return true;
+  }
+  if (iface_mask & OC_IF_C) {
+    // configuration
+    if (method == OC_GET)
+      return true;
+    if (method == OC_POST)
+      return true;
+    if (method == OC_PUT)
+      return true;
+    if (method == OC_DELETE)
+      return true;
+  }
+  if (iface_mask & OC_IF_P) {
+    // parameter
+    if (method == OC_GET)
+      return true;
+    if (method == OC_PUT)
+      return true;
+  }
+  if (iface_mask & OC_IF_D) {
+    // diagnostic
+    if (method == OC_GET)
+      return true;
+  }
+  if (iface_mask & OC_IF_A) {
+    // actuator
+    if (method == OC_GET)
+      return true;
+    if (method == OC_PUT)
+      return true;
+    if (method == OC_POST)
+      return true;
+  }
+  if (iface_mask & OC_IF_S) {
+    // sensor
+    if (method == OC_GET)
+      return true;
+  }
+  if (iface_mask & OC_IF_LI) {
+    // link list
+    if (method == OC_GET)
+      return true;
+  }
+  if (iface_mask & OC_IF_BA) {
+    // batch
+    if (method == OC_GET)
+      return true;
+    if (method == OC_PUT)
+      return true;
+    if (method == OC_POST)
+      return true;
+  }
+  if (iface_mask & OC_IF_SEC) {
+    // security
+    if (method == OC_GET)
+      return true;
+    if (method == OC_PUT)
+      return true;
+    if (method == OC_POST)
+      return true;
+    if (method == OC_DELETE)
+      return true;
+  }
+  if (iface_mask & OC_IF_SWU) {
+    // software update
+    if (method == OC_GET)
+      return true;
+    if (method == OC_PUT)
+      return true;
+    if (method == OC_POST)
+      return true;
+    if (method == OC_DELETE)
+      return true;
+  }
+  if (iface_mask & OC_IF_PM) {
+    // programming mode
+    if (method == OC_GET)
+      return true;
+  }
+  if (iface_mask & OC_IF_M) {
+    // manufacturer
+    return true;
+  }
+
+  return false;
 }
 
 #ifdef OC_SERVER
@@ -759,17 +868,17 @@ oc_observe_notification_delayed(void *data)
 }
 #endif
 
-#ifdef OC_SERVER
-static oc_event_callback_retval_t
-oc_observe_notification_resource_defaults_delayed(void *data)
-{
-  oc_resource_defaults_data_t *resource_defaults_data =
-    (oc_resource_defaults_data_t *)data;
-  notify_resource_defaults_observer(resource_defaults_data->resource,
-                                    resource_defaults_data->iface_mask, NULL);
-  return OC_EVENT_DONE;
-}
-#endif
+//#ifdef OC_SERVER
+// static oc_event_callback_retval_t
+// oc_observe_notification_resource_defaults_delayed(void *data)
+//{
+//  oc_resource_defaults_data_t *resource_defaults_data =
+//    (oc_resource_defaults_data_t *)data;
+//  notify_resource_defaults_observer(resource_defaults_data->resource,
+//                                    resource_defaults_data->iface_mask, NULL);
+//  return OC_EVENT_DONE;
+//}
+//#endif
 
 #ifdef OC_SERVER
 static oc_event_callback_retval_t
@@ -870,33 +979,10 @@ oc_interface_mask_t
 oc_ri_get_interface_mask(char *iface, size_t if_len)
 {
   oc_interface_mask_t iface_mask = 0;
-  if (15 == if_len && strncmp(iface, "oic.if.baseline", if_len) == 0)
-    iface_mask |= OC_IF_BASELINE;
-  if (9 == if_len && strncmp(iface, "oic.if.ll", if_len) == 0)
-    iface_mask |= OC_IF_LL;
-  if (8 == if_len && strncmp(iface, "oic.if.b", if_len) == 0)
-    iface_mask |= OC_IF_B;
-  if (8 == if_len && strncmp(iface, "oic.if.r", if_len) == 0)
-    iface_mask |= OC_IF_R;
-  if (9 == if_len && strncmp(iface, "oic.if.rw", if_len) == 0)
-    iface_mask |= OC_IF_RW;
-  if (8 == if_len && strncmp(iface, "oic.if.a", if_len) == 0)
-    iface_mask |= OC_IF_A;
-  if (8 == if_len && strncmp(iface, "oic.if.s", if_len) == 0)
-    iface_mask |= OC_IF_S;
-  if (13 == if_len && strncmp(iface, "oic.if.create", if_len) == 0)
-    iface_mask |= OC_IF_CREATE;
-  if (14 == if_len && strncmp(iface, "oic.if.startup", if_len) == 0)
-    iface_mask |= OC_IF_STARTUP;
-  if (21 == if_len && strncmp(iface, "oic.if.startup.revert", if_len) == 0)
-    iface_mask |= OC_IF_STARTUP_REVERT;
-  if (8 == if_len && strncmp(iface, "oic.if.w", if_len) == 0)
-    iface_mask |= OC_IF_W;
-
   if (4 == if_len && strncmp(iface, "if.i", if_len) == 0)
     iface_mask |= OC_IF_I;
   if (4 == if_len && strncmp(iface, "if.o", if_len) == 0)
-    iface_mask |= OC_IF_I;
+    iface_mask |= OC_IF_O;
   if (if_len > 8 && strncmp(iface, "if.g.s.", if_len) == 0)
     iface_mask |= OC_IF_G;
   if (4 == if_len && strncmp(iface, "if.c", if_len) == 0)
@@ -906,11 +992,11 @@ oc_ri_get_interface_mask(char *iface, size_t if_len)
   if (4 == if_len && strncmp(iface, "if.d", if_len) == 0)
     iface_mask |= OC_IF_D;
   if (4 == if_len && strncmp(iface, "if.a", if_len) == 0)
-    iface_mask |= OC_IF_AC;
+    iface_mask |= OC_IF_A;
   if (4 == if_len && strncmp(iface, "if.s", if_len) == 0)
-    iface_mask |= OC_IF_SE;
+    iface_mask |= OC_IF_S;
   if (5 == if_len && strncmp(iface, "if.ll", if_len) == 0)
-    iface_mask |= OC_IF_LIL;
+    iface_mask |= OC_IF_LI;
   if (4 == if_len && strncmp(iface, "if.b", if_len) == 0)
     iface_mask |= OC_IF_BA;
   if (6 == if_len && strncmp(iface, "if.sec", if_len) == 0)
@@ -927,33 +1013,23 @@ static bool
 does_interface_support_method(oc_interface_mask_t iface_mask,
                               oc_method_t method)
 {
+  (void)method;
   bool supported = true;
   switch (iface_mask) {
-  /* Per section 7.5.3 of the OCF Core spec, the following three interfaces
-   * are RETRIEVE-only.
-   */
-  case OC_IF_LL:
-  case OC_IF_S:
-  case OC_IF_R:
-    if (method != OC_GET)
-      supported = false;
-    break;
-  /* Per section 7.5.3 of the OCF Core spec, the following three interfaces
-   * support RETRIEVE, UPDATE.
-   * TODO: Refine logic below after adding logic that identifies
-   * and handles CREATE requests using PUT/POST.
-   */
-  case OC_IF_RW:
-  case OC_IF_B:
-  case OC_IF_BASELINE:
-  case OC_IF_CREATE:
-  /* Per section 7.5.3 of the OCF Core spec, the following interface
-   * supports CREATE, RETRIEVE and UPDATE.
-   */
-  case OC_IF_A:
-  case OC_IF_STARTUP:
-  case OC_IF_STARTUP_REVERT:
-  case OC_IF_W:
+    /* Per section 7.5.3 of the OCF Core spec, the following three interfaces
+     * are RETRIEVE-only.
+     */
+    // case OC_IF_LL:
+    // case OC_IF_S:
+    // case OC_IF_R:
+    //   if (method != OC_GET)
+    //     supported = false;
+    //   break;
+    /* Per section 7.5.3 of the OCF Core spec, the following three interfaces
+     * support RETRIEVE, UPDATE.
+     * TODO: Refine logic below after adding logic that identifies
+     * and handles CREATE requests using PUT/POST.
+     */
 
   case OC_IF_I:
   case OC_IF_O:
@@ -961,13 +1037,14 @@ does_interface_support_method(oc_interface_mask_t iface_mask,
   case OC_IF_C:
   case OC_IF_P:
   case OC_IF_D:
-  case OC_IF_AC:
-  case OC_IF_SE:
-  case OC_IF_LIL:
+  case OC_IF_A:
+  case OC_IF_S:
+  case OC_IF_LI:
   case OC_IF_BA:
   case OC_IF_SEC:
   case OC_IF_SWU:
   case OC_IF_PM:
+  case OC_IF_M:
   case OC_IF_NONE:
     break;
   }
@@ -1461,19 +1538,20 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
      */
     if (cur_resource && (method == OC_PUT || method == OC_POST) &&
         response_buffer.code < oc_status_code(OC_STATUS_BAD_REQUEST)) {
-      if ((iface_mask == OC_IF_STARTUP) ||
-          (iface_mask == OC_IF_STARTUP_REVERT)) {
-        oc_resource_defaults_data_t *resource_defaults_data =
-          oc_ri_alloc_resource_defaults();
-        resource_defaults_data->resource = cur_resource;
-        resource_defaults_data->iface_mask = iface_mask;
-        oc_ri_add_timed_event_callback_ticks(
-          resource_defaults_data,
-          &oc_observe_notification_resource_defaults_delayed, 0);
-      } else {
-        oc_ri_add_timed_event_callback_ticks(
-          cur_resource, &oc_observe_notification_delayed, 0);
-      }
+      // if ((iface_mask == OC_IF_STARTUP) ||
+      //    (iface_mask == OC_IF_STARTUP_REVERT)) {
+      //  oc_resource_defaults_data_t *resource_defaults_data =
+      //    oc_ri_alloc_resource_defaults();
+      //  resource_defaults_data->resource = cur_resource;
+      //  resource_defaults_data->iface_mask = iface_mask;
+      //  oc_ri_add_timed_event_callback_ticks(
+      //    resource_defaults_data,
+      //    &oc_observe_notification_resource_defaults_delayed, 0);
+      //} else
+      //{
+      oc_ri_add_timed_event_callback_ticks(cur_resource,
+                                           &oc_observe_notification_delayed, 0);
+      //}
     }
 
 #endif /* OC_SERVER */

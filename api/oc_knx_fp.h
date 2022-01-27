@@ -88,7 +88,7 @@ typedef struct oc_group_object_table_t
   int id;                 ///< contents of id
   oc_string_t href;       ///<  contents of href
   int *ga;                ///< array of integers
-  int ga_len;             //< length of the array of ga identifiers
+  int ga_len;             ///< length of the array of ga identifiers
   oc_cflag_mask_t cflags; ///< contents of cflags as bitmap
 } oc_group_object_table_t;
 

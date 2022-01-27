@@ -576,7 +576,7 @@ oc_sec_encode_acl(size_t device, oc_interface_mask_t iface_mask,
 {
   char uuid[OC_UUID_LEN];
   oc_rep_start_root_object();
-  if (to_storage || iface_mask & OC_IF_BASELINE) {
+  if (to_storage || iface_mask & OC_IF_NONE) {
     oc_process_baseline_interface(
       oc_core_get_resource_by_index(OCF_SEC_ACL, device));
   }

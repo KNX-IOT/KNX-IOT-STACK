@@ -280,7 +280,7 @@ register_resources(void)
   oc_resource_bind_resource_type(res_pushbutton, "urn:knx:dpa.421.61");
   oc_resource_bind_resource_type(res_pushbutton, "DPT_Switch");
   oc_resource_bind_content_type(res_pushbutton, APPLICATION_CBOR);
-  oc_resource_bind_resource_interface(res_pushbutton, OC_IF_SE); /* if.s */
+  oc_resource_bind_resource_interface(res_pushbutton, OC_IF_S); /* if.s */
   oc_resource_set_discoverable(res_pushbutton, true);
   /* periodic observable
      to be used when one wants to send an event per time slice

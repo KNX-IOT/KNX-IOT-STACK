@@ -116,28 +116,21 @@ oc_platform_info_t *oc_core_init_platform(const char *mfg_name,
                                           void *data);
 
 /**
- * @brief Add new device to the platform
+ * @brief Add device to the platform
  *
- * @param uri the URI of the device
- * @param rt the device type of the device
- * @param name the friendly name
- * @param spec_version specification version
- * @param data_model_version  data model version
- * @param add_device_cb callback
- * @param data supplied user data
- * @return oc_device_info_t* the device information
+ * @param name the name of the device
+ * @param version the version of the KNX spec
+ * @param base the base url
+ * @param serialnumber the serial number of the device
+ * @param add_device_cb device callback
+ * @param data the supplied user data
+ * @return oc_device_info_t* the device structure
  */
-oc_device_info_t *oc_core_add_new_device(const char *uri, const char *rt,
-                                         const char *name,
-                                         const char *spec_version,
-                                         const char *data_model_version,
-                                         oc_core_add_device_cb_t add_device_cb,
-                                         void *data);
-
 oc_device_info_t *oc_core_add_device(const char *name, const char *version,
                                      const char *base, const char *serialnumber,
                                      oc_core_add_device_cb_t add_device_cb,
                                      void *data);
+
 /**
  * @brief set the firmware version
  *

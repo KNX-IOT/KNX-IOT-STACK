@@ -51,6 +51,7 @@ jobs:
       - name: make secured
         run: |
           cd port/linux
-          make DYNAMIC=1 IPV4=1 TCP=1 SECURE=1 test
+          #make DYNAMIC=1 IPV4=1 TCP=1 SECURE=1 test
+          make DYNAMIC=1 IPV4=1 TCP=1 SECURE=1 
           
 

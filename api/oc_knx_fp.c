@@ -1481,8 +1481,7 @@ oc_core_get_recipient_index_url_or_path(int index)
 void
 oc_print_group_object_table_entry(int entry)
 {
-
-  PRINT("  GOT [%d] -> %d\n", entry, g_got[entry].ga_len);
+  // PRINT("  GOT [%d] -> %d\n", entry, g_got[entry].ga_len);
   if (g_got[entry].ga_len == 0) {
     return;
   }
@@ -1660,12 +1659,10 @@ oc_print_group_rp_table_entry(int entry, char *Store,
                               oc_group_rp_table_t *rp_table, int max_size)
 {
   (void)max_size;
-
-  PRINT("  %s [%d] --> [%d]\n", Store, entry, rp_table[entry].ga_len);
   if (rp_table[entry].ga_len == 0) {
     return;
   }
-
+  PRINT("  %s [%d] --> [%d]\n", Store, entry, rp_table[entry].ga_len);
   PRINT("    id %d\n", rp_table[entry].id);
   PRINT("    ia    %d\n", rp_table[entry].ia);
   PRINT("    path  %s\n", oc_string(rp_table[entry].url));

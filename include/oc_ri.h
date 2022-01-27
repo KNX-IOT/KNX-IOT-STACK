@@ -165,41 +165,62 @@ typedef struct oc_response_t
  *
  */
 typedef enum {
-  OC_IF_NONE = 0,                 ///< no interface defined
-  OC_IF_BASELINE = 1 << 1,        ///< oic.if.baseline
-  OC_IF_LL = 1 << 2,              ///< oic.if.ll
-  OC_IF_B = 1 << 3,               ///< oic.if.b
-  OC_IF_R = 1 << 4,               ///< oic.if.r
-  OC_IF_RW = 1 << 5,              ///< oic.if.rw
-  OC_IF_A = 1 << 6,               ///< oic.if.a
-  OC_IF_S = 1 << 7,               ///< oic.if.s
-  OC_IF_CREATE = 1 << 8,          ///< oic.if.create
-  OC_IF_W = 1 << 9,               ///< oic.if.w
-  OC_IF_STARTUP = 1 << 10,        ///< oic.if.startup
-  OC_IF_STARTUP_REVERT = 1 << 11, ///< oic.if.startup.revert
-  OC_IF_I = 1 << 12,              ///< if.i
-  OC_IF_O = 1 << 13,              ///< if.o
-  OC_IF_G = 1 << 14,              ///< if.g.s.[ga]
-  OC_IF_C = 1 << 15,              ///< if.c
-  OC_IF_P = 1 << 16,              ///< if.p
-  OC_IF_D = 1 << 17,              ///< if.d
-  OC_IF_AC = 1 << 18,             ///< if.a
-  OC_IF_SE = 1 << 19,             ///< if.s
-  OC_IF_LIL = 1 << 20,            ///< if.ll
-  OC_IF_BA = 1 << 21,             ///< if.b
-  OC_IF_SEC = 1 << 22,            ///< if.sec
-  OC_IF_SWU = 1 << 23,            ///< if.swu
-  OC_IF_PM = 1 << 24              ///< if.pm
-
+  OC_IF_NONE = 0,      ///< no interface defined
+  OC_IF_I = 1 << 1,    ///< if.i
+  OC_IF_O = 1 << 2,    ///< if.o
+  OC_IF_G = 1 << 3,    ///< if.g.s.[ga]
+  OC_IF_C = 1 << 4,    ///< if.c
+  OC_IF_P = 1 << 5,    ///< if.p
+  OC_IF_D = 1 << 6,    ///< if.d
+  OC_IF_A = 1 << 7,    ///< if.a
+  OC_IF_S = 1 << 8,    ///< if.s
+  OC_IF_LI = 1 << 9,   ///< if.ll
+  OC_IF_BA = 1 << 10,  ///< if.b
+  OC_IF_SEC = 1 << 11, ///< if.sec
+  OC_IF_SWU = 1 << 12, ///< if.swu
+  OC_IF_PM = 1 << 13,  ///< if.pm
+  OC_IF_M = 1 << 14    ///< if.m (manufactorer)
 } oc_interface_mask_t;
 
+/**
+ * @brief Get the interface string object
+ * Note: should be called with a single interface as mask only
+ * @param mask the interface maske
+ * @return const char* the interface as string
+ */
 const char *get_interface_string(oc_interface_mask_t mask);
 
+/**
+ * @brief total interfaces in the interface mask
+ * Note calculates the if.g.s.a only 1
+ * @param iface_mask the interface mask
+ * @return int the amount of interfaces in the mask
+ */
 int oc_total_interface_in_mask(oc_interface_mask_t iface_mask);
 
+/**
+ * @brief sets all interfaces in the mask in the string array
+ *
+ * @param iface_mask the interface mask
+ * @param nr_entries expected number of entries in the array
+ * @param interface_array the string array to place the individual interface
+ * names in
+ * @return int the amount of interfaces filled in the interface_arry
+ */
 int oc_get_interface_in_mask_in_string_array(oc_interface_mask_t iface_mask,
                                              int nr_entries,
                                              oc_string_array_t interface_array);
+
+/**
+ * @brief is the method allowed according to the interface mask
+ *
+ * @param iface_mask the interface mask
+ * @param method the method to be checked
+ * @return true method allowed
+ * @return false method not allowed
+ */
+bool oc_if_method_allowed_according_to_mask(oc_interface_mask_t iface_mask,
+                                            oc_method_t method);
 
 /**
  * @brief core resource numbers
@@ -519,12 +540,12 @@ void oc_ri_free_resource_properties(oc_resource_t *resource);
  * @brief retrieve the query value at the nth position
  *
  * @param query the input query
- * @param query_len the query lenght
+ * @param query_len the query length
  * @param key the key
- * @param key_len the lenght of the key
+ * @param key_len the length of the key
  * @param value the value belonging to the key
- * @param value_len the lenght of the value
- * @param n the posiition to query
+ * @param value_len the length of the value
+ * @param n the position to query
  * @return int the position of the next key value pair in the query or NULL
  */
 int oc_ri_get_query_nth_key_value(const char *query, size_t query_len,
@@ -535,10 +556,10 @@ int oc_ri_get_query_nth_key_value(const char *query, size_t query_len,
  * @brief retrieve the value of the query parameter "key"
  *
  * @param query the input query
- * @param query_len the query lenght
+ * @param query_len the query length
  * @param key the wanted key
  * @param value the returned value
- * @return int the lenght of the value
+ * @return int the length of the value
  */
 int oc_ri_get_query_value(const char *query, size_t query_len, const char *key,
                           char **value);
@@ -547,7 +568,7 @@ int oc_ri_get_query_value(const char *query, size_t query_len, const char *key,
  * @brief checks if key exist in query
  *
  * @param[in] query the query to inspect
- * @param[in] query_len the lenght of the query
+ * @param[in] query_len the length of the query
  * @param[in] key the key to be checked if exist, key is null terminated
  * @return int -1 = not exist
  */
@@ -557,7 +578,7 @@ int oc_ri_query_exists(const char *query, size_t query_len, const char *key);
  * @brief check if the nth key exists
  *
  * @param query the query to inspect
- * @param query_len the lenght of the query
+ * @param query_len the length of the query
  * @param key the key to be checked if exist, key is not null terminated
  * @param key_len the key length
  * @param n
@@ -570,7 +591,7 @@ int oc_ri_query_nth_key_exists(const char *query, size_t query_len, char **key,
  * @brief retrieve the interface mask from the interface name
  *
  * @param iface the interface (e.g. "if=oic.if.s")
- * @param if_len the interface lenght
+ * @param if_len the interface length
  * @return oc_interface_mask_t the mask value of the interface
  */
 oc_interface_mask_t oc_ri_get_interface_mask(char *iface, size_t if_len);
@@ -578,7 +599,7 @@ oc_interface_mask_t oc_ri_get_interface_mask(char *iface, size_t if_len);
 /**
  * @brief checks if the resource is valid
  *
- * @param resource resource to be tested
+ * @param resource The resource to be tested
  * @return true valid
  * @return false not valid
  */
