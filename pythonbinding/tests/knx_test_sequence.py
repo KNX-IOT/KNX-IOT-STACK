@@ -646,7 +646,6 @@ def do_auth_at(my_stack):
     lf = knx_stack.LinkFormat(response.payload)
     print(" lines:", lf.get_nr_lines())
     my_stack.purge_response(response)
-    
     # DTLS
     #Req : Content-Format: "application/cbor"
     #Payload:
@@ -675,7 +674,7 @@ def do_auth_at(my_stack):
     #"id": "<kid>",                  (6)
     #"ms": "ca5….4dd43e4c"           (2)
     #}}}
-    
+    #
     #{
     #"0": "OC5BLLhkAG...",
     #"2": "<asn-system-id.ldevid>",  ==> on level 8?
@@ -685,12 +684,13 @@ def do_auth_at(my_stack):
     # "9": ["if.sec"],
     # "19": "coap_dtls"
     #}
-    content = [ { 0: "my_509_token", 9 : ["if.a", "if.c", "if.sec"], 19: "coap_dtls", 8 : {3: "mykid", 2: "x509" } },
-                { 0: "my_oscore_token", 9 : ["if.a", "if.pm"], 19:"coap_oscore", 8 : { 4: { 6: "mykid", 2: "my_ms", 4:"AES-CCM-16-64-128" } } }
+    content = [ { 0: "my_509_token", 9 : ["if.a", "if.c", "if.sec"], 19: "coap_dtls", 
+                  8 : {3: "mykid", 2: "x509" } },
+                { 0: "my_oscore_token", 9 : ["if.a", "if.pm"], 19:"coap_oscore", 
+                  8 : { 4: { 6: "mykid", 2: "my_ms", 4:"AES-CCM-16-64-128" } } }
               ]
     response =  my_stack.issue_cbor_post(sn,"/auth/at",content)
     my_stack.purge_response(response)
-    
     response =  my_stack.issue_linkformat_get(sn, "/auth/at")
     print ("response:", response)
     lf = knx_stack.LinkFormat(response.payload)
@@ -706,9 +706,7 @@ def do_auth_at(my_stack):
         print ("response:",response3)
         print ("    value:", response3.get_payload_dict())
         my_stack.purge_response(response3)
-    
-    
-    
+
 def do_discovery_tests(my_stack):
     print("========discovery=========")
     # group address
