@@ -84,11 +84,11 @@ TEST_F(TestCoreResource, CoreDevice_P)
   oc_connectivity_shutdown(0);
 }
 
-TEST_F(TestCoreResource, CoreGetResource_P)
+TEST_F(TestCoreResource, CoreGetResource_Wellknown_core)
 {
   oc_core_init_platform(MANUFACTURER_NAME, NULL, NULL);
 
-  char uri[] = "/oic/p";
+  char uri[] = "/.well-known/core";
   oc_resource_t *res = oc_core_get_resource_by_uri(uri, 0);
 
   ASSERT_NE(res, NULL);
