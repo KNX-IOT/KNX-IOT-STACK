@@ -706,6 +706,21 @@ def do_auth_at(my_stack):
         print ("response:",response3)
         print ("    value:", response3.get_payload_dict())
         my_stack.purge_response(response3)
+    for line in lf.get_lines():
+        print(" ---------DELETE----------------")
+        print(" url :", lf.get_url(line))
+        response3 =  my_stack.issue_cbor_delete(sn, lf.get_url(line))
+        print ("response:",response3)
+        print ("    value:", response3.get_payload_dict())
+        my_stack.purge_response(response3)
+    print(" --------EMPTY-----------------")
+    response =  my_stack.issue_linkformat_get(sn, "/auth/at")
+    print ("response:", response)
+    lf = knx_stack.LinkFormat(response.payload)
+    print(" lines:", lf.get_nr_lines())
+    for line in lf.get_lines():
+        print(line)
+
 
 def do_discovery_tests(my_stack):
     print("========discovery=========")

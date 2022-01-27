@@ -224,7 +224,7 @@ oc_create_knx_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_resource\n");
   oc_core_lf_populate_resource(
-    resource_idx, device, "/.well-known/knx", OC_IF_LL | OC_IF_BASELINE,
+    resource_idx, device, "/.well-known/knx", OC_IF_LI ,
     APPLICATION_LINK_FORMAT, OC_DISCOVERABLE, oc_core_knx_get_handler, 0,
     oc_core_knx_post_handler, 0, 0, "");
 }
@@ -449,8 +449,8 @@ oc_create_knx_lsm_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_lsm_resource\n");
   // "/a/lsm"
-  oc_core_lf_populate_resource(resource_idx, device, "/a/lsm",
-                               OC_IF_LL | OC_IF_BASELINE, APPLICATION_CBOR,
+  oc_core_lf_populate_resource(resource_idx, device, "/a/lsm", OC_IF_LI,
+                               APPLICATION_CBOR,
                                OC_DISCOVERABLE, oc_core_knx_lsm_get_handler, 0,
                                oc_core_knx_lsm_post_handler, 0, 0, "");
 }
@@ -703,7 +703,7 @@ oc_create_knx_knx_resource(int resource_idx, size_t device)
   OC_DBG("oc_create_knx_knx_resource\n");
   // "/a/lsm"
   oc_core_lf_populate_resource(
-    resource_idx, device, "/.knx", OC_IF_LL | OC_IF_BASELINE, APPLICATION_CBOR,
+    resource_idx, device, "/.knx", OC_IF_LI, APPLICATION_CBOR,
     OC_DISCOVERABLE, oc_core_knx_knx_get_handler, 0,
     oc_core_knx_knx_post_handler, 0, 1, "urn:knx:g.s");
 }
@@ -735,7 +735,7 @@ oc_create_knx_fingerprint_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_fingerprint_resource\n");
   oc_core_lf_populate_resource(
-    resource_idx, device, "/.well-known/knx/f", OC_IF_LL, APPLICATION_CBOR,
+    resource_idx, device, "/.well-known/knx/f", OC_IF_LI, APPLICATION_CBOR,
     OC_DISCOVERABLE, oc_core_knx_fingerprint_get_handler, 0, 0, 0, 0, "");
 }
 
@@ -766,7 +766,7 @@ oc_create_knx_osn_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_osn_resource\n");
   oc_core_lf_populate_resource(resource_idx, device, "/.well-known/knx/osn",
-                               OC_IF_LL, APPLICATION_CBOR, OC_DISCOVERABLE,
+                               OC_IF_LI, APPLICATION_CBOR, OC_DISCOVERABLE,
                                oc_core_knx_osn_get_handler, 0, 0, 0, 0, "");
 }
 

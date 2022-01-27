@@ -278,8 +278,8 @@ oc_new_resource(const char *name, const char *uri, uint8_t num_resource_types,
 {
   oc_resource_t *resource = oc_ri_alloc_resource();
   if (resource) {
-    resource->interfaces = OC_IF_BASELINE;
-    resource->default_interface = OC_IF_BASELINE;
+    resource->interfaces = OC_IF_NONE;
+    resource->default_interface = OC_IF_NONE;
     resource->observe_period_seconds = 0;
     resource->num_observers = 0;
     oc_populate_resource_object(resource, name, uri, num_resource_types,

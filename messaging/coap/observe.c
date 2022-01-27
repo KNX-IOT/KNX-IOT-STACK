@@ -150,9 +150,8 @@ add_observer(oc_resource_t *resource, oc_endpoint_t *endpoint,
 static const char *
 get_iface_query(oc_interface_mask_t iface_mask)
 {
+  /*
   switch (iface_mask) {
-  case OC_IF_BASELINE:
-    return "if=oic.if.baseline";
   case OC_IF_LL:
     return "if=oic.if.ll";
   case OC_IF_B:
@@ -170,6 +169,7 @@ get_iface_query(oc_interface_mask_t iface_mask)
   default:
     break;
   }
+  */
   return NULL;
 }
 
@@ -405,15 +405,15 @@ coap_notify_observers(oc_resource_t *resource,
         obs = obs->next;
         continue;
       } // obs->resource != resource || endpoint != obs->endpoint
-      if (resource_is_collection && obs->iface_mask != OC_IF_BASELINE) {
-        obs = obs->next;
-        continue;
-      }
-      if (obs->iface_mask == OC_IF_STARTUP) {
-        OC_DBG("coap_notify_observers: Skipping startup established observe");
-        obs = obs->next;
-        continue;
-      }
+      //if (resource_is_collection && obs->iface_mask != OC_IF_BASELINE) {
+      //  obs = obs->next;
+      //  continue;
+      //}
+      //if (obs->iface_mask == OC_IF_STARTUP) {
+      //  OC_DBG("coap_notify_observers: Skipping startup established observe");
+      //  obs = obs->next;
+      //  continue;
+      //}
       if (response.separate_response != NULL) {
         coap_packet_t req[1];
 #ifdef OC_TCP
@@ -449,13 +449,13 @@ coap_notify_observers(oc_resource_t *resource,
           coap_packet_t notification[1];
           bool is_revert = false;
           uint8_t status_code = CONTENT_2_05;
-          if (obs->iface_mask == OC_IF_STARTUP_REVERT) {
-            OC_DBG("coap_notify_observers: Setting Valid response for a REVERT "
-                   "notification");
-            status_code = VALID_2_03;
-            response_buf->code = VALID_2_03;
-            is_revert = !is_revert;
-          }
+          //if (obs->iface_mask == OC_IF_STARTUP_REVERT) {
+          //  OC_DBG("coap_notify_observers: Setting Valid response for a REVERT "
+          //         "notification");
+          //  status_code = VALID_2_03;
+          //  response_buf->code = VALID_2_03;
+          //  is_revert = !is_revert;
+          //}
 #ifdef OC_TCP
           if (obs->endpoint.flags & TCP) {
             coap_tcp_init_message(notification, status_code);
@@ -660,9 +660,9 @@ notify_resource_defaults_observer(oc_resource_t *resource,
       if (response_buf) {
         coap_packet_t notification[1];
         uint8_t status_code = CONTENT_2_05;
-        if (obs->iface_mask == OC_IF_STARTUP_REVERT) {
-          status_code = VALID_2_03;
-        }
+        //if (obs->iface_mask == OC_IF_STARTUP_REVERT) {
+        //  status_code = VALID_2_03;
+        //}
 #ifdef OC_TCP
         if (obs->endpoint.flags & TCP) {
           coap_tcp_init_message(notification, status_code);

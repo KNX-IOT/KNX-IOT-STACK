@@ -192,7 +192,7 @@ oc_create_knx_swu_maxdefer_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_swu_maxdefer_resource\n");
   oc_core_lf_populate_resource(
-    resource_idx, device, "/swu/maxdefer", OC_IF_LL, APPLICATION_CBOR,
+    resource_idx, device, "/swu/maxdefer", OC_IF_LI, APPLICATION_CBOR,
     OC_DISCOVERABLE, oc_knx_swu_maxdefer_get_handler,
     oc_knx_swu_maxdefer_put_handler, 0, 0, 1, "urn:knx:dpt.value1UCount");
 }
@@ -614,8 +614,8 @@ oc_create_knx_swu_pkgqurl_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_swu_pkgqurl_resource\n");
   oc_core_lf_populate_resource(
-    resource_idx, device, "/swu/pkgqurl", OC_IF_D | OC_IF_BASELINE, OC_IF_LL,
-    OC_DISCOVERABLE, oc_knx_swu_pkgqurl_get_handler,
+    resource_idx, device, "/swu/pkgqurl", OC_IF_D, OC_DISCOVERABLE,
+    APPLICATION_CBOR, oc_knx_swu_pkgqurl_get_handler,
     oc_knx_swu_pkgqurl_put_handler, 0, 0, 1, ":dpt.url");
 }
 
