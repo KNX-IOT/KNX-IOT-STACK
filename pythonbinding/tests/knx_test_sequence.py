@@ -649,13 +649,13 @@ def do_auth_at(my_stack):
     # DTLS
     #Req : Content-Format: "application/cbor"
     #Payload:
-    #[{ 
+    #[{
     #"accessToken": "BC6BLLhk56...",         (0)
     #"scope": ["<if.scope>"],                (9)
     #"ace_profile": "coap_dtls",              (19)
-    #"sub": {"dnsName": "<.inst1.local>"},   (2) 
+    #"sub": {"dnsName": "<.inst1.local>"},   (2)
     #"cnf": {                                 (8)
-    #"kty": "x509",                         
+    #"kty": "x509",
     #"kid": "<trust list [X.509]fingerprint>"  (2)
     #}}]
     #
@@ -684,9 +684,9 @@ def do_auth_at(my_stack):
     # "9": ["if.sec"],
     # "19": "coap_dtls"
     #}
-    content = [ { 0: "my_509_token", 9 : ["if.a", "if.c", "if.sec"], 19: "coap_dtls", 
+    content = [ { 0: "my_509_token", 9 : ["if.a", "if.c", "if.sec"], 19: "coap_dtls",
                   8 : {3: "mykid", 2: "x509" } },
-                { 0: "my_oscore_token", 9 : ["if.a", "if.pm"], 19:"coap_oscore", 
+                { 0: "my_oscore_token", 9 : ["if.a", "if.pm"], 19:"coap_oscore",
                   8 : { 4: { 6: "mykid", 2: "my_ms", 4:"AES-CCM-16-64-128" } } }
               ]
     response =  my_stack.issue_cbor_post(sn,"/auth/at",content)
