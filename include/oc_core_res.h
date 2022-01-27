@@ -127,17 +127,18 @@ oc_platform_info_t *oc_core_init_platform(const char *mfg_name,
  * @param data supplied user data
  * @return oc_device_info_t* the device information
  */
-oc_device_info_t *oc_core_add_new_device(const char *uri, const char *rt,
-                                         const char *name,
-                                         const char *spec_version,
-                                         const char *data_model_version,
-                                         oc_core_add_device_cb_t add_device_cb,
-                                         void *data);
+//oc_device_info_t *oc_core_add_new_device(const char *uri, const char *rt,
+//                                         const char *name,
+//                                         const char *spec_version,
+//                                         const char *data_model_version,
+//                                         oc_core_add_device_cb_t add_device_cb,
+//                                         void *data);
 
 oc_device_info_t *oc_core_add_device(const char *name, const char *version,
                                      const char *base, const char *serialnumber,
                                      oc_core_add_device_cb_t add_device_cb,
                                      void *data);
+
 /**
  * @brief set the firmware version
  *
