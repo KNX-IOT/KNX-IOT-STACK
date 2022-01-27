@@ -63,7 +63,7 @@ protected:
     }
     ASSERT_NE(NULL, ep);
     target_ep = ep;
-	PRINT("HEELOEEE"\n");
+	PRINT("HEELOEEE\n");
   }
 
   static void TearDownTestCase() { oc_main_shutdown(); }
