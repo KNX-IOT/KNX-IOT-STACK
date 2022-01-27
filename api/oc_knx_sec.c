@@ -1049,6 +1049,7 @@ method_allowed(oc_method_t method, oc_resource_t *resource)
 bool oc_knx_sec_check_acl(oc_method_t method, oc_resource_t *resource,
                      oc_endpoint_t *endpoint)
 {
+  (void)endpoint;
   bool return_value = false;
 
   // first check if the method is allowed on the resource
