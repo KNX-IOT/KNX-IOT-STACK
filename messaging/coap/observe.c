@@ -150,6 +150,7 @@ add_observer(oc_resource_t *resource, oc_endpoint_t *endpoint,
 static const char *
 get_iface_query(oc_interface_mask_t iface_mask)
 {
+  (void)iface_mask;
   /*
   switch (iface_mask) {
   case OC_IF_LL:
