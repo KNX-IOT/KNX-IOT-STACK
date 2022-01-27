@@ -35,8 +35,13 @@ uint8_t bytes_N[] = {
   0x60, 0x34, 0x80, 0x8c, 0xd5, 0x64, 0x49, 0x0b, 0x1e, 0x65, 0x6e, 0xdb, 0xe7
 };
 
-static int
-init_context(void)
+#define KNX_RNG_LEN (32)
+#define KNX_SALT_LEN (32)
+#define KNX_MIN_IT (1000)
+#define KNX_MAX_IT (100000)
+
+int
+oc_spake_init(void)
 {
   int ret;
   // initialize entropy and drbg contexts
@@ -50,15 +55,40 @@ init_context(void)
   return 0;
 }
 
-static int
-free_context(void)
+int
+oc_spake_free(void)
 {
   mbedtls_ctr_drbg_free(&ctr_drbg_ctx);
   mbedtls_entropy_free(&entropy_ctx);
   return 0;
 }
 
-int calculate_w0_w1(size_t len_pw, const uint8_t pw[], const uint8_t salt[32], int it, mbedtls_mpi *w0, mbedtls_mpi *w1)
+int
+oc_spake_gen_rnd(oc_string_t *rnd, oc_string_t *salt, int *it)
+{
+  unsigned int it_seed;
+  int ret;
+  oc_free_string(rnd);
+  oc_free_string(salt);
+
+  oc_alloc_string(rnd, KNX_RNG_LEN);
+  oc_alloc_string(salt, KNX_SALT_LEN);
+
+  MBEDTLS_MPI_CHK(
+    mbedtls_ctr_drbg_random(&ctr_drbg_ctx, rnd->ptr, KNX_RNG_LEN));
+  MBEDTLS_MPI_CHK(
+    mbedtls_ctr_drbg_random(&ctr_drbg_ctx, salt->ptr, KNX_SALT_LEN));
+  MBEDTLS_MPI_CHK(mbedtls_ctr_drbg_random(
+    &ctr_drbg_ctx, (unsigned char *)&it_seed, sizeof(it_seed)));
+
+  *it = it_seed % (KNX_MAX_IT - KNX_MIN_IT) + KNX_MIN_IT;
+cleanup:
+  return ret;
+}
+
+int
+oc_spake_calc_w0_w1(size_t len_pw, const uint8_t pw[], const uint8_t salt[32],
+                    int it, mbedtls_mpi *w0, mbedtls_mpi *w1)
 {
   int ret;
   mbedtls_md_context_t ctx;
@@ -76,15 +106,19 @@ int calculate_w0_w1(size_t len_pw, const uint8_t pw[], const uint8_t salt[32], i
   mbedtls_mpi_init(&w0s);
   mbedtls_mpi_init(&w1s);
 
-  MBEDTLS_MPI_CHK(mbedtls_md_setup(&ctx, mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), 1));
-  MBEDTLS_MPI_CHK(mbedtls_pkcs5_pbkdf2_hmac(&ctx, pw, len_pw, salt, 32, it, output_len, output));
+  MBEDTLS_MPI_CHK(
+    mbedtls_md_setup(&ctx, mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), 1));
+  MBEDTLS_MPI_CHK(mbedtls_pkcs5_pbkdf2_hmac(&ctx, pw, len_pw, salt, 32, it,
+                                            output_len, output));
 
   // extract w0s and w1s from the output
-  MBEDTLS_MPI_CHK(mbedtls_mpi_read_binary(&w0s, output, output_len/2));
-  MBEDTLS_MPI_CHK(mbedtls_mpi_read_binary(&w1s, output + output_len/2, output_len/2));
+  MBEDTLS_MPI_CHK(mbedtls_mpi_read_binary(&w0s, output, output_len / 2));
+  MBEDTLS_MPI_CHK(
+    mbedtls_mpi_read_binary(&w1s, output + output_len / 2, output_len / 2));
 
   // calculate w0 and w1
-  // the cofactor of P-256 is 1, so the order of the group is equal to the large prime p
+  // the cofactor of P-256 is 1, so the order of the group is equal to the large
+  // prime p
   MBEDTLS_MPI_CHK(mbedtls_ecp_group_load(&grp, MBEDTLS_ECP_DP_SECP256R1));
   MBEDTLS_MPI_CHK(mbedtls_mpi_mod_mpi(w0, &w0s, &grp.N));
   MBEDTLS_MPI_CHK(mbedtls_mpi_mod_mpi(w1, &w1s, &grp.N));
@@ -308,7 +342,7 @@ encode_mpi(mbedtls_mpi *mpi, uint8_t *buffer)
 }
 
 int
-validate_against_test_vector()
+oc_spake_test_vector()
 {
   // Test Vector values from Spake2+ draft.
   // Using third set, as we only have easy access to the server (e.g. device)
@@ -407,7 +441,7 @@ validate_against_test_vector()
   MBEDTLS_MPI_CHK(mbedtls_ecp_group_load(&grp, MBEDTLS_ECP_DP_SECP256R1));
 
   // initialize rng
-  init_context();
+  oc_spake_init();
 
   // =========================
   // Check that X = x*P + w0*M

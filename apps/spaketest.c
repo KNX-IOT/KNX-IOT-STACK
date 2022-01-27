@@ -3,5 +3,5 @@
 int
 main(void)
 {
-  return validate_against_test_vector();
+  return oc_spake_test_vector();
 }

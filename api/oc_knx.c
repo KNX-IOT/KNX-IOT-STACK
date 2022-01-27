@@ -23,6 +23,8 @@
 #include <stdio.h>
 #include "oc_rep.h" // should not be needed
 
+#include "oc_spake2plus.h"
+
 #define TAGS_AS_STRINGS
 
 #define LSM_STORE "LSM_STORE"
@@ -1028,19 +1030,30 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
   }
   // on rnd
   if (valid_request == SPAKE_RND) {
-    // return changed, frame rnd (15) & pbkdf2 (12 containing (16, 5))
-    // TODO: probably we need to calculate them...
+    // the password is necessary at this point, so add some functions
+    // to obtain the password from wherever it is stored (persistent storage?)
+    // For testing, use hardcoded password, or pass as CLI argument from app
+
+    oc_spake_gen_rnd(&g_pase.rnd, &g_pase.salt, &g_pase.it);
+
+    // TODO start calculation of handshake parameters here, while you wait the
+    // second message from the client
+
+    // The straightforward way we are doing for now is starting the calculation
+    // after the data is requested - should be fast enough
 
     oc_rep_begin_root_object();
     // rnd (15)
-    oc_rep_i_set_text_string(root, SPAKE_RND, oc_string(g_pase.rnd));
+    oc_rep_i_set_byte_string(root, SPAKE_RND, oc_cast(g_pase.rnd, uint8_t),
+                             oc_string_len(g_pase.rnd));
     // pbkdf2
     oc_rep_i_set_key(&root_map, SPAKE_PBKDF2);
     oc_rep_begin_object(&root_map, pbkdf2);
     // it 16
     oc_rep_i_set_int(pbkdf2, SPAKE_IT, g_pase.it);
     // salt 5
-    oc_rep_i_set_text_string(pbkdf2, SPAKE_SALT, oc_string(g_pase.salt));
+    oc_rep_i_set_byte_string(pbkdf2, SPAKE_SALT, oc_cast(g_pase.salt, uint8_t),
+                             oc_string_len(g_pase.salt));
     oc_rep_end_object(&root_map, pbkdf2);
     oc_rep_end_root_object();
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
@@ -1173,4 +1186,7 @@ oc_create_knx_resources(size_t device_index)
   oc_create_knx_idevid_resource(OC_KNX_IDEVID, device_index);
   oc_create_knx_spake_resource(OC_KNX_SPAKE, device_index);
   oc_create_knx_resource(OC_KNX, device_index);
+
+  // can fail if initialization of the RNG does not work
+  assert(oc_spake_init() == 0);
 }
