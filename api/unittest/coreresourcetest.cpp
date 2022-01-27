@@ -75,7 +75,7 @@ TEST_F(TestCoreResource, CoreDevice_P)
   //    ock_add_device(DEVICE_URI, DEVICE_TYPE, DEVICE_NAME,
   //                                       OCF_SPEC_VERSION,
   //                                       OCF_DATA_MODEL_VERSION, NULL, NULL);
-  int device  = ock_add_device("myhname", "1.0", "//", "000001", NULL, NULL);
+  ock_add_device("myhname", "1.0", "//", "000001", NULL, NULL);
 
   //ASSERT_NE(addcoredevice, NULL);
   numcoredevice = oc_core_get_num_devices();

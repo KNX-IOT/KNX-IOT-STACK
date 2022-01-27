@@ -201,13 +201,13 @@ TEST_F(TestOcRi, RIinterfacestring_P)
   interface = get_interface_string(OC_IF_D);
   EXPECT_STREQ("if.d", interface);
 
-  interface = get_interface_string(OC_IF_AC);
+  interface = get_interface_string(OC_IF_A);
   EXPECT_STREQ("if.a", interface);
 
-  interface = get_interface_string(OC_IF_SE);
+  interface = get_interface_string(OC_IF_S);
   EXPECT_STREQ("if.s", interface);
 
-  interface = get_interface_string(OC_IF_LIL);
+  interface = get_interface_string(OC_IF_LI);
   EXPECT_STREQ("if.ll", interface);
 
   interface = get_interface_string(OC_IF_BA);
