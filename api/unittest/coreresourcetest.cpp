@@ -87,6 +87,7 @@ TEST_F(TestCoreResource, CoreDevice_P)
 TEST_F(TestCoreResource, CoreGetResource_Wellknown_core)
 {
   oc_core_init_platform(MANUFACTURER_NAME, NULL, NULL);
+  ock_add_device("myhname", "1.0", "//", "000001", NULL, NULL);
 
   char uri[] = "/.well-known/core";
   oc_resource_t *res = oc_core_get_resource_by_uri(uri, 0);
