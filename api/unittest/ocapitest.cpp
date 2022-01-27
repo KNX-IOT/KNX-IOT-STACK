@@ -77,9 +77,10 @@ public:
   static int appInit(void)
   {
     int result = oc_init_platform(MANUFACTURER_NAME, NULL, NULL);
-    result |=
-      oc_add_device(DEVICE_URI, DEVICE_TYPE, DEVICE_NAME, OCF_SPEC_VERSION,
-                    OCF_DATA_MODEL_VERSION, NULL, NULL);
+    //result |=
+    //  oc_add_device(DEVICE_URI, DEVICE_TYPE, DEVICE_NAME, OCF_SPEC_VERSION,
+    //                OCF_DATA_MODEL_VERSION, NULL, NULL);
+    result |=ock_add_device("myhname", "1.0", "//", "000001", NULL, NULL);
     return result;
   }
 
