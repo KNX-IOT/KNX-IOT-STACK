@@ -1044,6 +1044,15 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     // to obtain the password from wherever it is stored (persistent storage?)
     // For testing, use hardcoded password, or pass as CLI argument from app
 
+    const char *password = oc_spake_get_password();
+    mbedtls_mpi w0;
+    mbedtls_mpi w1;
+    mbedtls_mpi_init(&w0);
+    mbedtls_mpi_init(&w1);
+
+    oc_spake_calc_w0_w1(password, oc_string_len(g_pase.salt),
+                        oc_cast(g_pase.salt, uint8_t), g_pase.it, &w0, &w1);
+
     oc_rep_begin_root_object();
     // pb (11)
     oc_rep_i_set_text_string(root, SPAKE_PB, oc_string(g_pase.pb));
