@@ -1008,33 +1008,10 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
   }
 
   PRINT("oc_core_knx_spake_post_handler valid_request: %d\n", valid_request);
-  // on ca
-  if (valid_request == SPAKE_CA) {
-    // check key confirmation!!! don't just send status changed!!!
-    oc_send_cbor_response(request, OC_STATUS_CHANGED);
-    return;
-  }
-  // on pa
-  if (valid_request == SPAKE_PA) {
-    // return changed, frame pb (11) & cb (13)
-    // TODO: probably we need to calculate them...
 
-    // the password is necessary at this point, so add some functions
-    // to obtain the password from wherever it is stored (persistent storage?)
-    // For testing, use hardcoded password, or pass as CLI argument from app
-
-    oc_rep_begin_root_object();
-    // pb (11)
-    oc_rep_i_set_text_string(root, SPAKE_PB, oc_string(g_pase.pb));
-    // cb (13)
-    oc_rep_i_set_text_string(root, SPAKE_CB, oc_string(g_pase.cb));
-    oc_rep_end_root_object();
-    oc_send_cbor_response(request, OC_STATUS_CHANGED);
-    return;
-  }
   // on rnd
   if (valid_request == SPAKE_RND) {
-    oc_spake_gen_rnd(&g_pase.rnd, &g_pase.salt, &g_pase.it);
+    oc_spake_parameter_exchange(&g_pase.rnd, &g_pase.salt, &g_pase.it);
 
     // TODO start calculation of handshake parameters here, while you wait the
     // second message from the client
@@ -1056,6 +1033,29 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
                              oc_string_len(g_pase.salt));
     oc_rep_end_object(&root_map, pbkdf2);
     oc_rep_end_root_object();
+    oc_send_cbor_response(request, OC_STATUS_CHANGED);
+    return;
+  }
+  // on pa
+  if (valid_request == SPAKE_PA) {
+    // return changed, frame pb (11) & cb (13)
+
+    // the password is necessary at this point, so add some functions
+    // to obtain the password from wherever it is stored (persistent storage?)
+    // For testing, use hardcoded password, or pass as CLI argument from app
+
+    oc_rep_begin_root_object();
+    // pb (11)
+    oc_rep_i_set_text_string(root, SPAKE_PB, oc_string(g_pase.pb));
+    // cb (13)
+    oc_rep_i_set_text_string(root, SPAKE_CB, oc_string(g_pase.cb));
+    oc_rep_end_root_object();
+    oc_send_cbor_response(request, OC_STATUS_CHANGED);
+    return;
+  }
+  // on ca
+  if (valid_request == SPAKE_CA) {
+    // check key confirmation!!! don't just send status changed!!!
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
     return;
   }

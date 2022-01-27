@@ -35,6 +35,8 @@ uint8_t bytes_N[] = {
   0x60, 0x34, 0x80, 0x8c, 0xd5, 0x64, 0x49, 0x0b, 0x1e, 0x65, 0x6e, 0xdb, 0xe7
 };
 
+static char password[33];
+
 #define KNX_RNG_LEN (32)
 #define KNX_SALT_LEN (32)
 #define KNX_MIN_IT (1000)
@@ -63,8 +65,18 @@ oc_spake_free(void)
   return 0;
 }
 
+const char *oc_spake_get_password()
+{
+  return password;
+}
+
+void oc_spake_set_password(char* new_pass)
+{
+  strncpy(password, new_pass, sizeof(password));
+}
+
 int
-oc_spake_gen_rnd(oc_string_t *rnd, oc_string_t *salt, int *it)
+oc_spake_parameter_exchange(oc_string_t *rnd, oc_string_t *salt, int *it)
 {
   unsigned int it_seed;
   int ret;
