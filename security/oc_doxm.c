@@ -215,8 +215,8 @@ get_doxm(oc_request_t *request, oc_interface_mask_t iface_mask, void *data)
 {
   (void)data;
   switch (iface_mask) {
-  case OC_IF_RW:
-  case OC_IF_BASELINE: {
+  //case OC_IF_NONE:
+  case OC_IF_NONE: {
     char *q;
     int ql = oc_get_query_value(request, "owned", &q);
     size_t device = request->resource->device;
