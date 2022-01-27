@@ -311,8 +311,6 @@ oc_get_interface_in_mask_in_string_array(oc_interface_mask_t iface_mask,
 bool oc_if_method_allowed_according_to_mask(oc_interface_mask_t iface_mask,
                                        oc_method_t method)
 {
-  bool method_allowed = false;
-
   if (iface_mask & OC_IF_I) {
     // logical input
     if (method == OC_POST)
@@ -411,7 +409,7 @@ bool oc_if_method_allowed_according_to_mask(oc_interface_mask_t iface_mask,
       return true;
   }
   if (iface_mask & OC_IF_M) {
-    // manufactorer
+    // manufacturer
     return true;
   }
 
@@ -870,17 +868,17 @@ oc_observe_notification_delayed(void *data)
 }
 #endif
 
-#ifdef OC_SERVER
-static oc_event_callback_retval_t
-oc_observe_notification_resource_defaults_delayed(void *data)
-{
-  oc_resource_defaults_data_t *resource_defaults_data =
-    (oc_resource_defaults_data_t *)data;
-  notify_resource_defaults_observer(resource_defaults_data->resource,
-                                    resource_defaults_data->iface_mask, NULL);
-  return OC_EVENT_DONE;
-}
-#endif
+//#ifdef OC_SERVER
+//static oc_event_callback_retval_t
+//oc_observe_notification_resource_defaults_delayed(void *data)
+//{
+//  oc_resource_defaults_data_t *resource_defaults_data =
+//    (oc_resource_defaults_data_t *)data;
+//  notify_resource_defaults_observer(resource_defaults_data->resource,
+//                                    resource_defaults_data->iface_mask, NULL);
+//  return OC_EVENT_DONE;
+//}
+//#endif
 
 #ifdef OC_SERVER
 static oc_event_callback_retval_t
@@ -1015,6 +1013,7 @@ static bool
 does_interface_support_method(oc_interface_mask_t iface_mask,
                               oc_method_t method)
 {
+  (void)method;
   bool supported = true;
   switch (iface_mask) {
   /* Per section 7.5.3 of the OCF Core spec, the following three interfaces
@@ -1046,6 +1045,7 @@ does_interface_support_method(oc_interface_mask_t iface_mask,
   case OC_IF_SEC:
   case OC_IF_SWU:
   case OC_IF_PM:
+  case OC_IF_M:
   case OC_IF_NONE:
     break;
   }

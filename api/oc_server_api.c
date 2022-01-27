@@ -31,16 +31,16 @@
 
 static size_t query_iterator;
 
-int
-oc_add_device(const char *uri, const char *rt, const char *name,
-              const char *spec_version, const char *data_model_version,
-              oc_add_device_cb_t add_device_cb, void *data)
-{
-  if (!oc_core_add_new_device(uri, rt, name, spec_version, data_model_version,
-                              add_device_cb, data))
-    return -1;
-  return 0;
-}
+//int
+//oc_add_device(const char *uri, const char *rt, const char *name,
+//              const char *spec_version, const char *data_model_version,
+//              oc_add_device_cb_t add_device_cb, void *data)
+//{
+//  if (!oc_core_add_new_device(uri, rt, name, spec_version, data_model_version,
+//                              add_device_cb, data))
+//    return -1;
+//  return 0;
+//}
 
 int
 ock_add_device(const char *name, const char *version, const char *base,
