@@ -356,7 +356,7 @@ coap_notify_observers(oc_resource_t *resource,
   }
 #endif /* OC_SECURITY */
 
-  bool resource_is_collection = false;
+  //bool resource_is_collection = false;
   coap_observer_t *obs = NULL;
   if (resource->num_observers > 0) {
 #ifdef OC_BLOCK_WISE
