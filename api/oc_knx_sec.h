@@ -33,7 +33,6 @@ typedef enum {
   OC_PROFILE_COAP_DTLS    /**< 2coap_dtls" */
 } oc_at_profile_t;
 
-
 oc_at_profile_t oc_string_to_at_profile(oc_string_t str);
 char *oc_at_profile_to_string(oc_at_profile_t at_profile);
 
@@ -95,15 +94,15 @@ char *oc_at_profile_to_string(oc_at_profile_t at_profile);
  */
 typedef struct oc_auth_at_t
 {
-  oc_string_t id;                 //!< (0) token id
-  oc_interface_mask_t interface;  //!< (9) the interfaces
-  oc_at_profile_t profile;        //!< (19) "coap_oscore" or "coap_dtls"
-  oc_string_t dnsname; //!< dtls 2:x sub::dnsname 
-  oc_string_t kty;     //!< dtls 8:x cnf:kty
-  oc_string_t kid;     //!< dtls 8:2 cnf:kid
-  oc_string_t osc_id;  //!< oscore cnf::osc::kid 
-  oc_string_t osc_ms;  //!< oscore cnf::osc:ms 4
-  oc_string_t osc_alg; //!< oscore cnf::osc:alg
+  oc_string_t id;                //!< (0) token id
+  oc_interface_mask_t interface; //!< (9) the interfaces
+  oc_at_profile_t profile;       //!< (19) "coap_oscore" or "coap_dtls"
+  oc_string_t dnsname;           //!< dtls 2:x sub::dnsname
+  oc_string_t kty;               //!< dtls 8:x cnf:kty
+  oc_string_t kid;               //!< dtls 8:2 cnf:kid
+  oc_string_t osc_id;            //!< oscore cnf::osc::kid
+  oc_string_t osc_ms;            //!< oscore cnf::osc:ms 4
+  oc_string_t osc_alg;           //!< oscore cnf::osc:alg
 
   int *ga;    ///< array of integers, for the group objects in the interface
   int ga_len; //< length of the array of ga identifiers

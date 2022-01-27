@@ -25,13 +25,12 @@ uint64_t g_oscore_osndelay = 0;
 
 /** the list of connections */
 //#define G_OCM_MAX_ENTRIES 20
-//oc_oscore_cm_t g_ocm[G_OCM_MAX_ENTRIES];
+// oc_oscore_cm_t g_ocm[G_OCM_MAX_ENTRIES];
 
 /** the list of oscore profiles */
 #define AT_STORE "at_store"
 #define G_AT_MAX_ENTRIES 20
 oc_auth_at_t g_at_entries[G_AT_MAX_ENTRIES];
-
 
 // ----------------------------------------------------------------------------
 
@@ -365,8 +364,7 @@ find_access_token_from_payload(oc_rep_t *object)
     case OC_REP_BYTE_STRING: {
       if (oc_string_len(object->name) == 0 && object->iname == 0) {
         index = &object->value.string;
-        PRINT(" find_access_token_from_payload: %s \n",
-              oc_string(*index));
+        PRINT(" find_access_token_from_payload: %s \n", oc_string(*index));
         return index;
       }
     } break;
@@ -473,23 +471,21 @@ oc_core_auth_at_post_handler(oc_request_t *request,
       }
       PRINT("  storage index: %d (%s)\n", index, oc_string(*at));
       oc_free_string(&(g_at_entries[index].id));
-      oc_new_string(&g_at_entries[index].id,
-                    oc_string(*at),
+      oc_new_string(&g_at_entries[index].id, oc_string(*at),
                     oc_string_len(*at));
-      
+
       object = rep->value.object;
       while (object != NULL) {
         if (object->type == OC_REP_STRING_ARRAY) {
-          // scope 
+          // scope
           if (object->iname == 9) {
             // scope: e.g. list of interfaces
             oc_string_array_t str_array;
             size_t str_array_size = 0;
             oc_interface_mask_t interfaces = OC_IF_NONE;
-              oc_rep_i_get_string_array(object, 9, &str_array,
-                                        &str_array_size);
+            oc_rep_i_get_string_array(object, 9, &str_array, &str_array_size);
             for (size_t i = 0; i < str_array_size; i++) {
-              char* if_str = oc_string_array_get_item(str_array, i);
+              char *if_str = oc_string_array_get_item(str_array, i);
               int if_mask = oc_ri_get_interface_mask(if_str, strlen(if_str));
               interfaces = interfaces + if_mask;
             }
@@ -511,8 +507,9 @@ oc_core_auth_at_post_handler(oc_request_t *request,
               if (subobject->iname == 2 && subobject_nr == 2) {
                 // sub::dnsname :: 2:x?
                 oc_free_string(&(g_at_entries[index].dnsname));
-                oc_new_string(&g_at_entries[index].dnsname, oc_string(subobject->value.string),
-                                oc_string_len(subobject->value.string));
+                oc_new_string(&g_at_entries[index].dnsname,
+                              oc_string(subobject->value.string),
+                              oc_string_len(subobject->value.string));
               }
               if (subobject->iname == 3 && subobject_nr == 8) {
                 // cnf::kty 8::2
@@ -520,7 +517,7 @@ oc_core_auth_at_post_handler(oc_request_t *request,
                 oc_new_string(&g_at_entries[index].kty,
                               oc_string(subobject->value.string),
                               oc_string_len(subobject->value.string));
-              } 
+              }
               if (subobject->iname == 3 && subobject_nr == 8) {
                 // cnf::kid (8::3)
                 oc_free_string(&(g_at_entries[index].kid));
@@ -532,7 +529,7 @@ oc_core_auth_at_post_handler(oc_request_t *request,
               oscobject = subobject->value.object;
               int oscobject_nr = subobject->iname;
 
-              //PRINT("  oscobject_nr %d\n", oscobject_nr);
+              // PRINT("  oscobject_nr %d\n", oscobject_nr);
               while (oscobject) {
                 if (oscobject->type == OC_REP_STRING) {
                   if (oscobject->iname == 2 && subobject_nr == 8 &&
@@ -545,7 +542,7 @@ oc_core_auth_at_post_handler(oc_request_t *request,
                   }
                   if (oscobject->iname == 4 && subobject_nr == 8 &&
                       oscobject_nr == 4) {
-                    // cnf::osc::alg 
+                    // cnf::osc::alg
                     oc_free_string(&(g_at_entries[index].osc_alg));
                     oc_new_string(&g_at_entries[index].osc_alg,
                                   oc_string(oscobject->value.string),
@@ -565,10 +562,10 @@ oc_core_auth_at_post_handler(oc_request_t *request,
             }
             subobject = subobject->next;
           }
-        } 
+        }
         object = object->next;
-      }  // while (inner object)
-    } // if type == object
+      } // while (inner object)
+    }   // if type == object
     // show the entry on screen
     oc_at_entry_print(index);
     // dump the entry to persistent storage
@@ -630,13 +627,14 @@ oc_core_auth_at_x_get_handler(oc_request_t *request,
   // return the data
   oc_rep_begin_root_object();
   oc_rep_i_set_text_string(root, 0, oc_string(g_at_entries[index].id));
-  oc_rep_i_set_text_string(root, 19, oc_at_profile_to_string(g_at_entries[index].profile));
+  oc_rep_i_set_text_string(
+    root, 19, oc_at_profile_to_string(g_at_entries[index].profile));
   // the cflags
   int nr_entries = oc_total_interface_in_mask(g_at_entries[index].interface);
   oc_string_array_t cflags_entries;
   oc_new_string_array(&cflags_entries, (size_t)nr_entries);
-  int framed = oc_get_interface_in_mask_in_string_array(g_at_entries[index].interface,
-                                           nr_entries, cflags_entries);
+  int framed = oc_get_interface_in_mask_in_string_array(
+    g_at_entries[index].interface, nr_entries, cflags_entries);
   PRINT("  entries in cflags %d framed: %d \n", nr_entries, framed);
   oc_rep_i_set_string_array(root, 9, cflags_entries);
   oc_free_string_array(&cflags_entries);
@@ -656,13 +654,15 @@ oc_core_auth_at_x_get_handler(oc_request_t *request,
     cbor_encoder_create_map(&cnf_map, &osc_map, CborIndefiniteLength);
     if (oc_string_len(g_at_entries[index].osc_ms) > 0) {
       oc_rep_i_set_text_string(
-         osc, 2, oc_string(g_at_entries[index].osc_ms)); // root::cnf::osc::ms
+        osc, 2, oc_string(g_at_entries[index].osc_ms)); // root::cnf::osc::ms
     }
     if (oc_string_len(g_at_entries[index].osc_alg) > 0) {
-       oc_rep_i_set_text_string(osc, 4, oc_string(g_at_entries[index].osc_alg)); //root::cnf::osc::alg
+      oc_rep_i_set_text_string(
+        osc, 4, oc_string(g_at_entries[index].osc_alg)); // root::cnf::osc::alg
     }
     if (oc_string_len(g_at_entries[index].osc_id) > 0) {
-      oc_rep_i_set_text_string(osc, 6, oc_string(g_at_entries[index].osc_id));  //root::cnf::osc::id
+      oc_rep_i_set_text_string(
+        osc, 6, oc_string(g_at_entries[index].osc_id)); // root::cnf::osc::id
     }
     cbor_encoder_close_container_checked(&cnf_map, &osc_map);
     cbor_encoder_close_container_checked(&root_map, &cnf_map);
@@ -846,17 +846,16 @@ oc_at_delete_entry(int index)
   oc_free_string(&g_at_entries[index].id);
   oc_new_string(&g_at_entries[index].id, "", 0);
   g_at_entries[index].interface = OC_IF_NONE;
-  //oscore 
+  // oscore
   oc_free_string(&g_at_entries[index].osc_alg);
   oc_new_string(&g_at_entries[index].osc_alg, "", 0);
   oc_free_string(&g_at_entries[index].osc_id);
   oc_new_string(&g_at_entries[index].osc_id, "", 0);
   oc_free_string(&g_at_entries[index].osc_ms);
   oc_new_string(&g_at_entries[index].osc_ms, "", 0);
-  // dtls 
+  // dtls
   oc_free_string(&g_at_entries[index].dnsname);
   oc_new_string(&g_at_entries[index].dnsname, "", 0);
-  
 }
 
 static void
@@ -890,8 +889,8 @@ oc_at_dump_entry(int entry)
            filename, entry, size);
     long written_size = oc_storage_write(filename, buf, size);
     if (written_size != (long)size) {
-      PRINT("oc_at_dump_entry: written %d != %d (towrite)\n",
-            (int)written_size, size);
+      PRINT("oc_at_dump_entry: written %d != %d (towrite)\n", (int)written_size,
+            size);
     }
   }
   free(buf);
@@ -929,8 +928,7 @@ oc_at_load_entry(int entry)
         case OC_REP_STRING:
           if (rep->iname == 0) {
             oc_free_string(&g_at_entries[entry].id);
-            oc_new_string(&g_at_entries[entry].id,
-                          oc_string(rep->value.string),
+            oc_new_string(&g_at_entries[entry].id, oc_string(rep->value.string),
                           oc_string_len(rep->value.string));
           }
           if (rep->iname == 842) {
@@ -1004,7 +1002,6 @@ oc_delete_at_table()
     oc_at_dump_entry(i);
   }
 }
-
 
 // ----------------------------------------------------------------------------
 

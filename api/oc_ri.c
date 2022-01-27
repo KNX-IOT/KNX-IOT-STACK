@@ -197,8 +197,6 @@ get_interface_string(oc_interface_mask_t mask)
   return "";
 }
 
-
-
 int
 oc_total_interface_in_mask(oc_interface_mask_t iface_mask)
 {
@@ -247,13 +245,12 @@ oc_total_interface_in_mask(oc_interface_mask_t iface_mask)
   return total_masks;
 }
 
-
 int
 oc_get_interface_in_mask_in_string_array(oc_interface_mask_t iface_mask,
                                          int nr_entries,
                                          oc_string_array_t interface_array)
 {
-  (void)nr_entries; 
+  (void)nr_entries;
 
   int total_masks = 0;
   if (iface_mask & OC_IF_I) {
@@ -309,9 +306,6 @@ oc_get_interface_in_mask_in_string_array(oc_interface_mask_t iface_mask,
   }
   return total_masks;
 }
-
-
-
 
 #ifdef OC_SERVER
 oc_resource_t *
