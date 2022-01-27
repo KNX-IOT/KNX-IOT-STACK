@@ -682,7 +682,7 @@ oc_sec_encode_roles(oc_tls_peer_t *client, size_t device,
 {
   oc_sec_cred_t *cr = oc_sec_get_roles(client);
   oc_rep_start_root_object();
-  if (iface_mask & OC_IF_BASELINE) {
+  if (iface_mask & OC_IF_NONE) {
     oc_process_baseline_interface(
       oc_core_get_resource_by_index(OCF_SEC_ROLES, device));
   }
@@ -731,7 +731,7 @@ oc_sec_encode_cred(bool persist, size_t device, oc_interface_mask_t iface_mask,
   oc_sec_cred_t *cr = oc_list_head(devices[device].creds);
   char uuid[OC_UUID_LEN];
   oc_rep_start_root_object();
-  if (to_storage || iface_mask & OC_IF_BASELINE) {
+  if (to_storage || iface_mask & OC_IF_NONE) {
     oc_process_baseline_interface(
       oc_core_get_resource_by_index(OCF_SEC_CRED, device));
   }
