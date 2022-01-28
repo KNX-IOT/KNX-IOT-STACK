@@ -293,16 +293,15 @@ find_empty_slot_in_group_object_table(int id)
 {
   int index = -1;
   if (id < 0) {
-    // should be a positive number
+    /* should be a positive number */
     return index;
   }
   index = oc_core_find_index_in_group_object_table_from_id(id);
   if (index > -1) {
-    // overwrite existing index
+    /* overwrite existing index */
     return index;
   }
-
-  // empty slot
+  /* empty slot */
   for (int i = 0; i < GOT_MAX_ENTRIES; i++) {
     if (g_got[i].ga_len == 0) {
       return i;
@@ -369,7 +368,7 @@ oc_core_find_group_object_table_url_from_index(int index)
   // return oc_string_t();
 }
 
-int
+oc_cflag_mask_t
 oc_core_group_object_table_cflag_entries(int index)
 {
   if (index < GOT_MAX_ENTRIES) {
@@ -1499,7 +1498,7 @@ oc_core_get_recipient_index_url_or_path(int index)
 // -----------------------------------------------------------------------------
 
 void
-print_cflags(oc_cflag_mask_t cflags)
+oc_print_cflags(oc_cflag_mask_t cflags)
 {
 
   if (cflags & OC_CFLAG_READ) {
@@ -1531,7 +1530,7 @@ oc_print_group_object_table_entry(int entry)
   PRINT("    id %d\n", g_got[entry].id);
   PRINT("    href  %s\n", oc_string(g_got[entry].href));
   PRINT("    cflags  %d ", g_got[entry].cflags);
-  print_cflags(g_got[entry].cflags);
+  oc_print_cflags(g_got[entry].cflags);
   PRINT("    ga [");
   for (int i = 0; i < g_got[entry].ga_len; i++) {
     PRINT(" %d", g_got[entry].ga[i]);

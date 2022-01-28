@@ -31,15 +31,17 @@ extern "C" {
  */
 typedef enum {
   OC_CFLAG_NONE = 0, ///< Communication
-  OC_CFLAG_COMMUNICATION = 1
-                           << 2, ///< false = Group Object value cannot be read.
-  OC_CFLAG_READ = 1 << 3,        ///< false = Group Object value cannot be read.
+  OC_CFLAG_COMMUNICATION =
+    1 << 2,                ///< false = Group Object value cannot read or writen
+  OC_CFLAG_READ = 1 << 3,  ///< false = Group Object value cannot be read.
   OC_CFLAG_WRITE = 1 << 4, ///< false = Group Object value cannot be written
   OC_CFLAG_INIT = 1 << 5,  ///< false = Disable read after initialization.
   OC_CFLAG_TRANSMISSION =
     1 << 6,                 ///< false = Group Object value is not transmitted.
   OC_CFLAG_UPDATE = 1 << 7, ///< false = Group Object value is not updated.
 } oc_cflag_mask_t;
+
+void oc_print_cflags(oc_cflag_mask_t cflags);
 
 /**
  * @brief Group Object Table Resource (/fp/g)
@@ -189,7 +191,7 @@ int oc_core_find_group_object_table_url(char *url);
  */
 int oc_core_find_next_group_object_table_url(char *url, int cur_index);
 
-int oc_core_group_object_table_cflag_entries(int index);
+oc_cflag_mask_t oc_core_group_object_table_cflag_entries(int index);
 
 /**
  * @brief find the url (of the resource) that in the group object table entry.
