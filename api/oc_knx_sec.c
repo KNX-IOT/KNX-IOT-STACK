@@ -1068,9 +1068,142 @@ oc_create_knx_sec_resources(size_t device_index)
 
 // ----------------------------------------------------------------------------
 
+bool
+oc_is_resource_secure(oc_method_t method, oc_resource_t *resource)
+{
+  if (method == OC_GET &&
+      ((oc_string_len(resource->uri) == 17 &&
+        memcmp(oc_string(resource->uri), "/.well-known/core", 17) == 0) ||
+       (oc_string_len(resource->uri) == 16 &&
+        memcmp(oc_string(resource->uri), "/.well-known/knx", 16) == 0))) {
+    return false;
+  }
+  // note check this
+  if (method == OC_POST &&
+      ((oc_string_len(resource->uri) == 16 &&
+        memcmp(oc_string(resource->uri), "/.well-known/knx", 16) == 0))) {
+    return false;
+  }
+
+  return true;
+}
+
+bool
+oc_if_method_allowed_according_to_mask(oc_interface_mask_t iface_mask,
+                                       oc_method_t method)
+{
+  if (iface_mask & OC_IF_I) {
+    // logical input
+    if (method == OC_POST)
+      return true;
+    if (method == OC_PUT)
+      return true;
+  }
+  if (iface_mask & OC_IF_O) {
+    // Logical Output
+    if (method == OC_GET)
+      return true;
+    if (method == OC_POST)
+      return true;
+  }
+  if (iface_mask & OC_IF_G) {
+    // Group Address
+    if (method == OC_POST)
+      return true;
+  }
+  if (iface_mask & OC_IF_C) {
+    // configuration
+    if (method == OC_GET)
+      return true;
+    if (method == OC_POST)
+      return true;
+    if (method == OC_PUT)
+      return true;
+    if (method == OC_DELETE)
+      return true;
+  }
+  if (iface_mask & OC_IF_P) {
+    // parameter
+    if (method == OC_GET)
+      return true;
+    if (method == OC_PUT)
+      return true;
+  }
+  if (iface_mask & OC_IF_D) {
+    // diagnostic
+    if (method == OC_GET)
+      return true;
+  }
+  if (iface_mask & OC_IF_A) {
+    // actuator
+    if (method == OC_GET)
+      return true;
+    if (method == OC_PUT)
+      return true;
+    if (method == OC_POST)
+      return true;
+  }
+  if (iface_mask & OC_IF_S) {
+    // sensor
+    if (method == OC_GET)
+      return true;
+  }
+  if (iface_mask & OC_IF_LI) {
+    // link list
+    if (method == OC_GET)
+      return true;
+  }
+  if (iface_mask & OC_IF_B) {
+    // batch
+    if (method == OC_GET)
+      return true;
+    if (method == OC_PUT)
+      return true;
+    if (method == OC_POST)
+      return true;
+  }
+  if (iface_mask & OC_IF_SEC) {
+    // security
+    if (method == OC_GET)
+      return true;
+    if (method == OC_PUT)
+      return true;
+    if (method == OC_POST)
+      return true;
+    if (method == OC_DELETE)
+      return true;
+  }
+  if (iface_mask & OC_IF_SWU) {
+    // software update
+    if (method == OC_GET)
+      return true;
+    if (method == OC_PUT)
+      return true;
+    if (method == OC_POST)
+      return true;
+    if (method == OC_DELETE)
+      return true;
+  }
+  if (iface_mask & OC_IF_PM) {
+    // programming mode
+    if (method == OC_GET)
+      return true;
+  }
+  if (iface_mask & OC_IF_M) {
+    // manufacturer
+    return true;
+  }
+
+  return false;
+}
+
 static bool
 method_allowed(oc_method_t method, oc_resource_t *resource)
 {
+  if (oc_is_resource_secure(method, resource) == false) {
+    return true;
+  }
+
   return oc_if_method_allowed_according_to_mask(resource->interfaces, method);
 }
 
@@ -1079,13 +1212,13 @@ oc_knx_sec_check_acl(oc_method_t method, oc_resource_t *resource,
                      oc_endpoint_t *endpoint)
 {
   (void)endpoint;
-  bool return_value = false;
 
   // first check if the method is allowed on the resource
-  if (method_allowed(method, resource) == false) {
-    PRINT("oc_knx_sec_check_acl: method not allowed\n");
-    return false;
+  if (method_allowed(method, resource) == true) {
+    return true;
   }
+  PRINT("oc_knx_sec_check_acl: method %s NOT allowed on %s\n",
+        get_method_name(method), oc_string(resource->uri));
 
-  return return_value;
+  return false;
 }

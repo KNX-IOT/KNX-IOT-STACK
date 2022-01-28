@@ -210,7 +210,7 @@ TEST_F(TestOcRi, RIinterfacestring_P)
   interface = get_interface_string(OC_IF_LI);
   EXPECT_STREQ("if.ll", interface);
 
-  interface = get_interface_string(OC_IF_BA);
+  interface = get_interface_string(OC_IF_B);
   EXPECT_STREQ("if.b", interface);
 
   interface = get_interface_string(OC_IF_SEC);

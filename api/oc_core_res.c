@@ -153,7 +153,7 @@ oc_core_encode_interfaces_mask(CborEncoder *parent,
   if (iface_mask & OC_IF_LI) {
     oc_rep_add_text_string(if, "if.ll");
   }
-  if (iface_mask & OC_IF_BA) {
+  if (iface_mask & OC_IF_B) {
     oc_rep_add_text_string(if, "if.b");
   }
   if (iface_mask & OC_IF_SEC) {
@@ -211,7 +211,7 @@ oc_frame_interfaces_mask_in_response(oc_interface_mask_t iface_mask)
     oc_rep_encode_raw((uint8_t *)"if.ll", 5);
     total_size += 5;
   }
-  if (iface_mask & OC_IF_BA) {
+  if (iface_mask & OC_IF_B) {
     oc_rep_encode_raw((uint8_t *)"if.b", 4);
     total_size += 4;
   }

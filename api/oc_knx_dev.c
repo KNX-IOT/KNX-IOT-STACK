@@ -341,7 +341,7 @@ oc_create_dev_ia_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_dev_ia_resource\n");
   oc_core_lf_populate_resource(
-    resource_idx, device, "/dev/ia", OC_IF_D, APPLICATION_CBOR, OC_DISCOVERABLE,
+    resource_idx, device, "/dev/ia", OC_IF_P, APPLICATION_CBOR, OC_DISCOVERABLE,
     oc_core_dev_ia_get_handler, oc_core_dev_ia_put_handler, 0, 0, 1,
     ":dpt.value2Ucount");
 }
@@ -415,7 +415,7 @@ oc_create_dev_hostname_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_dev_hostname_resource\n");
   oc_core_lf_populate_resource(
-    resource_idx, device, "/dev/hostname", OC_IF_D, APPLICATION_CBOR,
+    resource_idx, device, "/dev/hame", OC_IF_P, APPLICATION_CBOR,
     OC_DISCOVERABLE, oc_core_dev_hostname_get_handler,
     oc_core_dev_hostname_put_handler, 0, 0, 1, ":dpt.varString8859_1");
 }
@@ -488,7 +488,7 @@ oc_create_dev_iid_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_dev_iid_resource\n");
   oc_core_lf_populate_resource(
-    resource_idx, device, "/dev/iid", OC_IF_D, APPLICATION_CBOR,
+    resource_idx, device, "/dev/iid", OC_IF_P, APPLICATION_CBOR,
     OC_DISCOVERABLE, oc_core_dev_iid_get_handler, oc_core_dev_iid_put_handler,
     0, 0, 1, ":dpt.value4Ucount ");
 }
@@ -556,7 +556,7 @@ oc_create_dev_pm_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_dev_pm_resource\n");
   oc_core_lf_populate_resource(
-    resource_idx, device, "/dev/pm", OC_IF_D, APPLICATION_CBOR, OC_DISCOVERABLE,
+    resource_idx, device, "/dev/pm", OC_IF_P, APPLICATION_CBOR, OC_DISCOVERABLE,
     oc_core_dev_pm_get_handler, oc_core_dev_pm_put_handler, 0, 0, 2,
     ":dpa.0.54", "dpa.binaryValue");
 }
@@ -607,7 +607,7 @@ oc_create_dev_dev_resource(int resource_idx, size_t device)
   // note that this resource is listed in /.well-known/core so it should have
   // the full rt with urn:knx prefix
   oc_core_lf_populate_resource(
-    resource_idx, device, "/dev", OC_IF_NONE, APPLICATION_LINK_FORMAT, 0,
+    resource_idx, device, "/dev", OC_IF_LI, APPLICATION_LINK_FORMAT, 0,
     oc_core_dev_dev_get_handler, 0, 0, 0, 1, "urn:knx:fb.0");
 }
 
