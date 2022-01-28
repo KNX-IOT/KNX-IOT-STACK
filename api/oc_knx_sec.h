@@ -171,7 +171,6 @@ uint64_t oc_oscore_get_osndelay();
  */
 void oc_create_knx_sec_resources(size_t device);
 
-
 /**
  * @brief is the method allowed according to the interface mask
  *

@@ -1069,19 +1069,16 @@ oc_create_knx_sec_resources(size_t device_index)
 // ----------------------------------------------------------------------------
 
 bool
-oc_is_resource_secure(oc_method_t method,
-                      oc_resource_t *resource)
+oc_is_resource_secure(oc_method_t method, oc_resource_t *resource)
 {
   if (method == OC_GET &&
-     (
-        (oc_string_len(resource->uri) == 17 &&
-         memcmp(oc_string(resource->uri), "/.well-known/core", 17) == 0) ||
-        (oc_string_len(resource->uri) == 16 &&
-         memcmp(oc_string(resource->uri), "/.well-known/knx", 16) == 0) )
-       ) {
+      ((oc_string_len(resource->uri) == 17 &&
+        memcmp(oc_string(resource->uri), "/.well-known/core", 17) == 0) ||
+       (oc_string_len(resource->uri) == 16 &&
+        memcmp(oc_string(resource->uri), "/.well-known/knx", 16) == 0))) {
     return false;
   }
-  // note check this 
+  // note check this
   if (method == OC_POST &&
       ((oc_string_len(resource->uri) == 16 &&
         memcmp(oc_string(resource->uri), "/.well-known/knx", 16) == 0))) {
@@ -1199,7 +1196,6 @@ oc_if_method_allowed_according_to_mask(oc_interface_mask_t iface_mask,
 
   return false;
 }
-
 
 static bool
 method_allowed(oc_method_t method, oc_resource_t *resource)

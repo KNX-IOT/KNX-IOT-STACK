@@ -142,20 +142,9 @@ set_mpro_status_codes(void)
     PROXYING_NOT_SUPPORTED_5_05;
 }
 
-static const char *interface_strings[] = { "if.i",
-                                           "if.o",
-                                           "if.g.s.[ga]",
-                                           "if.c",
-                                           "if.p",
-                                           "if.d",
-                                           "if.a",
-                                           "if.s",
-                                           "if.ll",
-                                           "if.b",
-                                           "if.sec",
-                                           "if.swu",
-                                           "if.pm", 
-                                           "if.m.x"
+static const char *interface_strings[] = {
+  "if.i", "if.o",  "if.g.s.[ga]", "if.c",   "if.p",   "if.d",  "if.a",
+  "if.s", "if.ll", "if.b",        "if.sec", "if.swu", "if.pm", "if.m.x"
 };
 
 const char *
@@ -203,7 +192,7 @@ get_method_name(oc_method_t method)
     return "PUT";
   if (method == OC_DELETE)
     return "DELETE";
-  //if (method == OC_FETCH)
+  // if (method == OC_FETCH)
   //  return "FETCH";
   return "METHOD ERROR";
 }
@@ -317,7 +306,6 @@ oc_get_interface_in_mask_in_string_array(oc_interface_mask_t iface_mask,
   }
   return total_masks;
 }
-
 
 #ifdef OC_SERVER
 oc_resource_t *
@@ -1242,17 +1230,16 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
      */
     oc_rep_new(response_buffer.buffer, response_buffer.buffer_size);
 
-
     if (!oc_knx_sec_check_acl(method, cur_resource, endpoint)) {
       authorized = false;
     } else
 
 #ifdef OC_SECURITY
-    /* If cur_resource is a coaps:// resource, then query ACL to check if
-     * the requestor (the subject) is authorized to issue this request to
-     * the resource.
-     */
-    if (!oc_sec_check_acl(method, cur_resource, endpoint)) {
+      /* If cur_resource is a coaps:// resource, then query ACL to check if
+       * the requestor (the subject) is authorized to issue this request to
+       * the resource.
+       */
+      if (!oc_sec_check_acl(method, cur_resource, endpoint)) {
       authorized = false;
       oc_ri_audit_log(method, cur_resource, endpoint);
     } else
@@ -1320,8 +1307,7 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
      */
     response_buffer.response_length = 0;
     response_buffer.code = oc_status_code(OC_STATUS_METHOD_NOT_ALLOWED);
-  }
-  else if (!authorized) {
+  } else if (!authorized) {
     OC_WRN("ocri: Subject not authorized");
     /* If the requestor (subject) does not have access granted via an
      * access control entry in the ACL, then it is not authorized to
@@ -1329,8 +1315,7 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
      */
     response_buffer.response_length = 0;
     response_buffer.code = oc_status_code(OC_STATUS_UNAUTHORIZED);
-  }
-  else {
+  } else {
     success = true;
   }
 

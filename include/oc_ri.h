@@ -175,7 +175,7 @@ typedef enum {
   OC_IF_A = 1 << 7,    /**< if.a */
   OC_IF_S = 1 << 8,    /**< if.s */
   OC_IF_LI = 1 << 9,   /**< if.ll */
-  OC_IF_B  = 1 << 10,  /**< if.b */
+  OC_IF_B = 1 << 10,   /**< if.b */
   OC_IF_SEC = 1 << 11, /**< if.sec */
   OC_IF_SWU = 1 << 12, /**< if.swu */
   OC_IF_PM = 1 << 13,  /**< if.pm */
@@ -212,8 +212,6 @@ int oc_total_interface_in_mask(oc_interface_mask_t iface_mask);
 int oc_get_interface_in_mask_in_string_array(oc_interface_mask_t iface_mask,
                                              int nr_entries,
                                              oc_string_array_t interface_array);
-
-
 
 /**
  * @brief core resource numbers
