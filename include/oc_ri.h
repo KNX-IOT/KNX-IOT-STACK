@@ -227,9 +227,9 @@ bool oc_if_method_allowed_according_to_mask(oc_interface_mask_t iface_mask,
  *
  */
 typedef enum {
-  OC_DEV_SN = 0,    ///< Device serial number
-  OC_DEV_HWV,   ///< Hardware version
-  OC_DEV_FWV,   /// Firmware version
+  OC_DEV_SN = 0, ///< Device serial number
+  OC_DEV_HWV,    ///< Hardware version
+  OC_DEV_FWV,    /// Firmware version
   OC_DEV_HWT,   ///< The hardware type is a manufacture specific id for a device
                 ///< type (MaC uses this id for compatibility checks)
   OC_DEV_NAME,  ///< Device name. Name may can be changed w/ MaC.
@@ -256,8 +256,8 @@ typedef enum {
   OC_KNX_FP_R,        ///< FP/R
   OC_KNX_FP_R_X,      ///< FP/R/X
   OC_KNX_P,           ///< P
-  OC_KNX_F,   ///< /f
-  OC_KNX_F_X, ///< /f/X
+  OC_KNX_F,           ///< /f
+  OC_KNX_F_X,         ///< /f/X
   OC_KNX_SWU_PROTOCOL,
   OC_KNX_SWU_MAXDEFER,
   OC_KNX_SWU_METHOD,
@@ -282,7 +282,7 @@ typedef enum {
 
   /* List of resources on a logical device: start */
   /* List of Device Configuration Resources (DCRs): start */
- // WELLKNOWNCORE,
+  // WELLKNOWNCORE,
   OCF_RES,
 #ifdef OC_SECURITY
   OCF_SEC_DOXM,

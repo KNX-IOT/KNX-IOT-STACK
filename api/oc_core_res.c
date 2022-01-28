@@ -732,10 +732,11 @@ oc_core_get_resource_by_uri(const char *uri, size_t device)
   int skip = 0, type = 0;
   if (uri[0] == '/')
     skip = 1;
- 
-  // TODO: need to add all other KNX resources, not sure though if this function is being used anywhere
+
+  // TODO: need to add all other KNX resources, not sure though if this function
+  // is being used anywhere
   if ((strlen(uri) - skip) == 7 &&
-             memcmp(uri + skip, ".well-known/core", 17) == 0) {
+      memcmp(uri + skip, ".well-known/core", 17) == 0) {
     type = WELLKNOWNCORE;
   } else if ((strlen(uri) - skip) == 7 &&
              memcmp(uri + skip, ".well-known/knx", 15) == 0) {

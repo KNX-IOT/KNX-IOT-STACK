@@ -516,14 +516,14 @@ oc_core_auth_at_post_handler(oc_request_t *request,
           PRINT("  subobject_nr %d\n", subobject_nr);
           while (subobject) {
             if (subobject->type == OC_REP_STRING) {
-              //if (subobject->iname == 2 && subobject_nr == 2) {
+              // if (subobject->iname == 2 && subobject_nr == 2) {
               //  // sub::dnsname :: 2:x?
               //  oc_free_string(&(g_at_entries[index].dnsname));
               //  oc_new_string(&g_at_entries[index].dnsname,
               //                oc_string(subobject->value.string),
               //                oc_string_len(subobject->value.string));
               //}
-              //if (subobject->iname == 3 && subobject_nr == 8) {
+              // if (subobject->iname == 3 && subobject_nr == 8) {
               //  // cnf::kty 8::2
               //  oc_free_string(&(g_at_entries[index].kty));
               //  oc_new_string(&g_at_entries[index].kty,
