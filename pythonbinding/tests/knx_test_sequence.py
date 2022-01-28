@@ -677,7 +677,7 @@ def do_auth_at(my_stack):
     # DTLS payload
     #{
     #"0": "OC5BLLhkAG...",
-    #"2": "<asn-system-id.ldevid>", 
+    #"2": "<asn-system-id.ldevid>",
     # "8": {
     # "3": "<kid>"
     # },

@@ -672,9 +672,9 @@ oc_core_get_resource_by_index(int type, size_t device)
 bool
 oc_core_is_SVR(oc_resource_t *resource, size_t device)
 {
-  size_t device_svrs = OCF_D * device + OCF_SEC_DOXM;
+  size_t device_svrs = WELLKNOWNCORE * device + OCF_SEC_DOXM;
 
-  size_t SVRs_end = (device + 1) * OCF_D - 1, i;
+  size_t SVRs_end = (device + 1) * WELLKNOWNCORE - 1, i;
   for (i = device_svrs; i <= SVRs_end; i++) {
     if (resource == &core_resources[i]) {
       return true;
@@ -716,7 +716,7 @@ oc_core_is_DCR(oc_resource_t *resource, size_t device)
   size_t DCRs_end = device_resources + WELLKNOWNCORE, i;
   for (i = device_resources + 1; i <= DCRs_end; i++) {
     if (resource == &core_resources[i]) {
-      if (i == (device_resources + OCF_RES)) {
+      if (i == (device_resources + WELLKNOWNCORE)) {
         return false;
       }
       return true;
