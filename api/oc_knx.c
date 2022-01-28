@@ -871,6 +871,8 @@ static struct
 {
   mbedtls_mpi w0;
   mbedtls_ecp_point L;
+  mbedtls_mpi y;
+  mbedtls_ecp_point pub_y;
 } spake_data;
 
 static void
@@ -1015,16 +1017,12 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
 
   PRINT("oc_core_knx_spake_post_handler valid_request: %d\n", valid_request);
 
-  // on rnd
   if (valid_request == SPAKE_RND) {
     // generate random numbers for rnd, salt & it (# of iterations)
     oc_spake_parameter_exchange(&g_pase.rnd, &g_pase.salt, &g_pase.it);
 
     // TODO start calculation of handshake parameters here, while you wait the
-    // second message from the client
-
-    // The straightforward way we are doing for now is starting the calculation
-    // after the data is requested - should be fast enough
+    // second message from the client - use delayed callback
 
     oc_rep_begin_root_object();
     // rnd (15)
@@ -1043,7 +1041,6 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
     return;
   }
-  // on pa
   if (valid_request == SPAKE_PA) {
     // return changed, frame pb (11) & cb (13)
 
@@ -1052,14 +1049,30 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     // For testing, use hardcoded password, or pass as CLI argument from app
 
     const char *password = oc_spake_get_password();
+    int ret;
     mbedtls_mpi_free(&spake_data.w0);
     mbedtls_ecp_point_free(&spake_data.L);
+    mbedtls_mpi_free(&spake_data.y);
+    mbedtls_ecp_point_free(&spake_data.pub_y);
+
     mbedtls_mpi_init(&spake_data.w0);
     mbedtls_ecp_point_init(&spake_data.L);
+    mbedtls_mpi_init(&spake_data.y);
+    mbedtls_ecp_point_init(&spake_data.pub_y);
 
-    oc_spake_calc_w0_L(password, oc_string_len(g_pase.salt),
-                       oc_cast(g_pase.salt, uint8_t), g_pase.it, &spake_data.w0,
-                       &spake_data.L);
+    ret = oc_spake_calc_w0_L(password, oc_string_len(g_pase.salt),
+                             oc_cast(g_pase.salt, uint8_t), g_pase.it,
+                             &spake_data.w0, &spake_data.L);
+    if (ret != 0) {
+      OC_ERR("oc_spake_calc_w0_L failed with code %d", ret);
+      goto error;
+    }
+
+    ret = oc_spake_gen_y(&spake_data.y, &spake_data.pub_y);
+    if (ret != 0) {
+      OC_ERR("oc_spake_gen_y failed with code %d", ret);
+      goto error;
+    }
 
     oc_rep_begin_root_object();
     // pb (11)
@@ -1070,13 +1083,12 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
     return;
   }
-  // on ca
   if (valid_request == SPAKE_CA) {
     // check key confirmation!!! don't just send status changed!!!
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
     return;
   }
-
+error:
   oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
 }
 
@@ -1092,6 +1104,8 @@ oc_create_knx_spake_resource(int resource_idx, size_t device)
   assert(oc_spake_init() == 0);
   mbedtls_mpi_init(&spake_data.w0);
   mbedtls_ecp_point_init(&spake_data.L);
+  mbedtls_mpi_init(&spake_data.y);
+  mbedtls_ecp_point_init(&spake_data.pub_y);
 }
 
 // ----------------------------------------------------------------------------

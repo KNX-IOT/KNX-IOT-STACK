@@ -70,4 +70,13 @@ void oc_spake_set_password(char *new_pass);
 int oc_spake_calc_w0_L(const char *pw, size_t len_salt, const uint8_t *salt,
                        int it, mbedtls_mpi *w0, mbedtls_ecp_point *L);
 
+/**
+ * @brief Generate an ECP keypair to be used within the Spake2+ handshake
+ *
+ * @param y The private part. Do not leak.
+ * @param pub_y The public part.
+ * @return int 0 on success, mbedtls error code on failure
+ */
+int oc_spake_gen_y(mbedtls_mpi *y, mbedtls_ecp_point *pub_y);
+
 #endif // OC_SPAKE2PLUS_H

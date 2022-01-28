@@ -147,8 +147,12 @@ cleanup:
   mbedtls_mpi_free(&w1);
 }
 
-// mbedtls_ecp_gen_keypair(&grp, a, &pubA, mbedtls_ctr_drbg_random,
-//                        &ctr_drbg_ctx);
+int
+oc_spake_gen_y(mbedtls_mpi *y, mbedtls_ecp_point *pub_y)
+{
+  return mbedtls_ecp_gen_keypair(&grp, y, pub_y, mbedtls_ctr_drbg_random,
+                                 &ctr_drbg_ctx);
+}
 
 // generic formula for
 // pX = pubX + wX * L
