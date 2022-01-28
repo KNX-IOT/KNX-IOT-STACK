@@ -35,11 +35,11 @@ extern "C" {
  *
  */
 typedef enum {
-  OC_GET = 1, ///< GET
-  OC_POST,    ///< POST
-  OC_PUT,     ///< PUT
-  OC_DELETE,  ///< DELETE
-  OC_FETCH    ///< FETCH
+  OC_GET = 1, /**< GET */
+  OC_POST,    /**< POST*/
+  OC_PUT,     /**< PUT*/
+  OC_DELETE,  /**< DELETE*/
+  OC_FETCH    /**< FETCH*/
 } oc_method_t;
 
 /**
@@ -47,11 +47,11 @@ typedef enum {
  *
  */
 typedef enum {
-  OC_DISCOVERABLE = (1 << 0), ///< discoverable
-  OC_OBSERVABLE = (1 << 1),   ///< observable
-  OC_SECURE = (1 << 4),       ///< secure
-  OC_PERIODIC = (1 << 6),     ///< periodical update
-  OC_SECURE_MCAST = (1 << 8)  ///< secure multi cast (OSCORE)
+  OC_DISCOVERABLE = (1 << 0), /**< discoverable*/
+  OC_OBSERVABLE = (1 << 1),   /**< observable*/
+  OC_SECURE = (1 << 4),       /**< secure*/
+  OC_PERIODIC = (1 << 6),     /**< periodical update*/
+  OC_SECURE_MCAST = (1 << 8)  /**< secure multi cast (OSCORE)*/
 } oc_resource_properties_t;
 
 /**
@@ -190,6 +190,12 @@ typedef enum {
  */
 const char *get_interface_string(oc_interface_mask_t mask);
 
+/**
+ * @brief Get the method name object
+ *
+ * @param method the input method
+ * @return const char* the method as string
+ */
 const char *get_method_name(oc_method_t method);
 
 /**
