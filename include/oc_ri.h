@@ -192,8 +192,8 @@ const char *get_interface_string(oc_interface_mask_t mask);
 
 /**
  * @brief Get the method name object
- * 
- * @param method the input method 
+ *
+ * @param method the input method
  * @return const char* the method as string
  */
 const char *get_method_name(oc_method_t method);

@@ -184,7 +184,7 @@ bool oc_if_method_allowed_according_to_mask(oc_interface_mask_t iface_mask,
 
 /**
  * @brief check access control based on acl and resource interfaces
- * 
+ *
  * @param method invocation method for thiscall
  * @param resource the resource being called
  * @param endpoint the used endpoint

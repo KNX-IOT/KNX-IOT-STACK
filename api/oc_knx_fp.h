@@ -32,12 +32,12 @@ extern "C" {
 typedef enum {
   OC_CFLAG_NONE = 0, /**< Communication */
   OC_CFLAG_COMMUNICATION =
-    1 << 2,                /**< false = Group Object value cannot read or writen.*/
+    1 << 2, /**< false = Group Object value cannot read or writen.*/
   OC_CFLAG_READ = 1 << 3,  /**< false = Group Object value cannot be read.*/
   OC_CFLAG_WRITE = 1 << 4, /**< false = Group Object value cannot be written.*/
   OC_CFLAG_INIT = 1 << 5,  /**< false = Disable read after initialization.*/
   OC_CFLAG_TRANSMISSION =
-    1 << 6,                 /**< false = Group Object value is not transmitted.*/
+    1 << 6, /**< false = Group Object value is not transmitted.*/
   OC_CFLAG_UPDATE = 1 << 7, /**< false = Group Object value is not updated.*/
 } oc_cflag_mask_t;
 
@@ -193,7 +193,7 @@ int oc_core_find_next_group_object_table_url(char *url, int cur_index);
 
 /**
  * @brief retrieve the cflags from the entry table
- * 
+ *
  * @param index the index in the group object table
  * @return oc_cflag_mask_t the retrieved cflags
  */
