@@ -719,24 +719,24 @@ oc_core_fp_g_x_get_handler(oc_request_t *request,
   // id 0
   oc_rep_i_set_int(root, 8, g_got[index].cflags);
 
-  //oc_rep_i_set_key(&root_map, 8);
-  //oc_rep_begin_array(&root_map, cflags);
-  //if (g_got[index].cflags & OC_CFLAG_READ) {
+  // oc_rep_i_set_key(&root_map, 8);
+  // oc_rep_begin_array(&root_map, cflags);
+  // if (g_got[index].cflags & OC_CFLAG_READ) {
   //  oc_rep_add_int(cflags, 1);
   //}
-  //if (g_got[index].cflags & OC_CFLAG_WRITE) {
+  // if (g_got[index].cflags & OC_CFLAG_WRITE) {
   //  oc_rep_add_int(cflags, 2);
   //}
-  //if (g_got[index].cflags & OC_CFLAG_TRANSMISSION) {
+  // if (g_got[index].cflags & OC_CFLAG_TRANSMISSION) {
   //  oc_rep_add_int(cflags, 3);
   //}
-  //if (g_got[index].cflags & OC_CFLAG_UPDATE) {
+  // if (g_got[index].cflags & OC_CFLAG_UPDATE) {
   //  oc_rep_add_int(cflags, 4);
   //}
-  //if (g_got[index].cflags & OC_CFLAG_INIT) {
+  // if (g_got[index].cflags & OC_CFLAG_INIT) {
   //  oc_rep_add_int(cflags, 5);
   //}
-  //oc_rep_close_array(root, cflags);
+  // oc_rep_close_array(root, cflags);
 
   oc_rep_end_root_object();
 
@@ -1489,7 +1489,9 @@ oc_core_get_recipient_index_url_or_path(int index)
 
 // -----------------------------------------------------------------------------
 
-void print_cflags(oc_cflag_mask_t cflags) {
+void
+print_cflags(oc_cflag_mask_t cflags)
+{
 
   if (cflags & OC_CFLAG_READ) {
     PRINT("r");
