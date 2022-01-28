@@ -99,7 +99,7 @@ oc_core_knx_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     int length = oc_rep_add_line_to_buffer("{");
     response_length += length;
 
-    length = oc_rep_add_line_to_buffer("\"api\": { \"version\": \"1.0\",");
+    length = oc_rep_add_line_to_buffer("\"api\": { \"version\": \"1.0.0\",");
     response_length += length;
 
     length = oc_rep_add_line_to_buffer("\"base\": \"/ \"}");
@@ -118,7 +118,7 @@ oc_core_knx_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 
     oc_rep_set_key(&root_map, "api");
     oc_rep_begin_object(&root_map, api);
-    oc_rep_set_text_string(api, version, "1.0");
+    oc_rep_set_text_string(api, version, "1.0.0");
     oc_rep_end_object(&root_map, api);
 
     oc_rep_end_root_object();

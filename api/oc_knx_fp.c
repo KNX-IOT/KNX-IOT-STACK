@@ -370,6 +370,15 @@ oc_core_find_group_object_table_url_from_index(int index)
 }
 
 int
+oc_core_group_object_table_cflag_entries(int index)
+{
+  if (index < GOT_MAX_ENTRIES) {
+    return g_got[index].cflags;
+  }
+  return 0;
+}
+
+int
 oc_core_find_group_object_table_number_group_entries(int index)
 {
   if (index < GOT_MAX_ENTRIES) {
