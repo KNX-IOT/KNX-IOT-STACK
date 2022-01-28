@@ -189,6 +189,9 @@ int oc_core_find_group_object_table_url(char *url);
  */
 int oc_core_find_next_group_object_table_url(char *url, int cur_index);
 
+
+int oc_core_group_object_table_cflag_entries(int index);
+
 /**
  * @brief find the url (of the resource) that in the group object table entry.
  *
