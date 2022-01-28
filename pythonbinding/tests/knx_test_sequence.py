@@ -441,7 +441,7 @@ def do_sequence_fp_programming(my_stack):
     # group object table
     # id (0)= 1
     # url (11)= /p/light
-    # ga (7 )= 
+    # ga (7 )=
     # cflags (8) = ["r" ] ; read = 8, write=16, init=32,transmit=64, update=128
     content = [ {0: 5, 11: "p/push5", 7:[1], 8: 16 } ,
                 {0: 2, 11: "p/light2", 7:[2], 8: 16+64 },
