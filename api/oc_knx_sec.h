@@ -171,6 +171,18 @@ uint64_t oc_oscore_get_osndelay();
  */
 void oc_create_knx_sec_resources(size_t device);
 
+
+/**
+ * @brief is the method allowed according to the interface mask
+ *
+ * @param iface_mask the interface mask
+ * @param method the method to be checked
+ * @return true method allowed
+ * @return false method not allowed
+ */
+bool oc_if_method_allowed_according_to_mask(oc_interface_mask_t iface_mask,
+                                            oc_method_t method);
+
 bool oc_knx_sec_check_acl(oc_method_t method, oc_resource_t *resource,
                           oc_endpoint_t *endpoint);
 

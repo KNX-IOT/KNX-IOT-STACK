@@ -796,7 +796,8 @@ oc_create_fp_g_x_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_fp_g_x_resource\n");
   oc_core_lf_populate_resource(
-    resource_idx, device, "/fp/g/*", OC_IF_D, APPLICATION_CBOR, OC_DISCOVERABLE,
+    resource_idx, device, "/fp/g/*", OC_IF_D | OC_IF_C, APPLICATION_CBOR,
+    OC_DISCOVERABLE,
     oc_core_fp_g_x_get_handler, 0, 0, oc_core_fp_g_x_del_handler, 0, 1,
     "urn:knx:if.c");
 }
@@ -1022,7 +1023,7 @@ oc_create_fp_p_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_fp_p_resource\n");
   oc_core_lf_populate_resource(
-    resource_idx, device, "/fp/p", OC_IF_D, APPLICATION_CBOR, OC_DISCOVERABLE,
+    resource_idx, device, "/fp/p", OC_IF_C | OC_IF_B, APPLICATION_CBOR, OC_DISCOVERABLE,
     oc_core_fp_p_get_handler, 0, oc_core_fp_p_post_handler, 0, 0, 1,
     "urn:knx:if.c");
 }
@@ -1133,7 +1134,8 @@ oc_create_fp_p_x_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_fp_p_x_resource\n");
   oc_core_lf_populate_resource(
-    resource_idx, device, "/fp/p/*", OC_IF_D, APPLICATION_CBOR, OC_DISCOVERABLE,
+    resource_idx, device, "/fp/p/*", OC_IF_D | OC_IF_C, APPLICATION_CBOR,
+    OC_DISCOVERABLE,
     oc_core_fp_p_x_get_handler, 0, 0, oc_core_fp_p_x_del_handler, 0, 1,
     "urn:knx:if.c");
 }
@@ -1332,7 +1334,8 @@ oc_create_fp_r_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_fp_r_resource\n");
   oc_core_lf_populate_resource(
-    resource_idx, device, "/fp/r", OC_IF_D, APPLICATION_CBOR, OC_DISCOVERABLE,
+    resource_idx, device, "/fp/r", OC_IF_C | OC_IF_B, APPLICATION_CBOR,
+    OC_DISCOVERABLE,
     oc_core_fp_r_get_handler, 0, oc_core_fp_r_post_handler, 0, 0, 1,
     "urn:knx:if.c");
 }
@@ -1434,7 +1437,8 @@ oc_create_fp_r_x_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_fp_r_x_resource\n");
   oc_core_lf_populate_resource(
-    resource_idx, device, "/fp/r/*", OC_IF_D, APPLICATION_CBOR, OC_DISCOVERABLE,
+    resource_idx, device, "/fp/r/*", OC_IF_D | OC_IF_C, APPLICATION_CBOR,
+    OC_DISCOVERABLE,
     oc_core_fp_r_x_get_handler, 0, 0, oc_core_fp_r_x_del_handler, 0, 1,
     "urn:knx:if.c");
 }

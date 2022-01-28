@@ -140,18 +140,7 @@ set_mpro_status_codes(void)
     PROXYING_NOT_SUPPORTED_5_05;
 }
 
-static const char *interface_strings[] = { "oic.if.baseline",
-                                           "oic.if.ll",
-                                           "oic.if.b",
-                                           "oic.if.r",
-                                           "oic.if.rw",
-                                           "oic.if.a",
-                                           "oic.if.s",
-                                           "oic.if.create",
-                                           "oic.if.w",
-                                           "oic.if.startup",
-                                           "oic.if.startup.revert",
-                                           "if.i",
+static const char *interface_strings[] = { "if.i",
                                            "if.o",
                                            "if.g.s.[ga]",
                                            "if.c",
@@ -163,38 +152,58 @@ static const char *interface_strings[] = { "oic.if.baseline",
                                            "if.b",
                                            "if.sec",
                                            "if.swu",
-                                           "if.pm" };
+                                           "if.pm", 
+                                           "if.m.x"
+};
 
 const char *
 get_interface_string(oc_interface_mask_t mask)
 {
   if (mask & OC_IF_I)
-    return interface_strings[11];
+    return interface_strings[0];
   if (mask & OC_IF_O)
-    return interface_strings[12];
+    return interface_strings[1];
   if (mask & OC_IF_G)
-    return interface_strings[13];
+    return interface_strings[2];
   if (mask & OC_IF_C)
-    return interface_strings[14];
+    return interface_strings[3];
   if (mask & OC_IF_P)
-    return interface_strings[15];
+    return interface_strings[4];
   if (mask & OC_IF_D)
-    return interface_strings[16];
+    return interface_strings[5];
   if (mask & OC_IF_A)
-    return interface_strings[17];
+    return interface_strings[6];
   if (mask & OC_IF_S)
-    return interface_strings[18];
+    return interface_strings[7];
   if (mask & OC_IF_LI)
-    return interface_strings[19];
-  if (mask & OC_IF_BA)
-    return interface_strings[20];
+    return interface_strings[8];
+  if (mask & OC_IF_B)
+    return interface_strings[9];
   if (mask & OC_IF_SEC)
-    return interface_strings[21];
+    return interface_strings[10];
   if (mask & OC_IF_SWU)
-    return interface_strings[22];
+    return interface_strings[11];
   if (mask & OC_IF_PM)
-    return interface_strings[23];
+    return interface_strings[12];
+  if (mask & OC_IF_M)
+    return interface_strings[13];
   return "";
+}
+
+const char *
+get_method_name(oc_method_t method)
+{
+  if (method == OC_GET)
+    return "GET";
+  if (method == OC_POST)
+    return "POST";
+  if (method == OC_PUT)
+    return "PUT";
+  if (method == OC_DELETE)
+    return "DELETE";
+  //if (method == OC_FETCH)
+  //  return "FETCH";
+  return "METHOD ERROR";
 }
 
 int
@@ -230,7 +239,7 @@ oc_total_interface_in_mask(oc_interface_mask_t iface_mask)
   if (iface_mask & OC_IF_LI) {
     total_masks++;
   }
-  if (iface_mask & OC_IF_BA) {
+  if (iface_mask & OC_IF_B) {
     total_masks++;
   }
   if (iface_mask & OC_IF_SEC) {
@@ -289,8 +298,8 @@ oc_get_interface_in_mask_in_string_array(oc_interface_mask_t iface_mask,
     oc_string_array_add_item(interface_array, get_interface_string(OC_IF_LI));
     total_masks++;
   }
-  if (iface_mask & OC_IF_BA) {
-    oc_string_array_add_item(interface_array, get_interface_string(OC_IF_BA));
+  if (iface_mask & OC_IF_B) {
+    oc_string_array_add_item(interface_array, get_interface_string(OC_IF_B));
   }
   if (iface_mask & OC_IF_SEC) {
     oc_string_array_add_item(interface_array, get_interface_string(OC_IF_SEC));
@@ -307,114 +316,6 @@ oc_get_interface_in_mask_in_string_array(oc_interface_mask_t iface_mask,
   return total_masks;
 }
 
-bool
-oc_if_method_allowed_according_to_mask(oc_interface_mask_t iface_mask,
-                                       oc_method_t method)
-{
-  if (iface_mask & OC_IF_I) {
-    // logical input
-    if (method == OC_POST)
-      return true;
-    if (method == OC_PUT)
-      return true;
-  }
-  if (iface_mask & OC_IF_O) {
-    // Logical Output
-    if (method == OC_GET)
-      return true;
-    if (method == OC_POST)
-      return true;
-  }
-  if (iface_mask & OC_IF_G) {
-    // Group Address
-    if (method == OC_POST)
-      return true;
-  }
-  if (iface_mask & OC_IF_C) {
-    // configuration
-    if (method == OC_GET)
-      return true;
-    if (method == OC_POST)
-      return true;
-    if (method == OC_PUT)
-      return true;
-    if (method == OC_DELETE)
-      return true;
-  }
-  if (iface_mask & OC_IF_P) {
-    // parameter
-    if (method == OC_GET)
-      return true;
-    if (method == OC_PUT)
-      return true;
-  }
-  if (iface_mask & OC_IF_D) {
-    // diagnostic
-    if (method == OC_GET)
-      return true;
-  }
-  if (iface_mask & OC_IF_A) {
-    // actuator
-    if (method == OC_GET)
-      return true;
-    if (method == OC_PUT)
-      return true;
-    if (method == OC_POST)
-      return true;
-  }
-  if (iface_mask & OC_IF_S) {
-    // sensor
-    if (method == OC_GET)
-      return true;
-  }
-  if (iface_mask & OC_IF_LI) {
-    // link list
-    if (method == OC_GET)
-      return true;
-  }
-  if (iface_mask & OC_IF_BA) {
-    // batch
-    if (method == OC_GET)
-      return true;
-    if (method == OC_PUT)
-      return true;
-    if (method == OC_POST)
-      return true;
-  }
-  if (iface_mask & OC_IF_SEC) {
-    // security
-    if (method == OC_GET)
-      return true;
-    if (method == OC_PUT)
-      return true;
-    if (method == OC_POST)
-      return true;
-    if (method == OC_DELETE)
-      return true;
-  }
-  if (iface_mask & OC_IF_SWU) {
-    // software update
-    if (method == OC_GET)
-      return true;
-    if (method == OC_PUT)
-      return true;
-    if (method == OC_POST)
-      return true;
-    if (method == OC_DELETE)
-      return true;
-  }
-  if (iface_mask & OC_IF_PM) {
-    // programming mode
-    if (method == OC_GET)
-      return true;
-  }
-  if (iface_mask & OC_IF_M) {
-    // manufacturer
-    return true;
-  }
-
-  return false;
-}
 
 #ifdef OC_SERVER
 oc_resource_t *
@@ -998,7 +899,7 @@ oc_ri_get_interface_mask(char *iface, size_t if_len)
   if (5 == if_len && strncmp(iface, "if.ll", if_len) == 0)
     iface_mask |= OC_IF_LI;
   if (4 == if_len && strncmp(iface, "if.b", if_len) == 0)
-    iface_mask |= OC_IF_BA;
+    iface_mask |= OC_IF_B;
   if (6 == if_len && strncmp(iface, "if.sec", if_len) == 0)
     iface_mask |= OC_IF_SEC;
   if (6 == if_len && strncmp(iface, "if.swu", if_len) == 0)
@@ -1040,7 +941,7 @@ does_interface_support_method(oc_interface_mask_t iface_mask,
   case OC_IF_A:
   case OC_IF_S:
   case OC_IF_LI:
-  case OC_IF_BA:
+  case OC_IF_B:
   case OC_IF_SEC:
   case OC_IF_SWU:
   case OC_IF_PM:
@@ -1109,10 +1010,7 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
    */
   bool method_impl = true, bad_request = false, success = false,
        forbidden = false, entity_too_large = false;
-
-#ifdef OC_SECURITY
   bool authorized = true;
-#endif /* OC_SECURITY */
 
   /* Parsed CoAP PDU structure. */
   coap_packet_t *const packet = (coap_packet_t *)request;
@@ -1342,6 +1240,11 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
      */
     oc_rep_new(response_buffer.buffer, response_buffer.buffer_size);
 
+
+    if (!oc_knx_sec_check_acl(method, cur_resource, endpoint)) {
+      authorized = false;
+    } else
+
 #ifdef OC_SECURITY
     /* If cur_resource is a coaps:// resource, then query ACL to check if
      * the requestor (the subject) is authorized to issue this request to
@@ -1416,7 +1319,6 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
     response_buffer.response_length = 0;
     response_buffer.code = oc_status_code(OC_STATUS_METHOD_NOT_ALLOWED);
   }
-#ifdef OC_SECURITY
   else if (!authorized) {
     OC_WRN("ocri: Subject not authorized");
     /* If the requestor (subject) does not have access granted via an
@@ -1426,7 +1328,6 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
     response_buffer.response_length = 0;
     response_buffer.code = oc_status_code(OC_STATUS_UNAUTHORIZED);
   }
-#endif /* OC_SECURITY */
   else {
     success = true;
   }
