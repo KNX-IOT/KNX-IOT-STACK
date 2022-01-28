@@ -2,6 +2,7 @@
 #define OC_SPAKE2PLUS_H
 
 #include "mbedtls/bignum.h"
+#include "mbedtls/ecp.h"
 
 /**
  * @brief Initialize Spake2+
@@ -62,11 +63,11 @@ void oc_spake_set_password(char *new_pass);
  * @param it the number of iterations to perform within PBKDF2
  * @param w0 the w0 constant as defined by SPAKE2+. Must be initialized by the
  * caller.
- * @param w1 the w1 constant as defined by SPAKE2+. Must be initialized by the
+ * @param L the L constant as defined by SPAKE2+. Must be initialized by the
  * caller.
  * @return int 0 on success, mbedtls error code on failure
  */
-int oc_spake_calc_w0_w1(const char *pw, size_t len_salt, const uint8_t *salt,
-                        int it, mbedtls_mpi *w0, mbedtls_mpi *w1);
+int oc_spake_calc_w0_L(const char *pw, size_t len_salt, const uint8_t *salt,
+                       int it, mbedtls_mpi *w0, mbedtls_ecp_point *L);
 
 #endif // OC_SPAKE2PLUS_H

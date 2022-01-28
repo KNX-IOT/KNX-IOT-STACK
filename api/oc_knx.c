@@ -867,6 +867,12 @@ oc_create_knx_idevid_resource(int resource_idx, size_t device)
 
 // ----------------------------------------------------------------------------
 
+static struct
+{
+  mbedtls_mpi w0;
+  mbedtls_ecp_point L;
+} spake_data;
+
 static void
 oc_core_knx_spake_post_handler(oc_request_t *request,
                                oc_interface_mask_t iface_mask, void *data)
@@ -1011,6 +1017,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
 
   // on rnd
   if (valid_request == SPAKE_RND) {
+    // generate random numbers for rnd, salt & it (# of iterations)
     oc_spake_parameter_exchange(&g_pase.rnd, &g_pase.salt, &g_pase.it);
 
     // TODO start calculation of handshake parameters here, while you wait the
@@ -1045,13 +1052,14 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     // For testing, use hardcoded password, or pass as CLI argument from app
 
     const char *password = oc_spake_get_password();
-    mbedtls_mpi w0;
-    mbedtls_mpi w1;
-    mbedtls_mpi_init(&w0);
-    mbedtls_mpi_init(&w1);
+    mbedtls_mpi_free(&spake_data.w0);
+    mbedtls_ecp_point_free(&spake_data.L);
+    mbedtls_mpi_init(&spake_data.w0);
+    mbedtls_ecp_point_init(&spake_data.L);
 
-    oc_spake_calc_w0_w1(password, oc_string_len(g_pase.salt),
-                        oc_cast(g_pase.salt, uint8_t), g_pase.it, &w0, &w1);
+    oc_spake_calc_w0_L(password, oc_string_len(g_pase.salt),
+                       oc_cast(g_pase.salt, uint8_t), g_pase.it, &spake_data.w0,
+                       &spake_data.L);
 
     oc_rep_begin_root_object();
     // pb (11)
@@ -1079,6 +1087,11 @@ oc_create_knx_spake_resource(int resource_idx, size_t device)
   oc_core_lf_populate_resource(resource_idx, device, "/.well-known/knx/spake",
                                OC_IF_NONE, APPLICATION_CBOR, OC_DISCOVERABLE, 0,
                                0, oc_core_knx_spake_post_handler, 0, 0, "");
+
+  // can fail if initialization of the RNG does not work
+  assert(oc_spake_init() == 0);
+  mbedtls_mpi_init(&spake_data.w0);
+  mbedtls_ecp_point_init(&spake_data.L);
 }
 
 // ----------------------------------------------------------------------------
@@ -1195,7 +1208,4 @@ oc_create_knx_resources(size_t device_index)
   oc_create_knx_idevid_resource(OC_KNX_IDEVID, device_index);
   oc_create_knx_spake_resource(OC_KNX_SPAKE, device_index);
   oc_create_knx_resource(OC_KNX, device_index);
-
-  // can fail if initialization of the RNG does not work
-  assert(oc_spake_init() == 0);
 }

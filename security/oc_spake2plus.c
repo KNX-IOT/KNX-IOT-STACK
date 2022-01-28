@@ -104,8 +104,8 @@ cleanup:
 }
 
 int
-oc_spake_calc_w0_w1(const char *pw, size_t len_salt, const uint8_t *salt,
-                    int it, mbedtls_mpi *w0, mbedtls_mpi *w1)
+oc_spake_calc_w0_L(const char *pw, size_t len_salt, const uint8_t *salt, int it,
+                   mbedtls_mpi *w0, mbedtls_ecp_point *L)
 {
   int ret;
   mbedtls_md_context_t ctx;
@@ -115,11 +115,12 @@ oc_spake_calc_w0_w1(const char *pw, size_t len_salt, const uint8_t *salt,
   const size_t output_len = 40;
   uint8_t output[output_len];
 
-  mbedtls_mpi w0s, w1s;
+  mbedtls_mpi w0s, w1s, w1;
 
   mbedtls_md_init(&ctx);
   mbedtls_mpi_init(&w0s);
   mbedtls_mpi_init(&w1s);
+  mbedtls_mpi_init(&w1);
 
   MBEDTLS_MPI_CHK(
     mbedtls_md_setup(&ctx, mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), 1));
@@ -135,12 +136,15 @@ oc_spake_calc_w0_w1(const char *pw, size_t len_salt, const uint8_t *salt,
   // the cofactor of P-256 is 1, so the order of the group is equal to the large
   // prime p
   MBEDTLS_MPI_CHK(mbedtls_mpi_mod_mpi(w0, &w0s, &grp.N));
-  MBEDTLS_MPI_CHK(mbedtls_mpi_mod_mpi(w1, &w1s, &grp.N));
+  MBEDTLS_MPI_CHK(mbedtls_mpi_mod_mpi(&w1, &w1s, &grp.N));
+  MBEDTLS_MPI_CHK(mbedtls_ecp_mul(&grp, L, &w1, &grp.G, mbedtls_ctr_drbg_random,
+                                  &ctr_drbg_ctx));
 
 cleanup:
   mbedtls_md_free(&ctx);
   mbedtls_mpi_free(&w0s);
   mbedtls_mpi_free(&w1s);
+  mbedtls_mpi_free(&w1);
 }
 
 // mbedtls_ecp_gen_keypair(&grp, a, &pubA, mbedtls_ctr_drbg_random,
