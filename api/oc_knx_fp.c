@@ -369,7 +369,6 @@ oc_core_find_group_object_table_url_from_index(int index)
   // return oc_string_t();
 }
 
-
 int
 oc_core_group_object_table_cflag_entries(int index)
 {
