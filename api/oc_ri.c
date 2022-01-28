@@ -45,6 +45,8 @@
 #include "oc_ri.h"
 #include "oc_uuid.h"
 
+#include "oc_knx_sec.h"
+
 #ifdef OC_BLOCK_WISE
 #include "oc_blockwise.h"
 #endif /* OC_BLOCK_WISE */
