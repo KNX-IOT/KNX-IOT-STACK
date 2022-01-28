@@ -106,7 +106,7 @@ oc_core_shutdown(void)
 #ifdef OC_DYNAMIC_ALLOCATION
   if (core_resources) {
 #endif /* OC_DYNAMIC_ALLOCATION */
-    for (i = 0; i < 1 + (OCF_D * device_count); ++i) {
+    for (i = 0; i < 1 + (WELLKNOWNCORE * device_count); ++i) {
       oc_resource_t *core_resource = &core_resources[i];
       oc_ri_free_resource_properties(core_resource);
     }
@@ -441,15 +441,15 @@ oc_core_add_device(const char *name, const char *version, const char *base,
     return NULL;
   }
 #else /* !OC_DYNAMIC_ALLOCATION */
-  size_t new_num = 1 + OCF_D * (device_count + 1);
+  size_t new_num = 1 + WELLKNOWNCORE * (device_count + 1);
   core_resources =
     (oc_resource_t *)realloc(core_resources, new_num * sizeof(oc_resource_t));
 
   if (!core_resources) {
     oc_abort("Insufficient memory");
   }
-  oc_resource_t *device = &core_resources[new_num - OCF_D];
-  memset(device, 0, OCF_D * sizeof(oc_resource_t));
+  oc_resource_t *device = &core_resources[new_num - WELLKNOWNCORE];
+  memset(device, 0, WELLKNOWNCORE * sizeof(oc_resource_t));
 
   oc_device_info = (oc_device_info_t *)realloc(
     oc_device_info, (device_count + 1) * sizeof(oc_device_info_t));
@@ -498,7 +498,7 @@ oc_core_add_device(const char *name, const char *version, const char *base,
 static void
 oc_device_bind_rt(size_t device_index, const char *rt)
 {
-  oc_resource_t *r = oc_core_get_resource_by_index(OCF_D, device_index);
+  oc_resource_t *r = oc_core_get_resource_by_index(WELLKNOWNCORE, device_index);
   oc_string_array_t types;
 
   memcpy(&types, &r->types, sizeof(oc_string_array_t));
@@ -662,10 +662,10 @@ oc_core_get_platform_info(void)
 oc_resource_t *
 oc_core_get_resource_by_index(int type, size_t device)
 {
-  if (type == OCF_P) {
+  if (type == OC_DEV_SN) {
     return &core_resources[0];
   }
-  return &core_resources[OCF_D * device + type];
+  return &core_resources[WELLKNOWNCORE * device + type];
 }
 
 #ifdef OC_SECURITY
@@ -692,9 +692,9 @@ oc_core_is_vertical_resource(oc_resource_t *resource, size_t device)
     return true;
   }
 
-  size_t device_resources = OCF_D * device;
+  size_t device_resources = WELLKNOWNCORE * device;
 
-  size_t DCRs_end = device_resources + OCF_D, i;
+  size_t DCRs_end = device_resources + WELLKNOWNCORE, i;
   for (i = device_resources + 1; i <= DCRs_end; i++) {
     if (resource == &core_resources[i]) {
       return false;
@@ -711,9 +711,9 @@ oc_core_is_DCR(oc_resource_t *resource, size_t device)
     return true;
   }
 
-  size_t device_resources = OCF_D * device;
+  size_t device_resources = WELLKNOWNCORE * device;
 
-  size_t DCRs_end = device_resources + OCF_D, i;
+  size_t DCRs_end = device_resources + WELLKNOWNCORE, i;
   for (i = device_resources + 1; i <= DCRs_end; i++) {
     if (resource == &core_resources[i]) {
       if (i == (device_resources + OCF_RES)) {
@@ -732,13 +732,9 @@ oc_core_get_resource_by_uri(const char *uri, size_t device)
   int skip = 0, type = 0;
   if (uri[0] == '/')
     skip = 1;
-  if ((strlen(uri) - skip) == 5) {
-    if (memcmp(uri + skip, "oic/p", 5) == 0) {
-      return &core_resources[0];
-    } else if (memcmp(uri + skip, "oic/d", 5) == 0) {
-      type = OCF_D;
-    }
-  } else if ((strlen(uri) - skip) == 7 &&
+ 
+  // TODO: need to add all other KNX resources, not sure though if this function is being used anywhere
+  if ((strlen(uri) - skip) == 7 &&
              memcmp(uri + skip, ".well-known/core", 17) == 0) {
     type = WELLKNOWNCORE;
   } else if ((strlen(uri) - skip) == 7 &&
@@ -780,7 +776,7 @@ oc_core_get_resource_by_uri(const char *uri, size_t device)
   else {
     return NULL;
   }
-  size_t res = OCF_D * device + type;
+  size_t res = WELLKNOWNCORE * device + type;
   return &core_resources[res];
 }
 

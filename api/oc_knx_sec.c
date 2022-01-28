@@ -447,7 +447,6 @@ oc_core_auth_at_post_handler(oc_request_t *request,
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
-
   rep = request->request_payload;
   while (rep != NULL) {
     if (rep->type == OC_REP_OBJECT) {
@@ -492,10 +491,23 @@ oc_core_auth_at_post_handler(oc_request_t *request,
             g_at_entries[index].interface = interfaces;
           }
         } else if (object->type == OC_REP_STRING) {
+          // old, but keep it there for now...
           // profile (19 ("coap_dtls" or "coap_oscore"))
           if (object->iname == 19) {
             g_at_entries[index].profile =
               oc_string_to_at_profile(object->value.string);
+          }
+          if (object->iname == 2) {
+            // sub
+            oc_free_string(&(g_at_entries[index].sub));
+            oc_new_string(&g_at_entries[index].sub,
+                          oc_string(object->value.string),
+                          oc_string_len(object->value.string));
+          }
+        } else if (object->type == OC_REP_INT) {
+          if (object->iname == 19) {
+            // profile (19 ("coap_dtls" ==1 or "coap_oscore" == 2))
+            g_at_entries[index].profile = (int)object->value.integer;
           }
         } else if (object->type == OC_REP_OBJECT) {
           // level of cnf or sub.
@@ -504,20 +516,20 @@ oc_core_auth_at_post_handler(oc_request_t *request,
           PRINT("  subobject_nr %d\n", subobject_nr);
           while (subobject) {
             if (subobject->type == OC_REP_STRING) {
-              if (subobject->iname == 2 && subobject_nr == 2) {
-                // sub::dnsname :: 2:x?
-                oc_free_string(&(g_at_entries[index].dnsname));
-                oc_new_string(&g_at_entries[index].dnsname,
-                              oc_string(subobject->value.string),
-                              oc_string_len(subobject->value.string));
-              }
-              if (subobject->iname == 3 && subobject_nr == 8) {
-                // cnf::kty 8::2
-                oc_free_string(&(g_at_entries[index].kty));
-                oc_new_string(&g_at_entries[index].kty,
-                              oc_string(subobject->value.string),
-                              oc_string_len(subobject->value.string));
-              }
+              //if (subobject->iname == 2 && subobject_nr == 2) {
+              //  // sub::dnsname :: 2:x?
+              //  oc_free_string(&(g_at_entries[index].dnsname));
+              //  oc_new_string(&g_at_entries[index].dnsname,
+              //                oc_string(subobject->value.string),
+              //                oc_string_len(subobject->value.string));
+              //}
+              //if (subobject->iname == 3 && subobject_nr == 8) {
+              //  // cnf::kty 8::2
+              //  oc_free_string(&(g_at_entries[index].kty));
+              //  oc_new_string(&g_at_entries[index].kty,
+              //                oc_string(subobject->value.string),
+              //                oc_string_len(subobject->value.string));
+              //}
               if (subobject->iname == 3 && subobject_nr == 8) {
                 // cnf::kid (8::3)
                 oc_free_string(&(g_at_entries[index].kid));
@@ -528,8 +540,6 @@ oc_core_auth_at_post_handler(oc_request_t *request,
             } else if (subobject->type == OC_REP_OBJECT) {
               oscobject = subobject->value.object;
               int oscobject_nr = subobject->iname;
-
-              // PRINT("  oscobject_nr %d\n", oscobject_nr);
               while (oscobject) {
                 if (oscobject->type == OC_REP_STRING) {
                   if (oscobject->iname == 2 && subobject_nr == 8 &&
@@ -602,7 +612,6 @@ oc_core_auth_at_x_get_handler(oc_request_t *request,
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
-
   // - find the id from the URL
   const char *value;
   int value_len = oc_uri_get_wildcard_value_as_string(
@@ -614,7 +623,6 @@ oc_core_auth_at_x_get_handler(oc_request_t *request,
     PRINT("index (at) not found\n");
     return;
   }
-
   PRINT(" id = %.*s\n", value_len, value);
   // get the index
   int index = find_index_from_at_string(value, value_len);
@@ -627,8 +635,7 @@ oc_core_auth_at_x_get_handler(oc_request_t *request,
   // return the data
   oc_rep_begin_root_object();
   oc_rep_i_set_text_string(root, 0, oc_string(g_at_entries[index].id));
-  oc_rep_i_set_text_string(
-    root, 19, oc_at_profile_to_string(g_at_entries[index].profile));
+  oc_rep_i_set_int(root, 19, g_at_entries[index].profile);
   // the cflags
   int nr_entries = oc_total_interface_in_mask(g_at_entries[index].interface);
   oc_string_array_t cflags_entries;
@@ -639,8 +646,11 @@ oc_core_auth_at_x_get_handler(oc_request_t *request,
   oc_rep_i_set_string_array(root, 9, cflags_entries);
   oc_free_string_array(&cflags_entries);
   if (g_at_entries[index].profile == OC_PROFILE_COAP_DTLS) {
-    if (oc_string_len(g_at_entries[index].dnsname) > 0) {
-      PRINT("    dnsname    : %s\n", oc_string(g_at_entries[index].dnsname));
+    if (oc_string_len(g_at_entries[index].sub) > 0) {
+      PRINT("    sub    : %s\n", oc_string(g_at_entries[index].sub));
+    }
+    if (oc_string_len(g_at_entries[index].kid) > 0) {
+      PRINT("    kid    : %s\n", oc_string(g_at_entries[index].kid));
     }
   }
   if (g_at_entries[index].profile == OC_PROFILE_COAP_OSCORE) {
@@ -685,7 +695,6 @@ oc_core_auth_at_x_post_handler(oc_request_t *request,
   (void)iface_mask;
   oc_rep_t *rep = NULL;
   int cmd = 0;
-
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_CBOR) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
@@ -821,8 +830,11 @@ oc_at_entry_print(int index)
     PRINT("    profile    : %d (%s)\n", g_at_entries[index].profile,
           oc_at_profile_to_string(g_at_entries[index].profile));
     if (g_at_entries[index].profile == OC_PROFILE_COAP_DTLS) {
-      if (oc_string_len(g_at_entries[index].dnsname) > 0) {
-        PRINT("    dnsname    : %s\n", oc_string(g_at_entries[index].dnsname));
+      if (oc_string_len(g_at_entries[index].sub) > 0) {
+        PRINT("    sub    : %s\n", oc_string(g_at_entries[index].sub));
+      }
+      if (oc_string_len(g_at_entries[index].kid) > 0) {
+        PRINT("    kid    : %s\n", oc_string(g_at_entries[index].kid));
       }
     }
     if (g_at_entries[index].profile == OC_PROFILE_COAP_OSCORE) {
@@ -854,8 +866,10 @@ oc_at_delete_entry(int index)
   oc_free_string(&g_at_entries[index].osc_ms);
   oc_new_string(&g_at_entries[index].osc_ms, "", 0);
   // dtls
-  oc_free_string(&g_at_entries[index].dnsname);
-  oc_new_string(&g_at_entries[index].dnsname, "", 0);
+  oc_free_string(&g_at_entries[index].sub);
+  oc_new_string(&g_at_entries[index].sub, "", 0);
+  oc_free_string(&g_at_entries[index].kid);
+  oc_new_string(&g_at_entries[index].kid, "", 0);
 }
 
 static void
@@ -879,6 +893,9 @@ oc_at_dump_entry(int entry)
   oc_rep_i_set_text_string(root, 842, oc_string(g_at_entries[entry].osc_id));
   oc_rep_i_set_text_string(root, 844, oc_string(g_at_entries[entry].osc_alg));
   oc_rep_i_set_text_string(root, 846, oc_string(g_at_entries[entry].osc_ms));
+
+  oc_rep_i_set_text_string(root, 82, oc_string(g_at_entries[entry].sub));
+  oc_rep_i_set_text_string(root, 81, oc_string(g_at_entries[entry].kid));
 
   oc_rep_end_root_object();
 
@@ -946,6 +963,18 @@ oc_at_load_entry(int entry)
           if (rep->iname == 846) {
             oc_free_string(&g_at_entries[entry].osc_ms);
             oc_new_string(&g_at_entries[entry].osc_ms,
+                          oc_string(rep->value.string),
+                          oc_string_len(rep->value.string));
+          }
+          if (rep->iname == 82) {
+            oc_free_string(&g_at_entries[entry].sub);
+            oc_new_string(&g_at_entries[entry].sub,
+                          oc_string(rep->value.string),
+                          oc_string_len(rep->value.string));
+          }
+          if (rep->iname == 81) {
+            oc_free_string(&g_at_entries[entry].kid);
+            oc_new_string(&g_at_entries[entry].kid,
                           oc_string(rep->value.string),
                           oc_string_len(rep->value.string));
           }

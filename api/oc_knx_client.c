@@ -165,6 +165,18 @@ oc_s_mode_get_value(oc_request_t *request)
   return NULL;
 }
 
+/*
+oc_endpoint_t *
+oc_group_address_to_endpoint(int group_address, int scope)
+{
+  // see line 1577 (section 2.6.5) 
+
+  oc_make_ipv6_endpoint(group, IPV6 | MULTICAST, 5683, 0xff, scope,
+                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0xfd);
+  return &group;
+}
+*/
+
 static void
 oc_issue_s_mode(int sia_value, int group_address, char *rp, uint8_t *value_data,
                 int value_size)
@@ -180,6 +192,7 @@ oc_issue_s_mode(int sia_value, int group_address, char *rp, uint8_t *value_data,
   oc_send_s_mode(&mcast, "/.knx", sia_value, group_address, rp, value_data,
                  value_size);
 }
+
 
 static void
 oc_send_s_mode(oc_endpoint_t *endpoint, char *path, int sia_value,
