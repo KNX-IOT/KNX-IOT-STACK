@@ -26,17 +26,18 @@ extern "C" {
 /**
  * @brief cflag masks
  *
- *
+ * Group Object Table Resource (/fp/g) 
  *
  */
 typedef enum {
-  OC_CFLAG_NONE = 0,       ///< Communication
-  OC_CFLAG_READ = 1 << 1,  ///< false = Group Object value cannot be read.
-  OC_CFLAG_WRITE = 1 << 2, ///< false = Group Object value cannot be written
+  OC_CFLAG_NONE = 0,               ///< Communication
+  OC_CFLAG_COMMUNICATION = 1 << 2, ///< false = Group Object value cannot be read.
+  OC_CFLAG_READ = 1 << 3,          ///< false = Group Object value cannot be read.
+  OC_CFLAG_WRITE = 1 << 4,         ///< false = Group Object value cannot be written
+  OC_CFLAG_INIT = 1 << 5,          ///< false = Disable read after initialization.
   OC_CFLAG_TRANSMISSION =
-    1 << 3,                 ///< false = Group Object value is not transmitted.
-  OC_CFLAG_UPDATE = 1 << 4, ///< false = Group Object value is not updated.
-  OC_CFLAG_INIT = 1 << 5    ///< false = Disable read after initialization.
+    1 << 6,                        ///< false = Group Object value is not transmitted.
+  OC_CFLAG_UPDATE = 1 << 7,        ///< false = Group Object value is not updated.
 } oc_cflag_mask_t;
 
 /**
@@ -48,24 +49,25 @@ typedef enum {
  *        "id": "1",
  *        "href":"/LDSB1/SOO",
  *        "ga":[2305, 2401],
- *        "cflag":["r","w","t","u"]
+ *        "cflag":["r","w","t","u"]  // note this is a integer
  *    },
  *    {
  *        "id": "2",
  *        "href":"/LDSB1/RSC",
  *        "ga":[2306],
- *        "cflag":["t"]
+ *        "cflag":["t"]  // note this is an integer
  *     }
  * ]
  *
  * cflag translation
- * | string | Integer Value |
- * | ------ | ------------- |
- * | r      | 1             |
- * | w      | 2             |
- * | t      | 3             |
- * | u      | 4             |
- * | i      | 5             |
+ * | string | bit     |  value |
+ * | ------ | ------- |--------|
+ * | c      | 2       |  4     |
+ * | r      | 3       |  8     |
+ * | w      | 4       |  16    |
+ * | i      | 5       |  32    |
+ * | t      | 6       |  64    |
+ * | u      | 7       | 128    |
 
  * Key translation
  * | Json Key | Integer Value |
