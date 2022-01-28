@@ -360,9 +360,15 @@ oc_do_s_mode(char *resource_url, char *rp)
   // loop over all group addresses and issue the s-mode command
   int index = oc_core_find_group_object_table_url(resource_url);
   while (index != -1) {
-    PRINT("  index : %d\n", index);
+    PRINT("  index : %d\n", rp, index);
 
     int ga_len = oc_core_find_group_object_table_number_group_entries(index);
+    oc_cflag_mask_t cflags = oc_core_group_object_table_cflag_entries(index);
+    PRINT(" rp = %s cflags %d", rp, cflags);
+
+    //if (cflags & OC_CFLAG_WRITE) {
+    //  break;
+    //}
     for (int j = 0; j < ga_len; j++) {
       group_address = oc_core_find_group_object_table_group_entry(index, j);
       PRINT("   ga : %d\n", group_address);
