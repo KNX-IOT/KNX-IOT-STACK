@@ -81,6 +81,14 @@ oc_spake_set_password(char *new_pass)
 }
 
 int
+oc_spake_encode_pubkey(mbedtls_ecp_point *P, uint8_t out[kPubKeySize])
+{
+  size_t olen;
+  return mbedtls_ecp_point_write_binary(&grp, P, MBEDTLS_ECP_PF_UNCOMPRESSED,
+                                        &olen, out, kPubKeySize);
+}
+
+int
 oc_spake_parameter_exchange(oc_string_t *rnd, oc_string_t *salt, int *it)
 {
   unsigned int it_seed;
@@ -190,9 +198,9 @@ calculate_pA(mbedtls_ecp_point *pA, const mbedtls_ecp_point *pubA,
 }
 
 // pB = pubB + w0 * N
-static int
-calculate_pB(mbedtls_ecp_point *pB, const mbedtls_ecp_point *pubB,
-             const mbedtls_mpi *w0)
+int
+oc_spake_calc_pB(mbedtls_ecp_point *pB, const mbedtls_ecp_point *pubB,
+                 const mbedtls_mpi *w0)
 {
   return calculate_pX(pB, pubB, w0, bytes_N, sizeof(bytes_N));
 }
@@ -313,7 +321,7 @@ encode_point(mbedtls_ecp_group *grp, const mbedtls_ecp_point *point,
 {
   size_t len_point = 0;
   size_t len_len = 0;
-  uint8_t point_buf[65];
+  uint8_t point_buf[kPubKeySize];
   int ret;
   ret =
     mbedtls_ecp_point_write_binary(grp, point, MBEDTLS_ECP_PF_UNCOMPRESSED,
@@ -484,7 +492,7 @@ oc_spake_test_vector()
                                   mbedtls_ctr_drbg_random, &ctr_drbg_ctx));
 
   // Y = pubB + w0*N
-  MBEDTLS_MPI_CHK(calculate_pB(&Y, &pubB, &w0));
+  MBEDTLS_MPI_CHK(oc_spake_calc_pB(&Y, &pubB, &w0));
   MBEDTLS_MPI_CHK(mbedtls_ecp_point_write_binary(
     &grp, &Y, MBEDTLS_ECP_PF_UNCOMPRESSED, &cmplen, cmpbuf, sizeof(cmpbuf)));
   // check the value of Y is correct
@@ -509,7 +517,7 @@ oc_spake_test_vector()
                                   mbedtls_ctr_drbg_random, &ctr_drbg_ctx));
 
   // Y = pubB + w0*N
-  MBEDTLS_MPI_CHK(calculate_pB(&bad_Y, &bad_pubB, &w0));
+  MBEDTLS_MPI_CHK(oc_spake_calc_pB(&bad_Y, &bad_pubB, &w0));
   MBEDTLS_MPI_CHK(
     mbedtls_ecp_point_write_binary(&grp, &bad_Y, MBEDTLS_ECP_PF_UNCOMPRESSED,
                                    &cmplen, cmpbuf, sizeof(cmpbuf)));

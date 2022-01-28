@@ -1074,6 +1074,19 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
       goto error;
     }
 
+    // next step: calculate pB, encode it into the struct
+    mbedtls_ecp_point pB;
+    mbedtls_ecp_point_init(&pB);
+    oc_spake_calc_pB(&pB, &spake_data.pub_y, &spake_data.w0);
+
+    oc_free_string(&g_pase.pb);
+    oc_alloc_string(&g_pase.pb, kPubKeySize);
+    oc_spake_encode_pubkey(&pB, oc_cast(g_pase.pb, uint8_t));
+    mbedtls_ecp_point_free(&pB);
+
+    // first, make sure pA is not equal to I
+    // use pA to calculate cB, encode it into the struct, then send the response
+
     oc_rep_begin_root_object();
     // pb (11)
     oc_rep_i_set_text_string(root, SPAKE_PB, oc_string(g_pase.pb));
