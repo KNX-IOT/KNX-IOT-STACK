@@ -366,7 +366,7 @@ oc_do_s_mode(char *resource_url, char *rp)
     oc_cflag_mask_t cflags = oc_core_group_object_table_cflag_entries(index);
     PRINT(" rp = %s cflags %d", rp, cflags);
 
-    //if (cflags & OC_CFLAG_WRITE) {
+    // if (cflags & OC_CFLAG_WRITE) {
     //  break;
     //}
     for (int j = 0; j < ga_len; j++) {
