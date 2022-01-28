@@ -441,11 +441,11 @@ def do_sequence_fp_programming(my_stack):
     # group object table
     # id (0)= 1
     # url (11)= /p/light
-    # ga (7 )= 1
-    # cflags (8) = ["r" ] ; read = 1, write = 2, transmit = 3 update = 4
-    content = [ {0: 5, 11: "p/push5", 7:[1], 8: [2] } ,
-                {0: 2, 11: "p/light2", 7:[2], 8: [2,4] },
-                {0: 225, 11: "p/light255", 7:[2], 8: [2,4] }]
+    # ga (7 )= 
+    # cflags (8) = ["r" ] ; read = 8, write=16, init=32,transmit=64, update=128
+    content = [ {0: 5, 11: "p/push5", 7:[1], 8: 16 } ,
+                {0: 2, 11: "p/light2", 7:[2], 8: 16+64 },
+                {0: 225, 11: "p/light255", 7:[2], 8: 16+64 }]
     do_check_table(my_stack, sn, "/fp/g",content)
 
     content = [ {0: 1, 11: "/p/push1", 7:[1], 12 :3 },
@@ -493,10 +493,11 @@ def do_sequence_knx_knx_s_mode(my_stack):
     # id (0)= 1
     # url (11)= /p/light
     # ga (7 )= 1
-    # cflags (8) = ["r" ] ; read = 1, write = 2, transmit = 3 update = 4
-    content = [ {0: 5, 11: "p/push5", 7:[1], 8: [2] } ,
-                {0: 2, 11: "p/light2", 7:[2], 8: [2,4] },
-                {0: 225, 11: "p/light255", 7:[2], 8: [2,4] }]
+    # cflags (8) = ["r" ] ; read = 8, write=16, init=32,transmit=64, update=128
+    #
+    content = [ {0: 5, 11: "p/push5", 7:[1], 8: 8 } ,
+                {0: 2, 11: "p/light2", 7:[2], 8: 8+32 },
+                {0: 225, 11: "p/light255", 7:[2], 8: 8+64 }]
     response =  my_stack.issue_cbor_post(sn,"/fp/g",content)
     print ("response:",response.get_payload())
     my_stack.purge_response(response)
