@@ -94,14 +94,14 @@ char *oc_at_profile_to_string(oc_at_profile_t at_profile);
  */
 typedef struct oc_auth_at_t
 {
-  oc_string_t id;                //!< (0) token id
-  oc_interface_mask_t interface; //!< (9) the interfaces
-  oc_at_profile_t profile;       //!< (19) "coap_oscore" or "coap_dtls"
-  oc_string_t sub;               //!< dtls 2 sub
-  oc_string_t kid;               //!< dtls 8:2 cnf:kid
-  oc_string_t osc_id;            //!< oscore cnf::osc::kid
-  oc_string_t osc_ms;            //!< oscore cnf::osc:ms 4
-  oc_string_t osc_alg;           //!< oscore cnf::osc:alg
+  oc_string_t id;                /**< (0) token id*/
+  oc_interface_mask_t interface; /**< (9) the interfaces*/
+  oc_at_profile_t profile;       /**< (19) "coap_oscore" or "coap_dtls"*/
+  oc_string_t sub;               /**< dtls 2 sub*/
+  oc_string_t kid;               /**< dtls 8:2 cnf:kid*/
+  oc_string_t osc_id;            /**< oscore cnf::osc::kid*/
+  oc_string_t osc_ms;            /**< oscore cnf::osc:ms 4*/
+  oc_string_t osc_alg;           /**< oscore cnf::osc:alg*/
 
   int *ga;    ///< array of integers, for the group objects in the interface
   int ga_len; //< length of the array of ga identifiers
@@ -182,6 +182,15 @@ void oc_create_knx_sec_resources(size_t device);
 bool oc_if_method_allowed_according_to_mask(oc_interface_mask_t iface_mask,
                                             oc_method_t method);
 
+/**
+ * @brief check access control based on acl and resource interfaces
+ * 
+ * @param method invocation method for thiscall
+ * @param resource the resource being called
+ * @param endpoint the used endpoint
+ * @return true has access
+ * @return false does not have access
+ */
 bool oc_knx_sec_check_acl(oc_method_t method, oc_resource_t *resource,
                           oc_endpoint_t *endpoint);
 
