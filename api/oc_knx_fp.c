@@ -550,7 +550,14 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 #endif
           if (oc_string_len(object->name) == 0 && object->iname == 0) {
             {
+              // id (0)
               g_got[index].id = object->value.integer;
+            }
+          }
+          if (oc_string_len(object->name) == 0 && object->iname == 8) {
+            {
+              // cflags (8)
+              g_got[index].cflags = object->value.integer;
             }
           }
           break;
@@ -708,24 +715,28 @@ oc_core_fp_g_x_get_handler(oc_request_t *request,
   oc_rep_i_set_int_array(root, 7, g_got[index].ga, g_got[index].ga_len);
 
   // cflags 8
-  oc_rep_i_set_key(&root_map, 8);
-  oc_rep_begin_array(&root_map, cflags);
-  if (g_got[index].cflags & OC_CFLAG_READ) {
-    oc_rep_add_int(cflags, 1);
-  }
-  if (g_got[index].cflags & OC_CFLAG_WRITE) {
-    oc_rep_add_int(cflags, 2);
-  }
-  if (g_got[index].cflags & OC_CFLAG_TRANSMISSION) {
-    oc_rep_add_int(cflags, 3);
-  }
-  if (g_got[index].cflags & OC_CFLAG_UPDATE) {
-    oc_rep_add_int(cflags, 4);
-  }
-  if (g_got[index].cflags & OC_CFLAG_INIT) {
-    oc_rep_add_int(cflags, 5);
-  }
-  oc_rep_close_array(root, cflags);
+
+  // id 0
+  oc_rep_i_set_int(root, 8, g_got[index].cflags);
+
+  // oc_rep_i_set_key(&root_map, 8);
+  // oc_rep_begin_array(&root_map, cflags);
+  // if (g_got[index].cflags & OC_CFLAG_READ) {
+  //  oc_rep_add_int(cflags, 1);
+  //}
+  // if (g_got[index].cflags & OC_CFLAG_WRITE) {
+  //  oc_rep_add_int(cflags, 2);
+  //}
+  // if (g_got[index].cflags & OC_CFLAG_TRANSMISSION) {
+  //  oc_rep_add_int(cflags, 3);
+  //}
+  // if (g_got[index].cflags & OC_CFLAG_UPDATE) {
+  //  oc_rep_add_int(cflags, 4);
+  //}
+  // if (g_got[index].cflags & OC_CFLAG_INIT) {
+  //  oc_rep_add_int(cflags, 5);
+  //}
+  // oc_rep_close_array(root, cflags);
 
   oc_rep_end_root_object();
 
@@ -1479,6 +1490,28 @@ oc_core_get_recipient_index_url_or_path(int index)
 // -----------------------------------------------------------------------------
 
 void
+print_cflags(oc_cflag_mask_t cflags)
+{
+
+  if (cflags & OC_CFLAG_READ) {
+    PRINT("r");
+  }
+  if (cflags & OC_CFLAG_WRITE) {
+    PRINT("w");
+  }
+  if (cflags & OC_CFLAG_INIT) {
+    PRINT("i");
+  }
+  if (cflags & OC_CFLAG_TRANSMISSION) {
+    PRINT("t");
+  }
+  if (cflags & OC_CFLAG_UPDATE) {
+    PRINT("u");
+  }
+  PRINT("\n");
+}
+
+void
 oc_print_group_object_table_entry(int entry)
 {
   // PRINT("  GOT [%d] -> %d\n", entry, g_got[entry].ga_len);
@@ -1488,7 +1521,8 @@ oc_print_group_object_table_entry(int entry)
 
   PRINT("    id %d\n", g_got[entry].id);
   PRINT("    href  %s\n", oc_string(g_got[entry].href));
-  PRINT("    cflags  %d\n", g_got[entry].cflags);
+  PRINT("    cflags  %d ", g_got[entry].cflags);
+  print_cflags(g_got[entry].cflags);
   PRINT("    ga [");
   for (int i = 0; i < g_got[entry].ga_len; i++) {
     PRINT(" %d", g_got[entry].ga[i]);
@@ -1925,6 +1959,7 @@ oc_create_knx_fp_resources(size_t device_index)
 }
 
 // -----------------------------------------------------------------------------
+
 bool
 is_in_array(int value, int *array, int array_size)
 {
