@@ -52,7 +52,6 @@
 #define MBEDTLS_SSL_DTLS_ANTI_REPLAY
 #define MBEDTLS_SSL_DTLS_HELLO_VERIFY
 
-
 /* mbed TLS modules */
 #define MBEDTLS_AES_C
 #define MBEDTLS_CIPHER_C
