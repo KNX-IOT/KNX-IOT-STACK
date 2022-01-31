@@ -37,6 +37,12 @@ target_include_directories(mbedcrypto PUBLIC
     ${PROJECT_SOURCE_DIR}
     ${PROJECT_SOURCE_DIR}/include
     ${PROJECT_SOURCE_DIR}/deps/mbedtls/include
+    ${PROJECT_SOURCE_DIR}/security
+)
+
+target_compile_definitions(mbedcrypto
+    PUBLIC
+    MBEDTLS_CONFIG_FILE=\"knx_mbedtls_config.h\"
 )
 
 if(TARGET mbedcrypto-plat)
