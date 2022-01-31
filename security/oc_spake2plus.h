@@ -6,6 +6,16 @@
 
 enum { kPubKeySize = 65 };
 
+typedef struct
+{
+  mbedtls_mpi w0;
+  mbedtls_ecp_point L;
+  mbedtls_mpi y;
+  mbedtls_ecp_point pub_y;
+} spake_data_t;
+
+#define SPAKE_CONTEXT "knxpase"
+
 /**
  * @brief Initialize Spake2+
  *

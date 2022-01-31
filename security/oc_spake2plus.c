@@ -354,6 +354,40 @@ encode_mpi(mbedtls_mpi *mpi, uint8_t *buffer)
 }
 
 int
+oc_spake_encode_cB(spake_data_t *spake_data, uint8_t X_enc[kPubKeySize],
+                   mbedtls_ecp_point *Y)
+{
+  int ret = 0;
+  mbedtls_ecp_point Z, V, X;
+
+  mbedtls_ecp_point_init(&Z);
+  mbedtls_ecp_point_init(&V);
+  mbedtls_ecp_point_init(&X);
+
+  mbedtls_ecp_point_read_binary(&grp, &X, X_enc, kPubKeySize);
+  // abort if X is the point at infinity
+  MBEDTLS_MPI_CHK(mbedtls_ecp_is_zero(&X));
+
+  // Z = h*y*(X - w0*M)
+  MBEDTLS_MPI_CHK(calculate_Z_M(&Z, &spake_data->y, &X, &spake_data->w0));
+
+  // V = h*y*L, where L = w1*P
+  MBEDTLS_MPI_CHK(mbedtls_ecp_mul(&grp, &V, &spake_data->y, &spake_data->L,
+                                  mbedtls_ctr_drbg_random, &ctr_drbg_ctx));
+
+  // calculate transcript
+  // for KNX, the identities A and B are missing
+  // we have X (pA) and Y (pB)
+  // we have Z, V & w0
+
+cleanup:
+  mbedtls_ecp_point_free(&Z);
+  mbedtls_ecp_point_free(&V);
+  mbedtls_ecp_point_free(&X);
+  return ret;
+}
+
+int
 oc_spake_test_vector()
 {
   // Test Vector values from Spake2+ draft.
