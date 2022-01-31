@@ -592,9 +592,9 @@ oc_create_auth_at_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_auth_at_resource\n");
   // "/a/sen"
-  oc_core_lf_populate_resource(resource_idx, device, "/auth/at", OC_IF_LI,
-                               APPLICATION_LINK_FORMAT, OC_DISCOVERABLE,
-                               oc_core_auth_at_get_handler, 0,
+  oc_core_lf_populate_resource(resource_idx, device, "/auth/at",
+                               OC_IF_B | OC_IF_SEC, APPLICATION_LINK_FORMAT,
+                               OC_DISCOVERABLE, oc_core_auth_at_get_handler, 0,
                                oc_core_auth_at_post_handler, 0, 1, "dpt.a[n]");
 }
 
@@ -772,7 +772,7 @@ oc_create_auth_at_x_resource(int resource_idx, size_t device)
   OC_DBG("oc_create_auth_at_x_resource\n");
   PRINT("oc_create_auth_at_x_resource\n");
   // "/a/sen"
-  oc_core_lf_populate_resource(resource_idx, device, "/auth/at/*", OC_IF_LI,
+  oc_core_lf_populate_resource(resource_idx, device, "/auth/at/*", OC_IF_SEC,
                                APPLICATION_CBOR, OC_DISCOVERABLE,
                                oc_core_auth_at_x_get_handler, 0, 0,
                                oc_core_auth_at_x_delete_handler, 1, "dpt.a[n]");
