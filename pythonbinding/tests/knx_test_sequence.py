@@ -810,6 +810,7 @@ def do_sequence(my_stack):
         do_sequence_knx_crc(my_stack)
         do_sequence_knx_osn(my_stack)
         do_sequence_core_knx(my_stack)
+        do_auth_at(my_stack)
         return
         # .knx
         #do_sequence_a_sen(my_stack)
