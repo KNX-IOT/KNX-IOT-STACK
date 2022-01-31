@@ -35,7 +35,8 @@
 #define MBEDTLS_MEMORY_BUFFER_ALLOC_C
 #endif /* !OC_DYNAMIC_ALLOCATION */
 #ifdef OC_PKI
-#if defined(_WIN64) || defined(_WIN32) || defined(__APPLE__) || defined(__linux) || defined(__ANDROID__)
+#if defined(_WIN64) || defined(_WIN32) || defined(__APPLE__) ||                \
+  defined(__linux) || defined(__ANDROID__)
 #define MBEDTLS_HAVE_TIME
 #define MBEDTLS_HAVE_TIME_DATE
 #endif /* One of the major OSs */
@@ -68,7 +69,7 @@
 #define MBEDTLS_AES_ROM_TABLES
 
 /* Save some RAM by adjusting to your exact needs */
-#define MBEDTLS_PSK_MAX_LEN    16 /* 128-bits keys are generally enough */
+#define MBEDTLS_PSK_MAX_LEN 16 /* 128-bits keys are generally enough */
 
 /*
  * You should adjust this to the exact number of sources you're using: default
@@ -122,7 +123,7 @@
 #define MBEDTLS_BASE64_C
 #define MBEDTLS_X509_CHECK_EXTENDED_KEY_USAGE
 
-#define MBEDTLS_PK_WRITE_C //extract public key
+#define MBEDTLS_PK_WRITE_C // extract public key
 #define MBEDTLS_PEM_WRITE_C
 
 #ifdef OC_CLOUD
