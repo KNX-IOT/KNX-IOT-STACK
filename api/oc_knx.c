@@ -1110,6 +1110,20 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
   }
   if (valid_request == SPAKE_CA) {
     // check key confirmation!!! don't just send status changed!!!
+
+    // calculate expected cA
+    uint8_t expected_ca[32];
+    oc_spake_calc_cA(&spake_data, expected_ca,
+                     oc_cast(g_pase.pb, uint8_t));
+
+    if (memcmp(expected_ca, oc_cast(g_pase.ca, uint8_t), 32) != 0) {
+      OC_ERR("oc_spake_calc_cA failed");
+      goto error;
+    }
+
+    // if you are here, key confirmation is ok - create auth token & start communicating securely
+
+
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
     return;
   }
