@@ -12,6 +12,7 @@ typedef struct
   mbedtls_ecp_point L;
   mbedtls_mpi y;
   mbedtls_ecp_point pub_y;
+  uint8_t Ka_Ke[32];
 } spake_data_t;
 
 #define SPAKE_CONTEXT "knxpase"
@@ -102,5 +103,17 @@ int oc_spake_calc_pB(mbedtls_ecp_point *pB, const mbedtls_ecp_point *pubB,
                      const mbedtls_mpi *w0);
 
 int oc_spake_encode_pubkey(mbedtls_ecp_point *P, uint8_t out[kPubKeySize]);
+
+/**
+ * @brief Calculate the shared secret
+ * 
+ * @param spake_data SPAKE2+ data structure, after receipt of Credential Exchange message.
+ * The output of this function is spake_data.Ka_Ke
+ * @param X_enc The X parameter (pA) encoded as binary data
+ * @param Y The Y parameter (pB) encoded as an ECP point
+ * @return int 0 on success, mbedtls error code on failure
+ */
+int oc_spake_calc_transcript(spake_data_t *spake_data, uint8_t X_enc[kPubKeySize],
+                   mbedtls_ecp_point *Y);
 
 #endif // OC_SPAKE2PLUS_H

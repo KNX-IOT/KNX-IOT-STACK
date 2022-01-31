@@ -1080,7 +1080,8 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     // first, make sure pA is not equal to I
     // use pA to calculate cB, encode it into the struct, then send the response
 
-    // oc_spake_calc_cB();
+    oc_spake_calc_transcript(&spake_data, oc_cast(g_pase.pa, uint8_t), &pB);
+    // oc_spake_calc_cb
     mbedtls_ecp_point_free(&pB);
 
     oc_rep_begin_root_object();

@@ -354,11 +354,13 @@ encode_mpi(mbedtls_mpi *mpi, uint8_t *buffer)
 }
 
 int
-oc_spake_encode_cB(spake_data_t *spake_data, uint8_t X_enc[kPubKeySize],
+oc_spake_calc_transcript(spake_data_t *spake_data, uint8_t X_enc[kPubKeySize],
                    mbedtls_ecp_point *Y)
 {
   int ret = 0;
   mbedtls_ecp_point Z, V, X;
+  uint8_t ttbuf[2048];
+  size_t ttlen = 0;
 
   mbedtls_ecp_point_init(&Z);
   mbedtls_ecp_point_init(&V);
@@ -376,9 +378,33 @@ oc_spake_encode_cB(spake_data_t *spake_data, uint8_t X_enc[kPubKeySize],
                                   mbedtls_ctr_drbg_random, &ctr_drbg_ctx));
 
   // calculate transcript
-  // for KNX, the identities A and B are missing
-  // we have X (pA) and Y (pB)
-  // we have Z, V & w0
+  // Context
+  ttlen += encode_string(SPAKE_CONTEXT, ttbuf + ttlen);
+  // M
+  mbedtls_ecp_point M;
+  mbedtls_ecp_point_init(&M);
+  MBEDTLS_MPI_CHK(
+    mbedtls_ecp_point_read_binary(&grp, &M, bytes_M, sizeof(bytes_M)));
+  ttlen += encode_point(&grp, &M, ttbuf + ttlen);
+  // N
+  mbedtls_ecp_point N;
+  mbedtls_ecp_point_init(&N);
+  MBEDTLS_MPI_CHK(
+    mbedtls_ecp_point_read_binary(&grp, &N, bytes_N, sizeof(bytes_N)));
+  ttlen += encode_point(&grp, &N, ttbuf + ttlen);
+  // X
+  ttlen += encode_point(&grp, &X, ttbuf + ttlen);
+  // Y
+  ttlen += encode_point(&grp, Y, ttbuf + ttlen);
+  // Z
+  ttlen += encode_point(&grp, &Z, ttbuf + ttlen);
+  // V
+  ttlen += encode_point(&grp, &V, ttbuf + ttlen);
+  // w0
+  ttlen += encode_mpi(&spake_data->w0, ttbuf + ttlen);
+
+  // calculate hash
+  mbedtls_sha256(ttbuf, ttlen, spake_data->Ka_Ke, 0);
 
 cleanup:
   mbedtls_ecp_point_free(&Z);
