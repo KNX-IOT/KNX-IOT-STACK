@@ -1071,17 +1071,32 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     // next step: calculate pB, encode it into the struct
     mbedtls_ecp_point pB;
     mbedtls_ecp_point_init(&pB);
-    oc_spake_calc_pB(&pB, &spake_data.pub_y, &spake_data.w0);
+    if (oc_spake_calc_pB(&pB, &spake_data.pub_y, &spake_data.w0))
+      ;
+    {
+      mbedtls_ecp_point_free(&pB);
+      goto error;
+    }
 
     oc_free_string(&g_pase.pb);
     oc_alloc_string(&g_pase.pb, kPubKeySize);
-    oc_spake_encode_pubkey(&pB, oc_cast(g_pase.pb, uint8_t));
 
-    // first, make sure pA is not equal to I
-    // use pA to calculate cB, encode it into the struct, then send the response
+    if (oc_spake_encode_pubkey(&pB, oc_cast(g_pase.pb, uint8_t)))
+      ;
+    {
+      mbedtls_ecp_point_free(&pB);
+      goto error;
+    }
 
-    oc_spake_calc_transcript(&spake_data, oc_cast(g_pase.pa, uint8_t), &pB);
-    // oc_spake_calc_cb
+    if (oc_spake_calc_transcript(&spake_data, oc_cast(g_pase.pa, uint8_t), &pB))
+      ;
+    {
+      mbedtls_ecp_point_free(&pB);
+      goto error;
+    }
+
+    oc_spake_calc_cB(&spake_data, oc_cast(g_pase.cb, uint8_t),
+                     oc_cast(g_pase.pa, uint8_t));
     mbedtls_ecp_point_free(&pB);
 
     oc_rep_begin_root_object();

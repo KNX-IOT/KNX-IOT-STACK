@@ -106,14 +106,20 @@ int oc_spake_encode_pubkey(mbedtls_ecp_point *P, uint8_t out[kPubKeySize]);
 
 /**
  * @brief Calculate the shared secret
- * 
- * @param spake_data SPAKE2+ data structure, after receipt of Credential Exchange message.
- * The output of this function is spake_data.Ka_Ke
+ *
+ * @param spake_data SPAKE2+ data structure, after receipt of Credential
+ * Exchange message. The output of this function is spake_data.Ka_Ke
  * @param X_enc The X parameter (pA) encoded as binary data
  * @param Y The Y parameter (pB) encoded as an ECP point
  * @return int 0 on success, mbedtls error code on failure
  */
-int oc_spake_calc_transcript(spake_data_t *spake_data, uint8_t X_enc[kPubKeySize],
-                   mbedtls_ecp_point *Y);
+int oc_spake_calc_transcript(spake_data_t *spake_data,
+                             uint8_t X_enc[kPubKeySize], mbedtls_ecp_point *Y);
+
+int oc_spake_calc_cA(spake_data_t *spake_data, uint8_t cA[32],
+                     uint8_t bytes_Y[kPubKeySize]);
+
+int oc_spake_calc_cB(spake_data_t *spake_data, uint8_t cB[32],
+                     uint8_t bytes_X[kPubKeySize]);
 
 #endif // OC_SPAKE2PLUS_H

@@ -355,7 +355,7 @@ encode_mpi(mbedtls_mpi *mpi, uint8_t *buffer)
 
 int
 oc_spake_calc_transcript(spake_data_t *spake_data, uint8_t X_enc[kPubKeySize],
-                   mbedtls_ecp_point *Y)
+                         mbedtls_ecp_point *Y)
 {
   int ret = 0;
   mbedtls_ecp_point Z, V, X;
@@ -411,6 +411,37 @@ cleanup:
   mbedtls_ecp_point_free(&V);
   mbedtls_ecp_point_free(&X);
   return ret;
+}
+
+int
+oc_spake_calc_cB(spake_data_t *spake_data, uint8_t cB[32],
+                 uint8_t bytes_X[kPubKeySize])
+{
+  // |KcA| + |KcB| = 16 bytes
+  uint8_t KcA_KcB[32];
+  mbedtls_hkdf(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), NULL, 0,
+               spake_data->Ka_Ke, sizeof(spake_data->Ka_Ke) / 2,
+               "ConfirmationKeys", strlen("ConfirmationKeys"), KcA_KcB, 32);
+
+  // Calculate cB
+  mbedtls_md_hmac(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256),
+                  KcA_KcB + sizeof(KcA_KcB) / 2, sizeof(KcA_KcB) / 2, bytes_X,
+                  kPubKeySize, cB);
+}
+
+int
+oc_spake_calc_cA(spake_data_t *spake_data, uint8_t cA[32],
+                 uint8_t bytes_Y[kPubKeySize])
+{
+  // |KcA| + |KcB| = 16 bytes
+  uint8_t KcA_KcB[32];
+  mbedtls_hkdf(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), NULL, 0,
+               spake_data->Ka_Ke, sizeof(spake_data->Ka_Ke) / 2,
+               "ConfirmationKeys", strlen("ConfirmationKeys"), KcA_KcB, 32);
+
+  // Calculate cA and cB
+  mbedtls_md_hmac(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), KcA_KcB,
+                  sizeof(KcA_KcB) / 2, bytes_Y, kPubKeySize, cA);
 }
 
 int
