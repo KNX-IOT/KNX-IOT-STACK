@@ -38,4 +38,7 @@ oc_audit_log(size_t device, const char *aeid, const char *message,
 #endif
 }
 
+#else  /* OC_SECURITY */
+
+typedef int dummy_declaration;
 #endif /* OC_SECURITY */
