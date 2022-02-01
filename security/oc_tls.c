@@ -245,7 +245,7 @@ static oc_event_callback_retval_t
 reset_in_RFOTM(void *data)
 {
   size_t device = (size_t)data;
-  oc_pstat_reset_device(device, true);
+  //oc_pstat_reset_device(device, true);
   return OC_EVENT_DONE;
 }
 
@@ -319,7 +319,7 @@ oc_tls_free_peer(oc_tls_peer_t *peer, bool inactivity_cb)
 
 #ifdef OC_PKI
   /* Free all roles bound to this (D)TLS session */
-  oc_sec_free_roles(peer);
+ // oc_sec_free_roles(peer);
 #endif /* OC_PKI */
 
 #ifdef OC_TCP
@@ -569,6 +569,7 @@ oc_tls_pbkdf2(const unsigned char *pin, size_t pin_len, oc_uuid_t *uuid,
   return ret;
 }
 
+/*
 static void
 oc_tls_audit_log(const char *aeid, const char *message, uint8_t category,
                  uint8_t priority, oc_tls_peer_t *peer)
@@ -583,6 +584,7 @@ oc_tls_audit_log(const char *aeid, const char *message, uint8_t category,
   oc_audit_log((peer) ? peer->endpoint.device : 0, aeid, message, category,
                priority, (const char **)aux, 1);
 }
+*/
 
 static int
 get_psk_cb(void *data, mbedtls_ssl_context *ssl, const unsigned char *identity,
@@ -1031,7 +1033,7 @@ static void
 oc_tls_set_ciphersuites(mbedtls_ssl_config *conf, oc_endpoint_t *endpoint)
 {
   (void)endpoint;
-#ifdef OC_PKI
+#ifdef OC_PKIx
   mbedtls_ssl_conf_ca_chain(conf, &trust_anchors, NULL);
 #ifdef OC_CLIENT
   bool loaded_chain = false;
@@ -1125,7 +1127,7 @@ oc_tls_select_anon_ciphersuite(void)
 }
 #endif /* OC_CLIENT */
 
-#ifdef OC_PKI
+#ifdef OC_PKIx
 static int
 verify_certificate(void *opq, mbedtls_x509_crt *crt, int depth, uint32_t *flags)
 {
@@ -1262,7 +1264,7 @@ verify_certificate(void *opq, mbedtls_x509_crt *crt, int depth, uint32_t *flags)
   OC_DBG("verified certificate at depth %d", depth);
   return 0;
 }
-#endif /* OC_PKI */
+#endif /* OC_PKIx */
 
 static int
 oc_tls_populate_ssl_config(mbedtls_ssl_config *conf, size_t device, int role,
