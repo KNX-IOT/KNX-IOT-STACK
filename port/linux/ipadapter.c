@@ -809,7 +809,8 @@ oc_udp_add_socks_to_fd_set(ip_context_t *dev)
 #ifdef OC_IPV4
   FD_SET(dev->server4_sock, &dev->rfds);
   FD_SET(dev->mcast4_sock, &dev->rfds);
-#ifdef OC_SECURITY
+//#ifdef OC_SECURITY
+#ifdef OC_OSCORE
   FD_SET(dev->secure4_sock, &dev->rfds);
 #endif /* OC_SECURITY */
 #endif /* OC_IPV4 */
