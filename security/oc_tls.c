@@ -154,9 +154,12 @@ static unsigned char alloc_buf[MBEDTLS_ALLOC_BUF_SIZE];
 
 static int *ciphers = NULL;
 #ifdef OC_PKI
-static int selected_mfg_cred = -1;
-static int selected_id_cred = -1;
-static const int default_priority[6] = {
+//static 
+int selected_mfg_cred = -1;
+//static 
+int selected_id_cred = -1;
+//static 
+const int default_priority[6] = {
 #else  /* OC_PKI */
 static const int default_priority[2] = {
 #endif /* !OC_PKI */
@@ -171,24 +174,28 @@ static const int default_priority[2] = {
 };
 
 #ifdef OC_CLIENT
-static const int psk_priority[2] = {
+//static 
+const int psk_priority[2] = {
   MBEDTLS_TLS_ECDHE_PSK_WITH_AES_128_CBC_SHA256, 0
 };
 
-static const int anon_ecdh_priority[2] = {
+//static 
+const int anon_ecdh_priority[2] = {
   MBEDTLS_TLS_ECDH_ANON_WITH_AES_128_CBC_SHA256, 0
 };
 #endif /* OC_CLIENT */
 
-static const int jw_otm_priority[2] = {
+//static 
+const int jw_otm_priority[2] = {
   MBEDTLS_TLS_ECDH_ANON_WITH_AES_128_CBC_SHA256, 0
 };
 
-static const int pin_otm_priority[2] = {
+//static 
+const int pin_otm_priority[2] = {
   MBEDTLS_TLS_ECDHE_PSK_WITH_AES_128_CBC_SHA256, 0
 };
 
-#ifdef OC_PKI
+#ifdef OC_PKIx
 static const int cert_otm_priority[5] = {
   MBEDTLS_TLS_ECDHE_ECDSA_WITH_AES_128_CCM_8,
   MBEDTLS_TLS_ECDHE_ECDSA_WITH_AES_128_CCM,
@@ -241,13 +248,14 @@ is_peer_active(oc_tls_peer_t *peer)
   return false;
 }
 
-static oc_event_callback_retval_t
-reset_in_RFOTM(void *data)
-{
-  size_t device = (size_t)data;
+//static oc_event_callback_retval_t
+//reset_in_RFOTM(void *data)
+//{
+//  (void)data;
+  //size_t device = (size_t)data;
   //oc_pstat_reset_device(device, true);
-  return OC_EVENT_DONE;
-}
+//  return OC_EVENT_DONE;
+//}
 
 static oc_event_callback_retval_t oc_tls_inactive(void *data);
 
@@ -298,7 +306,7 @@ oc_tls_free_peer(oc_tls_peer_t *peer, bool inactivity_cb)
   OC_DBG("\noc_tls: removing peer");
   oc_list_remove(tls_peers, peer);
 
-  size_t device = peer->endpoint.device;
+  //size_t device = peer->endpoint.device;
   //oc_sec_pstat_t *pstat = oc_sec_get_pstat(device);
   //if (pstat->s == OC_DOS_RFOTM) {
   //  oc_set_delayed_callback((void *)device, &reset_in_RFOTM, 0);
