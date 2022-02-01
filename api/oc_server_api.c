@@ -267,7 +267,9 @@ oc_populate_resource_object(oc_resource_t *resource, const char *name,
   resource->properties = 0;
   resource->device = device;
 
-#ifdef OC_SECURITY
+  // TODO
+//#ifdef OC_SECURITY
+#ifdef OC_OSCORE
   resource->properties |= OC_SECURE;
 #endif /* OC_SECURITY */
 }

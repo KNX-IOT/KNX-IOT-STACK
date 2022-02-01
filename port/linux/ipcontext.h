@@ -51,7 +51,8 @@ typedef struct tcp_context_t
   struct sockaddr_storage server4;
   int server4_sock;
   uint16_t port4;
-#ifdef OC_SECURITY
+//#ifdef OC_SECURITY
+#ifdef OC_OSCORE
   struct sockaddr_storage secure4;
   int secure4_sock;
   uint16_t tls4_port;
@@ -70,7 +71,8 @@ typedef struct ip_context_t
   int mcast_sock;
   int server_sock;
   uint16_t port;
-#ifdef OC_SECURITY
+//#ifdef OC_SECURITY
+#ifdef OC_OSCORE
   struct sockaddr_storage secure;
   int secure_sock;
   uint16_t dtls_port;

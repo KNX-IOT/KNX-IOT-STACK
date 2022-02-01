@@ -23,6 +23,8 @@ option(ENABLE_TESTING "Build mbed TLS tests." OFF)
 
 set(OC_DYNAMIC_ALLOCATION_ENABLED ON CACHE BOOL "Enable dynamic memory allocation within the OCF stack and MBedtls.")
 #set(OC_SECURITY_ENABLED ON CACHE BOOL "Enable security")
+
+set(OC_OSCORE_ENABLED ON CACHE BOOL "Enable oscore")
 set(OC_PKI_ENABLED ON CACHE BOOL "Enable PKI security")
 set(OC_DEBUG_ENABLED OFF CACHE BOOL "Enable debug messages")
 
@@ -124,10 +126,13 @@ target_sources(kis-common INTERFACE
     ${PROJECT_SOURCE_DIR}/security/oc_doxm.c
     ${PROJECT_SOURCE_DIR}/security/oc_keypair.c
     #${PROJECT_SOURCE_DIR}/security/oc_obt.c
-    ${PROJECT_SOURCE_DIR}/security/oc_obt_certs.c
+    #${PROJECT_SOURCE_DIR}/security/oc_obt_certs.c
     #${PROJECT_SOURCE_DIR}/security/oc_obt_otm_cert.c
     #${PROJECT_SOURCE_DIR}/security/oc_obt_otm_justworks.c
     #${PROJECT_SOURCE_DIR}/security/oc_obt_otm_randompin.c
+    ${PROJECT_SOURCE_DIR}/security/oc_oscore_context.c
+    ${PROJECT_SOURCE_DIR}/security/oc_oscore_crypto.c
+    ${PROJECT_SOURCE_DIR}/security/oc_oscore_engine.c
     ${PROJECT_SOURCE_DIR}/security/oc_pki.c
     ${PROJECT_SOURCE_DIR}/security/oc_pstat.c
     ${PROJECT_SOURCE_DIR}/security/oc_roles.c
@@ -157,6 +162,7 @@ target_sources(kis-coap INTERFACE
     ${PROJECT_SOURCE_DIR}/messaging/coap/coap_signal.c
     ${PROJECT_SOURCE_DIR}/messaging/coap/engine.c
     ${PROJECT_SOURCE_DIR}/messaging/coap/observe.c
+    ${PROJECT_SOURCE_DIR}/messaging/coap/oscore.c
     ${PROJECT_SOURCE_DIR}/messaging/coap/separate.c
     ${PROJECT_SOURCE_DIR}/messaging/coap/transactions.c
 )
@@ -173,6 +179,11 @@ endif()
 
 if(OC_SECURITY_ENABLED)
    # target_compile_definitions(mbedcrypto PUBLIC OC_SECURITY)
+endif()
+
+if(OC_OSCORE_ENABLED)
+   target_compile_definitions(mbedcrypto PUBLIC OC_OSCORE)
+   target_compile_definitions(kis-common INTERFACE OC_OSCORE)
 endif()
 
 if(OC_PKI_ENABLED)

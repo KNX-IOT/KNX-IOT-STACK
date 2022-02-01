@@ -14,7 +14,8 @@
 // limitations under the License.
 */
 
-#if defined(OC_SECURITY) && defined(OC_OSCORE)
+//#if defined(OC_SECURITY) && defined(OC_OSCORE)
+#if defined(OC_OSCORE)
 
 #include "oc_oscore_crypto.h"
 #include "mbedtls/ccm.h"

@@ -58,6 +58,9 @@
 #include "security/oc_audit.h"
 #include "security/oc_tls.h"
 #endif
+#ifdef OC_OSCORE
+#include "security/oc_tls.h"
+#endif 
 
 /*---------------------------------------------------------------------------*/
 /*- Variables ---------------------------------------------------------------*/

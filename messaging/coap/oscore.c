@@ -14,7 +14,7 @@
 // limitations under the License.
 */
 
-#ifdef OC_SECURITY
+//#ifdef OC_SECURITY
 #ifdef OC_OSCORE
 
 #include "oscore.h"
@@ -552,6 +552,7 @@ oscore_parse_outer_message(oc_message_t *msg, void *packet)
 #else  /* OC_OSCORE */
 typedef int dummy_declaration;
 #endif /* !OC_OSCORE */
-#else  /* OC_SECURITY */
-typedef int dummy_declaration;
-#endif /* !OC_SECURITY */
+
+//#else  /* OC_SECURITY */
+//typedef int dummy_declaration;
+//#endif /* !OC_SECURITY */

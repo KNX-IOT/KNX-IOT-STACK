@@ -22,7 +22,8 @@
 #include "oc_buffer.h"
 #include "oc_signal_event_loop.h"
 #include "util/oc_list.h"
-#ifdef OC_SECURITY
+//#ifdef OC_SECURITY
+#ifdef OC_OSCORE
 #include "security/oc_tls.h"
 #endif /* OC_SECURITY */
 #if defined(OC_SERVER)
@@ -145,7 +146,8 @@ oc_handle_session(oc_endpoint_t *endpoint, oc_session_state_t state)
   (void)endpoint;
   (void)state;
   if (state == OC_SESSION_DISCONNECTED) {
-#ifdef OC_SECURITY
+//#ifdef OC_SECURITY
+#ifdef OC_OSCORE
     if (endpoint->flags & SECURED && endpoint->flags & TCP) {
       oc_tls_remove_peer(endpoint);
     }

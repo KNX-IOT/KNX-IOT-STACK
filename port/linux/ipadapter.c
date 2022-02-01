@@ -801,7 +801,8 @@ oc_udp_add_socks_to_fd_set(ip_context_t *dev)
 {
   FD_SET(dev->server_sock, &dev->rfds);
   FD_SET(dev->mcast_sock, &dev->rfds);
-#ifdef OC_SECURITY
+//#ifdef OC_SECURITY
+#ifdef OC_OSCORE
   FD_SET(dev->secure_sock, &dev->rfds);
 #endif /* OC_SECURITY */
 
@@ -867,7 +868,8 @@ oc_udp_receive_message(ip_context_t *dev, fd_set *fds, oc_message_t *message)
   }
 #endif /* OC_IPV4 */
 
-#ifdef OC_SECURITY
+//#ifdef OC_SECURITY
+#ifdef OC_OSCORE
   if (FD_ISSET(dev->secure_sock, fds)) {
     int count = recv_msg(dev->secure_sock, message->data, OC_PDU_SIZE,
                          &message->endpoint, false);
@@ -1112,7 +1114,8 @@ oc_send_buffer(oc_message_t *message)
   }
 #endif /* OC_TCP */
 
-#ifdef OC_SECURITY
+//#ifdef OC_SECURITY
+#ifdef OC_OSCORE
   if (message->endpoint.flags & SECURED) {
 #ifdef OC_IPV4
     if (message->endpoint.flags & IPV4) {
@@ -1486,7 +1489,8 @@ oc_connectivity_init(size_t device)
     return -1;
   }
 
-#ifdef OC_SECURITY
+//#ifdef OC_SECURITY
+#ifdef OC_OSCORE
   dev->secure_sock = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
   if (dev->secure_sock < 0) {
     OC_ERR("creating secure socket");
@@ -1555,7 +1559,8 @@ oc_connectivity_init(size_t device)
     return -1;
   }
 
-#ifdef OC_SECURITY
+// #ifdef OC_SECURITY
+#ifdef OC_OSCORE
   if (setsockopt(dev->secure_sock, IPPROTO_IPV6, IPV6_RECVPKTINFO, &on,
                  sizeof(on)) == -1) {
     OC_ERR("setting recvpktinfo option %d\n", errno);
@@ -1667,7 +1672,8 @@ oc_connectivity_shutdown(size_t device)
   close(dev->mcast4_sock);
 #endif /* OC_IPV4 */
 
-#ifdef OC_SECURITY
+//#ifdef OC_SECURITY
+#ifdef OC_OSCORE
   close(dev->secure_sock);
 #ifdef OC_IPV4
   close(dev->secure4_sock);

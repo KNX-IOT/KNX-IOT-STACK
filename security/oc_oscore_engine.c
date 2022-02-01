@@ -14,7 +14,9 @@
 // limitations under the License.
 */
 
-#if defined(OC_SECURITY) && defined(OC_OSCORE)
+//#if defined (OC_SECURITY) && defined(OC_OSCORE)
+#if defined(OC_OSCORE)
+
 #include "api/oc_events.h"
 #include "mbedtls/ccm.h"
 #include "messaging/coap/coap_signal.h"
@@ -25,7 +27,7 @@
 #include "oc_oscore.h"
 #include "oc_oscore_context.h"
 #include "oc_oscore_crypto.h"
-#include "oc_pstat.h"
+//#include "oc_pstat.h"
 #include "oc_store.h"
 #include "oc_tls.h"
 #include "util/oc_process.h"
@@ -36,7 +38,8 @@ static oc_event_callback_retval_t
 dump_cred(void *data)
 {
   size_t device = (size_t)data;
-  oc_sec_dump_cred(device);
+ 
+   //oc_sec_dump_cred(device);
   return OC_EVENT_DONE;
 }
 
@@ -579,12 +582,13 @@ oc_oscore_send_message(oc_message_t *msg)
         || coap_pkt->code == PING_7_02 || coap_pkt->code == ABORT_7_05 ||
         coap_pkt->code == CSM_7_01
 #endif /* OC_TCP */
-    ) {
-      oc_sec_pstat_t *pstat = oc_sec_get_pstat(message->endpoint.device);
-      if (pstat->s != OC_DOS_RFNOP) {
-        OC_ERR("### device not in RFNOP; stop further processing ###");
-        goto oscore_send_error;
-      }
+    ) 
+     {
+     // oc_sec_pstat_t *pstat = oc_sec_get_pstat(message->endpoint.device);
+     // if (pstat->s != OC_DOS_RFNOP) {
+     //   OC_ERR("### device not in RFNOP; stop further processing ###");
+     //   goto oscore_send_error;
+     // }
 
       OC_DBG("### protecting outgoing request ###");
       /* Request */
@@ -754,6 +758,7 @@ oc_oscore_send_message(oc_message_t *msg)
     coap_pkt->observe = observe_option;
 
     /* Set the Proxy-uri option to the OCF URI bearing the peer's UUID */
+    // TODO
     char uuid[37];
     oc_uuid_to_str(&message->endpoint.di, uuid, OC_UUID_LEN);
     oc_string_t proxy_uri;
@@ -770,6 +775,7 @@ oscore_send_dispatch:
   OC_DBG("#################################");
   /* Dispatch oc_message_t to the TLS layer */
   OC_DBG("Outbound network event: forwarding to TLS");
+  // TODO, this could go to the unsecure network...
 #ifdef OC_CLIENT
   if (!oc_tls_connected(&message->endpoint)) {
     OC_DBG("Posting INIT_TLS_CONN_EVENT");

@@ -80,7 +80,8 @@ typedef struct ip_context_t
   SOCKET mcast_sock;
   SOCKET server_sock;
   uint16_t port;
-#ifdef OC_SECURITY
+//#ifdef OC_SECURITY
+#ifdef OC_OSCORE
   struct sockaddr_storage secure;
   SOCKET secure_sock;
   uint16_t dtls_port;
@@ -91,7 +92,8 @@ typedef struct ip_context_t
   SOCKET mcast4_sock;
   SOCKET server4_sock;
   uint16_t port4;
-#ifdef OC_SECURITY
+//#ifdef OC_SECURITY
+#ifdef OC_OSCORE
   struct sockaddr_storage secure4;
   SOCKET secure4_sock;
   uint16_t dtls4_port;
