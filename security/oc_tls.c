@@ -677,7 +677,7 @@ ssl_get_timer(void *ctx)
   return 0;
 }
 
-#ifdef OC_PKI
+#ifdef OC_PKIx
 typedef bool (*check_if_known_cert_cb)(oc_sec_cred_t *cred);
 typedef void (*add_new_cert_cb)(oc_sec_cred_t *cred, size_t device);
 
@@ -2019,12 +2019,12 @@ read_application_data(oc_tls_peer_t *peer)
              peer->ssl_ctx.session->ciphersuite);
       oc_handle_session(&peer->endpoint, OC_SESSION_CONNECTED);
 #ifdef OC_CLIENT
-#ifdef OC_PKI
+#ifdef OC_PKIx
       if (auto_assert_all_roles && !oc_tls_uses_psk_cred(peer) &&
           oc_get_all_roles()) {
         oc_assert_all_roles(&peer->endpoint, assert_all_roles_internal, peer);
       } else
-#endif /* OC_PKI */
+#endif /* OC_PKIx */
       {
         oc_tls_handler_schedule_write(peer);
       }
