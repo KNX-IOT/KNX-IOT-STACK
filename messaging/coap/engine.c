@@ -140,7 +140,7 @@ coap_send_empty_response(coap_message_type_t type, uint16_t mid,
 }
 
 #ifdef OC_SECURITY
-static void
+ void
 coap_audit_log(oc_message_t *msg)
 {
   char ipaddr[IPADDR_BUFF_SIZE];
