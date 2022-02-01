@@ -1342,7 +1342,8 @@ connectivity_ipv4_init(ip_context_t *dev)
   l->sin_addr.s_addr = INADDR_ANY;
   l->sin_port = 0;
 
-#ifdef OC_SECURITY
+//#ifdef OC_SECURITY
+#ifdef OC_OSCORE
   memset(&dev->secure4, 0, sizeof(struct sockaddr_storage));
   struct sockaddr_in *sm = (struct sockaddr_in *)&dev->secure4;
   sm->sin_family = AF_INET;
@@ -1405,7 +1406,8 @@ connectivity_ipv4_init(ip_context_t *dev)
     return -1;
   }
 
-#ifdef OC_SECURITY
+//#ifdef OC_SECURITY
+#ifdef OC_OSCORE
   if (setsockopt(dev->secure4_sock, IPPROTO_IP, IP_PKTINFO, &on, sizeof(on)) ==
       -1) {
     OC_ERR("setting pktinfo IPV4 option %d\n", errno);
@@ -1473,7 +1475,8 @@ oc_connectivity_init(size_t device)
   l->sin6_addr = in6addr_any;
   l->sin6_port = 0;
 
-#ifdef OC_SECURITY
+#//ifdef OC_SECURITY
+#ifdef OC_OSCORE
   memset(&dev->secure, 0, sizeof(struct sockaddr_storage));
   struct sockaddr_in6 *sm = (struct sockaddr_in6 *)&dev->secure;
   sm->sin6_family = AF_INET6;
