@@ -268,7 +268,7 @@ oc_tls_free_invalid_peer(oc_tls_peer_t *peer)
 
   oc_list_remove(tls_peers, peer);
 
-  size_t device = peer->endpoint.device;
+  //size_t device = peer->endpoint.device;
   //oc_sec_pstat_t *pstat = oc_sec_get_pstat(device);
   //if (pstat->s == OC_DOS_RFOTM) {
   //  oc_set_delayed_callback((void *)device, &reset_in_RFOTM, 0);
