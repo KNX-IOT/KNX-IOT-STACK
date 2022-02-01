@@ -210,4 +210,7 @@ oc_generate_ecdsa_keypair_for_device(size_t device)
 #else  /* OC_PKI */
 typedef int dummy_declaration;
 #endif /* !OC_PKI */
+#else  /* OC_SECURITY */
+
+typedef int dummy_declaration;
 #endif /* OC_SECURITY */
