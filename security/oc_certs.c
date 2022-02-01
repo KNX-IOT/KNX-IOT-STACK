@@ -883,4 +883,7 @@ generate_csr_error:
 #else  /* OC_PKI */
 typedef int dummy_declaration;
 #endif /* !OC_PKI */
+#else  /* OC_SECURITY */
+
+typedef int dummy_declaration;
 #endif /* OC_SECURITY */
