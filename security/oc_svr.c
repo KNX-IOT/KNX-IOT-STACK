@@ -81,4 +81,7 @@ oc_sec_create_svr(void)
     */
 }
 
+#else  /* OC_SECURITY */
+
+typedef int dummy_declaration;
 #endif /* OC_SECURITY */
