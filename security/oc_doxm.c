@@ -604,4 +604,7 @@ oc_is_owned_device(size_t device_index)
   }
   return false;
 }
+#else  /* OC_SECURITY */
+
+typedef int dummy_declaration;
 #endif /* OC_SECURITY */
