@@ -37,7 +37,7 @@ jobs:
           git submodule sync --recursive
           git -c "http.extraheader=$auth_header" -c protocol.version=2 submodule update --init --force --recursive --depth=1
           cd port/linux
-          make DYNAMIC=1 IPV4=1 TCP=1 SECURE=0 test
+          make DYNAMIC=1 IPV4=1 TCP=1 SECURE=0 OSCORE=0 test
           
    make_linux_secured:
     # The type of runner that the job will run on
@@ -52,6 +52,6 @@ jobs:
         run: |
           cd port/linux
           #make DYNAMIC=1 IPV4=1 TCP=1 SECURE=1 test
-          make DYNAMIC=1 IPV4=1 TCP=1 SECURE=1 
+          make DYNAMIC=1 IPV4=1 TCP=1 OSCORE=1
           
 

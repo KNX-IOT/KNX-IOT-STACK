@@ -152,7 +152,7 @@ else
 endif
 	CFLAGS += ${DTLSFLAGS}
 	#EXTRA_CFLAGS += -DOC_SECURITY
-	EXTRA_CFLAGS += -DOC_OSCORE
+	#EXTRA_CFLAGS += -DOC_OSCORE
 	VPATH += ../../security/:../../deps/mbedtls/library:
 endif
 
