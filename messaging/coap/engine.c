@@ -60,6 +60,9 @@
 #include "security/oc_audit.h"
 #include "security/oc_tls.h"
 #endif /* OC_SECURITY */
+#ifdef OC_OSCORE
+#include "security/oc_tls.h"
+#endif
 
 #ifdef OC_BLOCK_WISE
 #include "oc_blockwise.h"
@@ -163,7 +166,8 @@ coap_audit_log(oc_message_t *msg)
 }
 #endif /* OC_SECURITY */
 
-#ifdef OC_SECURITY
+//#ifdef OC_SECURITY
+#ifdef OC_OSCORE
 static oc_event_callback_retval_t
 close_all_tls_sessions(void *data)
 {
@@ -826,9 +830,9 @@ coap_receive(oc_message_t *msg)
     }
   } else {
     OC_ERR("Unexpected CoAP command");
-#ifdef OC_SECURITY
-    coap_audit_log(msg);
-#endif /* OC_SECURITY */
+    //#ifdef OC_SECURITY
+    //    coap_audit_log(msg);
+    //#endif /* OC_SECURITY */
     if (msg->endpoint.flags & TCP) {
       coap_send_empty_response(COAP_TYPE_NON, 0, message->token,
                                message->token_len, coap_status_code,
@@ -909,7 +913,8 @@ send_message:
     }
   }
 
-#ifdef OC_SECURITY
+//#ifdef OC_SECURITY
+#ifdef OC_OSCORE
   if (coap_status_code == CLOSE_ALL_TLS_SESSIONS) {
     oc_set_drop_commands(msg->endpoint.device, true);
     oc_set_delayed_callback((void *)msg->endpoint.device,

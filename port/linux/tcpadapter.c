@@ -767,7 +767,8 @@ oc_tcp_connectivity_init(ip_context_t *dev)
   }
   dev->tcp.port = ntohs(((struct sockaddr_in *)&dev->tcp.server)->sin_port);
 
-#ifdef OC_SECURITY
+//#ifdef OC_SECURITY
+#ifdef OC_OSCORE
   if (configure_tcp_socket(dev->tcp.secure_sock, &dev->tcp.secure) < 0) {
     OC_ERR("set socket option in secure socket");
     return -1;

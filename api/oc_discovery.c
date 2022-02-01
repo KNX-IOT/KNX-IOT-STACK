@@ -31,6 +31,9 @@
 #include "security/oc_sdi.h"
 #include "security/oc_tls.h"
 #endif
+#ifdef OC_OSCORE
+#include "security/oc_tls.h"
+#endif
 
 bool
 oc_add_resource_to_wk(oc_resource_t *resource, oc_request_t *request,
@@ -59,7 +62,8 @@ oc_add_resource_to_wk(oc_resource_t *resource, oc_request_t *request,
   oc_string_t ep, uri;
   memset(&uri, 0, sizeof(oc_string_t));
   while (eps != NULL) {
-#ifdef OC_SECURITY
+//#ifdef OC_SECURITY
+#ifdef OC_OSCORE
     if (eps->flags & SECURED) {
 #else
     if ((eps->flags & SECURED) == 0) {

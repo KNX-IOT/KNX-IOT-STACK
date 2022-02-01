@@ -863,6 +863,12 @@ main(int argc, char *argv[])
   PRINT("Security - Disabled\n");
 #endif /* OC_SECURITY */
 
+#ifdef OC_OSCORE
+  PRINT("OC_OSCORE - Enabled\n");
+#else
+  PRINT("OC_OSCORE - Disabled\n");
+#endif /* OC_OSCORE */
+
   oc_device_info_t *device = oc_core_get_device_info(0);
   PRINT("serial number: %s", oc_string(device->serialnumber));
 

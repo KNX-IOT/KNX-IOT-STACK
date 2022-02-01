@@ -450,13 +450,15 @@ refresh_endpoints_list(ip_context_t *dev, ifaddr_t *ifaddr_list)
     ifaddr_supplied = true;
   }
   get_interface_addresses(ifaddr_list, dev, AF_INET6, dev->port, false, false);
-#ifdef OC_SECURITY
+//#ifdef OC_SECURITY
+#ifdef OC_OSCORE
   get_interface_addresses(ifaddr_list, dev, AF_INET6, dev->dtls_port, true,
                           false);
 #endif /* OC_SECURITY */
 #ifdef OC_IPV4
   get_interface_addresses(ifaddr_list, dev, AF_INET, dev->port4, false, false);
-#ifdef OC_SECURITY
+//#ifdef OC_SECURITY
+#ifdef OC_OSCORE
   get_interface_addresses(ifaddr_list, dev, AF_INET, dev->dtls4_port, true,
                           false);
 #endif /* OC_SECURITY */
@@ -688,7 +690,8 @@ network_event_thread(void *data)
   OC_WSAEVENTSELECT(dev->server_sock, server6_event, FD_READ);
   dev->event_server_handle = server6_event;
 
-#ifdef OC_SECURITY
+//#ifdef OC_SECURITY
+#ifdef OC_OSCORE
   WSAEVENT secure6_event = WSACreateEvent();
   OC_WSAEVENTSELECT(dev->secure_sock, secure6_event, FD_READ);
 #endif /* OC_SECURITY */
@@ -700,7 +703,8 @@ network_event_thread(void *data)
   WSAEVENT server4_event = WSACreateEvent();
   OC_WSAEVENTSELECT(dev->server4_sock, server4_event, FD_READ);
 
-#ifdef OC_SECURITY
+//#ifdef OC_SECURITY
+#ifdef OC_OSCORE
   WSAEVENT secure4_event = WSACreateEvent();
   OC_WSAEVENTSELECT(dev->secure4_sock, secure4_event, FD_READ);
 #endif /* OC_SECURITY */
@@ -721,7 +725,8 @@ network_event_thread(void *data)
   DWORD SERVER6 = events_list_size;
   events_list[events_list_size] = server6_event;
   events_list_size++;
-#if defined(OC_SECURITY)
+//#if defined(OC_SECURITY)
+#if defined(OC_OSCORE)
   DWORD SECURE6 = events_list_size;
   events_list[events_list_size] = secure6_event;
   events_list_size++;
@@ -830,7 +835,8 @@ network_event_thread(void *data)
         }
 #endif /* OC_IPV4 */
 
-#ifdef OC_SECURITY
+//#ifdef OC_SECURITY
+#ifdef OC_OSCORE
         if (i == SECURE6) {
           int count = recv_msg(dev->secure_sock, message->data, OC_PDU_SIZE,
                                &message->endpoint, false);
@@ -1116,7 +1122,8 @@ oc_send_buffer(oc_message_t *message)
   }
 #endif /* OC_TCP */
 
-#ifdef OC_SECURITY
+//#ifdef OC_SECURITY
+#ifdef OC_OSCORE
   if (message->endpoint.flags & SECURED) {
 #ifdef OC_IPV4
     if (message->endpoint.flags & IPV4) {
@@ -1213,7 +1220,8 @@ connectivity_ipv4_init(ip_context_t *dev)
   l->sin_addr.s_addr = INADDR_ANY;
   l->sin_port = 0;
 
-#ifdef OC_SECURITY
+//#ifdef OC_SECURITY
+#ifdef OC_OSCORE
   memset(&dev->secure4, 0, sizeof(dev->secure4));
   struct sockaddr_in *sm = (struct sockaddr_in *)&dev->secure4;
   sm->sin_family = AF_INET;
@@ -1282,7 +1290,8 @@ connectivity_ipv4_init(ip_context_t *dev)
     return -1;
   }
 
-#ifdef OC_SECURITY
+//#ifdef OC_SECURITY
+#ifdef OC_OSCORE
   if (setsockopt(dev->secure4_sock, IPPROTO_IP, IP_PKTINFO, (char *)&on,
                  sizeof(on)) == -1) {
     OC_ERR("setting pktinfo IPV4 option %d\n", WSAGetLastError());
@@ -1474,7 +1483,8 @@ oc_connectivity_init(size_t device)
   l->sin6_addr = in6addr_any;
   l->sin6_port = 0;
 
-#ifdef OC_SECURITY
+//#ifdef OC_SECURITY
+#ifdef OC_OSCORE
   memset(&dev->secure, 0, sizeof(dev->secure));
   struct sockaddr_in6 *sm = (struct sockaddr_in6 *)&dev->secure;
   sm->sin6_family = AF_INET6;
@@ -1490,7 +1500,8 @@ oc_connectivity_init(size_t device)
     return -1;
   }
 
-#ifdef OC_SECURITY
+//#ifdef OC_SECURITY
+#ifdef OC_OSCORE
   dev->secure_sock = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
   if (dev->secure_sock == SOCKET_ERROR) {
     OC_ERR("creating secure socket");
@@ -1550,7 +1561,8 @@ oc_connectivity_init(size_t device)
     return -1;
   }
 
-#ifdef OC_SECURITY
+//#ifdef OC_SECURITY
+#ifdef OC_OSCORE
   if (setsockopt(dev->secure_sock, IPPROTO_IPV6, IPV6_PKTINFO, (char *)&on,
                  sizeof(on)) == -1) {
     OC_ERR("setting recvpktinfo option %d\n", WSAGetLastError());
@@ -1657,7 +1669,8 @@ oc_connectivity_shutdown(size_t device)
   closesocket(dev->mcast4_sock);
 #endif /* OC_IPV4 */
 
-#ifdef OC_SECURITY
+//#ifdef OC_SECURITY
+#ifdef OC_OSCORE
   closesocket(dev->secure_sock);
 #ifdef OC_IPV4
   closesocket(dev->secure4_sock);

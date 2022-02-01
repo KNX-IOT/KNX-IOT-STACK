@@ -21,7 +21,8 @@
 #include "messaging/coap/coap_signal.h"
 #endif /* OC_TCP */
 #include "oc_api.h"
-#ifdef OC_SECURITY
+//#ifdef OC_SECURITY
+#ifdef OC_OSCORE
 #include "security/oc_tls.h"
 #ifdef OC_PKI
 #include "security/oc_roles.h"
@@ -660,7 +661,8 @@ void
 oc_close_session(oc_endpoint_t *endpoint)
 {
   if (endpoint->flags & SECURED) {
-#ifdef OC_SECURITY
+//#ifdef OC_SECURITY
+#ifdef OC_OSCORE
     oc_tls_close_connection(endpoint);
 #endif /* OC_SECURITY */
   } else if (endpoint->flags & TCP) {

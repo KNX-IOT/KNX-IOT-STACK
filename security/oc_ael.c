@@ -494,4 +494,7 @@ oc_sec_ael_create_event(size_t device, uint8_t category, uint8_t priority,
   return res;
 }
 
+#else  /* OC_SECURITY */
+
+typedef int dummy_declaration;
 #endif /* OC_SECURITY */

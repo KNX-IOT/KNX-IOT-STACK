@@ -583,4 +583,7 @@ oc_reset()
     oc_pstat_reset_device(device, true);
   }
 }
+#else  /* OC_SECURITY */
+
+typedef int dummy_declaration;
 #endif /* OC_SECURITY */

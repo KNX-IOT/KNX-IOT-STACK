@@ -65,6 +65,9 @@
 #define MBEDTLS_SSL_SRV_C
 #define MBEDTLS_SSL_TLS_C
 
+/* oscore */
+#define MBEDTLS_CCM_C
+
 /* Save RAM at the expense of ROM */
 #define MBEDTLS_AES_ROM_TABLES
 

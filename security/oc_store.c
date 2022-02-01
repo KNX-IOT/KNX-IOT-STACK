@@ -679,4 +679,7 @@ oc_sec_dump_sdi(size_t device)
 #endif /* !OC_APP_DATA_STORAGE_BUFFER */
 }
 
+#else  /* OC_SECURITY */
+
+typedef int dummy_declaration;
 #endif /* OC_SECURITY */

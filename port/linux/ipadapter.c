@@ -801,14 +801,16 @@ oc_udp_add_socks_to_fd_set(ip_context_t *dev)
 {
   FD_SET(dev->server_sock, &dev->rfds);
   FD_SET(dev->mcast_sock, &dev->rfds);
-#ifdef OC_SECURITY
+//#ifdef OC_SECURITY
+#ifdef OC_OSCORE
   FD_SET(dev->secure_sock, &dev->rfds);
 #endif /* OC_SECURITY */
 
 #ifdef OC_IPV4
   FD_SET(dev->server4_sock, &dev->rfds);
   FD_SET(dev->mcast4_sock, &dev->rfds);
-#ifdef OC_SECURITY
+//#ifdef OC_SECURITY
+#ifdef OC_OSCORE
   FD_SET(dev->secure4_sock, &dev->rfds);
 #endif /* OC_SECURITY */
 #endif /* OC_IPV4 */
@@ -867,7 +869,8 @@ oc_udp_receive_message(ip_context_t *dev, fd_set *fds, oc_message_t *message)
   }
 #endif /* OC_IPV4 */
 
-#ifdef OC_SECURITY
+//#ifdef OC_SECURITY
+#ifdef OC_OSCORE
   if (FD_ISSET(dev->secure_sock, fds)) {
     int count = recv_msg(dev->secure_sock, message->data, OC_PDU_SIZE,
                          &message->endpoint, false);
@@ -1112,7 +1115,8 @@ oc_send_buffer(oc_message_t *message)
   }
 #endif /* OC_TCP */
 
-#ifdef OC_SECURITY
+//#ifdef OC_SECURITY
+#ifdef OC_OSCORE
   if (message->endpoint.flags & SECURED) {
 #ifdef OC_IPV4
     if (message->endpoint.flags & IPV4) {
@@ -1339,7 +1343,8 @@ connectivity_ipv4_init(ip_context_t *dev)
   l->sin_addr.s_addr = INADDR_ANY;
   l->sin_port = 0;
 
-#ifdef OC_SECURITY
+//#ifdef OC_SECURITY
+#ifdef OC_OSCORE
   memset(&dev->secure4, 0, sizeof(struct sockaddr_storage));
   struct sockaddr_in *sm = (struct sockaddr_in *)&dev->secure4;
   sm->sin_family = AF_INET;
@@ -1402,7 +1407,8 @@ connectivity_ipv4_init(ip_context_t *dev)
     return -1;
   }
 
-#ifdef OC_SECURITY
+//#ifdef OC_SECURITY
+#ifdef OC_OSCORE
   if (setsockopt(dev->secure4_sock, IPPROTO_IP, IP_PKTINFO, &on, sizeof(on)) ==
       -1) {
     OC_ERR("setting pktinfo IPV4 option %d\n", errno);
@@ -1470,7 +1476,8 @@ oc_connectivity_init(size_t device)
   l->sin6_addr = in6addr_any;
   l->sin6_port = 0;
 
-#ifdef OC_SECURITY
+#//ifdef OC_SECURITY
+#ifdef OC_OSCORE
   memset(&dev->secure, 0, sizeof(struct sockaddr_storage));
   struct sockaddr_in6 *sm = (struct sockaddr_in6 *)&dev->secure;
   sm->sin6_family = AF_INET6;
@@ -1486,7 +1493,8 @@ oc_connectivity_init(size_t device)
     return -1;
   }
 
-#ifdef OC_SECURITY
+//#ifdef OC_SECURITY
+#ifdef OC_OSCORE
   dev->secure_sock = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
   if (dev->secure_sock < 0) {
     OC_ERR("creating secure socket");
@@ -1555,7 +1563,8 @@ oc_connectivity_init(size_t device)
     return -1;
   }
 
-#ifdef OC_SECURITY
+// #ifdef OC_SECURITY
+#ifdef OC_OSCORE
   if (setsockopt(dev->secure_sock, IPPROTO_IPV6, IPV6_RECVPKTINFO, &on,
                  sizeof(on)) == -1) {
     OC_ERR("setting recvpktinfo option %d\n", errno);
@@ -1667,7 +1676,8 @@ oc_connectivity_shutdown(size_t device)
   close(dev->mcast4_sock);
 #endif /* OC_IPV4 */
 
-#ifdef OC_SECURITY
+//#ifdef OC_SECURITY
+#ifdef OC_OSCORE
   close(dev->secure_sock);
 #ifdef OC_IPV4
   close(dev->secure4_sock);

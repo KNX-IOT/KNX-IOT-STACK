@@ -1145,5 +1145,7 @@ get_acl(oc_request_t *request, oc_interface_mask_t iface_mask, void *data)
     oc_send_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
   }
 }
+#else  /* OC_SECURITY */
 
+typedef int dummy_declaration;
 #endif /* OC_SECURITY */

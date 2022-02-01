@@ -105,7 +105,7 @@ void oc_tls_use_pin_obt_psk_identity(void);
 int oc_tls_pbkdf2(const unsigned char *pin, size_t pin_len, oc_uuid_t *uuid,
                   unsigned int c, uint8_t *key, uint32_t key_len);
 
-/* Internal interface for refreshing identity certficate chains */
+/* Internal interface for refreshing identity certificate chains */
 void oc_tls_refresh_identity_certs(void);
 void oc_tls_remove_identity_cert(oc_sec_cred_t *cred);
 

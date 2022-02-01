@@ -231,4 +231,7 @@ post_sp(oc_request_t *request, oc_interface_mask_t iface_mask, void *data)
   }
 }
 
+#else  /* OC_SECURITY */
+
+typedef int dummy_declaration;
 #endif /* OC_SECURITY */

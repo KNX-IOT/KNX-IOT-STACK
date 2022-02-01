@@ -245,4 +245,7 @@ oc_sec_free_role_by_credid(int credid, oc_tls_peer_t *client)
 #else  /* OC_PKI */
 typedef int dummy_declaration;
 #endif /* !OC_PKI */
+#else  /* OC_SECURITY */
+
+typedef int dummy_declaration;
 #endif /* OC_SECURITY */

@@ -47,6 +47,10 @@
 #include "security/oc_sdi.h"
 #endif /* OC_SECURITY */
 
+#ifdef OC_OSCORE
+#include "security/oc_tls.h"
+#endif
+
 #ifdef OC_MEMORY_TRACE
 #include "util/oc_mem_trace.h"
 #endif /* OC_MEMORY_TRACE */
@@ -226,7 +230,9 @@ oc_main_init(const oc_handler_t *handler)
   }
 #endif
 
-#ifdef OC_SECURITY
+//#ifdef OC_SECURITY
+#ifdef OC_OSCORE
+
   ret = oc_tls_init_context();
   if (ret < 0) {
     oc_ri_shutdown();
@@ -328,6 +334,9 @@ oc_main_shutdown(void)
 #endif /* OC_PKI */
   oc_sec_sdi_free();
 #endif /* OC_SECURITY */
+#ifdef OC_OSCORE
+  oc_tls_shutdown();
+#endif
 
   oc_shutdown_all_devices();
 

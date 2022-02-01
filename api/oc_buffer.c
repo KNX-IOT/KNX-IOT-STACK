@@ -31,6 +31,11 @@
 #endif /* OC_OSCORE */
 #endif /* OC_SECURITY */
 
+#ifdef OC_OSCORE
+#include "security/oc_tls.h"
+#include "security/oc_oscore.h"
+#endif /* OC_OSCORE */
+
 #include "oc_buffer.h"
 #include "oc_config.h"
 #include "oc_events.h"
@@ -64,7 +69,8 @@ allocate_message(struct oc_memb *pool)
     message->next = 0;
     message->ref_count = 1;
     message->endpoint.interface_index = -1;
-#ifdef OC_SECURITY
+//#ifdef OC_SECURITY
+#ifdef OC_OSCORE
     message->encrypted = 0;
 #endif /* OC_SECURITY */
 #if !defined(OC_DYNAMIC_ALLOCATION) || defined(OC_INOUT_BUFFER_SIZE)
@@ -151,7 +157,8 @@ oc_send_message(oc_message_t *message)
   _oc_signal_event_loop();
 }
 
-#ifdef OC_SECURITY
+//#ifdef OC_SECURITY
+#ifdef OC_OSCORE
 void
 oc_close_all_tls_sessions_for_device(size_t device)
 {
@@ -175,7 +182,8 @@ OC_PROCESS_THREAD(message_buffer_handler, ev, data)
     OC_PROCESS_YIELD();
 
     if (ev == oc_events[INBOUND_NETWORK_EVENT]) {
-#ifdef OC_SECURITY
+//#ifdef OC_SECURITY
+#ifdef OC_OSCORE
       if (((oc_message_t *)data)->encrypted == 1) {
         OC_DBG("Inbound network event: encrypted request");
         oc_process_post(&oc_tls_handler, oc_events[UDP_TO_TLS_EVENT], data);
@@ -207,7 +215,8 @@ OC_PROCESS_THREAD(message_buffer_handler, ev, data)
         oc_send_discovery_request(message);
         oc_message_unref(message);
       }
-#if defined(OC_SECURITY) && defined(OC_OSCORE)
+//#if defined(OC_SECURITY) && defined(OC_OSCORE)
+#ifdef OC_OSCORE
       else if ((message->endpoint.flags & MULTICAST) &&
                (message->endpoint.flags & SECURED)) {
         OC_DBG("Outbound secure multicast request: forwarding to OSCORE");
@@ -217,7 +226,8 @@ OC_PROCESS_THREAD(message_buffer_handler, ev, data)
 #endif /* OC_SECURITY && OC_OSCORE */
       else
 #endif /* OC_CLIENT */
-#ifdef OC_SECURITY
+//#ifdef OC_SECURITY
+#ifdef OC_OSCORE
         if (message->endpoint.flags & SECURED) {
 #ifdef OC_OSCORE
         OC_DBG("Outbound network event: forwarding to OSCORE");
@@ -246,7 +256,8 @@ OC_PROCESS_THREAD(message_buffer_handler, ev, data)
         oc_message_unref(message);
       }
     }
-#ifdef OC_SECURITY
+//#ifdef OC_SECURITY
+#ifdef OC_OSCORE
     else if (ev == oc_events[TLS_CLOSE_ALL_SESSIONS]) {
       OC_DBG("Signaling to close all TLS sessions from this device");
       oc_process_post(&oc_tls_handler, oc_events[TLS_CLOSE_ALL_SESSIONS], data);

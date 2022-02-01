@@ -62,6 +62,11 @@
 #endif /* OC_OSCORE */
 #endif /* OC_SECURITY */
 
+#ifdef OC_OSCORE
+#include "security/oc_tls.h"
+#include "security/oc_oscore.h"
+#endif /* OC_OSCORE */
+
 #ifdef OC_SERVER
 OC_LIST(app_resources);
 OC_LIST(observe_callbacks);
@@ -511,7 +516,8 @@ start_processes(void)
   oc_process_start(&coap_engine, NULL);
   oc_process_start(&message_buffer_handler, NULL);
 
-#ifdef OC_SECURITY
+//#ifdef OC_SECURITY
+#ifdef OC_OSCORE
   oc_process_start(&oc_tls_handler, NULL);
 #ifdef OC_OSCORE
   oc_process_start(&oc_oscore_handler, NULL);
@@ -541,6 +547,10 @@ stop_processes(void)
 #endif /* OC_OSCORE */
   oc_process_exit(&oc_tls_handler);
 #endif /* OC_SECURITY */
+#ifdef OC_OSCORE
+  oc_process_exit(&oc_oscore_handler);
+  oc_process_exit(&oc_tls_handler);
+#endif /* OC_OSCORE */
 
   oc_process_exit(&message_buffer_handler);
 }
@@ -978,8 +988,8 @@ oc_ri_audit_log(oc_method_t method, oc_resource_t *resource,
     }
   }
 #endif /* OC_PKI */
-  oc_audit_log(endpoint->device, "AC-1", "Access Denied", 0x01, 2,
-               (const char **)aux, idx);
+  // oc_audit_log(endpoint->device, "AC-1", "Access Denied", 0x01, 2,
+  //             (const char **)aux, idx);
 }
 #endif /* OC_SECURITY */
 
@@ -1185,8 +1195,9 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
       forbidden = true;
       bad_request = true;
 #ifdef OC_SECURITY
-      oc_audit_log(endpoint->device, "COMM-1", "Operation not supported", 0x40,
-                   2, NULL, 0);
+      // oc_audit_log(endpoint->device, "COMM-1", "Operation not supported",
+      // 0x40,
+      //             2, NULL, 0);
 #endif
     }
   }
@@ -1241,7 +1252,7 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
        */
       if (!oc_sec_check_acl(method, cur_resource, endpoint)) {
       authorized = false;
-      oc_ri_audit_log(method, cur_resource, endpoint);
+      // oc_ri_audit_log(method, cur_resource, endpoint);
     } else
 #endif /* OC_SECURITY */
     {
@@ -1634,7 +1645,8 @@ oc_ri_invoke_client_cb(void *response, oc_client_cb_t *cb,
   coap_get_header_observe(pkt, (uint32_t *)&client_response.observe_option);
 #endif /* !OC_BLOCK_WISE */
 
-#if defined(OC_OSCORE) && defined(OC_SECURITY)
+//#if defined(OC_OSCORE) && defined(OC_SECURITY)
+#if defined(OC_OSCORE)
   if (client_response.observe_option > 1) {
     uint64_t notification_num = 0;
     oscore_read_piv(endpoint->piv, endpoint->piv_len, &notification_num);
