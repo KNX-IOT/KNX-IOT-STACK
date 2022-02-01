@@ -47,7 +47,6 @@
 #include "security/oc_sdi.h"
 #endif /* OC_SECURITY */
 
-
 #ifdef OC_OSCORE
 #include "security/oc_tls.h"
 #endif

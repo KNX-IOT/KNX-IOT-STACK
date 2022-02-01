@@ -38,9 +38,9 @@ static oc_event_callback_retval_t
 dump_cred(void *data)
 {
   (void)data;
-  //size_t device = (size_t)data;
- 
-   //oc_sec_dump_cred(device);
+  // size_t device = (size_t)data;
+
+  // oc_sec_dump_cred(device);
   return OC_EVENT_DONE;
 }
 
@@ -583,13 +583,12 @@ oc_oscore_send_message(oc_message_t *msg)
         || coap_pkt->code == PING_7_02 || coap_pkt->code == ABORT_7_05 ||
         coap_pkt->code == CSM_7_01
 #endif /* OC_TCP */
-    ) 
-     {
-     // oc_sec_pstat_t *pstat = oc_sec_get_pstat(message->endpoint.device);
-     // if (pstat->s != OC_DOS_RFNOP) {
-     //   OC_ERR("### device not in RFNOP; stop further processing ###");
-     //   goto oscore_send_error;
-     // }
+    ) {
+      // oc_sec_pstat_t *pstat = oc_sec_get_pstat(message->endpoint.device);
+      // if (pstat->s != OC_DOS_RFNOP) {
+      //   OC_ERR("### device not in RFNOP; stop further processing ###");
+      //   goto oscore_send_error;
+      // }
 
       OC_DBG("### protecting outgoing request ###");
       /* Request */

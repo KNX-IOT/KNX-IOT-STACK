@@ -988,7 +988,7 @@ oc_ri_audit_log(oc_method_t method, oc_resource_t *resource,
     }
   }
 #endif /* OC_PKI */
-  //oc_audit_log(endpoint->device, "AC-1", "Access Denied", 0x01, 2,
+  // oc_audit_log(endpoint->device, "AC-1", "Access Denied", 0x01, 2,
   //             (const char **)aux, idx);
 }
 #endif /* OC_SECURITY */
@@ -1195,7 +1195,8 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
       forbidden = true;
       bad_request = true;
 #ifdef OC_SECURITY
-      //oc_audit_log(endpoint->device, "COMM-1", "Operation not supported", 0x40,
+      // oc_audit_log(endpoint->device, "COMM-1", "Operation not supported",
+      // 0x40,
       //             2, NULL, 0);
 #endif
     }
@@ -1251,7 +1252,7 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
        */
       if (!oc_sec_check_acl(method, cur_resource, endpoint)) {
       authorized = false;
-      //oc_ri_audit_log(method, cur_resource, endpoint);
+      // oc_ri_audit_log(method, cur_resource, endpoint);
     } else
 #endif /* OC_SECURITY */
     {
@@ -1643,7 +1644,6 @@ oc_ri_invoke_client_cb(void *response, oc_client_cb_t *cb,
 #else  /* OC_BLOCK_WISE */
   coap_get_header_observe(pkt, (uint32_t *)&client_response.observe_option);
 #endif /* !OC_BLOCK_WISE */
-
 
 //#if defined(OC_OSCORE) && defined(OC_SECURITY)
 #if defined(OC_OSCORE)

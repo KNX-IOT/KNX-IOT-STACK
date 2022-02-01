@@ -554,5 +554,5 @@ typedef int dummy_declaration;
 #endif /* !OC_OSCORE */
 
 //#else  /* OC_SECURITY */
-//typedef int dummy_declaration;
+// typedef int dummy_declaration;
 //#endif /* !OC_SECURITY */

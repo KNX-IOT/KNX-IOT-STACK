@@ -863,7 +863,6 @@ main(int argc, char *argv[])
   PRINT("Security - Disabled\n");
 #endif /* OC_SECURITY */
 
-  
 #ifdef OC_OSCORE
   PRINT("OC_OSCORE - Enabled\n");
 #else

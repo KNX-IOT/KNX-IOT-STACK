@@ -830,9 +830,9 @@ coap_receive(oc_message_t *msg)
     }
   } else {
     OC_ERR("Unexpected CoAP command");
-//#ifdef OC_SECURITY
-//    coap_audit_log(msg);
-//#endif /* OC_SECURITY */
+    //#ifdef OC_SECURITY
+    //    coap_audit_log(msg);
+    //#endif /* OC_SECURITY */
     if (msg->endpoint.flags & TCP) {
       coap_send_empty_response(COAP_TYPE_NON, 0, message->token,
                                message->token_len, coap_status_code,
