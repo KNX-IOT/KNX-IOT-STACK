@@ -1389,9 +1389,9 @@ oc_tls_add_peer(oc_endpoint_t *endpoint, int role)
         return NULL;
       }
 
-#ifdef OC_PKI
+#ifdef OC_PKIx
       mbedtls_ssl_conf_verify(&peer->ssl_conf, verify_certificate, peer);
-#endif /* OC_PKI */
+#endif /* OC_PKIx */
 
 #ifdef OC_TCP
       peer->processed_recv_message = NULL;
