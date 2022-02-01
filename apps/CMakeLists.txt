@@ -18,6 +18,14 @@ target_link_libraries(simpleclient_all
     )
 file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/simpleclient_all_creds)
 
+add_executable(simpleclient_spake_all
+    ${PROJECT_SOURCE_DIR}/simpleclient_spake_all.c
+)
+target_link_libraries(simpleclient_spake_all
+        kisClientServer
+    )
+file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/simpleclient_spake_all_creds)
+
 # demo: sensor (e.g. sending command)
 add_executable(LSSB_minimal_all
     ${PROJECT_SOURCE_DIR}/LSSB_minimal_all.c
