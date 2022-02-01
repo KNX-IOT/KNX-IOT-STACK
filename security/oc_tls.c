@@ -207,7 +207,8 @@ static const int cert_otm_priority[5] = {
 #ifdef OC_CLIENT
 #ifdef OC_PKI
 
-static const int cert_priority[5] = {
+//static 
+const int cert_priority[5] = {
   MBEDTLS_TLS_ECDHE_ECDSA_WITH_AES_128_CCM_8,
   MBEDTLS_TLS_ECDHE_ECDSA_WITH_AES_128_CCM,
   MBEDTLS_TLS_ECDHE_ECDSA_WITH_AES_256_CCM_8,
@@ -1878,7 +1879,8 @@ oc_tls_connected(oc_endpoint_t *endpoint)
 }
 
 #if defined(OC_PKI) && defined(OC_CLIENT)
-static void
+//static 
+void
 assert_all_roles_internal(oc_client_response_t *data)
 {
   oc_tls_handler_schedule_write(data->user_data);
