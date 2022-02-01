@@ -37,7 +37,8 @@ OC_PROCESS(oc_oscore_handler, "OSCORE Process");
 static oc_event_callback_retval_t
 dump_cred(void *data)
 {
-  size_t device = (size_t)data;
+  (void)data;
+  //size_t device = (size_t)data;
  
    //oc_sec_dump_cred(device);
   return OC_EVENT_DONE;
