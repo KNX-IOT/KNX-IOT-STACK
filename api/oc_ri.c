@@ -51,16 +51,16 @@
 #include "oc_blockwise.h"
 #endif /* OC_BLOCK_WISE */
 
-#ifdef OC_SECURITY
-#include "security/oc_acl_internal.h"
-#include "security/oc_audit.h"
-#include "security/oc_pstat.h"
-#include "security/oc_roles.h"
-#include "security/oc_tls.h"
-#ifdef OC_OSCORE
-#include "security/oc_oscore.h"
-#endif /* OC_OSCORE */
-#endif /* OC_SECURITY */
+//#ifdef OC_SECURITY
+//#include "security/oc_acl_internal.h"
+//#include "security/oc_audit.h"
+//#include "security/oc_pstat.h"
+//#include "security/oc_roles.h"
+//#include "security/oc_tls.h"
+//#ifdef OC_OSCORE
+//#include "security/oc_oscore.h"
+//#endif /* OC_OSCORE */
+//#endif /* OC_SECURITY */
 
 #ifdef OC_OSCORE
 #include "security/oc_tls.h"

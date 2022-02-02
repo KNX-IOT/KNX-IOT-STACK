@@ -24,9 +24,9 @@
 //#ifdef OC_SECURITY
 #ifdef OC_OSCORE
 #include "security/oc_tls.h"
-#ifdef OC_PKI
-#include "security/oc_roles.h"
-#endif /* OC_PKI */
+//#ifdef OC_PKI
+//#include "security/oc_roles.h"
+//#endif /* OC_PKI */
 #endif /* OC_SECURITY */
 #ifdef OC_CLIENT
 
