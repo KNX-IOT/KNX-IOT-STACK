@@ -64,20 +64,23 @@ char *oc_at_profile_to_string(oc_at_profile_t at_profile);
  *  | nbf       | 5        | integer   | optional   |
  *  | sub       | 2        | string    | conditional |
  *
- *       
+ *
  * Specific Oscore values
  *
  * https://datatracker.ietf.org/doc/html/draft-ietf-ace-oscore-profile-19#section-3.2.1
  *
- * | name      | CBOR label | CBOR type | description                      | default value |
- * | ----------| -----------| ----------| ---------------------------------|---------------|
- * | id        | 0    | byte string | OSCORE Input Material Identifier     |  -            |
- * | version   | 1    | unsigned integer | OSCORE   Version                | 1             |
- * | ms        | 2    | byte string  | OSCORE Master Secret value (shall be PSK) | -       |
- * | hkdf      | 3    | text string / integer | OSCORE HKDF value          | HKDF SHA-256  |
- * | alg       | 4    | text string / integer | OSCORE AEAD Algorithm value | AES-CCM-16-64-128 (COSE algorithm encoding: 10) |
- * | salt      | 5    | byte string | an input to  OSCORE Master Salt value| Default SHALL be an empty byte string |
- * | contextId | 6    | byte string | OSCORE ID Context value              | omit  |
+ * | name      | CBOR label | CBOR type | description                      |
+ *default value | | ----------| -----------| ----------|
+ *---------------------------------|---------------| | id        | 0    | byte
+ *string | OSCORE Input Material Identifier     |  -            | | version   |
+ *1    | unsigned integer | OSCORE   Version                | 1             | |
+ *ms        | 2    | byte string  | OSCORE Master Secret value (shall be PSK) |
+ *-       | | hkdf      | 3    | text string / integer | OSCORE HKDF value |
+ *HKDF SHA-256  | | alg       | 4    | text string / integer | OSCORE AEAD
+ *Algorithm value | AES-CCM-16-64-128 (COSE algorithm encoding: 10) | | salt | 5
+ *| byte string | an input to  OSCORE Master Salt value| Default SHALL be an
+ *empty byte string | | contextId | 6    | byte string | OSCORE ID Context value
+ *| omit  |
  *
  * {
  *   "alg" : "AES-CCM-16-64-128",
@@ -101,7 +104,6 @@ typedef struct oc_auth_at_t
   int *ga;    ///< array of integers, for the group objects in the interface
   int ga_len; //< length of the array of ga identifiers
 } oc_auth_at_t;
-
 
 /**
  * @brief retrieve the replay window
