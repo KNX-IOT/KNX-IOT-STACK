@@ -42,7 +42,7 @@
 #include "api/oc_session_events_internal.h"
 #include "messaging/coap/engine.h"
 #include "messaging/coap/observe.h"
-#include "oc_acl_internal.h"
+//#include "oc_acl_internal.h"
 #include "oc_api.h"
 //#include "oc_audit.h"
 #include "oc_buffer.h"

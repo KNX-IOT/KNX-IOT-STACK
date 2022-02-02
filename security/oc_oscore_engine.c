@@ -28,7 +28,7 @@
 #include "oc_oscore_context.h"
 #include "oc_oscore_crypto.h"
 //#include "oc_pstat.h"
-#include "oc_store.h"
+//#include "oc_store.h"
 #include "oc_tls.h"
 #include "util/oc_process.h"
 

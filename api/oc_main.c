@@ -32,19 +32,19 @@
 #include "oc_knx_dev.h"
 
 #ifdef OC_SECURITY
-#include "security/oc_acl_internal.h"
-#include "security/oc_ael.h"
+//#include "security/oc_acl_internal.h"
+//#include "security/oc_ael.h"
 #include "security/oc_cred_internal.h"
-#include "security/oc_doxm.h"
-#include "security/oc_pstat.h"
-#include "security/oc_sp.h"
-#include "security/oc_store.h"
-#include "security/oc_svr.h"
+//#include "security/oc_doxm.h"
+//#include "security/oc_pstat.h"
+//#include "security/oc_sp.h"
+//#include "security/oc_store.h"
+//#include "security/oc_svr.h"
 #include "security/oc_tls.h"
 #ifdef OC_PKI
 #include "security/oc_keypair.h"
 #endif /* OC_PKI */
-#include "security/oc_sdi.h"
+//#include "security/oc_sdi.h"
 #endif /* OC_SECURITY */
 
 #ifdef OC_OSCORE
