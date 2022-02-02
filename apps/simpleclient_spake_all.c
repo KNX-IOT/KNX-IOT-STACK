@@ -164,6 +164,19 @@ get_dev_pm(oc_client_response_t *data)
 }
 
 void
+do_credential_verification(oc_client_response_t *data)
+{
+  PRINT("\nReceived Credential Response!:\n");
+
+  PRINT("  content format %d\n", data->content_format);
+
+  char buffer[200];
+  memset(buffer, 200, 1);
+  oc_rep_to_json(data->payload, (char *)&buffer, 200, true);
+  PRINT("%s", buffer);
+}
+
+void
 do_credential_exchange(oc_client_response_t *data)
 {
   PRINT("\nReceived Parameter Response!:\n");
@@ -215,13 +228,17 @@ do_credential_exchange(oc_client_response_t *data)
   oc_spake_calc_w0_w1("LETTUCE", salt_len, salt, it, &w0, &w1);
 
   oc_spake_calc_pA(&pA, &pubA, &w0);
+  uint8_t bytes_pA[65];
+  oc_spake_encode_pubkey(&pA, bytes_pA);
 
-  // calculate public share
+  oc_init_post("/.well-known/knx/spake", data->endpoint, NULL,
+               &do_credential_verification, HIGH_QOS, NULL);
 
-  /*
-  oc_do_get_ex("/dev/pm", data->endpoint, NULL, &get_dev_pm, HIGH_QOS,
-               APPLICATION_CBOR, APPLICATION_CBOR, NULL);
-               */
+  oc_rep_begin_root_object();
+  oc_rep_i_set_byte_string(root, 10, bytes_pA, 65);
+  oc_rep_end_root_object();
+
+  oc_do_post_ex(APPLICATION_CBOR, APPLICATION_CBOR);
 }
 
 static oc_discovery_flags_t

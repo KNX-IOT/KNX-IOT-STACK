@@ -877,6 +877,11 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
   (void)iface_mask;
   PRINT("oc_core_knx_spake_post_handler\n");
 
+  char buffer[200];
+  memset(buffer, 200, 1);
+  oc_rep_to_json(request->request_payload, (char *)&buffer, 200, true);
+  PRINT("%s", buffer);
+
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_CBOR) {
     request->response->response_buffer->code =
@@ -1011,11 +1016,6 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
 
   PRINT("oc_core_knx_spake_post_handler valid_request: %d\n", valid_request);
 
-  char buffer[200];
-  memset(buffer, 200, 1);
-  oc_rep_to_json(rep, (char *)&buffer, 200, true);
-  PRINT("%s", buffer);
-
   if (valid_request == SPAKE_RND) {
     // generate random numbers for rnd, salt & it (# of iterations)
     oc_spake_parameter_exchange(&g_pase.rnd, &g_pase.salt, &g_pase.it);
@@ -1077,7 +1077,6 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     mbedtls_ecp_point pB;
     mbedtls_ecp_point_init(&pB);
     if (oc_spake_calc_pB(&pB, &spake_data.pub_y, &spake_data.w0))
-      ;
     {
       mbedtls_ecp_point_free(&pB);
       goto error;
@@ -1087,14 +1086,12 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     oc_alloc_string(&g_pase.pb, kPubKeySize);
 
     if (oc_spake_encode_pubkey(&pB, oc_cast(g_pase.pb, uint8_t)))
-      ;
     {
       mbedtls_ecp_point_free(&pB);
       goto error;
     }
 
     if (oc_spake_calc_transcript(&spake_data, oc_cast(g_pase.pa, uint8_t), &pB))
-      ;
     {
       mbedtls_ecp_point_free(&pB);
       goto error;
@@ -1106,9 +1103,9 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
 
     oc_rep_begin_root_object();
     // pb (11)
-    oc_rep_i_set_text_string(root, SPAKE_PB, oc_string(g_pase.pb));
+    oc_rep_i_set_byte_string(root, SPAKE_PB, oc_string(g_pase.pb), g_pase.pb.size);
     // cb (13)
-    oc_rep_i_set_text_string(root, SPAKE_CB, oc_string(g_pase.cb));
+    oc_rep_i_set_byte_string(root, SPAKE_CB, oc_string(g_pase.cb), g_pase.cb.size);
     oc_rep_end_root_object();
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
     return;
