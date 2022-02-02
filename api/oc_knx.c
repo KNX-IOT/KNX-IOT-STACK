@@ -1011,6 +1011,11 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
 
   PRINT("oc_core_knx_spake_post_handler valid_request: %d\n", valid_request);
 
+  char buffer[200];
+  memset(buffer, 200, 1);
+  oc_rep_to_json(rep, (char *)&buffer, 200, true);
+  PRINT("%s", buffer);
+
   if (valid_request == SPAKE_RND) {
     // generate random numbers for rnd, salt & it (# of iterations)
     oc_spake_parameter_exchange(&g_pase.rnd, &g_pase.salt, &g_pase.it);
@@ -1113,16 +1118,15 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
 
     // calculate expected cA
     uint8_t expected_ca[32];
-    oc_spake_calc_cA(&spake_data, expected_ca,
-                     oc_cast(g_pase.pb, uint8_t));
+    oc_spake_calc_cA(&spake_data, expected_ca, oc_cast(g_pase.pb, uint8_t));
 
     if (memcmp(expected_ca, oc_cast(g_pase.ca, uint8_t), 32) != 0) {
       OC_ERR("oc_spake_calc_cA failed");
       goto error;
     }
 
-    // if you are here, key confirmation is ok - create auth token & start communicating securely
-
+    // if you are here, key confirmation is ok - create auth token & start
+    // communicating securely
 
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
     return;

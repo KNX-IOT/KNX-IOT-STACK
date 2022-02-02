@@ -80,6 +80,7 @@
 
 #include "oc_api.h"
 #include "oc_knx.h"
+#include "oc_spake2plus.h"
 #include "port/oc_clock.h"
 #include <signal.h>
 #include <stdio.h>
@@ -107,6 +108,9 @@ STATIC CRITICAL_SECTION cs;   /**< event loop variable */
 #endif
 
 volatile int quit = 0; /**< stop variable, used by handle_signal */
+
+mbedtls_mpi w0, w1;
+mbedtls_ecp_point pA, pubA;
 
 static int
 app_init(void)
@@ -162,14 +166,62 @@ get_dev_pm(oc_client_response_t *data)
 void
 do_credential_exchange(oc_client_response_t *data)
 {
-  PRINT("\nGET_DEV:\n");
+  PRINT("\nReceived Parameter Response!:\n");
 
   PRINT("  content format %d\n", data->content_format);
 
-  PRINT("%.*s\n", (int)data->_payload_len, data->_payload);
+  char buffer[200];
+  memset(buffer, 200, 1);
+  oc_rep_to_json(data->payload, (char *)&buffer, 200, true);
+  PRINT("%s", buffer);
 
+  // TODO parse payload, obtain seed & salt, use it to derive w0 & w1
+  int it;
+  uint8_t *salt;
+  size_t salt_len;
+
+  oc_rep_t *rep = data->payload;
+  while (rep != NULL) {
+    // rnd - we just skip
+    if (rep->type == OC_REP_BYTE_STRING && rep->iname == 15)
+      ;
+
+    // pbkdf2 - interesting
+    if (rep->type == OC_REP_OBJECT && rep->iname == 12) {
+      oc_rep_t *inner_rep = rep->value.object;
+      while (inner_rep != NULL) {
+        // it
+        if (inner_rep->type == OC_REP_INT && inner_rep->iname == 16)
+          it = inner_rep->value.integer;
+        // salt
+        if (inner_rep->type == OC_REP_BYTE_STRING && inner_rep->iname == 5)
+          salt = inner_rep->value.string.ptr;
+          salt_len = inner_rep->value.string.size;
+
+        inner_rep = inner_rep->next;
+      }
+    }
+    rep = rep->next;
+  }
+
+  // TODO construct and send credential request
+
+  // WARNING: init without free leaks memory every time it is called,
+  // but for the test client this is not important
+  mbedtls_mpi_init(&w0);
+  mbedtls_mpi_init(&w1);
+  mbedtls_ecp_point_init(&pA);
+  mbedtls_ecp_point_init(&pubA);
+  oc_spake_calc_w0_w1("LETTUCE", salt_len, salt, it, &w0, &w1);
+
+  oc_spake_calc_pA(&pA, &pubA, &w0);
+
+  // calculate public share
+
+  /*
   oc_do_get_ex("/dev/pm", data->endpoint, NULL, &get_dev_pm, HIGH_QOS,
                APPLICATION_CBOR, APPLICATION_CBOR, NULL);
+               */
 }
 
 static oc_discovery_flags_t
@@ -209,10 +261,15 @@ discovery(const char *payload, int len, oc_endpoint_t *endpoint,
   }
 
   // do parameter exchange
-  oc_init_post("/.well-known/knx/spake", endpoint, NULL, &do_credential_exchange, HIGH_QOS,
-               NULL);
+  oc_init_post("/.well-known/knx/spake", endpoint, NULL,
+               &do_credential_exchange, HIGH_QOS, NULL);
 
-  // TODO: CONSTRUCT PAYLOAD USING REP
+  // Payload consists of just a random number? should be pretty easy...
+  uint8_t
+    rnd[32]; // not actually used by the server, so just send some gibberish
+  oc_rep_begin_root_object();
+  oc_rep_i_set_byte_string(root, 15, rnd, 32);
+  oc_rep_end_root_object();
 
   oc_do_post_ex(APPLICATION_CBOR, APPLICATION_CBOR);
 
