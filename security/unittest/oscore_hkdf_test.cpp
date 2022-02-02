@@ -14,7 +14,8 @@
 // limitations under the License.
 */
 
-#if defined(OC_SECURITY) && defined(OC_OSCORE)
+//#if defined(OC_SECURITY) && 
+#if defined(OC_OSCORE)
 
 #include "oc_helpers.h"
 #include "security/oc_oscore_crypto.h"
@@ -181,6 +182,6 @@ TEST_F(TestOSCOREHKDF, HKFDTC3_P)
                      "c738d2d9d201395faa4b61a96c8");
 }
 
-#else  /* OC_SECURITY && OC_OSCORE */
+#else  /* OC_OSCORE */
 typedef int dummy_declaration;
-#endif /* !OC_SECURITY && !OC_OSCORE */
+#endif /* !OC_OSCORE */
