@@ -117,9 +117,9 @@ target_sources(kis-common INTERFACE
     ${PROJECT_SOURCE_DIR}/util/oc_process.c
     ${PROJECT_SOURCE_DIR}/util/oc_timer.c
     # Security
-    ${PROJECT_SOURCE_DIR}/security/oc_acl.c
-    ${PROJECT_SOURCE_DIR}/security/oc_ael.c
-    ${PROJECT_SOURCE_DIR}/security/oc_audit.c
+    #${PROJECT_SOURCE_DIR}/security/oc_acl.c
+    #${PROJECT_SOURCE_DIR}/security/oc_ael.c
+    #${PROJECT_SOURCE_DIR}/security/oc_audit.c
     ${PROJECT_SOURCE_DIR}/security/oc_certs.c
     ${PROJECT_SOURCE_DIR}/security/oc_cred.c
     ${PROJECT_SOURCE_DIR}/security/oc_csr.c
@@ -136,8 +136,8 @@ target_sources(kis-common INTERFACE
     ${PROJECT_SOURCE_DIR}/security/oc_pki.c
     ${PROJECT_SOURCE_DIR}/security/oc_pstat.c
     ${PROJECT_SOURCE_DIR}/security/oc_roles.c
-    ${PROJECT_SOURCE_DIR}/security/oc_sdi.c
-    ${PROJECT_SOURCE_DIR}/security/oc_sp.c
+    #${PROJECT_SOURCE_DIR}/security/oc_sdi.c
+    #${PROJECT_SOURCE_DIR}/security/oc_sp.c
     ${PROJECT_SOURCE_DIR}/security/oc_spake2plus.c
     ${PROJECT_SOURCE_DIR}/security/oc_store.c
     ${PROJECT_SOURCE_DIR}/security/oc_svr.c

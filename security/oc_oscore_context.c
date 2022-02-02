@@ -109,6 +109,7 @@ oc_oscore_find_context_by_token_mid(size_t device, uint8_t *token,
   return NULL;
 }
 
+// TODO: not sure if we need this
 oc_oscore_context_t *
 oc_oscore_find_context_by_UUID(size_t device, oc_uuid_t *uuid)
 {
