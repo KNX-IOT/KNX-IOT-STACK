@@ -14,7 +14,7 @@
 // limitations under the License.
 */
 
-//#if defined(OC_SECURITY) && 
+//#if defined(OC_SECURITY) &&
 #if defined(OC_OSCORE)
 
 #include "oc_helpers.h"
