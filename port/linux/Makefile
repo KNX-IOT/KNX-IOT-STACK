@@ -141,7 +141,7 @@ ifeq ($(IDD), 1)
 endif
 
 ifneq ($(SECURE),0)
-	SRC += $(addprefix ../../security/, oc_cred.c oc_tls.c oc_store.c oc_certs.c oc_keypair.c oc_oscore_engine.c oc_oscore_crypto.c oc_oscore_context.c)
+	SRC += $(addprefix ../../security/, oc_cred.c oc_tls.c oc_certs.c oc_keypair.c oc_oscore_engine.c oc_oscore_crypto.c oc_oscore_context.c)
 	SRC_COMMON += $(addprefix $(MBEDTLS_DIR)/library/,${DTLS})
 	MBEDTLS_PATCH_FILE := $(MBEDTLS_DIR)/patched.txt
 ifeq ($(DYNAMIC),1)
