@@ -1076,8 +1076,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     // next step: calculate pB, encode it into the struct
     mbedtls_ecp_point pB;
     mbedtls_ecp_point_init(&pB);
-    if (oc_spake_calc_pB(&pB, &spake_data.pub_y, &spake_data.w0))
-    {
+    if (oc_spake_calc_pB(&pB, &spake_data.pub_y, &spake_data.w0)) {
       mbedtls_ecp_point_free(&pB);
       goto error;
     }
@@ -1085,14 +1084,13 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     oc_free_string(&g_pase.pb);
     oc_alloc_string(&g_pase.pb, kPubKeySize);
 
-    if (oc_spake_encode_pubkey(&pB, oc_cast(g_pase.pb, uint8_t)))
-    {
+    if (oc_spake_encode_pubkey(&pB, oc_cast(g_pase.pb, uint8_t))) {
       mbedtls_ecp_point_free(&pB);
       goto error;
     }
 
-    if (oc_spake_calc_transcript(&spake_data, oc_cast(g_pase.pa, uint8_t), &pB))
-    {
+    if (oc_spake_calc_transcript_responder(&spake_data,
+                                           oc_cast(g_pase.pa, uint8_t), &pB)) {
       mbedtls_ecp_point_free(&pB);
       goto error;
     }
@@ -1103,16 +1101,16 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
 
     oc_rep_begin_root_object();
     // pb (11)
-    oc_rep_i_set_byte_string(root, SPAKE_PB, oc_string(g_pase.pb), g_pase.pb.size);
+    oc_rep_i_set_byte_string(root, SPAKE_PB, oc_string(g_pase.pb),
+                             g_pase.pb.size);
     // cb (13)
-    oc_rep_i_set_byte_string(root, SPAKE_CB, oc_string(g_pase.cb), g_pase.cb.size);
+    oc_rep_i_set_byte_string(root, SPAKE_CB, oc_string(g_pase.cb),
+                             g_pase.cb.size);
     oc_rep_end_root_object();
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
     return;
   }
   if (valid_request == SPAKE_CA) {
-    // check key confirmation!!! don't just send status changed!!!
-
     // calculate expected cA
     uint8_t expected_ca[32];
     oc_spake_calc_cA(&spake_data, expected_ca, oc_cast(g_pase.pb, uint8_t));
@@ -1124,6 +1122,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
 
     // if you are here, key confirmation is ok - create auth token & start
     // communicating securely
+    PRINT("KEY CONFIRMATION IS SUCCESSFUL! WE HAVE SPAKE");
 
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
     return;

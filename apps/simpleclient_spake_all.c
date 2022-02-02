@@ -174,6 +174,46 @@ do_credential_verification(oc_client_response_t *data)
   memset(buffer, 200, 1);
   oc_rep_to_json(data->payload, (char *)&buffer, 200, true);
   PRINT("%s", buffer);
+
+  uint8_t *pB_bytes, *cB_bytes;
+  oc_rep_t *rep = data->payload;
+  while (rep != NULL) {
+    if (rep->type == OC_REP_BYTE_STRING) {
+      // pb
+      if (rep->iname == 11) {
+        pB_bytes = rep->value.string.ptr;
+      }
+      // cb
+      if (rep->iname == 13) {
+        cB_bytes = rep->value.string.ptr;
+      }
+    }
+
+    rep = rep->next;
+  }
+
+  mbedtls_ecp_point pB;
+  mbedtls_mpi cB;
+
+  mbedtls_ecp_point_init(&pB);
+  // todo read binary pB from pB_bytes
+
+  mbedtls_mpi_init(&cB);
+  mbedtls_mpi_read_binary(&cB, cB_bytes, 32);
+
+  // calculate Ka_Ke, save it in spake_data
+  // what does this use from spake_data??
+  // separate function for transcript of party A, using bytes of pB and pA ECP
+  // Point
+
+  // calculate and transmit cA
+  // only uses Ka_Ke from spake_data
+  // oc_spake_calc_cA()
+
+  // calculate and verify cB against received value
+
+  mbedtls_ecp_point_free(&pB);
+  mbedtls_mpi_free(&cB);
 }
 
 void
@@ -204,12 +244,14 @@ do_credential_exchange(oc_client_response_t *data)
       oc_rep_t *inner_rep = rep->value.object;
       while (inner_rep != NULL) {
         // it
-        if (inner_rep->type == OC_REP_INT && inner_rep->iname == 16)
+        if (inner_rep->type == OC_REP_INT && inner_rep->iname == 16) {
           it = inner_rep->value.integer;
+        }
         // salt
-        if (inner_rep->type == OC_REP_BYTE_STRING && inner_rep->iname == 5)
+        if (inner_rep->type == OC_REP_BYTE_STRING && inner_rep->iname == 5) {
           salt = inner_rep->value.string.ptr;
           salt_len = inner_rep->value.string.size;
+        }
 
         inner_rep = inner_rep->next;
       }

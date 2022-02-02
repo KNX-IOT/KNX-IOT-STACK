@@ -204,7 +204,7 @@ cleanup:
 // pA = pubA + w0 * M
 int
 oc_spake_calc_pA(mbedtls_ecp_point *pA, const mbedtls_ecp_point *pubA,
-             const mbedtls_mpi *w0)
+                 const mbedtls_mpi *w0)
 {
   return calculate_pX(pA, pubA, w0, bytes_M, sizeof(bytes_M));
 }
@@ -366,8 +366,9 @@ encode_mpi(mbedtls_mpi *mpi, uint8_t *buffer)
 }
 
 int
-oc_spake_calc_transcript(spake_data_t *spake_data, uint8_t X_enc[kPubKeySize],
-                         mbedtls_ecp_point *Y)
+oc_spake_calc_transcript_responder(spake_data_t *spake_data,
+                                   uint8_t X_enc[kPubKeySize],
+                                   mbedtls_ecp_point *Y)
 {
   int ret = 0;
   mbedtls_ecp_point Z, V, X;
@@ -423,6 +424,40 @@ cleanup:
   mbedtls_ecp_point_free(&V);
   mbedtls_ecp_point_free(&X);
   return ret;
+}
+
+// separate function for transcript of party A, using bytes of pB and pA ECP
+// Point
+int
+oc_spake_calc_transcript_initiator(mbedtls_ecp_point *X,
+                                   uint8_t Y_enc[kPubKeySize])
+
+{
+  // TODO adapt this code from the test vector to work with the
+  // function definition
+  mbedtls_ecp_point Z;
+  mbedtls_ecp_point_init(&Z);
+
+  // Z = h*x*(Y - w0*N)
+  MBEDTLS_MPI_CHK(calculate_ZV_N(&Z, &x, &Y, &w0));
+
+  MBEDTLS_MPI_CHK(mbedtls_ecp_point_write_binary(
+    &grp, &Z, MBEDTLS_ECP_PF_UNCOMPRESSED, &cmplen, cmpbuf, sizeof(cmpbuf)));
+  assert(memcmp(bytes_Z, cmpbuf, cmplen) == 0);
+
+  mbedtls_ecp_point V;
+  mbedtls_ecp_point_init(&V);
+
+  mbedtls_mpi w1;
+  mbedtls_mpi_init(&w1);
+  mbedtls_mpi_read_binary(&w1, bytes_w1, sizeof(bytes_w1));
+
+  // V = h*w1*(Y - w0*N)
+  MBEDTLS_MPI_CHK(calculate_ZV_N(&V, &w1, &Y, &w0));
+  MBEDTLS_MPI_CHK(mbedtls_ecp_point_write_binary(
+    &grp, &V, MBEDTLS_ECP_PF_UNCOMPRESSED, &cmplen, cmpbuf, sizeof(cmpbuf)));
+  assert(memcmp(bytes_V, cmpbuf, cmplen) == 0);
+
 }
 
 int
