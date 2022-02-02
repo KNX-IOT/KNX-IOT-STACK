@@ -117,13 +117,13 @@ target_sources(kis-common INTERFACE
     ${PROJECT_SOURCE_DIR}/util/oc_process.c
     ${PROJECT_SOURCE_DIR}/util/oc_timer.c
     # Security
-    ${PROJECT_SOURCE_DIR}/security/oc_acl.c
-    ${PROJECT_SOURCE_DIR}/security/oc_ael.c
-    ${PROJECT_SOURCE_DIR}/security/oc_audit.c
+    #${PROJECT_SOURCE_DIR}/security/oc_acl.c
+    #${PROJECT_SOURCE_DIR}/security/oc_ael.c
+    #${PROJECT_SOURCE_DIR}/security/oc_audit.c
     ${PROJECT_SOURCE_DIR}/security/oc_certs.c
     ${PROJECT_SOURCE_DIR}/security/oc_cred.c
-    ${PROJECT_SOURCE_DIR}/security/oc_csr.c
-    ${PROJECT_SOURCE_DIR}/security/oc_doxm.c
+    #${PROJECT_SOURCE_DIR}/security/oc_csr.c
+    #${PROJECT_SOURCE_DIR}/security/oc_doxm.c
     ${PROJECT_SOURCE_DIR}/security/oc_keypair.c
     #${PROJECT_SOURCE_DIR}/security/oc_obt.c
     #${PROJECT_SOURCE_DIR}/security/oc_obt_certs.c
@@ -133,14 +133,14 @@ target_sources(kis-common INTERFACE
     ${PROJECT_SOURCE_DIR}/security/oc_oscore_context.c
     ${PROJECT_SOURCE_DIR}/security/oc_oscore_crypto.c
     ${PROJECT_SOURCE_DIR}/security/oc_oscore_engine.c
-    ${PROJECT_SOURCE_DIR}/security/oc_pki.c
-    ${PROJECT_SOURCE_DIR}/security/oc_pstat.c
-    ${PROJECT_SOURCE_DIR}/security/oc_roles.c
-    ${PROJECT_SOURCE_DIR}/security/oc_sdi.c
-    ${PROJECT_SOURCE_DIR}/security/oc_sp.c
+    #${PROJECT_SOURCE_DIR}/security/oc_pki.c
+    #${PROJECT_SOURCE_DIR}/security/oc_pstat.c
+    #${PROJECT_SOURCE_DIR}/security/oc_roles.c
+    #${PROJECT_SOURCE_DIR}/security/oc_sdi.c
+    #${PROJECT_SOURCE_DIR}/security/oc_sp.c
     ${PROJECT_SOURCE_DIR}/security/oc_spake2plus.c
-    ${PROJECT_SOURCE_DIR}/security/oc_store.c
-    ${PROJECT_SOURCE_DIR}/security/oc_svr.c
+    #${PROJECT_SOURCE_DIR}/security/oc_store.c
+    #${PROJECT_SOURCE_DIR}/security/oc_svr.c
     ${PROJECT_SOURCE_DIR}/security/oc_tls.c
 
 )
