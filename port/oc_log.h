@@ -207,12 +207,14 @@ extern "C" {
 #define OC_LOGbytes(bytes, length)                                             \
   android_log_bytes("DEBUG", __FILE__, __func__, __LINE__, bytes, length)
 #else /* ! __ANDROID */
-//#define OC_LOG(level, ...)                                                     \
-//  do {                                                                         \
-//    PRINT("%s: %s <%s:%d>: ", level, __FILENAME__, __func__, __LINE__);        \
-//    PRINT(__VA_ARGS__);                                                        \
-//    PRINT("\n");                                                               \
-//  } while (0)
+/*
+#define OC_LOG(level, ...)                                                     \
+  do {                                                                         \
+    PRINT("%s: %s <%s:%d>: ", level, __FILENAME__, __func__, __LINE__);        \
+    PRINT(__VA_ARGS__);                                                        \
+    PRINT("\n");                                                               \
+  } while (0)
+*/
 
 #define OC_LOGipaddr(endpoint)                                                 \
   do {                                                                         \

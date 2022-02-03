@@ -1017,7 +1017,7 @@ send_msg(int sock, struct sockaddr_storage *receiver, oc_message_t *message)
     pktinfo = (struct in6_pktinfo *)CMSG_DATA(cmsg);
     memset(pktinfo, 0, sizeof(struct in6_pktinfo));
 
-    /* Get the outgoing interface index from message->endpint */
+    /* Get the outgoing interface index from message->endpoint */
     pktinfo->ipi6_ifindex = message->endpoint.interface_index;
     /* Set the source address of this message using the address
      * from the endpoint's addr_local attribute.
