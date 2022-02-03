@@ -32,7 +32,8 @@ typedef struct oc_oscore_context_t
 {
   struct oc_oscore_context_t *next;
   /* Provisioned parameters */
-  void *cred; /* cred entry contains the master secret */
+  //void *cred; /* cred entry contains the master secret */
+  uint8_t mastersecret[OSCORE_IDCTX_LEN];
   size_t device;
   uint8_t sendid[OSCORE_CTXID_LEN];
   uint8_t sendid_len;
@@ -65,7 +66,7 @@ void oc_oscore_free_context(oc_oscore_context_t *ctx);
 oc_oscore_context_t *oc_oscore_add_context(size_t device, const char *senderid,
                                            const char *recipientid,
                                            uint64_t ssn, const char *desc,
-                                           void *cred, bool from_storagw);
+                                           const char* mastersecret, bool from_storagw);
 
 oc_oscore_context_t *oc_oscore_find_context_by_UUID(size_t device,
                                                     oc_uuid_t *uuid);

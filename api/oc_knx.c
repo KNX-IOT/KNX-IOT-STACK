@@ -27,6 +27,8 @@
 
 #define LSM_STORE "LSM_STORE"
 #define FINGERPRINT_STORE "dev_knx_fingerprint"
+#define OSN_STORE "dev_knx_osn"
+
 // ---------------------------Variables --------------------------------------
 
 oc_group_object_notification_t g_received_notification;
@@ -1048,11 +1050,35 @@ oc_knx_set_ldevid(char *idevid, int len)
   oc_new_string(&g_ldevid, idevid, len);
 }
 
+// ----------------------------------------------------------------------------
+
+void
+oc_knx_load_osn()
+{
+  g_osn = 0;
+  oc_storage_read(OSN_STORE, (uint8_t *)&g_osn, sizeof(g_osn));
+}
+
+void
+oc_knx_dump_osn()
+{
+  oc_storage_write(OSN_STORE, (uint8_t *)&g_osn, sizeof(g_osn));
+}
+
 void
 oc_knx_set_osn(uint64_t osn)
 {
   g_osn = osn;
+  oc_knx_dump_osn();
 }
+
+uint64_t
+oc_knx_get_osn()
+{
+  return g_osn;
+}
+
+// ----------------------------------------------------------------------------
 
 void
 oc_knx_load_fingerprint()
@@ -1106,6 +1132,7 @@ oc_knx_load_state(size_t device_index)
   }
 
   oc_knx_load_fingerprint();
+  oc_knx_load_osn();
 }
 
 void

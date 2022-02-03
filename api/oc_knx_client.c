@@ -186,8 +186,19 @@ oc_issue_s_mode(int sia_value, int group_address, char *rp, uint8_t *value_data,
 
   PRINT("  oc_issue_s_mode : scope %d\n", scope);
 
-  oc_make_ipv6_endpoint(mcast, IPV6 | DISCOVERY | MULTICAST, 5683, 0xff, scope,
+#ifdef OC_OSCORE
+  oc_make_ipv6_endpoint(mcast, IPV6 | MULTICAST | SECURED, 5683,
+                        0xff, scope,
                         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0xfd);
+#else
+  oc_make_ipv6_endpoint(mcast, IPV6 | MULTICAST , 5683,
+                        0xff, scope, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00,
+                        0xfd);
+#endif 
+  oc_string_t mcast_str;
+  oc_endpoint_to_string(&mcast, &mcast_str);
+  PRINT("   sending to: %s\n", oc_string(mcast_str));
+  oc_free_string(&mcast_str);
 
   oc_send_s_mode(&mcast, "/.knx", sia_value, group_address, rp, value_data,
                  value_size);
@@ -199,9 +210,19 @@ oc_send_s_mode(oc_endpoint_t *endpoint, char *path, int sia_value,
 {
   int scope = 5;
 
-  PRINT("  oc_issue_s_mode : scope %d\n", scope);
-  if (oc_init_post(path, endpoint, NULL, NULL, LOW_QOS, NULL)) {
+  PRINT("  oc_send_s_mode : scope %d\n", scope);
 
+  oc_string_t mcast_str;
+  oc_endpoint_to_string(endpoint, &mcast_str);
+  PRINT("   sending to: %s\n", oc_string(mcast_str));
+  oc_free_string(&mcast_str);
+
+
+#ifndef OC_OSCORE
+  if (oc_init_post(path, endpoint, NULL, NULL, LOW_QOS, NULL)) {
+#else /* OC_OSCORE */
+  if (oc_init_multicast_update(endpoint, path, NULL)) {
+#endif /* OC_OSCORE */
     /*
     { 4: <sia>, 5: { 6: <st>, 7: <ga>, 1: <value> } }
     */
@@ -239,8 +260,13 @@ oc_send_s_mode(oc_endpoint_t *endpoint, char *path, int sia_value,
 
     PRINT("S-MODE Payload Size: %d\n", oc_rep_get_encoded_payload_size());
 
+#ifndef OC_OSCORE
     if (oc_do_post_ex(APPLICATION_CBOR, APPLICATION_CBOR)) {
       PRINT("  Sent POST request\n");
+#else
+    if (oc_do_multicast_update()) {
+      PRINT("  Sent oc_do_multicast_update update\n");
+#endif 
     } else {
       PRINT("  Could not send POST request\n");
     }

@@ -69,7 +69,7 @@ enum transport_flags {
   SECURED = 1 << 1,   ///< secure communication
   IPV4 = 1 << 2,      ///< ipv4 communication
   IPV6 = 1 << 3,      ///< ipv6 communication
-  TCP = 1 << 4,       ///< tpc communication
+  TCP = 1 << 4,       ///< tcp communication
   GATT = 1 << 5,      ///< BLE GATT communication
   MULTICAST = 1 << 6, ///< multicast enabled
   ACCEPTED = 1 << 7   ///< accepted

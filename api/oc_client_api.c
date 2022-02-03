@@ -24,9 +24,6 @@
 //#ifdef OC_SECURITY
 #ifdef OC_OSCORE
 #include "security/oc_tls.h"
-//#ifdef OC_PKI
-//#include "security/oc_roles.h"
-//#endif /* OC_PKI */
 #endif /* OC_SECURITY */
 #ifdef OC_CLIENT
 
@@ -199,7 +196,8 @@ oc_do_multicast_update(void)
   }
 
   if (payload_size > 0) {
-    coap_set_header_content_format(request, APPLICATION_VND_OCF_CBOR);
+    //coap_set_header_content_format(request, APPLICATION_VND_OCF_CBOR);
+    coap_set_header_content_format(request, APPLICATION_OSCORE);
   }
 
   multicast_update->length =
@@ -210,7 +208,7 @@ oc_do_multicast_update(void)
     goto do_multicast_update_error;
   }
 
-#ifdef OC_IPV4
+#ifdef OC_IPV4x
   oc_message_t *multicast_update4 = oc_internal_allocate_outgoing_message();
   if (multicast_update4) {
     oc_make_ipv4_endpoint(mcast4, IPV4 | MULTICAST | SECURED, 5683, 0xe0, 0x00,
@@ -235,11 +233,12 @@ do_multicast_update_error:
 }
 
 bool
-oc_init_multicast_update(const char *uri, const char *query)
+oc_init_multicast_update(oc_endpoint_t* mcast, const char *uri,
+                         const char *query)
 {
-  oc_make_ipv6_endpoint(mcast, IPV6 | MULTICAST | SECURED, 5683, 0xff, 0x02, 0,
-                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x01, 0x58);
-  mcast.addr.ipv6.scope = 0;
+  //oc_make_ipv6_endpoint(mcast, IPV6 | MULTICAST | SECURED, 5683, 0xff, 0x02, 0,
+  //                      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x01, 0x58);
+  //mcast.addr.ipv6.scope = 0;
 
   coap_message_type_t type = COAP_TYPE_NON;
 
@@ -249,13 +248,14 @@ oc_init_multicast_update(const char *uri, const char *query)
     return false;
   }
 
-  memcpy(&multicast_update->endpoint, &mcast, sizeof(oc_endpoint_t));
+  memcpy(&multicast_update->endpoint, mcast, sizeof(oc_endpoint_t));
 
   oc_rep_new(multicast_update->data + COAP_MAX_HEADER_SIZE, OC_BLOCK_SIZE);
 
   coap_udp_init_message(request, type, OC_POST, coap_get_mid());
 
-  coap_set_header_accept(request, APPLICATION_VND_OCF_CBOR);
+  //coap_set_header_accept(request, APPLICATION_VND_OCF_CBOR);
+  coap_set_header_accept(request, APPLICATION_OSCORE);
 
   request->token_len = 8;
   int i = 0;

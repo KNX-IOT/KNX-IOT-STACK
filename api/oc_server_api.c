@@ -19,9 +19,9 @@
 #include "messaging/coap/separate.h"
 #include "oc_api.h"
 
-#ifdef OC_SECURITY
-#include "security/oc_store.h"
-#endif /* OC_SECURITY */
+//#ifdef OC_SECURITY
+//#include "security/oc_store.h"
+//#endif /* OC_SECURITY */
 
 #ifdef OC_DYNAMIC_ALLOCATION
 #include <stdlib.h>

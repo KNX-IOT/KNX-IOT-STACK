@@ -31,6 +31,7 @@
 //#include "oc_store.h"
 #include "oc_tls.h"
 #include "util/oc_process.h"
+#include "oc_knx.h"
 
 OC_PROCESS(oc_oscore_handler, "OSCORE Process");
 
@@ -109,7 +110,7 @@ oc_oscore_recv_message(oc_message_t *message)
    */
 
   if (oscore_is_oscore_message(message) >= 0) {
-    OC_DBG("#################################");
+    OC_DBG_OSCORE("#################################");
     oc_oscore_context_t *oscore_ctx = NULL;
     message->endpoint.flags |= SECURED;
 
@@ -117,7 +118,7 @@ oc_oscore_recv_message(oc_message_t *message)
 
     uint8_t AAD[OSCORE_AAD_MAX_LEN], AAD_len = 0, nonce[OSCORE_AEAD_NONCE_LEN];
     /* Parse OSCORE message */
-    OC_DBG("### parse OSCORE message ###");
+    OC_DBG_OSCORE("### parse OSCORE message ###");
     coap_status_t st = oscore_parse_outer_message(message, oscore_pkt);
 
     if (st != COAP_NO_ERROR) {
@@ -126,7 +127,7 @@ oc_oscore_recv_message(oc_message_t *message)
       goto oscore_recv_error;
     }
 
-    OC_DBG("### parsed OSCORE message ###");
+    OC_DBG_OSCORE("### parsed OSCORE message ###");
 
     if (oscore_pkt->transport_type == COAP_TRANSPORT_UDP &&
         oscore_pkt->code <= OC_FETCH) {
@@ -142,9 +143,9 @@ oc_oscore_recv_message(oc_message_t *message)
     /* If OSCORE packet contains kid... */
     if (oscore_pkt->kid_len > 0) {
       /* Search for OSCORE context by kid */
-      OC_DBG("--- got kid from incoming message");
+      OC_DBG_OSCORE("--- got kid from incoming message");
       OC_LOGbytes(oscore_pkt->kid, oscore_pkt->kid_len);
-      OC_DBG("### searching for OSCORE context by kid ###");
+      OC_DBG_OSCORE("### searching for OSCORE context by kid ###");
       oscore_ctx =
         oc_oscore_find_context_by_kid(oscore_ctx, message->endpoint.device,
                                       oscore_pkt->kid, oscore_pkt->kid_len);
@@ -152,7 +153,7 @@ oc_oscore_recv_message(oc_message_t *message)
       /* If message is response */
       if (oscore_pkt->code > OC_FETCH) {
         /* Search for OSCORE context by token */
-        OC_DBG("### searching for OSCORE context by token ###");
+        OC_DBG_OSCORE("### searching for OSCORE context by token ###");
         oscore_ctx = oc_oscore_find_context_by_token_mid(
           message->endpoint.device, oscore_pkt->token, oscore_pkt->token_len,
           oscore_pkt->mid, &request_piv, &request_piv_len,
@@ -171,17 +172,17 @@ oc_oscore_recv_message(oc_message_t *message)
       goto oscore_recv_error;
     }
 
-    oc_sec_cred_t *c = (oc_sec_cred_t *)oscore_ctx->cred;
-    if (!(message->endpoint.flags & MULTICAST) &&
-        c->credtype != OC_CREDTYPE_OSCORE) {
-      OC_ERR("***unicast message protected using group OSCORE context; "
-             "silently ignore***");
-      goto oscore_recv_error;
-    }
+    //oc_sec_cred_t *c = (oc_sec_cred_t *)oscore_ctx->cred;
+    //if (!(message->endpoint.flags & MULTICAST) &&
+    //    c->credtype != OC_CREDTYPE_OSCORE) {
+    //  OC_ERR("***unicast message protected using group OSCORE context; "
+    //         "silently ignore***");
+    //  goto oscore_recv_error;
+    //}
 
     /* Copy "subjectuuid" of cred with OSCORE context to oc_endpoint_t */
-    oc_sec_cred_t *oscore_cred = (oc_sec_cred_t *)oscore_ctx->cred;
-    memcpy(message->endpoint.di.id, oscore_cred->subjectuuid.id, 16);
+   // oc_sec_cred_t *oscore_cred = (oc_sec_cred_t *)oscore_ctx->cred;
+   // memcpy(message->endpoint.di.id, oscore_cred->subjectuuid.id, 16);
 
     /* Use recipient key for decryption */
     uint8_t *key = oscore_ctx->recvkey;
@@ -202,7 +203,8 @@ oc_oscore_recv_message(oc_message_t *message)
         oc_oscore_compose_AAD(oscore_ctx->recvid, oscore_ctx->recvid_len,
                               oscore_pkt->piv, oscore_pkt->piv_len, AAD,
                               &AAD_len);
-        OC_DBG("---composed AAD using received Partial IV and Recipient ID");
+        OC_DBG_OSCORE(
+          "---composed AAD using received Partial IV and Recipient ID");
         OC_LOGbytes(AAD, AAD_len);
       }
 
@@ -210,7 +212,7 @@ oc_oscore_recv_message(oc_message_t *message)
       memcpy(message->endpoint.piv, oscore_pkt->piv, oscore_pkt->piv_len);
       message->endpoint.piv_len = oscore_pkt->piv_len;
 
-      OC_DBG("---got Partial IV from incoming message");
+      OC_DBG_OSCORE("---got Partial IV from incoming message");
       OC_LOGbytes(message->endpoint.piv, message->endpoint.piv_len);
 
       /* Compute nonce using received piv and context->recvid */
@@ -218,14 +220,14 @@ oc_oscore_recv_message(oc_message_t *message)
                            message->endpoint.piv, message->endpoint.piv_len,
                            oscore_ctx->commoniv, nonce, OSCORE_AEAD_NONCE_LEN);
 
-      OC_DBG(
+      OC_DBG_OSCORE(
         "---computed AEAD nonce using received Partial IV and Recipient ID");
       OC_LOGbytes(nonce, OSCORE_AEAD_NONCE_LEN);
     }
 
     /* If message is response */
     if (oscore_pkt->code > OC_FETCH) {
-      OC_DBG("---got request_piv from client callback");
+      OC_DBG_OSCORE("---got request_piv from client callback");
       OC_LOGbytes(request_piv, request_piv_len);
 
       /* If oc_message_t->endpoint.piv_len == 0 */
@@ -240,7 +242,7 @@ oc_oscore_recv_message(oc_message_t *message)
                              request_piv, request_piv_len, oscore_ctx->commoniv,
                              nonce, OSCORE_AEAD_NONCE_LEN);
 
-        OC_DBG("---use AEAD nonce from request");
+        OC_DBG_OSCORE("---use AEAD nonce from request");
         OC_LOGbytes(nonce, OSCORE_AEAD_NONCE_LEN);
       }
 
@@ -248,11 +250,11 @@ oc_oscore_recv_message(oc_message_t *message)
       oc_oscore_compose_AAD(oscore_ctx->sendid, oscore_ctx->sendid_len,
                             request_piv, request_piv_len, AAD, &AAD_len);
 
-      OC_DBG("---composed AAD using request_piv and Sender ID");
+      OC_DBG_OSCORE("---composed AAD using request_piv and Sender ID");
       OC_LOGbytes(AAD, AAD_len);
     }
 
-    OC_DBG("### decrypting OSCORE payload ###");
+    OC_DBG_OSCORE("### decrypting OSCORE payload ###");
 
     /* Verify and decrypt OSCORE payload */
 
@@ -267,7 +269,7 @@ oc_oscore_recv_message(oc_message_t *message)
       goto oscore_recv_error;
     }
 
-    OC_DBG("### successfully decrypted OSCORE payload ###");
+    OC_DBG_OSCORE("### successfully decrypted OSCORE payload ###");
 
     /* Adjust payload length to size after decryption (i.e. exclude the tag)
      */
@@ -275,7 +277,7 @@ oc_oscore_recv_message(oc_message_t *message)
 
     coap_packet_t coap_pkt[1];
 
-    OC_DBG("### parse inner message ###");
+    OC_DBG_OSCORE("### parse inner message ###");
 
     /* Parse inner (CoAP) message from the decrypted COSE payload */
     st = oscore_parse_inner_message(oscore_pkt->payload,
@@ -287,14 +289,14 @@ oc_oscore_recv_message(oc_message_t *message)
       goto oscore_recv_error;
     }
 
-    OC_DBG("### successfully parsed inner message ###");
+    OC_DBG_OSCORE("### successfully parsed inner message ###");
 
-    if (c->credtype == OC_CREDTYPE_OSCORE_MCAST_SERVER &&
-        coap_pkt->code != OC_POST) {
-      OC_ERR("***non-UPDATE multicast request protected using group OSCORE "
-             "context; silently ignore***");
-      goto oscore_recv_error;
-    }
+    //if (c->credtype == OC_CREDTYPE_OSCORE_MCAST_SERVER &&
+    //    coap_pkt->code != OC_POST) {
+    //  OC_ERR("***non-UPDATE multicast request protected using group OSCORE "
+    //         "context; silently ignore***");
+    //  goto oscore_recv_error;
+    //}
 
     /* Copy type, version, mid, token, observe fields from OSCORE packet to
      * CoAP Packet */
@@ -306,14 +308,15 @@ oc_oscore_recv_message(oc_message_t *message)
     coap_pkt->token_len = oscore_pkt->token_len;
     coap_pkt->observe = oscore_pkt->observe;
 
-    OC_DBG("### serializing CoAP message ###");
+    OC_DBG_OSCORE("### serializing CoAP message ###");
     /* Serialize fully decrypted CoAP packet to message->data buffer */
     message->length = coap_serialize_message((void *)coap_pkt, message->data);
 
-    OC_DBG("### serialized decrypted CoAP message to dispatch to the CoAP "
+    OC_DBG_OSCORE(
+      "### serialized decrypted CoAP message to dispatch to the CoAP "
            "layer ###");
   }
-  OC_DBG("#################################");
+  OC_DBG_OSCORE("#################################");
 
   /* Dispatch oc_message_t to the CoAP layer */
   if (oc_process_post(&coap_engine, oc_events[INBOUND_RI_EVENT], message) ==
@@ -355,13 +358,13 @@ oc_oscore_send_multicast_message(oc_message_t *message)
   oc_oscore_context_t *oscore_ctx = oc_oscore_find_group_context();
 
   if (oscore_ctx) {
-    OC_DBG("#################################");
-    OC_DBG("found group OSCORE context");
+    OC_DBG_OSCORE("#################################");
+    OC_DBG_OSCORE("found group OSCORE context");
 
     /* Use sender key for encryption */
     uint8_t *key = oscore_ctx->sendkey;
 
-    OC_DBG("### parse CoAP message ###");
+    OC_DBG_OSCORE("### parse CoAP message ###");
     /* Parse CoAP message */
     coap_packet_t coap_pkt[1];
     coap_status_t code = 0;
@@ -373,19 +376,21 @@ oc_oscore_send_multicast_message(oc_message_t *message)
       goto oscore_group_send_error;
     }
 
-    OC_DBG("### parsed CoAP message ###");
+    OC_DBG_OSCORE("### parsed CoAP message ###");
 
     uint8_t piv[OSCORE_PIV_LEN], piv_len = 0, kid[OSCORE_CTXID_LEN],
                                  kid_len = 0, nonce[OSCORE_AEAD_NONCE_LEN],
                                  AAD[OSCORE_AAD_MAX_LEN], AAD_len = 0;
 
-    OC_DBG("### protecting multicast request ###");
+    OC_DBG_OSCORE("### protecting multicast request ###");
     /* Use context->SSN as Partial IV */
     oscore_store_piv(oscore_ctx->ssn, piv, &piv_len);
-    OC_DBG("---using SSN as Partial IV: %lu", oscore_ctx->ssn);
+    OC_DBG_OSCORE("---using SSN as Partial IV: %lu", oscore_ctx->ssn);
     OC_LOGbytes(piv, piv_len);
     /* Increment SSN */
     oscore_ctx->ssn++;
+    // store it so that it can be retrieved by the clients
+    oc_knx_set_osn(oscore_ctx->ssn);
 
     /* Use context-sendid as kid */
     memcpy(kid, oscore_ctx->sendid, oscore_ctx->sendid_len);
@@ -396,13 +401,14 @@ oc_oscore_send_multicast_message(oc_message_t *message)
                          piv_len, oscore_ctx->commoniv, nonce,
                          OSCORE_AEAD_NONCE_LEN);
 
-    OC_DBG("---computed AEAD nonce using Partial IV (SSN) and Sender ID");
+    OC_DBG_OSCORE(
+      "---computed AEAD nonce using Partial IV (SSN) and Sender ID");
     OC_LOGbytes(nonce, OSCORE_AEAD_NONCE_LEN);
 
     /* Compose AAD using partial IV and context->sendid */
     oc_oscore_compose_AAD(oscore_ctx->sendid, oscore_ctx->sendid_len, piv,
                           piv_len, AAD, &AAD_len);
-    OC_DBG("---composed AAD using Partial IV (SSN) and Sender ID");
+    OC_DBG_OSCORE("---composed AAD using Partial IV (SSN) and Sender ID");
     OC_LOGbytes(AAD, AAD_len);
 
     /* Move CoAP payload to offset 2*COAP_MAX_HEADER_SIZE to accommodate for
@@ -416,14 +422,15 @@ oc_oscore_send_multicast_message(oc_message_t *message)
       coap_pkt->payload = message->data + 2 * COAP_MAX_HEADER_SIZE;
     }
 
-    OC_DBG("### serializing OSCORE plaintext ###");
+    OC_DBG_OSCORE("### serializing OSCORE plaintext ###");
     /* Serialize OSCORE plaintext at offset COAP_MAX_HEADER_SIZE
        (code, inner options, payload)
     */
     size_t plaintext_size = oscore_serialize_plaintext(
       coap_pkt, message->data + COAP_MAX_HEADER_SIZE);
 
-    OC_DBG("### serialized OSCORE plaintext: %zd bytes ###", plaintext_size);
+    OC_DBG_OSCORE("### serialized OSCORE plaintext: %zd bytes ###",
+                  plaintext_size);
 
     /* Set the OSCORE packet payload to point to location of the serialized
        inner message.
@@ -432,7 +439,7 @@ oc_oscore_send_multicast_message(oc_message_t *message)
     coap_pkt->payload_len = plaintext_size;
 
     /* Encrypt OSCORE plaintext */
-    OC_DBG("### encrypting OSCORE plaintext ###");
+    OC_DBG_OSCORE("### encrypting OSCORE plaintext ###");
 
     int ret =
       oc_oscore_encrypt(coap_pkt->payload, coap_pkt->payload_len,
@@ -444,7 +451,7 @@ oc_oscore_send_multicast_message(oc_message_t *message)
       goto oscore_group_send_error;
     }
 
-    OC_DBG("### successfully encrypted OSCORE plaintext ###");
+    OC_DBG_OSCORE("### successfully encrypted OSCORE plaintext ###");
 
     /* Adjust payload length to include the size of the authentication tag */
     coap_pkt->payload_len += OSCORE_AEAD_TAG_LEN;
@@ -456,17 +463,17 @@ oc_oscore_send_multicast_message(oc_message_t *message)
     coap_set_header_oscore(coap_pkt, piv, piv_len, kid, kid_len, NULL, 0);
 
     /* Serialize OSCORE message to oc_message_t */
-    OC_DBG("### serializing OSCORE message ###");
+    OC_DBG_OSCORE("### serializing OSCORE message ###");
     message->length = oscore_serialize_message(coap_pkt, message->data);
-    OC_DBG("### serialized OSCORE message ###");
+    OC_DBG_OSCORE("### serialized OSCORE message ###");
   } else {
     OC_ERR("*** could not find group OSCORE context ***");
     goto oscore_group_send_error;
   }
 
-  OC_DBG("#################################");
+  OC_DBG_OSCORE("#################################");
   /* Dispatch oc_message_t to the IP layer */
-  OC_DBG("Outbound network event: forwarding to IP Connectivity layer");
+  OC_DBG_OSCORE("Outbound network event: forwarding to IP Connectivity layer");
   oc_send_discovery_request(message);
   oc_message_unref(message);
   return 0;
@@ -525,11 +532,12 @@ oc_oscore_send_message(oc_message_t *msg)
     message->endpoint.device, &message->endpoint.di);
 
   if (oscore_ctx) {
-    OC_DBG("#################################");
-    OC_DBG("found OSCORE context corresponding to the peer UUID");
+    OC_DBG_OSCORE("#################################");
+    OC_DBG_OSCORE("found OSCORE context corresponding to the peer UUID");
     /* Is this is an inadvertent response to a secure multicast message */
     if (msg->endpoint.flags & MULTICAST) {
-      OC_DBG("### secure multicast requests do not elicit a response, discard "
+      OC_DBG_OSCORE(
+        "### secure multicast requests do not elicit a response, discard "
              "###");
       oc_message_unref(msg);
       return 0;
@@ -551,7 +559,7 @@ oc_oscore_send_message(oc_message_t *msg)
 
     oc_message_unref(msg);
 
-    OC_DBG("### parse CoAP message ###");
+    OC_DBG_OSCORE("### parse CoAP message ###");
     /* Parse CoAP message */
     coap_packet_t coap_pkt[1];
     coap_status_t code = 0;
@@ -571,7 +579,7 @@ oc_oscore_send_message(oc_message_t *msg)
       goto oscore_send_error;
     }
 
-    OC_DBG("### parsed CoAP message ###");
+    OC_DBG_OSCORE("### parsed CoAP message ###");
 
     uint8_t piv[OSCORE_PIV_LEN], piv_len = 0, kid[OSCORE_CTXID_LEN],
                                  kid_len = 0, nonce[OSCORE_AEAD_NONCE_LEN],
@@ -590,11 +598,11 @@ oc_oscore_send_message(oc_message_t *msg)
       //   goto oscore_send_error;
       // }
 
-      OC_DBG("### protecting outgoing request ###");
+      OC_DBG_OSCORE("### protecting outgoing request ###");
       /* Request */
       /* Use context->SSN as Partial IV */
       oscore_store_piv(oscore_ctx->ssn, piv, &piv_len);
-      OC_DBG("---using SSN as Partial IV: %lu", oscore_ctx->ssn);
+      OC_DBG_OSCORE("---using SSN as Partial IV: %lu", oscore_ctx->ssn);
       OC_LOGbytes(piv, piv_len);
       /* Increment SSN */
       oscore_ctx->ssn++;
@@ -717,7 +725,8 @@ oc_oscore_send_message(oc_message_t *msg)
     size_t plaintext_size = oscore_serialize_plaintext(
       coap_pkt, message->data + COAP_MAX_HEADER_SIZE);
 
-    OC_DBG("### serialized OSCORE plaintext: %zd bytes ###", plaintext_size);
+    OC_DBG_OSCORE("### serialized OSCORE plaintext: %zd bytes ###",
+                  plaintext_size);
 
     /* Set the OSCORE packet payload to point to location of the serialized
        inner message.
@@ -726,7 +735,7 @@ oc_oscore_send_message(oc_message_t *msg)
     coap_pkt->payload_len = plaintext_size;
 
     /* Encrypt OSCORE plaintext */
-    OC_DBG("### encrypting OSCORE plaintext ###");
+    OC_DBG_OSCORE("### encrypting OSCORE plaintext ###");
 
     int ret =
       oc_oscore_encrypt(coap_pkt->payload, coap_pkt->payload_len,
@@ -738,7 +747,7 @@ oc_oscore_send_message(oc_message_t *msg)
       goto oscore_send_error;
     }
 
-    OC_DBG("### successfully encrypted OSCORE plaintext ###");
+    OC_DBG_OSCORE("### successfully encrypted OSCORE plaintext ###");
 
     /* Adjust payload length to include the size of the authentication tag */
     coap_pkt->payload_len += OSCORE_AEAD_TAG_LEN;
@@ -766,24 +775,24 @@ oc_oscore_send_message(oc_message_t *msg)
     coap_set_header_proxy_uri(coap_pkt, oc_string(proxy_uri));
 
     /* Serialize OSCORE message to oc_message_t */
-    OC_DBG("### serializing OSCORE message ###");
+    OC_DBG_OSCORE("### serializing OSCORE message ###");
     message->length = oscore_serialize_message(coap_pkt, message->data);
-    OC_DBG("### serialized OSCORE message ###");
+    OC_DBG_OSCORE("### serialized OSCORE message ###");
     oc_free_string(&proxy_uri);
   }
 oscore_send_dispatch:
-  OC_DBG("#################################");
+  OC_DBG_OSCORE("#################################");
   /* Dispatch oc_message_t to the TLS layer */
-  OC_DBG("Outbound network event: forwarding to TLS");
+  OC_DBG_OSCORE("Outbound network event: forwarding to TLS");
   // TODO, this could go to the unsecure network...
 #ifdef OC_CLIENT
   if (!oc_tls_connected(&message->endpoint)) {
-    OC_DBG("Posting INIT_TLS_CONN_EVENT");
+    OC_DBG_OSCORE("Posting INIT_TLS_CONN_EVENT");
     oc_process_post(&oc_tls_handler, oc_events[INIT_TLS_CONN_EVENT], message);
   } else
 #endif /* OC_CLIENT */
   {
-    OC_DBG("Posting RI_TO_TLS_EVENT");
+    OC_DBG_OSCORE("Posting RI_TO_TLS_EVENT");
     oc_process_post(&oc_tls_handler, oc_events[RI_TO_TLS_EVENT], message);
   }
   return 0;
@@ -796,20 +805,21 @@ oscore_send_error:
 
 OC_PROCESS_THREAD(oc_oscore_handler, ev, data)
 {
+  OC_DBG_OSCORE("===>OSCORE ENGINE\n");
   OC_PROCESS_BEGIN();
   while (1) {
     OC_PROCESS_YIELD();
 
     if (ev == oc_events[INBOUND_OSCORE_EVENT]) {
-      OC_DBG("Inbound OSCORE event: encrypted request");
+      OC_DBG_OSCORE("Inbound OSCORE event: encrypted request");
       oc_oscore_recv_message(data);
     } else if (ev == oc_events[OUTBOUND_OSCORE_EVENT]) {
-      OC_DBG("Outbound OSCORE event: protecting message");
+      OC_DBG_OSCORE("Outbound OSCORE event: protecting message");
       oc_oscore_send_message(data);
     }
 #ifdef OC_CLIENT
     else if (ev == oc_events[OUTBOUND_GROUP_OSCORE_EVENT]) {
-      OC_DBG("Outbound OSCORE event: protecting multicast message");
+      OC_DBG_OSCORE("Outbound OSCORE event: protecting multicast message");
       oc_oscore_send_multicast_message(data);
     }
 #endif /* OC_CLIENT */

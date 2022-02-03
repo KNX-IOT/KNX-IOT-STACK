@@ -974,11 +974,11 @@ network_event_thread(void *data)
       continue;
 
     common:
-#ifdef OC_DEBUG
+//#ifdef OC_DEBUG
       PRINT("Incoming message of size %zd bytes from ", message->length);
       PRINTipaddr(message->endpoint);
       PRINT("\n\n");
-#endif /* OC_DEBUG */
+//#endif /* OC_DEBUG */
 
       oc_network_event(message);
     }

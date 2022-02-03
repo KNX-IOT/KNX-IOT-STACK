@@ -1,5 +1,6 @@
 /*
 // Copyright (c) 2016, 2020 Intel Corporation
+// Copyright (c) 2021 Cascoda Ltd.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -54,10 +55,10 @@
 #include "coap_signal.h"
 #endif /* OC_TCP */
 #include "oc_ri.h"
-#ifdef OC_SECURITY
-#include "security/oc_audit.h"
-#include "security/oc_tls.h"
-#endif
+//#ifdef OC_SECURITY
+//#include "security/oc_audit.h"
+//#include "security/oc_tls.h"
+//#endif
 #ifdef OC_OSCORE
 #include "security/oc_tls.h"
 #endif
@@ -430,7 +431,8 @@ coap_serialize_options(void *packet, uint8_t *option_array, bool inner,
   COAP_SERIALIZE_STRING_OPTION(COAP_OPTION_LOCATION_PATH, location_path,
                                '/', "Location-Path");
 #endif
-#if defined(OC_OSCORE) && defined(OC_SECURITY)
+#if defined(OC_OSCORE) 
+  //&& defined(OC_SECURITY)
   if (oscore && outer && IS_OPTION(coap_pkt, COAP_OPTION_OSCORE)) {
     option_length +=
       coap_serialize_oscore_option(&current_number, coap_pkt, option);
@@ -616,6 +618,7 @@ coap_oscore_parse_options(void *packet, uint8_t *data, uint32_t data_len,
     }
     if (current_option + option_length > data + data_len) {
       OC_WRN("Unsupported option");
+      OC_ERR("Unsupported option");
       return BAD_OPTION_4_02;
     }
 
@@ -628,7 +631,8 @@ coap_oscore_parse_options(void *packet, uint8_t *data, uint32_t data_len,
     }
 #endif /* OC_TCP */
     switch (option_number) {
-#if defined(OC_OSCORE) && defined(OC_SECURITY)
+#if defined(OC_OSCORE)
+      //&& defined(OC_SECURITY)
     case COAP_OPTION_OSCORE:
       if (!outer || !oscore) {
         return BAD_OPTION_4_02;
@@ -643,7 +647,7 @@ coap_oscore_parse_options(void *packet, uint8_t *data, uint32_t data_len,
       coap_pkt->content_format =
         (uint16_t)coap_parse_int_option(current_option, option_length);
       OC_DBG("  Content-Format [%u]", coap_pkt->content_format);
-      if (coap_pkt->content_format != APPLICATION_VND_OCF_CBOR &&
+      if (coap_pkt->content_format != APPLICATION_OSCORE &&
           coap_pkt->content_format != APPLICATION_CBOR &&
           coap_pkt->content_format != APPLICATION_LINK_FORMAT &&
           coap_pkt->content_format != APPLICATION_JSON &&
@@ -678,6 +682,7 @@ coap_oscore_parse_options(void *packet, uint8_t *data, uint32_t data_len,
       OC_DBG("  Accept [%u]", coap_pkt->accept);
       if (coap_pkt->accept != APPLICATION_VND_OCF_CBOR &&
           coap_pkt->accept != APPLICATION_CBOR &&
+          coap_pkt->accept != APPLICATION_OSCORE &&
           coap_pkt->accept != APPLICATION_LINK_FORMAT &&
           coap_pkt->accept != APPLICATION_JSON &&
           coap_pkt->accept != APPLICATION_PKCS10 &&
@@ -1221,12 +1226,12 @@ coap_udp_parse_message(void *packet, uint8_t *data, uint16_t data_len)
   coap_pkt->mid = coap_pkt->buffer[2] << 8 | coap_pkt->buffer[3];
 
   if (coap_pkt->version != 1) {
-    OC_WRN("CoAP version must be 1");
+    OC_ERR("CoAP version must be 1");
     return BAD_REQUEST_4_00;
   }
 
   if (coap_pkt->token_len > COAP_TOKEN_LEN) {
-    OC_WRN("Token Length must not be more than 8");
+    OC_ERR("Token Length must not be more than 8");
     return BAD_REQUEST_4_00;
   }
 
@@ -1241,7 +1246,7 @@ coap_udp_parse_message(void *packet, uint8_t *data, uint16_t data_len)
   coap_status_t ret = coap_oscore_parse_options(
     packet, data, data_len, current_option, true, true, false);
   if (COAP_NO_ERROR != ret) {
-    OC_DBG("coap_oscore_parse_options failed! %d", ret);
+    OC_ERR("coap_oscore_parse_options failed! %d", ret);
     return ret;
   }
 
