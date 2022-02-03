@@ -168,7 +168,7 @@ cleanup:
 }
 
 int
-oc_spake_gen_y(mbedtls_mpi *y, mbedtls_ecp_point *pub_y)
+oc_spake_gen_keypair(mbedtls_mpi *y, mbedtls_ecp_point *pub_y)
 {
   return mbedtls_ecp_gen_keypair(&grp, y, pub_y, mbedtls_ctr_drbg_random,
                                  &ctr_drbg_ctx);
@@ -429,35 +429,61 @@ cleanup:
 // separate function for transcript of party A, using bytes of pB and pA ECP
 // Point
 int
-oc_spake_calc_transcript_initiator(mbedtls_ecp_point *X,
-                                   uint8_t Y_enc[kPubKeySize])
+oc_spake_calc_transcript_initiator(mbedtls_mpi *w0, mbedtls_mpi *w1, mbedtls_mpi *x, mbedtls_ecp_point *X,
+                                   uint8_t Y_enc[kPubKeySize], uint8_t Ka_Ke[32])
 
 {
-  // TODO adapt this code from the test vector to work with the
-  // function definition
-  mbedtls_ecp_point Z;
+  int ret;
+  mbedtls_ecp_point Y, Z, V;
+  uint8_t ttbuf[2048];
+  size_t ttlen = 0;
+  mbedtls_ecp_point_init(&Y);
   mbedtls_ecp_point_init(&Z);
-
-  // Z = h*x*(Y - w0*N)
-  MBEDTLS_MPI_CHK(calculate_ZV_N(&Z, &x, &Y, &w0));
-
-  MBEDTLS_MPI_CHK(mbedtls_ecp_point_write_binary(
-    &grp, &Z, MBEDTLS_ECP_PF_UNCOMPRESSED, &cmplen, cmpbuf, sizeof(cmpbuf)));
-  assert(memcmp(bytes_Z, cmpbuf, cmplen) == 0);
-
-  mbedtls_ecp_point V;
   mbedtls_ecp_point_init(&V);
 
-  mbedtls_mpi w1;
-  mbedtls_mpi_init(&w1);
-  mbedtls_mpi_read_binary(&w1, bytes_w1, sizeof(bytes_w1));
+  mbedtls_ecp_point_read_binary(&grp, &Y, Y_enc, kPubKeySize);
+
+  // Z = h*x*(Y - w0*N)
+  MBEDTLS_MPI_CHK(calculate_ZV_N(&Z, x, &Y, w0));
+
 
   // V = h*w1*(Y - w0*N)
-  MBEDTLS_MPI_CHK(calculate_ZV_N(&V, &w1, &Y, &w0));
-  MBEDTLS_MPI_CHK(mbedtls_ecp_point_write_binary(
-    &grp, &V, MBEDTLS_ECP_PF_UNCOMPRESSED, &cmplen, cmpbuf, sizeof(cmpbuf)));
-  assert(memcmp(bytes_V, cmpbuf, cmplen) == 0);
+  MBEDTLS_MPI_CHK(calculate_ZV_N(&V, w1, &Y, w0));
 
+  // calculate transcript
+  // Context
+  ttlen += encode_string(SPAKE_CONTEXT, ttbuf + ttlen);
+  // M
+  mbedtls_ecp_point M;
+  mbedtls_ecp_point_init(&M);
+  MBEDTLS_MPI_CHK(
+    mbedtls_ecp_point_read_binary(&grp, &M, bytes_M, sizeof(bytes_M)));
+  ttlen += encode_point(&grp, &M, ttbuf + ttlen);
+  // N
+  mbedtls_ecp_point N;
+  mbedtls_ecp_point_init(&N);
+  MBEDTLS_MPI_CHK(
+    mbedtls_ecp_point_read_binary(&grp, &N, bytes_N, sizeof(bytes_N)));
+  ttlen += encode_point(&grp, &N, ttbuf + ttlen);
+  // X
+  ttlen += encode_point(&grp, X, ttbuf + ttlen);
+  // Y
+  ttlen += encode_point(&grp, &Y, ttbuf + ttlen);
+  // Z
+  ttlen += encode_point(&grp, &Z, ttbuf + ttlen);
+  // V
+  ttlen += encode_point(&grp, &V, ttbuf + ttlen);
+  // w0
+  ttlen += encode_mpi(w0, ttbuf + ttlen);
+
+  // calculate hash
+  mbedtls_sha256(ttbuf, ttlen, Ka_Ke, 0);
+
+  cleanup:
+  mbedtls_ecp_point_free(&Y);
+  mbedtls_ecp_point_free(&Z);
+  mbedtls_ecp_point_free(&V);
+  return ret;
 }
 
 int

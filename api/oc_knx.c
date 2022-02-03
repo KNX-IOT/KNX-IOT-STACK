@@ -1067,9 +1067,9 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
       goto error;
     }
 
-    ret = oc_spake_gen_y(&spake_data.y, &spake_data.pub_y);
+    ret = oc_spake_gen_keypair(&spake_data.y, &spake_data.pub_y);
     if (ret != 0) {
-      OC_ERR("oc_spake_gen_y failed with code %d", ret);
+      OC_ERR("oc_spake_gen_keypair failed with code %d", ret);
       goto error;
     }
 

@@ -108,7 +108,7 @@ int oc_spake_calc_w0_w1(const char *pw, size_t len_salt, const uint8_t *salt,
  * @param pub_y The public part.
  * @return int 0 on success, mbedtls error code on failure
  */
-int oc_spake_gen_y(mbedtls_mpi *y, mbedtls_ecp_point *pub_y);
+int oc_spake_gen_keypair(mbedtls_mpi *y, mbedtls_ecp_point *pub_y);
 
 /**
  * @brief Calculate the Public Share of Party A, the Management Client

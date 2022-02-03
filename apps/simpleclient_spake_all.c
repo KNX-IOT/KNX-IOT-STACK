@@ -259,8 +259,6 @@ do_credential_exchange(oc_client_response_t *data)
     rep = rep->next;
   }
 
-  // TODO construct and send credential request
-
   // WARNING: init without free leaks memory every time it is called,
   // but for the test client this is not important
   mbedtls_mpi_init(&w0);
@@ -269,6 +267,8 @@ do_credential_exchange(oc_client_response_t *data)
   mbedtls_ecp_point_init(&pubA);
   oc_spake_calc_w0_w1("LETTUCE", salt_len, salt, it, &w0, &w1);
 
+  // TODO is this correct? do we not need to generate pA first?
+    // TODO: Use this to obtain pubA ret = oc_spake_gen_keypair(&spake_data.y, &spake_data.pub_y);
   oc_spake_calc_pA(&pA, &pubA, &w0);
   uint8_t bytes_pA[65];
   oc_spake_encode_pubkey(&pA, bytes_pA);
