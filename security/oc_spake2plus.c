@@ -426,8 +426,6 @@ cleanup:
   return ret;
 }
 
-// separate function for transcript of party A, using bytes of pB and pA ECP
-// Point
 int
 oc_spake_calc_transcript_initiator(mbedtls_mpi *w0, mbedtls_mpi *w1, mbedtls_mpi *x, mbedtls_ecp_point *X,
                                    uint8_t Y_enc[kPubKeySize], uint8_t Ka_Ke[32])
@@ -487,13 +485,13 @@ oc_spake_calc_transcript_initiator(mbedtls_mpi *w0, mbedtls_mpi *w1, mbedtls_mpi
 }
 
 int
-oc_spake_calc_cB(spake_data_t *spake_data, uint8_t cB[32],
+oc_spake_calc_cB(uint8_t *Ka_Ke, uint8_t cB[32],
                  uint8_t bytes_X[kPubKeySize])
 {
   // |KcA| + |KcB| = 16 bytes
   uint8_t KcA_KcB[32];
   mbedtls_hkdf(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), NULL, 0,
-               spake_data->Ka_Ke, sizeof(spake_data->Ka_Ke) / 2,
+               Ka_Ke, 16,
                "ConfirmationKeys", strlen("ConfirmationKeys"), KcA_KcB, 32);
 
   // Calculate cB
@@ -503,16 +501,16 @@ oc_spake_calc_cB(spake_data_t *spake_data, uint8_t cB[32],
 }
 
 int
-oc_spake_calc_cA(spake_data_t *spake_data, uint8_t cA[32],
+oc_spake_calc_cA(uint8_t *Ka_Ke, uint8_t cA[32],
                  uint8_t bytes_Y[kPubKeySize])
 {
   // |KcA| + |KcB| = 16 bytes
   uint8_t KcA_KcB[32];
   mbedtls_hkdf(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), NULL, 0,
-               spake_data->Ka_Ke, sizeof(spake_data->Ka_Ke) / 2,
+               Ka_Ke, 16,
                "ConfirmationKeys", strlen("ConfirmationKeys"), KcA_KcB, 32);
 
-  // Calculate cA and cB
+  // Calculate cA
   mbedtls_md_hmac(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), KcA_KcB,
                   sizeof(KcA_KcB) / 2, bytes_Y, kPubKeySize, cA);
 }

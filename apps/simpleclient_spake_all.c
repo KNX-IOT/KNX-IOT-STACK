@@ -109,8 +109,9 @@ STATIC CRITICAL_SECTION cs;   /**< event loop variable */
 
 volatile int quit = 0; /**< stop variable, used by handle_signal */
 
-mbedtls_mpi w0, w1;
+mbedtls_mpi w0, w1, privA;
 mbedtls_ecp_point pA, pubA;
+uint8_t Ka_Ke[32];
 
 static int
 app_init(void)
@@ -163,6 +164,18 @@ get_dev_pm(oc_client_response_t *data)
   }
 }
 
+
+void finish_spake_handshake(oc_client_response_t *data)
+{
+  PRINT("SPAKE2+ Handshake Finished!\n");
+  PRINT("Shared Secret: ");
+  for (int i = 0; i < 16; i++)
+  {
+    PRINT("%02x", Ka_Ke[i+16]);
+  }
+  PRINT("\n");
+}
+
 void
 do_credential_verification(oc_client_response_t *data)
 {
@@ -192,28 +205,28 @@ do_credential_verification(oc_client_response_t *data)
     rep = rep->next;
   }
 
-  mbedtls_ecp_point pB;
-  mbedtls_mpi cB;
+  uint8_t cA[32];
+  uint8_t local_cB[32];
+  uint8_t pA_bytes[63];
+  size_t len_pA;
+  mbedtls_ecp_group grp;
 
-  mbedtls_ecp_point_init(&pB);
-  // todo read binary pB from pB_bytes
+  mbedtls_ecp_group_init(&grp);
+  mbedtls_ecp_group_load(&grp, MBEDTLS_ECP_DP_SECP256R1);
 
-  mbedtls_mpi_init(&cB);
-  mbedtls_mpi_read_binary(&cB, cB_bytes, 32);
+  oc_spake_calc_transcript_initiator(&w0, &w1, &privA, &pA, pB_bytes, Ka_Ke);
+  oc_spake_calc_cA(Ka_Ke, cA, pB_bytes);
 
-  // calculate Ka_Ke, save it in spake_data
-  // what does this use from spake_data??
-  // separate function for transcript of party A, using bytes of pB and pA ECP
-  // Point
+  mbedtls_ecp_point_write_binary(&grp, &pA, MBEDTLS_ECP_PF_UNCOMPRESSED, &len_pA, pA_bytes, 63);
+  oc_spake_calc_cB(Ka_Ke, local_cB, pA_bytes);
 
-  // calculate and transmit cA
-  // only uses Ka_Ke from spake_data
-  // oc_spake_calc_cA()
 
-  // calculate and verify cB against received value
-
-  mbedtls_ecp_point_free(&pB);
-  mbedtls_mpi_free(&cB);
+  oc_init_post("/.well-known/knx/spake", data->endpoint, NULL,
+               &finish_spake_handshake, HIGH_QOS, NULL);
+  oc_rep_begin_root_object();
+  oc_rep_i_set_byte_string(root, 14, cA, 32);
+  oc_rep_end_root_object();
+  oc_do_post_ex(APPLICATION_CBOR, APPLICATION_CBOR);
 }
 
 void
@@ -263,12 +276,12 @@ do_credential_exchange(oc_client_response_t *data)
   // but for the test client this is not important
   mbedtls_mpi_init(&w0);
   mbedtls_mpi_init(&w1);
+  mbedtls_mpi_init(&privA);
   mbedtls_ecp_point_init(&pA);
   mbedtls_ecp_point_init(&pubA);
   oc_spake_calc_w0_w1("LETTUCE", salt_len, salt, it, &w0, &w1);
 
-  // TODO is this correct? do we not need to generate pA first?
-    // TODO: Use this to obtain pubA ret = oc_spake_gen_keypair(&spake_data.y, &spake_data.pub_y);
+  oc_spake_gen_keypair(&privA, &pubA);
   oc_spake_calc_pA(&pA, &pubA, &w0);
   uint8_t bytes_pA[65];
   oc_spake_encode_pubkey(&pA, bytes_pA);

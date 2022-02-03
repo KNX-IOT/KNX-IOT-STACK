@@ -1095,7 +1095,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
       goto error;
     }
 
-    oc_spake_calc_cB(&spake_data, oc_cast(g_pase.cb, uint8_t),
+    oc_spake_calc_cB(spake_data.Ka_Ke, oc_cast(g_pase.cb, uint8_t),
                      oc_cast(g_pase.pa, uint8_t));
     mbedtls_ecp_point_free(&pB);
 
@@ -1113,7 +1113,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
   if (valid_request == SPAKE_CA) {
     // calculate expected cA
     uint8_t expected_ca[32];
-    oc_spake_calc_cA(&spake_data, expected_ca, oc_cast(g_pase.pb, uint8_t));
+    oc_spake_calc_cA(spake_data.Ka_Ke, expected_ca, oc_cast(g_pase.pb, uint8_t));
 
     if (memcmp(expected_ca, oc_cast(g_pase.ca, uint8_t), 32) != 0) {
       OC_ERR("oc_spake_calc_cA failed");
@@ -1122,7 +1122,12 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
 
     // if you are here, key confirmation is ok - create auth token & start
     // communicating securely
-    PRINT("KEY CONFIRMATION IS SUCCESSFUL! WE HAVE SPAKE");
+    PRINT("Shared Secret: ");
+    for (int i = 0; i < 16; i++)
+    {
+      PRINT("%02x", spake_data.Ka_Ke[i+16]);
+    }
+    PRINT("\n");
 
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
     return;
