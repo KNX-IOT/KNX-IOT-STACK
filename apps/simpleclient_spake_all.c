@@ -244,7 +244,6 @@ do_credential_exchange(oc_client_response_t *data)
   // TODO parse payload, obtain seed & salt, use it to derive w0 & w1
   int it;
   uint8_t *salt;
-  size_t salt_len;
 
   oc_rep_t *rep = data->payload;
   while (rep != NULL) {
@@ -263,7 +262,6 @@ do_credential_exchange(oc_client_response_t *data)
         // salt
         if (inner_rep->type == OC_REP_BYTE_STRING && inner_rep->iname == 5) {
           salt = inner_rep->value.string.ptr;
-          salt_len = inner_rep->value.string.size;
         }
 
         inner_rep = inner_rep->next;
@@ -279,7 +277,7 @@ do_credential_exchange(oc_client_response_t *data)
   mbedtls_mpi_init(&privA);
   mbedtls_ecp_point_init(&pA);
   mbedtls_ecp_point_init(&pubA);
-  oc_spake_calc_w0_w1("LETTUCE", salt_len, salt, it, &w0, &w1);
+  oc_spake_calc_w0_w1("LETTUCE", 32, salt, it, &w0, &w1);
 
   oc_spake_gen_keypair(&privA, &pubA);
   oc_spake_calc_pA(&pA, &pubA, &w0);

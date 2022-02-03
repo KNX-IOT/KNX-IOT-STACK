@@ -1034,7 +1034,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     oc_rep_i_set_int(pbkdf2, SPAKE_IT, g_pase.it);
     // salt 5
     oc_rep_i_set_byte_string(pbkdf2, SPAKE_SALT, oc_cast(g_pase.salt, uint8_t),
-                             oc_string_len(g_pase.salt));
+                            32);
     oc_rep_end_object(&root_map, pbkdf2);
     oc_rep_end_root_object();
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
@@ -1059,7 +1059,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     mbedtls_mpi_init(&spake_data.y);
     mbedtls_ecp_point_init(&spake_data.pub_y);
 
-    ret = oc_spake_calc_w0_L(password, oc_string_len(g_pase.salt),
+    ret = oc_spake_calc_w0_L(password, 32,
                              oc_cast(g_pase.salt, uint8_t), g_pase.it,
                              &spake_data.w0, &spake_data.L);
     if (ret != 0) {

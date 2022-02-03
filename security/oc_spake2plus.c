@@ -80,6 +80,99 @@ oc_spake_set_password(char *new_pass)
   strncpy(password, new_pass, sizeof(password));
 }
 
+// encode value as zero-padded little endian bytes
+// returns number of bytes written (always 8)
+// buffer must be able to fit 8 bytes
+size_t
+encode_uint(uint64_t value, uint8_t *buffer)
+{
+  buffer[0] = (value >> 0) & 0xff;
+  buffer[1] = (value >> 8) & 0xff;
+  buffer[2] = (value >> 16) & 0xff;
+  buffer[3] = (value >> 24) & 0xff;
+  buffer[4] = (value >> 32) & 0xff;
+  buffer[5] = (value >> 40) & 0xff;
+  buffer[6] = (value >> 48) & 0xff;
+  buffer[7] = (value >> 56) & 0xff;
+  return 8;
+}
+
+// encode string as length followed by bytes
+// returns number of bytes written
+size_t
+encode_string(const char *str, uint8_t *buffer)
+{
+  size_t len = encode_uint(strlen(str), buffer);
+  memcpy(buffer + len, str, strlen(str));
+  return len + strlen(str);
+}
+
+// encode point as length followed by bytes
+// returns number of bytes written
+size_t
+encode_point(mbedtls_ecp_group *grp, const mbedtls_ecp_point *point,
+             uint8_t *buffer)
+{
+  size_t len_point = 0;
+  size_t len_len = 0;
+  uint8_t point_buf[kPubKeySize];
+  int ret;
+  ret =
+    mbedtls_ecp_point_write_binary(grp, point, MBEDTLS_ECP_PF_UNCOMPRESSED,
+                                   &len_point, point_buf, sizeof(point_buf));
+  assert(ret == 0);
+
+  len_len = encode_uint(len_point, buffer);
+  memcpy(buffer + len_len, point_buf, len_point);
+  return len_len + len_point;
+}
+
+// encode mpi as length followed by bytes
+// returns number of bytes written
+size_t
+encode_mpi(mbedtls_mpi *mpi, uint8_t *buffer)
+{
+  size_t len_mpi = 0;
+  size_t len_len = 0;
+  uint8_t mpi_buf[64];
+  int ret;
+
+  len_mpi = mbedtls_mpi_size(mpi);
+
+  ret = mbedtls_mpi_write_binary(mpi, mpi_buf, len_mpi);
+  assert(ret == 0);
+
+  len_len = encode_uint(len_mpi, buffer);
+  memcpy(buffer + len_len, mpi_buf, len_mpi);
+  return len_len + len_mpi;
+}
+
+void print_point(mbedtls_ecp_point *p)
+{
+  uint8_t buf[kPubKeySize];
+  size_t len = 0;
+
+  len = encode_point(&grp, p, buf);
+
+  for (size_t i = 0; i < len; i++) {
+    printf("%02x", buf[i]);
+  }
+  printf("\n");
+}
+
+void print_mpi(mbedtls_mpi * m)
+{
+  uint8_t buf[64];
+  size_t len = 0;
+
+  len = encode_mpi(m, buf);
+
+  for (size_t i = 0; i < len; i++) {
+    printf("%02x", buf[i]);
+  }
+  printf("\n");
+}
+
 int
 oc_spake_encode_pubkey(mbedtls_ecp_point *P, uint8_t out[kPubKeySize])
 {
@@ -144,6 +237,9 @@ oc_spake_calc_w0_w1(const char *pw, size_t len_salt, const uint8_t *salt,
   // prime p
   MBEDTLS_MPI_CHK(mbedtls_mpi_mod_mpi(w0, &w0s, &grp.N));
   MBEDTLS_MPI_CHK(mbedtls_mpi_mod_mpi(w1, &w1s, &grp.N));
+
+  print_mpi(w0);
+  print_mpi(w1);
 
 cleanup:
   mbedtls_md_free(&ctx);
@@ -298,73 +394,6 @@ cleanup:
   return ret;
 }
 
-// encode value as zero-padded little endian bytes
-// returns number of bytes written (always 8)
-// buffer must be able to fit 8 bytes
-size_t
-encode_uint(uint64_t value, uint8_t *buffer)
-{
-  buffer[0] = (value >> 0) & 0xff;
-  buffer[1] = (value >> 8) & 0xff;
-  buffer[2] = (value >> 16) & 0xff;
-  buffer[3] = (value >> 24) & 0xff;
-  buffer[4] = (value >> 32) & 0xff;
-  buffer[5] = (value >> 40) & 0xff;
-  buffer[6] = (value >> 48) & 0xff;
-  buffer[7] = (value >> 56) & 0xff;
-  return 8;
-}
-
-// encode string as length followed by bytes
-// returns number of bytes written
-size_t
-encode_string(const char *str, uint8_t *buffer)
-{
-  size_t len = encode_uint(strlen(str), buffer);
-  memcpy(buffer + len, str, strlen(str));
-  return len + strlen(str);
-}
-
-// encode point as length followed by bytes
-// returns number of bytes written
-size_t
-encode_point(mbedtls_ecp_group *grp, const mbedtls_ecp_point *point,
-             uint8_t *buffer)
-{
-  size_t len_point = 0;
-  size_t len_len = 0;
-  uint8_t point_buf[kPubKeySize];
-  int ret;
-  ret =
-    mbedtls_ecp_point_write_binary(grp, point, MBEDTLS_ECP_PF_UNCOMPRESSED,
-                                   &len_point, point_buf, sizeof(point_buf));
-  assert(ret == 0);
-
-  len_len = encode_uint(len_point, buffer);
-  memcpy(buffer + len_len, point_buf, len_point);
-  return len_len + len_point;
-}
-
-// encode mpi as length followed by bytes
-// returns number of bytes written
-size_t
-encode_mpi(mbedtls_mpi *mpi, uint8_t *buffer)
-{
-  size_t len_mpi = 0;
-  size_t len_len = 0;
-  uint8_t mpi_buf[64];
-  int ret;
-
-  len_mpi = mbedtls_mpi_size(mpi);
-
-  ret = mbedtls_mpi_write_binary(mpi, mpi_buf, len_mpi);
-  assert(ret == 0);
-
-  len_len = encode_uint(len_mpi, buffer);
-  memcpy(buffer + len_len, mpi_buf, len_mpi);
-  return len_len + len_mpi;
-}
-
 int
 oc_spake_calc_transcript_responder(spake_data_t *spake_data,
                                    uint8_t X_enc[kPubKeySize],
@@ -415,6 +444,13 @@ oc_spake_calc_transcript_responder(spake_data_t *spake_data,
   ttlen += encode_point(&grp, &V, ttbuf + ttlen);
   // w0
   ttlen += encode_mpi(&spake_data->w0, ttbuf + ttlen);
+
+  // print transcript
+  printf("Responder transcript:\n");
+  for (size_t i = 0; i < ttlen; ++i) {
+    printf("%02x", ttbuf[i]);
+  }
+  printf("\n");
 
   // calculate hash
   mbedtls_sha256(ttbuf, ttlen, spake_data->Ka_Ke, 0);
@@ -473,6 +509,13 @@ oc_spake_calc_transcript_initiator(mbedtls_mpi *w0, mbedtls_mpi *w1, mbedtls_mpi
   ttlen += encode_point(&grp, &V, ttbuf + ttlen);
   // w0
   ttlen += encode_mpi(w0, ttbuf + ttlen);
+
+  // print transcript
+  printf("Initiator transcript:\n");
+  for (size_t i = 0; i < ttlen; ++i) {
+    printf("%02x", ttbuf[i]);
+  }
+  printf("\n");
 
   // calculate hash
   mbedtls_sha256(ttbuf, ttlen, Ka_Ke, 0);
