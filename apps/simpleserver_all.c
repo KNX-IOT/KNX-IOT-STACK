@@ -781,9 +781,10 @@ oc_ownership_status_cb(const oc_uuid_t *device_uuid, size_t device_index,
 
 /* send a multicast s-mode message */
 oc_event_callback_retval_t
-issue_requests_s_mode_delayed(void)
+issue_requests_s_mode_delayed(void *data)
 {
-  int scope = 5;
+  //int scope = 5;
+  (void)data;
   PRINT(" issue_requests_s_mode_delayed\n");
   int ga_values[2] = { 2, 3 };
   oc_string_t href;
@@ -916,12 +917,12 @@ main(int argc, char *argv[])
 #ifdef OC_CLIENT
                                         ,
                                         .requests_entry = 0
-#endif
   };
   if (do_send_s_mode) {
 
     handler.requests_entry = issue_requests_s_mode;
   }
+#endif
 
   oc_set_factory_presets_cb(factory_presets_cb, NULL);
 
