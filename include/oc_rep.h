@@ -828,7 +828,7 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
  */
 #define oc_rep_i_set_key(parent, key)                                          \
   if ((uint64_t)(key) != 0)                                                      \
-    g_err |= cbor_encode_int(parent, (int64_t)key);
+    g_err |= cbor_encode_int(parent, (int64_t)(key));
 
 /**
  * This macro has been replaced with oc_rep_open_array
@@ -1063,7 +1063,7 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
       cbor_encoder_create_array(&object##_map, &x_key##_value_array, length);  \
     int i;                                                                     \
     for (i = 0; i < (length); i++) {                                             \
-      g_err |= cbor_encode_int(&x_key##_value_array, values[i]);               \
+      g_err |= cbor_encode_int(&x_key##_value_array, (values)[i]);               \
     }                                                                          \
     g_err |=                                                                   \
       cbor_encoder_close_container(&object##_map, &x_key##_value_array);       \
@@ -1101,7 +1101,7 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
       cbor_encoder_create_array(&object##_map, &key##_value_array, length);    \
     int i;                                                                     \
     for (i = 0; i < (length); i++) {                                             \
-      g_err |= cbor_encode_boolean(&key##_value_array, values[i]);             \
+      g_err |= cbor_encode_boolean(&key##_value_array, (values)[i]);             \
     }                                                                          \
     g_err |= cbor_encoder_close_container(&object##_map, &key##_value_array);  \
   } while (0)
@@ -1132,7 +1132,7 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
  */
 #define oc_rep_i_set_bool_array(object, key, values, length)                   \
   do {                                                                         \
-    g_err |= cbor_encode_int(&object##_map, (int64_t)key);                     \
+    g_err |= cbor_encode_int(&object##_map, (int64_t)(key));                     \
     CborEncoder x_key##_value_array;                                           \
     g_err |=                                                                   \
       cbor_encoder_create_array(&object##_map, &x_key##_value_array, length);  \
@@ -1178,7 +1178,7 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
     int i;                                                                     \
     for (i = 0; i < (length); i++) {                                             \
       g_err |= cbor_encode_floating_point(&key##_value_array, CborDoubleType,  \
-                                          &values[i]);                         \
+                                          &(values)[i]);                         \
     }                                                                          \
     g_err |= cbor_encoder_close_container(&object##_map, &key##_value_array);  \
   } while (0)
@@ -1219,7 +1219,7 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
     int i;                                                                     \
     for (i = 0; i < (length); i++) {                                             \
       g_err |= cbor_encode_floating_point(&x_key##_value_array,                \
-                                          CborDoubleType, &values[i]);         \
+                                          CborDoubleType, &(values)[i]);         \
     }                                                                          \
     g_err |=                                                                   \
       cbor_encoder_close_container(&object##_map, &x_key##_value_array);       \
