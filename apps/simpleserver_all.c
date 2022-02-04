@@ -917,7 +917,9 @@ main(int argc, char *argv[])
 #ifdef OC_CLIENT
                                         ,
                                         .requests_entry = 0
+#endif
   };
+#ifdef OC_CLIENT
   if (do_send_s_mode) {
 
     handler.requests_entry = issue_requests_s_mode;
