@@ -674,7 +674,8 @@ register_resources(void)
   oc_resource_t *res_353 = oc_new_resource("myname_c", "p/c", 1, 0);
   oc_resource_bind_resource_type(res_353, "urn:knx:dpa.353.52");
   oc_resource_bind_content_type(res_353, APPLICATION_CBOR);
-  oc_resource_bind_resource_interface(res_353, OC_IF_S); /* if.s */
+  oc_resource_bind_resource_interface(res_353,
+                                      OC_IF_S | OC_IF_A); /* if.s && if.a */
   oc_resource_set_discoverable(res_353, true);
   /* periodic observable
      to be used when one wants to send an event per time slice
@@ -783,7 +784,7 @@ issue_requests_s_mode_delayed(void *data)
   // int scope = 5;
   (void)data;
   PRINT(" issue_requests_s_mode_delayed\n");
-  int ga_values[2] = { 2, 3 };
+  int ga_values[2] = { 2 };
   oc_string_t href;
   oc_new_string(&href, "/p/c", strlen("/p/c"));
 
@@ -792,7 +793,7 @@ issue_requests_s_mode_delayed(void *data)
   entry.cflags = OC_CFLAG_WRITE | OC_CFLAG_READ;
   entry.id = 55;
   entry.href = href;
-  entry.ga_len = 2;
+  entry.ga_len = 1;
   entry.ga = (int *)&ga_values;
 
   oc_core_set_group_object_table(0, entry);

@@ -535,8 +535,8 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
   memset(buffer, 200, 1);
   oc_rep_to_json(request->request_payload, (char *)&buffer, 200, true);
   PRINT("Decoded Payload: %s\n", buffer);
-
   PRINT("Full Payload Size: %d\n", (int)request->_payload_len);
+  OC_LOGbytes_OSCORE(request->_payload, (int)request->_payload_len);
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_CBOR) {
@@ -704,9 +704,9 @@ oc_create_knx_knx_resource(int resource_idx, size_t device)
   OC_DBG("oc_create_knx_knx_resource\n");
   // "/a/lsm"
   oc_core_lf_populate_resource(
-    resource_idx, device, "/.knx", OC_IF_LI, APPLICATION_CBOR, OC_DISCOVERABLE,
-    oc_core_knx_knx_get_handler, 0, oc_core_knx_knx_post_handler, 0, 1,
-    "urn:knx:g.s");
+    resource_idx, device, "/.knx", OC_IF_LI | OC_IF_G, APPLICATION_CBOR,
+    OC_DISCOVERABLE, oc_core_knx_knx_get_handler, 0,
+    oc_core_knx_knx_post_handler, 0, 1, "urn:knx:g.s");
 }
 
 // ----------------------------------------------------------------------------

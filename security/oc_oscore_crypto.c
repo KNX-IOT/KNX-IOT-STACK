@@ -130,13 +130,13 @@ void
 oc_oscore_AEAD_nonce(uint8_t *id, uint8_t id_len, uint8_t *piv, uint8_t piv_len,
                      uint8_t *civ, uint8_t *nonce, uint8_t nonce_len)
 {
-  OC_DBG("### computing AEAD nonce ###");
-  OC_DBG("Sender ID:");
-  OC_LOGbytes(id, id_len);
-  OC_DBG("Partial IV:");
-  OC_LOGbytes(piv, piv_len);
-  OC_DBG("Common IV:");
-  OC_LOGbytes(civ, OSCORE_COMMON_IV_LEN);
+  OC_DBG_OSCORE("### computing AEAD nonce ###");
+  OC_DBG_OSCORE("Sender ID:");
+  OC_LOGbytes_OSCORE(id, id_len);
+  OC_DBG_OSCORE("Partial IV:");
+  OC_LOGbytes_OSCORE(piv, piv_len);
+  OC_DBG_OSCORE("Common IV:");
+  OC_LOGbytes_OSCORE(civ, OSCORE_COMMON_IV_LEN);
   /*
          <- nonce length minus 6 B -> <-- 5 bytes -->
     +---+-------------------+--------+---------+-----+

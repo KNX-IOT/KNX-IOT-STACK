@@ -386,7 +386,7 @@ oc_oscore_send_multicast_message(oc_message_t *message)
     /* Use context->SSN as Partial IV */
     oscore_store_piv(oscore_ctx->ssn, piv, &piv_len);
     OC_DBG_OSCORE("---using SSN as Partial IV: %lu", oscore_ctx->ssn);
-    OC_LOGbytes(piv, piv_len);
+    OC_LOGbytes_OSCORE(piv, piv_len);
     /* Increment SSN */
     oscore_ctx->ssn++;
     // store it so that it can be retrieved by the clients
@@ -403,13 +403,13 @@ oc_oscore_send_multicast_message(oc_message_t *message)
 
     OC_DBG_OSCORE(
       "---computed AEAD nonce using Partial IV (SSN) and Sender ID");
-    OC_LOGbytes(nonce, OSCORE_AEAD_NONCE_LEN);
+    OC_LOGbytes_OSCORE(nonce, OSCORE_AEAD_NONCE_LEN);
 
     /* Compose AAD using partial IV and context->sendid */
     oc_oscore_compose_AAD(oscore_ctx->sendid, oscore_ctx->sendid_len, piv,
                           piv_len, AAD, &AAD_len);
     OC_DBG_OSCORE("---composed AAD using Partial IV (SSN) and Sender ID");
-    OC_LOGbytes(AAD, AAD_len);
+    OC_LOGbytes_OSCORE(AAD, AAD_len);
 
     /* Move CoAP payload to offset 2*COAP_MAX_HEADER_SIZE to accommodate for
        Outer+Inner CoAP options in the OSCORE packet.

@@ -258,7 +258,7 @@ coap_parse_oscore_option(void *packet, uint8_t *current_option,
     option_length -= coap_pkt->piv_len;
 
     OC_DBG_OSCORE("\tPartial IV:");
-    OC_LOGbytes(coap_pkt->piv, coap_pkt->piv_len);
+    OC_LOGbytes_OSCORE(coap_pkt->piv, coap_pkt->piv_len);
   }
 
   /* kid context (if any) */
@@ -274,7 +274,7 @@ coap_parse_oscore_option(void *packet, uint8_t *current_option,
     option_length -= coap_pkt->kid_ctx_len;
 
     OC_DBG_OSCORE("\tkid context:");
-    OC_LOGbytes(coap_pkt->kid_ctx, coap_pkt->kid_ctx_len);
+    OC_LOGbytes_OSCORE(coap_pkt->kid_ctx, coap_pkt->kid_ctx_len);
   }
 
   /* kid (if any) */
@@ -285,7 +285,7 @@ coap_parse_oscore_option(void *packet, uint8_t *current_option,
     memcpy(coap_pkt->kid, current_option, option_length);
 
     OC_DBG_OSCORE("\tkid:");
-    OC_LOGbytes(coap_pkt->kid, coap_pkt->kid_len);
+    OC_LOGbytes_OSCORE(coap_pkt->kid, coap_pkt->kid_len);
   }
 
   return 0;
@@ -327,7 +327,7 @@ coap_serialize_oscore_option(unsigned int *current_number, void *packet,
         buffer += coap_pkt->piv_len;
 
         OC_DBG_OSCORE("\tPartial IV:");
-        OC_LOGbytes(coap_pkt->piv, coap_pkt->piv_len);
+        OC_LOGbytes_OSCORE(coap_pkt->piv, coap_pkt->piv_len);
       }
 
       /* Serialize kid context */
@@ -340,7 +340,7 @@ coap_serialize_oscore_option(unsigned int *current_number, void *packet,
         buffer += coap_pkt->kid_ctx_len;
 
         OC_DBG_OSCORE("\tkid context:");
-        OC_LOGbytes(coap_pkt->kid_ctx, coap_pkt->kid_ctx_len);
+        OC_LOGbytes_OSCORE(coap_pkt->kid_ctx, coap_pkt->kid_ctx_len);
       }
 
       /* Remaining bytes, if any, represent the kid */
@@ -349,7 +349,7 @@ coap_serialize_oscore_option(unsigned int *current_number, void *packet,
         buffer += coap_pkt->kid_len;
 
         OC_DBG_OSCORE("\tkid:");
-        OC_LOGbytes(coap_pkt->kid, coap_pkt->kid_len);
+        OC_LOGbytes_OSCORE(coap_pkt->kid, coap_pkt->kid_len);
       }
     }
   }
