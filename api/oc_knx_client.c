@@ -221,13 +221,6 @@ oc_send_s_mode(oc_endpoint_t *endpoint, char *path, int sia_value,
     { 4: <sia>, 5: { 6: <st>, 7: <ga>, 1: <value> } }
     */
 
-    PRINT("before subtract and encode: %d\n",
-          oc_rep_get_encoded_payload_size());
-    // oc_rep_new(response_buffer.buffer, response_buffer.buffer_size);
-    // oc_rep_subtract_length(oc_rep_get_encoded_payload_size());
-    PRINT("after subtract, before encode: %d\n",
-          oc_rep_get_encoded_payload_size());
-
     oc_rep_begin_root_object();
 
     oc_rep_i_set_int(root, 4, sia_value);
@@ -253,6 +246,7 @@ oc_send_s_mode(oc_endpoint_t *endpoint, char *path, int sia_value,
     oc_rep_end_root_object();
 
     PRINT("S-MODE Payload Size: %d\n", oc_rep_get_encoded_payload_size());
+    OC_LOGbytes_OSCORE(g_encoder.data.ptr, oc_rep_get_encoded_payload_size());
 
 #ifndef OC_OSCORE
     if (oc_do_post_ex(APPLICATION_CBOR, APPLICATION_CBOR)) {

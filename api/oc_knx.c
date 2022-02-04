@@ -535,8 +535,8 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
   memset(buffer, 200, 1);
   oc_rep_to_json(request->request_payload, (char *)&buffer, 200, true);
   PRINT("Decoded Payload: %s\n", buffer);
-
   PRINT("Full Payload Size: %d\n", (int)request->_payload_len);
+  OC_LOGbytes_OSCORE(request->_payload, (int)request->_payload_len);
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_CBOR) {

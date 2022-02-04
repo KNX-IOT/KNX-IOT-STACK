@@ -217,11 +217,11 @@ oc_oscore_add_context(size_t device, const char *senderid,
 
 
   if (token_id) {
-    strncpy(&ctx->token_id, token_id, 16);
+    strncpy((char*)&ctx->token_id, token_id, 16);
   }
 
   if (mastersecret) {
-    strncpy(&ctx->master_secret, mastersecret, 16);
+    strncpy((char*)&ctx->master_secret, mastersecret, 16);
   }
 
   // oc_sec_cred_t *cred = (oc_sec_cred_t *)cred_entry;
