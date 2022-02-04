@@ -1055,9 +1055,47 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     // TODO auth token
 
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
+    // handshake completed successfully - clear state
+    memset(spake_data.Ka_Ke, 0, sizeof(spake_data.Ka_Ke));
+    mbedtls_ecp_point_free(&spake_data.L);
+    mbedtls_ecp_point_free(&spake_data.pub_y);
+    mbedtls_mpi_free(&spake_data.w0);
+    mbedtls_mpi_free(&spake_data.y);
+
+    mbedtls_ecp_point_init(&spake_data.L);
+    mbedtls_ecp_point_init(&spake_data.pub_y);
+    mbedtls_mpi_init(&spake_data.w0);
+    mbedtls_mpi_init(&spake_data.y);
+
+    oc_free_string(&g_pase.pa);
+    oc_free_string(&g_pase.pb);
+    oc_free_string(&g_pase.ca);
+    oc_free_string(&g_pase.cb);
+    oc_free_string(&g_pase.rnd);
+    oc_free_string(&g_pase.salt);
+    g_pase.it = 100000;
     return;
   }
 error:
+  // be paranoid: wipe all global data after an error
+  memset(spake_data.Ka_Ke, 0, sizeof(spake_data.Ka_Ke));
+  mbedtls_ecp_point_free(&spake_data.L);
+  mbedtls_ecp_point_free(&spake_data.pub_y);
+  mbedtls_mpi_free(&spake_data.w0);
+  mbedtls_mpi_free(&spake_data.y);
+
+  mbedtls_ecp_point_init(&spake_data.L);
+  mbedtls_ecp_point_init(&spake_data.pub_y);
+  mbedtls_mpi_init(&spake_data.w0);
+  mbedtls_mpi_init(&spake_data.y);
+
+  oc_free_string(&g_pase.pa);
+  oc_free_string(&g_pase.pb);
+  oc_free_string(&g_pase.ca);
+  oc_free_string(&g_pase.cb);
+  oc_free_string(&g_pase.rnd);
+  oc_free_string(&g_pase.salt);
+  g_pase.it = 100000;
   oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
 }
 

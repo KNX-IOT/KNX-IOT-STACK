@@ -128,9 +128,6 @@ static oc_endpoint_t *the_server;
 void
 put_dev_pm(oc_client_response_t *data)
 {
-  PRINT("put_dev_pm:\n");
-  PRINT("  content format %d\n", data->content_format);
-
   oc_rep_t *rep = data->payload;
 
   if ((rep != NULL) && (rep->type == OC_REP_BOOL)) {
@@ -142,8 +139,6 @@ void
 get_dev_pm(oc_client_response_t *data)
 {
   PRINT("get_dev_pm:\n");
-
-  PRINT("  content format %d\n", data->content_format);
 
   oc_rep_t *rep = data->payload;
 
@@ -167,7 +162,12 @@ get_dev_pm(oc_client_response_t *data)
 void
 finish_spake_handshake(oc_client_response_t *data)
 {
+  if (data->code != OC_STATUS_CHANGED) {
+    PRINT("Error in Credential Verification!!!\n");
+    return;
+  }
   PRINT("SPAKE2+ Handshake Finished!\n");
+  PRINT("  code: %d\n", data->code);
   PRINT("Shared Secret: ");
   for (int i = 0; i < 16; i++) {
     PRINT("%02x", Ka_Ke[i + 16]);
@@ -178,9 +178,13 @@ finish_spake_handshake(oc_client_response_t *data)
 void
 do_credential_verification(oc_client_response_t *data)
 {
-  PRINT("\nReceived Credential Response!:\n");
+  PRINT("\nReceived Credential Response!\n");
 
-  PRINT("  content format %d\n", data->content_format);
+  PRINT("  code: %d\n", data->code);
+  if (data->code != OC_STATUS_CHANGED) {
+    PRINT("Error in Credential Response!!!\n");
+    return;
+  }
 
   char buffer[200];
   memset(buffer, 200, 1);
@@ -231,9 +235,13 @@ do_credential_verification(oc_client_response_t *data)
 void
 do_credential_exchange(oc_client_response_t *data)
 {
-  PRINT("\nReceived Parameter Response!:\n");
+  PRINT("\nReceived Parameter Response!\n");
 
-  PRINT("  content format %d\n", data->content_format);
+  PRINT("  code: %d\n", data->code);
+  if (data->code != OC_STATUS_CHANGED) {
+    PRINT("Error in Parameter Response!!!\n");
+    return;
+  }
 
   char buffer[200];
   memset(buffer, 200, 1);
