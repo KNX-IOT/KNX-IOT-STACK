@@ -186,8 +186,8 @@ extern "C" {
     char *beg = (buff);                                                        \
     char *end = (buff) + (size);                                               \
     for (size_t i = 0; beg <= (end - 3) && i < (len); i++) {                   \
-      beg += (i == 0) ? SPRINTF(beg, "%02x", data[i])                          \
-                      : SPRINTF(beg, ":%02x", data[i]);                        \
+      beg += (i == 0) ? SPRINTF(beg, "%02x", (data)[i])                        \
+                      : SPRINTF(beg, ":%02x", (data)[i]);                      \
     }                                                                          \
   } while (0)
 
@@ -229,7 +229,7 @@ extern "C" {
     PRINT("DEBUG: %s <%s:%d>: ", __FILENAME__, __func__, __LINE__);            \
     uint16_t i;                                                                \
     for (i = 0; i < length; i++)                                               \
-      PRINT(" %02X", bytes[i]);                                                \
+      PRINT(" %02X", (bytes)[i]);                                              \
     PRINT("\n");                                                               \
   } while (0)
 #else

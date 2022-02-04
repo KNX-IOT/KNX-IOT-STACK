@@ -187,7 +187,7 @@ oc_issue_s_mode(int scope, int sia_value, int group_address, char *rp,
 
   PRINT("  oc_issue_s_mode : scope %d\n", scope);
 
-#ifdef OC_OSCOREx
+#ifdef OC_OSCORE
   oc_make_ipv6_endpoint(mcast, IPV6 | MULTICAST | SECURED, COAP_PORT, 0xff,
                         scope, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0xfd);
 #else
@@ -212,7 +212,7 @@ oc_send_s_mode(oc_endpoint_t *endpoint, char *path, int sia_value,
   PRINTipaddr(*endpoint);
   PRINT("\n");
 
-#ifndef OC_OSCOREx
+#ifndef OC_OSCORE
   if (oc_init_post(path, endpoint, NULL, NULL, LOW_QOS, NULL)) {
 #else  /* OC_OSCORE */
   if (oc_init_multicast_update(endpoint, path, NULL)) {
@@ -254,7 +254,7 @@ oc_send_s_mode(oc_endpoint_t *endpoint, char *path, int sia_value,
 
     PRINT("S-MODE Payload Size: %d\n", oc_rep_get_encoded_payload_size());
 
-#ifndef OC_OSCOREx
+#ifndef OC_OSCORE
     if (oc_do_post_ex(APPLICATION_CBOR, APPLICATION_CBOR)) {
       PRINT("  Sent POST request\n");
 #else
