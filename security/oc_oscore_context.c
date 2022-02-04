@@ -117,6 +117,7 @@ oc_oscore_context_t *
 oc_oscore_find_context_by_UUID(size_t device, oc_uuid_t *uuid)
 {
   (void) device;
+  (void) uuid;
    oc_oscore_context_t *ctx = (oc_oscore_context_t *)oc_list_head(contexts);
 //  while (ctx != NULL) {
 //    oc_sec_cred_t *cred = (oc_sec_cred_t *)ctx->cred;
