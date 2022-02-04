@@ -71,7 +71,8 @@ oc_oscore_find_context_by_token_mid(size_t device, uint8_t *token,
                                     uint8_t **request_piv,
                                     uint8_t *request_piv_len, bool tcp)
 {
-  oc_uuid_t *uuid;
+  (void)device;
+  //oc_uuid_t *uuid;
 #ifdef OC_CLIENT
   /* Search for client cb by token */
   oc_client_cb_t *cb = oc_ri_find_client_cb_by_token(token, token_len);
@@ -79,7 +80,7 @@ oc_oscore_find_context_by_token_mid(size_t device, uint8_t *token,
   if (cb) {
     *request_piv = cb->piv;
     *request_piv_len = cb->piv_len;
-    uuid = &cb->endpoint.di;
+    //uuid = &cb->endpoint.di;
   } else {
 #endif /* OC_CLIENT */
     /* Search transactions by token and mid */
@@ -95,7 +96,7 @@ oc_oscore_find_context_by_token_mid(size_t device, uint8_t *token,
     }
     *request_piv = t->message->endpoint.piv;
     *request_piv_len = t->message->endpoint.piv_len;
-    uuid = &t->message->endpoint.di;
+    //uuid = &t->message->endpoint.di;
 #ifdef OC_CLIENT
   }
 #endif /* OC_CLIENT */
@@ -108,7 +109,7 @@ oc_oscore_find_context_by_token_mid(size_t device, uint8_t *token,
  //   }
  //   ctx = ctx->next;
   //}
-  return NULL;
+  return ctx;
 }
 
 // TODO: not sure if we need this
@@ -191,7 +192,7 @@ oc_oscore_add_context(size_t device, const char *senderid,
     OC_DBG_OSCORE("### \t\tderiving Sender key ###");
     if (oc_oscore_context_derive_param(
           ctx->sendid, ctx->sendid_len, ctx->idctx, ctx->idctx_len, "Key",
-          mastersecret, strlen(mastersecret), NULL, 0,
+          (uint8_t *)mastersecret, strlen(mastersecret), NULL, 0,
           ctx->sendkey,
           OSCORE_KEY_LEN) < 0) {
       OC_ERR("*** error deriving Sender key ###");
