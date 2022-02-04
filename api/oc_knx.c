@@ -901,42 +901,16 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
   while (rep != NULL) {
     switch (rep->type) {
     case OC_REP_BYTE_STRING: {
-      if (rep->iname == SPAKE_SALT) {
-        valid_request = SPAKE_SALT;
-      }
       if (rep->iname == SPAKE_PA) {
         valid_request = SPAKE_PA;
-      }
-      // Do we need this? server only sends pB as a response
-      if (rep->iname == SPAKE_PB) {
-        valid_request = SPAKE_PB;
       }
       if (rep->iname == SPAKE_CA) {
         valid_request = SPAKE_CA;
       }
-      // Do we need this? server only sends cB as a response
-      if (rep->iname == SPAKE_CB) {
-        valid_request = SPAKE_CB;
-      }
-      // do we need this? does it not go inside pbkdf2?
       if (rep->iname == SPAKE_RND) {
         valid_request = SPAKE_RND;
       }
     } break;
-    case OC_REP_OBJECT: {
-      // not sure if we need this
-      if (rep->iname == SPAKE_PBKDF2) {
-        valid_request = SPAKE_PBKDF2;
-      }
-    } break;
-    case OC_REP_INT: {
-      // do we need this? does it not go inside pbkdf2?
-      if (rep->iname == SPAKE_IT) {
-        valid_request = SPAKE_IT;
-      }
-    } break;
-    case OC_REP_NIL:
-      break;
     default:
       break;
     }
@@ -951,65 +925,23 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
   while (rep != NULL) {
     switch (rep->type) {
     case OC_REP_BYTE_STRING: {
-      // ca == 14
       if (rep->iname == SPAKE_CA) {
         oc_free_string(&g_pase.ca);
         oc_new_string(&g_pase.ca, oc_string(rep->value.string),
-                      oc_string_len(rep->value.string));
+                      oc_byte_string_len(rep->value.string));
       }
-      // pa == 10
       if (rep->iname == SPAKE_PA) {
         oc_free_string(&g_pase.pa);
         oc_new_string(&g_pase.pa, oc_string(rep->value.string),
-                      oc_string_len(rep->value.string));
+                      oc_byte_string_len(rep->value.string));
       }
-      // rnd == 15
       if (rep->iname == SPAKE_RND) {
         oc_free_string(&g_pase.rnd);
         oc_new_string(&g_pase.rnd, oc_string(rep->value.string),
-                      oc_string_len(rep->value.string));
-        // TODO: compute pB
-        oc_free_string(&g_pase.pb);
-        oc_new_string(&g_pase.pb, "pb-computed", strlen("pb-computed"));
-
-        // TODO: compute cB
-        oc_free_string(&g_pase.cb);
-        oc_new_string(&g_pase.cb, "cb-computed", strlen("cb-computed"));
+                      oc_byte_string_len(rep->value.string));
       }
     } break;
-    case OC_REP_OBJECT: {
-      // pbkdf2 == 12
-      if (rep->iname == SPAKE_PBKDF2) {
-        oc_rep_t *object = rep->value.object;
-        while (object != NULL) {
-          switch (object->type) {
-          case OC_REP_BYTE_STRING: {
-            // salt
-            if (object->iname == SPAKE_SALT) {
-              oc_free_string(&g_pase.salt);
-              oc_new_string(&g_pase.salt, oc_string(object->value.string),
-                            oc_string_len(object->value.string));
-            }
-          } break;
-          case OC_REP_INT: {
-            // it
-            if (object->iname == SPAKE_IT) {
-              g_pase.it = object->value.integer;
-            }
-          } break;
-          case OC_REP_NIL:
-            break;
-          default:
-            break;
-          }
-          object = object->next;
-        }
-      }
-    } break;
-    case OC_REP_NIL:
-      break;
-    default:
-      break;
+    default: break;
     }
     rep = rep->next;
   }
@@ -1020,13 +952,10 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     // generate random numbers for rnd, salt & it (# of iterations)
     oc_spake_parameter_exchange(&g_pase.rnd, &g_pase.salt, &g_pase.it);
 
-    // TODO start calculation of handshake parameters here, while you wait the
-    // second message from the client - use delayed callback
-
     oc_rep_begin_root_object();
     // rnd (15)
     oc_rep_i_set_byte_string(root, SPAKE_RND, oc_cast(g_pase.rnd, uint8_t),
-                             oc_string_len(g_pase.rnd));
+                             oc_byte_string_len(g_pase.rnd));
     // pbkdf2
     oc_rep_i_set_key(&root_map, SPAKE_PBKDF2);
     oc_rep_begin_object(&root_map, pbkdf2);
@@ -1034,7 +963,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     oc_rep_i_set_int(pbkdf2, SPAKE_IT, g_pase.it);
     // salt 5
     oc_rep_i_set_byte_string(pbkdf2, SPAKE_SALT, oc_cast(g_pase.salt, uint8_t),
-                            32);
+                            oc_byte_string_len(g_pase.salt));
     oc_rep_end_object(&root_map, pbkdf2);
     oc_rep_end_root_object();
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
@@ -1059,7 +988,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     mbedtls_mpi_init(&spake_data.y);
     mbedtls_ecp_point_init(&spake_data.pub_y);
 
-    ret = oc_spake_calc_w0_L(password, 32,
+    ret = oc_spake_calc_w0_L(password, oc_byte_string_len(g_pase.salt),
                              oc_cast(g_pase.salt, uint8_t), g_pase.it,
                              &spake_data.w0, &spake_data.L);
     if (ret != 0) {
@@ -1083,6 +1012,8 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
 
     oc_free_string(&g_pase.pb);
     oc_alloc_string(&g_pase.pb, kPubKeySize);
+    oc_free_string(&g_pase.cb);
+    oc_alloc_string(&g_pase.cb, kPubKeySize);
 
     if (oc_spake_encode_pubkey(&pB, oc_cast(g_pase.pb, uint8_t))) {
       mbedtls_ecp_point_free(&pB);
@@ -1102,10 +1033,10 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     oc_rep_begin_root_object();
     // pb (11)
     oc_rep_i_set_byte_string(root, SPAKE_PB, oc_string(g_pase.pb),
-                             g_pase.pb.size);
+                             oc_byte_string_len(g_pase.pb));
     // cb (13)
     oc_rep_i_set_byte_string(root, SPAKE_CB, oc_string(g_pase.cb),
-                             g_pase.cb.size);
+                             oc_byte_string_len(g_pase.cb));
     oc_rep_end_root_object();
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
     return;
@@ -1122,12 +1053,8 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
 
     // if you are here, key confirmation is ok - create auth token & start
     // communicating securely
-    PRINT("Shared Secret: ");
-    for (int i = 0; i < 16; i++)
-    {
-      PRINT("%02x", spake_data.Ka_Ke[i+16]);
-    }
-    PRINT("\n");
+
+    // TODO auth token
 
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
     return;

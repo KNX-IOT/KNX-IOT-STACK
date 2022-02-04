@@ -155,6 +155,7 @@ typedef struct oc_mmem oc_handle_t, oc_string_t, oc_array_t, oc_string_array_t,
 
 void oc_concat_strings(oc_string_t *concat, const char *str1, const char *str2);
 #define oc_string_len(ocstring) ((ocstring).size ? (ocstring).size - 1 : 0)
+#define oc_byte_string_len(ocstring) ((ocstring).size)
 
 #define oc_int_array_size(ocintarray) ((ocintarray).size)
 #define oc_bool_array_size(ocboolarray) ((ocboolarray).size)
