@@ -116,6 +116,7 @@ oc_oscore_find_context_by_token_mid(size_t device, uint8_t *token,
 oc_oscore_context_t *
 oc_oscore_find_context_by_UUID(size_t device, oc_uuid_t *uuid)
 {
+  (void) device;
    oc_oscore_context_t *ctx = (oc_oscore_context_t *)oc_list_head(contexts);
 //  while (ctx != NULL) {
 //    oc_sec_cred_t *cred = (oc_sec_cred_t *)ctx->cred;
@@ -205,7 +206,8 @@ oc_oscore_add_context(size_t device, const char *senderid,
   if (recipientid) {
     OC_DBG_OSCORE("### \t\tderiving Recipient key ###");
     if (oc_oscore_context_derive_param(
-          ctx->recvid, ctx->recvid_len, ctx->idctx, ctx->idctx_len, "Key", mastersecret,
+          ctx->recvid, ctx->recvid_len, ctx->idctx, ctx->idctx_len, "Key",
+          (uint8_t *)mastersecret,
                                        strlen(mastersecret), NULL, 0,
           ctx->recvkey,
           OSCORE_KEY_LEN) < 0) {
@@ -218,7 +220,8 @@ oc_oscore_add_context(size_t device, const char *senderid,
 
   OC_DBG_OSCORE("### \t\tderiving Common IV ###");
   if (oc_oscore_context_derive_param(NULL, 0, ctx->idctx, ctx->idctx_len, "IV",
-                                     mastersecret, strlen(mastersecret),
+                                     (uint8_t *)mastersecret,
+                                     strlen(mastersecret),
                                      NULL, 0, ctx->commoniv,
                                      OSCORE_COMMON_IV_LEN) < 0) {
     OC_ERR("*** error deriving Common IV ###");
