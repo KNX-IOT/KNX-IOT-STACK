@@ -1084,7 +1084,7 @@ oc_core_fp_p_x_get_handler(oc_request_t *request,
   }
 
   oc_rep_begin_root_object();
-  /* id 0 * /
+  /* id 0 */
   oc_rep_i_set_int(root, 0, g_gpt[index].id);
   /* ia - 12 */
   if (g_gpt[index].ia > -1) {
