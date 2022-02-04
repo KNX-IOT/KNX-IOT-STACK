@@ -27,6 +27,9 @@ set(OC_DYNAMIC_ALLOCATION_ENABLED ON CACHE BOOL "Enable dynamic memory allocatio
 set(OC_OSCORE_ENABLED ON CACHE BOOL "Enable oscore")
 set(OC_PKI_ENABLED ON CACHE BOOL "Enable PKI security")
 set(OC_DEBUG_ENABLED OFF CACHE BOOL "Enable debug messages")
+set(CLANG_TIDY_ENABLED OFF CACHE BOOL "Enable clang-tidy analysis during compilation.")
+
+include(tools/clang-tidy.cmake)
 
 # If an mbedtls platform layer is defined, add it to the mbedtls list of libs
 if(TARGET mbedtls-plat)
@@ -106,6 +109,9 @@ if(MSVC)
     target_compile_options(mbedcrypto PRIVATE /W1 /WX-)
     target_compile_options(kis-api INTERFACE /W1 /WX-)
 endif()
+
+# enable clang-tidy 
+enable_clang_tidy()
 
 target_sources(kis-common INTERFACE
     # Utilities that are used deep within the stack

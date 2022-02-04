@@ -65,7 +65,7 @@ get_network_addresses()
                              GAA_FLAG_SKIP_MULTICAST | GAA_FLAG_SKIP_DNS_SERVER,
                            NULL, interface_list, &out_buf_len);
     if (dwRetVal == ERROR_BUFFER_OVERFLOW) {
-      OC_ERR("retry GetAdaptersAddresses with out_buf_len=%d", out_buf_len);
+      OC_WRN("retry GetAdaptersAddresses with out_buf_len=%d", out_buf_len);
       free(interface_list);
       interface_list = NULL;
       continue;

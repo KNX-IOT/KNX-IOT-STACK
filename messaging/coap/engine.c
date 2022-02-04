@@ -56,10 +56,6 @@
 #include "oc_api.h"
 #include "oc_buffer.h"
 
-#ifdef OC_SECURITY
-#include "security/oc_audit.h"
-#include "security/oc_tls.h"
-#endif /* OC_SECURITY */
 #ifdef OC_OSCORE
 #include "security/oc_tls.h"
 #endif
@@ -139,33 +135,6 @@ coap_send_empty_response(coap_message_type_t type, uint16_t mid,
   }
 }
 
-#ifdef OC_SECURITY
-static void
-coap_audit_log(oc_message_t *msg)
-{
-  char ipaddr[IPADDR_BUFF_SIZE];
-  SNPRINTFipaddr(ipaddr, IPADDR_BUFF_SIZE, msg->endpoint);
-  char buff1[16];
-  memset(buff1, 0, sizeof(buff1));
-  if (msg->length >= 4) {
-    snprintf(buff1, sizeof(buff1), "[%02x:%02x:%02x:%02x]", msg->data[0],
-             msg->data[1], msg->data[2], msg->data[3]);
-  }
-  // oc_string_array item length cannot exceed 128 bytes
-  // hexdump format "XX:XX:..." : each byte is represented by 3 symbols
-  char buff2[128];
-  size_t length = (msg->length < 42) ? msg->length : 42;
-  if (length > 0) {
-    size_t size = length * 3 + 1;
-    memset(buff2, 0, 128);
-    SNPRINTFbytes(buff2, size - 1, msg->data, length);
-  }
-  char *aux[] = { ipaddr, buff1, buff2 };
-  oc_audit_log(msg->endpoint.device, "COMM-1", "Unexpected CoAP command", 0x40,
-               2, (const char **)aux, (length == 0) ? 2 : 3);
-}
-#endif /* OC_SECURITY */
-
 //#ifdef OC_SECURITY
 #ifdef OC_OSCORE
 static oc_event_callback_retval_t
@@ -187,7 +156,8 @@ coap_receive(oc_message_t *msg)
   coap_status_code = COAP_NO_ERROR;
 
   OC_DBG("CoAP Engine: received datalen=%u from", (unsigned int)msg->length);
-  // PRINT("CoAP Engine: received datalen=%u from", (unsigned int)msg->length);
+  PRINT("CoAP Engine: received datalen=%u from", (unsigned int)msg->length);
+  PRINTipaddr(msg->endpoint);
   OC_LOGipaddr(msg->endpoint);
   OC_LOGbytes(msg->data, msg->length);
 
@@ -830,9 +800,6 @@ coap_receive(oc_message_t *msg)
     }
   } else {
     OC_ERR("Unexpected CoAP command");
-    //#ifdef OC_SECURITY
-    //    coap_audit_log(msg);
-    //#endif /* OC_SECURITY */
     if (msg->endpoint.flags & TCP) {
       coap_send_empty_response(COAP_TYPE_NON, 0, message->token,
                                message->token_len, coap_status_code,

@@ -15,7 +15,6 @@
 */
 
 #include "oc_api.h"
-
 #include "oc_core_res.h"
 
 #include <ctype.h>

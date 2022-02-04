@@ -1,5 +1,5 @@
 /*
- // Copyright (c) 2021 Cascoda Ltd
+ // Copyright (c) 2021-2022 Cascoda Ltd
  //
  // Licensed under the Apache License, Version 2.0 (the "License");
  // you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@
 #include "oc_core_res.h"
 #include "oc_discovery.h"
 #include <stdio.h>
+
+#define COAP_PORT (5683)
 
 // ----------------------------------------------------------------------------
 
@@ -178,16 +180,23 @@ oc_group_address_to_endpoint(int group_address, int scope)
 */
 
 static void
-oc_issue_s_mode(int sia_value, int group_address, char *rp, uint8_t *value_data,
-                int value_size)
+oc_issue_s_mode(int scope, int sia_value, int group_address, char *rp,
+                uint8_t *value_data, int value_size)
 {
-  int scope = 5;
   //(void)sia_value; /* variable not used */
 
   PRINT("  oc_issue_s_mode : scope %d\n", scope);
 
-  oc_make_ipv6_endpoint(mcast, IPV6 | DISCOVERY | MULTICAST, 5683, 0xff, scope,
-                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0xfd);
+#ifdef OC_OSCOREx
+  oc_make_ipv6_endpoint(mcast, IPV6 | MULTICAST | SECURED, COAP_PORT, 0xff,
+                        scope, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0xfd);
+#else
+  oc_make_ipv6_endpoint(mcast, IPV6 | MULTICAST, COAP_PORT, 0xff, scope, 0, 0,
+                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0xfd);
+#endif
+  PRINT("  ");
+  PRINTipaddr(mcast);
+  PRINT("\n");
 
   oc_send_s_mode(&mcast, "/.knx", sia_value, group_address, rp, value_data,
                  value_size);
@@ -197,11 +206,17 @@ static void
 oc_send_s_mode(oc_endpoint_t *endpoint, char *path, int sia_value,
                int group_address, char *rp, uint8_t *value_data, int value_size)
 {
-  int scope = 5;
 
-  PRINT("  oc_issue_s_mode : scope %d\n", scope);
+  PRINT("  oc_send_s_mode : \n");
+  PRINT("  ");
+  PRINTipaddr(*endpoint);
+  PRINT("\n");
+
+#ifndef OC_OSCOREx
   if (oc_init_post(path, endpoint, NULL, NULL, LOW_QOS, NULL)) {
-
+#else  /* OC_OSCORE */
+  if (oc_init_multicast_update(endpoint, path, NULL)) {
+#endif /* OC_OSCORE */
     /*
     { 4: <sia>, 5: { 6: <st>, 7: <ga>, 1: <value> } }
     */
@@ -239,8 +254,13 @@ oc_send_s_mode(oc_endpoint_t *endpoint, char *path, int sia_value,
 
     PRINT("S-MODE Payload Size: %d\n", oc_rep_get_encoded_payload_size());
 
+#ifndef OC_OSCOREx
     if (oc_do_post_ex(APPLICATION_CBOR, APPLICATION_CBOR)) {
       PRINT("  Sent POST request\n");
+#else
+    if (oc_do_multicast_update()) {
+      PRINT("  Sent oc_do_multicast_update update\n");
+#endif
     } else {
       PRINT("  Could not send POST request\n");
     }
@@ -331,6 +351,13 @@ oc_s_mode_get_resource_value(char *resource_url, char *rp, uint8_t *buf,
 void
 oc_do_s_mode(char *resource_url, char *rp)
 {
+  int scope = 2;
+  oc_do_s_mode_with_scope(scope, resource_url, rp);
+}
+
+void
+oc_do_s_mode_with_scope(int scope, char *resource_url, char *rp)
+{
   int value_size;
   if (resource_url == NULL) {
     return;
@@ -371,7 +398,7 @@ oc_do_s_mode(char *resource_url, char *rp)
       group_address = oc_core_find_group_object_table_group_entry(index, j);
       PRINT("   ga : %d\n", group_address);
       // issue the s-mode command
-      oc_issue_s_mode(sia_value, group_address, rp, buffer, value_size);
+      oc_issue_s_mode(scope, sia_value, group_address, rp, buffer, value_size);
 
       // loop over the full recipient table and send a message if the group is
       // there

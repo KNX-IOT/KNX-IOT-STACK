@@ -19,6 +19,8 @@
 #include "oc_discovery.h"
 #include "oc_core_res.h"
 #include <stdio.h>
+#include "security/oc_oscore_context.h"
+#include "oc_knx.h"
 
 uint64_t g_oscore_replaywindow = 0;
 uint64_t g_oscore_osndelay = 0;
@@ -1064,6 +1066,30 @@ oc_create_knx_sec_resources(size_t device_index)
   oc_create_auth_at_resource(OC_KNX_AUTH_AT, device_index);
   oc_create_auth_at_x_resource(OC_KNX_AUTH_AT_X, device_index);
   oc_create_knx_auth_resource(OC_KNX_AUTH, device_index);
+}
+
+void
+oc_init_oscore(size_t device_index)
+{
+  (void)device_index;
+
+  // TODO
+#ifdef OC_OSCORE
+  PRINT("oc_init_oscore adding oscore context\n ");
+  // oc_device_info_t *device = oc_core_get_device_info(device_index);
+
+  char *serialnum = "abc";
+
+  // if (device != NULL) {
+  // oc_oscore_context_t* ctx =  oc_oscore_add_context( device_index,
+  // oc_string(device->serialnumber), "reci",
+  oc_oscore_context_t *ctx = oc_oscore_add_context(
+    device_index, serialnum, "reci", oc_knx_get_osn(), "desc", "MS", false);
+  if (ctx == NULL) {
+    PRINT("   fail...\n ");
+  }
+  //}
+#endif
 }
 
 // ----------------------------------------------------------------------------

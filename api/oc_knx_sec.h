@@ -69,18 +69,16 @@ char *oc_at_profile_to_string(oc_at_profile_t at_profile);
  *
  * https://datatracker.ietf.org/doc/html/draft-ietf-ace-oscore-profile-19#section-3.2.1
  *
- * | name      | CBOR label | CBOR type | description                      |
- *default value | | ----------| -----------| ----------|
- *---------------------------------|---------------| | id        | 0    | byte
- *string | OSCORE Input Material Identifier     |  -            | | version   |
- *1    | unsigned integer | OSCORE   Version                | 1             | |
- *ms        | 2    | byte string  | OSCORE Master Secret value (shall be PSK) |
- *-       | | hkdf      | 3    | text string / integer | OSCORE HKDF value |
- *HKDF SHA-256  | | alg       | 4    | text string / integer | OSCORE AEAD
- *Algorithm value | AES-CCM-16-64-128 (COSE algorithm encoding: 10) | | salt | 5
- *| byte string | an input to  OSCORE Master Salt value| Default SHALL be an
- *empty byte string | | contextId | 6    | byte string | OSCORE ID Context value
- *| omit  |
+ * | name      | CBOR label | CBOR type | description   |default value |
+ * | ----------| -----------| ----------|---------------|--------------|
+ * | id        | 0    | byte string | OSCORE Input Material Identifier |  - | |
+ *version   | 1    | unsigned integer | OSCORE   Version   | 1          | | ms
+ *| 2    | byte string  | OSCORE Master Secret value (shall be PSK) | -   | |
+ *hkdf      | 3    | text string / integer | HKDF value | HKDF SHA-256  | | alg
+ *| 4    | text string / integer | AEAD Algorithm value | AES-CCM-16-64-128 (10)
+ *| | salt | 5  | byte string | Master Salt value| Default SHALL be an empty
+ *byte string | | contextId | 6    | byte string | OSCORE ID Context value |
+ *omit  |
  *
  * {
  *   "alg" : "AES-CCM-16-64-128",
@@ -134,6 +132,8 @@ uint64_t oc_oscore_get_osndelay();
  * @param device index of the device to which the resources are to be created
  */
 void oc_create_knx_sec_resources(size_t device);
+
+void oc_init_oscore(size_t device_index);
 
 /**
  * @brief is the method allowed according to the interface mask

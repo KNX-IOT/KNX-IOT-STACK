@@ -1,5 +1,6 @@
 /*
 // Copyright (c) 2016 Intel Corporation
+// Copyright (c) 2022 Cascoda Ltd.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -190,6 +191,13 @@ extern "C" {
     }                                                                          \
   } while (0)
 
+#define OC_LOG(level, ...)                                                     \
+  do {                                                                         \
+    PRINT("%s: %s <%s:%d>: ", level, __FILENAME__, __func__, __LINE__);        \
+    PRINT(__VA_ARGS__);                                                        \
+    PRINT("\n");                                                               \
+  } while (0)
+
 #ifdef OC_DEBUG
 #ifdef __ANDROID__
 #define OC_LOG(level, ...)                                                     \
@@ -199,12 +207,14 @@ extern "C" {
 #define OC_LOGbytes(bytes, length)                                             \
   android_log_bytes("DEBUG", __FILE__, __func__, __LINE__, bytes, length)
 #else /* ! __ANDROID */
+/*
 #define OC_LOG(level, ...)                                                     \
   do {                                                                         \
     PRINT("%s: %s <%s:%d>: ", level, __FILENAME__, __func__, __LINE__);        \
     PRINT(__VA_ARGS__);                                                        \
     PRINT("\n");                                                               \
   } while (0)
+*/
 
 #define OC_LOGipaddr(endpoint)                                                 \
   do {                                                                         \
@@ -230,13 +240,18 @@ extern "C" {
 #define OC_WRN(...) OC_LOG("W", __VA_ARGS__)
 #define OC_ERR(...) OC_LOG("E", __VA_ARGS__)
 #else
-#define OC_LOG(...)
+// #define OC_LOG(...)
 #define OC_DBG(...)
 #define OC_WRN(...)
-#define OC_ERR(...)
+//#define OC_ERR(...)
 #define OC_LOGipaddr(endpoint)
 #define OC_LOGbytes(bytes, length)
 #endif
+
+#define OC_ERR(...) OC_LOG("E", __VA_ARGS__)
+#define OC_DBG_OSCORE(...) OC_LOG("OSCORE", __VA_ARGS__)
+
+//#define OC_DBG_OSCORE(...)
 
 #ifdef __cplusplus
 }

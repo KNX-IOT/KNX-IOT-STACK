@@ -522,14 +522,9 @@ typedef void (*oc_random_pin_cb_t)(const unsigned char *pin, size_t pin_len,
 void oc_set_random_pin_callback(oc_random_pin_cb_t cb, void *data);
 
 /**
- * Reset all logical devices to the RFOTM state
+ * Reset all logical devices to the unloaded state
  *
- * All devices will be placed in the 'Ready For Ownership Transfer Mode'
- * (RFOTM). This is the initial startup state for for all devices that have not
- * yet been onboarded.  After this call all devices will need to be onboarded
- * and provisioned again.
- *
- * @note The function oc_reset() deals only with security and provisioning it
+ * @note The function oc_reset() deals only with security and configuration it
  *       does not reset any other device settings.
  *
  * @note Use of this function requires building with OC_SECURITY defined.
@@ -1633,12 +1628,15 @@ void oc_stop_multicast(oc_client_response_t *response);
 /**
  * @brief initialize the multicast update
  *
+ * @param mcast the multicast address to be used
  * @param uri the uri to be used
  * @param query the query of uri
  * @return true
  * @return false
  */
-bool oc_init_multicast_update(const char *uri, const char *query);
+// bool oc_init_multicast_update(const char *uri, const char *query);
+bool oc_init_multicast_update(oc_endpoint_t *mcast, const char *uri,
+                              const char *query);
 
 /**
  * @brief initiate the multi-cast update

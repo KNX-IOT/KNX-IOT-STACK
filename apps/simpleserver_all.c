@@ -72,6 +72,7 @@
 
 #include "oc_api.h"
 #include "oc_core_res.h"
+#include "api/oc_knx_fp.h"
 #include "port/oc_clock.h"
 #include <signal.h>
 
@@ -775,6 +776,56 @@ oc_ownership_status_cb(const oc_uuid_t *device_uuid, size_t device_index,
 }
 #endif /* OC_SECURITY */
 
+/* send a multicast s-mode message */
+oc_event_callback_retval_t
+issue_requests_s_mode_delayed(void *data)
+{
+  // int scope = 5;
+  (void)data;
+  PRINT(" issue_requests_s_mode_delayed\n");
+  int ga_values[2] = { 2, 3 };
+  oc_string_t href;
+  oc_new_string(&href, "/p/c", strlen("/p/c"));
+
+  oc_group_object_table_t entry;
+  //= { 55, "/p/c", OC_CFLAG_WRITE, 2, (int *)&ga_values };
+  entry.cflags = OC_CFLAG_WRITE | OC_CFLAG_READ;
+  entry.id = 55;
+  entry.href = href;
+  entry.ga_len = 2;
+  entry.ga = (int *)&ga_values;
+
+  oc_core_set_group_object_table(0, entry);
+  oc_print_group_object_table_entry(0);
+
+  PRINT(" issue_requests_s_mode: issue\n");
+  oc_do_s_mode_with_scope(2, "/p/c", "w");
+  oc_do_s_mode_with_scope(5, "/p/c", "w");
+
+  return OC_EVENT_DONE;
+}
+
+/* send a multicast s-mode message */
+void
+issue_requests_s_mode(void)
+{
+  PRINT(" issue_requests_s_mode\n");
+  oc_set_delayed_callback(NULL, issue_requests_s_mode_delayed, 2);
+}
+
+// oc_set_delayed_callback
+
+void
+print_usage()
+{
+  PRINT("Usage:\n");
+  PRINT("none : starts the application as server (e.g. no client "
+        "functionality)\n ");
+  PRINT("-help : this message\n");
+  PRINT("s-mode : does an event (to itself)\n");
+  exit(0);
+}
+
 /**
  * main application.
  *       * initializes the global variables
@@ -786,10 +837,24 @@ int
 main(int argc, char *argv[])
 {
   int init;
+
+  // bool do_send_s_mode = false;
+  bool do_send_s_mode = true;
+
   oc_clock_time_t next_event;
 
   for (int i = 0; i < argc; i++) {
     printf("argv[%d] = %s\n", i, argv[i]);
+  }
+  if (argc > 1) {
+    PRINT("s-mode: %s\n", argv[1]);
+    if (strcmp(argv[1], "s-mode") == 0) {
+      do_send_s_mode = true;
+      PRINT(" smode: %d\n", do_send_s_mode);
+    }
+    if (strcmp(argv[1], "-help") == 0) {
+      print_usage();
+    }
   }
 
 #ifdef WIN32
@@ -826,18 +891,36 @@ main(int argc, char *argv[])
   PRINT("\tstorage at './simpleserver_all_creds' \n");
   oc_storage_config("./simpleserver_all_creds");
 
+#ifdef OC_SECURITY
+  PRINT("Security - Enabled\n");
+#else
+  PRINT("Security - Disabled\n");
+#endif /* OC_SECURITY */
+
+#ifdef OC_OSCORE
+  PRINT("OC_OSCORE - Enabled\n");
+#else
+  PRINT("OC_OSCORE - Disabled\n");
+#endif /* OC_OSCORE */
+
   /*initialize the variables */
   initialize_variables();
 
   /* initializes the handlers structure */
-  STATIC const oc_handler_t handler = { .init = app_init,
-                                        .signal_event_loop = signal_event_loop,
-                                        .register_resources = register_resources
+  oc_handler_t handler = { .init = app_init,
+                           .signal_event_loop = signal_event_loop,
+                           .register_resources = register_resources
 #ifdef OC_CLIENT
-                                        ,
-                                        .requests_entry = 0
+                           ,
+                           .requests_entry = 0
 #endif
   };
+#ifdef OC_CLIENT
+  if (do_send_s_mode) {
+
+    handler.requests_entry = issue_requests_s_mode;
+  }
+#endif
 
   oc_set_factory_presets_cb(factory_presets_cb, NULL);
 
@@ -857,23 +940,11 @@ main(int argc, char *argv[])
   oc_add_ownership_status_cb(oc_ownership_status_cb, NULL);
 #endif /* OC_SECURITY */
 
-#ifdef OC_SECURITY
-  PRINT("Security - Enabled\n");
-#else
-  PRINT("Security - Disabled\n");
-#endif /* OC_SECURITY */
-
-#ifdef OC_OSCORE
-  PRINT("OC_OSCORE - Enabled\n");
-#else
-  PRINT("OC_OSCORE - Disabled\n");
-#endif /* OC_OSCORE */
-
   oc_device_info_t *device = oc_core_get_device_info(0);
-  PRINT("serial number: %s", oc_string(device->serialnumber));
+  PRINT("serial number: %s\n", oc_string(device->serialnumber));
 
-  PRINT("Server \"simple_server_all\" running, waiting on incoming "
-        "connections.\n");
+  PRINT("Server \"simple_server_all\" running (polling), waiting on incoming "
+        "connections.\n\n\n");
 
 #ifdef WIN32
   /* windows specific loop */

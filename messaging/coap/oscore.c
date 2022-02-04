@@ -237,16 +237,16 @@ coap_parse_oscore_option(void *packet, uint8_t *current_option,
     +------------+----------------------+------------------+
   */
 
-  OC_DBG("OSCORE option");
+  OC_DBG_OSCORE("OSCORE option");
   if (option_length == 0) {
-    OC_DBG("\t---empty value");
+    OC_DBG_OSCORE("\t---empty value");
     return 0;
   }
   /* Flags  |0 0 0|h|k|  n  | */
   coap_pkt->oscore_flags = *current_option;
   current_option++;
   option_length--;
-  OC_DBG("\tflags: %02x", coap_pkt->oscore_flags);
+  OC_DBG_OSCORE("\tflags: %02x", coap_pkt->oscore_flags);
 
   /* Partial IV length (n bytes) */
   coap_pkt->piv_len = (coap_pkt->oscore_flags & OSCORE_FLAGS_PIVLEN_BITMASK);
@@ -257,7 +257,7 @@ coap_parse_oscore_option(void *packet, uint8_t *current_option,
     current_option += coap_pkt->piv_len;
     option_length -= coap_pkt->piv_len;
 
-    OC_DBG("\tPartial IV:");
+    OC_DBG_OSCORE("\tPartial IV:");
     OC_LOGbytes(coap_pkt->piv, coap_pkt->piv_len);
   }
 
@@ -273,7 +273,7 @@ coap_parse_oscore_option(void *packet, uint8_t *current_option,
     current_option += coap_pkt->kid_ctx_len;
     option_length -= coap_pkt->kid_ctx_len;
 
-    OC_DBG("\tkid context:");
+    OC_DBG_OSCORE("\tkid context:");
     OC_LOGbytes(coap_pkt->kid_ctx, coap_pkt->kid_ctx_len);
   }
 
@@ -284,7 +284,7 @@ coap_parse_oscore_option(void *packet, uint8_t *current_option,
     coap_pkt->kid_len = option_length;
     memcpy(coap_pkt->kid, current_option, option_length);
 
-    OC_DBG("\tkid:");
+    OC_DBG_OSCORE("\tkid:");
     OC_LOGbytes(coap_pkt->kid, coap_pkt->kid_len);
   }
 
@@ -314,8 +314,8 @@ coap_serialize_oscore_option(unsigned int *current_number, void *packet,
   if (buffer) {
     buffer += header_length;
 
-    OC_DBG("OSCORE option");
-    OC_DBG("\tflags: %02x", coap_pkt->oscore_flags);
+    OC_DBG_OSCORE("OSCORE option");
+    OC_DBG_OSCORE("\tflags: %02x", coap_pkt->oscore_flags);
     if (coap_pkt->oscore_flags != 0) {
       /* Serialize OSCORE option flags */
       *buffer = coap_pkt->oscore_flags;
@@ -326,7 +326,7 @@ coap_serialize_oscore_option(unsigned int *current_number, void *packet,
         memcpy(buffer, coap_pkt->piv, coap_pkt->piv_len);
         buffer += coap_pkt->piv_len;
 
-        OC_DBG("\tPartial IV:");
+        OC_DBG_OSCORE("\tPartial IV:");
         OC_LOGbytes(coap_pkt->piv, coap_pkt->piv_len);
       }
 
@@ -339,7 +339,7 @@ coap_serialize_oscore_option(unsigned int *current_number, void *packet,
         memcpy(buffer, coap_pkt->kid_ctx, coap_pkt->kid_ctx_len);
         buffer += coap_pkt->kid_ctx_len;
 
-        OC_DBG("\tkid context:");
+        OC_DBG_OSCORE("\tkid context:");
         OC_LOGbytes(coap_pkt->kid_ctx, coap_pkt->kid_ctx_len);
       }
 
@@ -348,7 +348,7 @@ coap_serialize_oscore_option(unsigned int *current_number, void *packet,
         memcpy(buffer, coap_pkt->kid, coap_pkt->kid_len);
         buffer += coap_pkt->kid_len;
 
-        OC_DBG("\tkid:");
+        OC_DBG_OSCORE("\tkid:");
         OC_LOGbytes(coap_pkt->kid, coap_pkt->kid_len);
       }
     }
@@ -383,7 +383,7 @@ oscore_parse_inner_message(uint8_t *data, size_t data_len, void *packet)
 
   /* Code */
   coap_pkt->code = data[0];
-  OC_DBG("Inner CoAP code: %d", coap_pkt->code);
+  OC_DBG_OSCORE("Inner CoAP code: %d", coap_pkt->code);
 
   uint8_t *current_option = &data[1];
 
@@ -391,7 +391,7 @@ oscore_parse_inner_message(uint8_t *data, size_t data_len, void *packet)
   coap_status_t ret = coap_oscore_parse_options(
     packet, data, data_len, current_option, true, false, true);
   if (COAP_NO_ERROR != ret) {
-    OC_DBG("coap_oscore_parse_options failed! %d", ret);
+    OC_DBG_OSCORE("coap_oscore_parse_options failed! %d", ret);
     return ret;
   }
 
@@ -527,14 +527,14 @@ oscore_parse_outer_message(oc_message_t *msg, void *packet)
                         COAP_HEADER_TOKEN_LEN_POSITION;
 
   if (coap_pkt->token_len > COAP_TOKEN_LEN) {
-    OC_DBG("Token Length must not be more than 8");
+    OC_DBG_OSCORE("Token Length must not be more than 8");
     return BAD_REQUEST_4_00;
   }
 
-  OC_DBG("Outer CoAP code: %d", coap_pkt->code);
+  OC_DBG_OSCORE("Outer CoAP code: %d", coap_pkt->code);
 
   memcpy(coap_pkt->token, current_option, coap_pkt->token_len);
-  OC_DBG("Token (len %u)", coap_pkt->token_len);
+  OC_DBG_OSCORE("Token (len %u)", coap_pkt->token_len);
   OC_LOGbytes(coap_pkt->token, coap_pkt->token_len);
 
   current_option += coap_pkt->token_len;
@@ -543,7 +543,7 @@ oscore_parse_outer_message(oc_message_t *msg, void *packet)
   coap_status_t ret = coap_oscore_parse_options(
     packet, msg->data, msg->length, current_option, false, true, true);
   if (COAP_NO_ERROR != ret) {
-    OC_DBG("coap_oscore_parse_options failed! %d", ret);
+    OC_DBG_OSCORE("coap_oscore_parse_options failed! %d", ret);
     return ret;
   }
 

@@ -42,19 +42,13 @@
 #include "api/oc_session_events_internal.h"
 #include "messaging/coap/engine.h"
 #include "messaging/coap/observe.h"
-//#include "oc_acl_internal.h"
 #include "oc_api.h"
-//#include "oc_audit.h"
 #include "oc_buffer.h"
 #include "oc_client_state.h"
 #include "oc_config.h"
 #include "oc_core_res.h"
 #include "oc_cred_internal.h"
-//#include "oc_doxm.h"
 #include "oc_endpoint.h"
-//#include "oc_pstat.h"
-//#include "oc_roles.h"
-//#include "oc_svr.h"
 #include "oc_tls.h"
 
 #ifdef OC_OSCORE
@@ -2167,6 +2161,7 @@ OC_PROCESS_THREAD(oc_tls_handler, ev, data)
 {
   OC_PROCESS_POLLHANDLER(close_all_tls_sessions());
   OC_PROCESS_BEGIN();
+  PRINT("tls engine\n");
   while (1) {
     OC_PROCESS_YIELD();
 

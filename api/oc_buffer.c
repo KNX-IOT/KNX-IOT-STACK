@@ -24,12 +24,12 @@
 #include <stdlib.h>
 #endif /* OC_DYNAMIC_ALLOCATION */
 
-#ifdef OC_SECURITY
-#include "security/oc_tls.h"
-#ifdef OC_OSCORE
-#include "security/oc_oscore.h"
-#endif /* OC_OSCORE */
-#endif /* OC_SECURITY */
+//#ifdef OC_SECURITY
+//#include "security/oc_tls.h"
+//#ifdef OC_OSCORE
+//#include "security/oc_oscore.h"
+//#endif /* OC_OSCORE */
+//#endif /* OC_SECURITY */
 
 #ifdef OC_OSCORE
 #include "security/oc_tls.h"
@@ -178,6 +178,7 @@ OC_PROCESS_THREAD(message_buffer_handler, ev, data)
 {
   OC_PROCESS_BEGIN();
   OC_DBG("Started buffer handler process");
+  PRINT("Started buffer handler process\n");
   while (1) {
     OC_PROCESS_YIELD();
 
@@ -185,16 +186,16 @@ OC_PROCESS_THREAD(message_buffer_handler, ev, data)
 //#ifdef OC_SECURITY
 #ifdef OC_OSCORE
       if (((oc_message_t *)data)->encrypted == 1) {
-        OC_DBG("Inbound network event: encrypted request");
+        OC_DBG_OSCORE("Inbound network event: encrypted request");
         oc_process_post(&oc_tls_handler, oc_events[UDP_TO_TLS_EVENT], data);
       } else {
 #ifdef OC_OSCORE
         if (((oc_message_t *)data)->endpoint.flags & MULTICAST) {
-          OC_DBG("Inbound network event: multicast request");
+          OC_DBG_OSCORE("Inbound network event: multicast request");
           oc_process_post(&oc_oscore_handler, oc_events[INBOUND_OSCORE_EVENT],
                           data);
         } else {
-          OC_DBG("Inbound network event: decrypted request");
+          OC_DBG_OSCORE("Inbound network event: decrypted request");
           oc_process_post(&coap_engine, oc_events[INBOUND_RI_EVENT], data);
         }
 #else  /* OC_OSCORE */
@@ -219,7 +220,8 @@ OC_PROCESS_THREAD(message_buffer_handler, ev, data)
 #ifdef OC_OSCORE
       else if ((message->endpoint.flags & MULTICAST) &&
                (message->endpoint.flags & SECURED)) {
-        OC_DBG("Outbound secure multicast request: forwarding to OSCORE");
+        OC_DBG_OSCORE(
+          "Outbound secure multicast request: forwarding to OSCORE\n");
         oc_process_post(&oc_oscore_handler,
                         oc_events[OUTBOUND_GROUP_OSCORE_EVENT], data);
       }

@@ -31,21 +31,12 @@
 
 #include "oc_knx_dev.h"
 
-#ifdef OC_SECURITY
-//#include "security/oc_acl_internal.h"
-//#include "security/oc_ael.h"
-#include "security/oc_cred_internal.h"
-//#include "security/oc_doxm.h"
-//#include "security/oc_pstat.h"
-//#include "security/oc_sp.h"
-//#include "security/oc_store.h"
-//#include "security/oc_svr.h"
-#include "security/oc_tls.h"
-#ifdef OC_PKI
-#include "security/oc_keypair.h"
-#endif /* OC_PKI */
-//#include "security/oc_sdi.h"
-#endif /* OC_SECURITY */
+//#ifdef OC_SECURITY
+//#include "security/oc_cred_internal.h"
+//#ifdef OC_PKI
+//#include "security/oc_keypair.h"
+//#endif /* OC_PKI */
+//#endif /* OC_SECURITY */
 
 #ifdef OC_OSCORE
 #include "security/oc_tls.h"
@@ -241,9 +232,9 @@ oc_main_init(const oc_handler_t *handler)
   }
 #endif /* OC_SECURITY */
 
-#ifdef OC_SECURITY
-  oc_sec_create_svr();
-#endif
+  //#ifdef OC_SECURITY
+  //  oc_sec_create_svr();
+  //#endif
 
   for (size_t device = 0; device < oc_core_get_num_devices(); device++) {
     oc_knx_device_storage_read(device);
@@ -255,24 +246,10 @@ oc_main_init(const oc_handler_t *handler)
   size_t device;
   for (device = 0; device < oc_core_get_num_devices(); device++) {
     oc_sec_load_unique_ids(device);
-    OC_DBG("oc_main_init(): loading pstat");
-    oc_sec_load_pstat(device);
-    OC_DBG("oc_main_init(): loading doxm");
-    oc_sec_load_doxm(device);
-    OC_DBG("oc_main_init(): loading cred");
-    oc_sec_load_cred(device);
-    OC_DBG("oc_main_init(): loading acl");
-    oc_sec_load_acl(device);
-    OC_DBG("oc_main_init(): loading sp");
-    oc_sec_load_sp(device);
-    OC_DBG("oc_main_init(): loading ael");
-    oc_sec_load_ael(device);
 #ifdef OC_PKI
     OC_DBG("oc_main_init(): loading ECDSA keypair");
     oc_sec_load_ecdsa_keypair(device);
 #endif /* OC_PKI */
-    OC_DBG("oc_main_init(): loading sdi");
-    oc_sec_load_sdi(device);
   }
 #endif
 
@@ -321,19 +298,12 @@ oc_main_shutdown(void)
 
   oc_ri_shutdown();
 
-#ifdef OC_SECURITY
-  oc_tls_shutdown();
-  oc_sec_acl_free();
-  oc_sec_cred_free();
-  oc_sec_doxm_free();
-  oc_sec_pstat_free();
-  oc_sec_ael_free();
-  oc_sec_sp_free();
-#ifdef OC_PKI
-  oc_free_ecdsa_keypairs();
-#endif /* OC_PKI */
-  oc_sec_sdi_free();
-#endif /* OC_SECURITY */
+//#ifdef OC_SECURITY
+//  oc_tls_shutdown();
+//#ifdef OC_PKI
+//  oc_free_ecdsa_keypairs();
+//#endif /* OC_PKI */
+//#endif /* OC_SECURITY */
 #ifdef OC_OSCORE
   oc_tls_shutdown();
 #endif

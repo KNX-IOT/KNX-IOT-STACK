@@ -66,16 +66,16 @@ typedef struct oc_group_address_mapping_table_t
 } oc_group_address_mapping_table_t;
 
 #define GAMT_MAX_ENTRIES 20
-oc_group_address_mapping_table_t g_groups[GAMT_MAX_ENTRIES];
+static oc_group_address_mapping_table_t g_groups[GAMT_MAX_ENTRIES];
 
 #define GOT_MAX_ENTRIES 20
-oc_group_object_table_t g_got[GOT_MAX_ENTRIES];
+static oc_group_object_table_t g_got[GOT_MAX_ENTRIES];
 
 #define GPT_MAX_ENTRIES 20
-oc_group_rp_table_t g_gpt[GPT_MAX_ENTRIES];
+static oc_group_rp_table_t g_gpt[GPT_MAX_ENTRIES];
 
 #define GRT_MAX_ENTRIES 20
-oc_group_rp_table_t g_grt[GRT_MAX_ENTRIES];
+static oc_group_rp_table_t g_grt[GRT_MAX_ENTRIES];
 
 // -----------------------------------------------------------------------------
 
@@ -308,6 +308,29 @@ find_empty_slot_in_group_object_table(int id)
     }
   }
   return -1;
+}
+
+int
+oc_core_set_group_object_table(int index, oc_group_object_table_t entry)
+{
+  g_got[index].cflags = entry.cflags;
+  g_got[index].id = entry.id;
+
+  oc_free_string(&g_got[index].href);
+  oc_new_string(&g_got[index].href, oc_string(entry.href),
+                oc_string_len(entry.href));
+  /* copy the ga array */
+  g_got[index].ga_len = entry.ga_len;
+  int *new_array = (int *)malloc(entry.ga_len * sizeof(int));
+
+  for (int i = 0; i < entry.ga_len; i++) {
+    new_array[i] = entry.ga[i];
+  }
+  if (g_got[index].ga != 0) {
+    free(g_got[index].ga);
+  }
+  g_got[index].ga = new_array;
+  return 0;
 }
 
 int
@@ -902,7 +925,7 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   while (rep != NULL) {
     switch (rep->type) {
     case OC_REP_OBJECT: {
-      // find the storage index, e.g. for this object
+      /* find the storage index, e.g. for this object */
       oc_rep_t *object = rep->value.object;
       id = table_find_id_from_rep(object);
       index = find_empty_slot_in_rp_table(id, g_gpt, GPT_MAX_ENTRIES);
@@ -1055,33 +1078,33 @@ oc_core_fp_p_x_get_handler(oc_request_t *request,
   }
 
   if (g_gpt[index].ga_len == 0) {
-    // it is empty
+    /* it is empty */
     oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
     return;
   }
 
   oc_rep_begin_root_object();
-  // id 0
+  /* id 0 */
   oc_rep_i_set_int(root, 0, g_gpt[index].id);
-  // ia - 12
+  /* ia - 12 */
   if (g_gpt[index].ia > -1) {
     // oc_rep_i_set_text_string(root, 11, oc_string(g_gpt[index].ia));
     oc_rep_i_set_int(root, 11, g_gpt[index].ia);
   }
 
-  // frame url as ia exist.
+  /* frame url as ia exist.*/
   if (g_gpt[index].ia > -1) {
     if (oc_string_len(g_gpt[index].path) > 0) {
-      // set the path only if it not empty
-      // path- 112
+      /* set the path only if it not empty
+         path- 112 */
       oc_rep_i_set_text_string(root, 112, oc_string(g_gpt[index].path));
     }
   } else {
-    // url- 10
+    /* url -10 */
     oc_rep_i_set_text_string(root, 10, oc_string(g_gpt[index].url));
   }
 
-  // ga - 7
+  /* ga -7 */
   oc_rep_i_set_int_array(root, 7, g_gpt[index].ga, g_gpt[index].ga_len);
 
   oc_rep_end_root_object();
@@ -1527,11 +1550,11 @@ oc_print_group_object_table_entry(int entry)
     return;
   }
 
-  PRINT("    id %d\n", g_got[entry].id);
-  PRINT("    href  %s\n", oc_string(g_got[entry].href));
-  PRINT("    cflags  %d ", g_got[entry].cflags);
+  PRINT("    id     : %d\n", g_got[entry].id);
+  PRINT("    href   : %s\n", oc_string(g_got[entry].href));
+  PRINT("    cflags : %d string: ", g_got[entry].cflags);
   oc_print_cflags(g_got[entry].cflags);
-  PRINT("    ga [");
+  PRINT("    ga     : [");
   for (int i = 0; i < g_got[entry].ga_len; i++) {
     PRINT(" %d", g_got[entry].ga[i]);
   }

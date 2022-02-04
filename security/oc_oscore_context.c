@@ -17,11 +17,13 @@
 //#if defined(OC_SECURITY) && defined(OC_OSCORE)
 #if defined(OC_OSCORE)
 
+#define OC_OSCORE_DBG PRINT
+
 #include "oc_oscore_context.h"
 #include "messaging/coap/transactions.h"
 #include "oc_api.h"
 #include "oc_client_state.h"
-#include "oc_cred.h"
+//#include "oc_cred.h"
 #include "oc_oscore_crypto.h"
 #include "oc_rep.h"
 //#include "oc_store.h"
@@ -34,16 +36,16 @@ oc_oscore_find_group_context(void)
 {
   oc_oscore_context_t *ctx = (oc_oscore_context_t *)oc_list_head(contexts);
 
-  while (ctx != NULL) {
-    oc_sec_cred_t *cred = (oc_sec_cred_t *)ctx->cred;
+  // while (ctx != NULL) {
+  //  oc_sec_cred_t *cred = (oc_sec_cred_t *)ctx->cred;
 
-    if (cred->credtype == OC_CREDTYPE_OSCORE_MCAST_CLIENT) {
-      return ctx;
-    }
-    ctx = ctx->next;
-  }
+  //  if (cred->credtype == OC_CREDTYPE_OSCORE_MCAST_CLIENT) {
+  //    return ctx;
+  //  }
+  //  ctx = ctx->next;
+  //}
 
-  return NULL;
+  return ctx;
 }
 
 oc_oscore_context_t *
@@ -69,7 +71,8 @@ oc_oscore_find_context_by_token_mid(size_t device, uint8_t *token,
                                     uint8_t **request_piv,
                                     uint8_t *request_piv_len, bool tcp)
 {
-  oc_uuid_t *uuid;
+  (void)device;
+  // oc_uuid_t *uuid;
 #ifdef OC_CLIENT
   /* Search for client cb by token */
   oc_client_cb_t *cb = oc_ri_find_client_cb_by_token(token, token_len);
@@ -77,7 +80,7 @@ oc_oscore_find_context_by_token_mid(size_t device, uint8_t *token,
   if (cb) {
     *request_piv = cb->piv;
     *request_piv_len = cb->piv_len;
-    uuid = &cb->endpoint.di;
+    // uuid = &cb->endpoint.di;
   } else {
 #endif /* OC_CLIENT */
     /* Search transactions by token and mid */
@@ -93,35 +96,37 @@ oc_oscore_find_context_by_token_mid(size_t device, uint8_t *token,
     }
     *request_piv = t->message->endpoint.piv;
     *request_piv_len = t->message->endpoint.piv_len;
-    uuid = &t->message->endpoint.di;
+    // uuid = &t->message->endpoint.di;
 #ifdef OC_CLIENT
   }
 #endif /* OC_CLIENT */
   oc_oscore_context_t *ctx = (oc_oscore_context_t *)oc_list_head(contexts);
-  while (ctx != NULL) {
-    oc_sec_cred_t *cred = (oc_sec_cred_t *)ctx->cred;
-    if (memcmp(cred->subjectuuid.id, uuid->id, 16) == 0 &&
-        ctx->device == device) {
-      return ctx;
-    }
-    ctx = ctx->next;
-  }
-  return NULL;
+  // while (ctx != NULL) {
+  //  oc_sec_cred_t *cred = (oc_sec_cred_t *)ctx->cred;
+  //  if (memcmp(cred->subjectuuid.id, uuid->id, 16) == 0 &&
+  //      ctx->device == device) {
+  //    return ctx;
+  //   }
+  //   ctx = ctx->next;
+  //}
+  return ctx;
 }
 
 // TODO: not sure if we need this
 oc_oscore_context_t *
 oc_oscore_find_context_by_UUID(size_t device, oc_uuid_t *uuid)
 {
+  (void)device;
+  (void)uuid;
   oc_oscore_context_t *ctx = (oc_oscore_context_t *)oc_list_head(contexts);
-  while (ctx != NULL) {
-    oc_sec_cred_t *cred = (oc_sec_cred_t *)ctx->cred;
-    if (memcmp(cred->subjectuuid.id, uuid->id, 16) == 0 &&
-        ctx->device == device) {
-      return ctx;
-    }
-    ctx = ctx->next;
-  }
+  //  while (ctx != NULL) {
+  //    oc_sec_cred_t *cred = (oc_sec_cred_t *)ctx->cred;
+  //    if (memcmp(cred->subjectuuid.id, uuid->id, 16) == 0 &&
+  //        ctx->device == device) {
+  //      return ctx;
+  //    }
+  //    ctx = ctx->next;
+  //  }
   return ctx;
 }
 
@@ -140,11 +145,11 @@ oc_oscore_free_context(oc_oscore_context_t *ctx)
 oc_oscore_context_t *
 oc_oscore_add_context(size_t device, const char *senderid,
                       const char *recipientid, uint64_t ssn, const char *desc,
-                      void *cred_entry, bool from_storage)
+                      const char *mastersecret, bool from_storage)
 {
   oc_oscore_context_t *ctx = (oc_oscore_context_t *)oc_memb_alloc(&ctx_s);
 
-  if (!ctx || (!senderid && !recipientid) || !cred_entry) {
+  if (!ctx || (!senderid && !recipientid)) {
     return NULL;
   }
 
@@ -156,7 +161,7 @@ oc_oscore_add_context(size_t device, const char *senderid,
   if (from_storage) {
     ctx->ssn += OSCORE_SSN_WRITE_FREQ_K + OSCORE_SSN_PAD_F;
   }
-  ctx->cred = cred_entry;
+  // ctx->cred = cred_entry;
   if (desc) {
     oc_new_string(&ctx->desc, desc, strlen(desc));
   }
@@ -182,48 +187,45 @@ oc_oscore_add_context(size_t device, const char *senderid,
     ctx->recvid_len = id_len;
   }
 
-  oc_sec_cred_t *cred = (oc_sec_cred_t *)cred_entry;
+  // oc_sec_cred_t *cred = (oc_sec_cred_t *)cred_entry;
 
-  OC_DBG("### Reading OSCORE context ###");
+  OC_DBG_OSCORE("### Reading OSCORE context ###");
   if (senderid) {
-    OC_DBG("### \t\tderiving Sender key ###");
+    OC_DBG_OSCORE("### \t\tderiving Sender key ###");
     if (oc_oscore_context_derive_param(
           ctx->sendid, ctx->sendid_len, ctx->idctx, ctx->idctx_len, "Key",
-          oc_cast(cred->privatedata.data, uint8_t),
-          oc_string_len(cred->privatedata.data), NULL, 0, ctx->sendkey,
+          (uint8_t *)mastersecret, strlen(mastersecret), NULL, 0, ctx->sendkey,
           OSCORE_KEY_LEN) < 0) {
       OC_ERR("*** error deriving Sender key ###");
       goto add_oscore_context_error;
     }
 
-    OC_DBG("### derived Sender key ###");
+    OC_DBG_OSCORE("### derived Sender key ###");
   }
 
   if (recipientid) {
-    OC_DBG("### \t\tderiving Recipient key ###");
+    OC_DBG_OSCORE("### \t\tderiving Recipient key ###");
     if (oc_oscore_context_derive_param(
           ctx->recvid, ctx->recvid_len, ctx->idctx, ctx->idctx_len, "Key",
-          oc_cast(cred->privatedata.data, uint8_t),
-          oc_string_len(cred->privatedata.data), NULL, 0, ctx->recvkey,
+          (uint8_t *)mastersecret, strlen(mastersecret), NULL, 0, ctx->recvkey,
           OSCORE_KEY_LEN) < 0) {
       OC_ERR("*** error deriving Recipient key ###");
       goto add_oscore_context_error;
     }
 
-    OC_DBG("### derived Recipient key ###");
+    OC_DBG_OSCORE("### derived Recipient key ###");
   }
 
-  OC_DBG("### \t\tderiving Common IV ###");
+  OC_DBG_OSCORE("### \t\tderiving Common IV ###");
   if (oc_oscore_context_derive_param(NULL, 0, ctx->idctx, ctx->idctx_len, "IV",
-                                     oc_cast(cred->privatedata.data, uint8_t),
-                                     oc_string_len(cred->privatedata.data),
-                                     NULL, 0, ctx->commoniv,
-                                     OSCORE_COMMON_IV_LEN) < 0) {
+                                     (uint8_t *)mastersecret,
+                                     strlen(mastersecret), NULL, 0,
+                                     ctx->commoniv, OSCORE_COMMON_IV_LEN) < 0) {
     OC_ERR("*** error deriving Common IV ###");
     goto add_oscore_context_error;
   }
 
-  OC_DBG("### derived Common IV ###");
+  OC_DBG_OSCORE("### derived Common IV ###");
 
   oc_list_add(contexts, ctx);
 

@@ -43,7 +43,7 @@ void oc_knx_device_storage_read(size_t device);
  * @brief clear the persistent storage
  * clears device info:
  * - internal address (ia)
- * - hostname
+ * - host name (hname)
  * - Installation ID (iid)
  * - programming mode (pm)
  * - group object table
