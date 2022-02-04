@@ -1041,6 +1041,8 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
   if (valid_request == SPAKE_CA) {
     // calculate expected cA
     uint8_t expected_ca[32];
+    if (g_pase.pb.ptr == NULL)
+      goto error;
     oc_spake_calc_cA(spake_data.Ka_Ke, expected_ca,
                      oc_cast(g_pase.pb, uint8_t));
 
