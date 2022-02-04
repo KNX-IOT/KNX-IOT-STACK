@@ -77,6 +77,8 @@ oc_rep_t *oc_s_mode_get_value(oc_request_t *request);
  */
 void oc_do_s_mode(char *resource_url, char *rp);
 
+void oc_do_s_mode_with_scope(int scope, char *resource_url, char *rp);
+
 #ifdef __cplusplus
 }
 #endif

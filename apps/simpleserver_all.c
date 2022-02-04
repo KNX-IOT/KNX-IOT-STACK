@@ -792,7 +792,7 @@ issue_requests_s_mode_delayed(void *data)
 
   oc_group_object_table_t entry;
   //= { 55, "/p/c", OC_CFLAG_WRITE, 2, (int *)&ga_values };
-  entry.cflags = OC_CFLAG_WRITE;
+  entry.cflags = OC_CFLAG_WRITE | OC_CFLAG_READ;
   entry.id = 55;
   entry.href = href;
   entry.ga_len = 2;
@@ -802,14 +802,15 @@ issue_requests_s_mode_delayed(void *data)
   oc_print_group_object_table_entry(0);
 
   PRINT(" issue_requests_s_mode: issue\n");
-  oc_do_s_mode("/p/c", "w");
+  oc_do_s_mode_with_scope(2, "/p/c", "w");
+  oc_do_s_mode_with_scope(5, "/p/c", "w");
 
   return OC_EVENT_DONE;
 }
 
 
 /* send a multicast s-mode message */
-static void
+void
 issue_requests_s_mode(void)
 {
   PRINT(" issue_requests_s_mode\n");
@@ -845,6 +846,7 @@ main(int argc, char *argv[])
 
   //bool do_send_s_mode = false;
   bool do_send_s_mode = true;
+
   oc_clock_time_t next_event;
 
   for (int i = 0; i < argc; i++) {
@@ -854,6 +856,7 @@ main(int argc, char *argv[])
     PRINT("s-mode: %s\n", argv[1]);
     if (strcmp(argv[1], "s-mode") == 0) {
       do_send_s_mode = true;
+      PRINT(" smode: %d\n", do_send_s_mode);
     }
     if (strcmp(argv[1], "-help") == 0) {
       print_usage();
