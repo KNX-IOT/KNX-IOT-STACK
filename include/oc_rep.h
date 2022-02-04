@@ -174,7 +174,7 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
  */
 #define oc_rep_i_set_double(object, key, value)                                \
   do {                                                                         \
-    g_err |= cbor_encode_int(&object##_map, (int64_t)key);                     \
+    g_err |= cbor_encode_int(&object##_map, (int64_t)(key));                     \
     g_err |= cbor_encode_double(&object##_map, value);                         \
   } while (0)
 
@@ -224,7 +224,7 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
  */
 #define oc_rep_i_set_int(object, key, value)                                   \
   do {                                                                         \
-    g_err |= cbor_encode_int(&object##_map, (int64_t)key);                     \
+    g_err |= cbor_encode_int(&object##_map, (int64_t)(key));                     \
     g_err |= cbor_encode_int(&object##_map, value);                            \
   } while (0)
 
@@ -278,7 +278,7 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
  */
 #define oc_rep_i_set_uint(object, key, value)                                  \
   do {                                                                         \
-    g_err |= cbor_encode_int(&object##_map, (int64_t)key);                     \
+    g_err |= cbor_encode_int(&object##_map, (int64_t)(key));                     \
     g_err |= cbor_encode_uint(&object##_map, value);                           \
   } while (0)
 
@@ -328,7 +328,7 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
  */
 #define oc_rep_i_set_boolean(object, key, value)                               \
   do {                                                                         \
-    g_err |= cbor_encode_int(&object##_map, (int64_t)key);                     \
+    g_err |= cbor_encode_int(&object##_map, (int64_t)(key));                     \
     g_err |= cbor_encode_boolean(&object##_map, value);                        \
   } while (0)
 
@@ -378,7 +378,7 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
  */
 #define oc_rep_i_set_text_string(object, key, value)                           \
   do {                                                                         \
-    g_err |= cbor_encode_int(&object##_map, (int64_t)key);                     \
+    g_err |= cbor_encode_int(&object##_map, (int64_t)(key));                     \
     if ((const char *)value != NULL) {                                         \
       g_err |= cbor_encode_text_string(&object##_map, value, strlen(value));   \
     } else {                                                                   \
@@ -462,7 +462,7 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
  */
 #define oc_rep_i_set_byte_string(object, key, value, length)                   \
   do {                                                                         \
-    g_err |= cbor_encode_int(&object##_map, (int64_t)key);                     \
+    g_err |= cbor_encode_int(&object##_map, (int64_t)(key));                     \
     g_err |= cbor_encode_byte_string(&object##_map, value, length);            \
   } while (0)
 
