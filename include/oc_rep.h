@@ -1138,7 +1138,7 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
       cbor_encoder_create_array(&object##_map, &x_key##_value_array, length);  \
     int i;                                                                     \
     for (i = 0; i < (length); i++) {                                             \
-      g_err |= cbor_encode_boolean(&x_key##_value_array, values[i]);           \
+      g_err |= cbor_encode_boolean(&x_key##_value_array, (values)[i]);           \
     }                                                                          \
     g_err |=                                                                   \
       cbor_encoder_close_container(&object##_map, &x_key##_value_array);       \
