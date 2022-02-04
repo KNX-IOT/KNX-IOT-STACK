@@ -212,7 +212,7 @@ extern "C" {
   do {                                                                         \
     uint16_t i;                                                                \
     for (i = 0; i < length; i++)                                               \
-      PRINT(" %02X", (char)(bytes)[i]);                                        \
+      PRINT(" %02X", (bytes)[i]);                                        \
     PRINT("\n");                                                               \
   } while (0)
 
