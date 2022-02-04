@@ -1074,7 +1074,9 @@ oc_create_knx_sec_resources(size_t device_index)
 void 
 oc_init_oscore(size_t device_index)
 {
+  (void)device_index;
 
+  // TODO
 #ifdef OC_OSCORE
   PRINT("oc_init_oscore adding oscore context\n ");
   //oc_device_info_t *device = oc_core_get_device_info(device_index);

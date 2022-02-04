@@ -1,5 +1,5 @@
 /*
- // Copyright (c) 2021 Cascoda Ltd
+ // Copyright (c) 2021-2022 Cascoda Ltd
  //
  // Licensed under the Apache License, Version 2.0 (the "License");
  // you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@
 #include "oc_core_res.h"
 #include "oc_discovery.h"
 #include <stdio.h>
+
+#define COAP_PORT (5683)
 
 // ----------------------------------------------------------------------------
 
@@ -187,18 +189,17 @@ oc_issue_s_mode(int sia_value, int group_address, char *rp, uint8_t *value_data,
   PRINT("  oc_issue_s_mode : scope %d\n", scope);
 
 #ifdef OC_OSCORE
-  oc_make_ipv6_endpoint(mcast, IPV6 | MULTICAST | SECURED, 5683,
+  oc_make_ipv6_endpoint(mcast, IPV6 | MULTICAST | SECURED, COAP_PORT,
                         0xff, scope,
                         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0xfd);
 #else
-  oc_make_ipv6_endpoint(mcast, IPV6 | MULTICAST , 5683,
+  oc_make_ipv6_endpoint(mcast, IPV6 | MULTICAST, COAP_PORT,
                         0xff, scope, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00,
                         0xfd);
 #endif 
-  oc_string_t mcast_str;
-  oc_endpoint_to_string(&mcast, &mcast_str);
-  PRINT("   sending to: %s\n", oc_string(mcast_str));
-  oc_free_string(&mcast_str);
+  PRINT("  ");
+  PRINTipaddr(mcast);
+  PRINT("\n");
 
   oc_send_s_mode(&mcast, "/.knx", sia_value, group_address, rp, value_data,
                  value_size);
@@ -211,11 +212,9 @@ oc_send_s_mode(oc_endpoint_t *endpoint, char *path, int sia_value,
   int scope = 5;
 
   PRINT("  oc_send_s_mode : scope %d\n", scope);
-
-  oc_string_t mcast_str;
-  oc_endpoint_to_string(endpoint, &mcast_str);
-  PRINT("   sending to: %s\n", oc_string(mcast_str));
-  oc_free_string(&mcast_str);
+  PRINT("  ");
+  PRINTipaddr(*endpoint);
+  PRINT("\n");
 
 
 #ifndef OC_OSCORE

@@ -778,12 +778,13 @@ oc_ownership_status_cb(const oc_uuid_t *device_uuid, size_t device_index,
 
 
 
+
 /* send a multicast s-mode message */
-static void
-issue_requests_s_mode(void)
+oc_event_callback_retval_t
+issue_requests_s_mode_delayed(void)
 {
   int scope = 5;
-  PRINT(" issue_requests_s_mode\n");
+  PRINT(" issue_requests_s_mode_delayed\n");
   int ga_values[2] = { 2, 3 };
   oc_string_t href;
   oc_new_string(&href, "/p/c", strlen("/p/c"));
@@ -794,17 +795,28 @@ issue_requests_s_mode(void)
   entry.id = 55;
   entry.href = href;
   entry.ga_len = 2;
-  entry.ga = &ga_values;
-
+  entry.ga = (int*)&ga_values;
 
   oc_core_set_group_object_table(0, entry);
   oc_print_group_object_table_entry(0);
 
-  
   PRINT(" issue_requests_s_mode: issue\n");
   oc_do_s_mode("/p/c", "w");
+
+  return OC_EVENT_DONE;
 }
 
+
+/* send a multicast s-mode message */
+static void
+issue_requests_s_mode(void)
+{
+  PRINT(" issue_requests_s_mode\n");
+  oc_set_delayed_callback(NULL, issue_requests_s_mode_delayed, 2);
+}
+
+
+//oc_set_delayed_callback
 
 void
 print_usage()
@@ -931,10 +943,10 @@ main(int argc, char *argv[])
 
 
   oc_device_info_t *device = oc_core_get_device_info(0);
-  PRINT("serial number: %s", oc_string(device->serialnumber));
+  PRINT("serial number: %s\n", oc_string(device->serialnumber));
 
   PRINT("Server \"simple_server_all\" running (polling), waiting on incoming "
-        "connections.\n");
+        "connections.\n\n\n");
 
 #ifdef WIN32
   /* windows specific loop */

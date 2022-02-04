@@ -40,7 +40,7 @@
 #include "port/oc_assert.h"
 #include "port/oc_connectivity.h"
 
-#define OCF_PORT_UNSECURED (5683)
+#define COAP_PORT_UNSECURED (5683)
 static const uint8_t ALL_OCF_NODES_LL[] = {
   0xff, 0x02, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x01, 0x58
 };
@@ -247,6 +247,8 @@ add_mcast_sock_to_ipv6_mcast_group(SOCKET mcast_sock, DWORD if_index)
 {
   struct ipv6_mreq mreq;
 
+  PRINT("add_mcast_sock_to_ipv6_mcast_group\n");
+
   /* Link-local scope */
   memset(&mreq, 0, sizeof(mreq));
   memcpy(mreq.ipv6mr_multiaddr.s6_addr, ALL_OCF_NODES_LL, 16);
@@ -354,10 +356,12 @@ update_mcast_socket(SOCKET mcast_sock, int sa_family, ifaddr_t *ifaddr_list)
   for (ifaddr = ifaddr_list; ifaddr; ifaddr = ifaddr->next) {
     if (sa_family == AF_INET6 && ifaddr->addr.ss_family == AF_INET6) {
       ret += add_mcast_sock_to_ipv6_mcast_group(mcast_sock, ifaddr->if_index);
+#ifdef OC_IPV4
     } else if (sa_family == AF_INET && ifaddr->addr.ss_family == AF_INET) {
       struct sockaddr_in *a = (struct sockaddr_in *)&ifaddr->addr;
       ret += add_mcast_sock_to_ipv4_mcast_group(mcast_sock, &a->sin_addr);
     }
+#endif
   }
 
   if (!ifaddr_supplied) {
@@ -1212,7 +1216,7 @@ connectivity_ipv4_init(ip_context_t *dev)
 
   struct sockaddr_in *m = (struct sockaddr_in *)&dev->mcast4;
   m->sin_family = AF_INET;
-  m->sin_port = htons(OCF_PORT_UNSECURED);
+  m->sin_port = htons(COAP_PORT_UNSECURED);
   m->sin_addr.s_addr = INADDR_ANY;
 
   struct sockaddr_in *l = (struct sockaddr_in *)&dev->server4;
@@ -1475,7 +1479,7 @@ oc_connectivity_init(size_t device)
 
   struct sockaddr_in6 *m = (struct sockaddr_in6 *)&dev->mcast;
   m->sin6_family = AF_INET6;
-  m->sin6_port = htons(OCF_PORT_UNSECURED);
+  m->sin6_port = htons(COAP_PORT_UNSECURED);
   m->sin6_addr = in6addr_any;
 
   struct sockaddr_in6 *l = (struct sockaddr_in6 *)&dev->server;

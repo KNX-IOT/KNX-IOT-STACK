@@ -50,7 +50,7 @@
 #define IFA_FLAGS (IFA_MULTICAST + 1)
 #endif
 
-#define OCF_PORT_UNSECURED (5683)
+#define COAP_PORT_UNSECURED (5683)
 static const uint8_t ALL_OCF_NODES_LL[] = {
   0xff, 0x02, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x01, 0x58
 };
@@ -1335,7 +1335,7 @@ connectivity_ipv4_init(ip_context_t *dev)
 
   struct sockaddr_in *m = (struct sockaddr_in *)&dev->mcast4;
   m->sin_family = AF_INET;
-  m->sin_port = htons(OCF_PORT_UNSECURED);
+  m->sin_port = htons(COAP_PORT_UNSECURED);
   m->sin_addr.s_addr = INADDR_ANY;
 
   struct sockaddr_in *l = (struct sockaddr_in *)&dev->server4;
@@ -1468,7 +1468,7 @@ oc_connectivity_init(size_t device)
 
   struct sockaddr_in6 *m = (struct sockaddr_in6 *)&dev->mcast;
   m->sin6_family = AF_INET6;
-  m->sin6_port = htons(OCF_PORT_UNSECURED);
+  m->sin6_port = htons(COAP_PORT_UNSECURED);
   m->sin6_addr = in6addr_any;
 
   struct sockaddr_in6 *l = (struct sockaddr_in6 *)&dev->server;
