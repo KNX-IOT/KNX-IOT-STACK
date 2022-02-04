@@ -160,6 +160,7 @@ coap_receive(oc_message_t *msg)
   PRINTipaddr(msg->endpoint);
   OC_LOGipaddr(msg->endpoint);
   OC_LOGbytes(msg->data, msg->length);
+  PRINT("\n");
 
   /* static declaration reduces stack peaks and program code size */
   static coap_packet_t

@@ -783,7 +783,7 @@ issue_requests_s_mode_delayed(void *data)
   // int scope = 5;
   (void)data;
   PRINT(" issue_requests_s_mode_delayed\n");
-  int ga_values[2] = { 2, 3 };
+  int ga_values[2] = { 2 };
   oc_string_t href;
   oc_new_string(&href, "/p/c", strlen("/p/c"));
 
@@ -792,7 +792,7 @@ issue_requests_s_mode_delayed(void *data)
   entry.cflags = OC_CFLAG_WRITE | OC_CFLAG_READ;
   entry.id = 55;
   entry.href = href;
-  entry.ga_len = 2;
+  entry.ga_len = 1;
   entry.ga = (int *)&ga_values;
 
   oc_core_set_group_object_table(0, entry);

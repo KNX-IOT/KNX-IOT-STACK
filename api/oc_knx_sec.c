@@ -1073,18 +1073,27 @@ oc_init_oscore(size_t device_index)
 {
   (void)device_index;
 
+  device_index = 0;
+
   // TODO
 #ifdef OC_OSCORE
   PRINT("oc_init_oscore adding oscore context\n ");
   // oc_device_info_t *device = oc_core_get_device_info(device_index);
 
-  char *serialnum = "abc";
+  //char *serialnum = "abc";
 
   // if (device != NULL) {
   // oc_oscore_context_t* ctx =  oc_oscore_add_context( device_index,
   // oc_string(device->serialnumber), "reci",
-  oc_oscore_context_t *ctx = oc_oscore_add_context(
-    device_index, serialnum, "reci", oc_knx_get_osn(), "desc", "MS", false);
+  oc_oscore_context_t *ctx = oc_oscore_add_context( device_index, "sender", "reci",
+                          oc_knx_get_osn(), "desc", "MSecret", "token1", false);
+  if (ctx == NULL) {
+    PRINT("   fail...\n ");
+  }
+
+  ctx =
+    oc_oscore_add_context( device_index, "reci", "sender", oc_knx_get_osn(),
+                              "desc", "MSecret", "token2", false);
   if (ctx == NULL) {
     PRINT("   fail...\n ");
   }
