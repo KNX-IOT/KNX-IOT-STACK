@@ -320,12 +320,12 @@ oc_core_set_group_object_table(int index, oc_group_object_table_t entry)
   oc_new_string(&g_got[index].href, oc_string(entry.href),
                 oc_string_len(entry.href));
   /* copy the ga array */
-  g_got[index].ga_len = entry.ga_len; 
+  g_got[index].ga_len = entry.ga_len;
   int *new_array = (int *)malloc(entry.ga_len * sizeof(int));
 
   for (int i = 0; i < entry.ga_len; i++) {
-      new_array[i] = entry.ga[i];
-    }
+    new_array[i] = entry.ga[i];
+  }
   if (g_got[index].ga != 0) {
     free(g_got[index].ga);
   }

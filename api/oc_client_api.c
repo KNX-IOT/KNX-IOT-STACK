@@ -196,7 +196,7 @@ oc_do_multicast_update(void)
   }
 
   if (payload_size > 0) {
-    //coap_set_header_content_format(request, APPLICATION_VND_OCF_CBOR);
+    // coap_set_header_content_format(request, APPLICATION_VND_OCF_CBOR);
     coap_set_header_content_format(request, APPLICATION_OSCORE);
   }
 
@@ -233,12 +233,13 @@ do_multicast_update_error:
 }
 
 bool
-oc_init_multicast_update(oc_endpoint_t* mcast, const char *uri,
+oc_init_multicast_update(oc_endpoint_t *mcast, const char *uri,
                          const char *query)
 {
-  //oc_make_ipv6_endpoint(mcast, IPV6 | MULTICAST | SECURED, 5683, 0xff, 0x02, 0,
+  // oc_make_ipv6_endpoint(mcast, IPV6 | MULTICAST | SECURED, 5683, 0xff, 0x02,
+  // 0,
   //                      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x01, 0x58);
-  //mcast.addr.ipv6.scope = 0;
+  // mcast.addr.ipv6.scope = 0;
 
   coap_message_type_t type = COAP_TYPE_NON;
 
@@ -254,7 +255,7 @@ oc_init_multicast_update(oc_endpoint_t* mcast, const char *uri,
 
   coap_udp_init_message(request, type, OC_POST, coap_get_mid());
 
-  //coap_set_header_accept(request, APPLICATION_VND_OCF_CBOR);
+  // coap_set_header_accept(request, APPLICATION_VND_OCF_CBOR);
   coap_set_header_accept(request, APPLICATION_OSCORE);
 
   request->token_len = 8;

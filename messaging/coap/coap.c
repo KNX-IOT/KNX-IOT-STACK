@@ -431,7 +431,7 @@ coap_serialize_options(void *packet, uint8_t *option_array, bool inner,
   COAP_SERIALIZE_STRING_OPTION(COAP_OPTION_LOCATION_PATH, location_path,
                                '/', "Location-Path");
 #endif
-#if defined(OC_OSCORE) 
+#if defined(OC_OSCORE)
   //&& defined(OC_SECURITY)
   if (oscore && outer && IS_OPTION(coap_pkt, COAP_OPTION_OSCORE)) {
     option_length +=

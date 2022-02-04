@@ -1634,8 +1634,8 @@ void oc_stop_multicast(oc_client_response_t *response);
  * @return true
  * @return false
  */
-//bool oc_init_multicast_update(const char *uri, const char *query);
-bool oc_init_multicast_update(oc_endpoint_t* mcast, const char *uri,
+// bool oc_init_multicast_update(const char *uri, const char *query);
+bool oc_init_multicast_update(oc_endpoint_t *mcast, const char *uri,
                               const char *query);
 
 /**

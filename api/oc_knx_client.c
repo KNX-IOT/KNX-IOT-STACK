@@ -180,22 +180,20 @@ oc_group_address_to_endpoint(int group_address, int scope)
 */
 
 static void
-oc_issue_s_mode(int scope,  int sia_value, int group_address, char *rp, uint8_t *value_data,
-                int value_size)
+oc_issue_s_mode(int scope, int sia_value, int group_address, char *rp,
+                uint8_t *value_data, int value_size)
 {
   //(void)sia_value; /* variable not used */
 
   PRINT("  oc_issue_s_mode : scope %d\n", scope);
 
 #ifdef OC_OSCOREx
-  oc_make_ipv6_endpoint(mcast, IPV6 | MULTICAST | SECURED, COAP_PORT,
-                        0xff, scope,
-                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0xfd);
+  oc_make_ipv6_endpoint(mcast, IPV6 | MULTICAST | SECURED, COAP_PORT, 0xff,
+                        scope, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0xfd);
 #else
-  oc_make_ipv6_endpoint(mcast, IPV6 | MULTICAST, COAP_PORT,
-                        0xff, scope, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00,
-                        0xfd);
-#endif 
+  oc_make_ipv6_endpoint(mcast, IPV6 | MULTICAST, COAP_PORT, 0xff, scope, 0, 0,
+                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0xfd);
+#endif
   PRINT("  ");
   PRINTipaddr(mcast);
   PRINT("\n");
@@ -216,7 +214,7 @@ oc_send_s_mode(oc_endpoint_t *endpoint, char *path, int sia_value,
 
 #ifndef OC_OSCOREx
   if (oc_init_post(path, endpoint, NULL, NULL, LOW_QOS, NULL)) {
-#else /* OC_OSCORE */
+#else  /* OC_OSCORE */
   if (oc_init_multicast_update(endpoint, path, NULL)) {
 #endif /* OC_OSCORE */
     /*
@@ -262,7 +260,7 @@ oc_send_s_mode(oc_endpoint_t *endpoint, char *path, int sia_value,
 #else
     if (oc_do_multicast_update()) {
       PRINT("  Sent oc_do_multicast_update update\n");
-#endif 
+#endif
     } else {
       PRINT("  Could not send POST request\n");
     }

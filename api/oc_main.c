@@ -232,9 +232,9 @@ oc_main_init(const oc_handler_t *handler)
   }
 #endif /* OC_SECURITY */
 
-//#ifdef OC_SECURITY
-//  oc_sec_create_svr();
-//#endif
+  //#ifdef OC_SECURITY
+  //  oc_sec_create_svr();
+  //#endif
 
   for (size_t device = 0; device < oc_core_get_num_devices(); device++) {
     oc_knx_device_storage_read(device);

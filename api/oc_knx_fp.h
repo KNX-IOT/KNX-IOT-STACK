@@ -33,12 +33,14 @@ typedef enum {
   OC_CFLAG_NONE = 0, /**< Communication */
   OC_CFLAG_COMMUNICATION =
     1 << 2, /**< false = Group Object value cannot read or writen.*/
-  OC_CFLAG_READ = 1 << 3,  /**< 8 false = Group Object value cannot be read.*/
-  OC_CFLAG_WRITE = 1 << 4, /**< 16 false = Group Object value cannot be written.*/
-  OC_CFLAG_INIT = 1 << 5,  /**< 32 false = Disable read after initialization.*/
+  OC_CFLAG_READ = 1 << 3, /**< 8 false = Group Object value cannot be read.*/
+  OC_CFLAG_WRITE =
+    1 << 4, /**< 16 false = Group Object value cannot be written.*/
+  OC_CFLAG_INIT = 1 << 5, /**< 32 false = Disable read after initialization.*/
   OC_CFLAG_TRANSMISSION =
     1 << 6, /**< 64 false = Group Object value is not transmitted.*/
-  OC_CFLAG_UPDATE = 1 << 7, /**< 128 false = Group Object value is not updated.*/
+  OC_CFLAG_UPDATE =
+    1 << 7, /**< 128 false = Group Object value is not updated.*/
 } oc_cflag_mask_t;
 
 void oc_print_cflags(oc_cflag_mask_t cflags);
@@ -147,7 +149,6 @@ typedef struct oc_group_rp_table_t
   int *ga;          /**< array of integers*/
   int ga_len;       /**< length of the array of ga identifiers*/
 } oc_group_rp_table_t;
-
 
 int oc_core_set_group_object_table(int index, oc_group_object_table_t entry);
 

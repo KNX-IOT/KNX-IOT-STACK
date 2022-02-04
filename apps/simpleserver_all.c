@@ -776,14 +776,11 @@ oc_ownership_status_cb(const oc_uuid_t *device_uuid, size_t device_index,
 }
 #endif /* OC_SECURITY */
 
-
-
-
 /* send a multicast s-mode message */
 oc_event_callback_retval_t
 issue_requests_s_mode_delayed(void *data)
 {
-  //int scope = 5;
+  // int scope = 5;
   (void)data;
   PRINT(" issue_requests_s_mode_delayed\n");
   int ga_values[2] = { 2, 3 };
@@ -796,7 +793,7 @@ issue_requests_s_mode_delayed(void *data)
   entry.id = 55;
   entry.href = href;
   entry.ga_len = 2;
-  entry.ga = (int*)&ga_values;
+  entry.ga = (int *)&ga_values;
 
   oc_core_set_group_object_table(0, entry);
   oc_print_group_object_table_entry(0);
@@ -808,7 +805,6 @@ issue_requests_s_mode_delayed(void *data)
   return OC_EVENT_DONE;
 }
 
-
 /* send a multicast s-mode message */
 void
 issue_requests_s_mode(void)
@@ -817,8 +813,7 @@ issue_requests_s_mode(void)
   oc_set_delayed_callback(NULL, issue_requests_s_mode_delayed, 2);
 }
 
-
-//oc_set_delayed_callback
+// oc_set_delayed_callback
 
 void
 print_usage()
@@ -830,7 +825,6 @@ print_usage()
   PRINT("s-mode : does an event (to itself)\n");
   exit(0);
 }
-
 
 /**
  * main application.
@@ -844,7 +838,7 @@ main(int argc, char *argv[])
 {
   int init;
 
-  //bool do_send_s_mode = false;
+  // bool do_send_s_mode = false;
   bool do_send_s_mode = true;
 
   oc_clock_time_t next_event;
@@ -897,7 +891,6 @@ main(int argc, char *argv[])
   PRINT("\tstorage at './simpleserver_all_creds' \n");
   oc_storage_config("./simpleserver_all_creds");
 
-  
 #ifdef OC_SECURITY
   PRINT("Security - Enabled\n");
 #else
@@ -915,11 +908,11 @@ main(int argc, char *argv[])
 
   /* initializes the handlers structure */
   oc_handler_t handler = { .init = app_init,
-                                        .signal_event_loop = signal_event_loop,
-                                        .register_resources = register_resources
+                           .signal_event_loop = signal_event_loop,
+                           .register_resources = register_resources
 #ifdef OC_CLIENT
-                                        ,
-                                        .requests_entry = 0
+                           ,
+                           .requests_entry = 0
 #endif
   };
 #ifdef OC_CLIENT
@@ -946,7 +939,6 @@ main(int argc, char *argv[])
   PRINT(" DI: '%s'\n", uuid);
   oc_add_ownership_status_cb(oc_ownership_status_cb, NULL);
 #endif /* OC_SECURITY */
-
 
   oc_device_info_t *device = oc_core_get_device_info(0);
   PRINT("serial number: %s\n", oc_string(device->serialnumber));

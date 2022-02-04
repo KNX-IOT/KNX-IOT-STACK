@@ -71,13 +71,14 @@ char *oc_at_profile_to_string(oc_at_profile_t at_profile);
  *
  * | name      | CBOR label | CBOR type | description   |default value |
  * | ----------| -----------| ----------|---------------|--------------|
- * | id        | 0    | byte string | OSCORE Input Material Identifier |  -      | 
- * | version   | 1    | unsigned integer | OSCORE   Version   | 1          |
- * | ms        | 2    | byte string  | OSCORE Master Secret value (shall be PSK) | -   |
- * | hkdf      | 3    | text string / integer | HKDF value | HKDF SHA-256  |
- * | alg       | 4    | text string / integer | AEAD Algorithm value | AES-CCM-16-64-128 (10) |
- * | salt | 5  | byte string | Master Salt value| Default SHALL be an empty byte string |
- * | contextId | 6    | byte string | OSCORE ID Context value | omit  |
+ * | id        | 0    | byte string | OSCORE Input Material Identifier |  - | |
+ *version   | 1    | unsigned integer | OSCORE   Version   | 1          | | ms
+ *| 2    | byte string  | OSCORE Master Secret value (shall be PSK) | -   | |
+ *hkdf      | 3    | text string / integer | HKDF value | HKDF SHA-256  | | alg
+ *| 4    | text string / integer | AEAD Algorithm value | AES-CCM-16-64-128 (10)
+ *| | salt | 5  | byte string | Master Salt value| Default SHALL be an empty
+ *byte string | | contextId | 6    | byte string | OSCORE ID Context value |
+ *omit  |
  *
  * {
  *   "alg" : "AES-CCM-16-64-128",

@@ -172,8 +172,8 @@ oc_oscore_recv_message(oc_message_t *message)
       goto oscore_recv_error;
     }
 
-    //oc_sec_cred_t *c = (oc_sec_cred_t *)oscore_ctx->cred;
-    //if (!(message->endpoint.flags & MULTICAST) &&
+    // oc_sec_cred_t *c = (oc_sec_cred_t *)oscore_ctx->cred;
+    // if (!(message->endpoint.flags & MULTICAST) &&
     //    c->credtype != OC_CREDTYPE_OSCORE) {
     //  OC_ERR("***unicast message protected using group OSCORE context; "
     //         "silently ignore***");
@@ -181,8 +181,8 @@ oc_oscore_recv_message(oc_message_t *message)
     //}
 
     /* Copy "subjectuuid" of cred with OSCORE context to oc_endpoint_t */
-   // oc_sec_cred_t *oscore_cred = (oc_sec_cred_t *)oscore_ctx->cred;
-   // memcpy(message->endpoint.di.id, oscore_cred->subjectuuid.id, 16);
+    // oc_sec_cred_t *oscore_cred = (oc_sec_cred_t *)oscore_ctx->cred;
+    // memcpy(message->endpoint.di.id, oscore_cred->subjectuuid.id, 16);
 
     /* Use recipient key for decryption */
     uint8_t *key = oscore_ctx->recvkey;
@@ -291,7 +291,7 @@ oc_oscore_recv_message(oc_message_t *message)
 
     OC_DBG_OSCORE("### successfully parsed inner message ###");
 
-    //if (c->credtype == OC_CREDTYPE_OSCORE_MCAST_SERVER &&
+    // if (c->credtype == OC_CREDTYPE_OSCORE_MCAST_SERVER &&
     //    coap_pkt->code != OC_POST) {
     //  OC_ERR("***non-UPDATE multicast request protected using group OSCORE "
     //         "context; silently ignore***");
@@ -314,7 +314,7 @@ oc_oscore_recv_message(oc_message_t *message)
 
     OC_DBG_OSCORE(
       "### serialized decrypted CoAP message to dispatch to the CoAP "
-           "layer ###");
+      "layer ###");
   }
   OC_DBG_OSCORE("#################################");
 
@@ -538,7 +538,7 @@ oc_oscore_send_message(oc_message_t *msg)
     if (msg->endpoint.flags & MULTICAST) {
       OC_DBG_OSCORE(
         "### secure multicast requests do not elicit a response, discard "
-             "###");
+        "###");
       oc_message_unref(msg);
       return 0;
     }

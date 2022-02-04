@@ -198,7 +198,6 @@ extern "C" {
     PRINT("\n");                                                               \
   } while (0)
 
-
 #ifdef OC_DEBUG
 #ifdef __ANDROID__
 #define OC_LOG(level, ...)                                                     \
