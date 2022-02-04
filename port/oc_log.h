@@ -207,15 +207,13 @@ extern "C" {
     PRINT("\n");                                                               \
   } while (0)
 
-
 #define OC_LOGbytes_internal(prefix, bytes, length)                            \
   do {                                                                         \
     uint16_t i;                                                                \
     for (i = 0; i < length; i++)                                               \
-      PRINT(" %02X", (bytes)[i]);                                        \
+      PRINT(" %02X", (bytes)[i]);                                              \
     PRINT("\n");                                                               \
   } while (0)
-
 
 #ifdef OC_DEBUG
 #ifdef __ANDROID__
@@ -271,7 +269,6 @@ extern "C" {
 #define OC_DBG_OSCORE(...) OC_LOG("OSCORE", __VA_ARGS__)
 #define OC_LOGbytes_OSCORE(bytes, length)                                      \
   OC_LOGbytes_internal("OSCORE", bytes, length)
-
 
 //#define OC_DBG_OSCORE(...)
 

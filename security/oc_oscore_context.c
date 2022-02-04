@@ -58,16 +58,14 @@ oc_oscore_find_context_by_kid(oc_oscore_context_t *ctx, size_t device,
 
   PRINT("oc_oscore_find_context_by_kid : %d\n  Kid:", device);
   OC_LOGbytes_OSCORE(kid, kid_len);
-  
 
   while (ctx != NULL) {
 
     PRINT("  ---> : =%s=\n  recvid:", (char *)(ctx->token_id));
     OC_LOGbytes_OSCORE(ctx->recvid, ctx->recvid_len);
 
-    //if (ctx->device == device && kid_len == ctx->recvid_len &&
-    if ( kid_len == ctx->recvid_len &&
-        memcmp(kid, ctx->recvid, kid_len) == 0) {
+    // if (ctx->device == device && kid_len == ctx->recvid_len &&
+    if (kid_len == ctx->recvid_len && memcmp(kid, ctx->recvid, kid_len) == 0) {
       PRINT("  FOUND\n");
       return ctx;
     }
@@ -156,7 +154,8 @@ oc_oscore_free_context(oc_oscore_context_t *ctx)
 oc_oscore_context_t *
 oc_oscore_add_context(size_t device, const char *senderid,
                       const char *recipientid, uint64_t ssn, const char *desc,
-                      const char *mastersecret, const char* token_id, bool from_storage)
+                      const char *mastersecret, const char *token_id,
+                      bool from_storage)
 {
   oc_oscore_context_t *ctx = (oc_oscore_context_t *)oc_memb_alloc(&ctx_s);
 
@@ -166,14 +165,13 @@ oc_oscore_add_context(size_t device, const char *senderid,
 
   PRINT("-----oc_oscore_add_context---%s\n", token_id);
 
-
   ctx->device = device;
   ctx->ssn = ssn;
 
   PRINT("  device  %d\n", device);
   PRINT("  ssn     %d\n", ssn);
   PRINT("  ms      %s\n", mastersecret);
-  OC_LOGbytes_OSCORE(mastersecret,strlen(mastersecret));
+  OC_LOGbytes_OSCORE(mastersecret, strlen(mastersecret));
 
   PRINT("  desc    %s\n", desc);
 
@@ -189,7 +187,6 @@ oc_oscore_add_context(size_t device, const char *senderid,
   }
   size_t id_len = OSCORE_CTXID_LEN;
 
-
   if (senderid) {
     if (oc_conv_hex_string_to_byte_array(senderid, strlen(senderid),
                                          ctx->sendid, &id_len) < 0) {
@@ -200,7 +197,6 @@ oc_oscore_add_context(size_t device, const char *senderid,
   }
   PRINT("SendID:");
   OC_LOGbytes_OSCORE(ctx->sendid, ctx->sendid_len);
-
 
   id_len = OSCORE_CTXID_LEN;
 
@@ -215,13 +211,12 @@ oc_oscore_add_context(size_t device, const char *senderid,
   PRINT("RecvID:");
   OC_LOGbytes_OSCORE(ctx->recvid, ctx->recvid_len);
 
-
   if (token_id) {
-    strncpy((char*)&ctx->token_id, token_id, 16);
+    strncpy((char *)&ctx->token_id, token_id, 16);
   }
 
   if (mastersecret) {
-    strncpy((char*)&ctx->master_secret, mastersecret, 16);
+    strncpy((char *)&ctx->master_secret, mastersecret, 16);
   }
 
   // oc_sec_cred_t *cred = (oc_sec_cred_t *)cred_entry;
@@ -266,7 +261,7 @@ oc_oscore_add_context(size_t device, const char *senderid,
     goto add_oscore_context_error;
   }
   PRINT("IV:");
-  //OC_LOGbytes_OSCORE(ctx->commoniv, OSCORE_KEY_LEN);
+  // OC_LOGbytes_OSCORE(ctx->commoniv, OSCORE_KEY_LEN);
   OC_DBG_OSCORE("### derived Common IV ###");
 
   oc_list_add(contexts, ctx);

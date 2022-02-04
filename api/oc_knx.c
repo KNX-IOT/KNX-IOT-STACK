@@ -705,9 +705,8 @@ oc_create_knx_knx_resource(int resource_idx, size_t device)
   // "/a/lsm"
   oc_core_lf_populate_resource(
     resource_idx, device, "/.knx", OC_IF_LI | OC_IF_G, APPLICATION_CBOR,
-    OC_DISCOVERABLE,
-    oc_core_knx_knx_get_handler, 0, oc_core_knx_knx_post_handler, 0, 1,
-    "urn:knx:g.s");
+    OC_DISCOVERABLE, oc_core_knx_knx_get_handler, 0,
+    oc_core_knx_knx_post_handler, 0, 1, "urn:knx:g.s");
 }
 
 // ----------------------------------------------------------------------------
