@@ -164,14 +164,13 @@ get_dev_pm(oc_client_response_t *data)
   }
 }
 
-
-void finish_spake_handshake(oc_client_response_t *data)
+void
+finish_spake_handshake(oc_client_response_t *data)
 {
   PRINT("SPAKE2+ Handshake Finished!\n");
   PRINT("Shared Secret: ");
-  for (int i = 0; i < 16; i++)
-  {
-    PRINT("%02x", Ka_Ke[i+16]);
+  for (int i = 0; i < 16; i++) {
+    PRINT("%02x", Ka_Ke[i + 16]);
   }
   PRINT("\n");
 }
@@ -217,9 +216,9 @@ do_credential_verification(oc_client_response_t *data)
   oc_spake_calc_transcript_initiator(&w0, &w1, &privA, &pA, pB_bytes, Ka_Ke);
   oc_spake_calc_cA(Ka_Ke, cA, pB_bytes);
 
-  mbedtls_ecp_point_write_binary(&grp, &pA, MBEDTLS_ECP_PF_UNCOMPRESSED, &len_pA, pA_bytes, 63);
+  mbedtls_ecp_point_write_binary(&grp, &pA, MBEDTLS_ECP_PF_UNCOMPRESSED,
+                                 &len_pA, pA_bytes, 63);
   oc_spake_calc_cB(Ka_Ke, local_cB, pA_bytes);
-
 
   oc_init_post("/.well-known/knx/spake", data->endpoint, NULL,
                &finish_spake_handshake, HIGH_QOS, NULL);

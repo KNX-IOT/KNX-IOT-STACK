@@ -941,7 +941,8 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
                       oc_byte_string_len(rep->value.string));
       }
     } break;
-    default: break;
+    default:
+      break;
     }
     rep = rep->next;
   }
@@ -963,7 +964,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     oc_rep_i_set_int(pbkdf2, SPAKE_IT, g_pase.it);
     // salt 5
     oc_rep_i_set_byte_string(pbkdf2, SPAKE_SALT, oc_cast(g_pase.salt, uint8_t),
-                            oc_byte_string_len(g_pase.salt));
+                             oc_byte_string_len(g_pase.salt));
     oc_rep_end_object(&root_map, pbkdf2);
     oc_rep_end_root_object();
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
@@ -971,10 +972,6 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
   }
   if (valid_request == SPAKE_PA) {
     // return changed, frame pb (11) & cb (13)
-
-    // the password is necessary at this point, so add some functions
-    // to obtain the password from wherever it is stored (persistent storage?)
-    // For testing, use hardcoded password, or pass as CLI argument from app
 
     const char *password = oc_spake_get_password();
     int ret;
@@ -1044,7 +1041,8 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
   if (valid_request == SPAKE_CA) {
     // calculate expected cA
     uint8_t expected_ca[32];
-    oc_spake_calc_cA(spake_data.Ka_Ke, expected_ca, oc_cast(g_pase.pb, uint8_t));
+    oc_spake_calc_cA(spake_data.Ka_Ke, expected_ca,
+                     oc_cast(g_pase.pb, uint8_t));
 
     if (memcmp(expected_ca, oc_cast(g_pase.ca, uint8_t), 32) != 0) {
       OC_ERR("oc_spake_calc_cA failed");
