@@ -868,6 +868,51 @@ oc_create_knx_idevid_resource(int resource_idx, size_t device)
 // ----------------------------------------------------------------------------
 
 static spake_data_t spake_data;
+static int failed_handshake_count = 0;
+
+static bool is_blocking = false;
+
+static oc_event_callback_retval_t
+decrement_counter(void *data)
+{
+  if (failed_handshake_count > 0) {
+    --failed_handshake_count;
+  }
+
+  if (is_blocking && failed_handshake_count == 0) {
+    is_blocking = false;
+  }
+  return OC_EVENT_CONTINUE;
+}
+
+static void
+increment_counter()
+{
+  ++failed_handshake_count;
+}
+
+static bool
+is_handshake_blocked()
+{
+  if (is_blocking) {
+    return true;
+  }
+
+  // after 10 failed attempts per minute, block the client for the
+  // next minute
+  if (failed_handshake_count > 10) {
+    is_blocking = true;
+    return true;
+  }
+
+  return false;
+}
+
+static int
+get_seconds_until_unblocked()
+{
+  return failed_handshake_count * 10;
+}
 
 static void
 oc_core_knx_spake_post_handler(oc_request_t *request,
@@ -876,11 +921,6 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
   (void)data;
   (void)iface_mask;
   PRINT("oc_core_knx_spake_post_handler\n");
-
-  char buffer[200];
-  memset(buffer, 200, 1);
-  oc_rep_to_json(request->request_payload, (char *)&buffer, 200, true);
-  PRINT("%s", buffer);
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_CBOR) {
@@ -891,6 +931,15 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
   if (request->content_format != APPLICATION_CBOR) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
+    return;
+  }
+
+  if (is_handshake_blocked()) {
+    request->response->response_buffer->code =
+      oc_status_code(OC_STATUS_SERVICE_UNAVAILABLE);
+    // this is dodgy
+    coap_set_header_max_age(request->response->response_buffer->buffer,
+                            get_seconds_until_unblocked());
     return;
   }
 
@@ -1098,6 +1147,8 @@ error:
   oc_free_string(&g_pase.rnd);
   oc_free_string(&g_pase.salt);
   g_pase.it = 100000;
+
+  increment_counter();
   oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
 }
 
@@ -1115,6 +1166,9 @@ oc_create_knx_spake_resource(int resource_idx, size_t device)
   mbedtls_ecp_point_init(&spake_data.L);
   mbedtls_mpi_init(&spake_data.y);
   mbedtls_ecp_point_init(&spake_data.pub_y);
+
+  // start SPAKE brute force protection timer
+  oc_set_delayed_callback(NULL, decrement_counter, 10);
 }
 
 // ----------------------------------------------------------------------------
