@@ -937,9 +937,8 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
   if (is_handshake_blocked()) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_SERVICE_UNAVAILABLE);
-    // this is dodgy
-    coap_set_header_max_age(request->response->response_buffer->buffer,
-                            get_seconds_until_unblocked());
+
+    request->response->response_buffer->max_age = get_seconds_until_unblocked();
     return;
   }
 

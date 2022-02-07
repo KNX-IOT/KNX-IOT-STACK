@@ -41,6 +41,7 @@ struct oc_response_buffer_s
   size_t response_length;
   int code;
   oc_content_format_t content_format;
+  uint32_t max_age;
 };
 
 #ifdef __cplusplus
