@@ -1065,7 +1065,6 @@ oc_core_set_at_table(int index, oc_auth_at_t entry)
 
   oc_init_oscore(0);
 
-
   return 0;
 }
 
@@ -1132,7 +1131,6 @@ oc_init_oscore(size_t device_index)
   (void)device_index;
 
   device_index = 0;
-  
 
   // TODO
 #ifdef OC_OSCORE
@@ -1144,20 +1142,19 @@ oc_init_oscore(size_t device_index)
     if (oc_string_len(g_at_entries[i].id) > 0) {
       oc_at_entry_print(i);
       oc_oscore_context_t *ctx =
-        oc_oscore_add_context(device_index, "sender", "reci", oc_knx_get_osn(), "desc",
-        oc_string(g_at_entries[i].osc_ms), oc_string(g_at_entries[i].kid), false);
+        oc_oscore_add_context(device_index, "sender", "reci", oc_knx_get_osn(),
+                              "desc", oc_string(g_at_entries[i].osc_ms),
+                              oc_string(g_at_entries[i].kid), false);
       if (ctx == NULL) {
         PRINT("   fail...\n ");
       }
 
-      ctx =
-        oc_oscore_add_context(device_index, "reci", "sender", oc_knx_get_osn(), "desc",
+      ctx = oc_oscore_add_context(
+        device_index, "reci", "sender", oc_knx_get_osn(), "desc",
         oc_string(g_at_entries[i].osc_ms), "token2", false);
       if (ctx == NULL) {
         PRINT("   fail...\n ");
       }
-    
-    
     }
   }
 #endif

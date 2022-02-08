@@ -25,9 +25,8 @@
 #include "oc_rep.h" // should not be needed
 
 #ifdef OC_SPAKE
-#include "security/oc_spake2plus.h"=
+#include "security/oc_spake2plus.h" =
 #endif
-
 
 #define TAGS_AS_STRINGS
 
@@ -1116,7 +1115,8 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     size_t shared_key_len = 16;
 
     // create the token & store in at tables at position 0
-    // note there should be no entries.. if there is an entry then overwrite it..
+    // note there should be no entries.. if there is an entry then overwrite
+    // it..
     oc_auth_at_t os_token;
     memset(&os_token, 0, sizeof(os_token));
     oc_new_string(&os_token.id, "spake", strlen("spake"));
