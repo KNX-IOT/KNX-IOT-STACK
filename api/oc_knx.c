@@ -1006,9 +1006,10 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
   PRINT("oc_core_knx_spake_post_handler valid_request: %d\n", valid_request);
 
   if (valid_request == SPAKE_RND) {
+#ifdef OC_SPAKE
     // generate random numbers for rnd, salt & it (# of iterations)
     oc_spake_parameter_exchange(&g_pase.rnd, &g_pase.salt, &g_pase.it);
-
+#endif /* OC_SPAKE */
     oc_rep_begin_root_object();
     // rnd (15)
     oc_rep_i_set_byte_string(root, SPAKE_RND, oc_cast(g_pase.rnd, uint8_t),
