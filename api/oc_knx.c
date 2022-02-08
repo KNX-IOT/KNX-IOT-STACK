@@ -19,13 +19,15 @@
 #include "oc_knx_fp.h"
 #include "oc_knx_dev.h"
 #include "oc_knx_client.h"
+#include "oc_knx_sec.h"
 #include "oc_core_res.h"
 #include <stdio.h>
 #include "oc_rep.h" // should not be needed
 
 #ifdef OC_SPAKE
-#include "security/oc_spake2plus.h"
+#include "security/oc_spake2plus.h"=
 #endif
+
 
 #define TAGS_AS_STRINGS
 
@@ -1112,6 +1114,20 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     // shared_key is 16-byte array - NOT NULL TERMINATED
     uint8_t *shared_key = spake_data.Ka_Ke + 16;
     size_t shared_key_len = 16;
+
+    // create the token & store in at tables at position 0
+    // note there should be no entries.. if there is an entry then overwrite it..
+    oc_auth_at_t os_token;
+    memset(&os_token, 0, sizeof(os_token));
+    oc_new_string(&os_token.id, "spake", strlen("spake"));
+    os_token.ga_len = 0;
+    os_token.profile = OC_PROFILE_COAP_OSCORE;
+    os_token.interface = OC_IF_SEC | OC_IF_D | OC_IF_P;
+    oc_new_string(&os_token.osc_ms, shared_key, 16);
+    oc_new_string(&os_token.osc_id, "spake2+", strlen("spake2+"));
+    oc_new_string(&os_token.sub, "", strlen("spake2+"));
+    oc_new_string(&os_token.kid, "+", strlen("spake2+"));
+    oc_core_set_at_table(0, os_token);
 
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
     // handshake completed successfully - clear state

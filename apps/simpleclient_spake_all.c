@@ -248,9 +248,9 @@ do_credential_exchange(oc_client_response_t *data)
     return;
   }
 
-  char buffer[200];
-  memset(buffer, 200, 1);
-  oc_rep_to_json(data->payload, (char *)&buffer, 200, true);
+  char buffer[300];
+  memset(buffer, 300, 1);
+  oc_rep_to_json(data->payload, (char *)&buffer, 300, true);
   PRINT("%s", buffer);
 
   // TODO parse payload, obtain seed & salt, use it to derive w0 & w1

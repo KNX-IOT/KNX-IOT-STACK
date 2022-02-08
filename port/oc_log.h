@@ -202,7 +202,7 @@ extern "C" {
   do {                                                                         \
     PRINT("%s: %s <%s:%d>:\n", prefix, __FILENAME__, __func__, __LINE__);      \
     uint16_t i;                                                                \
-    for (i = 0; i < length; i++)                                               \
+    for (i = 0; i < (length); i++)                                               \
       PRINT(" %02X", (bytes)[i]);                                              \
     PRINT("\n");                                                               \
   } while (0)
@@ -210,7 +210,7 @@ extern "C" {
 #define OC_LOGbytes_internal(prefix, bytes, length)                            \
   do {                                                                         \
     uint16_t i;                                                                \
-    for (i = 0; i < length; i++)                                               \
+    for (i = 0; i < (length); i++)                                               \
       PRINT(" %02X", (bytes)[i]);                                              \
     PRINT("\n");                                                               \
   } while (0)
@@ -245,7 +245,7 @@ extern "C" {
   do {                                                                         \
     PRINT("DEBUG: %s <%s:%d>: ", __FILENAME__, __func__, __LINE__);            \
     uint16_t i;                                                                \
-    for (i = 0; i < length; i++)                                               \
+    for (i = 0; i < (length); i++)                                               \
       PRINT(" %02X", (bytes)[i]);                                              \
     PRINT("\n");                                                               \
   } while (0)

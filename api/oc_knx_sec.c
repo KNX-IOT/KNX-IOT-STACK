@@ -844,7 +844,13 @@ oc_at_entry_print(int index)
         PRINT("    osc:id     : %s\n", oc_string(g_at_entries[index].osc_id));
       }
       if (oc_string_len(g_at_entries[index].osc_ms) > 0) {
-        PRINT("    osc:ms     : %s\n", oc_string(g_at_entries[index].osc_ms));
+        PRINT("    osc:ms     : ");
+        int length = oc_string_len(g_at_entries[index].osc_ms);
+        char *ms = oc_string(g_at_entries[index].osc_ms);
+        for (int i = 0; i < length; i++) {
+          PRINT("%02x", (unsigned char)ms[i]);
+        }
+        PRINT("\n");
       }
       if (oc_string_len(g_at_entries[index].osc_alg) > 0) {
         PRINT("    osc:alg    : %s\n", oc_string(g_at_entries[index].osc_alg));
@@ -1121,30 +1127,34 @@ oc_init_oscore(size_t device_index)
   (void)device_index;
 
   device_index = 0;
+  
 
   // TODO
 #ifdef OC_OSCORE
+  int i;
   PRINT("oc_init_oscore adding oscore context\n ");
-  // oc_device_info_t *device = oc_core_get_device_info(device_index);
 
-  // char *serialnum = "abc";
+  for (i = 0; i < G_AT_MAX_ENTRIES; i++) {
 
-  // if (device != NULL) {
-  // oc_oscore_context_t* ctx =  oc_oscore_add_context( device_index,
-  // oc_string(device->serialnumber), "reci",
-  oc_oscore_context_t *ctx =
-    oc_oscore_add_context(device_index, "sender", "reci", oc_knx_get_osn(),
-                          "desc", "MSecret", "token1", false);
-  if (ctx == NULL) {
-    PRINT("   fail...\n ");
+    if (oc_string_len(g_at_entries[i].id) > 0) {
+      oc_at_entry_print(i);
+      oc_oscore_context_t *ctx =
+        oc_oscore_add_context(device_index, "sender", "reci", oc_knx_get_osn(), "desc",
+        oc_string(g_at_entries[i].osc_ms), oc_string(g_at_entries[i].kid), false);
+      if (ctx == NULL) {
+        PRINT("   fail...\n ");
+      }
+
+      ctx =
+        oc_oscore_add_context(device_index, "reci", "sender", oc_knx_get_osn(), "desc",
+        oc_string(g_at_entries[i].osc_ms), "token2", false);
+      if (ctx == NULL) {
+        PRINT("   fail...\n ");
+      }
+    
+    
+    }
   }
-
-  ctx = oc_oscore_add_context(device_index, "reci", "sender", oc_knx_get_osn(),
-                              "desc", "MSecret", "token2", false);
-  if (ctx == NULL) {
-    PRINT("   fail...\n ");
-  }
-  //}
 #endif
 }
 
@@ -1160,10 +1170,17 @@ oc_is_resource_secure(oc_method_t method, oc_resource_t *resource)
         memcmp(oc_string(resource->uri), "/.well-known/knx", 16) == 0))) {
     return false;
   }
-  // note check this
+  // note check this, because we should not be able to do a reset...
+  // TODO
   if (method == OC_POST &&
       ((oc_string_len(resource->uri) == 16 &&
         memcmp(oc_string(resource->uri), "/.well-known/knx", 16) == 0))) {
+    return false;
+  }
+  // needed for SPAKE handshake
+  if (method == OC_POST &&
+      ((oc_string_len(resource->uri) == 22 &&
+        memcmp(oc_string(resource->uri), "/.well-known/knx/spake", 22) == 0))) {
     return false;
   }
 
