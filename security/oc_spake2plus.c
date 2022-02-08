@@ -1,13 +1,16 @@
 #include "mbedtls/md.h"
 #include "mbedtls/ecp.h"
-#include "mbedtls/bignum.h"
 #include "mbedtls/entropy.h"
 #include "mbedtls/ctr_drbg.h"
 #include "mbedtls/hkdf.h"
+#include "mbedtls/pkcs5.h"
 #include <assert.h>
+
+#include "oc_spake2plus.h"
 
 static mbedtls_entropy_context entropy_ctx;
 static mbedtls_ctr_drbg_context ctr_drbg_ctx;
+static mbedtls_ecp_group grp;
 
 // clang-format off
 // mbedTLS cannot decode the compressed points in the specification, so we have to do it ourselves.
@@ -33,171 +36,48 @@ uint8_t bytes_N[] = {
   0x60, 0x34, 0x80, 0x8c, 0xd5, 0x64, 0x49, 0x0b, 0x1e, 0x65, 0x6e, 0xdb, 0xe7
 };
 
-static int
-init_context(void)
+static char password[33];
+
+#define KNX_RNG_LEN (32)
+#define KNX_SALT_LEN (32)
+#define KNX_MIN_IT (1000)
+#define KNX_MAX_IT (100000)
+
+int
+oc_spake_init(void)
 {
-  int ret;
+  int ret = 0;
   // initialize entropy and drbg contexts
   mbedtls_entropy_init(&entropy_ctx);
   mbedtls_ctr_drbg_init(&ctr_drbg_ctx);
-  if (ret = mbedtls_ctr_drbg_seed(&ctr_drbg_ctx, mbedtls_entropy_func,
-                                  &entropy_ctx, NULL, 0))
-    ;
-  return ret;
+  mbedtls_ecp_group_init(&grp);
 
-  return 0;
+  MBEDTLS_MPI_CHK(mbedtls_ecp_group_load(&grp, MBEDTLS_ECP_DP_SECP256R1));
+  MBEDTLS_MPI_CHK(mbedtls_ctr_drbg_seed(&ctr_drbg_ctx, mbedtls_entropy_func,
+                                        &entropy_ctx, NULL, 0));
+cleanup:
+  return ret;
 }
 
-static int
-free_context(void)
+int
+oc_spake_free(void)
 {
   mbedtls_ctr_drbg_free(&ctr_drbg_ctx);
   mbedtls_entropy_free(&entropy_ctx);
+  mbedtls_ecp_group_free(&grp);
   return 0;
 }
 
-// mbedtls_ecp_gen_keypair(&grp, a, &pubA, mbedtls_ctr_drbg_random,
-//                        &ctr_drbg_ctx);
-
-// generic formula for
-// pX = pubX + wX * L
-static int
-calculate_pX(mbedtls_ecp_point *pX, const mbedtls_ecp_point *pubX,
-             const mbedtls_mpi *wX, const uint8_t bytes_L[], size_t len_L)
+const char *
+oc_spake_get_password()
 {
-  mbedtls_mpi one;
-  mbedtls_ecp_point L;
-  mbedtls_ecp_group grp;
-  int ret;
-
-  mbedtls_mpi_init(&one);
-  mbedtls_ecp_group_init(&grp);
-  mbedtls_ecp_point_init(&L);
-
-  // MBEDTLS_MPI_CHK sets ret to the return value of f and goes to cleanup if
-  // ret is nonzero
-  MBEDTLS_MPI_CHK(mbedtls_ecp_group_load(&grp, MBEDTLS_ECP_DP_SECP256R1));
-  MBEDTLS_MPI_CHK(mbedtls_ecp_point_read_binary(&grp, &L, bytes_L, len_L));
-  MBEDTLS_MPI_CHK(mbedtls_mpi_read_string(&one, 10, "1"));
-
-  // pA = 1 * pubA + w0 * M
-  MBEDTLS_MPI_CHK(mbedtls_ecp_muladd(&grp, pX, &one, pubX, wX, &L));
-
-cleanup:
-  mbedtls_mpi_free(&one);
-  mbedtls_ecp_point_free(&L);
-  mbedtls_ecp_group_free(&grp);
-  return ret;
+  return password;
 }
 
-// pA = pubA + w0 * M
-static int
-calculate_pA(mbedtls_ecp_point *pA, const mbedtls_ecp_point *pubA,
-             const mbedtls_mpi *w0)
+void
+oc_spake_set_password(char *new_pass)
 {
-  return calculate_pX(pA, pubA, w0, bytes_M, sizeof(bytes_M));
-}
-
-// pB = pubB + w0 * N
-static int
-calculate_pB(mbedtls_ecp_point *pB, const mbedtls_ecp_point *pubB,
-             const mbedtls_mpi *w0)
-{
-  return calculate_pX(pB, pubB, w0, bytes_N, sizeof(bytes_N));
-}
-
-// generic formula for
-// J = f * (K - g * L)
-static int
-calculate_JfKgL(mbedtls_ecp_point *J, const mbedtls_mpi *f,
-                const mbedtls_ecp_point *K, const mbedtls_mpi *g,
-                const mbedtls_ecp_point *L)
-{
-  int ret;
-  mbedtls_mpi negative_g, zero, one;
-  mbedtls_mpi_init(&negative_g);
-  mbedtls_mpi_init(&zero);
-  mbedtls_mpi_init(&one);
-
-  mbedtls_ecp_point K_minus_g_L;
-  mbedtls_ecp_point_init(&K_minus_g_L);
-
-  mbedtls_ecp_group grp;
-  mbedtls_ecp_group_init(&grp);
-  MBEDTLS_MPI_CHK(mbedtls_ecp_group_load(&grp, MBEDTLS_ECP_DP_SECP256R1));
-
-  // negative_g = -g
-  MBEDTLS_MPI_CHK(mbedtls_mpi_read_string(&zero, 10, "0"));
-  MBEDTLS_MPI_CHK(mbedtls_mpi_sub_mpi(&negative_g, &zero, g));
-  MBEDTLS_MPI_CHK(mbedtls_mpi_mod_mpi(&negative_g, &negative_g, &grp.N));
-
-  // K_minus_g_L = K - g * L
-  MBEDTLS_MPI_CHK(mbedtls_mpi_read_string(&one, 10, "1"));
-  MBEDTLS_MPI_CHK(
-    mbedtls_ecp_muladd(&grp, &K_minus_g_L, &one, K, &negative_g, L));
-
-  // J = f * (K_minus_g_L)
-  MBEDTLS_MPI_CHK(mbedtls_ecp_mul(&grp, J, f, &K_minus_g_L,
-                                  mbedtls_ctr_drbg_random, &ctr_drbg_ctx));
-
-cleanup:
-  mbedtls_mpi_free(&negative_g);
-  mbedtls_mpi_free(&zero);
-  mbedtls_mpi_free(&one);
-  mbedtls_ecp_point_free(&K_minus_g_L);
-  mbedtls_ecp_group_free(&grp);
-  return ret;
-}
-
-// Z = h*x*(Y - w0*N)
-// also works for:
-// V = h*w1*(Y - w0*N)
-static int
-calculate_ZV_N(mbedtls_ecp_point *Z, const mbedtls_mpi *x,
-               const mbedtls_ecp_point *Y, const mbedtls_mpi *w0)
-{
-  int ret;
-
-  mbedtls_ecp_point N;
-  mbedtls_ecp_point_init(&N);
-
-  mbedtls_ecp_group grp;
-  mbedtls_ecp_group_init(&grp);
-
-  MBEDTLS_MPI_CHK(mbedtls_ecp_group_load(&grp, MBEDTLS_ECP_DP_SECP256R1));
-  MBEDTLS_MPI_CHK(
-    mbedtls_ecp_point_read_binary(&grp, &N, bytes_N, sizeof(bytes_N)));
-
-  // For the secp256r1 curve, h is 1, so we don't need to do anything
-  MBEDTLS_MPI_CHK(calculate_JfKgL(Z, x, Y, w0, &N));
-
-cleanup:
-  mbedtls_ecp_point_free(&N);
-  return ret;
-}
-// Z = h*y*(X - w0*M)
-static int
-calculate_Z_M(mbedtls_ecp_point *Z, const mbedtls_mpi *x,
-              const mbedtls_ecp_point *Y, const mbedtls_mpi *w0)
-{
-  int ret;
-
-  mbedtls_ecp_point M;
-  mbedtls_ecp_point_init(&M);
-
-  mbedtls_ecp_group grp;
-  mbedtls_ecp_group_init(&grp);
-
-  MBEDTLS_MPI_CHK(mbedtls_ecp_group_load(&grp, MBEDTLS_ECP_DP_SECP256R1));
-  MBEDTLS_MPI_CHK(
-    mbedtls_ecp_point_read_binary(&grp, &M, bytes_M, sizeof(bytes_M)));
-
-  // For the secp256r1 curve, h is 1, so we don't need to do anything
-  MBEDTLS_MPI_CHK(calculate_JfKgL(Z, x, Y, w0, &M));
-
-cleanup:
-  mbedtls_ecp_point_free(&M);
-  return ret;
+  strncpy(password, new_pass, sizeof(password));
 }
 
 // encode value as zero-padded little endian bytes
@@ -235,7 +115,7 @@ encode_point(mbedtls_ecp_group *grp, const mbedtls_ecp_point *point,
 {
   size_t len_point = 0;
   size_t len_len = 0;
-  uint8_t point_buf[65];
+  uint8_t point_buf[kPubKeySize];
   int ret;
   ret =
     mbedtls_ecp_point_write_binary(grp, point, MBEDTLS_ECP_PF_UNCOMPRESSED,
@@ -267,8 +147,401 @@ encode_mpi(mbedtls_mpi *mpi, uint8_t *buffer)
   return len_len + len_mpi;
 }
 
+void
+print_point(mbedtls_ecp_point *p)
+{
+  uint8_t buf[kPubKeySize];
+  size_t len = 0;
+
+  len = encode_point(&grp, p, buf);
+
+  for (size_t i = 0; i < len; i++) {
+    printf("%02x", buf[i]);
+  }
+  printf("\n");
+}
+
+void
+print_mpi(mbedtls_mpi *m)
+{
+  uint8_t buf[64];
+  size_t len = 0;
+
+  len = encode_mpi(m, buf);
+
+  for (size_t i = 0; i < len; i++) {
+    printf("%02x", buf[i]);
+  }
+  printf("\n");
+}
+
 int
-validate_against_test_vector()
+oc_spake_encode_pubkey(mbedtls_ecp_point *P, uint8_t out[kPubKeySize])
+{
+  size_t olen;
+  return mbedtls_ecp_point_write_binary(&grp, P, MBEDTLS_ECP_PF_UNCOMPRESSED,
+                                        &olen, out, kPubKeySize);
+}
+
+int
+oc_spake_parameter_exchange(oc_string_t *rnd, oc_string_t *salt, int *it)
+{
+  unsigned int it_seed;
+  int ret;
+  oc_free_string(rnd);
+  oc_free_string(salt);
+
+  oc_alloc_string(rnd, KNX_RNG_LEN);
+  oc_alloc_string(salt, KNX_SALT_LEN);
+
+  MBEDTLS_MPI_CHK(
+    mbedtls_ctr_drbg_random(&ctr_drbg_ctx, rnd->ptr, KNX_RNG_LEN));
+  MBEDTLS_MPI_CHK(
+    mbedtls_ctr_drbg_random(&ctr_drbg_ctx, salt->ptr, KNX_SALT_LEN));
+  MBEDTLS_MPI_CHK(mbedtls_ctr_drbg_random(
+    &ctr_drbg_ctx, (unsigned char *)&it_seed, sizeof(it_seed)));
+
+  *it = it_seed % (KNX_MAX_IT - KNX_MIN_IT) + KNX_MIN_IT;
+cleanup:
+  return ret;
+}
+
+int
+oc_spake_calc_w0_w1(const char *pw, size_t len_salt, const uint8_t *salt,
+                    int it, mbedtls_mpi *w0, mbedtls_mpi *w1)
+{
+  int ret;
+  mbedtls_md_context_t ctx;
+
+  // Hmm, SPAKE2+ mandates this be 40 bytes or longer,
+  // but KNX-IoT says it's 32 bytes maybe?
+  const size_t output_len = 40;
+  uint8_t output[output_len];
+
+  mbedtls_mpi w0s, w1s;
+
+  mbedtls_md_init(&ctx);
+  mbedtls_mpi_init(&w0s);
+  mbedtls_mpi_init(&w1s);
+
+  MBEDTLS_MPI_CHK(
+    mbedtls_md_setup(&ctx, mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), 1));
+  MBEDTLS_MPI_CHK(mbedtls_pkcs5_pbkdf2_hmac(&ctx, pw, strlen(pw), salt,
+                                            len_salt, it, output_len, output));
+
+  // extract w0s and w1s from the output
+  MBEDTLS_MPI_CHK(mbedtls_mpi_read_binary(&w0s, output, output_len / 2));
+  MBEDTLS_MPI_CHK(
+    mbedtls_mpi_read_binary(&w1s, output + output_len / 2, output_len / 2));
+
+  // calculate w0 and w1
+  // the cofactor of P-256 is 1, so the order of the group is equal to the large
+  // prime p
+  MBEDTLS_MPI_CHK(mbedtls_mpi_mod_mpi(w0, &w0s, &grp.N));
+  MBEDTLS_MPI_CHK(mbedtls_mpi_mod_mpi(w1, &w1s, &grp.N));
+
+cleanup:
+  mbedtls_md_free(&ctx);
+  mbedtls_mpi_free(&w0s);
+  mbedtls_mpi_free(&w1s);
+  return ret;
+}
+
+int
+oc_spake_calc_w0_L(const char *pw, size_t len_salt, const uint8_t *salt, int it,
+                   mbedtls_mpi *w0, mbedtls_ecp_point *L)
+{
+  int ret;
+  mbedtls_mpi w1;
+  mbedtls_mpi_init(&w1);
+  MBEDTLS_MPI_CHK(oc_spake_calc_w0_w1(pw, len_salt, salt, it, w0, &w1));
+  MBEDTLS_MPI_CHK(mbedtls_ecp_mul(&grp, L, &w1, &grp.G, mbedtls_ctr_drbg_random,
+                                  &ctr_drbg_ctx));
+cleanup:
+  mbedtls_mpi_free(&w1);
+  return ret;
+}
+
+int
+oc_spake_gen_keypair(mbedtls_mpi *y, mbedtls_ecp_point *pub_y)
+{
+  return mbedtls_ecp_gen_keypair(&grp, y, pub_y, mbedtls_ctr_drbg_random,
+                                 &ctr_drbg_ctx);
+}
+
+// generic formula for
+// pX = pubX + wX * L
+static int
+calculate_pX(mbedtls_ecp_point *pX, const mbedtls_ecp_point *pubX,
+             const mbedtls_mpi *wX, const uint8_t bytes_L[], size_t len_L)
+{
+  mbedtls_mpi one;
+  mbedtls_ecp_point L;
+  int ret;
+
+  mbedtls_mpi_init(&one);
+  mbedtls_ecp_point_init(&L);
+
+  // MBEDTLS_MPI_CHK sets ret to the return value of f and goes to cleanup if
+  // ret is nonzero
+  MBEDTLS_MPI_CHK(mbedtls_ecp_point_read_binary(&grp, &L, bytes_L, len_L));
+  MBEDTLS_MPI_CHK(mbedtls_mpi_read_string(&one, 10, "1"));
+
+  // pA = 1 * pubA + w0 * M
+  MBEDTLS_MPI_CHK(mbedtls_ecp_muladd(&grp, pX, &one, pubX, wX, &L));
+
+cleanup:
+  mbedtls_mpi_free(&one);
+  mbedtls_ecp_point_free(&L);
+  return ret;
+}
+
+// pA = pubA + w0 * M
+int
+oc_spake_calc_pA(mbedtls_ecp_point *pA, const mbedtls_ecp_point *pubA,
+                 const mbedtls_mpi *w0)
+{
+  return calculate_pX(pA, pubA, w0, bytes_M, sizeof(bytes_M));
+}
+
+// pB = pubB + w0 * N
+int
+oc_spake_calc_pB(mbedtls_ecp_point *pB, const mbedtls_ecp_point *pubB,
+                 const mbedtls_mpi *w0)
+{
+  return calculate_pX(pB, pubB, w0, bytes_N, sizeof(bytes_N));
+}
+
+// generic formula for
+// J = f * (K - g * L)
+static int
+calculate_JfKgL(mbedtls_ecp_point *J, const mbedtls_mpi *f,
+                const mbedtls_ecp_point *K, const mbedtls_mpi *g,
+                const mbedtls_ecp_point *L)
+{
+  int ret;
+  mbedtls_mpi negative_g, zero, one;
+  mbedtls_mpi_init(&negative_g);
+  mbedtls_mpi_init(&zero);
+  mbedtls_mpi_init(&one);
+
+  mbedtls_ecp_point K_minus_g_L;
+  mbedtls_ecp_point_init(&K_minus_g_L);
+
+  // negative_g = -g
+  MBEDTLS_MPI_CHK(mbedtls_mpi_read_string(&zero, 10, "0"));
+  MBEDTLS_MPI_CHK(mbedtls_mpi_sub_mpi(&negative_g, &zero, g));
+  MBEDTLS_MPI_CHK(mbedtls_mpi_mod_mpi(&negative_g, &negative_g, &grp.N));
+
+  // K_minus_g_L = K - g * L
+  MBEDTLS_MPI_CHK(mbedtls_mpi_read_string(&one, 10, "1"));
+  MBEDTLS_MPI_CHK(
+    mbedtls_ecp_muladd(&grp, &K_minus_g_L, &one, K, &negative_g, L));
+
+  // J = f * (K_minus_g_L)
+  MBEDTLS_MPI_CHK(mbedtls_ecp_mul(&grp, J, f, &K_minus_g_L,
+                                  mbedtls_ctr_drbg_random, &ctr_drbg_ctx));
+
+cleanup:
+  mbedtls_mpi_free(&negative_g);
+  mbedtls_mpi_free(&zero);
+  mbedtls_mpi_free(&one);
+  mbedtls_ecp_point_free(&K_minus_g_L);
+  return ret;
+}
+
+// Z = h*x*(Y - w0*N)
+// also works for:
+// V = h*w1*(Y - w0*N)
+static int
+calculate_ZV_N(mbedtls_ecp_point *Z, const mbedtls_mpi *x,
+               const mbedtls_ecp_point *Y, const mbedtls_mpi *w0)
+{
+  int ret;
+
+  mbedtls_ecp_point N;
+  mbedtls_ecp_point_init(&N);
+
+  MBEDTLS_MPI_CHK(
+    mbedtls_ecp_point_read_binary(&grp, &N, bytes_N, sizeof(bytes_N)));
+
+  // For the secp256r1 curve, h is 1, so we don't need to do anything
+  MBEDTLS_MPI_CHK(calculate_JfKgL(Z, x, Y, w0, &N));
+
+cleanup:
+  mbedtls_ecp_point_free(&N);
+  return ret;
+}
+// Z = h*y*(X - w0*M)
+static int
+calculate_Z_M(mbedtls_ecp_point *Z, const mbedtls_mpi *x,
+              const mbedtls_ecp_point *Y, const mbedtls_mpi *w0)
+{
+  int ret;
+
+  mbedtls_ecp_point M;
+  mbedtls_ecp_point_init(&M);
+
+  MBEDTLS_MPI_CHK(
+    mbedtls_ecp_point_read_binary(&grp, &M, bytes_M, sizeof(bytes_M)));
+
+  // For the secp256r1 curve, h is 1, so we don't need to do anything
+  MBEDTLS_MPI_CHK(calculate_JfKgL(Z, x, Y, w0, &M));
+
+cleanup:
+  mbedtls_ecp_point_free(&M);
+  return ret;
+}
+
+int
+oc_spake_calc_transcript_responder(spake_data_t *spake_data,
+                                   uint8_t X_enc[kPubKeySize],
+                                   mbedtls_ecp_point *Y)
+{
+  int ret = 0;
+  mbedtls_ecp_point Z, V, X;
+  uint8_t ttbuf[2048];
+  size_t ttlen = 0;
+
+  mbedtls_ecp_point_init(&Z);
+  mbedtls_ecp_point_init(&V);
+  mbedtls_ecp_point_init(&X);
+
+  mbedtls_ecp_point_read_binary(&grp, &X, X_enc, kPubKeySize);
+  // abort if X is the point at infinity
+  MBEDTLS_MPI_CHK(mbedtls_ecp_is_zero(&X));
+
+  // Z = h*y*(X - w0*M)
+  MBEDTLS_MPI_CHK(calculate_Z_M(&Z, &spake_data->y, &X, &spake_data->w0));
+
+  // V = h*y*L, where L = w1*P
+  MBEDTLS_MPI_CHK(mbedtls_ecp_mul(&grp, &V, &spake_data->y, &spake_data->L,
+                                  mbedtls_ctr_drbg_random, &ctr_drbg_ctx));
+
+  // calculate transcript
+  // Context
+  ttlen += encode_string(SPAKE_CONTEXT, ttbuf + ttlen);
+  // M
+  mbedtls_ecp_point M;
+  mbedtls_ecp_point_init(&M);
+  MBEDTLS_MPI_CHK(
+    mbedtls_ecp_point_read_binary(&grp, &M, bytes_M, sizeof(bytes_M)));
+  ttlen += encode_point(&grp, &M, ttbuf + ttlen);
+  // N
+  mbedtls_ecp_point N;
+  mbedtls_ecp_point_init(&N);
+  MBEDTLS_MPI_CHK(
+    mbedtls_ecp_point_read_binary(&grp, &N, bytes_N, sizeof(bytes_N)));
+  ttlen += encode_point(&grp, &N, ttbuf + ttlen);
+  // X
+  ttlen += encode_point(&grp, &X, ttbuf + ttlen);
+  // Y
+  ttlen += encode_point(&grp, Y, ttbuf + ttlen);
+  // Z
+  ttlen += encode_point(&grp, &Z, ttbuf + ttlen);
+  // V
+  ttlen += encode_point(&grp, &V, ttbuf + ttlen);
+  // w0
+  ttlen += encode_mpi(&spake_data->w0, ttbuf + ttlen);
+
+  // calculate hash
+  mbedtls_sha256(ttbuf, ttlen, spake_data->Ka_Ke, 0);
+
+cleanup:
+  mbedtls_ecp_point_free(&Z);
+  mbedtls_ecp_point_free(&V);
+  mbedtls_ecp_point_free(&X);
+  return ret;
+}
+
+int
+oc_spake_calc_transcript_initiator(mbedtls_mpi *w0, mbedtls_mpi *w1,
+                                   mbedtls_mpi *x, mbedtls_ecp_point *X,
+                                   uint8_t Y_enc[kPubKeySize],
+                                   uint8_t Ka_Ke[32])
+
+{
+  int ret;
+  mbedtls_ecp_point Y, Z, V;
+  uint8_t ttbuf[2048];
+  size_t ttlen = 0;
+  mbedtls_ecp_point_init(&Y);
+  mbedtls_ecp_point_init(&Z);
+  mbedtls_ecp_point_init(&V);
+
+  mbedtls_ecp_point_read_binary(&grp, &Y, Y_enc, kPubKeySize);
+
+  // Z = h*x*(Y - w0*N)
+  MBEDTLS_MPI_CHK(calculate_ZV_N(&Z, x, &Y, w0));
+
+  // V = h*w1*(Y - w0*N)
+  MBEDTLS_MPI_CHK(calculate_ZV_N(&V, w1, &Y, w0));
+
+  // calculate transcript
+  // Context
+  ttlen += encode_string(SPAKE_CONTEXT, ttbuf + ttlen);
+  // M
+  mbedtls_ecp_point M;
+  mbedtls_ecp_point_init(&M);
+  MBEDTLS_MPI_CHK(
+    mbedtls_ecp_point_read_binary(&grp, &M, bytes_M, sizeof(bytes_M)));
+  ttlen += encode_point(&grp, &M, ttbuf + ttlen);
+  // N
+  mbedtls_ecp_point N;
+  mbedtls_ecp_point_init(&N);
+  MBEDTLS_MPI_CHK(
+    mbedtls_ecp_point_read_binary(&grp, &N, bytes_N, sizeof(bytes_N)));
+  ttlen += encode_point(&grp, &N, ttbuf + ttlen);
+  // X
+  ttlen += encode_point(&grp, X, ttbuf + ttlen);
+  // Y
+  ttlen += encode_point(&grp, &Y, ttbuf + ttlen);
+  // Z
+  ttlen += encode_point(&grp, &Z, ttbuf + ttlen);
+  // V
+  ttlen += encode_point(&grp, &V, ttbuf + ttlen);
+  // w0
+  ttlen += encode_mpi(w0, ttbuf + ttlen);
+
+  // calculate hash
+  mbedtls_sha256(ttbuf, ttlen, Ka_Ke, 0);
+
+cleanup:
+  mbedtls_ecp_point_free(&Y);
+  mbedtls_ecp_point_free(&Z);
+  mbedtls_ecp_point_free(&V);
+  return ret;
+}
+
+int
+oc_spake_calc_cB(uint8_t *Ka_Ke, uint8_t cB[32], uint8_t bytes_X[kPubKeySize])
+{
+  // |KcA| + |KcB| = 16 bytes
+  uint8_t KcA_KcB[32];
+  mbedtls_hkdf(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), NULL, 0, Ka_Ke, 16,
+               "ConfirmationKeys", strlen("ConfirmationKeys"), KcA_KcB, 32);
+
+  // Calculate cB
+  mbedtls_md_hmac(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256),
+                  KcA_KcB + sizeof(KcA_KcB) / 2, sizeof(KcA_KcB) / 2, bytes_X,
+                  kPubKeySize, cB);
+}
+
+int
+oc_spake_calc_cA(uint8_t *Ka_Ke, uint8_t cA[32], uint8_t bytes_Y[kPubKeySize])
+{
+  // |KcA| + |KcB| = 16 bytes
+  uint8_t KcA_KcB[32];
+  mbedtls_hkdf(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), NULL, 0, Ka_Ke, 16,
+               "ConfirmationKeys", strlen("ConfirmationKeys"), KcA_KcB, 32);
+
+  // Calculate cA
+  mbedtls_md_hmac(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), KcA_KcB,
+                  sizeof(KcA_KcB) / 2, bytes_Y, kPubKeySize, cA);
+}
+
+int
+oc_spake_test_vector()
 {
   // Test Vector values from Spake2+ draft.
   // Using third set, as we only have easy access to the server (e.g. device)
@@ -362,12 +635,8 @@ validate_against_test_vector()
   size_t cmplen;
   int ret;
 
-  mbedtls_ecp_group grp;
-  mbedtls_ecp_group_init(&grp);
-  MBEDTLS_MPI_CHK(mbedtls_ecp_group_load(&grp, MBEDTLS_ECP_DP_SECP256R1));
-
   // initialize rng
-  init_context();
+  oc_spake_init();
 
   // =========================
   // Check that X = x*P + w0*M
@@ -387,7 +656,7 @@ validate_against_test_vector()
                                   mbedtls_ctr_drbg_random, &ctr_drbg_ctx));
 
   // X = pubA + w0*M
-  MBEDTLS_MPI_CHK(calculate_pA(&X, &pubA, &w0));
+  MBEDTLS_MPI_CHK(oc_spake_calc_pA(&X, &pubA, &w0));
   MBEDTLS_MPI_CHK(mbedtls_ecp_point_write_binary(
     &grp, &X, MBEDTLS_ECP_PF_UNCOMPRESSED, &cmplen, cmpbuf, sizeof(cmpbuf)));
 
@@ -410,7 +679,7 @@ validate_against_test_vector()
                                   mbedtls_ctr_drbg_random, &ctr_drbg_ctx));
 
   // Y = pubB + w0*N
-  MBEDTLS_MPI_CHK(calculate_pB(&Y, &pubB, &w0));
+  MBEDTLS_MPI_CHK(oc_spake_calc_pB(&Y, &pubB, &w0));
   MBEDTLS_MPI_CHK(mbedtls_ecp_point_write_binary(
     &grp, &Y, MBEDTLS_ECP_PF_UNCOMPRESSED, &cmplen, cmpbuf, sizeof(cmpbuf)));
   // check the value of Y is correct
@@ -435,7 +704,7 @@ validate_against_test_vector()
                                   mbedtls_ctr_drbg_random, &ctr_drbg_ctx));
 
   // Y = pubB + w0*N
-  MBEDTLS_MPI_CHK(calculate_pB(&bad_Y, &bad_pubB, &w0));
+  MBEDTLS_MPI_CHK(oc_spake_calc_pB(&bad_Y, &bad_pubB, &w0));
   MBEDTLS_MPI_CHK(
     mbedtls_ecp_point_write_binary(&grp, &bad_Y, MBEDTLS_ECP_PF_UNCOMPRESSED,
                                    &cmplen, cmpbuf, sizeof(cmpbuf)));

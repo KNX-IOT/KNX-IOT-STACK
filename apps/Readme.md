@@ -7,7 +7,7 @@ e.g. provide information in how to build an KNX-IOT device based on the stack.
 
 naming convention:
 
-- [filename]**_all* has code specific for linux and Windows OS
+- [filename]**_all** has code specific for linux and Windows OS
 - [filename]**_openthread** has code specific for usage on an openthread based platform
 - [filename]**_pi** has code specific for usage on an Raspberry Pi platform (e.g. using a pi-hat).
 

@@ -23,6 +23,8 @@
 #include <stdio.h>
 #include "oc_rep.h" // should not be needed
 
+#include "oc_spake2plus.h"
+
 #define TAGS_AS_STRINGS
 
 #define LSM_STORE "LSM_STORE"
@@ -42,6 +44,17 @@ oc_string_t g_idevid;
 oc_string_t g_ldevid;
 
 // ----------------------------------------------------------------------------
+
+enum SpakeKeys {
+  SPAKE_SALT = 5,
+  SPAKE_PA = 10,
+  SPAKE_PB = 11,
+  SPAKE_PBKDF2 = 12,
+  SPAKE_CB = 13,
+  SPAKE_CA = 14,
+  SPAKE_RND = 15,
+  SPAKE_IT = 16,
+};
 
 #define RESTART_DEVICE 2
 #define RESET_DEVICE 1
@@ -265,7 +278,7 @@ oc_core_get_lsm_as_string(oc_lsm_state_t lsm)
   if (lsm == LSM_STARTLOADING) {
     return "startLoading";
   }
-  if (lsm == LSM_lOADCOMPLETE) {
+  if (lsm == LSM_LOADCOMPLETE) {
     return "loadComplete";
   }
 
@@ -326,7 +339,7 @@ oc_core_lsm_parse_string(const char *lsm)
     return LSM_STARTLOADING;
   }
   if (len == 12 && strncmp(lsm, "loadComplete", 12) == 0) {
-    return LSM_lOADCOMPLETE;
+    return LSM_LOADCOMPLETE;
   }
 
   return LSM_UNLOADED;
@@ -338,7 +351,7 @@ oc_core_lsm_cmd_to_state(oc_lsm_state_t cmd)
   if (cmd == LSM_STARTLOADING) {
     return LSM_LOADING;
   }
-  if (cmd == LSM_lOADCOMPLETE) {
+  if (cmd == LSM_LOADCOMPLETE) {
     return LSM_LOADED;
   }
   if (cmd == LSM_UNLOAD) {
@@ -854,6 +867,53 @@ oc_create_knx_idevid_resource(int resource_idx, size_t device)
 
 // ----------------------------------------------------------------------------
 
+static spake_data_t spake_data;
+static int failed_handshake_count = 0;
+
+static bool is_blocking = false;
+
+static oc_event_callback_retval_t
+decrement_counter(void *data)
+{
+  if (failed_handshake_count > 0) {
+    --failed_handshake_count;
+  }
+
+  if (is_blocking && failed_handshake_count == 0) {
+    is_blocking = false;
+  }
+  return OC_EVENT_CONTINUE;
+}
+
+static void
+increment_counter()
+{
+  ++failed_handshake_count;
+}
+
+static bool
+is_handshake_blocked()
+{
+  if (is_blocking) {
+    return true;
+  }
+
+  // after 10 failed attempts per minute, block the client for the
+  // next minute
+  if (failed_handshake_count > 10) {
+    is_blocking = true;
+    return true;
+  }
+
+  return false;
+}
+
+static int
+get_seconds_until_unblocked()
+{
+  return failed_handshake_count * 10;
+}
+
 static void
 oc_core_knx_spake_post_handler(oc_request_t *request,
                                oc_interface_mask_t iface_mask, void *data)
@@ -874,6 +934,14 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     return;
   }
 
+  if (is_handshake_blocked()) {
+    request->response->response_buffer->code =
+      oc_status_code(OC_STATUS_SERVICE_UNAVAILABLE);
+
+    request->response->response_buffer->max_age = get_seconds_until_unblocked();
+    return;
+  }
+
   oc_rep_t *rep = request->request_payload;
   int valid_request = 0;
   // check input
@@ -881,28 +949,16 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
   while (rep != NULL) {
     switch (rep->type) {
     case OC_REP_BYTE_STRING: {
-      // ca == 14
-      if (rep->iname == 14) {
-        valid_request = 14;
+      if (rep->iname == SPAKE_PA) {
+        valid_request = SPAKE_PA;
       }
-      // pa == 10
-      if (rep->iname == 10) {
-        valid_request = 10;
+      if (rep->iname == SPAKE_CA) {
+        valid_request = SPAKE_CA;
       }
-      // rnd == 15
-      if (rep->iname == 15) {
-        valid_request = 15;
+      if (rep->iname == SPAKE_RND) {
+        valid_request = SPAKE_RND;
       }
     } break;
-    case OC_REP_OBJECT: {
-      // pbkdf2 == 12
-      // not sure if we need this
-      if (rep->iname == 12) {
-        valid_request = 12;
-      }
-    } break;
-    case OC_REP_NIL:
-      break;
     default:
       break;
     }
@@ -917,63 +973,22 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
   while (rep != NULL) {
     switch (rep->type) {
     case OC_REP_BYTE_STRING: {
-      // ca == 14
-      if (rep->iname == 14) {
+      if (rep->iname == SPAKE_CA) {
         oc_free_string(&g_pase.ca);
         oc_new_string(&g_pase.ca, oc_string(rep->value.string),
-                      oc_string_len(rep->value.string));
+                      oc_byte_string_len(rep->value.string));
       }
-      // pa == 10
-      if (rep->iname == 10) {
+      if (rep->iname == SPAKE_PA) {
         oc_free_string(&g_pase.pa);
         oc_new_string(&g_pase.pa, oc_string(rep->value.string),
-                      oc_string_len(rep->value.string));
+                      oc_byte_string_len(rep->value.string));
       }
-      // rnd == 15
-      if (rep->iname == 15) {
+      if (rep->iname == SPAKE_RND) {
         oc_free_string(&g_pase.rnd);
         oc_new_string(&g_pase.rnd, oc_string(rep->value.string),
-                      oc_string_len(rep->value.string));
-        // TODO: compute pB
-        oc_free_string(&g_pase.pb);
-        oc_new_string(&g_pase.pb, "pb-computed", strlen("pb-computed"));
-
-        // TODO: compute cB
-        oc_free_string(&g_pase.cb);
-        oc_new_string(&g_pase.cb, "cb-computed", strlen("cb-computed"));
+                      oc_byte_string_len(rep->value.string));
       }
     } break;
-    case OC_REP_OBJECT: {
-      // pbkdf2 == 12
-      if (rep->iname == 12) {
-        oc_rep_t *object = rep->value.object;
-        while (object != NULL) {
-          switch (object->type) {
-          case OC_REP_BYTE_STRING: {
-            // salt
-            if (object->iname == 5) {
-              oc_free_string(&g_pase.salt);
-              oc_new_string(&g_pase.salt, oc_string(object->value.string),
-                            oc_string_len(object->value.string));
-            }
-          } break;
-          case OC_REP_INT: {
-            // it
-            if (object->iname == 16) {
-              g_pase.it = object->value.integer;
-            }
-          } break;
-          case OC_REP_NIL:
-            break;
-          default:
-            break;
-          }
-          object = object->next;
-        }
-      }
-    } break;
-    case OC_REP_NIL:
-      break;
     default:
       break;
     }
@@ -981,47 +996,158 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
   }
 
   PRINT("oc_core_knx_spake_post_handler valid_request: %d\n", valid_request);
-  // on ca
-  if (valid_request == 14) {
-    // return changed, no payload
-    oc_send_cbor_response(request, OC_STATUS_CHANGED);
-    return;
-  }
-  // on pa
-  if (valid_request == 10) {
-    // return changed, frame pb (11) & cb (13)
-    // TODO: probably we need to calculate them...
 
-    oc_rep_begin_root_object();
-    // pb (11)
-    oc_rep_i_set_text_string(root, 11, oc_string(g_pase.pb));
-    // cb (13)
-    oc_rep_i_set_text_string(root, 13, oc_string(g_pase.cb));
-    oc_rep_end_root_object();
-    oc_send_cbor_response(request, OC_STATUS_CHANGED);
-    return;
-  }
-  // on rnd
-  if (valid_request == 15) {
-    // return changed, frame rnd (15) & pbkdf2 (12 containing (16, 5))
-    // TODO: probably we need to calculate them...
+  if (valid_request == SPAKE_RND) {
+    // generate random numbers for rnd, salt & it (# of iterations)
+    oc_spake_parameter_exchange(&g_pase.rnd, &g_pase.salt, &g_pase.it);
 
     oc_rep_begin_root_object();
     // rnd (15)
-    oc_rep_i_set_text_string(root, 15, oc_string(g_pase.rnd));
+    oc_rep_i_set_byte_string(root, SPAKE_RND, oc_cast(g_pase.rnd, uint8_t),
+                             oc_byte_string_len(g_pase.rnd));
     // pbkdf2
-    oc_rep_i_set_key(&root_map, 12);
+    oc_rep_i_set_key(&root_map, SPAKE_PBKDF2);
     oc_rep_begin_object(&root_map, pbkdf2);
     // it 16
-    oc_rep_i_set_int(pbkdf2, 16, g_pase.it);
+    oc_rep_i_set_int(pbkdf2, SPAKE_IT, g_pase.it);
     // salt 5
-    oc_rep_i_set_text_string(pbkdf2, 5, oc_string(g_pase.salt));
+    oc_rep_i_set_byte_string(pbkdf2, SPAKE_SALT, oc_cast(g_pase.salt, uint8_t),
+                             oc_byte_string_len(g_pase.salt));
     oc_rep_end_object(&root_map, pbkdf2);
     oc_rep_end_root_object();
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
     return;
   }
+  if (valid_request == SPAKE_PA) {
+    // return changed, frame pb (11) & cb (13)
 
+    const char *password = oc_spake_get_password();
+    int ret;
+    mbedtls_mpi_free(&spake_data.w0);
+    mbedtls_ecp_point_free(&spake_data.L);
+    mbedtls_mpi_free(&spake_data.y);
+    mbedtls_ecp_point_free(&spake_data.pub_y);
+
+    mbedtls_mpi_init(&spake_data.w0);
+    mbedtls_ecp_point_init(&spake_data.L);
+    mbedtls_mpi_init(&spake_data.y);
+    mbedtls_ecp_point_init(&spake_data.pub_y);
+
+    ret = oc_spake_calc_w0_L(password, oc_byte_string_len(g_pase.salt),
+                             oc_cast(g_pase.salt, uint8_t), g_pase.it,
+                             &spake_data.w0, &spake_data.L);
+    if (ret != 0) {
+      OC_ERR("oc_spake_calc_w0_L failed with code %d", ret);
+      goto error;
+    }
+
+    ret = oc_spake_gen_keypair(&spake_data.y, &spake_data.pub_y);
+    if (ret != 0) {
+      OC_ERR("oc_spake_gen_keypair failed with code %d", ret);
+      goto error;
+    }
+
+    // next step: calculate pB, encode it into the struct
+    mbedtls_ecp_point pB;
+    mbedtls_ecp_point_init(&pB);
+    if (oc_spake_calc_pB(&pB, &spake_data.pub_y, &spake_data.w0)) {
+      mbedtls_ecp_point_free(&pB);
+      goto error;
+    }
+
+    oc_free_string(&g_pase.pb);
+    oc_alloc_string(&g_pase.pb, kPubKeySize);
+    oc_free_string(&g_pase.cb);
+    oc_alloc_string(&g_pase.cb, kPubKeySize);
+
+    if (oc_spake_encode_pubkey(&pB, oc_cast(g_pase.pb, uint8_t))) {
+      mbedtls_ecp_point_free(&pB);
+      goto error;
+    }
+
+    if (oc_spake_calc_transcript_responder(&spake_data,
+                                           oc_cast(g_pase.pa, uint8_t), &pB)) {
+      mbedtls_ecp_point_free(&pB);
+      goto error;
+    }
+
+    oc_spake_calc_cB(spake_data.Ka_Ke, oc_cast(g_pase.cb, uint8_t),
+                     oc_cast(g_pase.pa, uint8_t));
+    mbedtls_ecp_point_free(&pB);
+
+    oc_rep_begin_root_object();
+    // pb (11)
+    oc_rep_i_set_byte_string(root, SPAKE_PB, oc_string(g_pase.pb),
+                             oc_byte_string_len(g_pase.pb));
+    // cb (13)
+    oc_rep_i_set_byte_string(root, SPAKE_CB, oc_string(g_pase.cb),
+                             oc_byte_string_len(g_pase.cb));
+    oc_rep_end_root_object();
+    oc_send_cbor_response(request, OC_STATUS_CHANGED);
+    return;
+  }
+  if (valid_request == SPAKE_CA) {
+    // calculate expected cA
+    uint8_t expected_ca[32];
+    if (g_pase.pb.ptr == NULL)
+      goto error;
+    oc_spake_calc_cA(spake_data.Ka_Ke, expected_ca,
+                     oc_cast(g_pase.pb, uint8_t));
+
+    if (memcmp(expected_ca, oc_cast(g_pase.ca, uint8_t), 32) != 0) {
+      OC_ERR("oc_spake_calc_cA failed");
+      goto error;
+    }
+
+    // if you are here, key confirmation is ok - create auth token & start
+    // communicating securely
+
+    // TODO auth token
+
+    oc_send_cbor_response(request, OC_STATUS_CHANGED);
+    // handshake completed successfully - clear state
+    memset(spake_data.Ka_Ke, 0, sizeof(spake_data.Ka_Ke));
+    mbedtls_ecp_point_free(&spake_data.L);
+    mbedtls_ecp_point_free(&spake_data.pub_y);
+    mbedtls_mpi_free(&spake_data.w0);
+    mbedtls_mpi_free(&spake_data.y);
+
+    mbedtls_ecp_point_init(&spake_data.L);
+    mbedtls_ecp_point_init(&spake_data.pub_y);
+    mbedtls_mpi_init(&spake_data.w0);
+    mbedtls_mpi_init(&spake_data.y);
+
+    oc_free_string(&g_pase.pa);
+    oc_free_string(&g_pase.pb);
+    oc_free_string(&g_pase.ca);
+    oc_free_string(&g_pase.cb);
+    oc_free_string(&g_pase.rnd);
+    oc_free_string(&g_pase.salt);
+    g_pase.it = 100000;
+    return;
+  }
+error:
+  // be paranoid: wipe all global data after an error
+  memset(spake_data.Ka_Ke, 0, sizeof(spake_data.Ka_Ke));
+  mbedtls_ecp_point_free(&spake_data.L);
+  mbedtls_ecp_point_free(&spake_data.pub_y);
+  mbedtls_mpi_free(&spake_data.w0);
+  mbedtls_mpi_free(&spake_data.y);
+
+  mbedtls_ecp_point_init(&spake_data.L);
+  mbedtls_ecp_point_init(&spake_data.pub_y);
+  mbedtls_mpi_init(&spake_data.w0);
+  mbedtls_mpi_init(&spake_data.y);
+
+  oc_free_string(&g_pase.pa);
+  oc_free_string(&g_pase.pb);
+  oc_free_string(&g_pase.ca);
+  oc_free_string(&g_pase.cb);
+  oc_free_string(&g_pase.rnd);
+  oc_free_string(&g_pase.salt);
+  g_pase.it = 100000;
+
+  increment_counter();
   oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
 }
 
@@ -1032,6 +1158,16 @@ oc_create_knx_spake_resource(int resource_idx, size_t device)
   oc_core_lf_populate_resource(resource_idx, device, "/.well-known/knx/spake",
                                OC_IF_NONE, APPLICATION_CBOR, OC_DISCOVERABLE, 0,
                                0, oc_core_knx_spake_post_handler, 0, 0, "");
+
+  // can fail if initialization of the RNG does not work
+  assert(oc_spake_init() == 0);
+  mbedtls_mpi_init(&spake_data.w0);
+  mbedtls_ecp_point_init(&spake_data.L);
+  mbedtls_mpi_init(&spake_data.y);
+  mbedtls_ecp_point_init(&spake_data.pub_y);
+
+  // start SPAKE brute force protection timer
+  oc_set_delayed_callback(NULL, decrement_counter, 10);
 }
 
 // ----------------------------------------------------------------------------

@@ -993,6 +993,7 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
   response_buffer.code = 0;
   response_buffer.response_length = 0;
   response_buffer.content_format = 0;
+  response_buffer.max_age = 0;
 
   response_obj.separate_response = NULL;
   response_obj.response_buffer = &response_buffer;
@@ -1415,6 +1416,10 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
         coap_set_header_content_format(response,
                                        response_buffer.content_format);
       }
+    }
+
+    if (response_buffer.max_age > 0) {
+      coap_set_header_max_age(response, response_buffer.max_age);
     }
 
     if (response_buffer.code ==
