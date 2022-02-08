@@ -73,7 +73,9 @@
 #include "oc_api.h"
 #include "oc_core_res.h"
 #include "api/oc_knx_fp.h"
+#ifdef OC_SPAKE
 #include "oc_spake2plus.h"
+#endif
 #include "port/oc_clock.h"
 #include <signal.h>
 
