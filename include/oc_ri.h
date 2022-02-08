@@ -280,20 +280,6 @@ typedef enum {
   /* List of resources on a logical device: start */
   /* List of Device Configuration Resources (DCRs): start */
   // WELLKNOWNCORE,
-  OCF_RES,
-#ifdef OC_SECURITY
-  OCF_SEC_DOXM,
-  OCF_SEC_PSTAT,
-  OCF_SEC_ACL,
-  OCF_SEC_AEL,
-  OCF_SEC_CRED,
-  OCF_SEC_SDI,
-  OCF_SEC_SP,
-#ifdef OC_PKI
-  OCF_SEC_CSR,
-  OCF_SEC_ROLES,
-#endif /* OC_PKI */
-#endif /* OC_SECURITY */
   WELLKNOWNCORE
   /* List of Device Configuration Resources (DCRs): end */
   /* List of resources on a logical device: end */
