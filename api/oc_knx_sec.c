@@ -1061,6 +1061,11 @@ oc_core_set_at_table(int index, oc_auth_at_t entry)
     oc_at_dump_entry(index);
   }
 
+  // add the oscore context...
+
+  oc_init_oscore(0);
+
+
   return 0;
 }
 
