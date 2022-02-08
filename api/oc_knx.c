@@ -23,7 +23,7 @@
 #include <stdio.h>
 #include "oc_rep.h" // should not be needed
 
-#include "oc_spake2plus.h"
+#include "security/oc_spake2plus.h"
 
 #define TAGS_AS_STRINGS
 
