@@ -173,6 +173,11 @@ finish_spake_handshake(oc_client_response_t *data)
     PRINT("%02x", Ka_Ke[i + 16]);
   }
   PRINT("\n");
+
+  // TODO initialize OSCORE and create auth token using this key
+  // shared_key is 16-byte array - NOT NULL TERMINATED
+  uint8_t *shared_key = Ka_Ke + 16;
+  size_t shared_key_len = 16;
 }
 
 void

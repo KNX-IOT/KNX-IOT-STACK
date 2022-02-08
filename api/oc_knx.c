@@ -1108,10 +1108,10 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
       goto error;
     }
 
-    // if you are here, key confirmation is ok - create auth token & start
-    // communicating securely
-
-    // TODO auth token
+    // TODO initialize OSCORE and create auth token using this key
+    // shared_key is 16-byte array - NOT NULL TERMINATED
+    uint8_t *shared_key = spake_data.Ka_Ke + 16;
+    size_t shared_key_len = 16;
 
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
     // handshake completed successfully - clear state
