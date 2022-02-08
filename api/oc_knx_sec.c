@@ -1011,12 +1011,11 @@ oc_at_load_entry(int entry)
   free(buf);
 }
 
-
 int
 oc_core_set_at_table(int index, oc_auth_at_t entry)
 {
   if (index < G_AT_MAX_ENTRIES) {
-    
+
     oc_free_string(&g_at_entries[index].id);
     oc_new_string(&g_at_entries[index].id, oc_string(entry.id),
                   oc_string_len(entry.id));
@@ -1053,14 +1052,11 @@ oc_core_set_at_table(int index, oc_auth_at_t entry)
     g_at_entries[index].ga_len = array_size;
     g_at_entries[index].ga = new_array;
 
-
     oc_at_dump_entry(index);
   }
 
   return 0;
-
 }
-
 
 void
 oc_load_at_table()

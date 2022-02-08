@@ -873,7 +873,6 @@ oc_create_knx_idevid_resource(int resource_idx, size_t device)
 static spake_data_t spake_data;
 static int failed_handshake_count = 0;
 
-
 static bool is_blocking = false;
 
 static oc_event_callback_retval_t
@@ -1172,7 +1171,7 @@ oc_create_knx_spake_resource(int resource_idx, size_t device)
                                OC_IF_NONE, APPLICATION_CBOR, OC_DISCOVERABLE, 0,
                                0, oc_core_knx_spake_post_handler, 0, 0, "");
 
-#ifdef OC_SPAKE 
+#ifdef OC_SPAKE
   // can fail if initialization of the RNG does not work
   assert(oc_spake_init() == 0);
   mbedtls_mpi_init(&spake_data.w0);

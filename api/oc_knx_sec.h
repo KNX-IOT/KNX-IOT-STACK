@@ -103,8 +103,6 @@ typedef struct oc_auth_at_t
   int ga_len; //< length of the array of ga identifiers
 } oc_auth_at_t;
 
-
-
 int oc_core_set_at_table(int index, oc_auth_at_t entry);
 
 /**
