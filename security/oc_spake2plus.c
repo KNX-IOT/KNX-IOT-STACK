@@ -215,7 +215,8 @@ oc_spake_calc_w0_w1(const char *pw, size_t len_salt, const uint8_t *salt,
 
   // Hmm, SPAKE2+ mandates this be 40 bytes or longer,
   // but KNX-IoT says it's 32 bytes maybe?
-  const size_t output_len = 40;
+//  const size_t output_len = 40;
+#define output_len 40
   uint8_t output[output_len];
 
   mbedtls_mpi w0s, w1s;

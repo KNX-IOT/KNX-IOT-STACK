@@ -73,7 +73,9 @@
 #include "oc_api.h"
 #include "oc_core_res.h"
 #include "api/oc_knx_fp.h"
-#include "oc_spake2plus.h"
+#ifdef OC_SPAKE
+#include "security/oc_spake2plus.h"
+#endif
 #include "port/oc_clock.h"
 #include <signal.h>
 
@@ -179,7 +181,9 @@ app_init(void)
 
   oc_set_s_mode_response_cb(oc_add_s_mode_response_cb);
 
+#ifdef OC_SPAKE
   oc_spake_set_password("LETTUCE");
+#endif
 
   return ret;
 }

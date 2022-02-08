@@ -23,7 +23,9 @@
 #include <stdio.h>
 #include "oc_rep.h" // should not be needed
 
-#include "oc_spake2plus.h"
+#ifdef OC_SPAKE
+#include "security/oc_spake2plus.h"
+#endif
 
 #define TAGS_AS_STRINGS
 
@@ -867,6 +869,7 @@ oc_create_knx_idevid_resource(int resource_idx, size_t device)
 
 // ----------------------------------------------------------------------------
 
+#ifdef OC_SPAKE
 static spake_data_t spake_data;
 static int failed_handshake_count = 0;
 
@@ -914,6 +917,8 @@ get_seconds_until_unblocked()
   return failed_handshake_count * 10;
 }
 
+#endif /* OC_SPAKE */
+
 static void
 oc_core_knx_spake_post_handler(oc_request_t *request,
                                oc_interface_mask_t iface_mask, void *data)
@@ -934,6 +939,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     return;
   }
 
+#ifdef OC_SPAKE
   if (is_handshake_blocked()) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_SERVICE_UNAVAILABLE);
@@ -941,6 +947,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     request->response->response_buffer->max_age = get_seconds_until_unblocked();
     return;
   }
+#endif /* OC_SPAKE */
 
   oc_rep_t *rep = request->request_payload;
   int valid_request = 0;
@@ -998,9 +1005,10 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
   PRINT("oc_core_knx_spake_post_handler valid_request: %d\n", valid_request);
 
   if (valid_request == SPAKE_RND) {
+#ifdef OC_SPAKE
     // generate random numbers for rnd, salt & it (# of iterations)
     oc_spake_parameter_exchange(&g_pase.rnd, &g_pase.salt, &g_pase.it);
-
+#endif /* OC_SPAKE */
     oc_rep_begin_root_object();
     // rnd (15)
     oc_rep_i_set_byte_string(root, SPAKE_RND, oc_cast(g_pase.rnd, uint8_t),
@@ -1018,6 +1026,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
     return;
   }
+#ifdef OC_SPAKE
   if (valid_request == SPAKE_PA) {
     // return changed, frame pb (11) & cb (13)
 
@@ -1138,6 +1147,7 @@ error:
   mbedtls_ecp_point_init(&spake_data.pub_y);
   mbedtls_mpi_init(&spake_data.w0);
   mbedtls_mpi_init(&spake_data.y);
+#endif /* OC_SPAKE */
 
   oc_free_string(&g_pase.pa);
   oc_free_string(&g_pase.pb);
@@ -1147,7 +1157,9 @@ error:
   oc_free_string(&g_pase.salt);
   g_pase.it = 100000;
 
+#ifdef OC_SPAKE
   increment_counter();
+#endif /* OC_SPAKE */
   oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
 }
 
@@ -1159,15 +1171,16 @@ oc_create_knx_spake_resource(int resource_idx, size_t device)
                                OC_IF_NONE, APPLICATION_CBOR, OC_DISCOVERABLE, 0,
                                0, oc_core_knx_spake_post_handler, 0, 0, "");
 
+#ifdef OC_SPAKE
   // can fail if initialization of the RNG does not work
   assert(oc_spake_init() == 0);
   mbedtls_mpi_init(&spake_data.w0);
   mbedtls_ecp_point_init(&spake_data.L);
   mbedtls_mpi_init(&spake_data.y);
   mbedtls_ecp_point_init(&spake_data.pub_y);
-
   // start SPAKE brute force protection timer
   oc_set_delayed_callback(NULL, decrement_counter, 10);
+#endif /* OC_SPAKE */
 }
 
 // ----------------------------------------------------------------------------
