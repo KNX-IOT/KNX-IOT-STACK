@@ -1136,10 +1136,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     g_pase.it = 100000;
     return;
   }
-#endif /* OC_SPAKE */
 error:
-
-#ifdef OC_SPAKE
   // be paranoid: wipe all global data after an error
   memset(spake_data.Ka_Ke, 0, sizeof(spake_data.Ka_Ke));
   mbedtls_ecp_point_free(&spake_data.L);
