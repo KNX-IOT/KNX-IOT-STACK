@@ -1011,6 +1011,57 @@ oc_at_load_entry(int entry)
   free(buf);
 }
 
+
+int
+oc_core_set_at_table(int index, oc_auth_at_t entry)
+{
+  if (index < G_AT_MAX_ENTRIES) {
+    
+    oc_free_string(&g_at_entries[index].id);
+    oc_new_string(&g_at_entries[index].id, oc_string(entry.id),
+                  oc_string_len(entry.id));
+    g_at_entries[index].interface = entry.interface;
+    g_at_entries[index].profile = entry.profile;
+    oc_free_string(&g_at_entries[index].sub);
+    oc_new_string(&g_at_entries[index].sub, oc_string(entry.sub),
+                  oc_string_len(entry.sub));
+    oc_free_string(&g_at_entries[index].kid);
+    oc_new_string(&g_at_entries[index].kid, oc_string(entry.kid),
+                  oc_string_len(entry.kid));
+    oc_free_string(&g_at_entries[index].osc_id);
+    oc_new_string(&g_at_entries[index].osc_id, oc_string(entry.osc_id),
+                  oc_string_len(entry.osc_id));
+    oc_free_string(&g_at_entries[index].osc_ms);
+    oc_new_string(&g_at_entries[index].osc_ms, oc_string(entry.osc_ms),
+                  oc_string_len(entry.osc_ms));
+    oc_free_string(&g_at_entries[index].osc_id);
+    oc_new_string(&g_at_entries[index].osc_alg, oc_string(entry.osc_alg),
+                  oc_string_len(entry.osc_alg));
+
+    g_at_entries[index].ga_len = entry.ga_len;
+
+    int array_size = (int)entry.ga_len;
+    int *new_array = (int *)malloc(array_size * sizeof(int));
+
+    for (int i = 0; i < array_size; i++) {
+      new_array[i] = entry.ga[i];
+    }
+    if (g_at_entries[index].ga != 0) {
+      free(g_at_entries[index].ga);
+    }
+    PRINT("  ga size %d\n", array_size);
+    g_at_entries[index].ga_len = array_size;
+    g_at_entries[index].ga = new_array;
+
+
+    oc_at_dump_entry(index);
+  }
+
+  return 0;
+
+}
+
+
 void
 oc_load_at_table()
 {
