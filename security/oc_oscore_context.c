@@ -170,9 +170,12 @@ oc_oscore_add_context(size_t device, const char *senderid,
 
   PRINT("  device  %d\n", device);
   PRINT("  ssn     %d\n", ssn);
-  PRINT("  ms      %s\n", mastersecret);
-  OC_LOGbytes_OSCORE(mastersecret, strlen(mastersecret));
-
+  PRINT("  ms      ");
+  int length = strlen(mastersecret);
+  for (int i = 0; i < length; i++) {
+    PRINT("%02x", (unsigned char)mastersecret[i]);
+  }
+  PRINT("\n");
   PRINT("  desc    %s\n", desc);
 
   /* To prevent SSN reuse, bump to higher value that could've been previously

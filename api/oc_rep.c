@@ -1350,6 +1350,7 @@ py_oc_rep_to_json(oc_rep_t *rep, char *buf, size_t buf_size, bool pretty_print)
   }
   PRINT(" %d \n\n", tab);
 
+  // TODO fix this...
   // reserve space                            {'0':
   num_char_printed = snprintf(buf, buf_size, "     ");
   OC_JSON_UPDATE_BUFFER_AND_TOTAL;
