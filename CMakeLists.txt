@@ -171,7 +171,7 @@ if(OC_SECURITY_ENABLED)
 endif()
 
 if(OC_OSCORE_ENABLED)
-   target_compile_definitions(mbedcrypto PUBLIC OC_OSCORE)
+   target_compile_definitions(mbedcrypto PUBLIC OC_OSCORE)
    target_compile_definitions(kis-common INTERFACE OC_OSCORE)
    target_compile_definitions(kis-common INTERFACE OC_SPAKE)
 endif()
