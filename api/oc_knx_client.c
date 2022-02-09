@@ -42,13 +42,12 @@ typedef struct broker_s_mode_userdata_t
 oc_s_mode_response_cb_t m_s_mode_cb = NULL;
 oc_spake_cb_t m_spake_cb = NULL;
 
-
 // SPAKE2
 #ifdef OC_SPAKE
 static mbedtls_mpi w0, w1, privA;
 static mbedtls_ecp_point pA, pubA;
 static uint8_t Ka_Ke[32];
-#endif 
+#endif
 
 // ----------------------------------------------------------------------------
 
@@ -58,8 +57,6 @@ static void oc_send_s_mode(oc_endpoint_t *endpoint, char *path, int sia_value,
 
 static int oc_s_mode_get_resource_value(char *resource_url, char *rp,
                                         uint8_t *buf, int buf_size);
-
-
 
 // ----------------------------------------------------------------------------
 
@@ -71,20 +68,20 @@ finish_spake_handshake(oc_client_response_t *data)
     OC_DBG_SPAKE("Error in Credential Verification!!!\n");
     return;
   }
-  //OC_DBG_SPAKE("SPAKE2+ Handshake Finished!\n");
-  //OC_DBG_SPAKE("  code: %d\n", data->code);
-  //OC_DBG_SPAKE("Shared Secret: ");
-  //for (int i = 0; i < 16; i++) {
+  // OC_DBG_SPAKE("SPAKE2+ Handshake Finished!\n");
+  // OC_DBG_SPAKE("  code: %d\n", data->code);
+  // OC_DBG_SPAKE("Shared Secret: ");
+  // for (int i = 0; i < 16; i++) {
   //  PRINT("%02x", Ka_Ke[i + 16]);
   //}
-  //OC_DBG_SPAKE("\n");
+  // OC_DBG_SPAKE("\n");
 
   // shared_key is 16-byte array - NOT NULL TERMINATED
   uint8_t *shared_key = Ka_Ke + 16;
   size_t shared_key_len = 16;
 
   if (m_spake_cb) {
-    //PRINT("CALLING CALLBACK------->\n");
+    // PRINT("CALLING CALLBACK------->\n");
     m_spake_cb(0, shared_key, shared_key_len);
   }
 }
@@ -226,23 +223,23 @@ oc_initiate_spake(oc_endpoint_t *endpoint)
   (void)endpoint;
 #else /* OC_SPAKE*/
   // do parameter exchange
-oc_init_post("/.well-known/knx/spake", endpoint, NULL, &do_credential_exchange,
-             HIGH_QOS, NULL);
+  oc_init_post("/.well-known/knx/spake", endpoint, NULL,
+               &do_credential_exchange, HIGH_QOS, NULL);
 
-// Payload consists of just a random number? should be pretty easy...
-uint8_t rnd[32]; // not actually used by the server, so just send some gibberish
-oc_rep_begin_root_object();
-oc_rep_i_set_byte_string(root, 15, rnd, 32);
-oc_rep_end_root_object();
+  // Payload consists of just a random number? should be pretty easy...
+  uint8_t
+    rnd[32]; // not actually used by the server, so just send some gibberish
+  oc_rep_begin_root_object();
+  oc_rep_i_set_byte_string(root, 15, rnd, 32);
+  oc_rep_end_root_object();
 
- if (oc_do_post_ex(APPLICATION_CBOR, APPLICATION_CBOR)) {
-  return_value = 0;
- }
+  if (oc_do_post_ex(APPLICATION_CBOR, APPLICATION_CBOR)) {
+    return_value = 0;
+  }
 
 #endif /* OC_SPAKE */
-return return_value;
+  return return_value;
 }
-
 
 // ----------------------------------------------------------------------------
 

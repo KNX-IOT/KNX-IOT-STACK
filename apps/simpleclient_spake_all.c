@@ -155,7 +155,6 @@ get_dev_pm(oc_client_response_t *data)
   }
 }
 
-
 static oc_discovery_flags_t
 discovery(const char *payload, int len, oc_endpoint_t *endpoint,
           void *user_data)
@@ -322,7 +321,6 @@ my_spake_cb(int error, uint8_t *secret, int secret_size)
   PRINT("\n");
 }
 
-
 void
 print_usage()
 {
@@ -448,7 +446,6 @@ main(int argc, char *argv[])
 #endif /* OC_SECURITY */
 
   oc_set_spake_response_cb(my_spake_cb);
-
 
   PRINT("SimpleClient_spake_all running, waiting on incoming "
         "connections.\n");
