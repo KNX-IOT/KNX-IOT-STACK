@@ -934,6 +934,20 @@ class KNXIOTStack():
         client_event.wait(self.timout)
         return self.find_response(r_id)
 
+    def issue_init_spake(self, sn) :
+        #r_id = self.get_r_id()
+        #client_event.clear()
+        print(" py_initate_spake", sn, uri, query, r_id)
+        try:
+            self.lib.py_initate_spake.argtypes = [String]
+            self.lib.py_initate_spake(sn)
+        except:
+            pass
+        #print(" issue_cbor_delete - done")
+        #client_event.wait(self.timout)
+        #return self.find_response(r_id)
+
+
     def issue_s_mode(self, scope, sia, ga, st, value_type, value) :
         print(" issue_s_mode: scope:{} sia:{} ga:{} value_type:{} value:{}".
                format(scope, sia, ga, value_type, value))
