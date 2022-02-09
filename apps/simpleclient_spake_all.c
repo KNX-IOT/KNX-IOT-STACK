@@ -80,7 +80,7 @@
 
 #include "oc_api.h"
 #include "oc_knx.h"
-#include "oc_spake2plus.h"
+#include "api/oc_knx_client.h"
 #include "port/oc_clock.h"
 #include <signal.h>
 #include <stdio.h>
@@ -108,10 +108,6 @@ STATIC CRITICAL_SECTION cs;   /**< event loop variable */
 #endif
 
 volatile int quit = 0; /**< stop variable, used by handle_signal */
-
-mbedtls_mpi w0, w1, privA;
-mbedtls_ecp_point pA, pubA;
-uint8_t Ka_Ke[32];
 
 static int
 app_init(void)
@@ -159,152 +155,6 @@ get_dev_pm(oc_client_response_t *data)
   }
 }
 
-void
-finish_spake_handshake(oc_client_response_t *data)
-{
-  if (data->code != OC_STATUS_CHANGED) {
-    PRINT("Error in Credential Verification!!!\n");
-    return;
-  }
-  PRINT("SPAKE2+ Handshake Finished!\n");
-  PRINT("  code: %d\n", data->code);
-  PRINT("Shared Secret: ");
-  for (int i = 0; i < 16; i++) {
-    PRINT("%02x", Ka_Ke[i + 16]);
-  }
-  PRINT("\n");
-
-  // TODO initialize OSCORE and create auth token using this key
-  // shared_key is 16-byte array - NOT NULL TERMINATED
-  uint8_t *shared_key = Ka_Ke + 16;
-  size_t shared_key_len = 16;
-}
-
-void
-do_credential_verification(oc_client_response_t *data)
-{
-  PRINT("\nReceived Credential Response!\n");
-
-  PRINT("  code: %d\n", data->code);
-  if (data->code != OC_STATUS_CHANGED) {
-    PRINT("Error in Credential Response!!!\n");
-    return;
-  }
-
-  char buffer[200];
-  memset(buffer, 200, 1);
-  oc_rep_to_json(data->payload, (char *)&buffer, 200, true);
-  PRINT("%s", buffer);
-
-  uint8_t *pB_bytes, *cB_bytes;
-  oc_rep_t *rep = data->payload;
-  while (rep != NULL) {
-    if (rep->type == OC_REP_BYTE_STRING) {
-      // pb
-      if (rep->iname == 11) {
-        pB_bytes = rep->value.string.ptr;
-      }
-      // cb
-      if (rep->iname == 13) {
-        cB_bytes = rep->value.string.ptr;
-      }
-    }
-
-    rep = rep->next;
-  }
-
-  uint8_t cA[32];
-  uint8_t local_cB[32];
-  uint8_t pA_bytes[63];
-  size_t len_pA;
-  mbedtls_ecp_group grp;
-
-  mbedtls_ecp_group_init(&grp);
-  mbedtls_ecp_group_load(&grp, MBEDTLS_ECP_DP_SECP256R1);
-
-  oc_spake_calc_transcript_initiator(&w0, &w1, &privA, &pA, pB_bytes, Ka_Ke);
-  oc_spake_calc_cA(Ka_Ke, cA, pB_bytes);
-
-  mbedtls_ecp_point_write_binary(&grp, &pA, MBEDTLS_ECP_PF_UNCOMPRESSED,
-                                 &len_pA, pA_bytes, 63);
-  oc_spake_calc_cB(Ka_Ke, local_cB, pA_bytes);
-
-  oc_init_post("/.well-known/knx/spake", data->endpoint, NULL,
-               &finish_spake_handshake, HIGH_QOS, NULL);
-  oc_rep_begin_root_object();
-  oc_rep_i_set_byte_string(root, 14, cA, 32);
-  oc_rep_end_root_object();
-  oc_do_post_ex(APPLICATION_CBOR, APPLICATION_CBOR);
-}
-
-void
-do_credential_exchange(oc_client_response_t *data)
-{
-  PRINT("\nReceived Parameter Response!\n");
-
-  PRINT("  code: %d\n", data->code);
-  if (data->code != OC_STATUS_CHANGED) {
-    PRINT("Error in Parameter Response!!!\n");
-    return;
-  }
-
-  char buffer[300];
-  memset(buffer, 300, 1);
-  oc_rep_to_json(data->payload, (char *)&buffer, 300, true);
-  PRINT("%s", buffer);
-
-  // TODO parse payload, obtain seed & salt, use it to derive w0 & w1
-  int it;
-  uint8_t *salt;
-
-  oc_rep_t *rep = data->payload;
-  while (rep != NULL) {
-    // rnd - we just skip
-    if (rep->type == OC_REP_BYTE_STRING && rep->iname == 15)
-      ;
-
-    // pbkdf2 - interesting
-    if (rep->type == OC_REP_OBJECT && rep->iname == 12) {
-      oc_rep_t *inner_rep = rep->value.object;
-      while (inner_rep != NULL) {
-        // it
-        if (inner_rep->type == OC_REP_INT && inner_rep->iname == 16) {
-          it = inner_rep->value.integer;
-        }
-        // salt
-        if (inner_rep->type == OC_REP_BYTE_STRING && inner_rep->iname == 5) {
-          salt = inner_rep->value.string.ptr;
-        }
-
-        inner_rep = inner_rep->next;
-      }
-    }
-    rep = rep->next;
-  }
-
-  // WARNING: init without free leaks memory every time it is called,
-  // but for the test client this is not important
-  mbedtls_mpi_init(&w0);
-  mbedtls_mpi_init(&w1);
-  mbedtls_mpi_init(&privA);
-  mbedtls_ecp_point_init(&pA);
-  mbedtls_ecp_point_init(&pubA);
-  oc_spake_calc_w0_w1("LETTUCE", 32, salt, it, &w0, &w1);
-
-  oc_spake_gen_keypair(&privA, &pubA);
-  oc_spake_calc_pA(&pA, &pubA, &w0);
-  uint8_t bytes_pA[65];
-  oc_spake_encode_pubkey(&pA, bytes_pA);
-
-  oc_init_post("/.well-known/knx/spake", data->endpoint, NULL,
-               &do_credential_verification, HIGH_QOS, NULL);
-
-  oc_rep_begin_root_object();
-  oc_rep_i_set_byte_string(root, 10, bytes_pA, 65);
-  oc_rep_end_root_object();
-
-  oc_do_post_ex(APPLICATION_CBOR, APPLICATION_CBOR);
-}
 
 static oc_discovery_flags_t
 discovery(const char *payload, int len, oc_endpoint_t *endpoint,
@@ -343,17 +193,7 @@ discovery(const char *payload, int len, oc_endpoint_t *endpoint,
   }
 
   // do parameter exchange
-  oc_init_post("/.well-known/knx/spake", endpoint, NULL,
-               &do_credential_exchange, HIGH_QOS, NULL);
-
-  // Payload consists of just a random number? should be pretty easy...
-  uint8_t
-    rnd[32]; // not actually used by the server, so just send some gibberish
-  oc_rep_begin_root_object();
-  oc_rep_i_set_byte_string(root, 15, rnd, 32);
-  oc_rep_end_root_object();
-
-  oc_do_post_ex(APPLICATION_CBOR, APPLICATION_CBOR);
+  oc_initiate_spake(endpoint);
 
   PRINT(" DISCOVERY- END\n");
   return OC_STOP_DISCOVERY;
@@ -362,7 +202,7 @@ discovery(const char *payload, int len, oc_endpoint_t *endpoint,
 oc_group_object_notification_t g_send_notification;
 bool g_bool_value = false;
 int g_int_value = 1;
-int g_float_value = 1.0;
+float g_float_value = 1.0;
 
 // 0 == boolean
 // 1 == int
@@ -471,6 +311,19 @@ handle_signal(int signal)
 }
 
 void
+my_spake_cb(int error, uint8_t *secret, int secret_size)
+{
+  PRINT("my_spake_cb: SPAKE2+ Handshake Finished!\n");
+  PRINT("my_spake_cb: code: %d\n", error);
+  PRINT("my_spake_cb: Shared Secret: ");
+  for (int i = 0; i < secret_size; i++) {
+    PRINT("%02x", secret[i]);
+  }
+  PRINT("\n");
+}
+
+
+void
 print_usage()
 {
   PRINT("Usage:\n");
@@ -545,11 +398,11 @@ main(int argc, char *argv[])
     if (g_value_type == 2) {
       // double
       g_float_value = atof(argv[5]);
-      PRINT(" value type : %s [%d]\n", argv[5], g_float_value);
+      PRINT(" value type : %s [%f]\n", argv[5], g_float_value);
     }
   }
 
-  PRINT("Simple Client:\n");
+  PRINT("Simple Client SPAKE:\n");
 
 #ifdef WIN32
   /* windows specific */
@@ -594,7 +447,10 @@ main(int argc, char *argv[])
   PRINT("Security - Disabled\n");
 #endif /* OC_SECURITY */
 
-  PRINT("SimpleClient running, waiting on incoming "
+  oc_set_spake_response_cb(my_spake_cb);
+
+
+  PRINT("SimpleClient_spake_all running, waiting on incoming "
         "connections.\n");
 
 #ifdef WIN32

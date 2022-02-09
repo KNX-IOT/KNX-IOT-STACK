@@ -256,6 +256,7 @@ extern "C" {
 #define OC_DBG(...) OC_LOG("D", __VA_ARGS__)
 #define OC_WRN(...) OC_LOG("W", __VA_ARGS__)
 #define OC_ERR(...) OC_LOG("E", __VA_ARGS__)
+
 #else
 // #define OC_LOG(...)
 #define OC_DBG(...)
@@ -266,7 +267,9 @@ extern "C" {
 #endif
 
 #define OC_ERR(...) OC_LOG("E", __VA_ARGS__)
+
 #define OC_DBG_OSCORE(...) OC_LOG("OSCORE", __VA_ARGS__)
+#define OC_DBG_SPAKE(...) OC_LOG("SPAKE", __VA_ARGS__)
 #define OC_LOGbytes_OSCORE(bytes, length)                                      \
   OC_LOGbytes_internal("OSCORE", bytes, length)
 

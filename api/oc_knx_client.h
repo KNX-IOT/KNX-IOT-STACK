@@ -23,12 +23,29 @@
 extern "C" {
 #endif
 
+
+typedef void (*oc_spake_cb_t)(int error, uint8_t *secret, int secret_size);
+
+/**
+ * @brief set the spake response callback
+ * e.g. function is called when the spake handshake is finished
+ *
+ * @param my_func the callback function
+ * @return true function set
+ * @return false function set failed
+ */
+bool oc_set_spake_response_cb(oc_spake_cb_t my_func);
+
+int oc_initiate_spake(oc_endpoint_t *endpoint);
+
+
 typedef void (*oc_s_mode_response_cb_t)(char *url, oc_rep_t *rep,
                                         oc_rep_t *rep_value);
 
+
 /**
  * @brief set the s-mode response callback
- * e.g. function to be called when a s-mode response is comming back
+ * e.g. function is called when a s-mode response is coming back
  *
  * @param my_func the callback function
  * @return true function set

@@ -17,7 +17,9 @@
 #include "oc_api.h"
 #include "api/oc_knx_client.h"
 #include "api/oc_knx_fp.h"
-
+#ifdef OC_SPAKE
+#include "oc_spake2plus.h"
+#endif
 #include "oc_core_res.h"
 #include "oc_discovery.h"
 #include <stdio.h>
@@ -38,6 +40,15 @@ typedef struct broker_s_mode_userdata_t
 // ----------------------------------------------------------------------------
 
 oc_s_mode_response_cb_t m_s_mode_cb = NULL;
+oc_spake_cb_t m_spake_cb = NULL;
+
+
+// SPAKE2
+#ifdef OC_SPAKE
+static mbedtls_mpi w0, w1, privA;
+static mbedtls_ecp_point pA, pubA;
+static uint8_t Ka_Ke[32];
+#endif 
 
 // ----------------------------------------------------------------------------
 
@@ -47,6 +58,189 @@ static void oc_send_s_mode(oc_endpoint_t *endpoint, char *path, int sia_value,
 
 static int oc_s_mode_get_resource_value(char *resource_url, char *rp,
                                         uint8_t *buf, int buf_size);
+
+
+
+// ----------------------------------------------------------------------------
+
+#ifdef OC_SPAKE
+static void
+finish_spake_handshake(oc_client_response_t *data)
+{
+  if (data->code != OC_STATUS_CHANGED) {
+    OC_DBG_SPAKE("Error in Credential Verification!!!\n");
+    return;
+  }
+  //OC_DBG_SPAKE("SPAKE2+ Handshake Finished!\n");
+  //OC_DBG_SPAKE("  code: %d\n", data->code);
+  //OC_DBG_SPAKE("Shared Secret: ");
+  //for (int i = 0; i < 16; i++) {
+  //  PRINT("%02x", Ka_Ke[i + 16]);
+  //}
+  //OC_DBG_SPAKE("\n");
+
+  // shared_key is 16-byte array - NOT NULL TERMINATED
+  uint8_t *shared_key = Ka_Ke + 16;
+  size_t shared_key_len = 16;
+
+  if (m_spake_cb) {
+    //PRINT("CALLING CALLBACK------->\n");
+    m_spake_cb(0, shared_key, shared_key_len);
+  }
+}
+
+static void
+do_credential_verification(oc_client_response_t *data)
+{
+  OC_DBG_SPAKE("\nReceived Credential Response!\n");
+
+  OC_DBG_SPAKE("  code: %d\n", data->code);
+  if (data->code != OC_STATUS_CHANGED) {
+    OC_DBG_SPAKE("Error in Credential Response!!!\n");
+    return;
+  }
+
+  char buffer[200];
+  memset(buffer, 200, 1);
+  oc_rep_to_json(data->payload, (char *)&buffer, 200, true);
+  OC_DBG_SPAKE("%s", buffer);
+
+  uint8_t *pB_bytes, *cB_bytes;
+  oc_rep_t *rep = data->payload;
+  while (rep != NULL) {
+    if (rep->type == OC_REP_BYTE_STRING) {
+      // pb
+      if (rep->iname == 11) {
+        pB_bytes = rep->value.string.ptr;
+      }
+      // cb
+      if (rep->iname == 13) {
+        cB_bytes = rep->value.string.ptr;
+      }
+    }
+
+    rep = rep->next;
+  }
+
+  uint8_t cA[32];
+  uint8_t local_cB[32];
+  uint8_t pA_bytes[63];
+  size_t len_pA;
+  mbedtls_ecp_group grp;
+
+  mbedtls_ecp_group_init(&grp);
+  mbedtls_ecp_group_load(&grp, MBEDTLS_ECP_DP_SECP256R1);
+
+  oc_spake_calc_transcript_initiator(&w0, &w1, &privA, &pA, pB_bytes, Ka_Ke);
+  oc_spake_calc_cA(Ka_Ke, cA, pB_bytes);
+
+  mbedtls_ecp_point_write_binary(&grp, &pA, MBEDTLS_ECP_PF_UNCOMPRESSED,
+                                 &len_pA, pA_bytes, 63);
+  oc_spake_calc_cB(Ka_Ke, local_cB, pA_bytes);
+
+  oc_init_post("/.well-known/knx/spake", data->endpoint, NULL,
+               &finish_spake_handshake, HIGH_QOS, NULL);
+  oc_rep_begin_root_object();
+  oc_rep_i_set_byte_string(root, 14, cA, 32);
+  oc_rep_end_root_object();
+  oc_do_post_ex(APPLICATION_CBOR, APPLICATION_CBOR);
+}
+
+static void
+do_credential_exchange(oc_client_response_t *data)
+{
+  OC_DBG_SPAKE("\nReceived Parameter Response!\n");
+
+  OC_DBG_SPAKE("  code: %d\n", data->code);
+  if (data->code != OC_STATUS_CHANGED) {
+    OC_DBG_SPAKE("Error in Parameter Response!!!\n");
+    return;
+  }
+
+  char buffer[300];
+  memset(buffer, 300, 1);
+  oc_rep_to_json(data->payload, (char *)&buffer, 300, true);
+  OC_DBG_SPAKE("%s", buffer);
+
+  // TODO parse payload, obtain seed & salt, use it to derive w0 & w1
+  int it;
+  uint8_t *salt;
+
+  oc_rep_t *rep = data->payload;
+  while (rep != NULL) {
+    // rnd - we just skip
+    if (rep->type == OC_REP_BYTE_STRING && rep->iname == 15)
+      ;
+
+    // pbkdf2 - interesting
+    if (rep->type == OC_REP_OBJECT && rep->iname == 12) {
+      oc_rep_t *inner_rep = rep->value.object;
+      while (inner_rep != NULL) {
+        // it
+        if (inner_rep->type == OC_REP_INT && inner_rep->iname == 16) {
+          it = inner_rep->value.integer;
+        }
+        // salt
+        if (inner_rep->type == OC_REP_BYTE_STRING && inner_rep->iname == 5) {
+          salt = inner_rep->value.string.ptr;
+        }
+
+        inner_rep = inner_rep->next;
+      }
+    }
+    rep = rep->next;
+  }
+
+  // WARNING: init without free leaks memory every time it is called,
+  // but for the test client this is not important
+  mbedtls_mpi_init(&w0);
+  mbedtls_mpi_init(&w1);
+  mbedtls_mpi_init(&privA);
+  mbedtls_ecp_point_init(&pA);
+  mbedtls_ecp_point_init(&pubA);
+  oc_spake_calc_w0_w1("LETTUCE", 32, salt, it, &w0, &w1);
+
+  oc_spake_gen_keypair(&privA, &pubA);
+  oc_spake_calc_pA(&pA, &pubA, &w0);
+  uint8_t bytes_pA[65];
+  oc_spake_encode_pubkey(&pA, bytes_pA);
+
+  oc_init_post("/.well-known/knx/spake", data->endpoint, NULL,
+               &do_credential_verification, HIGH_QOS, NULL);
+
+  oc_rep_begin_root_object();
+  oc_rep_i_set_byte_string(root, 10, bytes_pA, 65);
+  oc_rep_end_root_object();
+
+  oc_do_post_ex(APPLICATION_CBOR, APPLICATION_CBOR);
+}
+
+#endif /* OC_SPAKE */
+
+int
+oc_initiate_spake(oc_endpoint_t *endpoint)
+{
+  int return_value = -1;
+
+#ifdef OC_SPAKE
+  // do parameter exchange
+oc_init_post("/.well-known/knx/spake", endpoint, NULL, &do_credential_exchange,
+             HIGH_QOS, NULL);
+
+// Payload consists of just a random number? should be pretty easy...
+uint8_t rnd[32]; // not actually used by the server, so just send some gibberish
+oc_rep_begin_root_object();
+oc_rep_i_set_byte_string(root, 15, rnd, 32);
+oc_rep_end_root_object();
+
+ if (oc_do_post_ex(APPLICATION_CBOR, APPLICATION_CBOR)) {
+  return_value = 0;
+ }
+
+#endif /* OC_SPAKE */
+return return_value;
+}
+
 
 // ----------------------------------------------------------------------------
 
@@ -412,6 +606,13 @@ oc_do_s_mode_with_scope(int scope, char *resource_url, char *rp)
     }
     index = oc_core_find_next_group_object_table_url(resource_url, index);
   }
+}
+
+bool
+oc_set_spake_response_cb(oc_spake_cb_t my_func)
+{
+  m_spake_cb = my_func;
+  return true;
 }
 
 // ----------------------------------------------------------------------------
