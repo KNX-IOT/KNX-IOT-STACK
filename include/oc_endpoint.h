@@ -51,28 +51,18 @@ typedef struct
 } oc_ipv4_addr_t;
 
 /**
- * @brief ble address data structure
- *
- */
-typedef struct
-{
-  uint8_t type;       ///< type of address
-  uint8_t address[6]; ///< ble address
-} oc_le_addr_t;
-
-/**
  * @brief transport flags (bit map)
- *
+ * these flags are used to determine what to do on communication level
  */
 enum transport_flags {
-  DISCOVERY = 1 << 0, ///< used for discovery
-  SECURED = 1 << 1,   ///< secure communication
-  IPV4 = 1 << 2,      ///< ipv4 communication
-  IPV6 = 1 << 3,      ///< ipv6 communication
-  TCP = 1 << 4,       ///< tcp communication
-  GATT = 1 << 5,      ///< BLE GATT communication
-  MULTICAST = 1 << 6, ///< multicast enabled
-  ACCEPTED = 1 << 7   ///< accepted
+  DISCOVERY = 1 << 0,  /**< used for discovery */
+  SECURED = 1 << 1,    /**< secure communication */
+  IPV4 = 1 << 2,       /**< ipv4 communication */
+  IPV6 = 1 << 3,       /**< ipv6 communication */
+  TCP = 1 << 4,        /**< tcp communication */
+  OSCORE = 1 << 5,     /**< OSCORE communication */
+  MULTICAST = 1 << 6,  /**< multicast enabled */
+  ACCEPTED = 1 << 7    /**< accepted */
 };
 
 /**
@@ -88,7 +78,6 @@ typedef struct oc_endpoint_t
   union dev_addr {
     oc_ipv6_addr_t ipv6; ///< ipv6 address
     oc_ipv4_addr_t ipv4; ///< ipv4 address
-    oc_le_addr_t bt;     ///< blue tooth address
   } addr, addr_local;
   int interface_index; ///< interface index
   uint8_t priority;    ///< priority

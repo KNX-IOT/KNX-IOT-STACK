@@ -409,7 +409,7 @@ int oc_add_device(const char *uri, const char *rt, const char *name,
  *
  * @see init
  */
-int ock_add_device(const char *name, const char *version, const char *base,
+int oc_add_device(const char *name, const char *version, const char *base,
                    const char *serialnumber, oc_add_device_cb_t add_device_cb,
                    void *data);
 

@@ -218,8 +218,9 @@ OC_PROCESS_THREAD(message_buffer_handler, ev, data)
       }
 //#if defined(OC_SECURITY) && defined(OC_OSCORE)
 #ifdef OC_OSCORE
-      else if ((message->endpoint.flags & MULTICAST) &&
-               (message->endpoint.flags & SECURED)) {
+      else if ((message->endpoint.flags & OSCORE) &&
+               (message->endpoint.flags & MULTICAST))
+      {
         OC_DBG_OSCORE(
           "Outbound secure multicast request: forwarding to OSCORE\n");
         oc_process_post(&oc_oscore_handler,
@@ -230,9 +231,9 @@ OC_PROCESS_THREAD(message_buffer_handler, ev, data)
 #endif /* OC_CLIENT */
 //#ifdef OC_SECURITY
 #ifdef OC_OSCORE
-        if (message->endpoint.flags & SECURED) {
+        if (message->endpoint.flags & OSCORE) {
 #ifdef OC_OSCORE
-        OC_DBG("Outbound network event: forwarding to OSCORE");
+        OC_DBG("Outbound unicast network event: forwarding to OSCORE");
         oc_process_post(&oc_oscore_handler, oc_events[OUTBOUND_OSCORE_EVENT],
                         data);
       } else

@@ -112,7 +112,8 @@ oc_oscore_recv_message(oc_message_t *message)
   if (oscore_is_oscore_message(message) >= 0) {
     OC_DBG_OSCORE("#################################");
     oc_oscore_context_t *oscore_ctx = NULL;
-    message->endpoint.flags |= SECURED;
+    // message->endpoint.flags |= SECURED;
+    message->endpoint.flags |= OSCORE;
 
     coap_packet_t oscore_pkt[1];
 
@@ -534,7 +535,7 @@ oc_oscore_send_message(oc_message_t *msg)
   if (oscore_ctx) {
     OC_DBG_OSCORE("#################################");
     OC_DBG_OSCORE("found OSCORE context corresponding to the peer UUID");
-    /* Is this is an inadvertent response to a secure multicast message */
+    /* Is this is an inadvertent response to a secure multi cast message */
     if (msg->endpoint.flags & MULTICAST) {
       OC_DBG_OSCORE(
         "### secure multicast requests do not elicit a response, discard "
