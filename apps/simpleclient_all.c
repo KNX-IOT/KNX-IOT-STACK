@@ -218,7 +218,7 @@ discovery(const char *payload, int len, oc_endpoint_t *endpoint,
 oc_group_object_notification_t g_send_notification;
 bool g_bool_value = false;
 int g_int_value = 1;
-int g_float_value = 1.0;
+float g_float_value = 1.0;
 
 // 0 == boolean
 // 1 == int
@@ -401,7 +401,7 @@ main(int argc, char *argv[])
     if (g_value_type == 2) {
       // double
       g_float_value = atof(argv[5]);
-      PRINT(" value type : %s [%d]\n", argv[5], g_float_value);
+      PRINT(" value type : %s [%f]\n", argv[5], g_float_value);
     }
   }
 
