@@ -633,6 +633,27 @@ py_cbor_delete(char *sn, char *uri, char *query, char *id)
 // -----------------------------------------------------------------------------
 
 void
+py_initate_spake(char *sn)
+{
+  int ret = -1;
+  device_handle_t *device = py_getdevice_from_sn(sn);
+
+  PRINT("  [C]py_initate_spake: [%s]\n", sn);
+
+  // user_struct_t *new_cbdata;
+  // new_cbdata = (user_struct_t *)malloc(sizeof(user_struct_t));
+  // if (new_cbdata != NULL) {
+  //  strcpy(new_cbdata->r_id, id);
+  //  strcpy(new_cbdata->url, uri);
+  //  strcpy(new_cbdata->sn, sn);
+  //}
+
+  oc_initiate_spake(&device->ep);
+}
+
+// -----------------------------------------------------------------------------
+
+void
 response_get_sn(oc_client_response_t *data)
 {
   PRINT("[C]response_get_sn: content format %d  %.*s\n", data->content_format,
@@ -877,25 +898,25 @@ py_reset_device(char *sn)
   // py_mutex_unlock(app_sync_lock);
 }
 
-void
-display_device_uuid()
-{
-  char buffer[OC_UUID_LEN];
-  oc_uuid_to_str(oc_core_get_device_id(0), buffer, sizeof(buffer));
+// void
+// display_device_uuid()
+//{
+//  char buffer[OC_UUID_LEN];
+//  oc_uuid_to_str(oc_core_get_device_id(0), buffer, sizeof(buffer));
 
-  PRINT("[C] Started device with ID: %s\n", buffer);
-}
+//  PRINT("[C] Started device with ID: %s\n", buffer);
+//}
 
-char *
-py_get_obt_uuid()
-{
-  char buffer[OC_UUID_LEN];
-  oc_uuid_to_str(oc_core_get_device_id(0), buffer, sizeof(buffer));
+// char *
+// py_get_obt_uuid()
+//{
+//  char buffer[OC_UUID_LEN];
+//  oc_uuid_to_str(oc_core_get_device_id(0), buffer, sizeof(buffer));
 
-  char *uuid = malloc(sizeof(char) * OC_UUID_LEN);
-  strncpy(uuid, buffer, OC_UUID_LEN);
-  return uuid;
-}
+//  char *uuid = malloc(sizeof(char) * OC_UUID_LEN);
+//  strncpy(uuid, buffer, OC_UUID_LEN);
+//  return uuid;
+//}
 
 // -----------------------------------------------------------------------------
 
@@ -955,7 +976,7 @@ py_main(void)
   }
 #endif
 
-  display_device_uuid();
+  // display_device_uuid();
 
   while (quit != 1) {
 #if defined(__linux__)
