@@ -294,10 +294,11 @@ coap_receive(oc_message_t *msg)
 #endif /* OC_REQUEST_HISTORY */
           // TODO
           //          if (href_len == 7 && memcmp(href, "oic/res", 7) == 0) {
-//            coap_udp_init_message(response, COAP_TYPE_CON, CONTENT_2_05,
-//                                  coap_get_mid());
-//          } else 
-        {
+          //            coap_udp_init_message(response, COAP_TYPE_CON,
+          //            CONTENT_2_05,
+          //                                  coap_get_mid());
+          //          } else
+          {
             coap_udp_init_message(response, COAP_TYPE_NON, CONTENT_2_05,
                                   coap_get_mid());
           }
@@ -372,7 +373,8 @@ coap_receive(oc_message_t *msg)
                 coap_set_header_block1(response, block1_num, block1_more,
                                        block1_size);
                 // TODO
-                //                coap_set_header_accept(response, APPLICATION_VND_OCF_CBOR);
+                //                coap_set_header_accept(response,
+                //                APPLICATION_VND_OCF_CBOR);
                 request_buffer->payload_size =
                   request_buffer->next_block_offset;
                 request_buffer->ref_count = 0;
@@ -418,7 +420,7 @@ coap_receive(oc_message_t *msg)
                                       coap_get_mid());
                 transaction->mid = response->mid;
                 // TODO
-                //coap_set_header_accept(response, APPLICATION_VND_OCF_CBOR);
+                // coap_set_header_accept(response, APPLICATION_VND_OCF_CBOR);
               }
               coap_set_header_content_format(
                 response, response_buffer->return_content_type);

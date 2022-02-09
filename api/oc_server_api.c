@@ -44,8 +44,8 @@ static size_t query_iterator;
 
 int
 oc_add_device(const char *name, const char *version, const char *base,
-               const char *serialnumber, oc_add_device_cb_t add_device_cb,
-               void *data)
+              const char *serialnumber, oc_add_device_cb_t add_device_cb,
+              void *data)
 {
   if (!oc_core_add_device(name, version, base, serialnumber, add_device_cb,
                           data))

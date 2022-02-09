@@ -405,8 +405,8 @@ void oc_set_factory_presets_cb(oc_factory_presets_cb_t cb, void *data);
  * @see init
  */
 int oc_add_device(const char *name, const char *version, const char *base,
-                   const char *serial_number, oc_add_device_cb_t add_device_cb,
-                   void *data);
+                  const char *serial_number, oc_add_device_cb_t add_device_cb,
+                  void *data);
 
 /**
  * Set custom device property

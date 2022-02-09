@@ -55,14 +55,14 @@ typedef struct
  * these flags are used to determine what to do on communication level
  */
 enum transport_flags {
-  DISCOVERY = 1 << 0,  /**< used for discovery */
-  SECURED = 1 << 1,    /**< secure communication */
-  IPV4 = 1 << 2,       /**< ipv4 communication */
-  IPV6 = 1 << 3,       /**< ipv6 communication */
-  TCP = 1 << 4,        /**< tcp communication */
-  OSCORE = 1 << 5,     /**< OSCORE communication */
-  MULTICAST = 1 << 6,  /**< multicast enabled */
-  ACCEPTED = 1 << 7    /**< accepted */
+  DISCOVERY = 1 << 0, /**< used for discovery */
+  SECURED = 1 << 1,   /**< secure communication */
+  IPV4 = 1 << 2,      /**< ipv4 communication */
+  IPV6 = 1 << 3,      /**< ipv6 communication */
+  TCP = 1 << 4,       /**< tcp communication */
+  OSCORE = 1 << 5,    /**< OSCORE communication */
+  MULTICAST = 1 << 6, /**< multicast enabled */
+  ACCEPTED = 1 << 7   /**< accepted */
 };
 
 /**

@@ -219,8 +219,7 @@ OC_PROCESS_THREAD(message_buffer_handler, ev, data)
 //#if defined(OC_SECURITY) && defined(OC_OSCORE)
 #ifdef OC_OSCORE
       else if ((message->endpoint.flags & OSCORE) &&
-               (message->endpoint.flags & MULTICAST))
-      {
+               (message->endpoint.flags & MULTICAST)) {
         OC_DBG_OSCORE(
           "Outbound secure multicast request: forwarding to OSCORE\n");
         oc_process_post(&oc_oscore_handler,
