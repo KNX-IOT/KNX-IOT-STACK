@@ -86,7 +86,7 @@ extern bool oc_ri_invoke_coap_entity_handler(void *request, void *response,
 #endif /* !OC_BLOCK_WISE */
 
 #ifdef OC_REQUEST_HISTORY
-// The size of the array used to deduplicate CoAP messages.
+// The size of the array used to de-duplicate CoAP messages.
 // A value of 25 means that the message ID & device counter
 // are compared to the ones in the last 25 messages. If a
 // match is found, the message is dropped as it must be
@@ -292,10 +292,13 @@ coap_receive(oc_message_t *msg)
           history_dev[idx] = (uint8_t)msg->endpoint.device;
           idx = (idx + 1) % OC_REQUEST_HISTORY_SIZE;
 #endif /* OC_REQUEST_HISTORY */
-          if (href_len == 7 && memcmp(href, "oic/res", 7) == 0) {
-            coap_udp_init_message(response, COAP_TYPE_CON, CONTENT_2_05,
-                                  coap_get_mid());
-          } else {
+          // TODO
+          //          if (href_len == 7 && memcmp(href, "oic/res", 7) == 0) {
+          //            coap_udp_init_message(response, COAP_TYPE_CON,
+          //            CONTENT_2_05,
+          //                                  coap_get_mid());
+          //          } else
+          {
             coap_udp_init_message(response, COAP_TYPE_NON, CONTENT_2_05,
                                   coap_get_mid());
           }
@@ -369,7 +372,9 @@ coap_receive(oc_message_t *msg)
                 transaction->mid = response->mid;
                 coap_set_header_block1(response, block1_num, block1_more,
                                        block1_size);
-                coap_set_header_accept(response, APPLICATION_VND_OCF_CBOR);
+                // TODO
+                //                coap_set_header_accept(response,
+                //                APPLICATION_VND_OCF_CBOR);
                 request_buffer->payload_size =
                   request_buffer->next_block_offset;
                 request_buffer->ref_count = 0;
@@ -414,7 +419,8 @@ coap_receive(oc_message_t *msg)
                 coap_udp_init_message(response, COAP_TYPE_CON, CONTENT_2_05,
                                       coap_get_mid());
                 transaction->mid = response->mid;
-                coap_set_header_accept(response, APPLICATION_VND_OCF_CBOR);
+                // TODO
+                // coap_set_header_accept(response, APPLICATION_VND_OCF_CBOR);
               }
               coap_set_header_content_format(
                 response, response_buffer->return_content_type);

@@ -145,7 +145,7 @@ app_init(void)
 {
   int ret = oc_init_platform("Cascoda", NULL, NULL);
 
-  ret |= ock_add_device("blah", "1.0", "//", "000005", NULL, NULL);
+  ret |= oc_add_device("blah", "1.0", "//", "000005", NULL, NULL);
 
   oc_device_info_t *device = oc_core_get_device_info(0);
   PRINT("Serial Number: %s\n", oc_string(device->serialnumber));

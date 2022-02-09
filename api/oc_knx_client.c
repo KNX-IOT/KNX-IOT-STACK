@@ -188,7 +188,7 @@ oc_issue_s_mode(int scope, int sia_value, int group_address, char *rp,
   PRINT("  oc_issue_s_mode : scope %d\n", scope);
 
 #ifdef OC_OSCORE
-  oc_make_ipv6_endpoint(mcast, IPV6 | MULTICAST | SECURED, COAP_PORT, 0xff,
+  oc_make_ipv6_endpoint(mcast, IPV6 | MULTICAST | OSCORE, COAP_PORT, 0xff,
                         scope, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0xfd);
 #else
   oc_make_ipv6_endpoint(mcast, IPV6 | MULTICAST, COAP_PORT, 0xff, scope, 0, 0,

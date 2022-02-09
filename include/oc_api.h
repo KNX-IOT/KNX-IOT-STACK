@@ -364,11 +364,6 @@ typedef void (*oc_factory_presets_cb_t)(size_t device, void *data);
  */
 void oc_set_factory_presets_cb(oc_factory_presets_cb_t cb, void *data);
 
-// obsolete
-int oc_add_device(const char *uri, const char *rt, const char *name,
-                  const char *spec_version, const char *data_model_version,
-                  oc_add_device_cb_t add_device_cb, void *data);
-
 /**
  * Add an a device to the stack.
  *
@@ -387,7 +382,7 @@ int oc_add_device(const char *uri, const char *rt, const char *name,
  * static int app_init(void)
  * {
  *   int ret = oc_init_platform("Refrigerator", NULL, NULL);
- *   ret |= ock_add_device("my_name", "1.0", "//",
+ *   ret |= oc_add_device("my_name", "1.0", "//",
  *                        "0123456", NULL, NULL);
 
  *   return ret;
@@ -397,7 +392,7 @@ int oc_add_device(const char *uri, const char *rt, const char *name,
  * @param[in] name the user readable name of the device
  * @param[in] version The api version e.g. "1.0"
  * @param[in] base the base url e.g. "/"
- * @param[in] serialnumber the serial number of the device
+ * @param[in] serial_number the serial number of the device
  * @param[in] add_device_cb callback function invoked during oc_add_device().
  * The purpose is to add additional device properties that are not supplied to
  * oc_add_device() function call.
@@ -409,9 +404,9 @@ int oc_add_device(const char *uri, const char *rt, const char *name,
  *
  * @see init
  */
-int ock_add_device(const char *name, const char *version, const char *base,
-                   const char *serialnumber, oc_add_device_cb_t add_device_cb,
-                   void *data);
+int oc_add_device(const char *name, const char *version, const char *base,
+                  const char *serial_number, oc_add_device_cb_t add_device_cb,
+                  void *data);
 
 /**
  * Set custom device property

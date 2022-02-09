@@ -113,7 +113,7 @@ app_init(void)
 {
   int ret = oc_init_platform("Cascoda", NULL, NULL);
 
-  ret |= ock_add_device("my-client", "1.0", "//", "000006", NULL, NULL);
+  ret |= oc_add_device("my-client", "1.0", "//", "000006", NULL, NULL);
 
   return ret;
 }
