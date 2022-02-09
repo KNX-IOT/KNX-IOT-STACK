@@ -63,11 +63,10 @@ static int oc_s_mode_get_resource_value(char *resource_url, char *rp,
 #ifdef OC_SPAKE
 
 static void
-update_tokens(uint8_t* secret, int secret_size)
+update_tokens(uint8_t *secret, int secret_size)
 {
   oc_oscore_set_auth(secret, secret_size);
 }
-
 
 static void
 finish_spake_handshake(oc_client_response_t *data)
