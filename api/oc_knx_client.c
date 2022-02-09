@@ -222,7 +222,9 @@ oc_initiate_spake(oc_endpoint_t *endpoint)
 {
   int return_value = -1;
 
-#ifdef OC_SPAKE
+#ifndef OC_SPAKE
+  (void)endpoint;
+#else /* OC_SPAKE*/
   // do parameter exchange
 oc_init_post("/.well-known/knx/spake", endpoint, NULL, &do_credential_exchange,
              HIGH_QOS, NULL);
