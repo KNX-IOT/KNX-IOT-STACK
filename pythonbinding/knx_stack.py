@@ -937,7 +937,7 @@ class KNXIOTStack():
     def issue_init_spake(self, sn) :
         #r_id = self.get_r_id()
         #client_event.clear()
-        print(" py_initate_spake", sn, uri, query, r_id)
+        print(" py_initate_spake", sn)
         try:
             self.lib.py_initate_spake.argtypes = [String]
             self.lib.py_initate_spake(sn)

@@ -641,17 +641,15 @@ py_initate_spake(char *sn)
 
   PRINT("  [C]py_initate_spake: [%s]\n", sn );
 
-  user_struct_t *new_cbdata;
-  new_cbdata = (user_struct_t *)malloc(sizeof(user_struct_t));
-  if (new_cbdata != NULL) {
-    strcpy(new_cbdata->r_id, id);
-    strcpy(new_cbdata->url, uri);
-    strcpy(new_cbdata->sn, sn);
-  }
+  //user_struct_t *new_cbdata;
+  //new_cbdata = (user_struct_t *)malloc(sizeof(user_struct_t));
+  //if (new_cbdata != NULL) {
+  //  strcpy(new_cbdata->r_id, id);
+  //  strcpy(new_cbdata->url, uri);
+  //  strcpy(new_cbdata->sn, sn);
+  //}
 
   oc_initiate_spake(&device->ep);
-
-
 }
 
 // -----------------------------------------------------------------------------
