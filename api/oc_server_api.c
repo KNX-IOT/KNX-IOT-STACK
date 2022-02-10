@@ -135,23 +135,6 @@ oc_ignore_request(oc_request_t *request)
 }
 
 void
-oc_set_immutable_device_identifier(size_t device, oc_uuid_t *piid)
-{
-  if (piid && device < oc_core_get_num_devices()) {
-    oc_device_info_t *info = oc_core_get_device_info(device);
-    if (info) {
-#ifdef OC_SECURITY
-      oc_sec_load_unique_ids(device);
-#endif /* OC_SECURITY */
-      memcpy(info->piid.id, piid->id, sizeof(oc_uuid_t));
-#ifdef OC_SECURITY
-      oc_sec_dump_unique_ids(device);
-#endif /* OC_SECURITY */
-    }
-  }
-}
-
-void
 oc_set_delayed_callback(void *cb_data, oc_trigger_t callback, uint16_t seconds)
 {
   oc_ri_add_timed_event_callback_seconds(cb_data, callback, seconds);
@@ -281,7 +264,6 @@ oc_new_resource(const char *name, const char *uri, uint8_t num_resource_types,
   oc_resource_t *resource = oc_ri_alloc_resource();
   if (resource) {
     resource->interfaces = OC_IF_NONE;
-    resource->default_interface = OC_IF_NONE;
     resource->observe_period_seconds = 0;
     resource->num_observers = 0;
     oc_populate_resource_object(resource, name, uri, num_resource_types,
@@ -295,13 +277,6 @@ oc_resource_bind_resource_interface(oc_resource_t *resource,
                                     oc_interface_mask_t iface_mask)
 {
   resource->interfaces |= iface_mask;
-}
-
-void
-oc_resource_set_default_interface(oc_resource_t *resource,
-                                  oc_interface_mask_t iface_mask)
-{
-  resource->default_interface = iface_mask;
 }
 
 void

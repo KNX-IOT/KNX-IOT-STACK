@@ -388,7 +388,9 @@ coap_notify_observers(oc_resource_t *resource,
       request.request_payload = NULL;
       oc_rep_new(response_buffer.buffer, response_buffer.buffer_size);
       {
-        resource->get_handler.cb(&request, resource->default_interface,
+        // resource->get_handler.cb(&request, resource->default_interface,
+        //                         resource->get_handler.user_data);
+        resource->get_handler.cb(&request, resource->interfaces,
                                  resource->get_handler.user_data);
       }
       response_buf = &response_buffer;

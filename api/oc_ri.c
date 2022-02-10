@@ -906,48 +906,6 @@ oc_ri_get_interface_mask(char *iface, size_t if_len)
   return iface_mask;
 }
 
-static bool
-does_interface_support_method(oc_interface_mask_t iface_mask,
-                              oc_method_t method)
-{
-  (void)method;
-  bool supported = true;
-  switch (iface_mask) {
-    /* Per section 7.5.3 of the OCF Core spec, the following three interfaces
-     * are RETRIEVE-only.
-     */
-    // case OC_IF_LL:
-    // case OC_IF_S:
-    // case OC_IF_R:
-    //   if (method != OC_GET)
-    //     supported = false;
-    //   break;
-    /* Per section 7.5.3 of the OCF Core spec, the following three interfaces
-     * support RETRIEVE, UPDATE.
-     * TODO: Refine logic below after adding logic that identifies
-     * and handles CREATE requests using PUT/POST.
-     */
-
-  case OC_IF_I:
-  case OC_IF_O:
-  case OC_IF_G:
-  case OC_IF_C:
-  case OC_IF_P:
-  case OC_IF_D:
-  case OC_IF_A:
-  case OC_IF_S:
-  case OC_IF_LI:
-  case OC_IF_B:
-  case OC_IF_SEC:
-  case OC_IF_SWU:
-  case OC_IF_PM:
-  case OC_IF_M:
-  case OC_IF_NONE:
-    break;
-  }
-  return supported;
-}
-
 #ifdef OC_BLOCK_WISE
 bool
 oc_ri_invoke_coap_entity_handler(void *request, void *response,
@@ -1136,8 +1094,8 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
   if (cur_resource) {
     /* If there was no interface selection, pick the "default interface". */
     iface_mask = iface_query;
-    if (iface_mask == 0)
-      iface_mask = cur_resource->default_interface;
+    // if (iface_mask == 0)
+    //   iface_mask = cur_resource->interfaces;
 
     /* Found the matching resource object. Now verify that:
      * 1) the selected interface is one that is supported by
@@ -1146,11 +1104,11 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
      *
      * If not, return a 4.00 response.
      */
-    if (((iface_mask & ~cur_resource->interfaces) != 0) ||
-        !does_interface_support_method(iface_mask, method)) {
-      forbidden = true;
-      bad_request = true;
-    }
+    // if (((iface_mask & ~cur_resource->interfaces) != 0) ||
+    //    !does_interface_support_method(iface_mask, method)) {
+    //  forbidden = true;
+    //  bad_request = true;
+    //}
   }
 
 /* Alloc response_state. It also affects request_obj.response.

@@ -225,7 +225,7 @@ register_resources(void)
     res = oc_new_resource(NULL, name, 1, 0);
     oc_resource_bind_resource_type(res, "constrained.r.test");
     oc_resource_bind_resource_interface(res, OC_IF_RW);
-    oc_resource_set_default_interface(res, OC_IF_RW);
+    // oc_resource_set_default_interface(res, OC_IF_RW);
     oc_resource_set_discoverable(res, true);
     oc_resource_set_periodic_observable(res, 1);
     oc_resource_set_request_handler(res, OC_GET, get_light, &light[i]);

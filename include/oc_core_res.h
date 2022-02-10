@@ -273,33 +273,6 @@ oc_resource_t *oc_core_get_resource_by_uri(const char *uri, size_t device);
 void oc_store_uri(const char *s_uri, oc_string_t *d_uri);
 
 /**
- * @brief populate resource
- * mainly used for creation of core resources
- *
- * @param core_resource the resource index
- * @param device_index the device index
- * @param uri the URI for the resource
- * @param iface_mask interfaces (as mask) to be implemented on the resource
- * @param default_interface the default interface
- * @param properties the properties (as mask)
- * @param get_cb get callback function
- * @param put_cb put callback function
- * @param post_cb post callback function
- * @param delete_cb delete callback function
- * @param num_resource_types amount of resource types, listed as variable
- * arguments after this argument
- * @param ...
- */
-void oc_core_populate_resource(int core_resource, size_t device_index,
-                               const char *uri, oc_interface_mask_t iface_mask,
-                               oc_interface_mask_t default_interface,
-                               int properties, oc_request_callback_t get_cb,
-                               oc_request_callback_t put_cb,
-                               oc_request_callback_t post_cb,
-                               oc_request_callback_t delete_cb,
-                               int num_resource_types, ...);
-
-/**
  * @brief populate resource for link-format responses
  * mainly used for creation of core resources
  *
@@ -318,12 +291,14 @@ void oc_core_populate_resource(int core_resource, size_t device_index,
  * arguments after this argument
  * @param ...
  */
-void oc_core_lf_populate_resource(
-  int core_resource, size_t device_index, const char *uri,
-  oc_interface_mask_t iface_mask, oc_content_format_t content_format,
-  int properties, oc_request_callback_t get_cb, oc_request_callback_t put_cb,
-  oc_request_callback_t post_cb, oc_request_callback_t delete_cb,
-  int num_resource_types, ...);
+void oc_core_populate_resource(int core_resource, size_t device_index,
+                               const char *uri, oc_interface_mask_t iface_mask,
+                               oc_content_format_t content_format,
+                               int properties, oc_request_callback_t get_cb,
+                               oc_request_callback_t put_cb,
+                               oc_request_callback_t post_cb,
+                               oc_request_callback_t delete_cb,
+                               int num_resource_types, ...);
 
 /**
  * @brief filter if the query parameters of the request contains the resource

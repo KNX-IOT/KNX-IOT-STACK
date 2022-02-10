@@ -65,8 +65,6 @@ typedef struct
    * Multiple devices can be added by making multiple calls to oc_add_device().
    *
    * Other actions may be taken in the init handler
-   *  - The immutable device identifier can be set `piid`
-   *    (a.k.a Protocol Independent ID) oc_set_immutable_device_identifier()
    *  - Set up an interrupt handler oc_activate_interrupt_handler()
    *  - Initialize application specific variables
    *
@@ -77,7 +75,6 @@ typedef struct
    * @see oc_activate_interrupt_handler
    * @see oc_add_device
    * @see oc_init_platform
-   * @see oc_set_immutable_device_identifier
    */
   int (*init)(void);
 
@@ -463,16 +460,6 @@ int oc_init_platform(const char *mfg_name,
 #define oc_set_custom_platform_property(prop, value)                           \
   oc_rep_set_text_string(root, prop, value)
 
-/**
- * Reset all logical devices to the unloaded state
- *
- * @note The function oc_reset() deals only with security and configuration it
- *       does not reset any other device settings.
- *
- * @note Use of this function requires building with OC_SECURITY defined.
- */
-void oc_reset();
-
 /* Server side */
 /**
   @defgroup doc_module_tag_server_side Server side
@@ -538,32 +525,7 @@ oc_resource_t *oc_new_resource(const char *name, const char *uri,
  * Resource interfaces specify how the code is able to interact with the
  * resource
  *
- * The `iface_mask` is bitwise OR of the following interfaces:
- *  - `OC_IF_BASELINE` ("oic.if.baseline") baseline interface allow GET,
- *                      PUT/POST, and notify/observe operations.
- *  - `OC_IF_LL` ("oic.if.ll") The links list interface is a specifically
- *               designed to provide a list of links pointing to other
- * resources. Links list interfaces allow GET, and notify/observe operations.
- *  - `OC_IF_B` ("oic.if.b") batch interface. The batch interface is used to
- *              interact with a collection of resources at the same time.
- *  - `OC_IF_R` ("oic.if.r") a read-only interface.  A read-only interface
- * allows GET, and notify/observe operations.
- *  - `OC_IF_RW` ("oir.if.rw") a read-write interface.  A read-write interface
- *                allows GET, PUT/POST, and notify/observe operations.
- *  - `OC_IF_A` ("oic.if.a") an actuator interface. An actuator interface allows
- *              GET, PUT/POST, and notify/observe operations.
- *  - `OC_IF_S` ("oic.if.s") a sensor interface.  A sensor interface allows GET,
- *              and notify/observe operations.
- *  - `OC_IC_CREATE` ("oic.if.create") used to create new resources in a
- *                   collection.
- *
- * The read-write and actuator interfaces are very similar and sometimes hard to
- * differentiate when one should be used over another.  In general an actuator
- * interface is used when it modifies the real world value. e.g. turn on light,
- * increase temperature, open vent.
- *
- * The read-only and sensor are also very similar in general a sensor value is
- * read directly or indirectly from a real world sensor.
+ * The `iface_mask` is bitwise OR of the interfaces
  *
  * @param[in] resource the resource that the interface(s) will be added to
  * @param[in] iface_mask a bitwise ORed list of all interfaces supported by the
@@ -1605,18 +1567,6 @@ bool oc_send_ping(bool custody, oc_endpoint_t *endpoint,
   @defgroup doc_module_tag_common_operations Common operations
   @{
 */
-/**
- * Set the immutable device identifier
- *
- * This will set the `piid` device property (a.k.a Protocol Independent ID)
- *
- * Unlike device id `di` device property the `piid` will remain the same even
- * after device resets.
- *
- * @param[in] device the logical device index
- * @param[in] piid the UUID for the immutable device identifier
- */
-void oc_set_immutable_device_identifier(size_t device, oc_uuid_t *piid);
 
 /**
  * Schedule a callback to be invoked after a set number of seconds.
