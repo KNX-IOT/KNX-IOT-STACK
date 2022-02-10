@@ -35,6 +35,12 @@ typedef void (*oc_spake_cb_t)(int error, uint8_t *secret, int secret_size);
  */
 bool oc_set_spake_response_cb(oc_spake_cb_t my_func);
 
+/**
+ * @brief initiate the spake handshake
+ * 
+ * @param endpoint the endpoint of the device to be used
+ * @return int success full start up of the handshake
+ */
 int oc_initiate_spake(oc_endpoint_t *endpoint);
 
 typedef void (*oc_s_mode_response_cb_t)(char *url, oc_rep_t *rep,

@@ -17,6 +17,7 @@
 #include "oc_api.h"
 #include "api/oc_knx_dev.h"
 #include "api/oc_knx_fp.h"
+#include "api/oc_knx_sec.h"
 
 #include "oc_core_res.h"
 #include "oc_discovery.h"
