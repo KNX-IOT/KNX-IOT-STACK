@@ -56,7 +56,7 @@ oc_oscore_find_context_by_kid(oc_oscore_context_t *ctx, size_t device,
     ctx = (oc_oscore_context_t *)oc_list_head(contexts);
   }
 
-  PRINT("oc_oscore_find_context_by_kid : %d\n  Kid:", device);
+  PRINT("oc_oscore_find_context_by_kid : %d\n  Kid:", (int)device);
   OC_LOGbytes_OSCORE(kid, kid_len);
 
   while (ctx != NULL) {
@@ -168,8 +168,8 @@ oc_oscore_add_context(size_t device, const char *senderid,
   ctx->device = device;
   ctx->ssn = ssn;
 
-  PRINT("  device  %d\n", device);
-  PRINT("  ssn     %d\n", ssn);
+  PRINT("  device  %d\n", (int)device);
+  PRINT("  ssn     %d\n", (int)ssn);
   PRINT("  ms      ");
   int length = strlen(mastersecret);
   for (int i = 0; i < length; i++) {
