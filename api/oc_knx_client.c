@@ -418,6 +418,7 @@ oc_send_s_mode(oc_endpoint_t *endpoint, char *path, int sia_value,
 #ifndef OC_OSCORE
   if (oc_init_post(path, endpoint, NULL, NULL, LOW_QOS, NULL)) {
 #else  /* OC_OSCORE */
+  endpoint->flags = endpoint->flags | OSCORE;
   if (oc_init_multicast_update(endpoint, path, NULL)) {
 #endif /* OC_OSCORE */
     /*

@@ -89,45 +89,47 @@ typedef struct oc_group_object_notification_t
  *
  */
 typedef enum {
-  LSM_UNLOADED = 0, ///< state is unloaded, e.g. ready for loading
-  LSM_LOADED,       ///< state is LOADED, e.g. normal operation
-  LSM_LOADCOMPLETE, ///< cmd loading complete, state will be LOADED
-  LSM_STARTLOADING, ///< cmd loading started, state will be LOADING
-  LSM_LOADING,      ///< state loading.
-  LSM_UNLOAD        ///< cmd unload: state will be UNLOADED
+  LSM_S_UNLOADED = 0,      /**< (0) state is unloaded, e.g. ready for loading */
+  LSM_S_LOADED = 1,        /**< (1) state is LOADED, e.g. normal operation */
+  LSM_S_LOADING = 2,       /**< (2) state loading. */
+  LSM_S_UNLOADING = 4,     /**< (4) state unloading loading. */
+  LSM_S_LOADCOMPLETING = 5 /**< (5) cmd unload: state will be UNLOADED */
 } oc_lsm_state_t;
 
 /**
- * @brief check if the lsm state is loaded
+ * @brief LSM event values
+ *
+ */
+typedef enum {
+  LSM_E_NOP = 0,          /**< (0) No operation */
+  LSM_E_STARTLOADING = 1, /**< (1) Request to start the loading of the loadable part */
+  LSM_E_LOADCOMPLETE = 2, /**< (2) cmd loading complete, state will be LOADED */
+  LSM_E_UNLOAD  = 4       /**< (4) cmd unload: state will be UNLOADED */
+} oc_lsm_event_t;
+
+
+/**
+ * @brief check if the lsm state
  *
  * @param device index of the device to which the resource is to be created
  */
 oc_lsm_state_t oc_knx_lsm_state(size_t device);
 
 /**
- * @brief checks if the load state machine (lsm) string contains a valid value
+ * @brief convert the load state machine (lsm) event to string
  *
- * @param lsm The lsm as string
- * @return true correct value
- * @return false incorrect value
+ * @param lsm_e the state
+ * @return const char* The state as string
  */
-bool oc_core_lsm_check_string(const char *lsm);
-
-/**
- * @brief convert the load state machine (lsm) string to lsm state
- *
- * @param lsm The state as string
- * @return oc_lsm_state_t The state as struct
- */
-oc_lsm_state_t oc_core_lsm_parse_string(const char *lsm);
+const char *oc_core_get_lsm_e_as_string(oc_lsm_state_t lsm_e);
 
 /**
  * @brief convert the load state machine (lsm) state to string
  *
- * @param lsm the state
+ * @param lsm_s the state
  * @return const char* The state as string
  */
-const char *oc_core_get_lsm_as_string(oc_lsm_state_t lsm);
+const char *oc_core_get_lsm_s_as_string(oc_lsm_event_t lsm_s);
 
 /**
  * @brief sets the ldevid
@@ -192,6 +194,9 @@ uint64_t oc_knx_get_osn();
  * @param device_index the device index to load the data for
  */
 void oc_knx_load_state(size_t device_index);
+
+
+int oc_reset_device(size_t device_index, int reset_value);
 
 /**
  * @brief Creation of the KNX device resources.

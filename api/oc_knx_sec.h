@@ -108,6 +108,8 @@ int oc_core_set_at_table(int index, oc_auth_at_t entry);
 
 void oc_oscore_set_auth(uint8_t *shared_key, int shared_key_size);
 
+void oc_delete_at_table();
+
 /**
  * @brief retrieve the replay window
  *

@@ -310,8 +310,10 @@ def do_sequence_lsm(my_stack):
     my_stack.purge_response(response)
 
     print("-------------------")
-    content = {2 : "startLoading"}
-    expect = { "3": "loading"}
+    #content = {2 : "startLoading"}
+    #expect = { "3": "loading"}
+    content = {2 : 1}
+    expect = { "3" : 2 }
     response =  my_stack.issue_cbor_post(sn,"/a/lsm",content)
     print ("response:",response)
     my_stack.purge_response(response)
@@ -324,8 +326,10 @@ def do_sequence_lsm(my_stack):
     my_stack.purge_response(response)
 
     print("-------------------")
-    content = {2 : "loadComplete"}
-    expect  = { "3": "loaded"}
+    #content = {2 : "loadComplete"}
+    #expect  = { "3": "loaded"}
+    content = {2 : 2 }
+    expect  = { "3": 1}
     response =  my_stack.issue_cbor_post(sn,"/a/lsm",content)
     print ("response:",response)
     my_stack.purge_response(response)
@@ -340,6 +344,8 @@ def do_sequence_lsm(my_stack):
     print("-------------------")
     content = {2 : "unload"}
     expect  = { "3": "unloaded"}
+    content = {2 : 4 }
+    expect  = { "3": 0 }
     response =  my_stack.issue_cbor_post(sn,"/a/lsm",content)
     print ("response:",response)
     my_stack.purge_response(response)

@@ -526,23 +526,6 @@ void oc_set_random_pin_callback(oc_random_pin_cb_t cb, void *data);
  */
 void oc_reset();
 
-/**
- * Reset logical device to the RFOTM state
- *
- * The device will be placed in the 'Ready For Ownership Transfer Mode' (RFOTM).
- * This is the initial state startup state for for all devices that have not yet
- * been onboarded.  After this call the device will need to be onboarded and
- * provisioned again.
- *
- * @note The function oc_reset_device() deals only with security and
- *       provisioning it does not reset any other device settings.
- *
- * @note Use of this function requires building the stack with OC_SECURITY
- *       defined.
- *
- * @param[in] device index of the logical device to reset
- */
-void oc_reset_device(size_t device);
 
 /**
  * Callback invoked when the "owned" property of the doxm is changed
