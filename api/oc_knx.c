@@ -25,7 +25,7 @@
 #include "oc_rep.h" // should not be needed
 
 #ifdef OC_SPAKE
-#include "security/oc_spake2plus.h" =
+#include "security/oc_spake2plus.h"
 #endif
 
 #define TAGS_AS_STRINGS
@@ -254,7 +254,7 @@ oc_knx_lsm_state(size_t device_index)
 {
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device == NULL) {
-    OC_ERR("device not found %d", device_index);
+    OC_ERR("device not found %d", (int)device_index);
     return LSM_S_UNLOADED;
   }
 
@@ -262,7 +262,7 @@ oc_knx_lsm_state(size_t device_index)
 }
 
 const char *
-oc_core_get_lsm_s_as_string(oc_lsm_state_t lsm)
+oc_core_get_lsm_state_as_string(oc_lsm_state_t lsm)
 {
   // states
   if (lsm == LSM_S_UNLOADED) {
@@ -286,7 +286,7 @@ oc_core_get_lsm_s_as_string(oc_lsm_state_t lsm)
 
 
 const char *
-oc_core_get_lsm_e_as_string(oc_lsm_event_t lsm)
+oc_core_get_lsm_event_as_string(oc_lsm_event_t lsm)
 {
   // commands
   if (lsm == LSM_E_NOP) {
@@ -402,9 +402,9 @@ oc_core_knx_lsm_post_handler(oc_request_t *request,
   }/* while */
 
   PRINT("  load event %d [%s]\n", event,
-        oc_core_get_lsm_e_as_string(event));
+        oc_core_get_lsm_event_as_string((oc_lsm_event_t)event));
   // check the input and change the state
-  changed = oc_lsm_event_to_state(event, device);
+  changed = oc_lsm_event_to_state((oc_lsm_event_t)event, device);
 
   /* input was set, so create the response*/
   if (changed == true) {
@@ -1244,7 +1244,7 @@ oc_knx_load_state(size_t device_index)
 
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device == NULL) {
-    OC_ERR(" could not get device %d\n", device_index);
+    OC_ERR(" could not get device %d\n", (int)device_index);
     return;
   }
 
@@ -1252,7 +1252,7 @@ oc_knx_load_state(size_t device_index)
   if (temp_size > 0) {
     device->lsm_s = lsm;
     PRINT("  load state (storage) %ld [%s]\n", (long)lsm,
-          oc_core_get_lsm_s_as_string(lsm));
+          oc_core_get_lsm_state_as_string((oc_lsm_state_t)lsm));
   }
 
   oc_knx_load_fingerprint();
