@@ -127,7 +127,7 @@ oc_create_knx_p_oscore_osndelay_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_p_oscore_osndelay_resource\n");
   //
-  oc_core_lf_populate_resource(
+  oc_core_populate_resource(
     resource_idx, device, "p/oscore/osndelay", OC_IF_D, APPLICATION_CBOR,
     OC_DISCOVERABLE, oc_core_knx_f_oscore_osndelay_get_handler,
     oc_core_knx_p_oscore_osndelay_put_handler, 0, 0, 1, ":dpt:timePeriodMsec");
@@ -192,7 +192,7 @@ oc_create_knx_p_oscore_replwdo_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_p_oscore_replwdo_resource\n");
   //
-  oc_core_lf_populate_resource(
+  oc_core_populate_resource(
     resource_idx, device, "/p/oscore/replwdo", OC_IF_D, APPLICATION_CBOR,
     OC_DISCOVERABLE, oc_core_knx_p_oscore_replwdo_get_handler,
     oc_core_knx_p_oscore_replwdo_put_handler, 0, 0, 1, ":dpt.value2UCount");
@@ -240,7 +240,7 @@ oc_create_knx_f_oscore_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_f_oscore_resource\n");
   //
-  oc_core_lf_populate_resource(resource_idx, device, "/f/oscore", OC_IF_LI,
+  oc_core_populate_resource(resource_idx, device, "/f/oscore", OC_IF_LI,
                                APPLICATION_LINK_FORMAT, OC_DISCOVERABLE,
                                oc_core_knx_f_oscore_get_handler, 0, 0, 0, 1,
                                "urn:knx:xxx");
@@ -313,7 +313,7 @@ oc_create_a_sen_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_a_sen_resource\n");
   // "/a/sen"
-  oc_core_lf_populate_resource(resource_idx, device, "/a/sen", OC_IF_SEC,
+  oc_core_populate_resource(resource_idx, device, "/a/sen", OC_IF_SEC,
                                APPLICATION_CBOR, OC_DISCOVERABLE, 0, 0,
                                oc_core_a_sen_post_handler, 0, 0, "");
 }
@@ -598,7 +598,7 @@ oc_create_auth_at_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_auth_at_resource\n");
   // "/a/sen"
-  oc_core_lf_populate_resource(resource_idx, device, "/auth/at",
+  oc_core_populate_resource(resource_idx, device, "/auth/at",
                                OC_IF_B | OC_IF_SEC, APPLICATION_LINK_FORMAT,
                                OC_DISCOVERABLE, oc_core_auth_at_get_handler, 0,
                                oc_core_auth_at_post_handler, 0, 1, "dpt.a[n]");
@@ -778,7 +778,7 @@ oc_create_auth_at_x_resource(int resource_idx, size_t device)
   OC_DBG("oc_create_auth_at_x_resource\n");
   PRINT("oc_create_auth_at_x_resource\n");
   // "/a/sen"
-  oc_core_lf_populate_resource(resource_idx, device, "/auth/at/*", OC_IF_SEC,
+  oc_core_populate_resource(resource_idx, device, "/auth/at/*", OC_IF_SEC,
                                APPLICATION_CBOR, OC_DISCOVERABLE,
                                oc_core_auth_at_x_get_handler, 0, 0,
                                oc_core_auth_at_x_delete_handler, 1, "dpt.a[n]");
@@ -821,7 +821,7 @@ oc_create_knx_auth_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_auth_resource\n");
   //
-  oc_core_lf_populate_resource(
+  oc_core_populate_resource(
     resource_idx, device, "/auth", OC_IF_LI, APPLICATION_LINK_FORMAT,
     OC_DISCOVERABLE, oc_core_knx_auth_get_handler, 0, 0, 0, 1, "urn:knx:xxx");
 }

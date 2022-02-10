@@ -561,42 +561,9 @@ oc_store_uri(const char *s_uri, oc_string_t *d_uri)
   }
 }
 
-void
-oc_core_populate_resource(int core_resource, size_t device_index,
-                          const char *uri, oc_interface_mask_t iface_mask,
-                          int properties,
-                          oc_request_callback_t get, oc_request_callback_t put,
-                          oc_request_callback_t post,
-                          oc_request_callback_t delete, int num_resource_types,
-                          ...)
-{
-  oc_resource_t *r = oc_core_get_resource_by_index(core_resource, device_index);
-  if (!r) {
-    return;
-  }
-  r->device = device_index;
-  oc_store_uri(uri, &r->uri);
-  r->properties = properties;
-  va_list rt_list;
-  int i;
-  va_start(rt_list, num_resource_types);
-  if (num_resource_types > 0) {
-    oc_new_string_array(&r->types, num_resource_types);
-    for (i = 0; i < num_resource_types; i++) {
-      oc_string_array_add_item(r->types, va_arg(rt_list, const char *));
-    }
-  }
-  va_end(rt_list);
-  r->interfaces = iface_mask;
-  r->content_type = APPLICATION_CBOR;
-  r->get_handler.cb = get;
-  r->put_handler.cb = put;
-  r->post_handler.cb = post;
-  r->delete_handler.cb = delete;
-}
 
 void
-oc_core_lf_populate_resource(int core_resource, size_t device_index,
+oc_core_populate_resource(int core_resource, size_t device_index,
                              const char *uri, oc_interface_mask_t iface_mask,
                              oc_content_format_t content_type, int properties,
                              oc_request_callback_t get,
