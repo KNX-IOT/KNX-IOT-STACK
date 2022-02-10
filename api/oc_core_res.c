@@ -564,7 +564,7 @@ oc_store_uri(const char *s_uri, oc_string_t *d_uri)
 void
 oc_core_populate_resource(int core_resource, size_t device_index,
                           const char *uri, oc_interface_mask_t iface_mask,
-                          oc_interface_mask_t default_interface, int properties,
+                          int properties,
                           oc_request_callback_t get, oc_request_callback_t put,
                           oc_request_callback_t post,
                           oc_request_callback_t delete, int num_resource_types,

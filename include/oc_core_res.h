@@ -280,7 +280,6 @@ void oc_store_uri(const char *s_uri, oc_string_t *d_uri);
  * @param device_index the device index
  * @param uri the URI for the resource
  * @param iface_mask interfaces (as mask) to be implemented on the resource
- * @param default_interface the default interface
  * @param properties the properties (as mask)
  * @param get_cb get callback function
  * @param put_cb put callback function
@@ -292,7 +291,6 @@ void oc_store_uri(const char *s_uri, oc_string_t *d_uri);
  */
 void oc_core_populate_resource(int core_resource, size_t device_index,
                                const char *uri, oc_interface_mask_t iface_mask,
-                               oc_interface_mask_t default_interface,
                                int properties, oc_request_callback_t get_cb,
                                oc_request_callback_t put_cb,
                                oc_request_callback_t post_cb,
