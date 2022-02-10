@@ -118,10 +118,10 @@ oc_lsm_state_t oc_knx_lsm_state(size_t device);
 /**
  * @brief convert the load state machine (lsm) event to string
  *
- * @param lsm_e the state
+ * @param lsm_e the event
  * @return const char* The state as string
  */
-const char *oc_core_get_lsm_event_as_string(oc_lsm_state_t lsm_e);
+const char *oc_core_get_lsm_event_as_string(oc_lsm_event_t lsm_e);
 
 /**
  * @brief convert the load state machine (lsm) state to string
@@ -129,7 +129,7 @@ const char *oc_core_get_lsm_event_as_string(oc_lsm_state_t lsm_e);
  * @param lsm_s the state
  * @return const char* The state as string
  */
-const char *oc_core_get_lsm_state_as_string(oc_lsm_event_t lsm_s);
+const char *oc_core_get_lsm_state_as_string(oc_lsm_state_t lsm_s);
 
 /**
  * @brief sets the ldevid
