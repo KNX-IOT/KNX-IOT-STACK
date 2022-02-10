@@ -1094,7 +1094,7 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
   if (cur_resource) {
     /* If there was no interface selection, pick the "default interface". */
     iface_mask = iface_query;
-    //if (iface_mask == 0)
+    // if (iface_mask == 0)
     //   iface_mask = cur_resource->interfaces;
 
     /* Found the matching resource object. Now verify that:
@@ -1104,7 +1104,7 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
      *
      * If not, return a 4.00 response.
      */
-    //if (((iface_mask & ~cur_resource->interfaces) != 0) ||
+    // if (((iface_mask & ~cur_resource->interfaces) != 0) ||
     //    !does_interface_support_method(iface_mask, method)) {
     //  forbidden = true;
     //  bad_request = true;

@@ -371,8 +371,8 @@ oc_create_discovery_resource(int resource_idx, size_t device)
 {
   if (resource_idx == WELLKNOWNCORE) {
     oc_core_populate_resource(resource_idx, device, "/.well-known/core", 0,
-                                 APPLICATION_LINK_FORMAT, OC_DISCOVERABLE,
-                                 oc_wkcore_discovery_handler, 0, 0, 0, 1, "wk");
+                              APPLICATION_LINK_FORMAT, OC_DISCOVERABLE,
+                              oc_wkcore_discovery_handler, 0, 0, 0, 1, "wk");
   }
 }
 

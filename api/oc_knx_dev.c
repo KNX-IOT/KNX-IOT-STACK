@@ -156,9 +156,9 @@ oc_create_dev_fwv_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_dev_fwv_resource\n");
   oc_core_populate_resource(resource_idx, device, "/dev/fwv", OC_IF_D,
-                               APPLICATION_CBOR, OC_DISCOVERABLE,
-                               oc_core_dev_fwv_get_handler, 0, 0, 0, 2,
-                               ":dpa.0.54", ":dpt.version");
+                            APPLICATION_CBOR, OC_DISCOVERABLE,
+                            oc_core_dev_fwv_get_handler, 0, 0, 0, 2,
+                            ":dpa.0.54", ":dpt.version");
 }
 
 // -----------------------------------------------------------------------------
@@ -193,9 +193,9 @@ oc_create_dev_hwt_resource(int resource_idx, size_t device)
   OC_DBG("oc_create_dev_hwt_resource\n");
   // cbor rt :dpt.varString8859_1
   oc_core_populate_resource(resource_idx, device, "/dev/hwt", OC_IF_D,
-                               APPLICATION_CBOR, OC_DISCOVERABLE,
-                               oc_core_dev_hwt_get_handler, 0, 0, 0, 1,
-                               ":dpt.varString8859_1");
+                            APPLICATION_CBOR, OC_DISCOVERABLE,
+                            oc_core_dev_hwt_get_handler, 0, 0, 0, 1,
+                            ":dpt.varString8859_1");
 }
 
 // -----------------------------------------------------------------------------

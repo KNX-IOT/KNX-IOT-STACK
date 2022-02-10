@@ -285,10 +285,10 @@ void
 oc_create_knx_swu_lastupdate_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_swu_lastupdate_resource\n");
-  oc_core_populate_resource(
-    resource_idx, device, "/swu/lastupdate", OC_IF_D | OC_IF_SWU,
-    APPLICATION_CBOR, OC_DISCOVERABLE, oc_knx_swu_lastupdate_get_handler, 0, 0,
-    0, 1, "urn:knx:dpt.varString8859_1");
+  oc_core_populate_resource(resource_idx, device, "/swu/lastupdate",
+                            OC_IF_D | OC_IF_SWU, APPLICATION_CBOR,
+                            OC_DISCOVERABLE, oc_knx_swu_lastupdate_get_handler,
+                            0, 0, 0, 1, "urn:knx:dpt.varString8859_1");
 }
 
 static void
@@ -317,9 +317,9 @@ oc_create_knx_swu_result_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_swu_result_resource\n");
   oc_core_populate_resource(resource_idx, device, "/swu/result",
-                               OC_IF_D | OC_IF_SWU, APPLICATION_CBOR,
-                               OC_DISCOVERABLE, oc_knx_swu_result_get_handler,
-                               0, 0, 0, 1, "urn:knx:dpt.value1UCount");
+                            OC_IF_D | OC_IF_SWU, APPLICATION_CBOR,
+                            OC_DISCOVERABLE, oc_knx_swu_result_get_handler, 0,
+                            0, 0, 1, "urn:knx:dpt.value1UCount");
 }
 
 static void
@@ -347,9 +347,9 @@ oc_create_knx_swu_state_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_swu_state_resource\n");
   oc_core_populate_resource(resource_idx, device, "/swu/state",
-                               OC_IF_D | OC_IF_SWU, APPLICATION_CBOR,
-                               OC_DISCOVERABLE, oc_knx_swu_state_get_handler, 0,
-                               0, 0, 1, "urn:knx:dpt.value1UCount");
+                            OC_IF_D | OC_IF_SWU, APPLICATION_CBOR,
+                            OC_DISCOVERABLE, oc_knx_swu_state_get_handler, 0, 0,
+                            0, 1, "urn:knx:dpt.value1UCount");
 }
 
 static void
@@ -384,10 +384,10 @@ void
 oc_create_knx_swu_update_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_swu_update_resource\n");
-  oc_core_populate_resource(
-    resource_idx, device, "/swu/update", OC_IF_D | OC_IF_SWU, APPLICATION_CBOR,
-    OC_DISCOVERABLE, 0, oc_knx_swu_update_put_handler, 0, 0, 1,
-    ":dpt.value2UCount");
+  oc_core_populate_resource(resource_idx, device, "/swu/update",
+                            OC_IF_D | OC_IF_SWU, APPLICATION_CBOR,
+                            OC_DISCOVERABLE, 0, oc_knx_swu_update_put_handler,
+                            0, 0, 1, ":dpt.value2UCount");
 }
 
 static void
@@ -529,9 +529,9 @@ oc_create_knx_swu_a_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_reset_resource\n");
   oc_core_populate_resource(resource_idx, device, "a/swu", OC_IF_NONE,
-                               APPLICATION_CBOR, OC_DISCOVERABLE, 0,
-                               oc_knx_swu_a_put_handler,
-                               oc_knx_swu_a_post_handler, 0, 1, ":dpt.file");
+                            APPLICATION_CBOR, OC_DISCOVERABLE, 0,
+                            oc_knx_swu_a_put_handler, oc_knx_swu_a_post_handler,
+                            0, 1, ":dpt.file");
 }
 
 static void
@@ -560,9 +560,9 @@ oc_create_knx_swu_pkgbytes_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_swu_pkgbytes_resource\n");
   oc_core_populate_resource(resource_idx, device, "/swu/bytes", OC_IF_NONE,
-                               APPLICATION_CBOR, OC_DISCOVERABLE,
-                               oc_knx_swu_bytes_get_handler, 0, 0, 0, 1,
-                               "urn:knx:dpt.value4UCount");
+                            APPLICATION_CBOR, OC_DISCOVERABLE,
+                            oc_knx_swu_bytes_get_handler, 0, 0, 0, 1,
+                            "urn:knx:dpt.value4UCount");
 }
 
 static void
@@ -646,9 +646,9 @@ oc_create_knx_swu_pkgnames_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_swu_pkgnames_resource\n");
   oc_core_populate_resource(resource_idx, device, "/swu/pkgnames", OC_IF_D,
-                               APPLICATION_CBOR, OC_DISCOVERABLE,
-                               oc_knx_swu_pkgnames_get_handler, 0, 0, 0, 0, 1,
-                               ":dpt.a[n]");
+                            APPLICATION_CBOR, OC_DISCOVERABLE,
+                            oc_knx_swu_pkgnames_get_handler, 0, 0, 0, 0, 1,
+                            ":dpt.a[n]");
 }
 
 static void

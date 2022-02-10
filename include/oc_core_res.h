@@ -291,12 +291,14 @@ void oc_store_uri(const char *s_uri, oc_string_t *d_uri);
  * arguments after this argument
  * @param ...
  */
-void oc_core_populate_resource(
-  int core_resource, size_t device_index, const char *uri,
-  oc_interface_mask_t iface_mask, oc_content_format_t content_format,
-  int properties, oc_request_callback_t get_cb, oc_request_callback_t put_cb,
-  oc_request_callback_t post_cb, oc_request_callback_t delete_cb,
-  int num_resource_types, ...);
+void oc_core_populate_resource(int core_resource, size_t device_index,
+                               const char *uri, oc_interface_mask_t iface_mask,
+                               oc_content_format_t content_format,
+                               int properties, oc_request_callback_t get_cb,
+                               oc_request_callback_t put_cb,
+                               oc_request_callback_t post_cb,
+                               oc_request_callback_t delete_cb,
+                               int num_resource_types, ...);
 
 /**
  * @brief filter if the query parameters of the request contains the resource
