@@ -31,7 +31,7 @@ typedef struct oc_factory_presets_t
 
 oc_factory_presets_t *oc_get_factory_presets_cb(void);
 
-//typedef struct oc_random_pin_t
+// typedef struct oc_random_pin_t
 //{
 //  oc_random_pin_cb_t cb;
 //  void *data;

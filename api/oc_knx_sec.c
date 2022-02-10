@@ -284,7 +284,8 @@ oc_core_a_sen_post_handler(oc_request_t *request,
   /* loop over the request document to check if all inputs are ok */
   rep = request->request_payload;
   while (rep != NULL) {
-    PRINT("oc_core_a_sen_post_handler: key: (check) %s \n", oc_string(rep->name));
+    PRINT("oc_core_a_sen_post_handler: key: (check) %s \n",
+          oc_string(rep->name));
     if (rep->type == OC_REP_STRING) {
       if (rep->iname == 2) {
         cmd = a_sen_convert_cmd(oc_string(rep->value.string));
@@ -294,7 +295,6 @@ oc_core_a_sen_post_handler(oc_request_t *request,
     }
     rep = rep->next;
   }
-
 
   /* input was set, so create the response*/
   if (changed == true) {

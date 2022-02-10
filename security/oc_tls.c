@@ -63,7 +63,6 @@ static mbedtls_entropy_context entropy_ctx;
 static mbedtls_ctr_drbg_context ctr_drbg_ctx;
 static mbedtls_ssl_cookie_ctx cookie_ctx;
 
-
 #ifdef OC_CLIENT
 static bool use_pin_obt_psk_identity = false;
 void
@@ -359,7 +358,7 @@ bool
 oc_tls_is_pin_otm_supported(size_t device)
 {
   (void)device;
-  //if (random_pin.cb) {
+  // if (random_pin.cb) {
   //  return true;
   //}
   return false;

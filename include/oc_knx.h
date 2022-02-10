@@ -101,12 +101,12 @@ typedef enum {
  *
  */
 typedef enum {
-  LSM_E_NOP = 0,          /**< (0) No operation */
-  LSM_E_STARTLOADING = 1, /**< (1) Request to start the loading of the loadable part */
+  LSM_E_NOP = 0, /**< (0) No operation */
+  LSM_E_STARTLOADING =
+    1, /**< (1) Request to start the loading of the loadable part */
   LSM_E_LOADCOMPLETE = 2, /**< (2) cmd loading complete, state will be LOADED */
-  LSM_E_UNLOAD  = 4       /**< (4) cmd unload: state will be UNLOADED */
+  LSM_E_UNLOAD = 4        /**< (4) cmd unload: state will be UNLOADED */
 } oc_lsm_event_t;
-
 
 /**
  * @brief check if the lsm state
@@ -194,7 +194,6 @@ uint64_t oc_knx_get_osn();
  * @param device_index the device index to load the data for
  */
 void oc_knx_load_state(size_t device_index);
-
 
 int oc_reset_device(size_t device_index, int reset_value);
 

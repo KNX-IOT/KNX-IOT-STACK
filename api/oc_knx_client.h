@@ -37,7 +37,7 @@ bool oc_set_spake_response_cb(oc_spake_cb_t my_func);
 
 /**
  * @brief initiate the spake handshake
- * 
+ *
  * @param endpoint the endpoint of the device to be used
  * @return int success full start up of the handshake
  */

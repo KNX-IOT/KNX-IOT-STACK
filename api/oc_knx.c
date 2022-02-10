@@ -280,10 +280,9 @@ oc_core_get_lsm_state_as_string(oc_lsm_state_t lsm)
   if (lsm == LSM_S_LOADCOMPLETING) {
     return "load completing";
   }
- 
+
   return "";
 }
-
 
 const char *
 oc_core_get_lsm_event_as_string(oc_lsm_event_t lsm)
@@ -329,7 +328,6 @@ oc_lsm_event_to_state(oc_lsm_event_t lsm_e, oc_device_info_t *device)
   }
   return false;
 }
-
 
 static void
 oc_core_knx_lsm_get_handler(oc_request_t *request,
@@ -393,13 +391,13 @@ oc_core_knx_lsm_post_handler(oc_request_t *request,
   while (rep != NULL) {
     if (rep->type == OC_REP_INT) {
       if (rep->iname == 2) {
-          event = rep->value.integer;
-          changed = true;
+        event = rep->value.integer;
+        changed = true;
         break;
       }
     }
     rep = rep->next;
-  }/* while */
+  } /* while */
 
   PRINT("  load event %d [%s]\n", event,
         oc_core_get_lsm_event_as_string((oc_lsm_event_t)event));
@@ -412,7 +410,8 @@ oc_core_knx_lsm_post_handler(oc_request_t *request,
     oc_rep_i_set_int(root, 3, device->lsm_s);
     oc_rep_end_root_object();
 
-    oc_storage_write(LSM_STORE, (uint8_t *)&device->lsm_s, sizeof(device->lsm_s));
+    oc_storage_write(LSM_STORE, (uint8_t *)&device->lsm_s,
+                     sizeof(device->lsm_s));
 
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
     return;

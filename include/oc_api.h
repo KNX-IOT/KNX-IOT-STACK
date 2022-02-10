@@ -473,8 +473,6 @@ int oc_init_platform(const char *mfg_name,
  */
 void oc_reset();
 
-
-
 /* Server side */
 /**
   @defgroup doc_module_tag_server_side Server side
