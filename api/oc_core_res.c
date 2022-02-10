@@ -588,8 +588,7 @@ oc_core_populate_resource(int core_resource, size_t device_index,
   }
   va_end(rt_list);
   r->interfaces = iface_mask;
-  r->default_interface = default_interface;
-  r->content_type = APPLICATION_VND_OCF_CBOR;
+  r->content_type = APPLICATION_CBOR;
   r->get_handler.cb = get;
   r->put_handler.cb = put;
   r->post_handler.cb = post;
@@ -624,7 +623,6 @@ oc_core_lf_populate_resource(int core_resource, size_t device_index,
   }
   va_end(rt_list);
   r->interfaces = iface_mask;
-  r->default_interface = iface_mask;
   r->content_type = content_type;
   r->get_handler.cb = get;
   r->put_handler.cb = put;
