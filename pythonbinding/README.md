@@ -42,6 +42,13 @@ cmake -G"NMake Makefiles" ..
 nmake
 ```
 
+Building without security, use the command line option to disable OSCORE
+
+```bash
+cmake -G"NMake Makefiles" .. -DOC_OSCORE_ENABLED=false
+nmake
+```
+
 This command builds the windows shared library.
 Therefore the python code can be used directly from this folder.
 
@@ -50,6 +57,7 @@ python knx_stack.py
 ```
 
 ## Build Shared Library on Linux
+
 Within the build directory:
 
 ```bash

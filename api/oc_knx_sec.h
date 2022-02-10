@@ -103,9 +103,29 @@ typedef struct oc_auth_at_t
   int ga_len; //< length of the array of ga identifiers
 } oc_auth_at_t;
 
+/**
+ * @brief set an entry in the auth/at table
+ *
+ * @param index index in the table, will overwrite if something is there
+ * @param entry the auth/at entry
+ * @return int 0 == successfull
+ */
 int oc_core_set_at_table(int index, oc_auth_at_t entry);
 
+/**
+ * @brief set shared (SPAKE) key
+ * TBD if this remains
+ *
+ * @param shared_key the master key after SPAKE2 handshake
+ * @param shared_key_size the key size
+ */
 void oc_oscore_set_auth(uint8_t *shared_key, int shared_key_size);
+
+/**
+ * @brief delete the /auth/at table
+ * will be used in reset of the device
+ */
+void oc_delete_at_table();
 
 /**
  * @brief retrieve the replay window
@@ -137,6 +157,11 @@ uint64_t oc_oscore_get_osndelay();
  */
 void oc_create_knx_sec_resources(size_t device);
 
+/**
+ * @brief initialize OSCORE for the device
+ *
+ * @param device_index The device index
+ */
 void oc_init_oscore(size_t device_index);
 
 /**

@@ -25,7 +25,7 @@
 #include "oc_rep.h" // should not be needed
 
 #ifdef OC_SPAKE
-#include "security/oc_spake2plus.h" =
+#include "security/oc_spake2plus.h"
 #endif
 
 #define TAGS_AS_STRINGS
@@ -86,11 +86,11 @@ restart_device()
 }
 
 int
-reset_device(int value)
+oc_reset_device(size_t device_index, int value)
 {
   PRINT("reset device: %d\n", value);
 
-  oc_knx_device_storage_reset(0, value);
+  oc_knx_device_storage_reset(device_index, value);
 
   return 0;
 }
@@ -207,7 +207,7 @@ oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     restart_device();
     error = false;
   } else if (cmd == RESET_DEVICE) {
-    reset_device(value);
+    oc_reset_device(0, value);
     error = false;
   }
 
@@ -254,114 +254,79 @@ oc_knx_lsm_state(size_t device_index)
 {
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device == NULL) {
-    OC_ERR("device not found %d", device_index);
-    return LSM_UNLOADED;
+    OC_ERR("device not found %d", (int)device_index);
+    return LSM_S_UNLOADED;
   }
 
-  return device->lsm;
+  return device->lsm_s;
 }
 
 const char *
-oc_core_get_lsm_as_string(oc_lsm_state_t lsm)
+oc_core_get_lsm_state_as_string(oc_lsm_state_t lsm)
 {
   // states
-  if (lsm == LSM_UNLOADED) {
+  if (lsm == LSM_S_UNLOADED) {
     return "unloaded";
   }
-  if (lsm == LSM_LOADING) {
-    return "loading";
-  }
-  if (lsm == LSM_LOADED) {
+  if (lsm == LSM_S_LOADED) {
     return "loaded";
   }
-  // commands
-  if (lsm == LSM_UNLOAD) {
-    return "unload";
+  if (lsm == LSM_S_LOADING) {
+    return "loading";
   }
-  if (lsm == LSM_STARTLOADING) {
+  if (lsm == LSM_S_UNLOADING) {
+    return "unloading";
+  }
+  if (lsm == LSM_S_LOADCOMPLETING) {
+    return "load completing";
+  }
+
+  return "";
+}
+
+const char *
+oc_core_get_lsm_event_as_string(oc_lsm_event_t lsm)
+{
+  // commands
+  if (lsm == LSM_E_NOP) {
+    return "nop";
+  }
+  if (lsm == LSM_E_STARTLOADING) {
     return "startLoading";
   }
-  if (lsm == LSM_LOADCOMPLETE) {
+  if (lsm == LSM_E_LOADCOMPLETE) {
     return "loadComplete";
+  }
+  if (lsm == LSM_E_UNLOAD) {
+    return "unload";
   }
 
   return "";
 }
 
 bool
-oc_core_lsm_check_string(const char *lsm)
+oc_lsm_event_to_state(oc_lsm_event_t lsm_e, oc_device_info_t *device)
 {
-  int len = strlen(lsm);
-
-  // states
-  if (len == 8 && strncmp(lsm, "unloaded", 8) == 0) {
+  if (lsm_e == LSM_E_NOP) {
+    // do nothing
     return true;
   }
-  if (len == 7 && strncmp(lsm, "loading", 7) == 0) {
+  if (lsm_e == LSM_E_STARTLOADING) {
+    device->lsm_s = LSM_S_LOADING;
     return true;
   }
-  if (len == 6 && strncmp(lsm, "loaded", 6) == 0) {
+  if (lsm_e == LSM_E_LOADCOMPLETE) {
+    device->lsm_s = LSM_S_LOADED;
     return true;
   }
-
-  // commands
-  if (len == 6 && strncmp(lsm, "unload", 6) == 0) {
+  if (lsm_e == LSM_E_UNLOAD) {
+    // do a reset
+    oc_delete_group_rp_table();
+    oc_delete_group_object_table();
+    device->lsm_s = LSM_S_UNLOADED;
     return true;
   }
-  if (len == 12 && strncmp(lsm, "startLoading", 12) == 0) {
-    return true;
-  }
-  if (len == 12 && strncmp(lsm, "loadComplete", 12) == 0) {
-    return true;
-  }
-
   return false;
-}
-
-oc_lsm_state_t
-oc_core_lsm_parse_string(const char *lsm)
-{
-  int len = strlen(lsm);
-
-  // states
-  if (len == 8 && strncmp(lsm, "unloaded", 8) == 0) {
-    return LSM_UNLOADED;
-  }
-  if (len == 7 && strncmp(lsm, "loading", 7) == 0) {
-    return LSM_LOADING;
-  }
-  if (len == 6 && strncmp(lsm, "loaded", 6) == 0) {
-    return LSM_LOADED;
-  }
-
-  // commands
-  if (len == 6 && strncmp(lsm, "unload", 6) == 0) {
-    return LSM_UNLOAD;
-  }
-  if (len == 12 && strncmp(lsm, "startLoading", 12) == 0) {
-    return LSM_STARTLOADING;
-  }
-  if (len == 12 && strncmp(lsm, "loadComplete", 12) == 0) {
-    return LSM_LOADCOMPLETE;
-  }
-
-  return LSM_UNLOADED;
-}
-
-oc_lsm_state_t
-oc_core_lsm_cmd_to_state(oc_lsm_state_t cmd)
-{
-  if (cmd == LSM_STARTLOADING) {
-    return LSM_LOADING;
-  }
-  if (cmd == LSM_LOADCOMPLETE) {
-    return LSM_LOADED;
-  }
-  if (cmd == LSM_UNLOAD) {
-    return LSM_UNLOADED;
-  }
-
-  return LSM_UNLOADED;
 }
 
 static void
@@ -389,7 +354,7 @@ oc_core_knx_lsm_get_handler(oc_request_t *request,
   oc_lsm_state_t lsm = oc_knx_lsm_state(device_index);
 
   oc_rep_start_root_object();
-  oc_rep_i_set_text_string(root, 3, oc_core_get_lsm_as_string(lsm));
+  oc_rep_i_set_int(root, 3, lsm);
   oc_rep_end_root_object();
 
   oc_send_cbor_response(request, OC_STATUS_OK);
@@ -420,40 +385,33 @@ oc_core_knx_lsm_post_handler(oc_request_t *request,
   }
 
   bool changed = false;
-  /* loop over the request document to check if all inputs are ok */
+  int event = LSM_E_NOP;
+  /* loop over the request document */
   rep = request->request_payload;
   while (rep != NULL) {
-    PRINT("key: (check) %s \n", oc_string(rep->name));
-    if (rep->type == OC_REP_STRING) {
-#ifdef TAGS_AS_STRINGS
-      if (oc_string_len(rep->name) == 3 &&
-          memcmp(oc_string(rep->name), "cmd", 3) == 0) {
-        oc_lsm_state_t state =
-          oc_core_lsm_parse_string(oc_string(rep->value.string));
-        device->lsm = oc_core_lsm_cmd_to_state(state);
-        changed = true;
-        break;
-      }
-#endif
+    if (rep->type == OC_REP_INT) {
       if (rep->iname == 2) {
-        oc_lsm_state_t state =
-          oc_core_lsm_parse_string(oc_string(rep->value.string));
-        device->lsm = oc_core_lsm_cmd_to_state(state);
+        event = rep->value.integer;
         changed = true;
         break;
       }
     }
-
     rep = rep->next;
-  }
+  } /* while */
+
+  PRINT("  load event %d [%s]\n", event,
+        oc_core_get_lsm_event_as_string((oc_lsm_event_t)event));
+  // check the input and change the state
+  changed = oc_lsm_event_to_state((oc_lsm_event_t)event, device);
 
   /* input was set, so create the response*/
   if (changed == true) {
     oc_rep_start_root_object();
-    oc_rep_i_set_text_string(root, 3, oc_core_get_lsm_as_string(device->lsm));
+    oc_rep_i_set_int(root, 3, device->lsm_s);
     oc_rep_end_root_object();
 
-    oc_storage_write(LSM_STORE, (uint8_t *)&device->lsm, sizeof(device->lsm));
+    oc_storage_write(LSM_STORE, (uint8_t *)&device->lsm_s,
+                     sizeof(device->lsm_s));
 
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
     return;
@@ -1285,15 +1243,15 @@ oc_knx_load_state(size_t device_index)
 
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device == NULL) {
-    OC_ERR(" could not get device %d\n", device_index);
+    OC_ERR(" could not get device %d\n", (int)device_index);
     return;
   }
 
   temp_size = oc_storage_read(LSM_STORE, (uint8_t *)&lsm, sizeof(lsm));
   if (temp_size > 0) {
-    device->lsm = lsm;
+    device->lsm_s = lsm;
     PRINT("  load state (storage) %ld [%s]\n", (long)lsm,
-          oc_core_get_lsm_as_string(lsm));
+          oc_core_get_lsm_state_as_string((oc_lsm_state_t)lsm));
   }
 
   oc_knx_load_fingerprint();

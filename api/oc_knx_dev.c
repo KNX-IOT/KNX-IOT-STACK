@@ -17,6 +17,7 @@
 #include "oc_api.h"
 #include "api/oc_knx_dev.h"
 #include "api/oc_knx_fp.h"
+#include "api/oc_knx_sec.h"
 
 #include "oc_core_res.h"
 #include "oc_discovery.h"
@@ -689,6 +690,8 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
 
   oc_delete_group_object_table();
   oc_delete_group_rp_table();
+
+  oc_delete_at_table();
 }
 
 bool

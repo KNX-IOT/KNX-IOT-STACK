@@ -155,7 +155,8 @@ def do_install_device(my_stack, sn, ia, iid, got_content, rec_content, pub_conte
     response =  my_stack.issue_cbor_put(sn,"/dev/iid",content)
     print ("response:",response)
     my_stack.purge_response(response)
-    content = { 2: "startLoading"}
+    # content = { 2: "startLoading"}
+    content = { 2: 1}
     print("lsm :", content)
     response =  my_stack.issue_cbor_post(sn,"/a/lsm",content)
     print ("response:",response)
@@ -201,7 +202,8 @@ def do_install_device(my_stack, sn, ia, iid, got_content, rec_content, pub_conte
     print ("response:",response)
     my_stack.purge_response(response)
 
-    content = { 2: "loadComplete"}
+    # content = { 2: "loadComplete"}
+    content = { 2: 2}
     print("lsm :", content)
     response =  my_stack.issue_cbor_post(sn,"/a/lsm",content)
     print ("response:",response)

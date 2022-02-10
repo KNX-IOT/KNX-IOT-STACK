@@ -84,7 +84,7 @@ typedef struct oc_device_info_t
   oc_string_t hostname;      ///< knx host name
   oc_string_t iid;           ///< knx idd (installation id)
   bool pm;                   ///< knx programming mode
-  oc_lsm_state_t lsm;        ///< knx lsm states
+  oc_lsm_state_t lsm_s;      ///< knx lsm states
 
   oc_device_mode_t device_mode; ///< device mode (programming, normal operation)
   oc_core_add_device_cb_t add_device_cb; ///< callback when device is changed

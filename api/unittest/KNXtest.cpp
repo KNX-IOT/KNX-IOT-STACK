@@ -28,82 +28,24 @@ TEST(KNXLSM, LSMConstToStr)
 {
   const char *mystring;
 
-  mystring = oc_core_get_lsm_as_string(LSM_UNLOADED);
+  mystring = oc_core_get_lsm_state_as_string(LSM_S_UNLOADED);
   EXPECT_STREQ("unloaded", mystring);
 
-  mystring = oc_core_get_lsm_as_string(LSM_LOADED);
+  mystring = oc_core_get_lsm_state_as_string(LSM_S_LOADED);
   EXPECT_STREQ("loaded", mystring);
 
-  mystring = oc_core_get_lsm_as_string(LSM_LOADCOMPLETE);
-  EXPECT_STREQ("loadComplete", mystring);
-
-  mystring = oc_core_get_lsm_as_string(LSM_STARTLOADING);
-  EXPECT_STREQ("startLoading", mystring);
-
-  mystring = oc_core_get_lsm_as_string(LSM_LOADING);
+  mystring = oc_core_get_lsm_state_as_string(LSM_S_LOADING);
   EXPECT_STREQ("loading", mystring);
 
-  mystring = oc_core_get_lsm_as_string(LSM_UNLOAD);
+  // mystring = oc_core_get_lsm_state_as_string(LSM_S_LOADCOMPLETE);
+  // EXPECT_STREQ("loadComplete", mystring);
+
+  mystring = oc_core_get_lsm_event_as_string(LSM_E_STARTLOADING);
+  EXPECT_STREQ("startLoading", mystring);
+
+  mystring = oc_core_get_lsm_event_as_string(LSM_E_LOADCOMPLETE);
+  EXPECT_STREQ("loadComplete", mystring);
+
+  mystring = oc_core_get_lsm_event_as_string(LSM_E_UNLOAD);
   EXPECT_STREQ("unload", mystring);
-}
-
-TEST(KNXLSM, LSMStrValid)
-{
-  bool retbool;
-  retbool = oc_core_lsm_check_string("unloaded");
-  EXPECT_EQ(retbool, true);
-
-  retbool = oc_core_lsm_check_string("loading");
-  EXPECT_EQ(retbool, true);
-
-  retbool = oc_core_lsm_check_string("loaded");
-  EXPECT_EQ(retbool, true);
-
-  retbool = oc_core_lsm_check_string("unload");
-  EXPECT_EQ(retbool, true);
-
-  retbool = oc_core_lsm_check_string("startLoading");
-  EXPECT_EQ(retbool, true);
-
-  retbool = oc_core_lsm_check_string("loadComplete");
-  EXPECT_EQ(retbool, true);
-
-  // errors
-  retbool = oc_core_lsm_check_string("loadcomplete");
-  EXPECT_EQ(retbool, false);
-
-  retbool = oc_core_lsm_check_string("load");
-  EXPECT_EQ(retbool, false);
-
-  retbool = oc_core_lsm_check_string("loadedxx");
-  EXPECT_EQ(retbool, false);
-}
-
-TEST(KNXLSM, LSMStrToConst)
-{
-  oc_lsm_state_t mystate;
-  mystate = oc_core_lsm_parse_string("unloaded");
-  EXPECT_EQ(mystate, LSM_UNLOADED);
-
-  mystate = oc_core_lsm_parse_string("loading");
-  EXPECT_EQ(mystate, LSM_LOADING);
-
-  mystate = oc_core_lsm_parse_string("loaded");
-  EXPECT_EQ(mystate, LSM_LOADED);
-
-  mystate = oc_core_lsm_parse_string("unload");
-  EXPECT_EQ(mystate, LSM_UNLOAD);
-
-  mystate = oc_core_lsm_parse_string("startLoading");
-  EXPECT_EQ(mystate, LSM_STARTLOADING);
-
-  mystate = oc_core_lsm_parse_string("loadComplete");
-  EXPECT_EQ(mystate, LSM_LOADCOMPLETE);
-
-  // errors
-  mystate = oc_core_lsm_parse_string("load");
-  EXPECT_EQ(mystate, LSM_UNLOADED);
-
-  mystate = oc_core_lsm_parse_string("loadedxx");
-  EXPECT_EQ(mystate, LSM_UNLOADED);
 }

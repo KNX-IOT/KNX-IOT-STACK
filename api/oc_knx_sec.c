@@ -284,7 +284,8 @@ oc_core_a_sen_post_handler(oc_request_t *request,
   /* loop over the request document to check if all inputs are ok */
   rep = request->request_payload;
   while (rep != NULL) {
-    PRINT("key: (check) %s \n", oc_string(rep->name));
+    PRINT("oc_core_a_sen_post_handler: key: (check) %s \n",
+          oc_string(rep->name));
     if (rep->type == OC_REP_STRING) {
       if (rep->iname == 2) {
         cmd = a_sen_convert_cmd(oc_string(rep->value.string));
@@ -297,7 +298,10 @@ oc_core_a_sen_post_handler(oc_request_t *request,
 
   /* input was set, so create the response*/
   if (changed == true) {
-    PRINT("  cmd %d\n", cmd);
+    PRINT("  oc_core_a_sen_post_handler cmd %d\n", cmd);
+    // reset the tables
+    oc_reset_device(request->resource->device, cmd);
+
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
     return;
   }
@@ -309,7 +313,7 @@ oc_create_a_sen_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_a_sen_resource\n");
   // "/a/sen"
-  oc_core_lf_populate_resource(resource_idx, device, "/a/sen", OC_IF_LI,
+  oc_core_lf_populate_resource(resource_idx, device, "/a/sen", OC_IF_SEC,
                                APPLICATION_CBOR, OC_DISCOVERABLE, 0, 0,
                                oc_core_a_sen_post_handler, 0, 0, "");
 }

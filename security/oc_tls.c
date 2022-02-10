@@ -62,28 +62,6 @@ OC_LIST(tls_peers);
 static mbedtls_entropy_context entropy_ctx;
 static mbedtls_ctr_drbg_context ctr_drbg_ctx;
 static mbedtls_ssl_cookie_ctx cookie_ctx;
-static oc_random_pin_t random_pin;
-unsigned char PIN[8];
-#define PIN_LEN (8)
-
-void
-oc_tls_generate_random_pin(void)
-{
-  int p = 0;
-  while (p < PIN_LEN) {
-    PIN[p++] = oc_random_value() % 10 + 48;
-  }
-  if (random_pin.cb) {
-    random_pin.cb(PIN, PIN_LEN, random_pin.data);
-  }
-}
-
-void
-oc_set_random_pin_callback(oc_random_pin_cb_t cb, void *data)
-{
-  random_pin.cb = cb;
-  random_pin.data = data;
-}
 
 #ifdef OC_CLIENT
 static bool use_pin_obt_psk_identity = false;
@@ -380,9 +358,9 @@ bool
 oc_tls_is_pin_otm_supported(size_t device)
 {
   (void)device;
-  if (random_pin.cb) {
-    return true;
-  }
+  // if (random_pin.cb) {
+  //  return true;
+  //}
   return false;
 }
 
