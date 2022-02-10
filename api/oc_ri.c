@@ -906,48 +906,6 @@ oc_ri_get_interface_mask(char *iface, size_t if_len)
   return iface_mask;
 }
 
-static bool
-does_interface_support_method(oc_interface_mask_t iface_mask,
-                              oc_method_t method)
-{
-  (void)method;
-  bool supported = true;
-  switch (iface_mask) {
-    /* Per section 7.5.3 of the OCF Core spec, the following three interfaces
-     * are RETRIEVE-only.
-     */
-    // case OC_IF_LL:
-    // case OC_IF_S:
-    // case OC_IF_R:
-    //   if (method != OC_GET)
-    //     supported = false;
-    //   break;
-    /* Per section 7.5.3 of the OCF Core spec, the following three interfaces
-     * support RETRIEVE, UPDATE.
-     * TODO: Refine logic below after adding logic that identifies
-     * and handles CREATE requests using PUT/POST.
-     */
-
-  case OC_IF_I:
-  case OC_IF_O:
-  case OC_IF_G:
-  case OC_IF_C:
-  case OC_IF_P:
-  case OC_IF_D:
-  case OC_IF_A:
-  case OC_IF_S:
-  case OC_IF_LI:
-  case OC_IF_B:
-  case OC_IF_SEC:
-  case OC_IF_SWU:
-  case OC_IF_PM:
-  case OC_IF_M:
-  case OC_IF_NONE:
-    break;
-  }
-  return supported;
-}
-
 #ifdef OC_BLOCK_WISE
 bool
 oc_ri_invoke_coap_entity_handler(void *request, void *response,
