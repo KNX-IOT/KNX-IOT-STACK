@@ -255,7 +255,6 @@ inform_discovery_python(int payload_size, const char *payload)
   }
 }
 
-
 // -----------------------------------------------------------------------------
 
 /**
@@ -639,11 +638,11 @@ py_initate_spake(char *sn)
   int ret = -1;
   device_handle_t *device = py_getdevice_from_sn(sn);
 
-  PRINT("  [C]py_initate_spake: [%s]\n", sn );
+  PRINT("  [C]py_initate_spake: [%s]\n", sn);
 
-  //user_struct_t *new_cbdata;
-  //new_cbdata = (user_struct_t *)malloc(sizeof(user_struct_t));
-  //if (new_cbdata != NULL) {
+  // user_struct_t *new_cbdata;
+  // new_cbdata = (user_struct_t *)malloc(sizeof(user_struct_t));
+  // if (new_cbdata != NULL) {
   //  strcpy(new_cbdata->r_id, id);
   //  strcpy(new_cbdata->url, uri);
   //  strcpy(new_cbdata->sn, sn);
@@ -899,8 +898,8 @@ py_reset_device(char *sn)
   // py_mutex_unlock(app_sync_lock);
 }
 
-//void
-//display_device_uuid()
+// void
+// display_device_uuid()
 //{
 //  char buffer[OC_UUID_LEN];
 //  oc_uuid_to_str(oc_core_get_device_id(0), buffer, sizeof(buffer));
@@ -908,8 +907,8 @@ py_reset_device(char *sn)
 //  PRINT("[C] Started device with ID: %s\n", buffer);
 //}
 
-//char *
-//py_get_obt_uuid()
+// char *
+// py_get_obt_uuid()
 //{
 //  char buffer[OC_UUID_LEN];
 //  oc_uuid_to_str(oc_core_get_device_id(0), buffer, sizeof(buffer));
@@ -977,7 +976,7 @@ py_main(void)
   }
 #endif
 
-  //display_device_uuid();
+  // display_device_uuid();
 
   while (quit != 1) {
 #if defined(__linux__)

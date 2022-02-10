@@ -1065,7 +1065,6 @@ oc_core_set_at_table(int index, oc_auth_at_t entry)
     oc_at_dump_entry(index);
   }
 
-
   return 0;
 }
 
@@ -1092,10 +1091,10 @@ oc_delete_at_table()
   }
 }
 
-
 // ----------------------------------------------------------------------------
 
-void oc_oscore_set_auth(uint8_t* shared_key, int shared_key_size)
+void
+oc_oscore_set_auth(uint8_t *shared_key, int shared_key_size)
 {
   // create the token & store in at tables at position 0
   // note there should be no entries.. if there is an entry then overwrite
@@ -1106,7 +1105,7 @@ void oc_oscore_set_auth(uint8_t* shared_key, int shared_key_size)
   os_token.ga_len = 0;
   os_token.profile = OC_PROFILE_COAP_OSCORE;
   os_token.interface = OC_IF_SEC | OC_IF_D | OC_IF_P;
-  oc_new_string(&os_token.osc_ms, (char*)shared_key, shared_key_size);
+  oc_new_string(&os_token.osc_ms, (char *)shared_key, shared_key_size);
   oc_new_string(&os_token.osc_id, "spake2+", strlen("spake2+"));
   oc_new_string(&os_token.sub, "", strlen("spake2+"));
   oc_new_string(&os_token.kid, "+", strlen("spake2+"));
@@ -1115,7 +1114,6 @@ void oc_oscore_set_auth(uint8_t* shared_key, int shared_key_size)
   // add the oscore context...
   oc_init_oscore(0);
 }
-
 
 // ----------------------------------------------------------------------------
 
