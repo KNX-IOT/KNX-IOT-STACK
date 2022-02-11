@@ -267,7 +267,7 @@ if(BUILD_TESTING AND UNIX)
     endif()
 
     # Disable clang-tidy for gtest
-    oc_disable_clang_tidy()
+    disable_clang_tidy()
 
     # Build googletest
     add_subdirectory(${PROJECT_SOURCE_DIR}/deps/gtest gtest)
@@ -322,7 +322,7 @@ if(BUILD_TESTING AND UNIX)
 #    endif()
 
     # reenable clang-tidy for any remaining targets
-    oc_enable_clang_tidy()
+    enable_clang_tidy()
 endif()
 
 
