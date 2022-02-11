@@ -283,6 +283,7 @@ if(BUILD_TESTING AND UNIX)
         target_include_directories(${TESTNAME} PRIVATE
             ${PROJECT_SOURCE_DIR}
             ${PROJECT_SOURCE_DIR}/include
+            ${PROJECT_SOURCE_DIR}/port/linux
             ${PORT_INCLUDE_DIR}
             ${PROJECT_SOURCE_DIR}/messaging/coap
         )

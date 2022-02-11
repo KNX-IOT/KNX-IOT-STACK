@@ -17,6 +17,7 @@
 #include "oc_api.h"
 #include "api/oc_knx_client.h"
 #include "api/oc_knx_fp.h"
+#include "api/oc_knx_sec.h"
 #ifdef OC_SPAKE
 #include "oc_spake2plus.h"
 #endif
