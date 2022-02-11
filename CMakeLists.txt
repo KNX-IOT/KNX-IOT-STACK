@@ -12,7 +12,7 @@ if(OC_REAPPLY_MBEDTLS_PATCHES)
 endif()
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/tools)
 
-# Enable missing algoritms
+# Enable missing algorithms
 # TODO add this to Makefiles, or regenerate mbedtls patches
 add_compile_definitions(MBEDTLS_HKDF_C)
 add_compile_options(-fPIC)
@@ -25,7 +25,7 @@ set(OC_DYNAMIC_ALLOCATION_ENABLED ON CACHE BOOL "Enable dynamic memory allocatio
 #set(OC_SECURITY_ENABLED ON CACHE BOOL "Enable security")
 
 set(OC_OSCORE_ENABLED ON CACHE BOOL "Enable oscore")
-set(OC_PKI_ENABLED ON CACHE BOOL "Enable PKI security")
+set(OC_PKI_ENABLED OFF CACHE BOOL "Enable PKI security")
 set(OC_DEBUG_ENABLED OFF CACHE BOOL "Enable debug messages")
 set(CLANG_TIDY_ENABLED OFF CACHE BOOL "Enable clang-tidy analysis during compilation.")
 
