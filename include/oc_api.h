@@ -105,7 +105,6 @@ typedef struct
    *   oc_resource_t *bswitch = oc_new_resource(NULL, "/switch", 1, 0);
    *   oc_resource_bind_resource_type(bswitch, "oic.r.switch.binary");
    *   oc_resource_bind_resource_interface(bswitch, OC_IF_A);
-   *   oc_resource_set_default_interface(bswitch, OC_IF_A);
    *   oc_resource_set_discoverable(bswitch, true);
    *   oc_resource_set_request_handler(bswitch, OC_GET, get_switch, NULL);
    *   oc_resource_set_request_handler(bswitch, OC_PUT, put_switch, NULL);
@@ -117,7 +116,6 @@ typedef struct
    * @see init
    * @see oc_new_resource
    * @see oc_resource_bind_resource_interface
-   * @see oc_resource_set_default_interface
    * @see oc_resource_bind_resource_type
    * @see oc_resource_make_public
    * @see oc_resource_set_discoverable
@@ -491,7 +489,6 @@ int oc_init_platform(const char *mfg_name,
  *   oc_resource_t *bswitch = oc_new_resource("light switch", "/switch", 1, 0);
  *   oc_resource_bind_resource_type(bswitch, "oic.r.switch.binary");
  *   oc_resource_bind_resource_interface(bswitch, OC_IF_A);
- *   oc_resource_set_default_interface(bswitch, OC_IF_A);
  *   oc_resource_set_observable(bswitch, true);
  *   oc_resource_set_discoverable(bswitch, true);
  *   oc_resource_set_request_handler(bswitch, OC_GET, get_switch, NULL);
@@ -508,7 +505,6 @@ int oc_init_platform(const char *mfg_name,
  * @param[in] device index of the logical device the resource will be added to
  *
  * @see oc_resource_bind_resource_interface
- * @see oc_resource_set_default_interface
  * @see oc_resource_bind_resource_type
  * @see oc_process_baseline_interface
  * @see oc_resource_set_discoverable
@@ -531,14 +527,10 @@ oc_resource_t *oc_new_resource(const char *name, const char *uri,
  * @param[in] iface_mask a bitwise ORed list of all interfaces supported by the
  *                       resource.
  * @see oc_interface_mask_t
- * @see oc_resource_set_default_interface
  */
 void oc_resource_bind_resource_interface(oc_resource_t *resource,
                                          oc_interface_mask_t iface_mask);
 
-// obsolete
-void oc_resource_set_default_interface(oc_resource_t *resource,
-                                       oc_interface_mask_t iface_mask);
 
 /**
  * Add a Resource Type "rt" property to the resource.
@@ -566,6 +558,12 @@ void oc_resource_set_default_interface(oc_resource_t *resource,
  */
 void oc_resource_bind_resource_type(oc_resource_t *resource, const char *type);
 
+/**
+ * @brief set the content type on the resource
+ * 
+ * @param resource the resource
+ * @param content_type the content type
+ */
 void oc_resource_bind_content_type(oc_resource_t *resource,
                                    oc_content_format_t content_type);
 
@@ -581,8 +579,6 @@ void oc_resource_bind_content_type(oc_resource_t *resource,
  */
 void oc_device_bind_resource_type(size_t device, const char *type);
 
-// obsolete
-void oc_process_baseline_interface(oc_resource_t *resource);
 
 /**
  * @defgroup doc_module_tag_collections Collection Support
@@ -1213,7 +1209,20 @@ int oc_lf_get_entry_uri(const char *payload, int payload_len, int entry,
 int oc_lf_get_entry_param(const char *payload, int payload_len, int entry,
                           const char *param, const char **p_out, int *p_len);
 
-// obsolete
+/**
+ * @brief issues a get request with accept-content CBOR
+ * 
+ * @param uri the uri to be used
+ * @param endpoint the endpoint of the device
+ * @param query the query
+ * @param handler the callback handler
+ * @param qos the qos type confirmable / not confirmable
+ * @param user_data the user data
+ * @return true 
+ * @return false 
+ * 
+ * @see oc_do_get_ex
+ */
 bool oc_do_get(const char *uri, oc_endpoint_t *endpoint, const char *query,
                oc_response_handler_t handler, oc_qos_t qos, void *user_data);
 
@@ -1256,8 +1265,8 @@ bool oc_do_get(const char *uri, oc_endpoint_t *endpoint, const char *query,
  * @param[in] handler function invoked once the client has received the servers
  *                    response to the GET request
  * @param[in] qos the quality of service current options are HIGH_QOS or LOW_QOS
- * @param content The content format of the request payload
- * @param accept  The content format of the response payload
+ * @param[in] content The content format of the request payload
+ * @param[in] accept  The content format of the response payload
  * @param[in] user_data context pointer that will be sent to the
  *                      oc_response_handler_t
  *
@@ -1333,7 +1342,14 @@ bool oc_do_delete(const char *uri, oc_endpoint_t *endpoint, const char *query,
 bool oc_init_put(const char *uri, oc_endpoint_t *endpoint, const char *query,
                  oc_response_handler_t handler, oc_qos_t qos, void *user_data);
 
-// obsolete
+/**
+ * @brief Dispatch the CoAP PUT request wiht content type and accept type CBOR 
+ * 
+ * @return true 
+ * @return false 
+ * 
+ * @see oc_do_put_ex
+ */
 bool oc_do_put(void);
 
 /**
@@ -1395,7 +1411,14 @@ bool oc_do_put_ex(oc_content_format_t content, oc_content_format_t accept);
 bool oc_init_post(const char *uri, oc_endpoint_t *endpoint, const char *query,
                   oc_response_handler_t handler, oc_qos_t qos, void *user_data);
 
-// obsolete
+/**
+ * @brief Dispatch the CoAP POST request wiht content type and accept type CBOR 
+ * 
+ * @return true 
+ * @return false 
+ * 
+ * @see oc_do_post_ex
+ */
 bool oc_do_post(void);
 
 /**
@@ -1492,58 +1515,7 @@ void oc_free_server_endpoints(oc_endpoint_t *endpoint);
  */
 void oc_close_session(oc_endpoint_t *endpoint);
 
-/**
-  @defgroup doc_module_tag_asserting_roles Asserting roles
-  Asserting roles support functions
-  @{
-*/
-typedef struct oc_role_t
-{
-  struct oc_role_t *next;
-  oc_string_t role;
-  oc_string_t authority;
-} oc_role_t;
 
-/**
- * @brief retrieve all roles
- *
- * @return oc_role_t*
- */
-oc_role_t *oc_get_all_roles(void);
-
-/**
- * @brief assert the specific role
- *
- * @param role the role
- * @param authority the authority
- * @param endpoint the endpoint identifying the connection
- * @param handler the response handler
- * @param user_data the user data to be conveyed to the response handler
- * @return true
- * @return false
- */
-bool oc_assert_role(const char *role, const char *authority,
-                    oc_endpoint_t *endpoint, oc_response_handler_t handler,
-                    void *user_data);
-
-/**
- * @brief set automatic role assertion (e.g. for all endpoints with a
- * connection)
- *
- * @param auto_assert
- */
-void oc_auto_assert_roles(bool auto_assert);
-
-/**
- * @brief assert all the roles for a specific endpoint
- *
- * @param endpoint identifying the connection
- * @param handler the response handler
- * @param user_data the user data to be conveyed to the response handler
- */
-void oc_assert_all_roles(oc_endpoint_t *endpoint, oc_response_handler_t handler,
-                         void *user_data);
-/** @} */ // end of doc_module_tag_asserting_roles
 #ifdef OC_TCP
 /**
  * @brief send CoAP ping over the TCP connection

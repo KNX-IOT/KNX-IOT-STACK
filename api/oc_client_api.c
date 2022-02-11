@@ -396,7 +396,7 @@ oc_do_get(const char *uri, oc_endpoint_t *endpoint, const char *query,
           oc_response_handler_t handler, oc_qos_t qos, void *user_data)
 {
   return oc_do_get_ex(uri, endpoint, query, handler, qos,
-                      APPLICATION_VND_OCF_CBOR, APPLICATION_VND_OCF_CBOR,
+                      APPLICATION_CBOR, APPLICATION_CBOR,
                       user_data);
 }
 
@@ -434,8 +434,8 @@ oc_init_post(const char *uri, oc_endpoint_t *endpoint, const char *query,
 bool
 oc_do_put(void)
 {
-  return dispatch_coap_request(APPLICATION_VND_OCF_CBOR,
-                               APPLICATION_VND_OCF_CBOR);
+  return dispatch_coap_request(APPLICATION_CBOR,
+                               APPLICATION_CBOR);
 }
 
 bool
@@ -840,103 +840,5 @@ oc_lf_get_entry_param(const char *payload, int payload_len, int entry,
 
   return found;
 }
-
-// -----------------------------------------------------------------------------
-
-#if defined(OC_SECURITY) && defined(OC_PKI)
-oc_role_t *
-oc_get_all_roles(void)
-{
-  return oc_sec_get_role_creds();
-}
-
-static void
-serialize_role_credential(CborEncoder *roles_array, oc_sec_cred_t *cr)
-{
-  oc_rep_begin_object(roles_array, roles);
-  /* credtype */
-  oc_rep_set_int(roles, credtype, cr->credtype);
-  /* roleid */
-  if (oc_string_len(cr->role.role) > 0) {
-    oc_rep_set_object(roles, roleid);
-    oc_rep_set_text_string(roleid, role, oc_string(cr->role.role));
-    if (oc_string_len(cr->role.authority) > 0) {
-      oc_rep_set_text_string(roleid, authority, oc_string(cr->role.authority));
-    }
-    oc_rep_close_object(roles, roleid);
-  }
-  /* credusage */
-  oc_rep_set_text_string(roles, credusage, "oic.sec.cred.rolecert");
-  /* publicdata */
-  if (oc_string_len(cr->publicdata.data) > 0) {
-    oc_rep_set_object(roles, publicdata);
-    oc_rep_set_text_string(publicdata, data, oc_string(cr->publicdata.data));
-    oc_rep_set_text_string(publicdata, encoding, "oic.sec.encoding.pem");
-    oc_rep_close_object(roles, publicdata);
-  }
-  oc_rep_end_object(roles_array, roles);
-}
-
-bool
-oc_assert_role(const char *role, const char *authority, oc_endpoint_t *endpoint,
-               oc_response_handler_t handler, void *user_data)
-{
-  if (oc_tls_uses_psk_cred(oc_tls_get_peer(endpoint))) {
-    return false;
-  }
-  oc_sec_cred_t *cr = oc_sec_find_role_cred(role, authority);
-  if (cr) {
-    oc_tls_select_cert_ciphersuite();
-    if (oc_init_post("/oic/sec/roles", endpoint, NULL, handler, HIGH_QOS,
-                     user_data)) {
-      oc_rep_start_root_object();
-      oc_rep_set_array(root, roles);
-      serialize_role_credential(&roles_array, cr);
-      oc_rep_close_array(root, roles);
-      oc_rep_end_root_object();
-      if (!oc_do_post()) {
-        return false;
-      }
-    }
-  }
-  return false;
-}
-
-void
-oc_assert_all_roles(oc_endpoint_t *endpoint, oc_response_handler_t handler,
-                    void *user_data)
-{
-  oc_tls_peer_t *peer = oc_tls_get_peer(endpoint);
-  if (oc_tls_uses_psk_cred(peer)) {
-    return;
-  }
-  oc_tls_select_cert_ciphersuite();
-  oc_role_t *roles = oc_get_all_roles();
-  if (roles) {
-    if (oc_init_post("/oic/sec/roles", endpoint, NULL, handler, HIGH_QOS,
-                     user_data)) {
-      oc_rep_start_root_object();
-      oc_rep_set_array(root, roles);
-
-      while (roles) {
-        oc_sec_cred_t *cr = oc_sec_find_role_cred(oc_string(roles->role),
-                                                  oc_string(roles->authority));
-        if (cr) {
-          serialize_role_credential(&roles_array, cr);
-        }
-
-        roles = roles->next;
-      }
-
-      oc_rep_close_array(root, roles);
-      oc_rep_end_root_object();
-      if (!oc_do_post()) {
-        return;
-      }
-    }
-  }
-}
-
-#endif /* OC_SECURITY && OC_PKI */
 
 #endif /* OC_CLIENT */

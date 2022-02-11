@@ -21,7 +21,20 @@
 extern "C" {
 #endif
 
+/**
+ * @brief handle sessions on an endpoint
+ * 
+ * @param endpoint the endpoint
+ * @param state the session state
+ */
 void oc_handle_session(oc_endpoint_t *endpoint, oc_session_state_t state);
+
+/**
+ * @brief check if there is a session
+ * 
+ * @return true 
+ * @return false 
+ */
 bool oc_session_events_is_ongoing(void);
 
 #ifdef __cplusplus
