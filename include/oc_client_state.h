@@ -53,9 +53,11 @@ typedef struct
   oc_rep_t *payload;       /**< response payload, interpreted as cbor */
   const uint8_t *_payload; /**< payload buffer */
   size_t _payload_len;     /**< payload buffer length */
-  oc_endpoint_t *endpoint; /**< endpoint on where the response has been received */
-  void *client_cb;         /**< callback for the response to the calling client */
-  void *user_data; /**< user data to be supplied to the callback to the client */
+  oc_endpoint_t
+    *endpoint;     /**< endpoint on where the response has been received */
+  void *client_cb; /**< callback for the response to the calling client */
+  void
+    *user_data; /**< user data to be supplied to the callback to the client */
   oc_content_format_t content_format; /**< content format of the payload */
   oc_status_t code;                   /**< status of the response */
   int observe_option;                 /**< observe indication */
@@ -93,8 +95,9 @@ typedef void (*oc_response_handler_t)(oc_client_response_t *);
  */
 typedef struct oc_client_handler_t
 {
-  oc_response_handler_t response;   /**< response handler */
-  oc_discovery_handler_t discovery; /**< discovery handler, e.g. per line entry */
+  oc_response_handler_t response; /**< response handler */
+  oc_discovery_handler_t
+    discovery; /**< discovery handler, e.g. per line entry */
   oc_discovery_all_handler_t
     discovery_all; /**< discovery all handler, full payload */
 } oc_client_handler_t;

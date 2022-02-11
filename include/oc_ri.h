@@ -122,12 +122,13 @@ typedef enum {
   APPLICATION_SENSML_EXI = 115,      /**< application/sensml-exi */
   APPLICATION_PKCS7_SGK =
     280, /**< application/pkcs7-mime; smime-type=server-generated-key */
-  APPLICATION_PKCS7_CO = 281, ////**<< application/pkcs7-mime; smime-type=certs-only */
+  APPLICATION_PKCS7_CO =
+    281, ////**<< application/pkcs7-mime; smime-type=certs-only */
   APPLICATION_PKCS7_CMC_REQUEST =
     282, /**< application/pkcs7-mime; smime-type=CMC-Request */
   APPLICATION_PKCS7_CMC_RESPONSE =
-    283,                   /**< application/pkcs7-mime; smime-type=CMC-Response */
-  APPLICATION_PKCS8 = 284, /**< application/pkcs8 */
+    283, /**< application/pkcs7-mime; smime-type=CMC-Response */
+  APPLICATION_PKCS8 = 284,                /**< application/pkcs8 */
   APPLICATION_CRATTRS = 285,              /**< application/csrattrs */
   APPLICATION_PKCS10 = 286,               /**< application/pkcs10 */
   APPLICATION_PKIX_CERT = 287,            /**< application/pkix-cert */
@@ -232,50 +233,50 @@ typedef enum {
   OC_DEV_NAME,  /**< Device name. Name may can be changed w/ MaC. */
   OC_DEV_MODEL, /**< Device model */
   OC_DEV_IA,    /**< Device individual address */
-  OC_DEV_HOSTNAME,    /**< Device host name for DNS resolution. */
-  OC_DEV_IID,         /**< KNX installation ID */
-  OC_DEV_PM,          /**< Programming Mode */
-  OC_DEV,             /**< core link */
-  OC_KNX_SPAKE,       /**< spake */
-  OC_KNX_IDEVID,      /**< IDevID */
-  OC_KNX_LDEVID,      /**< LDevID */
-  OC_KNX_LSM,         /**< load state machine */
-  OC_KNX_DOT_KNX,     /**< .knx resource */
-  OC_KNX_FINGERPRINT, /**< FINGERPRINT value of loaded contents */
-  OC_KNX_OSN,         /**< .well-known / knx / osn */
-  OC_KNX,             /**< .well-known / knx */
-  OC_KNX_FP_GM,       /**< FP/GM */
-  OC_KNX_FP_GM_X,     /**< FP/GM/X */
-  OC_KNX_FP_G,        /**< FP/G */
-  OC_KNX_FP_G_X,      /**< FP/G/X */
-  OC_KNX_FP_P,        /**< FP/P */
-  OC_KNX_FP_P_X,      /**< FP/P/X */
-  OC_KNX_FP_R,        /**< FP/R */
-  OC_KNX_FP_R_X,      /**< FP/R/X */
-  OC_KNX_P,           /**< P */
-  OC_KNX_F,           /**< /f */
-  OC_KNX_F_X,         /**< /f/X */
-  OC_KNX_SWU_PROTOCOL, /**< software update protocol */
-  OC_KNX_SWU_MAXDEFER, /**< swu max defer */
-  OC_KNX_SWU_METHOD,  /**< sw method */
-  OC_KNX_LASTUPDATE, /**< sw last update */
-  OC_KNX_SWU_RESULT, /**< sw result */
-  OC_KNX_SWU_STATE, /**< sw state */
-  OC_KNX_SWU_UPDATE, /**< sw update */
-  OC_KNX_SWU_PKGV, /**< sw package version */
-  OC_KNX_SWU_PKGCMD, /**< sw package command*/
-  OC_KNX_SWU_PKGBYTES, /**< sw package bytes*/
-  OC_KNX_SWU_PKGQURL, /**< sw query url */
-  OC_KNX_SWU_PKGNAMES, /**< sw package names*/
-  OC_KNX_SWU_PKG, /**< sw package */
-  OC_KNX_SWU, /**< swu top level */
-  OC_KNX_P_OSCORE_REPLWDO, /**< oscore replay window*/
+  OC_DEV_HOSTNAME,          /**< Device host name for DNS resolution. */
+  OC_DEV_IID,               /**< KNX installation ID */
+  OC_DEV_PM,                /**< Programming Mode */
+  OC_DEV,                   /**< core link */
+  OC_KNX_SPAKE,             /**< spake */
+  OC_KNX_IDEVID,            /**< IDevID */
+  OC_KNX_LDEVID,            /**< LDevID */
+  OC_KNX_LSM,               /**< load state machine */
+  OC_KNX_DOT_KNX,           /**< .knx resource */
+  OC_KNX_FINGERPRINT,       /**< FINGERPRINT value of loaded contents */
+  OC_KNX_OSN,               /**< .well-known / knx / osn */
+  OC_KNX,                   /**< .well-known / knx */
+  OC_KNX_FP_GM,             /**< FP/GM */
+  OC_KNX_FP_GM_X,           /**< FP/GM/X */
+  OC_KNX_FP_G,              /**< FP/G */
+  OC_KNX_FP_G_X,            /**< FP/G/X */
+  OC_KNX_FP_P,              /**< FP/P */
+  OC_KNX_FP_P_X,            /**< FP/P/X */
+  OC_KNX_FP_R,              /**< FP/R */
+  OC_KNX_FP_R_X,            /**< FP/R/X */
+  OC_KNX_P,                 /**< P */
+  OC_KNX_F,                 /**< /f */
+  OC_KNX_F_X,               /**< /f/X */
+  OC_KNX_SWU_PROTOCOL,      /**< software update protocol */
+  OC_KNX_SWU_MAXDEFER,      /**< swu max defer */
+  OC_KNX_SWU_METHOD,        /**< sw method */
+  OC_KNX_LASTUPDATE,        /**< sw last update */
+  OC_KNX_SWU_RESULT,        /**< sw result */
+  OC_KNX_SWU_STATE,         /**< sw state */
+  OC_KNX_SWU_UPDATE,        /**< sw update */
+  OC_KNX_SWU_PKGV,          /**< sw package version */
+  OC_KNX_SWU_PKGCMD,        /**< sw package command*/
+  OC_KNX_SWU_PKGBYTES,      /**< sw package bytes*/
+  OC_KNX_SWU_PKGQURL,       /**< sw query url */
+  OC_KNX_SWU_PKGNAMES,      /**< sw package names*/
+  OC_KNX_SWU_PKG,           /**< sw package */
+  OC_KNX_SWU,               /**< swu top level */
+  OC_KNX_P_OSCORE_REPLWDO,  /**< oscore replay window*/
   OC_KNX_P_OSCORE_OSNDELAY, /**< oscore osn delay*/
-  OC_KNX_F_OSCORE, /**< oscore/f */
-  OC_KNX_A_SEN, /**< a/sen resource */
-  OC_KNX_AUTH_AT, /**< auth/at resource listing auth/at/X */
-  OC_KNX_AUTH_AT_X, /**< auth/at/X resources */
-  OC_KNX_AUTH, /**< auth resource */
+  OC_KNX_F_OSCORE,          /**< oscore/f */
+  OC_KNX_A_SEN,             /**< a/sen resource */
+  OC_KNX_AUTH_AT,           /**< auth/at resource listing auth/at/X */
+  OC_KNX_AUTH_AT_X,         /**< auth/at/X resources */
+  OC_KNX_AUTH,              /**< auth resource */
 
   /* List of resources on a logical device: start */
   /* List of Device Configuration Resources (DCRs): start */
@@ -384,17 +385,17 @@ struct oc_resource_s
   oc_properties_cb_t set_properties;   /**< callback for set properties */
   uint8_t num_observers;               /**< amount of observers */
   uint16_t observe_period_seconds;     /**< observe period in seconds */
-  uint8_t fb_instance;                 /**< function block instance, default = 0 */
+  uint8_t fb_instance; /**< function block instance, default = 0 */
 };
 
 typedef struct oc_link_s oc_link_t;
 
 /**
  * @brief callback return values
- * 
+ *
  */
 typedef enum {
-  OC_EVENT_DONE = 0,  /**< callback done, e.g. don't call again */
+  OC_EVENT_DONE = 0, /**< callback done, e.g. don't call again */
   OC_EVENT_CONTINUE  /**< callbacks continue */
 } oc_event_callback_retval_t;
 

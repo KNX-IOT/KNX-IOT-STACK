@@ -49,7 +49,7 @@ typedef void (*interface_event_handler_t)(oc_interface_event_t event);
 typedef struct oc_network_interface_cb
 {
   struct oc_network_interface_cb *next; /**< next in the list */
-  interface_event_handler_t handler; /**< the callback (handler) */
+  interface_event_handler_t handler;    /**< the callback (handler) */
 } oc_network_interface_cb_t;
 
 /**

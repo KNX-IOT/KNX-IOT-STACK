@@ -41,21 +41,22 @@ typedef enum {
 typedef struct oc_blockwise_state_s
 {
   struct oc_blockwise_state_s *next;
-  oc_string_t href;        /**< href e.g. path of the transfer */
-  oc_endpoint_t endpoint; /**< endpoint of the transfer */
-  oc_method_t method;       /**< coap method for this blockwise transfer */
-  oc_blockwise_role_t role; /**< role of the buffer, e.g. client or server */
-  uint32_t payload_size;     /**< the payload size in bytes */
+  oc_string_t href;           /**< href e.g. path of the transfer */
+  oc_endpoint_t endpoint;     /**< endpoint of the transfer */
+  oc_method_t method;         /**< coap method for this blockwise transfer */
+  oc_blockwise_role_t role;   /**< role of the buffer, e.g. client or server */
+  uint32_t payload_size;      /**< the payload size in bytes */
   uint32_t next_block_offset; /**< offset in buffer to the next block */
-  uint8_t ref_count;  /**< reference counter, e.g. indicator if the block is still in use */
+  uint8_t ref_count; /**< reference counter, e.g. indicator if the block is
+                        still in use */
 #ifdef OC_DYNAMIC_ALLOCATION
 #ifdef OC_APP_DATA_BUFFER_POOL
   void *block;
 #endif /* OC_APP_DATA_BUFFER_POOL */
   uint8_t *buffer;
-#else  /* OC_DYNAMIC_ALLOCATION */
-  uint8_t buffer[OC_MAX_APP_DATA_SIZE];    /**< the buffer */
-#endif /* !OC_DYNAMIC_ALLOCATION */
+#else                                      /* OC_DYNAMIC_ALLOCATION */
+  uint8_t buffer[OC_MAX_APP_DATA_SIZE]; /**< the buffer */
+#endif                                     /* !OC_DYNAMIC_ALLOCATION */
   oc_string_t uri_query;                   /**< the query */
   oc_content_format_t return_content_type; /**< the content type */
 #ifdef OC_CLIENT
@@ -63,12 +64,12 @@ typedef struct oc_blockwise_state_s
   uint8_t token_len;             /**< token length */
   uint16_t mid;                  /**< the message id */
   void *client_cb;               /**< client callback */
-#endif  /* OC_CLIENT */
+#endif                           /* OC_CLIENT */
 } oc_blockwise_state_t;
 
 /**
  * @brief the blockwise request state
- * 
+ *
  */
 typedef struct oc_blockwise_request_state_s
 {
@@ -77,16 +78,16 @@ typedef struct oc_blockwise_request_state_s
 
 /**
  * @brief the blockwise response state
- * 
+ *
  */
 typedef struct oc_blockwise_response_state_s
 {
-  oc_blockwise_state_t base;  /**< blockwise state data */
+  oc_blockwise_state_t base;   /**< blockwise state data */
   uint8_t etag[COAP_ETAG_LEN]; /**< etag for the response */
 
 #ifdef OC_CLIENT
-  int32_t observe_seq;   /**< the observe sequence number */
-#endif /* OC_CLIENT */
+  int32_t observe_seq; /**< the observe sequence number */
+#endif                 /* OC_CLIENT */
 } oc_blockwise_response_state_t;
 
 /**

@@ -83,8 +83,8 @@ typedef struct oc_endpoint_t
   uint8_t priority;    /**< priority */
 #ifdef OC_OSCORE
   uint8_t piv[OSCORE_PIV_LEN]; /**< oscore partial iv */
-  uint8_t piv_len;/**< oscore partial iv length */
-#endif /* OC_OSCORE */
+  uint8_t piv_len;             /**< oscore partial iv length */
+#endif                         /* OC_OSCORE */
 } oc_endpoint_t;
 
 #define oc_make_ipv4_endpoint(__name__, __flags__, __port__, ...)              \

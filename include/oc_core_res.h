@@ -70,11 +70,11 @@ typedef struct oc_knx_version_info_t
  */
 typedef struct oc_device_info_t
 {
-  oc_uuid_t di;     /**< device identifier */
-  oc_uuid_t piid;   /**< Permanent Immutable ID */
-  oc_string_t name; /**< name of the device */
-  oc_string_t icv;  /**< specification version */
-  oc_string_t dmv;  /**< data model version */
+  oc_uuid_t di;              /**< device identifier */
+  oc_uuid_t piid;            /**< Permanent Immutable ID */
+  oc_string_t name;          /**< name of the device */
+  oc_string_t icv;           /**< specification version */
+  oc_string_t dmv;           /**< data model version */
   oc_string_t serialnumber;  /**< knx serial number */
   oc_knx_version_info_t hwv; /**< knx hardware version */
   oc_knx_version_info_t fwv; /**< fwv firmware version number */
@@ -85,7 +85,8 @@ typedef struct oc_device_info_t
   oc_string_t iid;           /**< knx idd (installation id) */
   bool pm;                   /**< knx programming mode */
   oc_lsm_state_t lsm_s;      /**< knx lsm states */
-  oc_device_mode_t device_mode; /**< device mode (programming, normal operation) */
+  oc_device_mode_t
+    device_mode; /**< device mode (programming, normal operation) */
   oc_core_add_device_cb_t add_device_cb; /**< callback when device is changed */
   void *data;                            /**< user data */
 } oc_device_info_t;

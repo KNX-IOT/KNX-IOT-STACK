@@ -101,8 +101,9 @@ typedef enum {
  *
  */
 typedef enum {
-  LSM_E_NOP = 0,      /**< (0) No operation */
-  LSM_E_STARTLOADING = 1, /**< (1) Request to start the loading of the loadable part */
+  LSM_E_NOP = 0, /**< (0) No operation */
+  LSM_E_STARTLOADING =
+    1, /**< (1) Request to start the loading of the loadable part */
   LSM_E_LOADCOMPLETE = 2, /**< (2) cmd loading complete, state will be LOADED */
   LSM_E_UNLOAD = 4        /**< (4) cmd unload: state will be UNLOADED */
 } oc_lsm_event_t;
