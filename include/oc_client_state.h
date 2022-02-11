@@ -40,8 +40,8 @@ extern "C" {
  *
  */
 typedef enum {
-  HIGH_QOS = 0, ///< confirmable messages
-  LOW_QOS       ///< non-confirmable messages
+  HIGH_QOS = 0, /**< confirmable messages */
+  LOW_QOS       /**< non-confirmable messages */
 } oc_qos_t;
 
 /**
@@ -50,15 +50,15 @@ typedef enum {
  */
 typedef struct
 {
-  oc_rep_t *payload;       ///< response payload, interpreted as cbor
-  const uint8_t *_payload; ///< payload buffer
-  size_t _payload_len;     ///< payload buffer length
-  oc_endpoint_t *endpoint; ///< endpoint on where the response has been received
-  void *client_cb;         ///< callback for the response to the calling client
-  void *user_data; ///< user data to be supplied to the callback to the client
-  oc_content_format_t content_format; ///< content format of the payload
-  oc_status_t code;                   ///< status of the response
-  int observe_option;                 ///< observe indication
+  oc_rep_t *payload;       /**< response payload, interpreted as cbor */
+  const uint8_t *_payload; /**< payload buffer */
+  size_t _payload_len;     /**< payload buffer length */
+  oc_endpoint_t *endpoint; /**< endpoint on where the response has been received */
+  void *client_cb;         /**< callback for the response to the calling client */
+  void *user_data; /**< user data to be supplied to the callback to the client */
+  oc_content_format_t content_format; /**< content format of the payload */
+  oc_status_t code;                   /**< status of the response */
+  int observe_option;                 /**< observe indication */
 } oc_client_response_t;
 
 /**
@@ -66,8 +66,8 @@ typedef struct
  *
  */
 typedef enum {
-  OC_STOP_DISCOVERY = 0, ///< stop discovering (also no more data)
-  OC_CONTINUE_DISCOVERY  ///< continue discovering (more data)
+  OC_STOP_DISCOVERY = 0, /**< stop discovering (also no more data) */
+  OC_CONTINUE_DISCOVERY  /**< continue discovering (more data) */
 } oc_discovery_flags_t;
 
 /**
@@ -93,10 +93,10 @@ typedef void (*oc_response_handler_t)(oc_client_response_t *);
  */
 typedef struct oc_client_handler_t
 {
-  oc_response_handler_t response;   ///< response handler
-  oc_discovery_handler_t discovery; ///< discovery handler, e.g. per line entry
+  oc_response_handler_t response;   /**< response handler */
+  oc_discovery_handler_t discovery; /**< discovery handler, e.g. per line entry */
   oc_discovery_all_handler_t
-    discovery_all; ///< discovery all handler, full payload
+    discovery_all; /**< discovery all handler, full payload */
 } oc_client_handler_t;
 
 /**
@@ -105,28 +105,28 @@ typedef struct oc_client_handler_t
  */
 typedef struct oc_client_cb_t
 {
-  struct oc_client_cb_t *next;   ///< pointer next callback information
-  oc_string_t uri;               ///< the uri
-  oc_string_t query;             ///< query parameters
-  oc_endpoint_t endpoint;        ///< endpoint
-  oc_client_handler_t handler;   ///< handler information
-  void *user_data;               ///< user data for the callbacks
-  int32_t observe_seq;           ///< observe sequence number
-  oc_clock_time_t timestamp;     ///< time stamp
-  oc_qos_t qos;                  ///< quality of service
-  oc_method_t method;            ///< method used
-  uint16_t mid;                  ///< CoAP message identifier
-  uint8_t token[COAP_TOKEN_LEN]; ///< CoAP token
-  uint8_t token_len;             ///< CoAP token length
-  bool discovery;                ///< discovery call
-  bool multicast;                ///< multi cast
-  bool stop_multicast_receive;   ///< stop receiving multi cast
-  uint8_t ref_count;             ///< reference counting on this data block
-  uint8_t separate;              ///< separate responses
+  struct oc_client_cb_t *next;   /**< pointer next callback information */
+  oc_string_t uri;               /**< the uri */
+  oc_string_t query;             /**< query parameters */
+  oc_endpoint_t endpoint;        /**< endpoint */
+  oc_client_handler_t handler;   /**< handler information */
+  void *user_data;               /**< user data for the callbacks */
+  int32_t observe_seq;           /**< observe sequence number */
+  oc_clock_time_t timestamp;     /**< time stamp */
+  oc_qos_t qos;                  /**< quality of service */
+  oc_method_t method;            /**< method used */
+  uint16_t mid;                  /**< CoAP message identifier */
+  uint8_t token[COAP_TOKEN_LEN]; /**< CoAP token */
+  uint8_t token_len;             /**< CoAP token length */
+  bool discovery;                /**< discovery call */
+  bool multicast;                /**< multi cast */
+  bool stop_multicast_receive;   /**< stop receiving multi cast */
+  uint8_t ref_count;             /**< reference counting on this data block */
+  uint8_t separate;              /**< separate responses */
 #ifdef OC_OSCORE
-  uint8_t piv[OSCORE_PIV_LEN]; ///< partial IV
-  uint8_t piv_len;             ///< length of the partial IV
-  uint64_t notification_num;   ///< notification number
+  uint8_t piv[OSCORE_PIV_LEN]; /**< partial IV */
+  uint8_t piv_len;             /**< length of the partial IV */
+  uint64_t notification_num;   /**< notification number */
 #endif                         /* OC_OSCORE */
 } oc_client_cb_t;
 
