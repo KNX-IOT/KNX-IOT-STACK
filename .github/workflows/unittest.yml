@@ -32,5 +32,5 @@ jobs:
           git submodule sync --recursive
           git -c "http.extraheader=$auth_header" -c protocol.version=2 submodule update --init --force --recursive --depth=1
           cd port/linux
-          make test -IPV5 SECURE=0
+          make test -IPV5 SECURE=0 OSCORE=0
           
