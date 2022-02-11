@@ -154,14 +154,15 @@ const int psk_priority[2] = { MBEDTLS_TLS_ECDHE_PSK_WITH_AES_128_CBC_SHA256,
 //const int anon_ecdh_priority[2] = {
 //  MBEDTLS_TLS_ECDH_ANON_WITH_AES_128_CBC_SHA256, 0
 //};
-static
  const int anon_ecdh_priority[1] = {
    0
 };
 #endif /* OC_CLIENT */
 
 // static
-const int jw_otm_priority[2] = { MBEDTLS_TLS_ECDH_ANON_WITH_AES_128_CBC_SHA256,
+//const int jw_otm_priority[2] = { MBEDTLS_TLS_ECDH_ANON_WITH_AES_128_CBC_SHA256,
+//                                 0 };
+const int jw_otm_priority[1] = {
                                  0 };
 
 // static
