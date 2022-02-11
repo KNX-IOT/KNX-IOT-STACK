@@ -39,7 +39,7 @@ HEADER_DIR = -I$(ROOT_DIR)/include \
              -I$(OUT_DIR)
 SECURITY_HEADERS = -I$(ROOT_DIR)/security \
                    -I$(MBEDTLS_DIR)/include \
-                    -I../../security -DMBEDTLS_CONFIG_FILE=knx_mbedtls_config.h
+                    -I../../security -DMBEDTLS_CONFIG_FILE="knx_mbedtls_config.h"
 MESSAGING_HEADERS = -I$(ROOT_DIR)/messaging/coap
 API_TEST_DIR = $(ROOT_DIR)/api/unittest
 API_TEST_OBJ_DIR = $(API_TEST_DIR)/obj
@@ -75,7 +75,7 @@ DTLS= 	aes.c		aesni.c 	arc4.c  	asn1parse.c	asn1write.c	base64.c	\
 	ssl_cache.c	ssl_ciphersuites.c		ssl_cli.c	ssl_cookie.c	platform_util.c	\
 	ssl_srv.c	ssl_ticket.c	ssl_tls.c	rsa_internal.c	x509write_csr.c\
 	x509write_crt.c	x509_create.c	x509_csr.c
-DTLSFLAGS=-I../../deps/mbedtls/include -D__OC_RANDOM  -I../../security -DMBEDTLS_CONFIG_FILE='knx_mbedtls_config.h'
+DTLSFLAGS=-I../../deps/mbedtls/include -D__OC_RANDOM  -I../../security -DMBEDTLS_CONFIG_FILE="knx_mbedtls_config.h"
 
 CBOR=../../deps/tinycbor/src/cborencoder.c ../../deps/tinycbor/src/cborencoder_close_container_checked.c ../../deps/tinycbor/src/cborparser.c# ../../deps/tinycbor/src/cbortojson.c ../../deps/tinycbor/src/cborpretty.c ../../deps/tinycbor/src/cborparser_dup_string.c
 
