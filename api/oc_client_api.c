@@ -395,9 +395,8 @@ bool
 oc_do_get(const char *uri, oc_endpoint_t *endpoint, const char *query,
           oc_response_handler_t handler, oc_qos_t qos, void *user_data)
 {
-  return oc_do_get_ex(uri, endpoint, query, handler, qos,
-                      APPLICATION_CBOR, APPLICATION_CBOR,
-                      user_data);
+  return oc_do_get_ex(uri, endpoint, query, handler, qos, APPLICATION_CBOR,
+                      APPLICATION_CBOR, user_data);
 }
 
 bool
@@ -434,8 +433,7 @@ oc_init_post(const char *uri, oc_endpoint_t *endpoint, const char *query,
 bool
 oc_do_put(void)
 {
-  return dispatch_coap_request(APPLICATION_CBOR,
-                               APPLICATION_CBOR);
+  return dispatch_coap_request(APPLICATION_CBOR, APPLICATION_CBOR);
 }
 
 bool

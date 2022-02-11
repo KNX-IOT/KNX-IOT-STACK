@@ -43,7 +43,6 @@ bool oc_set_spake_response_cb(oc_spake_cb_t my_func);
  */
 int oc_initiate_spake(oc_endpoint_t *endpoint);
 
-
 typedef void (*oc_s_mode_response_cb_t)(char *url, oc_rep_t *rep,
                                         oc_rep_t *rep_value);
 

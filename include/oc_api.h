@@ -531,7 +531,6 @@ oc_resource_t *oc_new_resource(const char *name, const char *uri,
 void oc_resource_bind_resource_interface(oc_resource_t *resource,
                                          oc_interface_mask_t iface_mask);
 
-
 /**
  * Add a Resource Type "rt" property to the resource.
  *
@@ -560,7 +559,7 @@ void oc_resource_bind_resource_type(oc_resource_t *resource, const char *type);
 
 /**
  * @brief set the content type on the resource
- * 
+ *
  * @param resource the resource
  * @param content_type the content type
  */
@@ -578,7 +577,6 @@ void oc_resource_bind_content_type(oc_resource_t *resource,
  * @param[in] type the Resource type to add to the Resource Type "rt" property
  */
 void oc_device_bind_resource_type(size_t device, const char *type);
-
 
 /**
  * @defgroup doc_module_tag_collections Collection Support
@@ -1211,16 +1209,16 @@ int oc_lf_get_entry_param(const char *payload, int payload_len, int entry,
 
 /**
  * @brief issues a get request with accept-content CBOR
- * 
+ *
  * @param uri the uri to be used
  * @param endpoint the endpoint of the device
  * @param query the query
  * @param handler the callback handler
  * @param qos the qos type confirmable / not confirmable
  * @param user_data the user data
- * @return true 
- * @return false 
- * 
+ * @return true
+ * @return false
+ *
  * @see oc_do_get_ex
  */
 bool oc_do_get(const char *uri, oc_endpoint_t *endpoint, const char *query,
@@ -1343,11 +1341,11 @@ bool oc_init_put(const char *uri, oc_endpoint_t *endpoint, const char *query,
                  oc_response_handler_t handler, oc_qos_t qos, void *user_data);
 
 /**
- * @brief Dispatch the CoAP PUT request wiht content type and accept type CBOR 
- * 
- * @return true 
- * @return false 
- * 
+ * @brief Dispatch the CoAP PUT request wiht content type and accept type CBOR
+ *
+ * @return true
+ * @return false
+ *
  * @see oc_do_put_ex
  */
 bool oc_do_put(void);
@@ -1412,11 +1410,11 @@ bool oc_init_post(const char *uri, oc_endpoint_t *endpoint, const char *query,
                   oc_response_handler_t handler, oc_qos_t qos, void *user_data);
 
 /**
- * @brief Dispatch the CoAP POST request wiht content type and accept type CBOR 
- * 
- * @return true 
- * @return false 
- * 
+ * @brief Dispatch the CoAP POST request wiht content type and accept type CBOR
+ *
+ * @return true
+ * @return false
+ *
  * @see oc_do_post_ex
  */
 bool oc_do_post(void);
@@ -1514,7 +1512,6 @@ void oc_free_server_endpoints(oc_endpoint_t *endpoint);
  * @param endpoint endpoint indicating a session
  */
 void oc_close_session(oc_endpoint_t *endpoint);
-
 
 #ifdef OC_TCP
 /**

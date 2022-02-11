@@ -89,8 +89,8 @@ TEST_F(TestCoreResource, CoreGetResource_Wellknown_core)
   oc_core_init_platform(MANUFACTURER_NAME, NULL, NULL);
   oc_add_device("myhname", "1.0", "//", "000001", NULL, NULL);
 
-  //char uri[] = "/.well-known/core";
-  //oc_resource_t *res = oc_core_get_resource_by_uri(uri, 0);
+  // char uri[] = "/.well-known/core";
+  // oc_resource_t *res = oc_core_get_resource_by_uri(uri, 0);
 
   // ASSERT_NE(res, NULL);
   // EXPECT_EQ(strlen(uri), oc_string_len(res->uri));
