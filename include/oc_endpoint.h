@@ -35,9 +35,9 @@ extern "C" {
  */
 typedef struct
 {
-  uint16_t port;       ///< port number
-  uint8_t address[16]; ///< address
-  uint8_t scope;       ///< scope of the address (multicast)
+  uint16_t port;       /**< port number */
+  uint8_t address[16]; /**< address */
+  uint8_t scope;       /**< scope of the address (multicast) */
 } oc_ipv6_addr_t;
 
 /**
@@ -46,8 +46,8 @@ typedef struct
  */
 typedef struct
 {
-  uint16_t port;      ///< port
-  uint8_t address[4]; ///< address
+  uint16_t port;      /**< port */
+  uint8_t address[4]; /**< address */
 } oc_ipv4_addr_t;
 
 /**
@@ -71,20 +71,20 @@ enum transport_flags {
  */
 typedef struct oc_endpoint_t
 {
-  struct oc_endpoint_t *next; ///< pointer to the next structure
-  size_t device;              ///< device index
-  enum transport_flags flags; ///< the transport flags
-  oc_uuid_t di;               ///< device di
+  struct oc_endpoint_t *next; /**< pointer to the next structure */
+  size_t device;              /**< device index */
+  enum transport_flags flags; /**< the transport flags */
+  oc_uuid_t di;               /**< device di */
   union dev_addr {
-    oc_ipv6_addr_t ipv6; ///< ipv6 address
-    oc_ipv4_addr_t ipv4; ///< ipv4 address
+    oc_ipv6_addr_t ipv6; /**< ipv6 address */
+    oc_ipv4_addr_t ipv4; /**< ipv4 address */
   } addr, addr_local;
-  int interface_index; ///< interface index
-  uint8_t priority;    ///< priority
+  int interface_index; /**< interface index */
+  uint8_t priority;    /**< priority */
 #ifdef OC_OSCORE
-  uint8_t piv[OSCORE_PIV_LEN];
-  uint8_t piv_len;
-#endif /* OC_OSCORE */
+  uint8_t piv[OSCORE_PIV_LEN]; /**< oscore partial iv */
+  uint8_t piv_len;             /**< oscore partial iv length */
+#endif                         /* OC_OSCORE */
 } oc_endpoint_t;
 
 #define oc_make_ipv4_endpoint(__name__, __flags__, __port__, ...)              \

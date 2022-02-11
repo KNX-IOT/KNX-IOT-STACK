@@ -47,20 +47,21 @@ typedef void (*oc_core_add_device_cb_t)(void *data);
  */
 typedef struct oc_platform_info_t
 {
-  oc_uuid_t pi;                                ///< the platform identifier
-  oc_string_t mfg_name;                        ///< manufacturer name
-  oc_core_init_platform_cb_t init_platform_cb; ///< callback function
-  void *data; ///< user data for the callback function
+  oc_uuid_t pi;                                /**< the platform identifier */
+  oc_string_t mfg_name;                        /**< manufacturer name */
+  oc_core_init_platform_cb_t init_platform_cb; /**< callback function */
+  void *data; /**< user data for the callback function */
 } oc_platform_info_t;
 
 /**
-
+ * @brief version information
+ * e.g. [major, minor, third]
  */
 typedef struct oc_knx_version_info_t
 {
-  int major; ///< major version number
-  int minor; ///< minor version number
-  int third; ///< third version number
+  int major; /**< major version number */
+  int minor; /**< minor version number */
+  int third; /**< third version number */
 } oc_knx_version_info_t;
 
 /**
@@ -69,26 +70,25 @@ typedef struct oc_knx_version_info_t
  */
 typedef struct oc_device_info_t
 {
-  oc_uuid_t di;     ///< device identifier
-  oc_uuid_t piid;   ///< Permanent Immutable ID
-  oc_string_t name; ///< name of the device
-  oc_string_t icv;  ///< specification version
-  oc_string_t dmv;  ///< data model version
-
-  oc_string_t serialnumber;  ///< knx serial number
-  oc_knx_version_info_t hwv; ///< knx hardware version
-  oc_knx_version_info_t fwv; ///< fwv firmware version number
-  oc_string_t hwt;           ///< knx hardware type
-  oc_string_t model;         ///< knx model
-  int ia;                    ///< knx ia Device individual address
-  oc_string_t hostname;      ///< knx host name
-  oc_string_t iid;           ///< knx idd (installation id)
-  bool pm;                   ///< knx programming mode
-  oc_lsm_state_t lsm_s;      ///< knx lsm states
-
-  oc_device_mode_t device_mode; ///< device mode (programming, normal operation)
-  oc_core_add_device_cb_t add_device_cb; ///< callback when device is changed
-  void *data;                            ///< user data
+  oc_uuid_t di;              /**< device identifier */
+  oc_uuid_t piid;            /**< Permanent Immutable ID */
+  oc_string_t name;          /**< name of the device */
+  oc_string_t icv;           /**< specification version */
+  oc_string_t dmv;           /**< data model version */
+  oc_string_t serialnumber;  /**< knx serial number */
+  oc_knx_version_info_t hwv; /**< knx hardware version */
+  oc_knx_version_info_t fwv; /**< fwv firmware version number */
+  oc_string_t hwt;           /**< knx hardware type */
+  oc_string_t model;         /**< knx model */
+  int ia;                    /**< knx ia Device individual address */
+  oc_string_t hostname;      /**< knx host name */
+  oc_string_t iid;           /**< knx idd (installation id) */
+  bool pm;                   /**< knx programming mode */
+  oc_lsm_state_t lsm_s;      /**< knx lsm states */
+  oc_device_mode_t
+    device_mode; /**< device mode (programming, normal operation) */
+  oc_core_add_device_cb_t add_device_cb; /**< callback when device is changed */
+  void *data;                            /**< user data */
 } oc_device_info_t;
 
 /**

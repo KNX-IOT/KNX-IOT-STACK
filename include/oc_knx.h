@@ -49,12 +49,12 @@ extern "C" {
  */
 typedef struct oc_pase_t
 {
-  oc_string_t salt; ///< salt
-  oc_string_t pa;   ///< pa
-  oc_string_t pb;   ///< pb
-  oc_string_t ca;   ///< ca
-  oc_string_t cb;   ///< cb
-  oc_string_t rnd;  ///< rnd
+  oc_string_t salt; /**< salt */
+  oc_string_t pa;   /**< pa */
+  oc_string_t pb;   /**< pb */
+  oc_string_t ca;   /**< ca */
+  oc_string_t cb;   /**< cb */
+  oc_string_t rnd;  /**< rnd */
   int it;
 } oc_pase_t;
 
@@ -78,10 +78,10 @@ typedef struct oc_pase_t
  */
 typedef struct oc_group_object_notification_t
 {
-  oc_string_t value; ///< generic value received.
-  int sia;           ///< (source id) sender individual address
-  oc_string_t st;    ///< Service type code (write=w, read=r, response=rp)
-  int ga;            ///< group address
+  oc_string_t value; /**< generic value received. */
+  int sia;           /**< (source id) sender individual address */
+  oc_string_t st;    /**< Service type code (write=w, read=r, response=rp) */
+  int ga;            /**< group address */
 } oc_group_object_notification_t;
 
 /**
