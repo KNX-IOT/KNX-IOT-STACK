@@ -191,7 +191,8 @@ test: all
 	LD_LIBRARY_PATH=./ ./apitest
 	LD_LIBRARY_PATH=./ ./messagingtest
 	LD_LIBRARY_PATH=./ ./platformtest
-	LD_LIBRARY_PATH=./ ./securitytest
+
+#	LD_LIBRARY_PATH=./ ./securitytest
 
 .PHONY: test clean
 
