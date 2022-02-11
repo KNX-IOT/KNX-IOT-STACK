@@ -12,7 +12,7 @@ if(OC_REAPPLY_MBEDTLS_PATCHES)
 endif()
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/tools)
 
-# Enable missing algoritms
+# Enable missing algorithms
 # TODO add this to Makefiles, or regenerate mbedtls patches
 add_compile_definitions(MBEDTLS_HKDF_C)
 add_compile_options(-fPIC)
@@ -25,7 +25,7 @@ set(OC_DYNAMIC_ALLOCATION_ENABLED ON CACHE BOOL "Enable dynamic memory allocatio
 #set(OC_SECURITY_ENABLED ON CACHE BOOL "Enable security")
 
 set(OC_OSCORE_ENABLED ON CACHE BOOL "Enable oscore")
-set(OC_PKI_ENABLED ON CACHE BOOL "Enable PKI security")
+set(OC_PKI_ENABLED OFF CACHE BOOL "Enable PKI security")
 set(OC_DEBUG_ENABLED OFF CACHE BOOL "Enable debug messages")
 set(CLANG_TIDY_ENABLED OFF CACHE BOOL "Enable clang-tidy analysis during compilation.")
 
@@ -249,6 +249,77 @@ if(PROJECT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
     )
 endif()
+
+
+
+######## Units tests (UNIX only) ########
+include(CTest)
+if(BUILD_TESTING AND UNIX)
+    enable_language(CXX)
+    find_package(Threads REQUIRED)
+    set(CMAKE_CXX_STANDARD 11)
+    set(CMAKE_CXX_STANDARD_REQUIRED ON)
+    set(CMAKE_CXX_EXTENSIONS OFF)
+    list(APPEND TEST_COMPILE_OPTIONS "-Wall" "-Wextra"  "-fpermissive")
+    list(APPEND TEST_LINK_LIBS kisClientServer gtest_main Threads::Threads)
+    if(CMAKE_COMPILER_IS_GNUCXX)
+        list(APPEND TEST_COMPILE_OPTIONS "-fprofile-arcs" "-ftest-coverage")
+        list(APPEND TEST_LINK_LIBS gcov)
+    endif()
+
+    # Disable clang-tidy for gtest
+    disable_clang_tidy()
+
+    # Build googletest
+    add_subdirectory(${PROJECT_SOURCE_DIR}/deps/gtest gtest)
+
+    # Helper macro to build unit test
+    macro(package_add_test TESTNAME)
+        add_executable(${TESTNAME} ${ARGN})
+        target_compile_options(${TESTNAME} PRIVATE ${TEST_COMPILE_OPTIONS})
+        target_compile_features(${TESTNAME} PRIVATE cxx_nullptr)
+        target_compile_definitions(${TESTNAME} PRIVATE ${PUBLIC_COMPILE_DEFINITIONS} "OC_CLIENT" "OC_SERVER")
+        target_include_directories(${TESTNAME} SYSTEM PRIVATE ${PROJECT_SOURCE_DIR}/deps/gtest/include)
+        target_include_directories(${TESTNAME} PRIVATE
+            ${PROJECT_SOURCE_DIR}
+            ${PROJECT_SOURCE_DIR}/include
+            ${PROJECT_SOURCE_DIR}/port/linux
+            ${PORT_INCLUDE_DIR}
+            ${PROJECT_SOURCE_DIR}/messaging/coap
+        )
+        if(OC_SECURITY_ENABLED)
+            target_include_directories(${TESTNAME} PRIVATE
+                ${PROJECT_SOURCE_DIR}/security
+                ${PROJECT_SOURCE_DIR}/deps/mbedtls/include
+            )
+        endif()
+        target_link_libraries(${TESTNAME} PRIVATE ${TEST_LINK_LIBS})
+        add_test(NAME ${TESTNAME} COMMAND ${TESTNAME})
+        set_target_properties(${TESTNAME} PROPERTIES FOLDER unittests)
+    endmacro()
+
+    # Unit tests
+    file(GLOB APITEST_SRC api/unittest/*.cpp)
+    package_add_test(apitest ${APITEST_SRC})
+
+    file(GLOB PLATFORMTEST_SRC port/unittest/*.cpp)
+    file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/storage_test)
+    package_add_test(platformtest ${PLATFORMTEST_SRC})
+
+    file(GLOB MESSAGINGTEST_SRC messaging/coap/unittest/*.cpp)
+    package_add_test(messagingtest ${MESSAGINGTEST_SRC})
+
+    if(OC_SECURITY_ENABLED)
+        file(GLOB SECURITYTEST_SRC security/unittest/*.cpp)
+        package_add_test(securitytest ${SECURITYTEST_SRC})
+    endif()
+
+    # reenable clang-tidy for any remaining targets
+    enable_clang_tidy()
+endif()
+
+
+
 
 # https://stackoverflow.com/questions/37957583/how-to-use-gcov-with-cmake
 if (CMAKE_BUILD_TYPE STREQUAL "Coverage")

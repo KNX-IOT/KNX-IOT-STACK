@@ -38,7 +38,8 @@ HEADER_DIR = -I$(ROOT_DIR)/include \
              -I$(ROOT_DIR) \
              -I$(OUT_DIR)
 SECURITY_HEADERS = -I$(ROOT_DIR)/security \
-                   -I$(MBEDTLS_DIR)/include
+                   -I$(MBEDTLS_DIR)/include \
+                    -I../../security -DMBEDTLS_CONFIG_FILE=\"knx_mbedtls_config.h\"
 MESSAGING_HEADERS = -I$(ROOT_DIR)/messaging/coap
 API_TEST_DIR = $(ROOT_DIR)/api/unittest
 API_TEST_OBJ_DIR = $(API_TEST_DIR)/obj
@@ -74,7 +75,7 @@ DTLS= 	aes.c		aesni.c 	arc4.c  	asn1parse.c	asn1write.c	base64.c	\
 	ssl_cache.c	ssl_ciphersuites.c		ssl_cli.c	ssl_cookie.c	platform_util.c	\
 	ssl_srv.c	ssl_ticket.c	ssl_tls.c	rsa_internal.c	x509write_csr.c\
 	x509write_crt.c	x509_create.c	x509_csr.c
-DTLSFLAGS=-I../../deps/mbedtls/include -D__OC_RANDOM
+DTLSFLAGS=-I../../deps/mbedtls/include -D__OC_RANDOM  -I../../security -DMBEDTLS_CONFIG_FILE="knx_mbedtls_config.h"
 
 CBOR=../../deps/tinycbor/src/cborencoder.c ../../deps/tinycbor/src/cborencoder_close_container_checked.c ../../deps/tinycbor/src/cborparser.c# ../../deps/tinycbor/src/cbortojson.c ../../deps/tinycbor/src/cborpretty.c ../../deps/tinycbor/src/cborparser_dup_string.c
 
@@ -190,7 +191,8 @@ test: all
 	LD_LIBRARY_PATH=./ ./apitest
 	LD_LIBRARY_PATH=./ ./messagingtest
 	LD_LIBRARY_PATH=./ ./platformtest
-	LD_LIBRARY_PATH=./ ./securitytest
+
+#	LD_LIBRARY_PATH=./ ./securitytest
 
 .PHONY: test clean
 
@@ -386,10 +388,11 @@ $(MBEDTLS_PATCH_FILE): ${MBEDTLS_DIR}/.git ${MBEDTLS_PATCHES}
 	git reset --hard && \
 	cd -; \
 	fi && \
-	git submodule update --init && \
-	cd ${MBEDTLS_DIR} && \
-	for patch in $(MBEDTLS_PATCHES); do patch -r - -s -N -p1 < $${patch} ; done && \
-	echo "Patches applied in $^" > ${@F}
+	git submodule update --init 
+#	&& \
+#	cd ${MBEDTLS_DIR} && \
+#	for patch in $(MBEDTLS_PATCHES); do patch -r - -s -N -p1 < $${patch} ; done && \
+#	echo "Patches applied in $^" > ${@F}
 endif
 
 clean:

@@ -94,7 +94,7 @@ bool oc_tls_is_pin_otm_supported(size_t device);
 bool oc_tls_is_cert_otm_supported(size_t device);
 
 /* Internal interface for generating a random PIN */
-void oc_tls_generate_random_pin(void);
+// void oc_tls_generate_random_pin(void);
 
 /* Internal interface for changing psk authority hint */
 #ifdef OC_CLIENT

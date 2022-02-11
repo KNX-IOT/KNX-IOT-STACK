@@ -27,12 +27,12 @@ execute_process(COMMAND ${GIT_EXECUTABLE} -C ${STACK_SRC_DIR} submodule update -
 
 message("submodules initialised")
 
-file(GLOB PATCHES "${STACK_PATCH_DIR}/*.patch")
+#file(GLOB PATCHES "${STACK_PATCH_DIR}/*.patch")
 
-foreach(PATCH IN LISTS PATCHES)
-	message("Running patch ${PATCH}")
-	execute_process(
-		COMMAND ${GIT_EXECUTABLE} apply ${PATCH}
-		WORKING_DIRECTORY ${MBEDTLS_SRC_DIR}
-	)
-endforeach()
+#foreach(PATCH IN LISTS PATCHES)
+#	message("Running patch ${PATCH}")
+#	execute_process(
+#		COMMAND ${GIT_EXECUTABLE} apply ${PATCH}
+#		WORKING_DIRECTORY ${MBEDTLS_SRC_DIR}
+#	)
+#endforeach()
