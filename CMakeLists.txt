@@ -2,14 +2,14 @@ cmake_minimum_required (VERSION 3.10)
 project(knx-iot-stack)
 
 # Patch mbedtls
-#set(OC_REAPPLY_MBEDTLS_PATCHES ON CACHE BOOL "")
-#if(OC_REAPPLY_MBEDTLS_PATCHES)
-#    include(mbedtls-patch.cmake)
-#    set(OC_REAPPLY_MBEDTLS_PATCHES OFF CACHE BOOL 
-#        "By default, mbedTLS patches are applied upon the first CMake Configure. Set this to ON to reapply the patches on the next configure."
-#         FORCE
-#    )
-#endif()
+set(OC_REAPPLY_MBEDTLS_PATCHES ON CACHE BOOL "")
+if(OC_REAPPLY_MBEDTLS_PATCHES)
+    include(mbedtls-patch.cmake)
+    set(OC_REAPPLY_MBEDTLS_PATCHES OFF CACHE BOOL 
+        "By default, mbedTLS patches are applied upon the first CMake Configure. Set this to ON to reapply the patches on the next configure."
+         FORCE
+    )
+endif()
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/tools)
 
 # Enable missing algoritms
