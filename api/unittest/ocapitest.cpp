@@ -93,7 +93,7 @@ public:
     oc_resource_set_discoverable(s_pResource, true);
     oc_resource_set_periodic_observable(s_pResource, 1);
     oc_resource_set_request_handler(s_pResource, OC_GET, onGet, NULL);
-    oc_process_baseline_interface(s_pResource);
+    //oc_process_baseline_interface(s_pResource);
     oc_add_resource(s_pResource);
   }
 
