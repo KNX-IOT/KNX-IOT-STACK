@@ -71,19 +71,19 @@ enum transport_flags {
  */
 typedef struct oc_endpoint_t
 {
-  struct oc_endpoint_t *next; ///< pointer to the next structure */
-  size_t device;              ///< device index */
-  enum transport_flags flags; ///< the transport flags */
-  oc_uuid_t di;               ///< device di
+  struct oc_endpoint_t *next; /**< pointer to the next structure */
+  size_t device;              /**< device index */
+  enum transport_flags flags; /**< the transport flags */
+  oc_uuid_t di;               /**< device di */
   union dev_addr {
-    oc_ipv6_addr_t ipv6; ///< ipv6 address
-    oc_ipv4_addr_t ipv4; ///< ipv4 address
+    oc_ipv6_addr_t ipv6; /**< ipv6 address */
+    oc_ipv4_addr_t ipv4; /**< ipv4 address */
   } addr, addr_local;
-  int interface_index; ///< interface index
-  uint8_t priority;    ///< priority
+  int interface_index; /**< interface index */
+  uint8_t priority;    /**< priority */
 #ifdef OC_OSCORE
-  uint8_t piv[OSCORE_PIV_LEN];
-  uint8_t piv_len;
+  uint8_t piv[OSCORE_PIV_LEN]; /**< oscore partial iv */
+  uint8_t piv_len;/**< oscore partial iv length */
 #endif /* OC_OSCORE */
 } oc_endpoint_t;
 

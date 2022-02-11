@@ -32,15 +32,16 @@ extern "C" {
  *
  */
 typedef enum {
-  OC_SESSION_CONNECTED,   ///< session connected
-  OC_SESSION_DISCONNECTED ///< session disconnected
+  OC_SESSION_CONNECTED,   /**< session connected */
+  OC_SESSION_DISCONNECTED /**< session disconnected */
 } oc_session_state_t;
 
 /**
-  @brief Callback function to pass the session event infomation to App.
-  @param endpoint  endpoint info which the session event is happened.
-  @param state  enum values in oc_session_state_t.
-*/
+ * @brief Callback function to pass the session event infomation to App.
+ * 
+ * @param endpoint  endpoint info which the session event is happened.
+ * @param state  enum values in oc_session_state_t.
+ */
 typedef void (*session_event_handler_t)(const oc_endpoint_t *endpoint,
                                         oc_session_state_t state);
 

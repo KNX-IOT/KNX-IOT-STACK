@@ -1,5 +1,6 @@
 /*
 // Copyright (c) 2016-2018 Intel Corporation
+// Copyright (c) 2022 Cascoda Ltd.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -31,8 +32,8 @@ extern "C" {
  *
  */
 typedef enum {
-  NETWORK_INTERFACE_DOWN, ///< network interface down
-  NETWORK_INTERFACE_UP    ///< network interface up
+  NETWORK_INTERFACE_DOWN, /**< network interface down */
+  NETWORK_INTERFACE_UP    /**< network interface up */
 } oc_interface_event_t;
 
 /**
@@ -47,8 +48,8 @@ typedef void (*interface_event_handler_t)(oc_interface_event_t event);
  */
 typedef struct oc_network_interface_cb
 {
-  struct oc_network_interface_cb *next;
-  interface_event_handler_t handler;
+  struct oc_network_interface_cb *next; /**< next in the list */
+  interface_event_handler_t handler; /**< the callback (handler) */
 } oc_network_interface_cb_t;
 
 /**
