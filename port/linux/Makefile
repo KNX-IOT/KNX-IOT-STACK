@@ -39,7 +39,7 @@ HEADER_DIR = -I$(ROOT_DIR)/include \
              -I$(OUT_DIR)
 SECURITY_HEADERS = -I$(ROOT_DIR)/security \
                    -I$(MBEDTLS_DIR)/include \
-                    -I../../security -DMBEDTLS_CONFIG_FILE='knx_mbedtls_config.h'
+                    -I../../security -DMBEDTLS_CONFIG_FILE=knx_mbedtls_config.h
 MESSAGING_HEADERS = -I$(ROOT_DIR)/messaging/coap
 API_TEST_DIR = $(ROOT_DIR)/api/unittest
 API_TEST_OBJ_DIR = $(API_TEST_DIR)/obj
