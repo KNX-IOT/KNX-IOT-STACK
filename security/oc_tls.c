@@ -1822,7 +1822,7 @@ oc_tls_uses_psk_cred(oc_tls_peer_t *peer)
     return false;
   }
   int cipher = peer->ssl_ctx.session->ciphersuite;
-  if (MBEDTLS_TLS_ECDHE_PSK_WITH_AES_128_CBC_SHA256 == cipher
+  if (MBEDTLS_TLS_ECDHE_PSK_WITH_AES_128_CBC_SHA256 == cipher )
    //   ||MBEDTLS_TLS_ECDH_ANON_WITH_AES_128_CBC_SHA256 == cipher) 
   {
     return true;
