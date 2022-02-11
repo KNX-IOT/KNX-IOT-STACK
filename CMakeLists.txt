@@ -317,12 +317,6 @@ if(BUILD_TESTING AND UNIX)
         package_add_test(securitytest ${SECURITYTEST_SRC})
     endif()
 
-# Currently disabled because it hangs on TestCloudManager.cloud_manager_start_initialized_f
-#    if(OC_CLOUD_ENABLED)
-#        file(GLOB CLOUDTEST_SRC api/cloud/unittest/*.cpp)
-#        package_add_test(cloudtest ${CLOUDTEST_SRC})
-#    endif()
-
     # reenable clang-tidy for any remaining targets
     enable_clang_tidy()
 endif()
