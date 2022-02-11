@@ -14,7 +14,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/tools)
 
 # Enable missing algoritms
 # TODO add this to Makefiles, or regenerate mbedtls patches
-add_compile_definitions(MBEDTLS_HKDF_C)
+#add_compile_definitions(MBEDTLS_HKDF_C)
 add_compile_options(-fPIC)
 
 # Do not build anything except for the library
