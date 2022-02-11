@@ -1614,8 +1614,8 @@ oc_sec_derive_owner_psk(oc_endpoint_t *endpoint, const uint8_t *oxm,
   int iv_size = 0;
   int key_size = 0;
   int key_block_len = 0;
-  if (MBEDTLS_TLS_ECDH_ANON_WITH_AES_128_CBC_SHA256 ==
-        peer->ssl_ctx.session->ciphersuite ||
+  if (//MBEDTLS_TLS_ECDH_ANON_WITH_AES_128_CBC_SHA256 ==
+      //  peer->ssl_ctx.session->ciphersuite ||
       MBEDTLS_TLS_ECDHE_PSK_WITH_AES_128_CBC_SHA256 ==
         peer->ssl_ctx.session->ciphersuite ||
       MBEDTLS_TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256 ==
@@ -1822,8 +1822,9 @@ oc_tls_uses_psk_cred(oc_tls_peer_t *peer)
     return false;
   }
   int cipher = peer->ssl_ctx.session->ciphersuite;
-  if (MBEDTLS_TLS_ECDHE_PSK_WITH_AES_128_CBC_SHA256 == cipher ||
-      MBEDTLS_TLS_ECDH_ANON_WITH_AES_128_CBC_SHA256 == cipher) {
+  if (MBEDTLS_TLS_ECDHE_PSK_WITH_AES_128_CBC_SHA256 == cipher
+   //   ||MBEDTLS_TLS_ECDH_ANON_WITH_AES_128_CBC_SHA256 == cipher) 
+  {
     return true;
   }
   return false;

@@ -231,7 +231,6 @@ typedef void (*oc_add_device_cb_t)(void *data);
  * - oc_set_con_res_announced()
  * - oc_set_factory_presets_cb()
  * - oc_set_max_app_data_size()
- * - oc_set_random_pin_callback()
  * - oc_storage_config()
  *
  * Not all of the listed functions must be called before calling oc_main_init.
@@ -245,7 +244,6 @@ typedef void (*oc_add_device_cb_t)(void *data);
  * @see oc_set_con_res_announced
  * @see oc_set_factory_presets_cb
  * @see oc_set_max_app_data_size
- * @see oc_set_random_pin_callback
  * @see oc_storage_config
  */
 int oc_main_init(const oc_handler_t *handler);
