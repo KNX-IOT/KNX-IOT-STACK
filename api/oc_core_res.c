@@ -435,17 +435,17 @@ oc_core_add_device(const char *name, const char *version, const char *base,
     return NULL;
   }
 #else /* !OC_DYNAMIC_ALLOCATION */
-  size_t new_num = (OC_NUM_CORE_RESOURCES_PER_DEVICE) * (device_count + 1);
-  PRINT(" oc_core_add_device  %d", (int)new_num);
+  // note: there is always 1 resource, the initial one in the list
+  size_t new_num = 1 + WELLKNOWNCORE * (device_count + 1);
+  PRINT(" oc_core_add_device  %d\n", (int)new_num);
   core_resources =
     (oc_resource_t *)realloc(core_resources, new_num * sizeof(oc_resource_t));
 
   if (!core_resources) {
     oc_abort("Insufficient memory");
   }
-  oc_resource_t *device =
-    &core_resources[new_num - OC_NUM_CORE_RESOURCES_PER_DEVICE];
-  memset(device, 0, OC_NUM_CORE_RESOURCES_PER_DEVICE * sizeof(oc_resource_t));
+  oc_resource_t *device_resources = &core_resources[new_num - WELLKNOWNCORE];
+  memset(device_resources, 0, WELLKNOWNCORE * sizeof(oc_resource_t));
 
   oc_device_info = (oc_device_info_t *)realloc(
     oc_device_info, (device_count + 1) * sizeof(oc_device_info_t));
@@ -502,13 +502,7 @@ oc_core_init_platform(const char *mfg_name, oc_core_init_platform_cb_t init_cb,
     return &oc_platform_info;
   }
 
-  /* Populating resource object */
-  // int properties = OC_DISCOVERABLE;
-
-  // oc_core_populate_resource(OCF_P, 0, "oic/p", OC_IF_R | OC_IF_BASELINE,
-  //                          OC_IF_R, properties, oc_core_platform_handler, 0,
-  //                          0, 0, 1, "oic.wk.p");
-
+  // todo remove uuid stuff
   oc_gen_uuid(&oc_platform_info.pi);
 
   oc_new_string(&oc_platform_info.mfg_name, mfg_name, strlen(mfg_name));
@@ -675,35 +669,7 @@ oc_core_get_resource_by_uri(const char *uri, size_t device)
   }
 
 #ifdef OC_SECURITY
-  else if ((strlen(uri) - skip) == 12) {
-    if (memcmp(uri + skip, "oic/sec/doxm", 12) == 0) {
-      type = OCF_SEC_DOXM;
-    } else if (memcmp(uri + skip, "oic/sec/pstat", 12) == 0) {
-      type = OCF_SEC_PSTAT;
-    } else if (memcmp(uri + skip, "oic/sec/acl2", 12) == 0) {
-      type = OCF_SEC_ACL;
-    } else if (memcmp(uri + skip, "oic/sec/ael", 11) == 0) {
-      type = OCF_SEC_AEL;
-    } else if (memcmp(uri + skip, "oic/sec/cred", 12) == 0) {
-      type = OCF_SEC_CRED;
-    }
-  } else if ((strlen(uri) - skip) == 10 &&
-             memcmp(uri + skip, "oic/sec/sp", 10) == 0) {
-    type = OCF_SEC_SP;
-  }
-#ifdef OC_PKI
-  else if ((strlen(uri) - skip) == 11 &&
-           memcmp(uri + skip, "oic/sec/csr", 11) == 0) {
-    type = OCF_SEC_CSR;
-  } else if ((strlen(uri) - skip) == 13 &&
-             memcmp(uri + skip, "oic/sec/roles", 13) == 0) {
-    type = OCF_SEC_ROLES;
-  }
-#endif /* OC_PKI */
-  else if ((strlen(uri) - skip) == 11 &&
-           memcmp(uri + skip, "oic/sec/sdi", 11) == 0) {
-    type = OCF_SEC_SDI;
-  }
+
 #endif /* OC_SECURITY */
   else {
     return NULL;
@@ -735,15 +701,19 @@ oc_filter_resource_by_rt(oc_resource_t *resource, oc_request_t *request)
       int i;
       for (i = 0; i < (int)oc_string_array_get_allocated_size(resource->types);
            i++) {
-        size_t size = oc_string_array_get_item_size(resource->types, i);
-        const char *t =
+        size_t resource_type_len =
+          oc_string_array_get_item_size(resource->types, i);
+        const char *resource_type =
           (const char *)oc_string_array_get_item(resource->types, i);
+        PRINT("   oc_filter_resource_by_rt '%.*s'\n", resource_type_len,
+              resource_type);
         if (wildcart != NULL) {
-          if (strncmp(rt, t, rt_len) == 0) {
+          if (strncmp(rt, resource_type, rt_len) == 0) {
             return true;
           }
         }
-        if (rt_len == (int)size && strncmp(rt, t, rt_len) == 0) {
+        if (rt_len == (int)resource_type_len &&
+            strncmp(rt, resource_type, rt_len) == 0) {
           return true;
         }
       }

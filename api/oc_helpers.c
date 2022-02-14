@@ -169,7 +169,7 @@ _oc_alloc_string_array(
     pos = i * STRING_ARRAY_ITEM_MAX_LEN;
     memcpy((char *)oc_string(*ocstringarray) + pos, (const char *)"", 1);
   }
-  ocstringarray->size = size;
+  ocstringarray->size = size * STRING_ARRAY_ITEM_MAX_LEN;
 }
 
 bool
