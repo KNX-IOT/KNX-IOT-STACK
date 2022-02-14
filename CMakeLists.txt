@@ -309,7 +309,7 @@ if(BUILD_TESTING AND UNIX)
     file(GLOB MESSAGINGTEST_SRC messaging/coap/unittest/*.cpp)
     package_add_test(messagingtest ${MESSAGINGTEST_SRC})
 
-    if(OC_SECURITY_ENABLED)
+    if(OC_OSCORE_ENABLED)
         file(GLOB SECURITYTEST_SRC security/unittest/*.cpp)
         package_add_test(securitytest ${SECURITYTEST_SRC})
     endif()
