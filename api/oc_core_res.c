@@ -435,15 +435,17 @@ oc_core_add_device(const char *name, const char *version, const char *base,
     return NULL;
   }
 #else /* !OC_DYNAMIC_ALLOCATION */
-  size_t new_num = 1 + WELLKNOWNCORE * (device_count + 1);
+  size_t new_num = (OC_NUM_CORE_RESOURCES_PER_DEVICE) * (device_count + 1);
+  PRINT(" oc_core_add_device  %d", (int)new_num);
   core_resources =
     (oc_resource_t *)realloc(core_resources, new_num * sizeof(oc_resource_t));
 
   if (!core_resources) {
     oc_abort("Insufficient memory");
   }
-  oc_resource_t *device = &core_resources[new_num - WELLKNOWNCORE];
-  memset(device, 0, WELLKNOWNCORE * sizeof(oc_resource_t));
+  oc_resource_t *device =
+    &core_resources[new_num - OC_NUM_CORE_RESOURCES_PER_DEVICE];
+  memset(device, 0, OC_NUM_CORE_RESOURCES_PER_DEVICE * sizeof(oc_resource_t));
 
   oc_device_info = (oc_device_info_t *)realloc(
     oc_device_info, (device_count + 1) * sizeof(oc_device_info_t));
@@ -490,37 +492,6 @@ oc_core_add_device(const char *name, const char *version, const char *base,
   device_count++;
 
   return &oc_device_info[device_count - 1];
-}
-
-static void
-oc_device_bind_rt(size_t device_index, const char *rt)
-{
-  oc_resource_t *r = oc_core_get_resource_by_index(WELLKNOWNCORE, device_index);
-  oc_string_array_t types;
-
-  memcpy(&types, &r->types, sizeof(oc_string_array_t));
-
-  size_t num_types = oc_string_array_get_allocated_size(types);
-  num_types++;
-
-  memset(&r->types, 0, sizeof(oc_string_array_t));
-  oc_new_string_array(&r->types, num_types);
-  size_t i;
-  for (i = 0; i < num_types; i++) {
-    if (i == 0) {
-      oc_string_array_add_item(r->types, rt);
-    } else {
-      oc_string_array_add_item(r->types,
-                               oc_string_array_get_item(types, (i - 1)));
-    }
-  }
-  oc_free_string_array(&types);
-}
-
-void
-oc_device_bind_resource_type(size_t device, const char *type)
-{
-  oc_device_bind_rt(device, type);
 }
 
 oc_platform_info_t *

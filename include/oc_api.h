@@ -45,6 +45,8 @@
 extern "C" {
 #endif
 
+#define OC_MAX_URL_LENGTH (30)
+
 /**
  * Call back handlers that are invoked in response to oc_main_init()
  *
@@ -134,6 +136,7 @@ typedef struct
    *
    * Callback is invoked after the device initialization callback.
    *
+   *      TODO
    * Example:
    * ```
    * static void issue_requests(void)
@@ -563,18 +566,6 @@ void oc_resource_bind_resource_type(oc_resource_t *resource, const char *type);
  */
 void oc_resource_bind_content_type(oc_resource_t *resource,
                                    oc_content_format_t content_type);
-
-// UPDATE
-/**
- * Add a Resource Type "rt" property to the an `/oic/d` resource.
- *
- * This function can be used to bind a new Resource Type to a logical device's
- * `/oic/d` resource.
- *
- * @param[in] device index of a logical device
- * @param[in] type the Resource type to add to the Resource Type "rt" property
- */
-void oc_device_bind_resource_type(size_t device, const char *type);
 
 /**
  * @defgroup doc_module_tag_collections Collection Support

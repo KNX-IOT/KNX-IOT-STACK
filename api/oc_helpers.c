@@ -169,6 +169,7 @@ _oc_alloc_string_array(
     pos = i * STRING_ARRAY_ITEM_MAX_LEN;
     memcpy((char *)oc_string(*ocstringarray) + pos, (const char *)"", 1);
   }
+  ocstringarray->size = size;
 }
 
 bool
@@ -220,6 +221,9 @@ _oc_string_array_add_item(oc_string_array_t *ocstringarray, const char str[])
 {
   bool success = false;
   size_t i;
+  if (ocstringarray == NULL) {
+    return false;
+  }
   for (i = 0; i < oc_string_array_get_allocated_size(*ocstringarray); i++) {
     if (oc_string_array_get_item_size(*ocstringarray, i) == 0) {
       success = oc_string_array_set_item(*ocstringarray, str, i);
@@ -315,6 +319,16 @@ oc_conv_hex_string_to_byte_array(const char *hex_str, size_t hex_str_len,
   }
 
   return 0;
+}
+
+int
+oc_string_cmp(oc_string_t string1, oc_string_t string2)
+{
+  if (oc_string_len(string1) != oc_string_len(string2)) {
+    return -1;
+  }
+  return strncmp(oc_string(string1), oc_string(string2),
+                 oc_string_len(string1));
 }
 
 bool
