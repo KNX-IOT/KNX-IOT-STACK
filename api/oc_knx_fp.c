@@ -520,12 +520,49 @@ oc_core_fp_g_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   PRINT("oc_core_fp_g_get_handler - end\n");
 }
 
+static bool
+oc_fp_p_check_and_save(int index, size_t device_index, bool status_ok)
+{
+  bool do_save = true;
+  if (status_ok == false) {
+    return status_ok;
+  }
+
+  // do additional sanity checks
+  if (g_got[index].ga_len == 0) {
+    do_save = false;
+    OC_ERR("  index %d no groups %d", index, g_got[index].ga_len);
+  }
+  if (g_got[index].cflags == 0) {
+    do_save = false;
+    OC_ERR("  index %d no cflags set %d", index, g_got[index].cflags);
+  }
+  if (oc_string_len(g_got[index].href) > OC_MAX_URL_LENGTH) {
+    do_save = false;
+    OC_ERR("  index %d href is longer than %d", index, (int)OC_MAX_URL_LENGTH);
+  }
+  if (oc_belongs_href_to_resource(g_got[index].href, device_index) == false) {
+    do_save = false;
+    OC_ERR("  index %d href does not belong to device '%s'", index,
+           oc_string(g_got[index].href));
+  }
+
+  oc_print_group_object_table_entry(index);
+  if (do_save) {
+    oc_dump_group_object_table_entry(index);
+  } else {
+    status_ok = false;
+  }
+  return status_ok;
+}
+
 static void
 oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
                           void *data)
 {
   (void)data;
   (void)iface_mask;
+  bool status_ok = true;
 
   PRINT("oc_core_fp_g_post_handler\n");
 
@@ -537,7 +574,7 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 
   size_t device_index = request->resource->device;
   if (oc_knx_lsm_state(device_index) != LSM_S_LOADING) {
-    PRINT(" not in loading state\n");
+    OC_ERR(" not in loading state\n");
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -558,31 +595,21 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       oc_rep_t *object = rep->value.object;
       id = table_find_id_from_rep(object);
       if (id == -1) {
-        PRINT("  ERROR id %d\n", index);
+        OC_ERR("  ERROR id %d", index);
         oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
         return;
       }
       index = find_empty_slot_in_group_object_table(id);
       if (index == -1) {
-        PRINT("  ERROR index %d\n", index);
+        OC_ERR("  ERROR index %d", index);
         oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
         return;
       }
-      PRINT("  storing at %d\n", index);
-
+      PRINT("  storing at index: %d\n", index);
       object = rep->value.object;
-
       while (object != NULL) {
         switch (object->type) {
         case OC_REP_STRING: {
-#ifdef TAGS_AS_STRINGS
-          if (oc_string_len(object->name) == 4 &&
-              memcmp(oc_string(object->name), "href", 4) == 0) {
-            oc_free_string(&g_got[index].href);
-            oc_new_string(&g_got[index].href, oc_string(object->value.string),
-                          oc_string_len(object->value.string));
-          }
-#endif
           if (object->iname == 11) {
             oc_free_string(&g_got[index].href);
             oc_new_string(&g_got[index].href, oc_string(object->value.string),
@@ -590,68 +617,17 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
           }
         } break;
         case OC_REP_INT: {
-#ifdef TAGS_AS_STRINGS
-          if ((oc_string_len(object->name) == 2 &&
-               memcmp(oc_string(object->name), "id", 2) == 0)) {
+          if (oc_string_len(object->name) == 0 && object->iname == 0) {
+            // id (0)
             g_got[index].id = object->value.integer;
           }
-#endif
-          if (oc_string_len(object->name) == 0 && object->iname == 0) {
-            {
-              // id (0)
-              g_got[index].id = object->value.integer;
-            }
-          }
           if (oc_string_len(object->name) == 0 && object->iname == 8) {
-            {
-              // cflags (8)
-              g_got[index].cflags = object->value.integer;
-            }
+            // cflags (8)
+            g_got[index].cflags = object->value.integer;
           }
-          break;
+        } break;
         case OC_REP_INT_ARRAY: {
-#ifdef TAGS_AS_STRINGS
-          if (oc_string_len(object->name) == 5 &&
-              memcmp(oc_string(object->name), "cflag", 5) == 0) {
-            // g_got[index].id = object->value.integer;
-            g_got[index].cflags = OC_CFLAG_NONE;
-            int64_t *arr = oc_int_array(object->value.array);
-            for (int i = 0; i < (int)oc_int_array_size(object->value.array);
-                 i++) {
-              if (arr[i] == 1) {
-                g_got[index].cflags += OC_CFLAG_READ;
-              } else if (arr[i] == 2) {
-                g_got[index].cflags += OC_CFLAG_WRITE;
-              } else if (arr[i] == 3) {
-                g_got[index].cflags += OC_CFLAG_TRANSMISSION;
-              } else if (arr[i] == 4) {
-                g_got[index].cflags += OC_CFLAG_UPDATE;
-              } else if (arr[i] == 5) {
-                g_got[index].cflags += OC_CFLAG_INIT;
-              }
-            }
-          }
-          if (oc_string_len(object->name) == 2 &&
-              memcmp(oc_string(object->name), "ga", 2) == 0) {
-            // g_got[index].id = object->value.integer;
-            int64_t *arr = oc_int_array(object->value.array);
-            int array_size = (int)oc_int_array_size(object->value.array);
-            int *new_array = (int *)malloc(array_size * sizeof(int));
-
-            for (int i = 0; i < array_size; i++) {
-              new_array[i] = arr[i];
-            }
-            if (g_got[index].ga != 0) {
-              free(g_got[index].ga);
-            }
-            PRINT("  ga size %d\n", array_size);
-            g_got[index].ga_len = array_size;
-            g_got[index].ga = new_array;
-          }
-        }
-#endif
           if (object->iname == 8) {
-            // g_got[index].id = object->value.integer;
             g_got[index].cflags = OC_CFLAG_NONE;
             int64_t *arr = oc_int_array(object->value.array);
             for (int i = 0; i < (int)oc_int_array_size(object->value.array);
@@ -669,9 +645,7 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
               }
             }
           }
-
           if (object->iname == 7) {
-            // g_got[index].id = object->value.integer;
             int64_t *arr = oc_int_array(object->value.array);
             int array_size = (int)oc_int_array_size(object->value.array);
             int *new_array = (int *)malloc(array_size * sizeof(int));
@@ -682,66 +656,37 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
             if (g_got[index].ga != 0) {
               free(g_got[index].ga);
             }
-            PRINT("  storing index %d length %d", index, array_size);
             g_got[index].ga_len = array_size;
             g_got[index].ga = new_array;
           }
         } break;
-        case OC_REP_NIL:
-          break;
         default:
           break;
-        }
+        } // switch
 
-        // do additional sanity checks
-        bool do_save = true;
-        if (g_got[index].ga_len == 0) {
-          do_save = false;
-          OC_ERR("  no groups in entry\n");
-        }
-        if (g_got[index].cflags == 0) {
-          do_save = false;
-          OC_ERR("  no cflags set\n");
-        }
-        if (oc_string_len(g_got[index].href) > OC_MAX_URL_LENGTH) {
-          do_save = false;
-          OC_ERR("  href is longer than %d \n", (int)OC_MAX_URL_LENGTH);
-        }
-        if (oc_belongs_href_to_resource(g_got[index].href, device_index) ==
-            false) {
-          do_save = false;
-          OC_ERR("  href does not belong to device %s \n",
-                 oc_string(g_got[index].href));
-        }
-
-        oc_print_group_object_table_entry(index);
-        if (do_save) {
-          oc_dump_group_object_table_entry(index);
-        }
         object = object->next;
-      }
+      } // next object in array
+      status_ok = oc_fp_p_check_and_save(index, device_index, status_ok);
     }
-
-    case OC_REP_NIL:
-      break;
-
     default:
       break;
-    }
-
+    } // object level
     rep = rep->next;
-  };
+  } // top level
 
-  oc_knx_increase_fingerprint();
   PRINT("oc_core_fp_g_post_handler - end\n");
-  oc_send_cbor_response(request, OC_STATUS_CHANGED);
+  if (status_ok) {
+    oc_knx_increase_fingerprint();
+    oc_send_cbor_response(request, OC_STATUS_CHANGED);
+  }
+  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
 }
 
 void
 oc_create_fp_g_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_fp_g_resource\n");
-  oc_core_populate_resource(resource_idx, device, "/fp/g", OC_IF_D,
+  oc_core_populate_resource(resource_idx, device, "/fp/g", OC_IF_C | OC_IF_B,
                             APPLICATION_CBOR, OC_DISCOVERABLE,
                             oc_core_fp_g_get_handler, 0,
                             oc_core_fp_g_post_handler, 0, 0, 1, "urn:knx:if.c");
@@ -785,33 +730,9 @@ oc_core_fp_g_x_get_handler(oc_request_t *request,
   oc_rep_i_set_text_string(root, 11, oc_string(g_got[index].href));
   // ga - 7
   oc_rep_i_set_int_array(root, 7, g_got[index].ga, g_got[index].ga_len);
-
   // cflags 8
-
-  // id 0
   oc_rep_i_set_int(root, 8, g_got[index].cflags);
-
-  // oc_rep_i_set_key(&root_map, 8);
-  // oc_rep_begin_array(&root_map, cflags);
-  // if (g_got[index].cflags & OC_CFLAG_READ) {
-  //  oc_rep_add_int(cflags, 1);
-  //}
-  // if (g_got[index].cflags & OC_CFLAG_WRITE) {
-  //  oc_rep_add_int(cflags, 2);
-  //}
-  // if (g_got[index].cflags & OC_CFLAG_TRANSMISSION) {
-  //  oc_rep_add_int(cflags, 3);
-  //}
-  // if (g_got[index].cflags & OC_CFLAG_UPDATE) {
-  //  oc_rep_add_int(cflags, 4);
-  //}
-  // if (g_got[index].cflags & OC_CFLAG_INIT) {
-  //  oc_rep_add_int(cflags, 5);
-  //}
-  // oc_rep_close_array(root, cflags);
-
   oc_rep_end_root_object();
-
   oc_send_cbor_response(request, OC_STATUS_OK);
 
   PRINT("oc_core_fp_g_x_get_handler - end\n");
@@ -887,6 +808,7 @@ oc_core_find_reciepient_table_index(int group_address)
 oc_string_t
 oc_core_find_reciepient_table_url_from_index(int index)
 {
+  // TODO
   return g_gpt[index].url;
 }
 
@@ -987,12 +909,6 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
         } break;
         case OC_REP_STRING: {
 #ifdef TAGS_AS_STRINGS
-          // if (oc_string_len(object->name) == 2 &&
-          //    memcmp(oc_string(object->name), "ia", 2) == 0) {
-          //  oc_free_string(&g_gpt[index].ia);
-          //  oc_new_string(&g_gpt[index].ia, oc_string(object->value.string),
-          //                oc_string_len(object->value.string));
-          //}
           if (oc_string_len(object->name) == 4 &&
               memcmp(oc_string(object->name), "path", 4) == 0) {
             oc_free_string(&g_gpt[index].path);
@@ -1006,11 +922,6 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
                           oc_string_len(object->value.string));
           }
 #endif
-          // if (object->iname == 12) {
-          //  oc_free_string(&g_gpt[index].ia);
-          //  oc_new_string(&g_gpt[index].ia, oc_string(object->value.string),
-          //                oc_string_len(object->value.string));
-          //}
           if (object->iname == 112) {
             oc_free_string(&g_gpt[index].path);
             oc_new_string(&g_gpt[index].path, oc_string(object->value.string),
@@ -1297,13 +1208,13 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       oc_rep_t *object = rep->value.object;
       id = table_find_id_from_rep(object);
       if (id == -1) {
-        PRINT("  ERROR id %d\n", index);
+        OC_ERR("  ERROR id %d", index);
         oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
         return;
       }
       index = find_empty_slot_in_rp_table(id, g_grt, GRT_MAX_ENTRIES);
       if (index == -1) {
-        PRINT("  ERROR index %d\n", index);
+        OC_ERR("  ERROR index %d", index);
         oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
         return;
       }
@@ -1617,11 +1528,11 @@ oc_print_group_object_table_entry(int entry)
     return;
   }
 
-  PRINT("    id     : %d\n", g_got[entry].id);
-  PRINT("    href   : %s\n", oc_string(g_got[entry].href));
-  PRINT("    cflags : %d string: ", g_got[entry].cflags);
+  PRINT("    id (0)     : %d\n", g_got[entry].id);
+  PRINT("    href (11)  : %s\n", oc_string(g_got[entry].href));
+  PRINT("    cflags (8) : %d string: ", g_got[entry].cflags);
   oc_print_cflags(g_got[entry].cflags);
-  PRINT("    ga     : [");
+  PRINT("    ga (7)     : [");
   for (int i = 0; i < g_got[entry].ga_len; i++) {
     PRINT(" %d", g_got[entry].ga[i]);
   }
@@ -1814,7 +1725,7 @@ oc_dump_group_rp_table_entry(int entry, char *Store,
   (void)max_size;
   char filename[20];
   snprintf(filename, 20, "%s_%d", Store, entry);
-  PRINT("oc_dump_group_rp_table_entry %s, fname=%s\n", Store, filename);
+  // PRINT("oc_dump_group_rp_table_entry %s, fname=%s\n", Store, filename);
 
   uint8_t *buf = malloc(OC_MAX_APP_DATA_SIZE);
   if (!buf) {

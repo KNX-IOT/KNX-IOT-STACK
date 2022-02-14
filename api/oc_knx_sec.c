@@ -829,35 +829,40 @@ oc_create_knx_auth_resource(int resource_idx, size_t device)
 static void
 oc_at_entry_print(int index)
 {
-  PRINT("  at index: %d\n", index);
+  // PRINT("  at index: %d\n", index);
   if (index > -1) {
-    PRINT("    id         : %s\n", oc_string(g_at_entries[index].id));
-    PRINT("    interfaces : %d\n", g_at_entries[index].interface);
-    PRINT("    profile    : %d (%s)\n", g_at_entries[index].profile,
-          oc_at_profile_to_string(g_at_entries[index].profile));
-    if (g_at_entries[index].profile == OC_PROFILE_COAP_DTLS) {
-      if (oc_string_len(g_at_entries[index].sub) > 0) {
-        PRINT("    sub    : %s\n", oc_string(g_at_entries[index].sub));
-      }
-      if (oc_string_len(g_at_entries[index].kid) > 0) {
-        PRINT("    kid    : %s\n", oc_string(g_at_entries[index].kid));
-      }
-    }
-    if (g_at_entries[index].profile == OC_PROFILE_COAP_OSCORE) {
-      if (oc_string_len(g_at_entries[index].osc_id) > 0) {
-        PRINT("    osc:id     : %s\n", oc_string(g_at_entries[index].osc_id));
-      }
-      if (oc_string_len(g_at_entries[index].osc_ms) > 0) {
-        PRINT("    osc:ms     : ");
-        int length = oc_string_len(g_at_entries[index].osc_ms);
-        char *ms = oc_string(g_at_entries[index].osc_ms);
-        for (int i = 0; i < length; i++) {
-          PRINT("%02x", (unsigned char)ms[i]);
+    if (g_at_entries[index].profile != OC_PROFILE_UNKNOWN) {
+
+      PRINT("  at index: %d\n", index);
+      PRINT("    id         : %s\n", oc_string(g_at_entries[index].id));
+      PRINT("    interfaces : %d\n", g_at_entries[index].interface);
+      PRINT("    profile    : %d (%s)\n", g_at_entries[index].profile,
+            oc_at_profile_to_string(g_at_entries[index].profile));
+      if (g_at_entries[index].profile == OC_PROFILE_COAP_DTLS) {
+        if (oc_string_len(g_at_entries[index].sub) > 0) {
+          PRINT("    sub    : %s\n", oc_string(g_at_entries[index].sub));
         }
-        PRINT("\n");
+        if (oc_string_len(g_at_entries[index].kid) > 0) {
+          PRINT("    kid    : %s\n", oc_string(g_at_entries[index].kid));
+        }
       }
-      if (oc_string_len(g_at_entries[index].osc_alg) > 0) {
-        PRINT("    osc:alg    : %s\n", oc_string(g_at_entries[index].osc_alg));
+      if (g_at_entries[index].profile == OC_PROFILE_COAP_OSCORE) {
+        if (oc_string_len(g_at_entries[index].osc_id) > 0) {
+          PRINT("    osc:id     : %s\n", oc_string(g_at_entries[index].osc_id));
+        }
+        if (oc_string_len(g_at_entries[index].osc_ms) > 0) {
+          PRINT("    osc:ms     : ");
+          int length = oc_string_len(g_at_entries[index].osc_ms);
+          char *ms = oc_string(g_at_entries[index].osc_ms);
+          for (int i = 0; i < length; i++) {
+            PRINT("%02x", (unsigned char)ms[i]);
+          }
+          PRINT("\n");
+        }
+        if (oc_string_len(g_at_entries[index].osc_alg) > 0) {
+          PRINT("    osc:alg    : %s\n",
+                oc_string(g_at_entries[index].osc_alg));
+        }
       }
     }
   }

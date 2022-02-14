@@ -110,51 +110,48 @@ def do_sequence_dev(my_stack):
     print("========dev get=========")
     print("Get HWT :")
     response = my_stack.issue_cbor_get(sn, "/dev/hwt")
-    print ("response:",response)
+    safe_print(response)
     safe_print(response)
     my_stack.purge_response(response)
 
     #print("===================")
     #print("Get HWV :");
     #response =  my_stack.issue_cbor_get(sn, "/dev/hwv")
-    #print ("response:",response)
+    #safe_print(response)
     #my_stack.purge_response(response)
 
     #print("===================")
     #print("Get FWV :");
     #response =  my_stack.issue_cbor_get(sn, "/dev/fwv")
-    #print ("response:",response)
+    #safe_print(response)
     #my_stack.purge_response(response)
 
     print("===================")
     print("-------------------")
     print("Get Model :")
     response =  my_stack.issue_cbor_get(sn,"/dev/model")
-    print ("response:",response)
     safe_print(response)
     my_stack.purge_response(response)
 
     print("-------------------")
     response =  my_stack.issue_cbor_get(sn,"/dev/pm")
-    #print ("response:",response)
     safe_print(response)
     my_stack.purge_response(response)
 
     print("-------------------")
     my_stack.purge_response(response)
     response =  my_stack.issue_cbor_get(sn,"/dev/ia")
-    #print ("response:",response)
     safe_print(response)
     my_stack.purge_response(response)
 
     print("-------------------")
     response =  my_stack.issue_cbor_get(sn,"/dev/hostname")
-    print ("response:",response)#
+    safe_print(response)
     my_stack.purge_response(response)
 
     print("-------------------")
     response =  my_stack.issue_cbor_get(sn,"/dev/iid")
-    print ("response:",response)#
+    safe_print(response)
     my_stack.purge_response(response)
 
 # no json tags as strings
@@ -166,10 +163,10 @@ def do_sequence_dev_programming_mode(my_stack):
     content = True
     print("set PM :", content)
     response =  my_stack.issue_cbor_put(sn,"/dev/pm",content)
-    print ("response:",response)
+    safe_print(response)
     my_stack.purge_response(response)
     response =  my_stack.issue_cbor_get(sn,"/dev/pm")
-    print ("response:",response)
+    safe_print(response)
     safe_print(response)
     if content == response.get_payload_boolean():
         print("PASS : /dev/pm ", content)
@@ -179,10 +176,9 @@ def do_sequence_dev_programming_mode(my_stack):
     content = 44
     print("set IA :", content)
     response =  my_stack.issue_cbor_put(sn,"/dev/ia",content)
-    print ("response:",response)
+    safe_print(response)
     my_stack.purge_response(response)
     response =  my_stack.issue_cbor_get(sn,"/dev/ia")
-    print ("response:",response)
     safe_print(response)
     if content == response.get_payload_int():
         print("PASS : /dev/ia ", content)
@@ -194,10 +190,10 @@ def do_sequence_dev_programming_mode(my_stack):
     content = "my host name"
     print("set hostname :", content)
     response =  my_stack.issue_cbor_put(sn,"/dev/hostname",content)
-    print ("response:",response)
+    safe_print(response)
     my_stack.purge_response(response)
     response =  my_stack.issue_cbor_get(sn,"/dev/hostname")
-    print ("response:",response)
+    safe_print(response)
     if content == response.get_payload_string():
         print("PASS : /dev/hostname ", content)
     else:
@@ -208,10 +204,10 @@ def do_sequence_dev_programming_mode(my_stack):
     content = " iid xxx"
     print("set iid :", content)
     response =  my_stack.issue_cbor_put(sn,"/dev/iid",content)
-    print ("response:",response)
+    safe_print(response)
     my_stack.purge_response(response)
     response =  my_stack.issue_cbor_get(sn,"/dev/iid")
-    print ("response:",response)
+    safe_print(response)
     if content == response.get_payload_string():
         print("PASS : /dev/iid ", content)
     else:
@@ -222,10 +218,10 @@ def do_sequence_dev_programming_mode(my_stack):
     # reset programming mode
     content = False
     response =  my_stack.issue_cbor_put(sn,"/dev/pm",content)
-    print ("response:",response)
+    safe_print(response)
     my_stack.purge_response(response)
     response =  my_stack.issue_cbor_get(sn,"/dev/pm")
-    print ("response:",response)
+    safe_print(response)
     safe_print(response)
     if content == response.get_payload_boolean():
         print("PASS : /dev/pm ", content)
@@ -243,10 +239,10 @@ def do_sequence_dev_programming_mode_fail(my_stack):
     content = False
     print("set PM :", content)
     response =  my_stack.issue_cbor_put(sn,"/dev/pm",content)
-    print ("response:",response)
+    safe_print(response)
     my_stack.purge_response(response)
     response =  my_stack.issue_cbor_get(sn,"/dev/pm")
-    print ("response:",response)
+    safe_print(response)
     safe_print(response)
     if content == response.get_payload_boolean():
         print("PASS : /dev/pm ", content)
@@ -258,10 +254,10 @@ def do_sequence_dev_programming_mode_fail(my_stack):
     content = 4444
     print("set IA :", content)
     response =  my_stack.issue_cbor_put(sn,"/dev/ia",content)
-    print ("response:",response)
+    safe_print(response)
     my_stack.purge_response(response)
     response =  my_stack.issue_cbor_get(sn,"/dev/ia")
-    print ("response:",response)
+    safe_print(response)
     safe_print(response)
     if content != response.get_payload_int():
         print("PASS : /dev/ia ", content, " != ", response.get_payload_int())
@@ -273,10 +269,10 @@ def do_sequence_dev_programming_mode_fail(my_stack):
     content = "my new host name"
     print("set hostname :", content)
     response =  my_stack.issue_cbor_put(sn,"/dev/hostname",content)
-    print ("response:",response)
+    safe_print(response)
     my_stack.purge_response(response)
     response =  my_stack.issue_cbor_get(sn,"/dev/hostname")
-    print ("response:",response)
+    safe_print(response)
     if content != response.get_payload_string():
         print("PASS : /dev/hostname ", content, " != ", response.get_payload_string())
     else:
@@ -287,10 +283,10 @@ def do_sequence_dev_programming_mode_fail(my_stack):
     content = " xxx iid xxx"
     print("set iid :", content)
     response =  my_stack.issue_cbor_put(sn,"/dev/iid",content)
-    print ("response:",response)
+    safe_print(response)
     my_stack.purge_response(response)
     response =  my_stack.issue_cbor_get(sn,"/dev/iid")
-    print ("response:",response)
+    safe_print(response)
     if content != response.get_payload_string():
         print("PASS : /dev/iid ", content, " != ", response.get_payload_string())
     else:
@@ -306,19 +302,19 @@ def do_sequence_lsm(my_stack):
 
     print("-------------------")
     response =  my_stack.issue_cbor_get(sn, "/a/lsm")
-    print ("response:",response)
+    safe_print(response)
     my_stack.purge_response(response)
 
     print("-------------------")
     #content = {2 : "startLoading"}
     #expect = { "3": "loading"}
-    content = {2 : 1}
-    expect = { "3" : 2 }
+    content = { 2: 1}  # startLoading
+    expect = { "3" : 2 } #  LSM_S_LOADING = 2,
     response =  my_stack.issue_cbor_post(sn,"/a/lsm",content)
-    print ("response:",response)
+    safe_print(response)
     my_stack.purge_response(response)
     response =  my_stack.issue_cbor_get(sn, "/a/lsm")
-    print ("response:",response)
+    safe_print(response)
     if compare_dict(expect, response.get_payload_dict()):
         print("PASS : /a/lsm ", expect, response.get_payload_dict())
     else:
@@ -326,15 +322,13 @@ def do_sequence_lsm(my_stack):
     my_stack.purge_response(response)
 
     print("-------------------")
-    #content = {2 : "loadComplete"}
-    #expect  = { "3": "loaded"}
-    content = {2 : 2 }
-    expect  = { "3": 1}
+    content = {2 : 2 } # loadComplete
+    expect  = { "3": 1} # loaded
     response =  my_stack.issue_cbor_post(sn,"/a/lsm",content)
-    print ("response:",response)
+    safe_print(response)
     my_stack.purge_response(response)
     response =  my_stack.issue_cbor_get(sn, "/a/lsm")
-    print ("response:",response)
+    safe_print(response)
     if compare_dict(expect, response.get_payload_dict()):
         print("PASS : /a/lsm ", expect, response.get_payload_dict())
     else:
@@ -347,10 +341,10 @@ def do_sequence_lsm(my_stack):
     content = {2 : 4 }
     expect  = { "3": 0 }
     response =  my_stack.issue_cbor_post(sn,"/a/lsm",content)
-    print ("response:",response)
+    safe_print(response)
     my_stack.purge_response(response)
     response =  my_stack.issue_cbor_get(sn, "/a/lsm")
-    print ("response:",response)
+    safe_print(response)
     if compare_dict(expect, response.get_payload_dict()):
         print("PASS : /a/lsm ", expect, response.get_payload_dict())
     else:
@@ -360,11 +354,11 @@ def do_sequence_lsm(my_stack):
 
 def do_check_table(my_stack, sn, table_url, content):
     response =  my_stack.issue_cbor_post(sn,table_url,content)
-    print ("response:",response.get_payload())
+    safe_print(response)
     my_stack.purge_response(response)
 
     response =  my_stack.issue_linkformat_get(sn,table_url)
-    print ("response:",response)
+    safe_print(response)
     lf = knx_stack.LinkFormat(response.payload)
     print(" lines:", lf.get_nr_lines())
     # list the response
@@ -390,7 +384,7 @@ def do_check_table(my_stack, sn, table_url, content):
     my_stack.purge_response(response)
 
     response =  my_stack.issue_linkformat_get(sn,table_url)
-    print ("response:",response)
+    safe_print(response)
     lf = knx_stack.LinkFormat(response.payload)
     print(" lines:", lf.get_nr_lines())
     for line in lf.get_lines():
@@ -410,38 +404,39 @@ def do_sequence_fp_programming(my_stack):
     content = { 2: "reset"}
     print("reset :", content)
     response =  my_stack.issue_cbor_post(sn,"/.well-known/knx",content)
-    print ("response:",response)
+    safe_print(response)
     my_stack.purge_response(response)
 
     print("-------------------")
     content = True
     print("set PM :", content)
     response =  my_stack.issue_cbor_put(sn,"/dev/pm",content)
-    print ("response:",response)
+    safe_print(response)
     my_stack.purge_response(response)
 
     print("-------------------")
     content = 455
     print("set IA :", content)
     response =  my_stack.issue_cbor_put(sn,"/dev/ia",content)
-    print ("response:",response)
+    safe_print(response)
     my_stack.purge_response(response)
 
     print("-------------------")
     content = 555
     response =  my_stack.issue_cbor_put(sn,"/dev/iid",content)
-    print ("response:",response)
+    safe_print(response)
     my_stack.purge_response(response)
 
     print("-------------------")
     content = { 2: "startLoading"}
+    content = { 2: 1}  # startLoading
     print("lsm :", content)
     response =  my_stack.issue_cbor_post(sn,"/a/lsm",content)
-    print ("response:",response)
+    safe_print(response)
     my_stack.purge_response(response)
 
     response =  my_stack.issue_cbor_get(sn,"/a/lsm")
-    print ("response:",response)
+    safe_print(response)
     my_stack.purge_response(response)
 
     # group object table
@@ -449,9 +444,13 @@ def do_sequence_fp_programming(my_stack):
     # url (11)= /p/light
     # ga (7 )=
     # cflags (8) = ["r" ] ; read = 8, write=16, init=32,transmit=64, update=128
-    content = [ {0: 5, 11: "p/push5", 7:[1], 8: 16 } ,
-                {0: 2, 11: "p/light2", 7:[2], 8: 16+64 },
-                {0: 225, 11: "p/light255", 7:[2], 8: 16+64 }]
+    content = [ {0: 5, 11: "/p/a", 7:[1], 8: 16 } ,
+                {0: 2, 11: "/p/b", 7:[2], 8: 16+64 },
+                {0: 225, 11: "/p/c", 7:[2], 8: 16+64 }]
+    do_check_table(my_stack, sn, "/fp/g",content)
+
+    # too long
+    content = [ {0: 5, 33: "p/123456789012345678901234567890", 7:[1], 8: 16 }]
     do_check_table(my_stack, sn, "/fp/g",content)
 
     content = [ {0: 1, 11: "/p/push1", 7:[1], 12 :3 },
@@ -464,13 +463,16 @@ def do_sequence_fp_programming(my_stack):
                 {0: 235, 11: "/p/push235", 7:[1], 12 :8 } ]
     do_check_table(my_stack, sn, "/fp/p",content)
 
+    content = [ {0: 1, 33: "/p/123456789012345678901234567890", 7:[1], 12 :6 } ]
+    do_check_table(my_stack, sn, "/fp/p",content)
+
     content = False
     print("set PM :", content)
     response =  my_stack.issue_cbor_put(sn,"/dev/pm",content)
-    print ("response:",response)
+    safe_print(response)
     my_stack.purge_response(response)
 
-    content = { 2: "loadComplete"}
+    content = { 2: 2 } # loadComplete
     print("lsm :", content)
     response =  my_stack.issue_cbor_post(sn,"/a/lsm",content)
     print ("response:", response)
@@ -490,9 +492,10 @@ def do_sequence_knx_knx_s_mode(my_stack):
     print("========.knx=s-mode========")
     print("-------------------")
     content = { 2: "startLoading"}
+    content = { 2: 1}  # startLoading
     print("lsm :", content)
     response =  my_stack.issue_cbor_post(sn,"/a/lsm",content)
-    print ("response:",response)
+    safe_print(response)
     my_stack.purge_response(response)
 
     # group object table
@@ -509,32 +512,32 @@ def do_sequence_knx_knx_s_mode(my_stack):
     my_stack.purge_response(response)
     #do_check_table(my_stack, sn, "/fp/g",content)
 
-    content = { 2: "loadComplete"}
+    content = {2 : 2 } # loadComplete
     print("lsm :", content)
     response =  my_stack.issue_cbor_post(sn,"/a/lsm",content)
     print ("response:", response)
     my_stack.purge_response(response)
 
     response =  my_stack.issue_cbor_get(sn, "/.knx")
-    print ("response:",response)
+    safe_print(response)
     my_stack.purge_response(response)
 
     content = {"value": { 4 : 5, 7: 7777 , 6 : "w"}}
     response =  my_stack.issue_cbor_post(sn,"/a/lsm",content)
-    print ("response:",response)
+    safe_print(response)
     my_stack.purge_response(response)
 
     response =  my_stack.issue_cbor_get(sn, "/.knx")
-    print ("response:",response)
+    safe_print(response)
     my_stack.purge_response(response)
 
     content = {"value": { 4 : 5, 7: 7777 , 6 : "r"}}
     response =  my_stack.issue_cbor_post(sn,"/a/lsm",content)
-    print ("response:",response)
+    safe_print(response)
     my_stack.purge_response(response)
 
     response =  my_stack.issue_cbor_get(sn, "/.knx")
-    print ("response:",response)
+    safe_print(response)
     my_stack.purge_response(response)
 
 # ./knx resource
@@ -546,9 +549,10 @@ def do_sequence_knx_knx_recipient(my_stack):
     print("========.knx=recipient========")
     print("-------------------")
     content = { 2: "startLoading"}
+    content = { 2: 1}  # startLoading
     print("lsm :", content)
     response =  my_stack.issue_cbor_post(sn,"/a/lsm",content)
-    print ("response:",response)
+    safe_print(response)
     my_stack.purge_response(response)
 
     # recipient table, setting the destination
@@ -566,23 +570,23 @@ def do_sequence_knx_knx_recipient(my_stack):
     my_stack.purge_response(response)
     #do_check_table(my_stack, sn, "/fp/g",content)
 
-    content = { 2: "loadComplete"}
+    content = {2 : 2 } # loadComplete
     print("lsm :", content)
     response =  my_stack.issue_cbor_post(sn,"/a/lsm",content)
     print ("response:", response)
     my_stack.purge_response(response)
 
     response =  my_stack.issue_cbor_get(sn, "/.knx")
-    print ("response:",response)
+    safe_print(response)
     my_stack.purge_response(response)
 
     content = {"value": { 4 : 5, 7: 7777 , 6 : "rp"}}
     response =  my_stack.issue_cbor_post(sn,"/a/lsm",content)
-    print ("response:",response)
+    safe_print(response)
     my_stack.purge_response(response)
 
     response =  my_stack.issue_cbor_get(sn, "/.knx")
-    print ("response:",response)
+    safe_print(response)
     my_stack.purge_response(response)
 
 def do_sequence_knx_osn(my_stack):
@@ -598,7 +602,7 @@ def do_sequence_knx_crc(my_stack):
     sn = my_stack.device_array[0].sn
     print("========knx/fingerprint=========")
     response =  my_stack.issue_cbor_get(sn, "/.well-known/knx/f")
-    print ("response:",response)
+    safe_print(response)
     print("   value:", response.get_payload_int())
     my_stack.purge_response(response)
 
@@ -606,7 +610,7 @@ def do_sequence_core_knx(my_stack):
     sn = my_stack.device_array[0].sn
     print("=get=======.well-known/knx=========")
     response =  my_stack.issue_cbor_get(sn, "/.well-known/knx")
-    print ("response:",response)
+    safe_print(response)
     print ("    value:", response.get_payload_dict())
     my_stack.purge_response(response)
 
@@ -840,6 +844,16 @@ def do_security(my_stack):
     if my_stack.get_nr_devices() > 0:
         do_auth_at(my_stack)
 
+
+def do_fp(my_stack):
+    """
+    do fp tests
+    """
+    if my_stack.get_nr_devices() > 0:
+        do_sequence_fp_programming(my_stack)
+
+
+
 def do_all(my_stack):
     if my_stack.get_nr_devices() > 0:
         do_sequence(my_stack)
@@ -873,13 +887,17 @@ if __name__ == '__main__':  # pragma: no cover
     parser.add_argument("-sec", "--security",
                     help="do security", nargs='?',
                     default=False, const=1, required=False)
+    parser.add_argument("-fp", "--fp",
+                    help="do function point programming", nargs='?',
+                    default=False, const=1, required=False)
     print(sys.argv)
     args = parser.parse_args()
     print("scope         :" + str(args.scope))
     print("sleep         :" + str(args.sleep))
     print("all           :" + str(args.all))
     print("discovery     :" + str(args.discovery))
-    print("security     :" + str(args.security))
+    print("security      :" + str(args.security))
+    print("fp            :" + str(args.fp))
     time.sleep(int(args.sleep))
 
     the_stack = knx_stack.KNXIOTStack()
@@ -893,6 +911,8 @@ if __name__ == '__main__':  # pragma: no cover
             do_discovery(the_stack)
         elif args.security:
             do_security(the_stack)
+        elif args.fp:
+            do_fp(the_stack)
         else:
             do_sequence(the_stack)
     except:
