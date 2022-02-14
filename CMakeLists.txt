@@ -275,7 +275,7 @@ if(BUILD_TESTING AND UNIX)
 
     # Helper macro to build unit test
     macro(package_add_test TESTNAME)
-        add_executable(${TESTNAME} ${TESTNAME})
+        add_executable(${TESTNAME} ${TESTNAME}.cpp)
         target_compile_options(${TESTNAME} PRIVATE ${TEST_COMPILE_OPTIONS})
         target_compile_features(${TESTNAME} PRIVATE cxx_nullptr)
         target_compile_definitions(${TESTNAME} PRIVATE ${PUBLIC_COMPILE_DEFINITIONS} "OC_CLIENT" "OC_SERVER")
