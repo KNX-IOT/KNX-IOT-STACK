@@ -227,7 +227,7 @@ oc_spake_calc_w0_w1(const char *pw, size_t len_salt, const uint8_t *salt,
 
   MBEDTLS_MPI_CHK(
     mbedtls_md_setup(&ctx, mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), 1));
-  MBEDTLS_MPI_CHK(mbedtls_pkcs5_pbkdf2_hmac(&ctx, pw, strlen(pw), salt,
+  MBEDTLS_MPI_CHK(mbedtls_pkcs5_pbkdf2_hmac(&ctx, (const char*)pw, strlen(pw), salt,
                                             len_salt, it, output_len, output));
 
   // extract w0s and w1s from the output
@@ -520,12 +520,13 @@ oc_spake_calc_cB(uint8_t *Ka_Ke, uint8_t cB[32], uint8_t bytes_X[kPubKeySize])
   // |KcA| + |KcB| = 16 bytes
   uint8_t KcA_KcB[32];
   mbedtls_hkdf(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), NULL, 0, Ka_Ke, 16,
-               "ConfirmationKeys", strlen("ConfirmationKeys"), KcA_KcB, 32);
+               (char*)"ConfirmationKeys", strlen("ConfirmationKeys"), KcA_KcB, 32);
 
   // Calculate cB
   mbedtls_md_hmac(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256),
                   KcA_KcB + sizeof(KcA_KcB) / 2, sizeof(KcA_KcB) / 2, bytes_X,
                   kPubKeySize, cB);
+  return 0;
 }
 
 int
@@ -534,11 +535,13 @@ oc_spake_calc_cA(uint8_t *Ka_Ke, uint8_t cA[32], uint8_t bytes_Y[kPubKeySize])
   // |KcA| + |KcB| = 16 bytes
   uint8_t KcA_KcB[32];
   mbedtls_hkdf(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), NULL, 0, Ka_Ke, 16,
-               "ConfirmationKeys", strlen("ConfirmationKeys"), KcA_KcB, 32);
+               (char *)"ConfirmationKeys", strlen("ConfirmationKeys"), KcA_KcB,
+               32);
 
   // Calculate cA
   mbedtls_md_hmac(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), KcA_KcB,
                   sizeof(KcA_KcB) / 2, bytes_Y, kPubKeySize, cA);
+  return 0;
 }
 
 int
@@ -816,7 +819,8 @@ oc_spake_test_vector()
   // |KcA| + |KcB| = 16 bytes
   uint8_t KcA_KcB[32];
   mbedtls_hkdf(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), NULL, 0, Ka,
-               sizeof(Ka), "ConfirmationKeys", strlen("ConfirmationKeys"),
+               sizeof(Ka), (char *)"ConfirmationKeys",
+               strlen("ConfirmationKeys"),
                KcA_KcB, 32);
 
   assert(memcmp(KcA, KcA_KcB, 16) == 0);
@@ -834,4 +838,5 @@ oc_spake_test_vector()
 
 cleanup:
   return ret;
+ 
 }
