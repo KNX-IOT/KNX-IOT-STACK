@@ -731,33 +731,9 @@ oc_core_fp_g_x_get_handler(oc_request_t *request,
   oc_rep_i_set_text_string(root, 11, oc_string(g_got[index].href));
   // ga - 7
   oc_rep_i_set_int_array(root, 7, g_got[index].ga, g_got[index].ga_len);
-
   // cflags 8
-
-  // id 0
   oc_rep_i_set_int(root, 8, g_got[index].cflags);
-
-  // oc_rep_i_set_key(&root_map, 8);
-  // oc_rep_begin_array(&root_map, cflags);
-  // if (g_got[index].cflags & OC_CFLAG_READ) {
-  //  oc_rep_add_int(cflags, 1);
-  //}
-  // if (g_got[index].cflags & OC_CFLAG_WRITE) {
-  //  oc_rep_add_int(cflags, 2);
-  //}
-  // if (g_got[index].cflags & OC_CFLAG_TRANSMISSION) {
-  //  oc_rep_add_int(cflags, 3);
-  //}
-  // if (g_got[index].cflags & OC_CFLAG_UPDATE) {
-  //  oc_rep_add_int(cflags, 4);
-  //}
-  // if (g_got[index].cflags & OC_CFLAG_INIT) {
-  //  oc_rep_add_int(cflags, 5);
-  //}
-  // oc_rep_close_array(root, cflags);
-
   oc_rep_end_root_object();
-
   oc_send_cbor_response(request, OC_STATUS_OK);
 
   PRINT("oc_core_fp_g_x_get_handler - end\n");
@@ -833,6 +809,7 @@ oc_core_find_reciepient_table_index(int group_address)
 oc_string_t
 oc_core_find_reciepient_table_url_from_index(int index)
 {
+  // TODO
   return g_gpt[index].url;
 }
 

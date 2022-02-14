@@ -309,7 +309,7 @@ def do_sequence_lsm(my_stack):
     #content = {2 : "startLoading"}
     #expect = { "3": "loading"}
     content = { 2: 1}  # startLoading
-    expect = { "3" : 2 } #  LSM_S_LOADING = 2,  
+    expect = { "3" : 2 } #  LSM_S_LOADING = 2,
     response =  my_stack.issue_cbor_post(sn,"/a/lsm",content)
     safe_print(response)
     my_stack.purge_response(response)
@@ -448,11 +448,10 @@ def do_sequence_fp_programming(my_stack):
                 {0: 2, 11: "/p/b", 7:[2], 8: 16+64 },
                 {0: 225, 11: "/p/c", 7:[2], 8: 16+64 }]
     do_check_table(my_stack, sn, "/fp/g",content)
-    
+
     # too long
     content = [ {0: 5, 33: "p/123456789012345678901234567890", 7:[1], 8: 16 }]
     do_check_table(my_stack, sn, "/fp/g",content)
-    
 
     content = [ {0: 1, 11: "/p/push1", 7:[1], 12 :3 },
                 {0: 5, 11: "/p/push5", 7:[1], 12 : 4 },
@@ -463,10 +462,9 @@ def do_sequence_fp_programming(my_stack):
                 {0: 5, 11: "/p/push5", 7:[1], 12 : 7 },
                 {0: 235, 11: "/p/push235", 7:[1], 12 :8 } ]
     do_check_table(my_stack, sn, "/fp/p",content)
-    
+
     content = [ {0: 1, 33: "/p/123456789012345678901234567890", 7:[1], 12 :6 } ]
     do_check_table(my_stack, sn, "/fp/p",content)
-
 
     content = False
     print("set PM :", content)
