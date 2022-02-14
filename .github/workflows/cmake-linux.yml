@@ -40,8 +40,6 @@ jobs:
           make all
           make test
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
-jobs:
   # This workflow contains a single job called "check_code_style"
    cmake_linux_unsecured:
     # The type of runner that the job will run on
