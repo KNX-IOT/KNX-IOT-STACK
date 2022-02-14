@@ -721,8 +721,6 @@ discovery_cb(const char *payload, int len, oc_endpoint_t *endpoint,
 void
 py_discover_devices(int scope)
 {
-
-  // PRINT("[C]discover_devices: scope %d\n", scope);
   py_mutex_lock(app_sync_lock);
   oc_do_wk_discovery_all("rt=urn:knx:dpa.*", scope, discovery_cb, NULL);
 
@@ -733,7 +731,6 @@ py_discover_devices(int scope)
 void
 py_discover_devices_with_query(int scope, const char *query)
 {
-  // PRINT("[C]discover_devices: scope %d\n", scope);
   py_mutex_lock(app_sync_lock);
   oc_do_wk_discovery_all(query, scope, discovery_cb, NULL);
 
@@ -940,6 +937,11 @@ py_main(void)
 #endif
 #ifdef OC_CLIENT
   PRINT("[C]OC_CLIENT\n");
+#endif 
+#ifdef OC_OSCORE
+  PRINT("[C]OC_OSCORE\n");
+#else 
+  PRINT("[C] NO OC_OSCORE ---\n");
 #endif
 
   int init;
@@ -975,8 +977,6 @@ py_main(void)
     return -1;
   }
 #endif
-
-  // display_device_uuid();
 
   while (quit != 1) {
 #if defined(__linux__)

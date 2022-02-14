@@ -206,7 +206,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   size_t value_len;
   char *key;
   size_t key_len;
-  // char *rt_request = 0;
+  char *rt_request = 0;
   int rt_len = 0;
   char *ep_request = 0;
   int ep_len = 0;
@@ -219,7 +219,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   oc_init_query_iterator();
   while (oc_iterate_query(request, &key, &key_len, &value, &value_len) > 0) {
     if (strncmp(key, "rt", key_len) == 0) {
-      // rt_request = value;
+      rt_request = value;
       rt_len = (int)value_len;
     }
     if (strncmp(key, "ep", key_len) == 0) {
@@ -329,6 +329,8 @@ oc_wkcore_discovery_handler(oc_request_t *request,
 
   if (rt_len > 0 || if_len > 0) {
     size_t device = request->resource->device;
+    PRINT("  oc_wkcore_discovery_handler rt='%.*s'\n", rt_len, rt_request);
+    PRINT("  oc_wkcore_discovery_handler if='%.*s'\n", if_len, if_request);
     matches = oc_process_resources(request, device, &response_length);
   }
 

@@ -277,12 +277,8 @@ typedef enum {
   OC_KNX_AUTH_AT,           /**< auth/at resource listing auth/at/X */
   OC_KNX_AUTH_AT_X,         /**< auth/at/X resources */
   OC_KNX_AUTH,              /**< auth resource */
-
   /* List of resources on a logical device: start */
-  /* List of Device Configuration Resources (DCRs): start */
-  // WELLKNOWNCORE,
   WELLKNOWNCORE /**< well-known/core resource */
-  /* List of Device Configuration Resources (DCRs): end */
   /* List of resources on a logical device: end */
 } oc_core_resource_t;
 

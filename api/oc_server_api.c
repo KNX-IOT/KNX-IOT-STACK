@@ -257,11 +257,12 @@ oc_new_resource(const char *name, const char *uri, uint8_t num_resource_types,
       resource->interfaces = OC_IF_NONE;
       resource->observe_period_seconds = 0;
       resource->num_observers = 0;
+      resource->properties = OC_DISCOVERABLE;
       oc_populate_resource_object(resource, name, uri, num_resource_types,
                                   device_index);
     }
   } else {
-    OC_ERR(" resource longer than 30 bytes: %d", (int)strlen(uri));
+    OC_ERR(" resource uri longer than 30 bytes: %d", (int)strlen(uri));
   }
 
   return resource;
