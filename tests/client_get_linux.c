@@ -197,7 +197,7 @@ get_light(oc_request_t *request, oc_interface_mask_t iface_mask,
 
   switch (iface_mask) {
   case OC_IF_BASELINE:
-    //oc_process_baseline_interface(request->resource);
+    // oc_process_baseline_interface(request->resource);
   case OC_IF_RW:
     oc_rep_set_boolean(root, state, light);
     break;

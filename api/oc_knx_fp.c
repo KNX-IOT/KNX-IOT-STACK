@@ -692,7 +692,7 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
         default:
           break;
         }
- 
+
         // do additional sanity checks
         bool do_save = true;
         if (g_got[index].ga_len == 0) {
@@ -707,8 +707,8 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
           do_save = false;
           OC_ERR("  href is longer than %d \n", (int)OC_MAX_URL_LENGTH);
         }
-        if (oc_belongs_href_to_resource(g_got[index].href,
-                                        device_index) == false) {
+        if (oc_belongs_href_to_resource(g_got[index].href, device_index) ==
+            false) {
           do_save = false;
           OC_ERR("  href does not belong to device %s \n",
                  oc_string(g_got[index].href));
@@ -1074,7 +1074,7 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     oc_print_group_rp_table_entry(index, GPT_STORE, g_gpt, GPT_MAX_ENTRIES);
     bool do_save = true;
     if (oc_string_len(g_gpt[index].url) > OC_MAX_URL_LENGTH) {
-      //do_save = false;
+      // do_save = false;
       OC_ERR("  url is longer than %d \n", (int)OC_MAX_URL_LENGTH);
     }
     if (oc_string_len(g_gpt[index].path) > OC_MAX_URL_LENGTH) {
@@ -1396,17 +1396,17 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     }
     bool do_save = true;
     if (oc_string_len(g_grt[index].url) > OC_MAX_URL_LENGTH) {
-        // do_save = false;
-        OC_ERR("  url is longer than %d \n", (int)OC_MAX_URL_LENGTH);
-      }
+      // do_save = false;
+      OC_ERR("  url is longer than %d \n", (int)OC_MAX_URL_LENGTH);
+    }
     if (oc_string_len(g_grt[index].path) > OC_MAX_URL_LENGTH) {
-        // do_save = false;
-        OC_ERR("  path is longer than %d \n", (int)OC_MAX_URL_LENGTH);
-      }
+      // do_save = false;
+      OC_ERR("  path is longer than %d \n", (int)OC_MAX_URL_LENGTH);
+    }
 
     oc_print_group_rp_table_entry(index, GPT_STORE, g_grt, GRT_MAX_ENTRIES);
     if (do_save) {
-     oc_dump_group_rp_table_entry(index, GRT_STORE, g_grt, GRT_MAX_ENTRIES);
+      oc_dump_group_rp_table_entry(index, GRT_STORE, g_grt, GRT_MAX_ENTRIES);
     }
     rep = rep->next;
   };

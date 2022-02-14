@@ -45,9 +45,7 @@
 extern "C" {
 #endif
 
-  
 #define OC_MAX_URL_LENGTH (30)
-
 
 /**
  * Call back handlers that are invoked in response to oc_main_init()
@@ -138,7 +136,7 @@ typedef struct
    *
    * Callback is invoked after the device initialization callback.
    *
-   *      TODO  
+   *      TODO
    * Example:
    * ```
    * static void issue_requests(void)

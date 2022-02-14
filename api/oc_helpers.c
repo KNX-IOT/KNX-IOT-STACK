@@ -321,7 +321,6 @@ oc_conv_hex_string_to_byte_array(const char *hex_str, size_t hex_str_len,
   return 0;
 }
 
-
 int
 oc_string_cmp(oc_string_t string1, oc_string_t string2)
 {
@@ -330,9 +329,7 @@ oc_string_cmp(oc_string_t string1, oc_string_t string2)
   }
   return strncmp(oc_string(string1), oc_string(string2),
                  oc_string_len(string1));
-
 }
-
 
 bool
 oc_uri_contains_wildcard(const char *uri)
