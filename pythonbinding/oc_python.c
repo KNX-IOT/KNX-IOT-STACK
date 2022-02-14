@@ -937,10 +937,10 @@ py_main(void)
 #endif
 #ifdef OC_CLIENT
   PRINT("[C]OC_CLIENT\n");
-#endif 
+#endif
 #ifdef OC_OSCORE
   PRINT("[C]OC_OSCORE\n");
-#else 
+#else
   PRINT("[C] NO OC_OSCORE ---\n");
 #endif
 

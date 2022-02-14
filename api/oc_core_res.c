@@ -701,11 +701,12 @@ oc_filter_resource_by_rt(oc_resource_t *resource, oc_request_t *request)
       int i;
       for (i = 0; i < (int)oc_string_array_get_allocated_size(resource->types);
            i++) {
-        size_t resource_type_len = oc_string_array_get_item_size(resource->types, i);
+        size_t resource_type_len =
+          oc_string_array_get_item_size(resource->types, i);
         const char *resource_type =
           (const char *)oc_string_array_get_item(resource->types, i);
-        PRINT("   oc_filter_resource_by_rt '%.*s'\n",
-              resource_type_len, resource_type);
+        PRINT("   oc_filter_resource_by_rt '%.*s'\n", resource_type_len,
+              resource_type);
         if (wildcart != NULL) {
           if (strncmp(rt, resource_type, rt_len) == 0) {
             return true;
