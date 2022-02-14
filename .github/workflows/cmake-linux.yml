@@ -39,6 +39,7 @@ jobs:
           ./platformtest
           #./storage_test
           ./messagingtest
+          ./securitytest
 
   # This workflow contains a single job called "check_code_style"
   cmake_linux_unsecured:
@@ -56,8 +57,8 @@ jobs:
           git submodule sync --recursive
           git -c "http.extraheader=$auth_header" -c protocol.version=2 submodule update --init --force --recursive --depth=1
           # create the make files in a subfolder
-          mkdir linuxbuild
-          cd linuxbuild
+          mkdir linuxbuild_sec
+          cd linuxbuild_sec
           cmake ../.
           make all OSCORE=0
           ./apitest
