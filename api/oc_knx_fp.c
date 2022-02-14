@@ -551,6 +551,9 @@ oc_fp_p_check_and_save(int index, size_t device_index, bool status_ok)
   if (do_save) {
     oc_dump_group_object_table_entry(index);
   } else {
+    OC_DBG("Deleting %s", index);
+    oc_delete_group_object_table_entry(index);
+    oc_dump_group_object_table_entry(index);
     status_ok = false;
   }
   return status_ok;
@@ -1706,12 +1709,12 @@ oc_print_group_rp_table_entry(int entry, char *Store,
     return;
   }
   PRINT("  %s [%d] --> [%d]\n", Store, entry, rp_table[entry].ga_len);
-  PRINT("    id %d\n", rp_table[entry].id);
-  PRINT("    ia    %d\n", rp_table[entry].ia);
-  PRINT("    path  %s\n", oc_string(rp_table[entry].url));
-  PRINT("    url  %s\n", oc_string(rp_table[entry].path));
+  PRINT("    id (0)     : %d\n", rp_table[entry].id);
+  PRINT("    ia (12)    : %d\n", rp_table[entry].ia);
+  PRINT("    path (112) : '%s'\n", oc_string(rp_table[entry].path));
+  PRINT("    url (10)   : '%s'\n", oc_string(rp_table[entry].url));
   // PRINT("    cflags  %d\n", rp_table[entry].cflags);
-  PRINT("    ga [");
+  PRINT("    ga (7)     : [");
   for (int i = 0; i < rp_table[entry].ga_len; i++) {
     PRINT(" %d", rp_table[entry].ga[i]);
   }
