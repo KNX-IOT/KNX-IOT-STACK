@@ -228,8 +228,8 @@ oc_spake_calc_w0_w1(const char *pw, size_t len_salt, const uint8_t *salt,
   MBEDTLS_MPI_CHK(
     mbedtls_md_setup(&ctx, mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), 1));
   MBEDTLS_MPI_CHK(mbedtls_pkcs5_pbkdf2_hmac(&ctx, (const unsigned char *)pw,
-                                            strlen(pw), salt,
-                                            len_salt, it, output_len, output));
+                                            strlen(pw), salt, len_salt, it,
+                                            output_len, output));
 
   // extract w0s and w1s from the output
   MBEDTLS_MPI_CHK(mbedtls_mpi_read_binary(&w0s, output, output_len / 2));
@@ -538,8 +538,7 @@ oc_spake_calc_cA(uint8_t *Ka_Ke, uint8_t cA[32], uint8_t bytes_Y[kPubKeySize])
   uint8_t KcA_KcB[32];
   mbedtls_hkdf(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), NULL, 0, Ka_Ke, 16,
                (const unsigned char *)"ConfirmationKeys",
-               strlen("ConfirmationKeys"), KcA_KcB,
-               32);
+               strlen("ConfirmationKeys"), KcA_KcB, 32);
 
   // Calculate cA
   mbedtls_md_hmac(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), KcA_KcB,
@@ -824,8 +823,7 @@ oc_spake_test_vector()
   uint8_t KcA_KcB[32];
   mbedtls_hkdf(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), NULL, 0, Ka,
                sizeof(Ka), (const unsigned char *)"ConfirmationKeys",
-               strlen("ConfirmationKeys"),
-               KcA_KcB, 32);
+               strlen("ConfirmationKeys"), KcA_KcB, 32);
 
   assert(memcmp(KcA, KcA_KcB, 16) == 0);
   assert(memcmp(KcB, KcA_KcB + 16, 16) == 0);
@@ -842,5 +840,4 @@ oc_spake_test_vector()
 
 cleanup:
   return ret;
- 
 }
