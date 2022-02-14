@@ -441,7 +441,7 @@ def do_sequence_fp_programming(my_stack):
 
     # group object table
     # id (0)= 1
-    # url (11)= /p/light
+    # href (11)= /p/light
     # ga (7 )=
     # cflags (8) = ["r" ] ; read = 8, write=16, init=32,transmit=64, update=128
     content = [ {0: 5, 11: "/p/a", 7:[1], 8: 16 } ,
@@ -462,8 +462,12 @@ def do_sequence_fp_programming(my_stack):
                 {0: 5, 11: "/p/push5", 7:[1], 12 : 7 },
                 {0: 235, 11: "/p/push235", 7:[1], 12 :8 } ]
     do_check_table(my_stack, sn, "/fp/p",content)
-
-    content = [ {0: 1, 33: "/p/123456789012345678901234567890", 7:[1], 12 :6 } ]
+    
+    # path 112
+    content = [ {0: 1, 112 : "/p/123456789012345678901234567890", 7:[1], 12 :6 } ]
+    do_check_table(my_stack, sn, "/fp/p",content)
+    # url 10
+    content = [ {0: 1, 10 : "/p/123456789012345678901234567890", 7:[1], 12 :6 } ]
     do_check_table(my_stack, sn, "/fp/p",content)
 
     content = False
