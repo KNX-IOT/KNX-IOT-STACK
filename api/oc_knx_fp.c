@@ -663,14 +663,14 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
         default:
           break;
         } // switch
-        
+
         object = object->next;
-      }  // next object in array
+      } // next object in array
       status_ok = oc_fp_p_check_and_save(index, device_index, status_ok);
     }
     default:
       break;
-    }   // object level
+    } // object level
     rep = rep->next;
   } // top level
 
@@ -680,7 +680,6 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
   }
   oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
-  
 }
 
 void
@@ -1726,7 +1725,7 @@ oc_dump_group_rp_table_entry(int entry, char *Store,
   (void)max_size;
   char filename[20];
   snprintf(filename, 20, "%s_%d", Store, entry);
-  //PRINT("oc_dump_group_rp_table_entry %s, fname=%s\n", Store, filename);
+  // PRINT("oc_dump_group_rp_table_entry %s, fname=%s\n", Store, filename);
 
   uint8_t *buf = malloc(OC_MAX_APP_DATA_SIZE);
   if (!buf) {

@@ -829,7 +829,7 @@ oc_create_knx_auth_resource(int resource_idx, size_t device)
 static void
 oc_at_entry_print(int index)
 {
-  //PRINT("  at index: %d\n", index);
+  // PRINT("  at index: %d\n", index);
   if (index > -1) {
     if (g_at_entries[index].profile != OC_PROFILE_UNKNOWN) {
 

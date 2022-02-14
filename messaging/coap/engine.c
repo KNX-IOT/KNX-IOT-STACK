@@ -161,7 +161,7 @@ coap_receive(oc_message_t *msg)
 
   // PRINT("CoAP Engine: received datalen=%u from ", (unsigned int)msg->length);
   // PRINTipaddr(msg->endpoint);
-  //PRINT("\n");
+  // PRINT("\n");
 
   /* static declaration reduces stack peaks and program code size */
   static coap_packet_t
