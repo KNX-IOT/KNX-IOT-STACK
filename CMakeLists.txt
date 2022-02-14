@@ -274,8 +274,8 @@ if(BUILD_TESTING AND UNIX)
     add_subdirectory(${PROJECT_SOURCE_DIR}/deps/gtest gtest)
 
     # Helper macro to build unit test
-    macro(package_add_test TESTNAME)
-        add_executable(${TESTNAME} ${TESTNAME}.cpp)
+    macro(package_add_test TESTNAME FOLDER)
+        add_executable(${TESTNAME} ${PROJECT_SOURCE_DIR}/${FOLDER}/${TESTNAME}.cpp)
         target_compile_options(${TESTNAME} PRIVATE ${TEST_COMPILE_OPTIONS})
         target_compile_features(${TESTNAME} PRIVATE cxx_nullptr)
         target_compile_definitions(${TESTNAME} PRIVATE ${PUBLIC_COMPILE_DEFINITIONS} "OC_CLIENT" "OC_SERVER")
@@ -300,18 +300,18 @@ if(BUILD_TESTING AND UNIX)
 
     # Unit tests
     file(GLOB APITEST_SRC api/unittest/*.cpp)
-    package_add_test(apitest ${APITEST_SRC})
+    package_add_test(apitest api/unittest ${APITEST_SRC})
 
     file(GLOB PLATFORMTEST_SRC port/unittest/*.cpp)
     file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/storage_test)
-    package_add_test(platformtest ${PLATFORMTEST_SRC})
+    package_add_test(platformtest port/unittest ${PLATFORMTEST_SRC} )
 
     file(GLOB MESSAGINGTEST_SRC messaging/coap/unittest/*.cpp)
-    package_add_test(messagingtest ${MESSAGINGTEST_SRC})
+    package_add_test(messagingtest messaging/coap/unittest ${MESSAGINGTEST_SRC})
 
     if(OC_OSCORE_ENABLED)
         file(GLOB SECURITYTEST_SRC security/unittest/*.cpp)
-        package_add_test(securitytest ${SECURITYTEST_SRC})
+        package_add_test(securitytest security/unittest ${SECURITYTEST_SRC})
     endif()
 
     # reenable clang-tidy for any remaining targets
