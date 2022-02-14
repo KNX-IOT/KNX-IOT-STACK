@@ -147,16 +147,6 @@ oc_remove_delayed_callback(void *cb_data, oc_trigger_t callback)
 }
 
 void
-oc_process_baseline_interface(oc_resource_t *resource)
-{
-  if (oc_string_len(resource->name) > 0) {
-    oc_rep_set_text_string(root, n, oc_string(resource->name));
-  }
-  oc_rep_set_string_array(root, rt, resource->types);
-  oc_core_encode_interfaces_mask(oc_rep_object(root), resource->interfaces);
-}
-
-void
 oc_init_query_iterator(void)
 {
   query_iterator = 0;
@@ -250,25 +240,30 @@ oc_populate_resource_object(oc_resource_t *resource, const char *name,
   resource->properties = 0;
   resource->device = device;
 
-  // TODO
-//#ifdef OC_SECURITY
 #ifdef OC_OSCORE
   resource->properties |= OC_SECURE;
-#endif /* OC_SECURITY */
+#endif /* OC_OSCORE */
 }
 
 oc_resource_t *
 oc_new_resource(const char *name, const char *uri, uint8_t num_resource_types,
-                size_t device)
+                size_t device_index)
 {
-  oc_resource_t *resource = oc_ri_alloc_resource();
-  if (resource) {
-    resource->interfaces = OC_IF_NONE;
-    resource->observe_period_seconds = 0;
-    resource->num_observers = 0;
-    oc_populate_resource_object(resource, name, uri, num_resource_types,
-                                device);
+  oc_resource_t *resource = NULL;
+  if (strlen(uri) < OC_MAX_URL_LENGTH) {
+
+    resource = oc_ri_alloc_resource();
+    if (resource) {
+      resource->interfaces = OC_IF_NONE;
+      resource->observe_period_seconds = 0;
+      resource->num_observers = 0;
+      oc_populate_resource_object(resource, name, uri, num_resource_types,
+                                  device_index);
+    }
+  } else {
+    OC_ERR(" resource longer than 30 bytes: %d", (int)strlen(uri));
   }
+
   return resource;
 }
 
@@ -276,20 +271,33 @@ void
 oc_resource_bind_resource_interface(oc_resource_t *resource,
                                     oc_interface_mask_t iface_mask)
 {
+  if (resource == NULL) {
+    OC_ERR("oc_resource_bind_resource_interface: resource is NULL");
+    return;
+  }
+
   resource->interfaces |= iface_mask;
 }
 
 void
 oc_resource_bind_resource_type(oc_resource_t *resource, const char *type)
 {
-  oc_string_array_add_item(resource->types, (char *)type);
+  if (resource) {
+    oc_string_array_add_item(resource->types, (char *)type);
+  } else {
+    OC_ERR("oc_resource_bind_resource_type: resource is NULL");
+  }
 }
 
 void
 oc_resource_bind_content_type(oc_resource_t *resource,
                               oc_content_format_t content_type)
 {
-  resource->content_type = content_type;
+  if (resource) {
+    resource->content_type = content_type;
+  } else {
+    OC_ERR("oc_resource_bind_content_type: resource is NULL");
+  }
 }
 
 #ifdef OC_SECURITY
@@ -303,6 +311,11 @@ oc_resource_make_public(oc_resource_t *resource)
 void
 oc_resource_set_discoverable(oc_resource_t *resource, bool state)
 {
+  if (resource == NULL) {
+    OC_ERR("oc_resource_set_discoverable: resource is NULL");
+    return;
+  }
+
   if (state)
     resource->properties |= OC_DISCOVERABLE;
   else
@@ -312,6 +325,11 @@ oc_resource_set_discoverable(oc_resource_t *resource, bool state)
 void
 oc_resource_set_observable(oc_resource_t *resource, bool state)
 {
+  if (resource == NULL) {
+    OC_ERR("oc_resource_set_observable: resource is NULL");
+    return;
+  }
+
   if (state)
     resource->properties |= OC_OBSERVABLE;
   else
@@ -321,6 +339,11 @@ oc_resource_set_observable(oc_resource_t *resource, bool state)
 void
 oc_resource_set_periodic_observable(oc_resource_t *resource, uint16_t seconds)
 {
+  if (resource == NULL) {
+    OC_ERR("oc_resource_set_periodic_observable: resource is NULL");
+    return;
+  }
+
   resource->properties |= OC_OBSERVABLE | OC_PERIODIC;
   resource->observe_period_seconds = seconds;
 }
@@ -329,6 +352,11 @@ void
 oc_resource_set_function_block_instance(oc_resource_t *resource,
                                         uint8_t instance)
 {
+  if (resource == NULL) {
+    OC_ERR("oc_resource_set_function_block_instance: resource is NULL");
+    return;
+  }
+
   resource->fb_instance = instance;
 }
 
@@ -339,6 +367,11 @@ oc_resource_set_properties_cbs(oc_resource_t *resource,
                                oc_set_properties_cb_t set_properties,
                                void *set_props_user_data)
 {
+  if (resource == NULL) {
+    OC_ERR("oc_resource_set_properties_cbs: resource is NULL");
+    return;
+  }
+
   resource->get_properties.cb.get_props = get_properties;
   resource->get_properties.user_data = get_props_user_data;
   resource->set_properties.cb.set_props = set_properties;
@@ -350,6 +383,12 @@ oc_resource_set_request_handler(oc_resource_t *resource, oc_method_t method,
                                 oc_request_callback_t callback, void *user_data)
 {
   oc_request_handler_t *handler = NULL;
+
+  if (resource == NULL) {
+    OC_ERR("oc_resource_set_request_handler: resource is NULL");
+    return;
+  }
+
   switch (method) {
   case OC_GET:
     handler = &resource->get_handler;

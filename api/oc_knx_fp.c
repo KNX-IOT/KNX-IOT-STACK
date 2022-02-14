@@ -452,6 +452,24 @@ oc_core_find_next_group_object_table_url(char *url, int cur_index)
   return -1;
 }
 
+static bool
+oc_belongs_href_to_resource(oc_string_t href, size_t device_index)
+{
+
+  oc_resource_t *resource = oc_ri_get_app_resources();
+  for (; resource; resource = resource->next) {
+    if (resource->device != device_index ||
+        !(resource->properties & OC_DISCOVERABLE)) {
+      continue;
+    }
+    if (oc_string_cmp(href, resource->uri) == 0) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 static void
 oc_core_fp_g_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
                          void *data)
@@ -528,7 +546,6 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   memset(buffer, 200, 1);
   oc_rep_to_json(request->request_payload, (char *)&buffer, 200, true);
   PRINT("%s", buffer);
-
   int index = -1;
   int id;
   oc_rep_t *rep = request->request_payload;
@@ -675,8 +692,32 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
         default:
           break;
         }
+ 
+        // do additional sanity checks
+        bool do_save = true;
+        if (g_got[index].ga_len == 0) {
+          do_save = false;
+          OC_ERR("  no groups in entry\n");
+        }
+        if (g_got[index].cflags == 0) {
+          do_save = false;
+          OC_ERR("  no cflags set\n");
+        }
+        if (oc_string_len(g_got[index].href) > OC_MAX_URL_LENGTH) {
+          do_save = false;
+          OC_ERR("  href is longer than %d \n", (int)OC_MAX_URL_LENGTH);
+        }
+        if (oc_belongs_href_to_resource(g_got[index].href,
+                                        device_index) == false) {
+          do_save = false;
+          OC_ERR("  href does not belong to device %s \n",
+                 oc_string(g_got[index].href));
+        }
+
         oc_print_group_object_table_entry(index);
-        oc_dump_group_object_table_entry(index);
+        if (do_save) {
+          oc_dump_group_object_table_entry(index);
+        }
         object = object->next;
       }
     }
@@ -1031,7 +1072,21 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     }
 
     oc_print_group_rp_table_entry(index, GPT_STORE, g_gpt, GPT_MAX_ENTRIES);
-    oc_dump_group_rp_table_entry(index, GPT_STORE, g_gpt, GPT_MAX_ENTRIES);
+    bool do_save = true;
+    if (oc_string_len(g_gpt[index].url) > OC_MAX_URL_LENGTH) {
+      //do_save = false;
+      OC_ERR("  url is longer than %d \n", (int)OC_MAX_URL_LENGTH);
+    }
+    if (oc_string_len(g_gpt[index].path) > OC_MAX_URL_LENGTH) {
+      // do_save = false;
+      OC_ERR("  path is longer than %d \n", (int)OC_MAX_URL_LENGTH);
+    }
+
+    oc_print_group_rp_table_entry(index, GPT_STORE, g_gpt, GPT_MAX_ENTRIES);
+    if (do_save) {
+      oc_dump_group_rp_table_entry(index, GPT_STORE, g_gpt, GPT_MAX_ENTRIES);
+    }
+
     rep = rep->next;
   };
 
@@ -1339,8 +1394,20 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     default:
       break;
     }
+    bool do_save = true;
+    if (oc_string_len(g_grt[index].url) > OC_MAX_URL_LENGTH) {
+        // do_save = false;
+        OC_ERR("  url is longer than %d \n", (int)OC_MAX_URL_LENGTH);
+      }
+    if (oc_string_len(g_grt[index].path) > OC_MAX_URL_LENGTH) {
+        // do_save = false;
+        OC_ERR("  path is longer than %d \n", (int)OC_MAX_URL_LENGTH);
+      }
+
     oc_print_group_rp_table_entry(index, GPT_STORE, g_grt, GRT_MAX_ENTRIES);
-    oc_dump_group_rp_table_entry(index, GRT_STORE, g_grt, GRT_MAX_ENTRIES);
+    if (do_save) {
+     oc_dump_group_rp_table_entry(index, GRT_STORE, g_grt, GRT_MAX_ENTRIES);
+    }
     rep = rep->next;
   };
 

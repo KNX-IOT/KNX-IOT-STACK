@@ -89,11 +89,9 @@ public:
     s_pResource = oc_new_resource(NULL, RESOURCE_URI, 1, 0);
     oc_resource_bind_resource_type(s_pResource, RESOURCE_TYPE);
     oc_resource_bind_resource_interface(s_pResource, OC_IF_NONE);
-    // oc_resource_set_default_interface(s_pResource, OC_IF_NONE);
     oc_resource_set_discoverable(s_pResource, true);
     oc_resource_set_periodic_observable(s_pResource, 1);
     oc_resource_set_request_handler(s_pResource, OC_GET, onGet, NULL);
-    // oc_process_baseline_interface(s_pResource);
     oc_add_resource(s_pResource);
   }
 
