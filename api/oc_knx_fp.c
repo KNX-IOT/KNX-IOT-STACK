@@ -551,6 +551,9 @@ oc_fp_p_check_and_save(int index, size_t device_index, bool status_ok)
   if (do_save) {
     oc_dump_group_object_table_entry(index);
   } else {
+    OC_DBG("Deleting %s", index);
+    oc_delete_group_object_table_entry(index);
+    oc_dump_group_object_table_entry(index);
     status_ok = false;
   }
   return status_ok;
