@@ -733,8 +733,8 @@ class KNXIOTStack():
         data = cb_payload[:cb_payload_size]
         self.discovery_data = data.decode("utf-8")
         discover_data_event.set()
-        
-    def spakeCB(self, cb_sn, cb_state, cb_secret, cb_secret_size):
+
+    def spakeCB(self, cb_sn, cb_state, cb_secret, _cb_secret_size):
         """ ********************************
         Call back handles spake callbacks.
         Client spake/state
@@ -762,6 +762,7 @@ class KNXIOTStack():
         self.device_array = []
         self.response_array = []
         self.discovery_data = None
+        self.spake = []
         print (self.lib)
         print ("...")
         self.debug=debug
@@ -846,7 +847,7 @@ class KNXIOTStack():
         discover_data_event.wait(self.timout)
         print("Discovered DEVICE ARRAY {}".format(self.device_array))
         return self.discovery_data
-    
+
     def initate_spake(self, sn):
         print("initiate spake: ", sn)
         # application

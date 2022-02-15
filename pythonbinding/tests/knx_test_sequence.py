@@ -840,7 +840,6 @@ def do_discovery(my_stack):
         print(" -------------------------")
         do_sequence_f(my_stack)
 
-
 def do_security(my_stack):
     """
     do security tests
@@ -851,13 +850,12 @@ def do_security(my_stack):
 
 def do_spake(my_stack):
     """
-    do security tests
+    do spake handshake
     """
     if my_stack.get_nr_devices() > 0:
         sn = my_stack.device_array[0].sn
         print("========spake=========", sn)
         my_stack.initate_spake(sn)
-
 
 def do_fp(my_stack):
     """
@@ -865,8 +863,6 @@ def do_fp(my_stack):
     """
     if my_stack.get_nr_devices() > 0:
         do_sequence_fp_programming(my_stack)
-
-
 
 def do_all(my_stack):
     if my_stack.get_nr_devices() > 0:
