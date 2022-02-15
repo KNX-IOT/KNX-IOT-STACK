@@ -849,6 +849,16 @@ def do_security(my_stack):
         do_auth_at(my_stack)
 
 
+def do_spake(my_stack):
+    """
+    do security tests
+    """
+    if my_stack.get_nr_devices() > 0:
+        sn = my_stack.device_array[0].sn
+        print("========spake=========", sn)
+        my_stack.initate_spake(sn)
+
+
 def do_fp(my_stack):
     """
     do fp tests
@@ -894,6 +904,9 @@ if __name__ == '__main__':  # pragma: no cover
     parser.add_argument("-fp", "--fp",
                     help="do function point programming", nargs='?',
                     default=False, const=1, required=False)
+    parser.add_argument("-spake", "--spake",
+                    help="do spake", nargs='?',
+                    default=False, const=1, required=False)
     print(sys.argv)
     args = parser.parse_args()
     print("scope         :" + str(args.scope))
@@ -902,6 +915,7 @@ if __name__ == '__main__':  # pragma: no cover
     print("discovery     :" + str(args.discovery))
     print("security      :" + str(args.security))
     print("fp            :" + str(args.fp))
+    print("spake         :" + str(args.spake))
     time.sleep(int(args.sleep))
 
     the_stack = knx_stack.KNXIOTStack()
@@ -917,6 +931,8 @@ if __name__ == '__main__':  # pragma: no cover
             do_security(the_stack)
         elif args.fp:
             do_fp(the_stack)
+        elif args.spake:
+            do_spake(the_stack)
         else:
             do_sequence(the_stack)
     except:

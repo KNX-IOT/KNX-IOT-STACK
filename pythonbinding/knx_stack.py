@@ -74,6 +74,7 @@ unowned_return_list=[]
 
 discover_event = threading.Event()
 discover_data_event = threading.Event()
+spake_event = threading.Event()
 client_event = threading.Event()
 client_mutex = threading.Lock()
 resource_mutex = threading.Lock()
@@ -456,6 +457,7 @@ CHANGED_CALLBACK = CFUNCTYPE(None, c_char_p, c_char_p, c_char_p)
 RESOURCE_CALLBACK = CFUNCTYPE(None, c_char_p, c_char_p, c_char_p, c_char_p)
 CLIENT_CALLBACK = CFUNCTYPE(None, c_char_p, c_int, c_char_p, c_char_p, c_char_p, c_int, c_char_p)
 DISCOVERY_CALLBACK = CFUNCTYPE(None, c_int, c_char_p)
+SPAKE_CALLBACK = CFUNCTYPE(None, c_char_p, c_int, c_char_p, c_int)
 
 #----------LinkFormat parsing ---------------
 
@@ -731,6 +733,15 @@ class KNXIOTStack():
         data = cb_payload[:cb_payload_size]
         self.discovery_data = data.decode("utf-8")
         discover_data_event.set()
+        
+    def spakeCB(self, cb_sn, cb_state, cb_secret, cb_secret_size):
+        """ ********************************
+        Call back handles spake callbacks.
+        Client spake/state
+        **********************************"""
+        print("spakeCB", cb_sn, cb_state)
+        self.spake = [ cb_state, cb_secret.decode("utf-8")]
+        spake_event.set()
 
     def __init__(self, debug=True):
         print ("loading ...")
@@ -767,6 +778,8 @@ class KNXIOTStack():
         self.lib.py_install_clientCB(self.clientCBFunc)
         self.discoveryCBFunc = DISCOVERY_CALLBACK(self.discoveryCB)
         self.lib.py_install_discoveryCB(self.discoveryCBFunc)
+        self.spakeCBFunc = SPAKE_CALLBACK(self.spakeCB)
+        self.lib.py_install_spakeCB(self.spakeCBFunc)
         print ("...")
         self.threadid = threading.Thread(target=self.thread_function, args=())
         self.threadid.start()
@@ -833,6 +846,22 @@ class KNXIOTStack():
         discover_data_event.wait(self.timout)
         print("Discovered DEVICE ARRAY {}".format(self.device_array))
         return self.discovery_data
+    
+    def initate_spake(self, sn):
+        print("initiate spake: ", sn)
+        # application
+        spake_event.clear()
+        self.discovery_data = None
+        self.lib.py_initate_spake.argtypes = [ String ]
+        self.lib.py_initate_spake(sn)
+        #time.sleep(self.timout)
+        # python callback application
+        #print("[P] discovery- done")
+        #self.lib.py_get_nr_devices()
+        spake_event.wait(self.timout)
+        print ("initate_spake data: ", self.spake)
+        return self.spake
+        #return self.discovery_data
 
     def device_array_contains(self, sn):
         contains = False
