@@ -705,7 +705,7 @@ oc_filter_resource_by_rt(oc_resource_t *resource, oc_request_t *request)
           oc_string_array_get_item_size(resource->types, i);
         const char *resource_type =
           (const char *)oc_string_array_get_item(resource->types, i);
-        PRINT("   oc_filter_resource_by_rt '%.*s'\n", (int) resource_type_len,
+        PRINT("   oc_filter_resource_by_rt '%.*s'\n", (int)resource_type_len,
               resource_type);
         if (wildcart != NULL) {
           if (strncmp(rt, resource_type, rt_len) == 0) {
