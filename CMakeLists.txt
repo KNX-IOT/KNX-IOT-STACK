@@ -98,8 +98,7 @@ target_include_directories(kis-api INTERFACE
 )
 
 # Core functions used by the stack
-add_library(kis-common INTERFACE)
-
+add_library(kis-common)
 
 # do not treat warnings as errors on Windows
 # block should be defined after the target library
@@ -113,7 +112,7 @@ endif()
 # enable clang-tidy 
 enable_clang_tidy()
 
-target_sources(kis-common INTERFACE
+target_sources(kis-common PUBLIC
     # Utilities that are used deep within the stack
     ${PROJECT_SOURCE_DIR}/util/oc_etimer.c
     ${PROJECT_SOURCE_DIR}/util/oc_list.c
@@ -134,7 +133,7 @@ target_sources(kis-common INTERFACE
 
 )
 
-target_link_libraries(kis-common INTERFACE kis-port mbedtls tinycbor-master)
+target_link_libraries(kis-common PUBLIC kis-port mbedtls tinycbor-master)
 
 # stack implementation of CoAP
 add_library(kis-coap INTERFACE)
@@ -165,8 +164,8 @@ endif()
 
 if(OC_OSCORE_ENABLED)
    target_compile_definitions(mbedcrypto PUBLIC OC_OSCORE)
-   target_compile_definitions(kis-common INTERFACE OC_OSCORE)
-   target_compile_definitions(kis-common INTERFACE OC_SPAKE)
+   target_compile_definitions(kis-common PUBLIC OC_OSCORE)
+   target_compile_definitions(kis-common PUBLIC OC_SPAKE)
 endif()
 
 if(OC_PKI_ENABLED)
@@ -174,7 +173,7 @@ if(OC_PKI_ENABLED)
 endif()
 
 if(OC_DEBUG_ENABLED)
-    target_compile_definitions(kis-common INTERFACE OC_DEBUG)
+    target_compile_definitions(kis-common PUBLIC OC_DEBUG)
     target_compile_definitions(mbedcrypto PUBLIC OC_DEBUG)
 endif()
 
@@ -189,32 +188,33 @@ set(KNX_INCLUDE_DIRS
 
 add_library(kis-client)
 target_compile_definitions(kis-client PUBLIC OC_CLIENT)
-target_link_libraries(kis-client PUBLIC
+target_link_libraries(kis-client PRIVATE
     kis-coap
     kis-api
     kis-port
+    kis-common
 )
 target_link_libraries(kis-client PUBLIC kis-common)
 target_include_directories(kis-client PUBLIC ${KNX_INCLUDE_DIRS})
 
 add_library(kis-server)
 target_compile_definitions(kis-server PUBLIC OC_SERVER)
-target_link_libraries(kis-server PUBLIC
+target_link_libraries(kis-server PRIVATE
     kis-coap
     kis-api
     kis-port
+    kis-common
 )
-target_link_libraries(kis-server PUBLIC kis-common)
 target_include_directories(kis-server PUBLIC ${KNX_INCLUDE_DIRS})
 
 add_library(kisClientServer)
 target_compile_definitions(kisClientServer PUBLIC OC_SERVER=1 OC_CLIENT=1)
-target_link_libraries(kisClientServer PUBLIC
+target_link_libraries(kisClientServer PRIVATE
     kis-coap
     kis-api
     kis-port
+    kis-common
 )
-target_link_libraries(kisClientServer PUBLIC kis-common)
 target_include_directories(kisClientServer PUBLIC ${KNX_INCLUDE_DIRS})
 
 
