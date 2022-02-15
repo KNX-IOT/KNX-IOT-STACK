@@ -75,10 +75,9 @@ char *oc_at_profile_to_string(oc_at_profile_t at_profile);
  * | version | 1    | unsigned integer | OSCORE   Version   | 1          |
  * | ms | 2    | byte string  | OSCORE Master Secret value (shall be PSK) | - |
  * | hkdf | 3    | text string / integer | HKDF value | HKDF SHA-256  |
- * | alg | 4  | text string / integer | AEAD Algorithm value | AES-CCM-16-64-128
- *(10)| | salt | 5 | byte string | Master Salt value| Default SHALL be an empty
- *byte string | | contextId | 6    | byte string | OSCORE ID Context value |
- *omit  |
+ * | alg | 4  | text string / integer | AEAD Algorithm | AES-CCM-16-64-128 (10)|
+ * | salt | 5 | byte string | Master Salt | Default SHALL be an empty byte string |
+ * | contextId | 6    | byte string | OSCORE ID Context value | omit  |
  *
  * {
  *   "alg" : "AES-CCM-16-64-128",
@@ -164,6 +163,10 @@ void oc_create_knx_sec_resources(size_t device);
  */
 void oc_init_oscore(size_t device_index);
 
+
+bool oc_knx_contains_interface(oc_interface_mask_t at_interface,
+                               oc_interface_mask_t resource_interface);
+
 /**
  * @brief is the method allowed according to the interface mask
  *
@@ -178,7 +181,7 @@ bool oc_if_method_allowed_according_to_mask(oc_interface_mask_t iface_mask,
 /**
  * @brief check access control based on acl and resource interfaces
  *
- * @param method invocation method for thiscall
+ * @param method invocation method for this call
  * @param resource the resource being called
  * @param endpoint the used endpoint
  * @return true has access

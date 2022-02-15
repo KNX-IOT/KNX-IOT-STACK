@@ -834,9 +834,9 @@ oc_at_entry_print(int index)
     if (g_at_entries[index].profile != OC_PROFILE_UNKNOWN) {
 
       PRINT("  at index: %d\n", index);
-      PRINT("    id         : %s\n", oc_string(g_at_entries[index].id));
+      PRINT("    id (0)        : %s\n", oc_string(g_at_entries[index].id));
       PRINT("    interfaces : %d\n", g_at_entries[index].interface);
-      PRINT("    profile    : %d (%s)\n", g_at_entries[index].profile,
+      PRINT("    profile (38)  : %d (%s)\n", g_at_entries[index].profile,
             oc_at_profile_to_string(g_at_entries[index].profile));
       if (g_at_entries[index].profile == OC_PROFILE_COAP_DTLS) {
         if (oc_string_len(g_at_entries[index].sub) > 0) {
@@ -1332,9 +1332,46 @@ method_allowed(oc_method_t method, oc_resource_t *resource)
 {
   if (oc_is_resource_secure(method, resource) == false) {
     return true;
-  }
+  } 
+
 
   return oc_if_method_allowed_according_to_mask(resource->interfaces, method);
+}
+
+bool
+oc_knx_contains_interface(oc_interface_mask_t at_interface, oc_interface_mask_t resource_interface)
+{
+  int i;
+  for (i = 1; i < OC_MAX_IF_MASKS; i++) {
+    uint16_t value = 1 << i;
+    if (at_interface && value) {
+      if (resource_interface && value) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+
+bool
+oc_knx_sec_check_interface(oc_resource_t *resource,
+                           oc_string_t *token)
+{
+  if (resource == NULL) {
+    return false;
+  }
+  if (token == NULL) {
+    return false;
+  }
+  oc_interface_mask_t resource_interfaces = resource->interfaces;
+  int index = find_index_from_at(token);
+  if (index < 0) {
+    return false;
+  }
+  
+  return oc_knx_contains_interface(g_at_entries[index].interface, resource_interfaces);
 }
 
 bool
