@@ -133,7 +133,7 @@ int selected_id_cred = -1;
 // static
 const int default_priority[6] = {
 #else  /* OC_PKI */
-//static 
+// static
 const int default_priority[2] = {
 #endif /* !OC_PKI */
   MBEDTLS_TLS_ECDHE_PSK_WITH_AES_128_CBC_SHA256,

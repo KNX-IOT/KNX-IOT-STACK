@@ -51,22 +51,21 @@ TEST(KNXLSM, LSMConstToStr)
   EXPECT_STREQ("unload", mystring);
 }
 
-
-TEST(KNXSEC, contains_interfaces) 
+TEST(KNXSEC, contains_interfaces)
 {
   EXPECT_FALSE(oc_knx_contains_interface(OC_IF_NONE, OC_IF_NONE));
-  
+
   EXPECT_TRUE(oc_knx_contains_interface(OC_IF_I, OC_IF_I));
   EXPECT_TRUE(oc_knx_contains_interface(OC_IF_I, OC_IF_I | OC_IF_O));
   EXPECT_FALSE(oc_knx_contains_interface(OC_IF_I, OC_IF_NONE));
   EXPECT_FALSE(oc_knx_contains_interface(OC_IF_I, OC_IF_O));
-  
+
   EXPECT_TRUE(oc_knx_contains_interface(OC_IF_O, OC_IF_O));
   EXPECT_TRUE(oc_knx_contains_interface(OC_IF_O, OC_IF_O | OC_IF_G));
   EXPECT_FALSE(oc_knx_contains_interface(OC_IF_O, OC_IF_NONE));
   EXPECT_FALSE(oc_knx_contains_interface(OC_IF_O, OC_IF_I));
   EXPECT_FALSE(oc_knx_contains_interface(OC_IF_O, OC_IF_I | OC_IF_G));
-  
+
   EXPECT_TRUE(oc_knx_contains_interface(OC_IF_M, OC_IF_M));
   EXPECT_TRUE(oc_knx_contains_interface(OC_IF_M, OC_IF_M | OC_IF_G));
   EXPECT_FALSE(oc_knx_contains_interface(OC_IF_M, OC_IF_NONE));
