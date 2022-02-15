@@ -134,13 +134,6 @@ target_sources(kis-common INTERFACE
 
 )
 
-target_include_directories(kis-common INTERFACE
-    ${PROJECT_SOURCE_DIR}/
-    ${PROJECT_SOURCE_DIR}/include
-    ${PROJECT_SOURCE_DIR}/deps/tinycbor/src
-    ${PROJECT_SOURCE_DIR}/security
-)
-
 target_link_libraries(kis-common INTERFACE kis-port mbedtls tinycbor-master)
 
 # stack implementation of CoAP
@@ -187,32 +180,43 @@ endif()
 
 
 # Client and server versions
+set(KNX_INCLUDE_DIRS 
+    ${PROJECT_SOURCE_DIR}/
+    ${PROJECT_SOURCE_DIR}/include
+    ${PROJECT_SOURCE_DIR}/deps/tinycbor/src
+    ${PROJECT_SOURCE_DIR}/security
+)
+
 add_library(kis-client)
 target_compile_definitions(kis-client PUBLIC OC_CLIENT)
-target_link_libraries(kis-client PRIVATE
+target_link_libraries(kis-client PUBLIC
     kis-coap
     kis-api
     kis-port
 )
 target_link_libraries(kis-client PUBLIC kis-common)
+target_include_directories(kis-client PUBLIC ${KNX_INCLUDE_DIRS})
 
 add_library(kis-server)
 target_compile_definitions(kis-server PUBLIC OC_SERVER)
-target_link_libraries(kis-server PRIVATE
+target_link_libraries(kis-server PUBLIC
     kis-coap
     kis-api
     kis-port
 )
 target_link_libraries(kis-server PUBLIC kis-common)
+target_include_directories(kis-server PUBLIC ${KNX_INCLUDE_DIRS})
 
 add_library(kisClientServer)
 target_compile_definitions(kisClientServer PUBLIC OC_SERVER=1 OC_CLIENT=1)
-target_link_libraries(kisClientServer PRIVATE
+target_link_libraries(kisClientServer PUBLIC
     kis-coap
     kis-api
     kis-port
 )
 target_link_libraries(kisClientServer PUBLIC kis-common)
+target_include_directories(kisClientServer PUBLIC ${KNX_INCLUDE_DIRS})
+
 
 add_compile_definitions(OC_CLIENT OC_SERVER)
 include (GenerateExportHeader)
@@ -233,7 +237,7 @@ target_link_libraries(kisCS PUBLIC
 )
 target_link_libraries(kisCS PUBLIC kis-common)
 
-target_include_directories(kisCS PRIVATE ${PROJECT_BINARY_DIR})
+target_include_directories(kisCS PRIVATE ${PROJECT_BINARY_DIR} ${KNX_INCLUDE_DIRS})
 
 # copy Python binding files to build directory
 file(COPY "${PROJECT_SOURCE_DIR}/pythonbinding/knx_stack.py" DESTINATION ${PROJECT_BINARY_DIR}/)
@@ -261,7 +265,7 @@ if(BUILD_TESTING AND UNIX)
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
     set(CMAKE_CXX_EXTENSIONS OFF)
     list(APPEND TEST_COMPILE_OPTIONS "-Wall" "-Wextra")
-    list(APPEND TEST_LINK_LIBS kisClientServer gtest_main Threads::Threads)
+    list(APPEND TEST_LINK_LIBS kisClientServer gtest gtest_main Threads::Threads)
     if(CMAKE_COMPILER_IS_GNUCXX)
         list(APPEND TEST_COMPILE_OPTIONS "-fprofile-arcs" "-ftest-coverage" "-fpermissive")
         list(APPEND TEST_LINK_LIBS gcov)
@@ -278,22 +282,8 @@ if(BUILD_TESTING AND UNIX)
         add_executable(${TESTNAME} ${PROJECT_SOURCE_DIR}/${FOLDER}/${TESTNAME}.cpp)
         target_compile_options(${TESTNAME} PRIVATE ${TEST_COMPILE_OPTIONS})
         target_compile_features(${TESTNAME} PRIVATE cxx_nullptr)
-        target_compile_definitions(${TESTNAME} PRIVATE ${PUBLIC_COMPILE_DEFINITIONS} "OC_CLIENT" "OC_SERVER")
-        target_include_directories(${TESTNAME} SYSTEM PRIVATE ${PROJECT_SOURCE_DIR}/deps/gtest/include)
-        target_include_directories(${TESTNAME} PRIVATE
-            ${PROJECT_SOURCE_DIR}
-            ${PROJECT_SOURCE_DIR}/include
-            ${PROJECT_SOURCE_DIR}/port/linux
-            ${PORT_INCLUDE_DIR}
-            ${PROJECT_SOURCE_DIR}/messaging/coap
-        )
-        if(OC_OSCORE_ENABLED)
-            target_include_directories(${TESTNAME} PRIVATE
-                ${PROJECT_SOURCE_DIR}/security
-                ${PROJECT_SOURCE_DIR}/deps/mbedtls/include
-            )
-        endif()
-        target_link_libraries(${TESTNAME} PRIVATE ${TEST_LINK_LIBS})
+        target_include_directories(${TESTNAME} PRIVATE ${PROJECT_SOURCE_DIR}/deps/gtest/include)
+        target_link_libraries(${TESTNAME} PUBLIC ${TEST_LINK_LIBS})
         add_test(NAME ${TESTNAME} COMMAND ${TESTNAME})
         set_target_properties(${TESTNAME} PROPERTIES FOLDER unittests)
     endmacro()
