@@ -1342,12 +1342,16 @@ bool
 oc_knx_contains_interface(oc_interface_mask_t at_interface, oc_interface_mask_t resource_interface)
 {
   int i;
+  oc_interface_mask_t new_mask;
+  oc_interface_mask_t at_mask;
+  oc_interface_mask_t resource_mask;
+
   for (i = 1; i < OC_MAX_IF_MASKS; i++) {
-    uint16_t value = 1 << i;
-    if (at_interface && value) {
-      if (resource_interface && value) {
+    new_mask = 1 << i;
+    at_mask = at_interface && new_mask;
+    resource_mask = resource_interface && new_mask;
+    if ((at_mask != 0) && (at_mask == resource_mask)) {
         return true;
-      }
     }
   }
 
