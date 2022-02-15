@@ -1345,13 +1345,13 @@ oc_knx_contains_interface(oc_interface_mask_t at_interface, oc_interface_mask_t 
   oc_interface_mask_t new_mask;
   oc_interface_mask_t at_mask;
   oc_interface_mask_t resource_mask;
-  PRINT("------ oc_knx_contains_interface  at  %d resource %d  \n", at_interface, resource_interface);
+  //PRINT("------ oc_knx_contains_interface  at  %d resource %d  \n", at_interface, resource_interface);
   for (i = 1; i < OC_MAX_IF_MASKS + 1; i++) {
     new_mask = 1 << i;
     at_mask = at_interface & new_mask;
     resource_mask = resource_interface & new_mask;
-    PRINT("oc_knx_contains_interface  %d %d %d %d  \n", i, new_mask, at_mask,
-          resource_mask);
+    //PRINT("oc_knx_contains_interface  %d %d %d %d  \n", i, new_mask, at_mask,
+    //      resource_mask);
     if ((at_mask != 0) && (at_mask == resource_mask)) {
         return true;
     }
