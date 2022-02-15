@@ -183,6 +183,8 @@ typedef enum {
   OC_IF_M = 1 << 14    /**< if.m (manufacturer) */
 } oc_interface_mask_t;
 
+#define OC_MAX_IF_MASKS 14
+
 /**
  * @brief Get the interface string object
  * Note: should be called with a single interface as mask only

@@ -510,7 +510,7 @@ oc_oscore_send_message(oc_message_t *msg)
    *       Return error
    *   Else: (CoAP message is response)
    *     Use context->SSN as partial IV
-   *     Coompute nonce using partial IV and context->sendid
+   *     Compute nonce using partial IV and context->sendid
    *     Compute AAD using request_piv and context->recvid
    *     Copy partial IV into incoming oc_message_t (*msg), if valid
    *    Make room for inner options and payload by moving CoAP payload to offset
@@ -665,7 +665,7 @@ oc_oscore_send_message(oc_message_t *msg)
       /* Increment SSN */
       oscore_ctx->ssn++;
 
-      /* Coompute nonce using partial IV and context->sendid */
+      /* Compute nonce using partial IV and context->sendid */
       oc_oscore_AEAD_nonce(oscore_ctx->sendid, oscore_ctx->sendid_len, piv,
                            piv_len, oscore_ctx->commoniv, nonce,
                            OSCORE_AEAD_NONCE_LEN);
