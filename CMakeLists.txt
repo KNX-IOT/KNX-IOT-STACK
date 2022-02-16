@@ -165,45 +165,29 @@ set(KNX_INCLUDE_DIRS
     ${COAP_INCLUDE_DIRS}
 )
 
-add_library(kis-client
-    ${API_SOURCES}
-    ${CORE_SOURCES}
-    ${COAP_SOURCES}
-)
-target_compile_definitions(kis-client PUBLIC OC_CLIENT)
-target_link_libraries(kis-client PRIVATE
-    kis-common
-)
-target_link_libraries(kis-client PUBLIC kis-common)
-target_include_directories(kis-client PUBLIC ${KNX_INCLUDE_DIRS})
-
-add_library(kis-server
-    ${API_SOURCES}
-    ${CORE_SOURCES}
-    ${COAP_SOURCES}
-)
-target_compile_definitions(kis-server PUBLIC OC_SERVER)
-target_link_libraries(kis-server PRIVATE
-    kis-common
-)
-target_include_directories(kis-server PUBLIC ${KNX_INCLUDE_DIRS})
-
+add_compile_definitions(OC_CLIENT OC_SERVER)
 add_library(kisClientServer
     ${API_SOURCES}
     ${CORE_SOURCES}
     ${COAP_SOURCES}
 )
-target_compile_definitions(kisClientServer PUBLIC OC_SERVER=1 OC_CLIENT=1)
-target_link_libraries(kisClientServer PRIVATE
+target_compile_definitions(kisClientServer PUBLIC)
+target_link_libraries(kisClientServer PUBLIC
     kis-common
+    kis-port
+    mbedtls
+    tinycbor-master
 )
 target_include_directories(kisClientServer PUBLIC ${KNX_INCLUDE_DIRS})
 
-
-add_compile_definitions(OC_CLIENT OC_SERVER)
 include (GenerateExportHeader)
 
-add_library(kisCS SHARED ${PROJECT_SOURCE_DIR}/pythonbinding/oc_python.c)
+add_library(kisCS SHARED 
+    ${PROJECT_SOURCE_DIR}/pythonbinding/oc_python.c
+    ${API_SOURCES}
+    ${CORE_SOURCES}
+    ${COAP_SOURCES}
+)
 GENERATE_EXPORT_HEADER( kisCS
              BASE_NAME kisCS
              EXPORT_MACRO_NAME kisCS_EXPORT
@@ -214,6 +198,9 @@ GENERATE_EXPORT_HEADER( kisCS
 target_compile_definitions(kisCS PUBLIC OC_SERVER OC_CLIENT)
 target_link_libraries(kisCS PUBLIC
     kis-common
+    kis-port
+    mbedtls
+    tinycbor-master
 )
 target_link_libraries(kisCS PUBLIC kis-common)
 
