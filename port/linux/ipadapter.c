@@ -1148,7 +1148,7 @@ oc_send_buffer(oc_message_t *message)
 void
 oc_send_discovery_request(oc_message_t *message)
 {
-  struct ifaddrs *ifs = NULL, *interface = NULL;
+  struct ifaddrs *ifs = NULL, *iface = NULL;
   if (getifaddrs(&ifs) < 0) {
     OC_ERR("querying interfaces: %d", errno);
     goto done;
@@ -1163,15 +1163,14 @@ oc_send_discovery_request(oc_message_t *message)
 #define IN6_IS_ADDR_MC_REALM_LOCAL(addr)                                       \
   IN6_IS_ADDR_MULTICAST(addr) && ((((const uint8_t *)(addr))[1] & 0x0f) == 0x03)
 
-  for (interface = ifs; interface != NULL; interface = interface->ifa_next) {
-    if (!(interface->ifa_flags & IFF_UP) ||
-        (interface->ifa_flags & IFF_LOOPBACK))
+  for (iface = ifs; iface != NULL; iface = iface->ifa_next) {
+    if (!(iface->ifa_flags & IFF_UP) || (iface->ifa_flags & IFF_LOOPBACK))
       continue;
-    if ((message->endpoint.flags & IPV6) && interface->ifa_addr &&
-        interface->ifa_addr->sa_family == AF_INET6) {
-      struct sockaddr_in6 *addr = (struct sockaddr_in6 *)interface->ifa_addr;
+    if ((message->endpoint.flags & IPV6) && iface->ifa_addr &&
+        iface->ifa_addr->sa_family == AF_INET6) {
+      struct sockaddr_in6 *addr = (struct sockaddr_in6 *)iface->ifa_addr;
       if (IN6_IS_ADDR_LINKLOCAL(&addr->sin6_addr)) {
-        unsigned int mif = if_nametoindex(interface->ifa_name);
+        unsigned int mif = if_nametoindex(iface->ifa_name);
         if (setsockopt(dev->server_sock, IPPROTO_IPV6, IPV6_MULTICAST_IF, &mif,
                        sizeof(mif)) == -1) {
           OC_ERR("setting socket option for default IPV6_MULTICAST_IF: %d",
@@ -1200,15 +1199,15 @@ oc_send_discovery_request(oc_message_t *message)
         oc_send_buffer(message);
       }
 #ifdef OC_IPV4
-    } else if (message->endpoint.flags & IPV4 && interface->ifa_addr &&
-               interface->ifa_addr->sa_family == AF_INET) {
-      struct sockaddr_in *addr = (struct sockaddr_in *)interface->ifa_addr;
+    } else if (message->endpoint.flags & IPV4 && iface->ifa_addr &&
+               iface->ifa_addr->sa_family == AF_INET) {
+      struct sockaddr_in *addr = (struct sockaddr_in *)iface->ifa_addr;
       if (setsockopt(dev->server4_sock, IPPROTO_IP, IP_MULTICAST_IF,
                      &addr->sin_addr, sizeof(addr->sin_addr)) == -1) {
         OC_ERR("setting socket option for default IP_MULTICAST_IF: %d", errno);
         goto done;
       }
-      message->endpoint.interface_index = if_nametoindex(interface->ifa_name);
+      message->endpoint.iface = if_nametoindex(iface->ifa_name);
       oc_send_buffer(message);
     }
 #else  /* OC_IPV4 */
