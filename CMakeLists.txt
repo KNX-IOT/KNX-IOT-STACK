@@ -4,12 +4,12 @@ project(knx-iot-stack)
 if(CMAKE_COMPILER_IS_GNUCC)
     add_compile_options(-fPIC)
 endif()
+add_compile_definitions(OC_DYNAMIC_ALLOCATION)
 
 # Do not build anything except for the library
 option(ENABLE_PROGRAMS "Build mbed TLS programs." OFF)
 option(ENABLE_TESTING "Build mbed TLS tests." OFF)
 
-set(OC_DYNAMIC_ALLOCATION_ENABLED ON CACHE BOOL "Enable dynamic memory allocation within the OCF stack and MBedtls.")
 #set(OC_SECURITY_ENABLED ON CACHE BOOL "Enable security")
 
 set(OC_OSCORE_ENABLED ON CACHE BOOL "Enable oscore")
@@ -124,10 +124,6 @@ set(COAP_INCLUDE_DIRS
 )
 
 add_library(kis-common INTERFACE)
-
-if(OC_DYNAMIC_ALLOCATION_ENABLED)
-    target_compile_definitions(kis-common INTERFACE OC_DYNAMIC_ALLOCATION)
-endif()
 
 if(OC_OSCORE_ENABLED)
    target_compile_definitions(mbedcrypto PUBLIC OC_OSCORE)
