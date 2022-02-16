@@ -44,14 +44,14 @@ oc_s_mode_response_cb_t m_s_mode_cb = NULL;
 oc_spake_cb_t m_spake_cb = NULL;
 
 #define MAX_SECRET_LEN 32
-#define MAX_PHRASE_LEN 30
+#define MAX_PASSWORD_LEN 30
 
 // SPAKE2
 #ifdef OC_SPAKE
 static mbedtls_mpi w0, w1, privA;
 static mbedtls_ecp_point pA, pubA;
 static uint8_t Ka_Ke[MAX_SECRET_LEN];
-static char g_phrase[MAX_PHRASE_LEN];
+static char g_spake_password[MAX_PASSWORD_LEN];
 #endif
 
 
@@ -212,7 +212,7 @@ do_credential_exchange(oc_client_response_t *data)
   mbedtls_ecp_point_init(&pA);
   mbedtls_ecp_point_init(&pubA);
   // use the global variable that comes with the input of the handshake
-  oc_spake_calc_w0_w1(g_phrase, 32, salt, it, &w0, &w1);
+  oc_spake_calc_w0_w1(g_spake_password, 32, salt, it, &w0, &w1);
 
   oc_spake_gen_keypair(&privA, &pubA);
   oc_spake_calc_pA(&pA, &pubA, &w0);
@@ -232,7 +232,7 @@ do_credential_exchange(oc_client_response_t *data)
 #endif /* OC_SPAKE */
 
 int
-oc_initiate_spake(oc_endpoint_t *endpoint, char* phrase)
+oc_initiate_spake(oc_endpoint_t *endpoint, char* password)
 {
   int return_value = -1;
 
@@ -250,7 +250,7 @@ oc_initiate_spake(oc_endpoint_t *endpoint, char* phrase)
   oc_rep_i_set_byte_string(root, 15, rnd, 32);
   oc_rep_end_root_object();
 
-  strncpy(g_phrase, phrase, MAX_PHRASE_LEN);
+  strncpy(g_spake_password, password, MAX_PASSWORD_LEN);
 
   if (oc_do_post_ex(APPLICATION_CBOR, APPLICATION_CBOR)) {
     return_value = 0;

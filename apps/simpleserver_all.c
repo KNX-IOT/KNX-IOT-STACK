@@ -182,7 +182,9 @@ app_init(void)
   oc_set_s_mode_response_cb(oc_add_s_mode_response_cb);
 
 #ifdef OC_SPAKE
-  oc_spake_set_password("LETTUCE");
+#define PASSWORD "LETTUCE"
+  oc_spake_set_password(PASSWORD);
+  PRINT("SPAKE password %s\n", PASSWORD)
 #endif
 
   return ret;

@@ -806,7 +806,7 @@ oscore_send_error:
 
 OC_PROCESS_THREAD(oc_oscore_handler, ev, data)
 {
-  OC_DBG_OSCORE("===>OSCORE ENGINE\n");
+ // OC_DBG_OSCORE("===>OSCORE ENGINE\n");
   OC_PROCESS_BEGIN();
   while (1) {
     OC_PROCESS_YIELD();

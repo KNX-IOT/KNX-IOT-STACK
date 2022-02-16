@@ -154,9 +154,13 @@ kisCS_EXPORT void py_cbor_put(char *sn, char *uri, char *query, char *r_id,
  */
 kisCS_EXPORT void py_cbor_delete(char *sn, char *uri, char *query, char *r_id);
 
-
-kisCS_EXPORT void py_initate_spake(char *sn, char* phrase);
-
+/**
+ * @brief initiate the spake handshake
+ *
+ * @param sn the serial number of the device (is unique?)
+ * @param password the password of the device
+ */
+kisCS_EXPORT void py_initate_spake(char *sn, char* password);
 
 /**
  * @brief sends an s-mode message
