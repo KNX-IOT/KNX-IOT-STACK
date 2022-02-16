@@ -848,13 +848,13 @@ class KNXIOTStack():
         print("Discovered DEVICE ARRAY {}".format(self.device_array))
         return self.discovery_data
 
-    def initate_spake(self, sn):
+    def initate_spake(self, sn, phrase):
         print("initiate spake: ", sn)
         # application
         spake_event.clear()
         self.discovery_data = None
-        self.lib.py_initate_spake.argtypes = [ String ]
-        self.lib.py_initate_spake(sn)
+        self.lib.py_initate_spake.argtypes = [ String, String ]
+        self.lib.py_initate_spake(sn, phrase)
         #time.sleep(self.timout)
         # python callback application
         #print("[P] discovery- done")
@@ -964,13 +964,13 @@ class KNXIOTStack():
         client_event.wait(self.timout)
         return self.find_response(r_id)
 
-    def issue_init_spake(self, sn) :
+    def issue_init_spake(self, sn, phrase) :
         #r_id = self.get_r_id()
         #client_event.clear()
-        print(" py_initate_spake", sn)
+        print(" py_initate_spake", sn, phrase)
         try:
-            self.lib.py_initate_spake.argtypes = [String]
-            self.lib.py_initate_spake(sn)
+            self.lib.py_initate_spake.argtypes = [String, String]
+            self.lib.py_initate_spake(sn, phrase)
         except:
             pass
         #print(" issue_cbor_delete - done")

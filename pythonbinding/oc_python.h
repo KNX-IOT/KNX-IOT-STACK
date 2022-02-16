@@ -155,7 +155,7 @@ kisCS_EXPORT void py_cbor_put(char *sn, char *uri, char *query, char *r_id,
 kisCS_EXPORT void py_cbor_delete(char *sn, char *uri, char *query, char *r_id);
 
 
-kisCS_EXPORT void py_initate_spake(char *sn);
+kisCS_EXPORT void py_initate_spake(char *sn, char* phrase);
 
 
 /**

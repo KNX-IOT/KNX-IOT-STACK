@@ -192,7 +192,7 @@ discovery(const char *payload, int len, oc_endpoint_t *endpoint,
   }
 
   // do parameter exchange
-  oc_initiate_spake(endpoint);
+  oc_initiate_spake(endpoint, "LETTUCE");
 
   PRINT(" DISCOVERY- END\n");
   return OC_STOP_DISCOVERY;

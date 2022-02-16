@@ -746,14 +746,14 @@ py_discover_devices_with_query(int scope, const char *query)
 // -----------------------------------------------------------------------------
 
 void
-py_initate_spake(char *sn)
+py_initate_spake(char *sn, char* phrase)
 {
   int ret = -1;
   device_handle_t *device = py_getdevice_from_sn(sn);
 
   PRINT("  [C]py_initate_spake: [%s]\n", sn);
 
-  ret  = oc_initiate_spake(&device->ep);
+  ret  = oc_initiate_spake(&device->ep, phrase);
   PRINT("  [C]py_initate_spake: [%d]-- done\n", ret);
   if (ret == -1) {
     // failure, so unblock python
