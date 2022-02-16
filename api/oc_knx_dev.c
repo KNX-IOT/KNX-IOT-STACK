@@ -446,10 +446,12 @@ oc_core_dev_iid_put_handler(oc_request_t *request,
 
   oc_rep_t *rep = request->request_payload;
   if ((rep != NULL) && (rep->type == OC_REP_INT)) {
-    PRINT("  oc_core_dev_iid_put_handler received : %d\n",(int)rep->value.integer);
+    PRINT("  oc_core_dev_iid_put_handler received : %d\n",
+          (int)rep->value.integer);
     oc_core_set_device_iid(device_index, oc_string(rep->value.string));
 
-    oc_storage_write(KNX_STORAGE_IID, (uint32_t*)&rep->value.integer, sizeof(uint32_t));
+    oc_storage_write(KNX_STORAGE_IID, (uint32_t *)&rep->value.integer,
+                     sizeof(uint32_t));
 
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
     return;
@@ -474,7 +476,7 @@ oc_core_dev_iid_get_handler(oc_request_t *request,
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device != NULL) {
-    cbor_encode_int(&g_encoder,device->iid);
+    cbor_encode_int(&g_encoder, device->iid);
     oc_send_cbor_response(request, OC_STATUS_OK);
     return;
   }
@@ -649,8 +651,9 @@ oc_knx_device_storage_read(size_t device_index)
   }
 
   /* KNX_STORAGE_IID */
-  temp_size = oc_storage_read(KNX_STORAGE_IID, (uint32_t *)&device->iid, sizeof(uint32_t));
-  PRINT("  idd (storage) %d\n",device->iid);
+  temp_size = oc_storage_read(KNX_STORAGE_IID, (uint32_t *)&device->iid,
+                              sizeof(uint32_t));
+  PRINT("  idd (storage) %d\n", device->iid);
 
   /* KNX_STORAGE_PM */
   temp_size = oc_storage_read(KNX_STORAGE_PM, (uint8_t *)&pm, 1);
@@ -678,7 +681,7 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
   // writing the empty values
   oc_storage_write(KNX_STORAGE_IA, (char *)&zero, sizeof(int));
   oc_storage_write(KNX_STORAGE_HOSTNAME, (char *)&buf, 1);
-  oc_storage_write(KNX_STORAGE_IID, (char*)&zero, sizeof(uint32_t));
+  oc_storage_write(KNX_STORAGE_IID, (char *)&zero, sizeof(uint32_t));
 
   oc_storage_write(KNX_STORAGE_PM, (char *)&zero, sizeof(uint8_t));
 

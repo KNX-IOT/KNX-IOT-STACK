@@ -33,7 +33,6 @@
 extern "C" {
 #endif
 
-
 typedef void (*spakeCB)(char *sn, int state, char *secret, int secret_size);
 
 typedef void (*changedCB)(char *uuid, char *state, char *event);
@@ -95,7 +94,6 @@ kisCS_EXPORT void py_install_discoveryCB(discoveryCB discoveryCB);
  * @param spakeCB the spake callback
  */
 kisCS_EXPORT void py_install_spakeCB(spakeCB spakeCB);
-
 
 /**
  * @brief issue a GET request with expected content type CBOR
@@ -160,7 +158,7 @@ kisCS_EXPORT void py_cbor_delete(char *sn, char *uri, char *query, char *r_id);
  * @param sn the serial number of the device (is unique?)
  * @param password the password of the device
  */
-kisCS_EXPORT void py_initate_spake(char *sn, char* password);
+kisCS_EXPORT void py_initate_spake(char *sn, char *password);
 
 /**
  * @brief sends an s-mode message
@@ -198,7 +196,6 @@ kisCS_EXPORT void py_discover_devices(int scope);
  * @param query the query
  */
 kisCS_EXPORT void py_discover_devices_with_query(int scope, const char *query);
-
 
 /**
  * @brief retrieve the amount of discovered devices
