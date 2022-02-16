@@ -116,8 +116,6 @@ set(CORE_SOURCES
 
 )
 
-# target_link_libraries(kis-common PUBLIC kis-port mbedtls tinycbor-master)
-
 # stack implementation of CoAP
 set(COAP_SOURCES
     ${PROJECT_SOURCE_DIR}/messaging/coap/coap.c
