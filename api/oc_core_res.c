@@ -336,92 +336,16 @@ oc_core_set_device_hostname(int device_index, const char *hostname)
 }
 
 int
-oc_core_set_device_iid(int device_index, const char *iid)
+oc_core_set_device_iid(int device_index, uint32_t iid)
 {
   if (device_index >= (int)oc_number_of_devices()) {
     PRINT("  device_index %d to large\n", device_index);
     return -1;
   }
-  oc_free_string(&oc_device_info[device_index].iid);
-  oc_new_string(&oc_device_info[device_index].iid, iid, strlen(iid));
+  oc_device_info[device_index].iid = iid;
 
   return 0;
 }
-
-/*
-oc_device_info_t *
-oc_core_add_new_device(const char *uri, const char *rt, const char *name,
-                       const char *spec_version, const char *data_model_version,
-                       oc_core_add_device_cb_t add_device_cb, void *data)
-{
-  (void)data;
-  (void)uri;
-  (void)rt;
-#ifndef OC_DYNAMIC_ALLOCATION
-  if (device_count == OC_MAX_NUM_DEVICES) {
-    OC_ERR("device limit reached");
-    return NULL;
-  }
-#else // !OC_DYNAMIC_ALLOCATION
-  size_t new_num = 1 + OCF_D * (device_count + 1);
-  core_resources =
-    (oc_resource_t *)realloc(core_resources, new_num * sizeof(oc_resource_t));
-
-  if (!core_resources) {
-    oc_abort("Insufficient memory");
-  }
-  oc_resource_t *device = &core_resources[new_num - OCF_D];
-  memset(device, 0, OCF_D * sizeof(oc_resource_t));
-
-  oc_device_info = (oc_device_info_t *)realloc(
-    oc_device_info, (device_count + 1) * sizeof(oc_device_info_t));
-
-  if (!oc_device_info) {
-    oc_abort("Insufficient memory");
-  }
-  memset(&oc_device_info[device_count], 0, sizeof(oc_device_info_t));
-
-#endif // OC_DYNAMIC_ALLOCATION
-
-  oc_gen_uuid(&oc_device_info[device_count].di);
-
-  // Construct device resource
-  //int properties = OC_DISCOVERABLE;
-
- // if (strlen(rt) == 8 && strncmp(rt, "oic.wk.d", 8) == 0) {
- //   oc_core_populate_resource(OCF_D, device_count, uri,
- //                             OC_IF_R | OC_IF_BASELINE, OC_IF_R, properties,
-//                              oc_core_device_handler, 0, 0, 0, 1, rt);
-//  } else {
-//    oc_core_populate_resource(
-//      OCF_D, device_count, uri, OC_IF_R | OC_IF_BASELINE, OC_IF_R, properties,
- //     oc_core_device_handler, 0, 0, 0, 2, rt, "oic.wk.d");
-//  }
-
-  oc_gen_uuid(&oc_device_info[device_count].piid);
-
-  oc_new_string(&oc_device_info[device_count].name, name, strlen(name));
-  oc_new_string(&oc_device_info[device_count].icv, spec_version,
-                strlen(spec_version));
-  oc_new_string(&oc_device_info[device_count].dmv, data_model_version,
-                strlen(data_model_version));
-  oc_device_info[device_count].add_device_cb = add_device_cb;
-
-  oc_create_discovery_resource(OCF_RES, device_count);
-
-  oc_create_discovery_resource(WELLKNOWNCORE, device_count);
-
-  oc_device_info[device_count].data = data;
-
-  if (oc_connectivity_init(device_count) < 0) {
-    oc_abort("error initializing connectivity for device");
-  }
-
-  device_count++;
-
-  return &oc_device_info[device_count - 1];
-}
-*/
 
 oc_device_info_t *
 oc_core_add_device(const char *name, const char *version, const char *base,

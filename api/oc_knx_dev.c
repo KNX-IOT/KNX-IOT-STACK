@@ -475,8 +475,8 @@ oc_core_dev_iid_get_handler(oc_request_t *request,
 
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
-  if (device != NULL && oc_string(device->iid) != NULL) {
-    cbor_encode_text_stringz(&g_encoder, oc_string(device->iid));
+  if (device != NULL) {
+    cbor_encode_int(&g_encoder,device->iid);
     oc_send_cbor_response(request, OC_STATUS_OK);
     return;
   }
@@ -655,7 +655,7 @@ oc_knx_device_storage_read(size_t device_index)
   if (temp_size > 1) {
     tempstring[temp_size] = 0;
     oc_core_set_device_iid(device_index, tempstring);
-    PRINT("  idd (storage) %s\n", oc_string(device->iid));
+    PRINT("  idd (storage) %s\n",device->iid);
   }
 
   /* KNX_STORAGE_PM */

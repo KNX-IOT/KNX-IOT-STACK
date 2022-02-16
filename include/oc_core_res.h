@@ -80,9 +80,9 @@ typedef struct oc_device_info_t
   oc_knx_version_info_t fwv; /**< fwv firmware version number */
   oc_string_t hwt;           /**< knx hardware type */
   oc_string_t model;         /**< knx model */
-  int ia;                    /**< knx ia Device individual address */
+  uint32_t ia;               /**< knx ia Device individual address */
   oc_string_t hostname;      /**< knx host name */
-  oc_string_t iid;           /**< knx idd (installation id) */
+  uint32_t iid;              /**< knx idd (installation id) */
   bool pm;                   /**< knx programming mode */
   oc_lsm_state_t lsm_s;      /**< knx lsm states */
   oc_device_mode_t
@@ -199,13 +199,13 @@ int oc_core_set_device_model(int device_index, const char *model);
 int oc_core_set_device_hostname(int device_index, const char *hostname);
 
 /**
- * @brief sets the iid (string)
+ * @brief sets the iid (unsigned int)
  *
  * @param device_index the device index
  * @param iid the KNX installation id
  * @return int error status, 0 = OK
  */
-int oc_core_set_device_iid(int device_index, const char *iid);
+int oc_core_set_device_iid(int device_index, uint32_t iid);
 
 /**
  * @brief retrieve the amount of devices
