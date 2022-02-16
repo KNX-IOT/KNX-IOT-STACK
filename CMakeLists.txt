@@ -1,27 +1,15 @@
 cmake_minimum_required (VERSION 3.10)
 project(knx-iot-stack)
 
-# Patch mbedtls
-set(OC_REAPPLY_MBEDTLS_PATCHES ON CACHE BOOL "")
-if(OC_REAPPLY_MBEDTLS_PATCHES)
-    include(mbedtls-patch.cmake)
-    set(OC_REAPPLY_MBEDTLS_PATCHES OFF CACHE BOOL 
-        "By default, mbedTLS patches are applied upon the first CMake Configure. Set this to ON to reapply the patches on the next configure."
-         FORCE
-    )
+if(CMAKE_COMPILER_IS_GNUCC)
+    add_compile_options(-fPIC)
 endif()
-set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/tools)
-
-# Enable missing algorithms
-# TODO add this to Makefiles, or regenerate mbedtls patches
-add_compile_definitions(MBEDTLS_HKDF_C)
-add_compile_options(-fPIC)
+add_compile_definitions(OC_DYNAMIC_ALLOCATION)
 
 # Do not build anything except for the library
 option(ENABLE_PROGRAMS "Build mbed TLS programs." OFF)
 option(ENABLE_TESTING "Build mbed TLS tests." OFF)
 
-set(OC_DYNAMIC_ALLOCATION_ENABLED ON CACHE BOOL "Enable dynamic memory allocation within the OCF stack and MBedtls.")
 #set(OC_SECURITY_ENABLED ON CACHE BOOL "Enable security")
 
 set(OC_OSCORE_ENABLED ON CACHE BOOL "Enable oscore")
@@ -56,9 +44,7 @@ endif()
 
 
 # API
-add_library(kis-api INTERFACE)
-
-target_sources(kis-api INTERFACE
+set(API_SOURCES
     ${PROJECT_SOURCE_DIR}/api/oc_base64.c
     ${PROJECT_SOURCE_DIR}/api/oc_blockwise.c
     ${PROJECT_SOURCE_DIR}/api/oc_buffer.c
@@ -90,30 +76,18 @@ target_sources(kis-api INTERFACE
     ${PROJECT_SOURCE_DIR}/api/c-timestamp/timestamp_valid.c
 )
 
-target_include_directories(kis-api INTERFACE
+set(API_INCLUDE_DIR
     ${PROJECT_SOURCE_DIR}/
     ${PROJECT_SOURCE_DIR}/api
     ${PROJECT_SOURCE_DIR}/api/c-timestamp
     ${PROJECT_SOURCE_DIR}/include
 )
 
-# Core functions used by the stack
-add_library(kis-common INTERFACE)
-
-
-# do not treat warnings as errors on Windows
-# block should be defined after the target library
-if(MSVC)
-    target_compile_options(mbedtls PRIVATE /W1 /WX-)
-    target_compile_options(mbedx509 PRIVATE /W1 /WX-)
-    target_compile_options(mbedcrypto PRIVATE /W1 /WX-)
-    target_compile_options(kis-api INTERFACE /W1 /WX-)
-endif()
-
 # enable clang-tidy 
 enable_clang_tidy()
 
-target_sources(kis-common INTERFACE
+# Core functions used by the stack
+set(CORE_SOURCES
     # Utilities that are used deep within the stack
     ${PROJECT_SOURCE_DIR}/util/oc_etimer.c
     ${PROJECT_SOURCE_DIR}/util/oc_list.c
@@ -134,19 +108,8 @@ target_sources(kis-common INTERFACE
 
 )
 
-target_include_directories(kis-common INTERFACE
-    ${PROJECT_SOURCE_DIR}/
-    ${PROJECT_SOURCE_DIR}/include
-    ${PROJECT_SOURCE_DIR}/deps/tinycbor/src
-    ${PROJECT_SOURCE_DIR}/security
-)
-
-target_link_libraries(kis-common INTERFACE kis-port mbedtls tinycbor-master)
-
 # stack implementation of CoAP
-add_library(kis-coap INTERFACE)
-
-target_sources(kis-coap INTERFACE
+set(COAP_SOURCES
     ${PROJECT_SOURCE_DIR}/messaging/coap/coap.c
     ${PROJECT_SOURCE_DIR}/messaging/coap/coap_signal.c
     ${PROJECT_SOURCE_DIR}/messaging/coap/engine.c
@@ -156,19 +119,11 @@ target_sources(kis-coap INTERFACE
     ${PROJECT_SOURCE_DIR}/messaging/coap/transactions.c
 )
 
-target_include_directories(kis-coap INTERFACE
+set(COAP_INCLUDE_DIRS
     ${PROJECT_SOURCE_DIR}/messaging/coap/
 )
 
-target_link_libraries(kis-coap INTERFACE kis-port)
-
-if(OC_DYNAMIC_ALLOCATION_ENABLED)
-    target_compile_definitions(mbedcrypto PUBLIC OC_DYNAMIC_ALLOCATION)
-endif()
-
-if(OC_SECURITY_ENABLED)
-   # target_compile_definitions(mbedcrypto PUBLIC OC_SECURITY)
-endif()
+add_library(kis-common INTERFACE)
 
 if(OC_OSCORE_ENABLED)
    target_compile_definitions(mbedcrypto PUBLIC OC_OSCORE)
@@ -187,37 +142,38 @@ endif()
 
 
 # Client and server versions
-add_library(kis-client)
-target_compile_definitions(kis-client PUBLIC OC_CLIENT)
-target_link_libraries(kis-client PRIVATE
-    kis-coap
-    kis-api
-    kis-port
+set(KNX_INCLUDE_DIRS 
+    ${PROJECT_SOURCE_DIR}/
+    ${PROJECT_SOURCE_DIR}/include
+    ${PROJECT_SOURCE_DIR}/deps/tinycbor/src
+    ${PROJECT_SOURCE_DIR}/security
+    ${API_INCLUDE_DIRS}
+    ${COAP_INCLUDE_DIRS}
 )
-target_link_libraries(kis-client PUBLIC kis-common)
-
-add_library(kis-server)
-target_compile_definitions(kis-server PUBLIC OC_SERVER)
-target_link_libraries(kis-server PRIVATE
-    kis-coap
-    kis-api
-    kis-port
-)
-target_link_libraries(kis-server PUBLIC kis-common)
-
-add_library(kisClientServer)
-target_compile_definitions(kisClientServer PUBLIC OC_SERVER=1 OC_CLIENT=1)
-target_link_libraries(kisClientServer PRIVATE
-    kis-coap
-    kis-api
-    kis-port
-)
-target_link_libraries(kisClientServer PUBLIC kis-common)
 
 add_compile_definitions(OC_CLIENT OC_SERVER)
+add_library(kisClientServer
+    ${API_SOURCES}
+    ${COAP_SOURCES}
+    ${CORE_SOURCES}
+)
+target_compile_definitions(kisClientServer PUBLIC)
+target_link_libraries(kisClientServer PUBLIC
+    kis-common
+    mbedtls
+    tinycbor-master
+    kis-port
+)
+target_include_directories(kisClientServer PUBLIC ${KNX_INCLUDE_DIRS})
+
 include (GenerateExportHeader)
 
-add_library(kisCS SHARED ${PROJECT_SOURCE_DIR}/pythonbinding/oc_python.c)
+add_library(kisCS SHARED 
+    ${PROJECT_SOURCE_DIR}/pythonbinding/oc_python.c
+    ${API_SOURCES}
+    ${COAP_SOURCES}
+    ${CORE_SOURCES}
+)
 GENERATE_EXPORT_HEADER( kisCS
              BASE_NAME kisCS
              EXPORT_MACRO_NAME kisCS_EXPORT
@@ -227,13 +183,22 @@ GENERATE_EXPORT_HEADER( kisCS
 
 target_compile_definitions(kisCS PUBLIC OC_SERVER OC_CLIENT)
 target_link_libraries(kisCS PUBLIC
-    kis-coap
-    kis-api
+    kis-common
+    mbedtls
+    tinycbor-master
     kis-port
 )
 target_link_libraries(kisCS PUBLIC kis-common)
 
-target_include_directories(kisCS PRIVATE ${PROJECT_BINARY_DIR})
+target_include_directories(kisCS PRIVATE ${PROJECT_BINARY_DIR} ${KNX_INCLUDE_DIRS})
+
+# do not treat warnings as errors on Windows
+if(MSVC)
+    target_compile_options(mbedtls PRIVATE /W1 /WX-)
+    target_compile_options(mbedx509 PRIVATE /W1 /WX-)
+    target_compile_options(mbedcrypto PRIVATE /W1 /WX-)
+    target_compile_options(kis-common INTERFACE /W1 /WX-)
+endif()
 
 # copy Python binding files to build directory
 file(COPY "${PROJECT_SOURCE_DIR}/pythonbinding/knx_stack.py" DESTINATION ${PROJECT_BINARY_DIR}/)
@@ -261,7 +226,7 @@ if(BUILD_TESTING AND UNIX)
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
     set(CMAKE_CXX_EXTENSIONS OFF)
     list(APPEND TEST_COMPILE_OPTIONS "-Wall" "-Wextra")
-    list(APPEND TEST_LINK_LIBS kisClientServer gtest_main Threads::Threads)
+    list(APPEND TEST_LINK_LIBS kis-port kisClientServer gtest gtest_main Threads::Threads)
     if(CMAKE_COMPILER_IS_GNUCXX)
         list(APPEND TEST_COMPILE_OPTIONS "-fprofile-arcs" "-ftest-coverage" "-fpermissive")
         list(APPEND TEST_LINK_LIBS gcov)
@@ -278,22 +243,8 @@ if(BUILD_TESTING AND UNIX)
         add_executable(${TESTNAME} ${PROJECT_SOURCE_DIR}/${FOLDER}/${TESTNAME}.cpp)
         target_compile_options(${TESTNAME} PRIVATE ${TEST_COMPILE_OPTIONS})
         target_compile_features(${TESTNAME} PRIVATE cxx_nullptr)
-        target_compile_definitions(${TESTNAME} PRIVATE ${PUBLIC_COMPILE_DEFINITIONS} "OC_CLIENT" "OC_SERVER")
-        target_include_directories(${TESTNAME} SYSTEM PRIVATE ${PROJECT_SOURCE_DIR}/deps/gtest/include)
-        target_include_directories(${TESTNAME} PRIVATE
-            ${PROJECT_SOURCE_DIR}
-            ${PROJECT_SOURCE_DIR}/include
-            ${PROJECT_SOURCE_DIR}/port/linux
-            ${PORT_INCLUDE_DIR}
-            ${PROJECT_SOURCE_DIR}/messaging/coap
-        )
-        if(OC_OSCORE_ENABLED)
-            target_include_directories(${TESTNAME} PRIVATE
-                ${PROJECT_SOURCE_DIR}/security
-                ${PROJECT_SOURCE_DIR}/deps/mbedtls/include
-            )
-        endif()
-        target_link_libraries(${TESTNAME} PRIVATE ${TEST_LINK_LIBS})
+        target_include_directories(${TESTNAME} PRIVATE ${PROJECT_SOURCE_DIR}/deps/gtest/include)
+        target_link_libraries(${TESTNAME} PUBLIC ${TEST_LINK_LIBS})
         add_test(NAME ${TESTNAME} COMMAND ${TESTNAME})
         set_target_properties(${TESTNAME} PROPERTIES FOLDER unittests)
     endmacro()
@@ -317,9 +268,6 @@ if(BUILD_TESTING AND UNIX)
     # reenable clang-tidy for any remaining targets
     enable_clang_tidy()
 endif()
-
-
-
 
 # https://stackoverflow.com/questions/37957583/how-to-use-gcov-with-cmake
 if (CMAKE_BUILD_TYPE STREQUAL "Coverage")

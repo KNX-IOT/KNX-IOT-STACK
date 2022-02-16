@@ -33,7 +33,7 @@ typedef uint64_t oc_clock_time_t;
 #define OC_MAX_OBSERVE_SIZE 512
 
 #if !defined(OC_DYNAMIC_ALLOCATION)
-#error "Set preprocessor definition OC_DYNAMIC_ALLOCATION in your build"
+#define OC_DYNAMIC_ALLOCATION
 #endif /* OC_DYNAMIC_ALLOCATION */
 #if !defined(OC_BLOCK_WISE)
 #define OC_BLOCK_WISE
