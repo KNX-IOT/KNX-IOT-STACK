@@ -126,7 +126,7 @@ set(COAP_INCLUDE_DIRS
 add_library(kis-common INTERFACE)
 
 if(OC_DYNAMIC_ALLOCATION_ENABLED)
-    target_compile_definitions(mbedcrypto PUBLIC OC_DYNAMIC_ALLOCATION)
+    target_compile_definitions(kis-common INTERFACE OC_DYNAMIC_ALLOCATION)
 endif()
 
 if(OC_OSCORE_ENABLED)
