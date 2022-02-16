@@ -1,6 +1,6 @@
 /*
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
- Copyright (c) 2021 Cascoda Ltd
+ Copyright (c) 2021-2022 Cascoda Ltd
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -159,15 +159,12 @@ app_init(void)
   /* set the hardware type*/
   oc_core_set_device_hwt(0, "hwt-mytype");
 
-  /* set the programming mode */
-  oc_core_set_device_pm(0, true);
-
   /* set the model */
   oc_core_set_device_model(0, "my model");
     
   /* set the internal address */
   oc_core_set_device_ia(0, 5);
-
+  
   oc_device_mode_display(0);
 
   oc_set_s_mode_response_cb(oc_add_s_mode_response_cb);
@@ -357,12 +354,11 @@ get_dpa_353_52(oc_request_t *request, oc_interface_mask_t interfaces,
 /**
  * post method for "/p/a" resource.
  * The function has as input the request body, which are the input values of the
- POST method.
+ * POST method.
  * The input values (as a set) are checked if all supplied values are correct.
  * If the input values are correct, they will be assigned to the global property
- values.
+ * values.
  * Resource Description:
-
  *
  * @param request the request representation.
  * @param interfaces the used interfaces during the request.
@@ -410,12 +406,11 @@ post_dpa_352_51(oc_request_t *request, oc_interface_mask_t interfaces,
 /**
  * post method for "/p/a_1" resource.
  * The function has as input the request body, which are the input values of the
- POST method.
+ * POST method.
  * The input values (as a set) are checked if all supplied values are correct.
  * If the input values are correct, they will be assigned to the global property
- values.
+ * values.
  * Resource Description:
-
  *
  * @param request the request representation.
  * @param interfaces the used interfaces during the request.
@@ -464,12 +459,11 @@ post_dpa_352_51_1(oc_request_t *request, oc_interface_mask_t interfaces,
 /**
  * post method for "/p/b" resource.
  * The function has as input the request body, which are the input values of the
- POST method.
+ * POST method.
  * The input values (as a set) are checked if all supplied values are correct.
  * If the input values are correct, they will be assigned to the global property
- values.
+ * values.
  * Resource Description:
-
  *
  * @param request the request representation.
  * @param interfaces the used interfaces during the request.
@@ -507,12 +501,11 @@ post_dpa_352_52(oc_request_t *request, oc_interface_mask_t interfaces,
 /**
  * post method for "/p/b" resource.
  * The function has as input the request body, which are the input values of the
- POST method.
+ * POST method.
  * The input values (as a set) are checked if all supplied values are correct.
  * If the input values are correct, they will be assigned to the global property
- values.
+ * values.
  * Resource Description:
-
  *
  * @param request the request representation.
  * @param interfaces the used interfaces during the request.
@@ -548,14 +541,12 @@ post_dpa_353_52(oc_request_t *request, oc_interface_mask_t interfaces,
  * register all the resources to the stack
  * this function registers all application level resources:
  * - each resource path is bind to a specific function for the supported methods
- * (GET, POST, PUT)
+ * (GET, POST, PUT, DELETE)
  * - each resource is
  *   - secure
  *   - observable
  *   - discoverable
- *   - used interfaces, including the default interface.
- *     default interface is the first of the list of interfaces as specified in
- * the input file
+ *   - used interfaces
  */
 void
 register_resources(void)
@@ -694,11 +685,16 @@ handle_signal(int signal)
   quit = 1;
 }
 
-/* send a multicast s-mode message */
+/**
+ * send a multicast s-mode message
+ * fires only once
+ * @param data the callback data
+ */
 oc_event_callback_retval_t
 issue_requests_s_mode_delayed(void *data)
 {
   (void)data;
+  
   PRINT(" issue_requests_s_mode_delayed\n");
   int ga_values[2] = { 2 };
   oc_string_t href;
@@ -721,7 +717,9 @@ issue_requests_s_mode_delayed(void *data)
   return OC_EVENT_DONE;
 }
 
-/* send a multicast s-mode message */
+/**
+ * set a multicast s-mode message as delayed callback
+ */
 void
 issue_requests_s_mode(void)
 {
@@ -729,8 +727,9 @@ issue_requests_s_mode(void)
   oc_set_delayed_callback(NULL, issue_requests_s_mode_delayed, 2);
 }
 
-// oc_set_delayed_callback
-
+/**
+ * prints the usage of the applicaton
+ */
 void
 print_usage()
 {
@@ -744,10 +743,13 @@ print_usage()
 
 /**
  * main application.
- *       * initializes the global variables
- * registers and starts the handler
- *       * handles (in a loop) the next event.
- * shuts down the stack
+ * - initializes the global variables
+ * - registers and starts the handler
+ * - handles (in a loop) the next event.
+ * - shuts down the stack
+ *
+ * @param argc the number of arguments.
+ * @param argv the argument list
  */
 int
 main(int argc, char *argv[])
