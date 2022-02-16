@@ -42,9 +42,7 @@ endif()
 
 
 # API
-add_library(kis-api INTERFACE)
-
-target_sources(kis-api INTERFACE
+set(API_SOURCES
     ${PROJECT_SOURCE_DIR}/api/oc_base64.c
     ${PROJECT_SOURCE_DIR}/api/oc_blockwise.c
     ${PROJECT_SOURCE_DIR}/api/oc_buffer.c
@@ -76,15 +74,13 @@ target_sources(kis-api INTERFACE
     ${PROJECT_SOURCE_DIR}/api/c-timestamp/timestamp_valid.c
 )
 
-target_include_directories(kis-api INTERFACE
+set(API_INCLUDE_DIR
     ${PROJECT_SOURCE_DIR}/
     ${PROJECT_SOURCE_DIR}/api
     ${PROJECT_SOURCE_DIR}/api/c-timestamp
     ${PROJECT_SOURCE_DIR}/include
 )
 
-# Core functions used by the stack
-add_library(kis-common)
 
 # do not treat warnings as errors on Windows
 # block should be defined after the target library
@@ -98,7 +94,8 @@ endif()
 # enable clang-tidy 
 enable_clang_tidy()
 
-target_sources(kis-common PUBLIC
+# Core functions used by the stack
+set(CORE_SOURCES
     # Utilities that are used deep within the stack
     ${PROJECT_SOURCE_DIR}/util/oc_etimer.c
     ${PROJECT_SOURCE_DIR}/util/oc_list.c
@@ -119,12 +116,10 @@ target_sources(kis-common PUBLIC
 
 )
 
-target_link_libraries(kis-common PUBLIC kis-port mbedtls tinycbor-master)
+# target_link_libraries(kis-common PUBLIC kis-port mbedtls tinycbor-master)
 
 # stack implementation of CoAP
-add_library(kis-coap INTERFACE)
-
-target_sources(kis-coap INTERFACE
+set(COAP_SOURCES
     ${PROJECT_SOURCE_DIR}/messaging/coap/coap.c
     ${PROJECT_SOURCE_DIR}/messaging/coap/coap_signal.c
     ${PROJECT_SOURCE_DIR}/messaging/coap/engine.c
@@ -134,24 +129,20 @@ target_sources(kis-coap INTERFACE
     ${PROJECT_SOURCE_DIR}/messaging/coap/transactions.c
 )
 
-target_include_directories(kis-coap INTERFACE
+set(COAP_INCLUDE_DIRS
     ${PROJECT_SOURCE_DIR}/messaging/coap/
 )
 
-target_link_libraries(kis-coap INTERFACE kis-port)
+add_library(kis-common INTERFACE)
 
 if(OC_DYNAMIC_ALLOCATION_ENABLED)
     target_compile_definitions(mbedcrypto PUBLIC OC_DYNAMIC_ALLOCATION)
 endif()
 
-if(OC_SECURITY_ENABLED)
-   # target_compile_definitions(mbedcrypto PUBLIC OC_SECURITY)
-endif()
-
 if(OC_OSCORE_ENABLED)
    target_compile_definitions(mbedcrypto PUBLIC OC_OSCORE)
-   target_compile_definitions(kis-common PUBLIC OC_OSCORE)
-   target_compile_definitions(kis-common PUBLIC OC_SPAKE)
+   target_compile_definitions(kis-common INTERFACE OC_OSCORE)
+   target_compile_definitions(kis-common INTERFACE OC_SPAKE)
 endif()
 
 if(OC_PKI_ENABLED)
@@ -159,7 +150,7 @@ if(OC_PKI_ENABLED)
 endif()
 
 if(OC_DEBUG_ENABLED)
-    target_compile_definitions(kis-common PUBLIC OC_DEBUG)
+    target_compile_definitions(kis-common INTERFACE OC_DEBUG)
     target_compile_definitions(mbedcrypto PUBLIC OC_DEBUG)
 endif()
 
@@ -170,35 +161,40 @@ set(KNX_INCLUDE_DIRS
     ${PROJECT_SOURCE_DIR}/include
     ${PROJECT_SOURCE_DIR}/deps/tinycbor/src
     ${PROJECT_SOURCE_DIR}/security
+    ${API_INCLUDE_DIRS}
+    ${COAP_INCLUDE_DIRS}
 )
 
-add_library(kis-client)
+add_library(kis-client
+    ${API_SOURCES}
+    ${CORE_SOURCES}
+    ${COAP_SOURCES}
+)
 target_compile_definitions(kis-client PUBLIC OC_CLIENT)
 target_link_libraries(kis-client PRIVATE
-    kis-coap
-    kis-api
-    kis-port
     kis-common
 )
 target_link_libraries(kis-client PUBLIC kis-common)
 target_include_directories(kis-client PUBLIC ${KNX_INCLUDE_DIRS})
 
-add_library(kis-server)
+add_library(kis-server
+    ${API_SOURCES}
+    ${CORE_SOURCES}
+    ${COAP_SOURCES}
+)
 target_compile_definitions(kis-server PUBLIC OC_SERVER)
 target_link_libraries(kis-server PRIVATE
-    kis-coap
-    kis-api
-    kis-port
     kis-common
 )
 target_include_directories(kis-server PUBLIC ${KNX_INCLUDE_DIRS})
 
-add_library(kisClientServer)
+add_library(kisClientServer
+    ${API_SOURCES}
+    ${CORE_SOURCES}
+    ${COAP_SOURCES}
+)
 target_compile_definitions(kisClientServer PUBLIC OC_SERVER=1 OC_CLIENT=1)
 target_link_libraries(kisClientServer PRIVATE
-    kis-coap
-    kis-api
-    kis-port
     kis-common
 )
 target_include_directories(kisClientServer PUBLIC ${KNX_INCLUDE_DIRS})
@@ -217,9 +213,7 @@ GENERATE_EXPORT_HEADER( kisCS
 
 target_compile_definitions(kisCS PUBLIC OC_SERVER OC_CLIENT)
 target_link_libraries(kisCS PUBLIC
-    kis-coap
-    kis-api
-    kis-port
+    kis-common
 )
 target_link_libraries(kisCS PUBLIC kis-common)
 
@@ -293,9 +287,6 @@ if(BUILD_TESTING AND UNIX)
     # reenable clang-tidy for any remaining targets
     enable_clang_tidy()
 endif()
-
-
-
 
 # https://stackoverflow.com/questions/37957583/how-to-use-gcov-with-cmake
 if (CMAKE_BUILD_TYPE STREQUAL "Coverage")
