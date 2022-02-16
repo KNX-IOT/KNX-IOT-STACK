@@ -274,8 +274,14 @@ inform_discovery_python(int payload_size, const char *payload)
 void
 inform_spake_python(char *sn, int state, char* key, int key_size)
 {
-  PRINT("[C]inform_spake_python %p %s %d [%s]%d\n",
-    my_CBFunctions.spakeFCB, sn, state, key, key_size);
+  PRINT("[C]inform_spake_python %p %s %d %d key=[",
+    my_CBFunctions.spakeFCB, sn, state,  key_size);
+  for (int i = 0; i < key_size; i++) {
+     PRINT("%02x", (unsigned char) key[i]);
+  }
+  PRINT("]\n");
+
+
   if (my_CBFunctions.spakeFCB != NULL) {
     my_CBFunctions.spakeFCB(sn, state, key, key_size);
   }

@@ -855,7 +855,7 @@ def do_spake(my_stack):
     if my_stack.get_nr_devices() > 0:
         sn = my_stack.device_array[0].sn
         print("========spake=========", sn)
-        my_stack.initate_spake(sn)
+        my_stack.initate_spake(sn, "LETTUCE")
 
 def do_fp(my_stack):
     """

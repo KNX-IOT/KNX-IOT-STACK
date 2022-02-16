@@ -54,6 +54,7 @@
 # pylint: disable=W0614
 
 #import argparse
+import binascii
 import copy
 import ctypes
 import json
@@ -734,13 +735,17 @@ class KNXIOTStack():
         self.discovery_data = data.decode("utf-8")
         discover_data_event.set()
 
-    def spakeCB(self, cb_sn, cb_state, cb_secret, _cb_secret_size):
+    def spakeCB(self, cb_sn, cb_state, cb_secret, cb_secret_size):
         """ ********************************
         Call back handles spake callbacks.
         Client spake/state
         **********************************"""
-        print("spakeCB", cb_sn, cb_state)
-        self.spake = [ cb_state, cb_secret.decode("utf-8")]
+        print("spakeCB", cb_sn, cb_state, cb_secret_size) #, hex(cb_secret))
+        new_secret = cb_secret[:cb_secret_size]
+        self.spake = { "state": cb_state, "sec_size": cb_secret_size, "secret" : new_secret}
+        hex = binascii.hexlify(new_secret)
+        print (hex)
+        #print (len(new_secret))
         spake_event.set()
 
     def __init__(self, debug=True):
@@ -762,7 +767,7 @@ class KNXIOTStack():
         self.device_array = []
         self.response_array = []
         self.discovery_data = None
-        self.spake = []
+        self.spake = {}
         print (self.lib)
         print ("...")
         self.debug=debug
@@ -849,7 +854,7 @@ class KNXIOTStack():
         return self.discovery_data
 
     def initate_spake(self, sn, phrase):
-        print("initiate spake: ", sn)
+        print("initiate spake: ", sn, phrase)
         # application
         spake_event.clear()
         self.discovery_data = None
@@ -860,7 +865,7 @@ class KNXIOTStack():
         #print("[P] discovery- done")
         #self.lib.py_get_nr_devices()
         spake_event.wait(self.timout)
-        print ("initate_spake data: ", self.spake)
+        print ("initate_spake data: ")
         return self.spake
         #return self.discovery_data
 
@@ -963,20 +968,6 @@ class KNXIOTStack():
         print(" issue_cbor_delete - done")
         client_event.wait(self.timout)
         return self.find_response(r_id)
-
-    def issue_init_spake(self, sn, phrase) :
-        #r_id = self.get_r_id()
-        #client_event.clear()
-        print(" py_initate_spake", sn, phrase)
-        try:
-            self.lib.py_initate_spake.argtypes = [String, String]
-            self.lib.py_initate_spake(sn, phrase)
-        except:
-            pass
-        #print(" issue_cbor_delete - done")
-        #client_event.wait(self.timout)
-        #return self.find_response(r_id)
-
 
     def issue_s_mode(self, scope, sia, ga, st, value_type, value) :
         print(" issue_s_mode: scope:{} sia:{} ga:{} value_type:{} value:{}".
