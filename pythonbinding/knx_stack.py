@@ -576,6 +576,7 @@ class CoAPResponse():
     def get_payload_int(self):
         if self.payload_type == "json":
             my_string = self.get_payload()
+            print("get_payload_int:", int(my_string))
             return int(my_string)
         return self.payload
 

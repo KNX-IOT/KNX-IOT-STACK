@@ -74,7 +74,6 @@ oc_core_free_device_info_properties(oc_device_info_t *oc_device_info_item)
     oc_free_string(&(oc_device_info_item->hwt));
     oc_free_string(&(oc_device_info_item->model));
     oc_free_string(&(oc_device_info_item->hostname));
-    oc_free_string(&(oc_device_info_item->iid));
   }
 }
 

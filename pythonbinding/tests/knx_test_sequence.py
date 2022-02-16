@@ -201,14 +201,14 @@ def do_sequence_dev_programming_mode(my_stack):
     my_stack.purge_response(response)
 
     print("-------------------")
-    content = " iid xxx"
+    content = 555
     print("set iid :", content)
-    response =  my_stack.issue_cbor_put(sn,"/dev/iid",content)
+    response =  my_stack.issue_cbor_put(sn,"/dev/iid", content)
     safe_print(response)
     my_stack.purge_response(response)
     response =  my_stack.issue_cbor_get(sn,"/dev/iid")
     safe_print(response)
-    if content == response.get_payload_string():
+    if content == response.get_payload_int():
         print("PASS : /dev/iid ", content)
     else:
         print_fail(msg="/dev/iid")
@@ -260,7 +260,7 @@ def do_sequence_dev_programming_mode_fail(my_stack):
     safe_print(response)
     safe_print(response)
     if content != response.get_payload_int():
-        print("PASS : /dev/ia ", content, " != ", response.get_payload_int())
+        print("PASS (expected failure): /dev/ia ", content, " != ", response.get_payload_int())
     else:
         print_fail(msg="/dev/ia")
     my_stack.purge_response(response)
@@ -274,21 +274,21 @@ def do_sequence_dev_programming_mode_fail(my_stack):
     response =  my_stack.issue_cbor_get(sn,"/dev/hostname")
     safe_print(response)
     if content != response.get_payload_string():
-        print("PASS : /dev/hostname ", content, " != ", response.get_payload_string())
+        print("PASS (expected failure): /dev/hostname ", content, " != ", response.get_payload_string())
     else:
         print_fail(msg="/dev/hostname")
     my_stack.purge_response(response)
 
     print("-------------------")
-    content = " xxx iid xxx"
+    content = 3333
     print("set iid :", content)
     response =  my_stack.issue_cbor_put(sn,"/dev/iid",content)
     safe_print(response)
     my_stack.purge_response(response)
     response =  my_stack.issue_cbor_get(sn,"/dev/iid")
     safe_print(response)
-    if content != response.get_payload_string():
-        print("PASS : /dev/iid ", content, " != ", response.get_payload_string())
+    if content != response.get_payload_int():
+        print("PASS (expected failure): /dev/iid ", content, " != ", response.get_payload_int())
     else:
         print_fail(msg="/dev/iid")
     my_stack.purge_response(response)
