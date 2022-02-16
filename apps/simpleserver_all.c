@@ -46,16 +46,11 @@
  *     set the global variables in the output
  *   - post_[path]
  *     function that is being called when a POST is called on [path]
- *     checks the input data
- *     if input data is correct
- *       updates the global variables
+ *     updates the global variables
  *
  * ## stack specific defines
- *
- *  - OC_SECURITY
-      enable security
- *    - OC_PKI
- *      enable use of PKI
+ * - OC_OSCORE
+ * - OC_SPAKE
  * - __linux__
  *   build for linux
  * - WIN32
@@ -117,12 +112,20 @@ STATIC CRITICAL_SECTION cs;   /**< event loop variable */
 /* Note: Magic numbers are derived from the resource definition, either from the
  * example or the definition.*/
 
-bool g_352_51_state = false;
-bool g_352_51_1_state = false;
-bool g_352_52_state = false;
-bool g_353_52_state = false;
+bool g_352_51_state = false; /**< state variable for dp 352.51 instance 0 */
+bool g_352_51_1_state = false;/**< state variable for dp 352.51 instance 1 */
+bool g_352_52_state = false;/**< state variable for dp 352.52 instance 0 */
+bool g_353_52_state = false;/**< state variable for dp 353.52 instance 0 */
 volatile int quit = 0; /**< stop variable, used by handle_signal */
 
+/**
+ * @brief callback for the smode response
+ * testing purpose
+ * 
+ * @param url url called
+ * @param rep the response
+ * @param rep_value the response value
+ */
 void
 oc_add_s_mode_response_cb(char *url, oc_rep_t *rep, oc_rep_t *rep_value)
 {
@@ -135,45 +138,49 @@ oc_add_s_mode_response_cb(char *url, oc_rep_t *rep, oc_rep_t *rep_value)
  * function to set up the device.
  *
  * sets the:
+ * - manufactorer name
  * - serial number
- * - friendly device name
+ * - friendly device name (not needed for knx)
  * - spec version
- *
+ * - basepath
+ * - serial number
+ * - hardware version
+ * - firmware version
+ * - hardware type
+ * - model name
+ * - spake password
  */
 int
 app_init(void)
 {
+  /* create platform and set the manufactorer name */
   int ret = oc_init_platform("Cascoda", NULL, NULL);
 
-  ret |= oc_add_device("blah", "1.0", "//", "000005", NULL, NULL);
-
+  /* create the device and set 
+    - specification number (1.0.0)
+    - basepath (/)
+    - the serial number 
+  */
+  ret |= oc_add_device("my_name", "1.0.0", "//", "000005", NULL, NULL);
   oc_device_info_t *device = oc_core_get_device_info(0);
-  PRINT("Serial Number: %s\n", oc_string(device->serialnumber));
-
   /* set the hardware version*/
   oc_core_set_device_hwv(0, 5, 6, 7);
-
   /* set the firmware version*/
   oc_core_set_device_fwv(0, 1, 2, 3);
-
   /* set the hardware type*/
   oc_core_set_device_hwt(0, "hwt-mytype");
-
   /* set the model */
   oc_core_set_device_model(0, "my model");
-    
-  /* set the internal address */
-  oc_core_set_device_ia(0, 5);
-  
-  oc_device_mode_display(0);
 
-  oc_set_s_mode_response_cb(oc_add_s_mode_response_cb);
 
 #ifdef OC_SPAKE
 #define PASSWORD "LETTUCE"
   oc_spake_set_password(PASSWORD);
   PRINT(" SPAKE password %s\n", PASSWORD);
 #endif
+
+  /* set the client callback, for testing purposes only */
+  oc_set_s_mode_response_cb(oc_add_s_mode_response_cb);
 
   return ret;
 }
@@ -327,6 +334,7 @@ get_dpa_353_52(oc_request_t *request, oc_interface_mask_t interfaces,
   (void)user_data; /* variable not used */
   bool error_state = false; /**< the error state, the generated code */
   int oc_status_code = OC_STATUS_OK;
+  CborError error;
 
   PRINT("-- Begin get_dpa_353_52: interface %d\n", interfaces);
   /* check if the accept header is CBOR */
@@ -335,8 +343,6 @@ get_dpa_353_52(oc_request_t *request, oc_interface_mask_t interfaces,
     oc_send_response(request, OC_STATUS_BAD_OPTION);
     return;
   }
-
-  CborError error;
 
   error = cbor_encode_boolean(&g_encoder, g_352_52_state);
   if (error) {
@@ -542,11 +548,14 @@ post_dpa_353_52(oc_request_t *request, oc_interface_mask_t interfaces,
  * this function registers all application level resources:
  * - each resource path is bind to a specific function for the supported methods
  * (GET, POST, PUT, DELETE)
- * - each resource is
- *   - secure
- *   - observable
- *   - discoverable
+ * - each resource will can be set up with
+ *   - resource types
+ *   - discoverable (e.g. listed in /.well-known/core)
  *   - used interfaces
+ *   - content type (CBOR/JSON)
+ *   - function block instance (default = instance 0)
+ *   - observable
+ * Note that the resource type(s) determines the functional block.
  */
 void
 register_resources(void)
@@ -643,7 +652,11 @@ factory_presets_cb(size_t device, void *data)
 void
 initialize_variables(void)
 {
-  /* initialize global variables for resources */
+  /* initialize global (state) variables for resources */
+  g_352_51_state = false;
+  g_352_51_1_state = false;
+  g_352_52_state = false;
+  g_353_52_state = false;
 }
 
 #ifndef NO_MAIN
@@ -851,6 +864,7 @@ main(int argc, char *argv[])
 
   oc_device_info_t *device = oc_core_get_device_info(0);
   PRINT("serial number: %s\n", oc_string(device->serialnumber));
+  oc_device_mode_display(0);
   PRINT("Server \"simple_server_all\" running (polling), waiting on incoming "
         "connections.\n\n\n");
 
