@@ -743,8 +743,8 @@ class KNXIOTStack():
         print("spakeCB", cb_sn, cb_state, cb_secret_size) #, hex(cb_secret))
         new_secret = cb_secret[:cb_secret_size]
         self.spake = { "state": cb_state, "sec_size": cb_secret_size, "secret" : new_secret}
-        hex = binascii.hexlify(new_secret)
-        print (hex)
+        secret_in_hex = binascii.hexlify(new_secret)
+        print ("spakeCB: secret (in hex)",secret_in_hex)
         #print (len(new_secret))
         spake_event.set()
 
