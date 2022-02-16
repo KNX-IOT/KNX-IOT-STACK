@@ -21,6 +21,7 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "mbedtls/config.h"
 #include "mbedtls/ctr_drbg.h"
 #include "mbedtls/entropy.h"
 #include "mbedtls/md.h"
