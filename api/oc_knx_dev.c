@@ -474,7 +474,7 @@ oc_core_dev_iid_get_handler(oc_request_t *request,
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device != NULL) {
-    cbor_encode_int(&g_encoder,device->iid);
+    cbor_encode_int(&g_encoder, device->iid);
     oc_send_cbor_response(request, OC_STATUS_OK);
     return;
   }
@@ -678,7 +678,7 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
   // writing the empty values
   oc_storage_write(KNX_STORAGE_IA, (char *)&zero, sizeof(int));
   oc_storage_write(KNX_STORAGE_HOSTNAME, (char *)&buf, 1);
-  oc_storage_write(KNX_STORAGE_IID, (char*)&zero, sizeof(uint32_t));
+  oc_storage_write(KNX_STORAGE_IID, (char *)&zero, sizeof(uint32_t));
 
   oc_storage_write(KNX_STORAGE_PM, (char *)&zero, sizeof(uint8_t));
 

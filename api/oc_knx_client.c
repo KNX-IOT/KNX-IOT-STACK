@@ -54,8 +54,6 @@ static uint8_t Ka_Ke[MAX_SECRET_LEN];
 static char g_spake_password[MAX_PASSWORD_LEN];
 #endif
 
-
-
 // ----------------------------------------------------------------------------
 
 static void oc_send_s_mode(oc_endpoint_t *endpoint, char *path, int sia_value,
@@ -232,7 +230,7 @@ do_credential_exchange(oc_client_response_t *data)
 #endif /* OC_SPAKE */
 
 int
-oc_initiate_spake(oc_endpoint_t *endpoint, char* password)
+oc_initiate_spake(oc_endpoint_t *endpoint, char *password)
 {
   int return_value = -1;
 

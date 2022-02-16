@@ -272,15 +272,14 @@ inform_discovery_python(int payload_size, const char *payload)
  * CFUNCTYPE(None, c_int, c_char_p, c_int)
  */
 void
-inform_spake_python(char *sn, int state, char* key, int key_size)
+inform_spake_python(char *sn, int state, char *key, int key_size)
 {
-  PRINT("[C]inform_spake_python %p %s %d %d key=[",
-    my_CBFunctions.spakeFCB, sn, state,  key_size);
+  PRINT("[C]inform_spake_python %p %s %d %d key=[", my_CBFunctions.spakeFCB, sn,
+        state, key_size);
   for (int i = 0; i < key_size; i++) {
-     PRINT("%02x", (unsigned char) key[i]);
+    PRINT("%02x", (unsigned char)key[i]);
   }
   PRINT("]\n");
-
 
   if (my_CBFunctions.spakeFCB != NULL) {
     my_CBFunctions.spakeFCB(sn, state, key, key_size);
@@ -752,7 +751,7 @@ py_discover_devices_with_query(int scope, const char *query)
 // -----------------------------------------------------------------------------
 
 void
-py_initate_spake(char *sn, char* password)
+py_initate_spake(char *sn, char *password)
 {
   int ret = -1;
   device_handle_t *device = py_getdevice_from_sn(sn);
@@ -770,7 +769,7 @@ py_initate_spake(char *sn, char* password)
 void
 spake_callback(int error, uint8_t *secret, int secret_size)
 {
-  inform_spake_python("", error , secret, secret_size);
+  inform_spake_python("", error, secret, secret_size);
 }
 
 // -----------------------------------------------------------------------------
