@@ -81,16 +81,6 @@ set(API_INCLUDE_DIR
     ${PROJECT_SOURCE_DIR}/include
 )
 
-
-# do not treat warnings as errors on Windows
-# block should be defined after the target library
-if(MSVC)
-    target_compile_options(mbedtls PRIVATE /W1 /WX-)
-    target_compile_options(mbedx509 PRIVATE /W1 /WX-)
-    target_compile_options(mbedcrypto PRIVATE /W1 /WX-)
-    target_compile_options(kis-api INTERFACE /W1 /WX-)
-endif()
-
 # enable clang-tidy 
 enable_clang_tidy()
 
@@ -203,6 +193,14 @@ target_link_libraries(kisCS PUBLIC
 target_link_libraries(kisCS PUBLIC kis-common)
 
 target_include_directories(kisCS PRIVATE ${PROJECT_BINARY_DIR} ${KNX_INCLUDE_DIRS})
+
+# do not treat warnings as errors on Windows
+if(MSVC)
+    target_compile_options(mbedtls PRIVATE /W1 /WX-)
+    target_compile_options(mbedx509 PRIVATE /W1 /WX-)
+    target_compile_options(mbedcrypto PRIVATE /W1 /WX-)
+    target_compile_options(kis-common INTERFACE /W1 /WX-)
+endif()
 
 # copy Python binding files to build directory
 file(COPY "${PROJECT_SOURCE_DIR}/pythonbinding/knx_stack.py" DESTINATION ${PROJECT_BINARY_DIR}/)
