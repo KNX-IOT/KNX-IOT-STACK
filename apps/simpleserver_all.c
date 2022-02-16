@@ -112,16 +112,16 @@ STATIC CRITICAL_SECTION cs;   /**< event loop variable */
 /* Note: Magic numbers are derived from the resource definition, either from the
  * example or the definition.*/
 
-bool g_352_51_state = false; /**< state variable for dp 352.51 instance 0 */
-bool g_352_51_1_state = false;/**< state variable for dp 352.51 instance 1 */
-bool g_352_52_state = false;/**< state variable for dp 352.52 instance 0 */
-bool g_353_52_state = false;/**< state variable for dp 353.52 instance 0 */
-volatile int quit = 0; /**< stop variable, used by handle_signal */
+bool g_352_51_state = false;   /**< state variable for dp 352.51 instance 0 */
+bool g_352_51_1_state = false; /**< state variable for dp 352.51 instance 1 */
+bool g_352_52_state = false;   /**< state variable for dp 352.52 instance 0 */
+bool g_353_52_state = false;   /**< state variable for dp 353.52 instance 0 */
+volatile int quit = 0;         /**< stop variable, used by handle_signal */
 
 /**
  * @brief callback for the smode response
  * testing purpose
- * 
+ *
  * @param url url called
  * @param rep the response
  * @param rep_value the response value
@@ -156,10 +156,10 @@ app_init(void)
   /* create platform and set the manufactorer name */
   int ret = oc_init_platform("Cascoda", NULL, NULL);
 
-  /* create the device and set 
+  /* create the device and set
     - specification number (1.0.0)
     - basepath (/)
-    - the serial number 
+    - the serial number
   */
   ret |= oc_add_device("my_name", "1.0.0", "//", "000005", NULL, NULL);
   oc_device_info_t *device = oc_core_get_device_info(0);
@@ -171,7 +171,6 @@ app_init(void)
   oc_core_set_device_hwt(0, "hwt-mytype");
   /* set the model */
   oc_core_set_device_model(0, "my model");
-
 
 #ifdef OC_SPAKE
 #define PASSWORD "LETTUCE"
@@ -201,8 +200,8 @@ STATIC void
 get_dpa_352_51(oc_request_t *request, oc_interface_mask_t interfaces,
                void *user_data)
 {
-  (void)user_data; /**< variable not used */
-  (void)interfaces; /**< variable not used */
+  (void)user_data;          /**< variable not used */
+  (void)interfaces;         /**< variable not used */
   bool error_state = false; /**< the error state, the generated code */
   int oc_status_code = OC_STATUS_OK;
 
@@ -244,7 +243,7 @@ STATIC void
 get_dpa_352_51_1(oc_request_t *request, oc_interface_mask_t interfaces,
                  void *user_data)
 {
-  (void)user_data; /* variable not used */
+  (void)user_data;  /* variable not used */
   (void)interfaces; /**< variable not used */
 
   bool error_state = false; /**< the error state, the generated code */
@@ -288,8 +287,8 @@ STATIC void
 get_dpa_352_52(oc_request_t *request, oc_interface_mask_t interfaces,
                void *user_data)
 {
-  (void)user_data;  /**< variable not used */
-  (void)interfaces; /**< variable not used */
+  (void)user_data;          /**< variable not used */
+  (void)interfaces;         /**< variable not used */
   bool error_state = false; /**< the error state, the generated code */
   int oc_status_code = OC_STATUS_OK;
 
@@ -331,7 +330,7 @@ STATIC void
 get_dpa_353_52(oc_request_t *request, oc_interface_mask_t interfaces,
                void *user_data)
 {
-  (void)user_data; /* variable not used */
+  (void)user_data;          /* variable not used */
   bool error_state = false; /**< the error state, the generated code */
   int oc_status_code = OC_STATUS_OK;
   CborError error;
@@ -707,7 +706,7 @@ oc_event_callback_retval_t
 issue_requests_s_mode_delayed(void *data)
 {
   (void)data;
-  
+
   PRINT(" issue_requests_s_mode_delayed\n");
   int ga_values[2] = { 2 };
   oc_string_t href;
