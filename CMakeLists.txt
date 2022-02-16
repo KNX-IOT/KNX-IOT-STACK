@@ -1,7 +1,9 @@
 cmake_minimum_required (VERSION 3.10)
 project(knx-iot-stack)
 
-add_compile_options(-fPIC)
+if(CMAKE_COMPILER_IS_GNUCC)
+    add_compile_options(-fPIC)
+endif()
 
 # Do not build anything except for the library
 option(ENABLE_PROGRAMS "Build mbed TLS programs." OFF)
