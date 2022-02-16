@@ -447,10 +447,10 @@ oc_core_dev_iid_put_handler(oc_request_t *request,
   oc_rep_t *rep = request->request_payload;
   if ((rep != NULL) && (rep->type == OC_REP_INT)) {
     PRINT("  oc_core_dev_iid_put_handler received : %d\n",(int)rep->value.integer);
-    oc_core_set_device_iid(device_index, oc_string(rep->value.string));
-
-    oc_storage_write(KNX_STORAGE_IID, (uint32_t*)&rep->value.integer, sizeof(uint32_t));
-
+    // set the current value
+    oc_core_set_device_iid(device_index,rep->value.integer);
+    // make the value persistent
+    oc_storage_write(KNX_STORAGE_IID, (uint8_t*)&rep->value.integer, sizeof(uint32_t));
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
     return;
   }
@@ -649,7 +649,7 @@ oc_knx_device_storage_read(size_t device_index)
   }
 
   /* KNX_STORAGE_IID */
-  temp_size = oc_storage_read(KNX_STORAGE_IID, (uint32_t *)&device->iid, sizeof(uint32_t));
+  temp_size = oc_storage_read(KNX_STORAGE_IID, (uint8_t *)&device->iid, sizeof(uint32_t));
   PRINT("  idd (storage) %d\n",device->iid);
 
   /* KNX_STORAGE_PM */

@@ -156,9 +156,6 @@ app_init(void)
   /* set the firmware version*/
   oc_core_set_device_fwv(0, 1, 2, 3);
 
-  /* set the internal address (ia) */
-  oc_core_set_device_ia(0, 5);
-
   /* set the hardware type*/
   oc_core_set_device_hwt(0, "hwt-mytype");
 
@@ -167,13 +164,7 @@ app_init(void)
 
   /* set the model */
   oc_core_set_device_model(0, "my model");
-
-  /* set the host name */
-  oc_core_set_device_hostname(0, "my.hostname");
-
-  /* set the installation id (iid) */
-  oc_core_set_device_iid(0, 2);
-
+    
   /* set the internal address */
   oc_core_set_device_ia(0, 5);
 
@@ -184,14 +175,14 @@ app_init(void)
 #ifdef OC_SPAKE
 #define PASSWORD "LETTUCE"
   oc_spake_set_password(PASSWORD);
-  PRINT("SPAKE password %s\n", PASSWORD);
+  PRINT(" SPAKE password %s\n", PASSWORD);
 #endif
 
   return ret;
 }
 
 /**
- * get method for "/p/a" resource.
+ * get method for "/p/a_1" resource.
  * function is called to initialize the return values of the GET method.
  * initialization of the returned values are done from the global property
  * values. Resource Description: This Resource describes a binary switch
@@ -206,17 +197,12 @@ STATIC void
 get_dpa_352_51(oc_request_t *request, oc_interface_mask_t interfaces,
                void *user_data)
 {
-  (void)user_data; /* variable not used */
-
-  /* TODO: SENSOR add here the code to talk to the HW if one implements a
-     sensor. the call to the HW needs to fill in the global variable before it
-     returns to this function here. alternative is to have a callback from the
-     hardware that sets the global variables.
-  */
+  (void)user_data; /**< variable not used */
+  (void)interfaces; /**< variable not used */
   bool error_state = false; /**< the error state, the generated code */
   int oc_status_code = OC_STATUS_OK;
 
-  PRINT("-- Begin get_dpa_352_51: interface %d\n", interfaces);
+  PRINT("-- Begin get_dpa_352_51\n");
   /* check if the accept header is CBOR */
   if (request->accept != APPLICATION_CBOR) {
     oc_send_response(request, OC_STATUS_BAD_OPTION);
@@ -239,7 +225,7 @@ get_dpa_352_51(oc_request_t *request, oc_interface_mask_t interfaces,
 }
 
 /**
- * get method for "/p/a_1" resource.
+ * get method for "/p/a" resource.
  * function is called to initialize the return values of the GET method.
  * initialization of the returned values are done from the global property
  * values. Resource Description: This Resource describes a binary switch
@@ -255,16 +241,12 @@ get_dpa_352_51_1(oc_request_t *request, oc_interface_mask_t interfaces,
                  void *user_data)
 {
   (void)user_data; /* variable not used */
+  (void)interfaces; /**< variable not used */
 
-  /* TODO: SENSOR add here the code to talk to the HW if one implements a
-     sensor. the call to the HW needs to fill in the global variable before it
-     returns to this function here. alternative is to have a callback from the
-     hardware that sets the global variables.
-  */
   bool error_state = false; /**< the error state, the generated code */
   int oc_status_code = OC_STATUS_OK;
 
-  PRINT("-- Begin get_dpa_352_51_1: interface %d\n", interfaces);
+  PRINT("-- Begin get_dpa_352_51_1\n");
   /* check if the accept header is CBOR */
   if (request->accept != APPLICATION_CBOR) {
     oc_send_response(request, OC_STATUS_BAD_OPTION);
@@ -287,7 +269,7 @@ get_dpa_352_51_1(oc_request_t *request, oc_interface_mask_t interfaces,
 }
 
 /**
- * get method for "/b" resource.
+ * get method for "/p/b" resource.
  * function is called to initialize the return values of the GET method.
  * initialization of the returned values are done from the global property
  * values. Resource Description: This Resource describes a binary switch
@@ -302,34 +284,17 @@ STATIC void
 get_dpa_352_52(oc_request_t *request, oc_interface_mask_t interfaces,
                void *user_data)
 {
-  (void)user_data; /* variable not used */
-  /* TODO: SENSOR add here the code to talk to the HW if one implements a
-     sensor. the call to the HW needs to fill in the global variable before it
-     returns to this function here. alternative is to have a callback from the
-     hardware that sets the global variables.
-  */
+  (void)user_data;  /**< variable not used */
+  (void)interfaces; /**< variable not used */
   bool error_state = false; /**< the error state, the generated code */
   int oc_status_code = OC_STATUS_OK;
 
-  PRINT("-- Begin get_dpa_352_52: interface %d\n", interfaces);
+  PRINT("-- Begin get_dpa_352_52\n");
   /* check if the accept header is CBOR */
   if (request->accept != APPLICATION_CBOR) {
     oc_send_response(request, OC_STATUS_BAD_OPTION);
     return;
   }
-
-  // set a string value
-  // CborError error;
-  // error = cbor_encode_text_stringz(&g_encoder, "blahblah");
-  // if (error) {
-  //  oc_status_code = true;
-  // }
-  // PRINT("CBOR encoder size %d\n", oc_rep_get_encoded_payload_size());
-  // error = cbor_encode_text_string(&g_encoder, "xyzxyz", 3);
-  // if (error) {
-  // PRINT("CBOR error %s\n", cbor_error_string(error));
-  // oc_status_code = true;
-  //}
 
   CborError error;
   error = cbor_encode_boolean(&g_encoder, g_352_52_state);
@@ -363,16 +328,10 @@ get_dpa_353_52(oc_request_t *request, oc_interface_mask_t interfaces,
                void *user_data)
 {
   (void)user_data; /* variable not used */
-  /* TODO: SENSOR add here the code to talk to the HW if one implements a
-     sensor. the call to the HW needs to fill in the global variable before it
-     returns to this function here. alternative is to have a callback from the
-     hardware that sets the global variables.
-  */
   bool error_state = false; /**< the error state, the generated code */
   int oc_status_code = OC_STATUS_OK;
 
   PRINT("-- Begin get_dpa_353_52: interface %d\n", interfaces);
-
   /* check if the accept header is CBOR */
   if (request->accept != APPLICATION_CBOR) {
     PRINT(" accept %d", request->accept);
@@ -381,15 +340,7 @@ get_dpa_353_52(oc_request_t *request, oc_interface_mask_t interfaces,
   }
 
   CborError error;
-  // error = cbor_encode_int(&g_encoder, (int64_t)555);
-  // if (error) {
-  //  oc_status_code = true;
-  //}
-  // PRINT("CBOR encoder size %d\n", oc_rep_get_encoded_payload_size());
-  // error = cbor_encode_int(&g_encoder, (int64_t)666);
-  // if (error) {
-  //  oc_status_code = true;
-  //}
+
   error = cbor_encode_boolean(&g_encoder, g_352_52_state);
   if (error) {
     oc_status_code = true;
@@ -425,11 +376,6 @@ post_dpa_352_51(oc_request_t *request, oc_interface_mask_t interfaces,
   (void)user_data;
   bool error_state = false;
   PRINT("-- Begin post_dpa_352_51:\n");
-  // oc_rep_t *rep = request->request_payload;
-
-  /* loop over the request document for each required input field to check if
-   * all required input fields are present */
-
   oc_rep_t *rep = NULL;
   // handle the different requests
   if (oc_is_s_mode_request(request)) {
@@ -456,15 +402,13 @@ post_dpa_352_51(oc_request_t *request, oc_interface_mask_t interfaces,
     oc_send_cbor_response(request, OC_STATUS_OK);
   } else {
     PRINT("  Returning Error \n");
-    /* TODO: add error response, if any */
-    // oc_send_response(request, OC_STATUS_NOT_MODIFIED);
     oc_send_response(request, OC_STATUS_BAD_REQUEST);
   }
   PRINT("-- End post_dpa_352_51\n");
 }
 
 /**
- * post method for "/p/a" resource.
+ * post method for "/p/a_1" resource.
  * The function has as input the request body, which are the input values of the
  POST method.
  * The input values (as a set) are checked if all supplied values are correct.
@@ -485,10 +429,6 @@ post_dpa_352_51_1(oc_request_t *request, oc_interface_mask_t interfaces,
   (void)user_data;
   bool error_state = false;
   PRINT("-- Begin post_dpa_352_51_1:\n");
-  // oc_rep_t *rep = request->request_payload;
-
-  /* loop over the request document for each required input field to check if
-   * all required input fields are present */
 
   oc_rep_t *rep = NULL;
   // handle the different requests
@@ -516,8 +456,6 @@ post_dpa_352_51_1(oc_request_t *request, oc_interface_mask_t interfaces,
     oc_send_cbor_response(request, OC_STATUS_OK);
   } else {
     PRINT("  Returning Error \n");
-    /* TODO: add error response, if any */
-    // oc_send_response(request, OC_STATUS_NOT_MODIFIED);
     oc_send_response(request, OC_STATUS_BAD_REQUEST);
   }
   PRINT("-- End post_dpa_352_51_1\n");
@@ -544,7 +482,6 @@ post_dpa_352_52(oc_request_t *request, oc_interface_mask_t interfaces,
   (void)interfaces;
   (void)user_data;
   PRINT("-- Begin post_dpa_352_52:\n");
-  // oc_rep_t *rep = request->request_payload;
 
   oc_rep_t *rep = NULL;
   // handle the different requests
@@ -589,13 +526,10 @@ post_dpa_353_52(oc_request_t *request, oc_interface_mask_t interfaces,
   (void)user_data;
   oc_rep_t *rep = NULL;
   PRINT("-- Begin post_dpa_353_52:\n");
-  // oc_rep_t *rep = request->request_payload;
 
   if (oc_is_s_mode_request(request)) {
     PRINT(" S-MODE\n");
-
     rep = oc_s_mode_get_value(request);
-
   } else {
     rep = request->request_payload;
   }
@@ -606,9 +540,7 @@ post_dpa_353_52(oc_request_t *request, oc_interface_mask_t interfaces,
     PRINT("-- End post_dpa_353_52\n");
     return;
   }
-
   oc_send_response(request, OC_STATUS_BAD_REQUEST);
-
   PRINT("-- End post_dpa_353_52\n");
 }
 
@@ -762,35 +694,10 @@ handle_signal(int signal)
   quit = 1;
 }
 
-#ifdef OC_SECURITY
-/**
- * oc_ownership_status_cb callback implementation
- * handler to print out the DI after onboarding
- *
- * @param device_uuid the device ID
- * @param device_index the index in the list of device IDs
- * @param owned owned or unowned indication
- * @param user_data the supplied user data.
- */
-void
-oc_ownership_status_cb(const oc_uuid_t *device_uuid, size_t device_index,
-                       bool owned, void *user_data)
-{
-  (void)user_data;
-  (void)device_index;
-  (void)owned;
-
-  char uuid[37] = { 0 };
-  oc_uuid_to_str(device_uuid, uuid, OC_UUID_LEN);
-  PRINT(" oc_ownership_status_cb: DI: '%s'\n", uuid);
-}
-#endif /* OC_SECURITY */
-
 /* send a multicast s-mode message */
 oc_event_callback_retval_t
 issue_requests_s_mode_delayed(void *data)
 {
-  // int scope = 5;
   (void)data;
   PRINT(" issue_requests_s_mode_delayed\n");
   int ga_values[2] = { 2 };
@@ -798,7 +705,6 @@ issue_requests_s_mode_delayed(void *data)
   oc_new_string(&href, "/p/c", strlen("/p/c"));
 
   oc_group_object_table_t entry;
-  //= { 55, "/p/c", OC_CFLAG_WRITE, 2, (int *)&ga_values };
   entry.cflags = OC_CFLAG_WRITE | OC_CFLAG_READ;
   entry.id = 55;
   entry.href = href;
@@ -848,8 +754,7 @@ main(int argc, char *argv[])
 {
   int init;
 
-  // bool do_send_s_mode = false;
-  bool do_send_s_mode = true;
+  bool do_send_s_mode = false;
 
   oc_clock_time_t next_event;
 
@@ -942,17 +847,8 @@ main(int argc, char *argv[])
     return init;
   }
 
-#ifdef OC_SECURITY
-  /* print out the current DI of the device */
-  char uuid[37] = { 0 };
-  oc_uuid_to_str(oc_core_get_device_id(0), uuid, OC_UUID_LEN);
-  PRINT(" DI: '%s'\n", uuid);
-  oc_add_ownership_status_cb(oc_ownership_status_cb, NULL);
-#endif /* OC_SECURITY */
-
   oc_device_info_t *device = oc_core_get_device_info(0);
   PRINT("serial number: %s\n", oc_string(device->serialnumber));
-  //PRINT
 
   PRINT("Server \"simple_server_all\" running (polling), waiting on incoming "
         "connections.\n\n\n");
