@@ -156,15 +156,15 @@ set(KNX_INCLUDE_DIRS
 add_compile_definitions(OC_CLIENT OC_SERVER)
 add_library(kisClientServer
     ${API_SOURCES}
-    ${CORE_SOURCES}
     ${COAP_SOURCES}
+    ${CORE_SOURCES}
 )
 target_compile_definitions(kisClientServer PUBLIC)
 target_link_libraries(kisClientServer PUBLIC
     kis-common
-    kis-port
     mbedtls
     tinycbor-master
+    kis-port
 )
 target_include_directories(kisClientServer PUBLIC ${KNX_INCLUDE_DIRS})
 
@@ -173,8 +173,8 @@ include (GenerateExportHeader)
 add_library(kisCS SHARED 
     ${PROJECT_SOURCE_DIR}/pythonbinding/oc_python.c
     ${API_SOURCES}
-    ${CORE_SOURCES}
     ${COAP_SOURCES}
+    ${CORE_SOURCES}
 )
 GENERATE_EXPORT_HEADER( kisCS
              BASE_NAME kisCS
@@ -186,9 +186,9 @@ GENERATE_EXPORT_HEADER( kisCS
 target_compile_definitions(kisCS PUBLIC OC_SERVER OC_CLIENT)
 target_link_libraries(kisCS PUBLIC
     kis-common
-    kis-port
     mbedtls
     tinycbor-master
+    kis-port
 )
 target_link_libraries(kisCS PUBLIC kis-common)
 
@@ -228,7 +228,7 @@ if(BUILD_TESTING AND UNIX)
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
     set(CMAKE_CXX_EXTENSIONS OFF)
     list(APPEND TEST_COMPILE_OPTIONS "-Wall" "-Wextra")
-    list(APPEND TEST_LINK_LIBS kisClientServer gtest gtest_main Threads::Threads)
+    list(APPEND TEST_LINK_LIBS kis-port kisClientServer gtest gtest_main Threads::Threads)
     if(CMAKE_COMPILER_IS_GNUCXX)
         list(APPEND TEST_COMPILE_OPTIONS "-fprofile-arcs" "-ftest-coverage" "-fpermissive")
         list(APPEND TEST_LINK_LIBS gcov)
