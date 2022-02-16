@@ -184,7 +184,7 @@ app_init(void)
 #ifdef OC_SPAKE
 #define PASSWORD "LETTUCE"
   oc_spake_set_password(PASSWORD);
-  PRINT("SPAKE password %s\n", PASSWORD)
+  PRINT("SPAKE password %s\n", PASSWORD);
 #endif
 
   return ret;

@@ -446,7 +446,7 @@ oc_core_dev_iid_put_handler(oc_request_t *request,
 
   oc_rep_t *rep = request->request_payload;
   if ((rep != NULL) && (rep->type == OC_REP_INT)) {
-    PRINT("  oc_core_dev_iid_put_handler received : %d\n",rep->value.integer);
+    PRINT("  oc_core_dev_iid_put_handler received : %d\n",(int)rep->value.integer);
     oc_core_set_device_iid(device_index, oc_string(rep->value.string));
 
     oc_storage_write(KNX_STORAGE_IID, (uint32_t*)&rep->value.integer, sizeof(uint32_t));
@@ -676,11 +676,11 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
   }
 
   // writing the empty values
-  oc_storage_write(KNX_STORAGE_IA, (uint8_t *)&zero, sizeof(int));
-  oc_storage_write(KNX_STORAGE_HOSTNAME, (uint8_t *)&buf, 1);
-  oc_storage_write(KNX_STORAGE_IID, (uint32_t*)&zero, sizeof(uint32_t));
+  oc_storage_write(KNX_STORAGE_IA, (char *)&zero, sizeof(int));
+  oc_storage_write(KNX_STORAGE_HOSTNAME, (char *)&buf, 1);
+  oc_storage_write(KNX_STORAGE_IID, (char*)&zero, sizeof(uint32_t));
 
-  oc_storage_write(KNX_STORAGE_PM, (uint8_t *)&zero, sizeof(uint8_t));
+  oc_storage_write(KNX_STORAGE_PM, (char *)&zero, sizeof(uint8_t));
 
   oc_delete_group_object_table();
   oc_delete_group_rp_table();

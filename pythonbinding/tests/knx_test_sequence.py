@@ -274,7 +274,8 @@ def do_sequence_dev_programming_mode_fail(my_stack):
     response =  my_stack.issue_cbor_get(sn,"/dev/hostname")
     safe_print(response)
     if content != response.get_payload_string():
-        print("PASS (expected failure): /dev/hostname ", content, " != ", response.get_payload_string())
+        print("PASS (expected failure): /dev/hostname ",
+            content, " != ", response.get_payload_string())
     else:
         print_fail(msg="/dev/hostname")
     my_stack.purge_response(response)
