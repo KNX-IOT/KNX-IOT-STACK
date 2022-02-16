@@ -33,6 +33,8 @@
 extern "C" {
 #endif
 
+typedef void (*spakeCB)(char *sn, int state, char *secret, int secret_size);
+
 typedef void (*changedCB)(char *uuid, char *state, char *event);
 
 typedef void (*discoveryCB)(int payload_size, char *payload);
@@ -85,6 +87,13 @@ kisCS_EXPORT void py_install_clientCB(clientCB clientCB);
  * @param discoveryCB the discovery callback
  */
 kisCS_EXPORT void py_install_discoveryCB(discoveryCB discoveryCB);
+
+/**
+ * @brief install the spake callback
+ * This function is called when the spake handshake is finished (or failed)
+ * @param spakeCB the spake callback
+ */
+kisCS_EXPORT void py_install_spakeCB(spakeCB spakeCB);
 
 /**
  * @brief issue a GET request with expected content type CBOR
@@ -142,6 +151,14 @@ kisCS_EXPORT void py_cbor_put(char *sn, char *uri, char *query, char *r_id,
  * @param r_id the r_id (string)
  */
 kisCS_EXPORT void py_cbor_delete(char *sn, char *uri, char *query, char *r_id);
+
+/**
+ * @brief initiate the spake handshake
+ *
+ * @param sn the serial number of the device (is unique?)
+ * @param password the password of the device
+ */
+kisCS_EXPORT void py_initate_spake(char *sn, char *password);
 
 /**
  * @brief sends an s-mode message

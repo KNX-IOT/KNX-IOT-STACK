@@ -172,7 +172,7 @@ app_init(void)
   oc_core_set_device_hostname(0, "my.hostname");
 
   /* set the installation id (iid) */
-  oc_core_set_device_iid(0, "my installation");
+  oc_core_set_device_iid(0, 2);
 
   /* set the internal address */
   oc_core_set_device_ia(0, 5);
@@ -182,7 +182,9 @@ app_init(void)
   oc_set_s_mode_response_cb(oc_add_s_mode_response_cb);
 
 #ifdef OC_SPAKE
-  oc_spake_set_password("LETTUCE");
+#define PASSWORD "LETTUCE"
+  oc_spake_set_password(PASSWORD);
+  PRINT("SPAKE password %s\n", PASSWORD);
 #endif
 
   return ret;
@@ -950,6 +952,7 @@ main(int argc, char *argv[])
 
   oc_device_info_t *device = oc_core_get_device_info(0);
   PRINT("serial number: %s\n", oc_string(device->serialnumber));
+  // PRINT
 
   PRINT("Server \"simple_server_all\" running (polling), waiting on incoming "
         "connections.\n\n\n");

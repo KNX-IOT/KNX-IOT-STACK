@@ -88,6 +88,7 @@ typedef struct py_cb_struct
   resourceCB resourceFCB;
   clientCB clientFCB;
   discoveryCB discoveryFCB;
+  spakeCB spakeFCB;
 } py_cb_struct_t;
 
 /**
@@ -204,6 +205,17 @@ py_install_discoveryCB(discoveryCB discoveryCB)
 }
 
 /**
+ * function to install spake callbacks, called from python
+ *
+ */
+void
+py_install_spakeCB(spakeCB spakeCB)
+{
+  PRINT("[C]installspakeCB\n");
+  my_CBFunctions.spakeFCB = spakeCB;
+}
+
+/**
  * function to call the callback to python.
  *
  */
@@ -252,6 +264,25 @@ inform_discovery_python(int payload_size, const char *payload)
 {
   if (my_CBFunctions.discoveryFCB != NULL) {
     my_CBFunctions.discoveryFCB(payload_size, (char *)payload);
+  }
+}
+
+/**
+ * function to call the callback for discovery to python.
+ * CFUNCTYPE(None, c_int, c_char_p, c_int)
+ */
+void
+inform_spake_python(char *sn, int state, char *key, int key_size)
+{
+  PRINT("[C]inform_spake_python %p %s %d %d key=[", my_CBFunctions.spakeFCB, sn,
+        state, key_size);
+  for (int i = 0; i < key_size; i++) {
+    PRINT("%02x", (unsigned char)key[i]);
+  }
+  PRINT("]\n");
+
+  if (my_CBFunctions.spakeFCB != NULL) {
+    my_CBFunctions.spakeFCB(sn, state, key, key_size);
   }
 }
 
@@ -633,27 +664,6 @@ py_cbor_delete(char *sn, char *uri, char *query, char *id)
 // -----------------------------------------------------------------------------
 
 void
-py_initate_spake(char *sn)
-{
-  int ret = -1;
-  device_handle_t *device = py_getdevice_from_sn(sn);
-
-  PRINT("  [C]py_initate_spake: [%s]\n", sn);
-
-  // user_struct_t *new_cbdata;
-  // new_cbdata = (user_struct_t *)malloc(sizeof(user_struct_t));
-  // if (new_cbdata != NULL) {
-  //  strcpy(new_cbdata->r_id, id);
-  //  strcpy(new_cbdata->url, uri);
-  //  strcpy(new_cbdata->sn, sn);
-  //}
-
-  oc_initiate_spake(&device->ep);
-}
-
-// -----------------------------------------------------------------------------
-
-void
 response_get_sn(oc_client_response_t *data)
 {
   PRINT("[C]response_get_sn: content format %d  %.*s\n", data->content_format,
@@ -736,6 +746,30 @@ py_discover_devices_with_query(int scope, const char *query)
 
   py_mutex_unlock(app_sync_lock);
   signal_event_loop();
+}
+
+// -----------------------------------------------------------------------------
+
+void
+py_initate_spake(char *sn, char *password)
+{
+  int ret = -1;
+  device_handle_t *device = py_getdevice_from_sn(sn);
+
+  PRINT("  [C]py_initate_spake: [%s]\n", sn);
+
+  ret = oc_initiate_spake(&device->ep, password);
+  PRINT("  [C]py_initate_spake: [%d]-- done\n", ret);
+  if (ret == -1) {
+    // failure, so unblock python
+    inform_spake_python(sn, ret, "", 0);
+  }
+}
+
+void
+spake_callback(int error, uint8_t *secret, int secret_size)
+{
+  inform_spake_python("", error, secret, secret_size);
 }
 
 // -----------------------------------------------------------------------------
@@ -961,6 +995,8 @@ py_main(void)
 #endif /* OC_STORAGE */
        // oc_set_factory_presets_cb(factory_presets_cb, NULL);
   oc_set_max_app_data_size(16384);
+
+  oc_set_spake_response_cb(spake_callback);
 
   init = oc_main_init(&handler);
   if (init < 0)

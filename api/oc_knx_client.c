@@ -43,11 +43,15 @@ typedef struct broker_s_mode_userdata_t
 oc_s_mode_response_cb_t m_s_mode_cb = NULL;
 oc_spake_cb_t m_spake_cb = NULL;
 
+#define MAX_SECRET_LEN 32
+#define MAX_PASSWORD_LEN 30
+
 // SPAKE2
 #ifdef OC_SPAKE
 static mbedtls_mpi w0, w1, privA;
 static mbedtls_ecp_point pA, pubA;
-static uint8_t Ka_Ke[32];
+static uint8_t Ka_Ke[MAX_SECRET_LEN];
+static char g_spake_password[MAX_PASSWORD_LEN];
 #endif
 
 // ----------------------------------------------------------------------------
@@ -205,7 +209,8 @@ do_credential_exchange(oc_client_response_t *data)
   mbedtls_mpi_init(&privA);
   mbedtls_ecp_point_init(&pA);
   mbedtls_ecp_point_init(&pubA);
-  oc_spake_calc_w0_w1("LETTUCE", 32, salt, it, &w0, &w1);
+  // use the global variable that comes with the input of the handshake
+  oc_spake_calc_w0_w1(g_spake_password, 32, salt, it, &w0, &w1);
 
   oc_spake_gen_keypair(&privA, &pubA);
   oc_spake_calc_pA(&pA, &pubA, &w0);
@@ -225,7 +230,7 @@ do_credential_exchange(oc_client_response_t *data)
 #endif /* OC_SPAKE */
 
 int
-oc_initiate_spake(oc_endpoint_t *endpoint)
+oc_initiate_spake(oc_endpoint_t *endpoint, char *password)
 {
   int return_value = -1;
 
@@ -242,6 +247,8 @@ oc_initiate_spake(oc_endpoint_t *endpoint)
   oc_rep_begin_root_object();
   oc_rep_i_set_byte_string(root, 15, rnd, 32);
   oc_rep_end_root_object();
+
+  strncpy(g_spake_password, password, MAX_PASSWORD_LEN);
 
   if (oc_do_post_ex(APPLICATION_CBOR, APPLICATION_CBOR)) {
     return_value = 0;
@@ -304,18 +311,22 @@ oc_knx_client_do_broker_request(char *resource_url, int ia, char *destination,
   snprintf(query, 20, "if=urn:knx:ia.%d", ia);
 
   // not sure if we should use a malloc here, what would happen if there are no
-  // devices found?
+  // devices found? because that causes a memory leak
   broker_s_mode_userdata_t *cb_data =
     (broker_s_mode_userdata_t *)malloc(sizeof(broker_s_mode_userdata_t));
-  memset(cb_data, 0, sizeof(broker_s_mode_userdata_t));
-  cb_data->ia = ia;
-  strncpy(cb_data->rp_type, rp, 2);
-  strncpy(cb_data->resource_url, resource_url, 20);
-  strncpy(cb_data->path, destination, 20);
+  if (cb_data != NULL) {
+    memset(cb_data, 0, sizeof(broker_s_mode_userdata_t));
+    cb_data->ia = ia;
+    strncpy(cb_data->rp_type, rp, 2);
+    strncpy(cb_data->resource_url, resource_url, 20);
+    strncpy(cb_data->path, destination, 20);
 
-  oc_do_wk_discovery_all(query, 2, discovery_ia_cb, cb_data);
-  oc_do_wk_discovery_all(query, 3, discovery_ia_cb, cb_data);
-  oc_do_wk_discovery_all(query, 5, discovery_ia_cb, cb_data);
+    oc_do_wk_discovery_all(query, 2, discovery_ia_cb, cb_data);
+    oc_do_wk_discovery_all(query, 3, discovery_ia_cb, cb_data);
+    oc_do_wk_discovery_all(query, 5, discovery_ia_cb, cb_data);
+  } else {
+    OC_ERR("cb_data is NULL");
+  }
   return 0;
 }
 

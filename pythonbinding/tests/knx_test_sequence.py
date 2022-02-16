@@ -201,14 +201,14 @@ def do_sequence_dev_programming_mode(my_stack):
     my_stack.purge_response(response)
 
     print("-------------------")
-    content = " iid xxx"
+    content = 555
     print("set iid :", content)
-    response =  my_stack.issue_cbor_put(sn,"/dev/iid",content)
+    response =  my_stack.issue_cbor_put(sn,"/dev/iid", content)
     safe_print(response)
     my_stack.purge_response(response)
     response =  my_stack.issue_cbor_get(sn,"/dev/iid")
     safe_print(response)
-    if content == response.get_payload_string():
+    if content == response.get_payload_int():
         print("PASS : /dev/iid ", content)
     else:
         print_fail(msg="/dev/iid")
@@ -260,7 +260,7 @@ def do_sequence_dev_programming_mode_fail(my_stack):
     safe_print(response)
     safe_print(response)
     if content != response.get_payload_int():
-        print("PASS : /dev/ia ", content, " != ", response.get_payload_int())
+        print("PASS (expected failure): /dev/ia ", content, " != ", response.get_payload_int())
     else:
         print_fail(msg="/dev/ia")
     my_stack.purge_response(response)
@@ -274,21 +274,22 @@ def do_sequence_dev_programming_mode_fail(my_stack):
     response =  my_stack.issue_cbor_get(sn,"/dev/hostname")
     safe_print(response)
     if content != response.get_payload_string():
-        print("PASS : /dev/hostname ", content, " != ", response.get_payload_string())
+        print("PASS (expected failure): /dev/hostname ",
+            content, " != ", response.get_payload_string())
     else:
         print_fail(msg="/dev/hostname")
     my_stack.purge_response(response)
 
     print("-------------------")
-    content = " xxx iid xxx"
+    content = 3333
     print("set iid :", content)
     response =  my_stack.issue_cbor_put(sn,"/dev/iid",content)
     safe_print(response)
     my_stack.purge_response(response)
     response =  my_stack.issue_cbor_get(sn,"/dev/iid")
     safe_print(response)
-    if content != response.get_payload_string():
-        print("PASS : /dev/iid ", content, " != ", response.get_payload_string())
+    if content != response.get_payload_int():
+        print("PASS (expected failure): /dev/iid ", content, " != ", response.get_payload_int())
     else:
         print_fail(msg="/dev/iid")
     my_stack.purge_response(response)
@@ -840,7 +841,6 @@ def do_discovery(my_stack):
         print(" -------------------------")
         do_sequence_f(my_stack)
 
-
 def do_security(my_stack):
     """
     do security tests
@@ -849,14 +849,21 @@ def do_security(my_stack):
         do_auth_at(my_stack)
 
 
+def do_spake(my_stack):
+    """
+    do spake handshake
+    """
+    if my_stack.get_nr_devices() > 0:
+        sn = my_stack.device_array[0].sn
+        print("========spake=========", sn)
+        my_stack.initate_spake(sn, "LETTUCE")
+
 def do_fp(my_stack):
     """
     do fp tests
     """
     if my_stack.get_nr_devices() > 0:
         do_sequence_fp_programming(my_stack)
-
-
 
 def do_all(my_stack):
     if my_stack.get_nr_devices() > 0:
@@ -894,6 +901,9 @@ if __name__ == '__main__':  # pragma: no cover
     parser.add_argument("-fp", "--fp",
                     help="do function point programming", nargs='?',
                     default=False, const=1, required=False)
+    parser.add_argument("-spake", "--spake",
+                    help="do spake", nargs='?',
+                    default=False, const=1, required=False)
     print(sys.argv)
     args = parser.parse_args()
     print("scope         :" + str(args.scope))
@@ -902,6 +912,7 @@ if __name__ == '__main__':  # pragma: no cover
     print("discovery     :" + str(args.discovery))
     print("security      :" + str(args.security))
     print("fp            :" + str(args.fp))
+    print("spake         :" + str(args.spake))
     time.sleep(int(args.sleep))
 
     the_stack = knx_stack.KNXIOTStack()
@@ -917,6 +928,8 @@ if __name__ == '__main__':  # pragma: no cover
             do_security(the_stack)
         elif args.fp:
             do_fp(the_stack)
+        elif args.spake:
+            do_spake(the_stack)
         else:
             do_sequence(the_stack)
     except:

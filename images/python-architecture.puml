@@ -13,7 +13,7 @@ to talk indirectly to KNX
 end note
 }
 
-node "shared object" as dll{
+node "knx stack as shared object" as dll{
     rectangle "oc_python.c" as so_pi
     rectangle "knx-stack" as so_obj
  note as N2
@@ -23,7 +23,6 @@ end note
 }
 
 pis -- so_pi
-py -- dll
 pih -- pis
 so_pi -- so_obj
 
