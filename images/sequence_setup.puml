@@ -1,0 +1,50 @@
+@startuml
+skinparam sequenceMessageAlign center
+
+== Discovery ==
+
+ETS --> Device: CoAP Discovery ep=urn:knx:sn.<sn>
+note left : Device serial number known
+ETS <- Device: <>;ep=urn:knx:sn.000005 [ipaddress]
+
+== Security handshake  ===
+ETS -> Device: initate spake [sn, password]
+note left : Device password known
+ETS <-> Device: Handshake
+ETS -> ETS : store MS as oscore 
+Device -> Device : store MS as oscore 
+
+== Device individualisation ==
+ETS --> Device: set programming mode on
+ETS -> Device: Search for if=urn:knx:ia.<x>
+ETS -> Device: set ia = <x>
+ETS -> Device: set iid = <x>
+ETS -> Device: // set hname = <x>
+ETS --> Device: set programming mode off
+
+== Device configuration ==
+ETS -> Device: set loadstate: unload 
+ETS <- Device: unloaded
+note left : group object table cleared
+ETS -> Device: set loadstate: load 
+ETS <- Device: loading
+
+ETS -> Device: set group object table
+note left : multiple calls
+ETS -> Device: set publisher table
+note left : multiple calls
+ETS -> Device: set loadstate: loadcomplete 
+ETS -> Device: set loadstate: loaded
+
+
+ETS -> Device: retrieve finger print
+ETS <- Device: finger print
+ETS -> ETS: store finger print
+
+== Security configuration  ==
+ETS -> Device: set auth/at info
+note left : multiple calls
+ETS <- Device: 
+
+note left : device is functional
+@enduml

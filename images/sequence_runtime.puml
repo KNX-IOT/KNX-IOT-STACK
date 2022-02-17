@@ -1,0 +1,23 @@
+@startuml
+skinparam sequenceMessageAlign center
+
+== setup of runtime ==
+Device1 -> Device1 : regisister all group adresses\n in group object table for sending
+Device2 -> Device2 : regisister all group adresses\n in group object table for sending
+
+== runtime with s-mode ==
+
+Device1 -> Device1 : change of state of resource
+group loop per group object table entry 
+Device1 --> Device2: s-mode (state)
+note left : call per group address
+end
+
+
+Device2 -> Device2 : change of state of resource
+group loop per group object table entry 
+Device2 --> Device1: s-mode (state)
+note left : call per group address
+end
+
+@enduml
