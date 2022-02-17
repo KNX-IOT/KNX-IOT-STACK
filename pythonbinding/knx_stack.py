@@ -677,7 +677,7 @@ class KNXIOTStack():
             payload = self.convertcbor2json(cb_payload, cb_payload_size)
         if c_format == "json" :
             print("ClientCB: json")
-            try: 
+            try:
                 temp_payload = cb_payload[:cb_payload_size]
                 payload = temp_payload.decode("utf-8")
             except:

@@ -530,7 +530,7 @@ oc_oscore_send_message(oc_message_t *msg)
    */
   oc_message_t *message = msg;
   oc_oscore_context_t *oscore_ctx = oc_oscore_find_context_by_serial_number(
-    message->endpoint.device, &message->endpoint.serial_number);
+    message->endpoint.device, message->endpoint.serial_number);
 
   if (oscore_ctx) {
     OC_DBG_OSCORE("#################################");
