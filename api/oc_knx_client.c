@@ -25,7 +25,11 @@
 #include "oc_discovery.h"
 #include <stdio.h>
 
+// ----------------------------------------------------------------------------
+
 #define COAP_PORT (5683)
+#define MAX_SECRET_LEN 32
+#define MAX_PASSWORD_LEN 30
 
 // ----------------------------------------------------------------------------
 
@@ -38,20 +42,26 @@ typedef struct broker_s_mode_userdata_t
   char resource_url[20]; //< the url to pull the data from.
 } broker_s_mode_userdata_t;
 
+
+
+typedef struct oc_spake_context_t
+{
+  char *spake_password[MAX_PASSWORD_LEN]; /**< spake password */
+  oc_string_t serial_number;              /**< the serial number of the device */
+} oc_spake_context_t;
+
+
 // ----------------------------------------------------------------------------
 
 oc_s_mode_response_cb_t m_s_mode_cb = NULL;
 oc_spake_cb_t m_spake_cb = NULL;
-
-#define MAX_SECRET_LEN 32
-#define MAX_PASSWORD_LEN 30
 
 // SPAKE2
 #ifdef OC_SPAKE
 static mbedtls_mpi w0, w1, privA;
 static mbedtls_ecp_point pA, pubA;
 static uint8_t Ka_Ke[MAX_SECRET_LEN];
-static char g_spake_password[MAX_PASSWORD_LEN];
+static oc_spake_context_t g_spake_ctx;
 #endif
 
 // ----------------------------------------------------------------------------
@@ -210,7 +220,7 @@ do_credential_exchange(oc_client_response_t *data)
   mbedtls_ecp_point_init(&pA);
   mbedtls_ecp_point_init(&pubA);
   // use the global variable that comes with the input of the handshake
-  oc_spake_calc_w0_w1(g_spake_password, 32, salt, it, &w0, &w1);
+  oc_spake_calc_w0_w1(g_spake_ctx.spake_password, 32, salt, it, &w0, &w1);
 
   oc_spake_gen_keypair(&privA, &pubA);
   oc_spake_calc_pA(&pA, &pubA, &w0);
@@ -248,7 +258,7 @@ oc_initiate_spake(oc_endpoint_t *endpoint, char *password)
   oc_rep_i_set_byte_string(root, 15, rnd, 32);
   oc_rep_end_root_object();
 
-  strncpy(g_spake_password, password, MAX_PASSWORD_LEN);
+  strncpy(g_spake_ctx.spake_password, password, MAX_PASSWORD_LEN);
 
   if (oc_do_post_ex(APPLICATION_CBOR, APPLICATION_CBOR)) {
     return_value = 0;

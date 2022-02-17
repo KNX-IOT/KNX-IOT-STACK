@@ -677,7 +677,11 @@ class KNXIOTStack():
             payload = self.convertcbor2json(cb_payload, cb_payload_size)
         if c_format == "json" :
             print("ClientCB: json")
-            payload = cb_payload.decode("utf-8")
+            try: 
+                temp_payload = cb_payload[:cb_payload_size]
+                payload = temp_payload.decode("utf-8")
+            except:
+                payload = cb_payload
         if c_format == "error" :
             print("ClientCB: error")
             print("p:", cb_payload_size)
@@ -845,7 +849,7 @@ class KNXIOTStack():
         discover_data_event.clear()
         self.discovery_data = None
         self.lib.py_discover_devices_with_query.argtypes = [c_int, String ]
-        self.lib.py_discover_devices_with_query(scope, query)
+        self.lib.py_discover_devices_with_query(int(scope), query)
         time.sleep(self.timout)
         # python callback application
         print("[P] discovery- done")

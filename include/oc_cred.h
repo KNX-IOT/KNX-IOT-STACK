@@ -98,7 +98,7 @@ typedef struct oc_sec_cred_t
   void *ctx;                    ///< security context
 #endif                          /* OC_PKI */
 #ifdef OC_OSCORE
-  void *oscore_ctx;           ///< oscore security contex
+  void *oscore_ctx;           ///< oscore security context
 #endif                        /* OC_OSCORE */
   int credid;                 ///< credential id
   oc_sec_credtype_t credtype; ///< credential type

@@ -207,6 +207,15 @@ OC_PROCESS_THREAD(message_buffer_handler, ev, data)
       OC_DBG("Inbound network event: decrypted request");
       oc_process_post(&coap_engine, oc_events[INBOUND_RI_EVENT], data);
 #endif /* !OC_SECURITY */
+#ifdef OC_OSCORE
+    } else if (ev == oc_events[OUTBOUND_NETWORK_EVENT_ENCRYPTED]) {
+      OC_DBG_OSCORE("Outbound network event: send encrypted message");
+      oc_message_t *message = (oc_message_t *)data;
+      oc_send_buffer(message);
+      oc_message_unref(message);
+#endif /* OC_OSCORE */
+//#if defined(OC_SECURITY) && defined(OC_OSCORE)
+//#ifdef OC_OSCORE
     } else if (ev == oc_events[OUTBOUND_NETWORK_EVENT]) {
       oc_message_t *message = (oc_message_t *)data;
 

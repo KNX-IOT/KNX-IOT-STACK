@@ -75,6 +75,7 @@ typedef struct oc_endpoint_t
   size_t device;              /**< device index */
   enum transport_flags flags; /**< the transport flags */
   oc_uuid_t di;               /**< device di */
+  oc_string_t serial_number;  /**< serial number */
   union dev_addr {
     oc_ipv6_addr_t ipv6; /**< ipv6 address */
     oc_ipv4_addr_t ipv4; /**< ipv4 address */
