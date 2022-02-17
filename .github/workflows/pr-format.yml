@@ -36,6 +36,10 @@ jobs:
           comment-id: ${{ github.event.comment.id }}
           reactions: eyes
 
+      - name: Checkout Submodules
+        run: |
+          git -C ${{ github.workspace }}/iotivity-lite submodule update --init --recursive
+
       - name: build-docs
         run: |
           sudo apt-get update -y
