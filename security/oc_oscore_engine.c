@@ -534,7 +534,8 @@ oc_oscore_send_message(oc_message_t *msg)
 
   if (oscore_ctx) {
     OC_DBG_OSCORE("#################################");
-    OC_DBG_OSCORE("found OSCORE context corresponding to the peer serial number");
+    OC_DBG_OSCORE(
+      "found OSCORE context corresponding to the peer serial number");
     /* Is this is an inadvertent response to a secure multi cast message */
     if (msg->endpoint.flags & MULTICAST) {
       OC_DBG_OSCORE(
@@ -784,7 +785,6 @@ oc_oscore_send_message(oc_message_t *msg)
 oscore_send_dispatch:
   OC_DBG_OSCORE("#################################");
   if (!oc_tls_connected(&message->endpoint)) {
-  
   }
 
 #ifdef OC_CLIENT

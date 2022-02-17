@@ -1091,7 +1091,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     oc_new_string(&os_token.osc_id, "spake2+", strlen("spake2+"));
     oc_new_string(&os_token.sub, "", strlen("spake2+"));
     oc_new_string(&os_token.kid, "+", strlen("spake2+"));
-    //store in at tables at position 0
+    // store in at tables at position 0
     // note there should be no entries.
     // if there is an entry then overwrite it..
     oc_core_set_at_table(0, os_token);

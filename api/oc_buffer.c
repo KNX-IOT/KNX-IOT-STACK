@@ -214,8 +214,8 @@ OC_PROCESS_THREAD(message_buffer_handler, ev, data)
       oc_send_buffer(message);
       oc_message_unref(message);
 #endif /* OC_OSCORE */
-//#if defined(OC_SECURITY) && defined(OC_OSCORE)
-//#ifdef OC_OSCORE
+       //#if defined(OC_SECURITY) && defined(OC_OSCORE)
+       //#ifdef OC_OSCORE
     } else if (ev == oc_events[OUTBOUND_NETWORK_EVENT]) {
       oc_message_t *message = (oc_message_t *)data;
 

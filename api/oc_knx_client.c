@@ -42,14 +42,11 @@ typedef struct broker_s_mode_userdata_t
   char resource_url[20]; //< the url to pull the data from.
 } broker_s_mode_userdata_t;
 
-
-
 typedef struct oc_spake_context_t
 {
   char spake_password[MAX_PASSWORD_LEN]; /**< spake password */
-  oc_string_t serial_number;              /**< the serial number of the device */
+  oc_string_t serial_number;             /**< the serial number of the device */
 } oc_spake_context_t;
-
 
 // ----------------------------------------------------------------------------
 
@@ -258,7 +255,7 @@ oc_initiate_spake(oc_endpoint_t *endpoint, char *password)
   oc_rep_i_set_byte_string(root, 15, rnd, 32);
   oc_rep_end_root_object();
 
-  strncpy((char*)&g_spake_ctx.spake_password, password, MAX_PASSWORD_LEN);
+  strncpy((char *)&g_spake_ctx.spake_password, password, MAX_PASSWORD_LEN);
 
   if (oc_do_post_ex(APPLICATION_CBOR, APPLICATION_CBOR)) {
     return_value = 0;

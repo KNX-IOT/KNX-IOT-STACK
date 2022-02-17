@@ -121,20 +121,20 @@ oc_oscore_find_context_by_token_mid(size_t device, uint8_t *token,
   return ctx;
 }
 
-
 oc_oscore_context_t *
-oc_oscore_find_context_by_serial_number(size_t device, oc_string_t serial_number)
+oc_oscore_find_context_by_serial_number(size_t device,
+                                        oc_string_t serial_number)
 {
   (void)device;
 
   oc_oscore_context_t *ctx = (oc_oscore_context_t *)oc_list_head(contexts);
-    while (ctx != NULL) {
+  while (ctx != NULL) {
     oc_string_t ctx_serial_number = ctx->destination_serial_number;
-      if (oc_string_cmp (serial_number, ctx_serial_number) == 0) {
-      //if (memcmp(cred->subjectuuid.id, uuid->id, 16) == 0 &&
+    if (oc_string_cmp(serial_number, ctx_serial_number) == 0) {
+      // if (memcmp(cred->subjectuuid.id, uuid->id, 16) == 0 &&
       //    ctx->device == device) {
-        return ctx;
-      }
+      return ctx;
+    }
     ctx = ctx->next;
   }
   return ctx;
