@@ -30,14 +30,15 @@ jobs:
           path: iotivity-lite
           ref: ${{ fromJSON(steps.get_branch.outputs.data).repository.pullRequest.headRefName }}
 
-      - name: Checkout Submodules
-        run: git submodule update --init --recursive
-
       - name: add reaction
         uses: peter-evans/create-or-update-comment@v1
         with:
           comment-id: ${{ github.event.comment.id }}
           reactions: eyes
+
+      - name: Checkout Submodules
+        run: |
+          git -C ${{ github.workspace }}/iotivity-lite submodule update --init --recursive
 
       - name: build-docs
         run: |
