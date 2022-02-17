@@ -1079,11 +1079,10 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     uint8_t *shared_key = spake_data.Ka_Ke + 16;
     size_t shared_key_len = 16;
 
-    // create the token & store in at tables at position 0
-    // note there should be no entries.. if there is an entry then overwrite
-    // it..
+    // create the token
     oc_auth_at_t os_token;
     memset(&os_token, 0, sizeof(os_token));
+    // password...
     oc_new_string(&os_token.id, "spake", strlen("spake"));
     os_token.ga_len = 0;
     os_token.profile = OC_PROFILE_COAP_OSCORE;
@@ -1092,6 +1091,9 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     oc_new_string(&os_token.osc_id, "spake2+", strlen("spake2+"));
     oc_new_string(&os_token.sub, "", strlen("spake2+"));
     oc_new_string(&os_token.kid, "+", strlen("spake2+"));
+    // store in at tables at position 0
+    // note there should be no entries.
+    // if there is an entry then overwrite it..
     oc_core_set_at_table(0, os_token);
 
     oc_send_cbor_response(request, OC_STATUS_CHANGED);

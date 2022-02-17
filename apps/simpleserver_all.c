@@ -138,11 +138,11 @@ oc_add_s_mode_response_cb(char *url, oc_rep_t *rep, oc_rep_t *rep_value)
  * function to set up the device.
  *
  * sets the:
- * - manufactorer name
+ * - manufacturer name
  * - serial number
  * - friendly device name (not needed for knx)
  * - spec version
- * - basepath
+ * - base path
  * - serial number
  * - hardware version
  * - firmware version
@@ -153,12 +153,12 @@ oc_add_s_mode_response_cb(char *url, oc_rep_t *rep, oc_rep_t *rep_value)
 int
 app_init(void)
 {
-  /* create platform and set the manufactorer name */
+  /* create platform and set the manufacturer name */
   int ret = oc_init_platform("Cascoda", NULL, NULL);
 
   /* create the device and set
     - specification number (1.0.0)
-    - basepath (/)
+    - base path (/)
     - the serial number
   */
   ret |= oc_add_device("my_name", "1.0.0", "//", "000005", NULL, NULL);

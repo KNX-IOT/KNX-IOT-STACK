@@ -348,10 +348,10 @@ oc_oscore_send_multicast_message(oc_message_t *message)
    *   Compute AAD using partial IV and context->sendid
    *   Make room for inner options and payload by moving CoAP payload to offset
    *    2 * COAP_MAX_HEADER_SIZE
-   *   Serialize OSCORE plaintext at offset COAP_MAX_HEADER_SIZE
-   *   Encrypt OSCORE plaintext at offset COAP_MAX_HEADER_SIZE
+   *   Serialize OSCORE plain text at offset COAP_MAX_HEADER_SIZE
+   *   Encrypt OSCORE plain text at offset COAP_MAX_HEADER_SIZE
    *   Set OSCORE packet payload to location COAP_MAX_HEADER_SIZE
-   *   Set OSCORE packet payload length to the plaintext size + tag length (8)
+   *   Set OSCORE packet payload length to the plain text size + tag length (8)
    *   Set OSCORE option in OSCORE packet
    *   Serialize OSCORE message to oc_message_t
    * Dispatch oc_message_t to IP layer
@@ -424,7 +424,7 @@ oc_oscore_send_multicast_message(oc_message_t *message)
     }
 
     OC_DBG_OSCORE("### serializing OSCORE plaintext ###");
-    /* Serialize OSCORE plaintext at offset COAP_MAX_HEADER_SIZE
+    /* Serialize OSCORE plain text at offset COAP_MAX_HEADER_SIZE
        (code, inner options, payload)
     */
     size_t plaintext_size = oscore_serialize_plaintext(
@@ -520,7 +520,7 @@ oc_oscore_send_message(oc_message_t *msg)
    *    Serialize OSCORE plaintext at offset COAP_MAX_HEADER_SIZE
    *    Encrypt OSCORE plaintext at offset COAP_MAX_HEADER_SIZE
    *    Set OSCORE packet payload to location COAP_MAX_HEADER_SIZE
-   *    Set OSCORE packet payload length to the plaintext size + tag length (8)
+   *    Set OSCORE packet payload length to the plain text size + tag length (8)
    *    Set OSCORE option in OSCORE packet
    *    Reflect the Observe option (if present in the CoAP packet)
    *    Set the Proxy-uri option to the OCF URI bearing the peer's UUID
@@ -529,12 +529,13 @@ oc_oscore_send_message(oc_message_t *msg)
    * Dispatch oc_message_t to the TLS layer
    */
   oc_message_t *message = msg;
-  oc_oscore_context_t *oscore_ctx = oc_oscore_find_context_by_UUID(
-    message->endpoint.device, &message->endpoint.di);
+  oc_oscore_context_t *oscore_ctx = oc_oscore_find_context_by_serial_number(
+    message->endpoint.device, message->endpoint.serial_number);
 
   if (oscore_ctx) {
     OC_DBG_OSCORE("#################################");
-    OC_DBG_OSCORE("found OSCORE context corresponding to the peer UUID");
+    OC_DBG_OSCORE(
+      "found OSCORE context corresponding to the peer serial number");
     /* Is this is an inadvertent response to a secure multi cast message */
     if (msg->endpoint.flags & MULTICAST) {
       OC_DBG_OSCORE(
@@ -783,10 +784,23 @@ oc_oscore_send_message(oc_message_t *msg)
   }
 oscore_send_dispatch:
   OC_DBG_OSCORE("#################################");
-  /* Dispatch oc_message_t to the TLS layer */
-  OC_DBG_OSCORE("Outbound network event: forwarding to TLS");
-  // TODO, this could go to the unsecure network...
+  if (!oc_tls_connected(&message->endpoint)) {
+  }
+
 #ifdef OC_CLIENT
+  /* Dispatch oc_message_t to the message buffer layer */
+  OC_DBG_OSCORE("Outbound network event: OUTBOUND_NETWORK_EVENT_ENCRYPTED");
+  if (oc_process_post(&message_buffer_handler,
+                      oc_events[OUTBOUND_NETWORK_EVENT_ENCRYPTED],
+                      message) == OC_PROCESS_ERR_FULL) {
+    OC_ERR(" could not send message");
+  }
+  return 0;
+#endif /* OC_CLIENT */
+
+#ifdef OC_CLIENT
+
+  OC_DBG_OSCORE("Outbound network event: forwarding to TLS");
   if (!oc_tls_connected(&message->endpoint)) {
     OC_DBG_OSCORE("Posting INIT_TLS_CONN_EVENT");
     oc_process_post(&oc_tls_handler, oc_events[INIT_TLS_CONN_EVENT], message);

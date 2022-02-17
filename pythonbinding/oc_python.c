@@ -530,7 +530,13 @@ py_cbor_get(char *sn, char *uri, char *query, char *cbdata)
     strcpy(new_cbdata->url, uri);
     strcpy(new_cbdata->sn, sn);
   }
+
   PRINT("  [C]py_cbor_get: [%s], [%s] [%s] [%s]\n", sn, uri, query, cbdata);
+#ifdef OC_OSCORE
+  device->ep.flags += OSCORE;
+  PRINT("  [C] OSCORE\n");
+#endif
+
   ret = oc_do_get_ex(uri, &device->ep, query, general_get_cb, HIGH_QOS,
                      APPLICATION_CBOR, APPLICATION_CBOR, new_cbdata);
   if (ret >= 0) {
@@ -549,6 +555,10 @@ py_linkformat_get(char *sn, char *uri, char *query, char *cbdata)
 
   PRINT("  [C]py_linkformat_get: [%s], [%s] [%s] [%s]\n", sn, uri, query,
         cbdata);
+#ifdef OC_OSCORE
+  device->ep.flags += OSCORE;
+  PRINT("  [C] OSCORE\n");
+#endif
 
   user_struct_t *new_cbdata;
   new_cbdata = (user_struct_t *)malloc(sizeof(user_struct_t));
@@ -581,6 +591,10 @@ py_cbor_post(char *sn, char *uri, char *query, char *id, int size, char *data)
 
   PRINT("  [C]py_cbor_post: [%s], [%s] [%s] [%s] %d\n", sn, uri, id, query,
         size);
+#ifdef OC_OSCORE
+  device->ep.flags += OSCORE;
+  PRINT("  [C] OSCORE\n");
+#endif
 
   user_struct_t *new_cbdata;
   new_cbdata = (user_struct_t *)malloc(sizeof(user_struct_t));
@@ -613,6 +627,10 @@ py_cbor_put(char *sn, char *uri, char *query, char *id, int size, char *data)
 
   PRINT("  [C]py_cbor_put: [%s], [%s] [%s] [%s] %d\n", sn, uri, id, query,
         size);
+#ifdef OC_OSCORE
+  device->ep.flags += OSCORE;
+  PRINT("  [C] OSCORE\n");
+#endif
 
   user_struct_t *new_cbdata;
   new_cbdata = (user_struct_t *)malloc(sizeof(user_struct_t));
@@ -644,6 +662,10 @@ py_cbor_delete(char *sn, char *uri, char *query, char *id)
   device_handle_t *device = py_getdevice_from_sn(sn);
 
   PRINT("  [C]py_cbor_delete: [%s], [%s] [%s] [%s]\n", sn, uri, id, query);
+#ifdef OC_OSCORE
+  device->ep.flags += OSCORE;
+  PRINT("  [C] OSCORE\n");
+#endif
 
   user_struct_t *new_cbdata;
   new_cbdata = (user_struct_t *)malloc(sizeof(user_struct_t));
@@ -756,8 +778,10 @@ py_initate_spake(char *sn, char *password)
   int ret = -1;
   device_handle_t *device = py_getdevice_from_sn(sn);
 
-  PRINT("  [C]py_initate_spake: [%s]\n", sn);
-
+  PRINT("  [C]py_initate_spake: [%s] [%s]\n", sn, password);
+  if (oc_string_len(device->ep.serial_number) == 0) {
+    oc_new_string(&device->ep.serial_number, sn, strlen(sn));
+  }
   ret = oc_initiate_spake(&device->ep, password);
   PRINT("  [C]py_initate_spake: [%d]-- done\n", ret);
   if (ret == -1) {
