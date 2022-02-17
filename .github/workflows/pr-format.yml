@@ -29,6 +29,7 @@ jobs:
         with:
           path: iotivity-lite
           ref: ${{ fromJSON(steps.get_branch.outputs.data).repository.pullRequest.headRefName }}
+          run: git submodule update --init --recursive
 
       - name: add reaction
         uses: peter-evans/create-or-update-comment@v1
