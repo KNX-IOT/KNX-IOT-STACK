@@ -1088,9 +1088,9 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     os_token.profile = OC_PROFILE_COAP_OSCORE;
     os_token.interface = OC_IF_SEC | OC_IF_D | OC_IF_P;
     oc_new_string(&os_token.osc_ms, shared_key, 16);
-    oc_new_string(&os_token.osc_id, "spake2+", strlen("spake2+"));
-    oc_new_string(&os_token.sub, "", strlen("spake2+"));
-    oc_new_string(&os_token.kid, "+", strlen("spake2+"));
+    oc_new_string(&os_token.osc_id, "responderkey", strlen("responderkey+"));
+    oc_new_string(&os_token.sub, "", 0);
+    oc_new_string(&os_token.kid, "", 0);
     // store in at tables at position 0
     // note there should be no entries.
     // if there is an entry then overwrite it..
