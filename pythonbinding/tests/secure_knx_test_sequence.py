@@ -665,7 +665,6 @@ def do_auth_at(my_stack):
     #lf = knx_stack.LinkFormat(response.payload)
     #print(" lines:", lf.get_nr_lines())
     #my_stack.purge_response(response)
-    
     # DTLS
     #Req : Content-Format: "application/cbor"
     #Payload:
@@ -749,7 +748,6 @@ def do_sn_discovery(my_stack, scope, sn):
     query = "ep=urn:knx:sn."+str(sn)
     print("do_sn_discovery scope :", scope)
     print("do_sn_discovery query :", query)
-    
     data = my_stack.discover_devices_with_query_data(query, scope=scope)
     print(" -------------------------")
     print (data)
@@ -795,7 +793,6 @@ if __name__ == '__main__':  # pragma: no cover
     try:
         do_sn_discovery(the_stack, args.scope, str(args.sn))
         do_spake(the_stack, str(args.password) )
-        
         do_auth_at(the_stack)
         #do_sequence_dev_programming_mode(the_stack)
     except:

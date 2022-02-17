@@ -1,5 +1,6 @@
 out/*
 .vs/*
+CMakeSettings.json
 
 # pythonbindings
 pythonbinding/apps/**
@@ -15,6 +16,9 @@ pythonbinding/kisCS*
 pythonbinding/Makefile
 pythonbinding/oc_python_export.h
 pythonbinding/cmake_install.cmake
+pythonbinding/CMakeCache.txt
+pythonbinding/DartConfiguration.tcl
+pythonbinding/CTestTestfile.cmake
 
 
 # dependend subprojects
@@ -38,8 +42,6 @@ port/linux/kis-client-server.pc
 port/linux/tests/*
 port/linux/obj/
 port/linux/onboarding_tool_creds/
-
-
 
 port/windows/vs2015/.vs/
 port/windows/vs2015/Debug/
@@ -73,15 +75,6 @@ port/linux/stapptest
 #creds files
 port/linux/client_creds
 port/linux/server_creds
-port/linux/temp_sensor_creds
-port/linux/simpleclient_creds
-port/linux/simpleserver_creds
-port/linux/server_collections_linux_creds
-port/linux/client_collections_linux_creds
-port/linux/smart_home_server_linux_creds
-port/linux/multi_device_client_creds
-port/linux/multi_device_server_creds
-port/linux/server_multithread_linux_creds
 port/linux/client_multithread_linux_creds
 
 #service
