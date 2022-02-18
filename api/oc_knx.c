@@ -279,7 +279,6 @@ oc_knx_lsm_set_state(size_t device_index, oc_lsm_event_t new_state)
   return 0;
 }
 
-
 const char *
 oc_core_get_lsm_state_as_string(oc_lsm_state_t lsm)
 {

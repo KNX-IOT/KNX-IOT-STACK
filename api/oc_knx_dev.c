@@ -678,8 +678,9 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
     return;
   }
   if (reset_mode == 2) {
-    /* With erase code ‘2’ (“Factory Reset to default state”), 
-     all addressing information and security configuration data SHALL be reset to default ex-factory state. */
+    /* With erase code ‘2’ (“Factory Reset to default state”),
+     all addressing information and security configuration data SHALL be reset
+     to default ex-factory state. */
     // writing the empty values
     oc_storage_write(KNX_STORAGE_IA, (char *)&zero, sizeof(int));
     oc_storage_write(KNX_STORAGE_HOSTNAME, (char *)&buf, 1);
@@ -687,17 +688,17 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
     oc_storage_write(KNX_STORAGE_PM, (char *)&zero, sizeof(uint8_t));
     // load state: unloaded
     oc_knx_lsm_set_state(device_index, LSM_S_UNLOADED);
-    //oc_storage_write(KNX_STORAGE_PM, (char *)&zero, sizeof(uint8_t));
+    // oc_storage_write(KNX_STORAGE_PM, (char *)&zero, sizeof(uint8_t));
 
     oc_delete_group_object_table();
     oc_delete_group_rp_table();
 
     oc_delete_at_table();
-  
+
   } else if (reset_mode == 7) {
     /*
     With erase code ‘7’ (“Factory Reset to default without IA”),
-      all configuration data SHALL be reset to ex -factory default state 
+      all configuration data SHALL be reset to ex -factory default state
       except addressing information( IA, Device IP Address) and
       security configuration data(credentials)
       that are needed after the reset to access the device without need
@@ -710,9 +711,6 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
     // load state: unloaded
     oc_knx_lsm_set_state(device_index, LSM_S_UNLOADED);
   }
-
-
-
 }
 
 bool
