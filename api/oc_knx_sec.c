@@ -299,8 +299,8 @@ oc_core_a_sen_post_handler(oc_request_t *request,
   /* input was set, so create the response*/
   if (changed == true) {
     PRINT("  oc_core_a_sen_post_handler cmd %d\n", cmd);
-    // reset the tables
-    oc_reset_device(request->resource->device, cmd);
+    // renew the
+    // c_reset_device(request->resource->device, cmd);
 
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
     return;

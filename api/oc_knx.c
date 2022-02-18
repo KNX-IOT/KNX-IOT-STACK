@@ -261,6 +261,24 @@ oc_knx_lsm_state(size_t device_index)
   return device->lsm_s;
 }
 
+/*
+ * function will store the new state
+ */
+int
+oc_knx_lsm_set_state(size_t device_index, oc_lsm_event_t new_state)
+{
+  oc_device_info_t *device = oc_core_get_device_info(device_index);
+  if (device == NULL) {
+    OC_ERR("device not found %d", (int)device_index);
+    return -1;
+  }
+  device->lsm_s = new_state;
+
+  oc_storage_write(LSM_STORE, (uint8_t *)&device->lsm_s, sizeof(device->lsm_s));
+
+  return 0;
+}
+
 const char *
 oc_core_get_lsm_state_as_string(oc_lsm_state_t lsm)
 {
@@ -304,26 +322,29 @@ oc_core_get_lsm_event_as_string(oc_lsm_event_t lsm)
   return "";
 }
 
+/*
+ * function will store the new state
+ */
 bool
-oc_lsm_event_to_state(oc_lsm_event_t lsm_e, oc_device_info_t *device)
+oc_lsm_event_to_state(oc_lsm_event_t lsm_e, size_t device_index)
 {
   if (lsm_e == LSM_E_NOP) {
     // do nothing
     return true;
   }
   if (lsm_e == LSM_E_STARTLOADING) {
-    device->lsm_s = LSM_S_LOADING;
+    oc_knx_lsm_set_state(device_index, LSM_S_LOADING);
     return true;
   }
   if (lsm_e == LSM_E_LOADCOMPLETE) {
-    device->lsm_s = LSM_S_LOADED;
+    oc_knx_lsm_set_state(device_index, LSM_S_LOADED);
     return true;
   }
   if (lsm_e == LSM_E_UNLOAD) {
     // do a reset
     oc_delete_group_rp_table();
     oc_delete_group_object_table();
-    device->lsm_s = LSM_S_UNLOADED;
+    oc_knx_lsm_set_state(device_index, LSM_S_UNLOADED);
     return true;
   }
   return false;
@@ -402,17 +423,13 @@ oc_core_knx_lsm_post_handler(oc_request_t *request,
   PRINT("  load event %d [%s]\n", event,
         oc_core_get_lsm_event_as_string((oc_lsm_event_t)event));
   // check the input and change the state
-  changed = oc_lsm_event_to_state((oc_lsm_event_t)event, device);
+  changed = oc_lsm_event_to_state((oc_lsm_event_t)event, device_index);
 
   /* input was set, so create the response*/
   if (changed == true) {
     oc_rep_start_root_object();
-    oc_rep_i_set_int(root, 3, device->lsm_s);
+    oc_rep_i_set_int(root, 3, (int)oc_knx_lsm_state(device_index));
     oc_rep_end_root_object();
-
-    oc_storage_write(LSM_STORE, (uint8_t *)&device->lsm_s,
-                     sizeof(device->lsm_s));
-
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
     return;
   }

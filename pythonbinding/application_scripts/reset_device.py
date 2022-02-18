@@ -67,11 +67,12 @@ def get_sn(my_stack):
     print ("response:",response)
     my_stack.purge_response(response)
 
-def do_reset(my_stack):
+def do_reset(my_stack, reset_value):
     if my_stack.get_nr_devices() > 0:
         sn = my_stack.device_array[0].sn
-        content = {2: "reset"}
-        response =  my_stack.issue_cbor_post(sn,"/a/sen",content)
+        # { cmd : "reset", "value": 2}
+        content = {2: "reset", 1: reset_value }
+        response =  my_stack.issue_cbor_post(sn,"/.well-known/knx",content)
         print ("response:",response)
         my_stack.purge_response(response)
 
@@ -83,18 +84,22 @@ if __name__ == '__main__':  # pragma: no cover
                     help="serial number of the device", nargs='?',
                     const=1, required=True)
     parser.add_argument("-scope", "--scope",
-                    help="scope of the multicast request [2,5]",
+                    help="scope of the multicast request [2,5] 2:linklocal",
+                    nargs='?', default=2, const=1, required=False)
+    parser.add_argument("-rs", "--resetvalue",
+                    help="reset value [2,7], 2: factory default, 7: table info",
                     nargs='?', default=2, const=1, required=False)
     # (args) supports batch scripts providing arguments
     print(sys.argv)
     args = parser.parse_args()
     print("scope         :" + str(args.scope))
     print("serial number :" + str(args.serialnumber))
+    print("reset value   :" + str(args.resetvalue))
     the_stack = knx_stack.KNXIOTStack()
     signal.signal(signal.SIGINT, the_stack.sig_handler)
     try:
         do_discover(the_stack, args.serialnumber, args.scope)
-        do_reset(the_stack)
+        do_reset(the_stack, args.resetvalue)
     except:
         traceback.print_exc()
     time.sleep(2)
