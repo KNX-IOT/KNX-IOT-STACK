@@ -1194,7 +1194,7 @@ oc_init_oscore(size_t device_index)
 bool
 oc_is_resource_secure(oc_method_t method, oc_resource_t *resource)
 {
-  // see table 6.1.3: all resources with methods that do not have 
+  // see table 6.1.3: all resources with methods that do not have
   // an interface are unsecure
   if (method == OC_GET &&
       ((oc_string_len(resource->uri) == 17 &&
@@ -1202,8 +1202,7 @@ oc_is_resource_secure(oc_method_t method, oc_resource_t *resource)
        (oc_string_len(resource->uri) == 16 &&
         memcmp(oc_string(resource->uri), "/.well-known/knx", 16) == 0) ||
        (oc_string_len(resource->uri) == 20 &&
-        memcmp(oc_string(resource->uri), "/.well-known/knx/osn", 20) == 0))
-    ) {
+        memcmp(oc_string(resource->uri), "/.well-known/knx/osn", 20) == 0))) {
     return false;
   }
   // not secure: needed for SPAKE handshake
