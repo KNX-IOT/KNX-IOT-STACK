@@ -1111,7 +1111,7 @@ oc_oscore_set_auth(uint8_t *shared_key, int shared_key_size)
   os_token.profile = OC_PROFILE_COAP_OSCORE;
   os_token.interface = OC_IF_SEC | OC_IF_D | OC_IF_P;
   oc_new_string(&os_token.osc_ms, (char *)shared_key, shared_key_size);
-  oc_new_string(&os_token.osc_id, "spake2+", strlen("spake2+"));
+  oc_new_string(&os_token.osc_id, "responderkey", strlen("responderkey"));
   oc_new_string(&os_token.sub, "", strlen("spake2+"));
   oc_new_string(&os_token.kid, "+", strlen("spake2+"));
   oc_core_set_at_table(0, os_token);
