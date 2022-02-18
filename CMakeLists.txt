@@ -258,7 +258,7 @@ if(BUILD_TESTING AND UNIX)
 
     file(GLOB PLATFORMTEST_SRC port/unittest/*.cpp)
     file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/storage_test)
-    package_add_test(platformtest port/unittest ${PLATFORMTEST_SRC} )
+    #package_add_test(platformtest port/unittest ${PLATFORMTEST_SRC} )
 
     file(GLOB MESSAGINGTEST_SRC messaging/coap/unittest/*.cpp)
     package_add_test(messagingtest messaging/coap/unittest ${MESSAGINGTEST_SRC})
@@ -284,3 +284,7 @@ endif() #CMAKE_BUILD_TYPE STREQUAL "Coverage"
 add_subdirectory(port)
 add_subdirectory(apps)
 add_subdirectory(deps)
+
+if(BUILD_TESTING AND UNIX)
+    add_subdirectory(port/unittest)
+endif()
