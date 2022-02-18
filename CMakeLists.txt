@@ -250,6 +250,9 @@ if(BUILD_TESTING AND UNIX)
     endmacro()
 
     # Unit tests
+    # glob of all tests within api/unittest
+    # NOT GONNA WORK
+    # We should instead add the tests individually to a bunch of test runners
     file(GLOB APITEST_SRC api/unittest/*.cpp)
     package_add_test(apitest api/unittest ${APITEST_SRC})
 
