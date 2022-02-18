@@ -50,11 +50,11 @@ oc_string_t g_ldevid;
 
 enum SpakeKeys {
   SPAKE_SALT = 5,
-  SPAKE_PA = 10,
-  SPAKE_PB = 11,
+  SPAKE_PA_SHARE_P = 10,
+  SPAKE_PB_SHARE_V = 11,
   SPAKE_PBKDF2 = 12,
-  SPAKE_CB = 13,
-  SPAKE_CA = 14,
+  SPAKE_CB_CONFIRM_V = 13,
+  SPAKE_CA_CONFIRM_P = 14,
   SPAKE_RND = 15,
   SPAKE_IT = 16,
 };
@@ -922,11 +922,11 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
   while (rep != NULL) {
     switch (rep->type) {
     case OC_REP_BYTE_STRING: {
-      if (rep->iname == SPAKE_PA) {
-        valid_request = SPAKE_PA;
+      if (rep->iname == SPAKE_PA_SHARE_P) {
+        valid_request = SPAKE_PA_SHARE_P;
       }
-      if (rep->iname == SPAKE_CA) {
-        valid_request = SPAKE_CA;
+      if (rep->iname == SPAKE_CA_CONFIRM_P) {
+        valid_request = SPAKE_CA_CONFIRM_P;
       }
       if (rep->iname == SPAKE_RND) {
         valid_request = SPAKE_RND;
@@ -946,12 +946,12 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
   while (rep != NULL) {
     switch (rep->type) {
     case OC_REP_BYTE_STRING: {
-      if (rep->iname == SPAKE_CA) {
+      if (rep->iname == SPAKE_CA_CONFIRM_P) {
         oc_free_string(&g_pase.ca);
         oc_new_string(&g_pase.ca, oc_string(rep->value.string),
                       oc_byte_string_len(rep->value.string));
       }
-      if (rep->iname == SPAKE_PA) {
+      if (rep->iname == SPAKE_PA_SHARE_P) {
         oc_free_string(&g_pase.pa);
         oc_new_string(&g_pase.pa, oc_string(rep->value.string),
                       oc_byte_string_len(rep->value.string));
@@ -993,7 +993,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     return;
   }
 #ifdef OC_SPAKE
-  if (valid_request == SPAKE_PA) {
+  if (valid_request == SPAKE_PA_SHARE_P) {
     // return changed, frame pb (11) & cb (13)
 
     const char *password = oc_spake_get_password();
@@ -1052,16 +1052,16 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
 
     oc_rep_begin_root_object();
     // pb (11)
-    oc_rep_i_set_byte_string(root, SPAKE_PB, oc_string(g_pase.pb),
+    oc_rep_i_set_byte_string(root, SPAKE_PB_SHARE_V, oc_string(g_pase.pb),
                              oc_byte_string_len(g_pase.pb));
     // cb (13)
-    oc_rep_i_set_byte_string(root, SPAKE_CB, oc_string(g_pase.cb),
+    oc_rep_i_set_byte_string(root, SPAKE_CB_CONFIRM_V, oc_string(g_pase.cb),
                              oc_byte_string_len(g_pase.cb));
     oc_rep_end_root_object();
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
     return;
   }
-  if (valid_request == SPAKE_CA) {
+  if (valid_request == SPAKE_CA_CONFIRM_P) {
     // calculate expected cA
     uint8_t expected_ca[32];
     if (g_pase.pb.ptr == NULL)
