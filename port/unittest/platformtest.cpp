@@ -56,7 +56,7 @@ TEST(TestConnectivity_init, oc_connectivity_init)
 TEST_F(TestConnectivity, oc_connectivity_get_endpoints)
 {
   oc_endpoint_t *ep = oc_connectivity_get_endpoints(device);
-  EXPECT_NE(NULL, ep);
+  EXPECT_NE((oc_endpoint_t *)NULL, ep);
 }
 
 static void
@@ -95,7 +95,7 @@ TEST_F(TestConnectivity, handle_network_interface_event_callback)
 static void
 session_event_handler(const oc_endpoint_t *ep, oc_session_state_t state)
 {
-  EXPECT_NE(NULL, ep);
+  EXPECT_NE((oc_endpoint_t *)NULL, ep);
   EXPECT_EQ(OC_SESSION_CONNECTED, state);
   is_callback_received = true;
 }
