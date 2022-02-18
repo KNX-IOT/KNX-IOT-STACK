@@ -109,11 +109,21 @@ typedef enum {
 } oc_lsm_event_t;
 
 /**
- * @brief check if the lsm state
+ * @brief retrieve the current lsm state
  *
  * @param device index of the device to which the resource is to be created
+ * @return the lsm state
  */
 oc_lsm_state_t oc_knx_lsm_state(size_t device);
+
+/**
+ * @brief retrieve the current lsm state
+ *
+ * @param device index of the device to which the resource is to be created
+ * @param new_state the new lsm_state
+ * @return 0 == success
+ */
+int oc_knx_lsm_set_state(size_t device_index, oc_lsm_event_t new_state);
 
 /**
  * @brief convert the load state machine (lsm) event to string
