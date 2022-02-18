@@ -1194,25 +1194,30 @@ oc_init_oscore(size_t device_index)
 bool
 oc_is_resource_secure(oc_method_t method, oc_resource_t *resource)
 {
+  // see table 6.1.3: all resources with methods that do not have
+  // an interface are unsecure
   if (method == OC_GET &&
       ((oc_string_len(resource->uri) == 17 &&
         memcmp(oc_string(resource->uri), "/.well-known/core", 17) == 0) ||
        (oc_string_len(resource->uri) == 16 &&
-        memcmp(oc_string(resource->uri), "/.well-known/knx", 16) == 0))) {
+        memcmp(oc_string(resource->uri), "/.well-known/knx", 16) == 0) ||
+       (oc_string_len(resource->uri) == 20 &&
+        memcmp(oc_string(resource->uri), "/.well-known/knx/osn", 20) == 0))) {
     return false;
   }
-  // note check this, because we should not be able to do a reset...
-  // TODO
-  if (method == OC_POST &&
-      ((oc_string_len(resource->uri) == 16 &&
-        memcmp(oc_string(resource->uri), "/.well-known/knx", 16) == 0))) {
-    return false;
-  }
-  // needed for SPAKE handshake
+  // not secure: needed for SPAKE handshake
   if (method == OC_POST &&
       ((oc_string_len(resource->uri) == 22 &&
         memcmp(oc_string(resource->uri), "/.well-known/knx/spake", 22) == 0))) {
     return false;
+  }
+
+  // not needed, but now this is very explicit
+  // POSTING to /.well-known/knx is secure, this is a device reset
+  if (method == OC_POST &&
+      ((oc_string_len(resource->uri) == 16 &&
+        memcmp(oc_string(resource->uri), "/.well-known/knx", 16) == 0))) {
+    return true;
   }
 
   return true;
