@@ -1,5 +1,5 @@
 /*
- // Copyright (c) 2021 Cascoda Ltd
+ // Copyright (c) 2021-2022 Cascoda Ltd
  //
  // Licensed under the Apache License, Version 2.0 (the "License");
  // you may not use this file except in compliance with the License.
@@ -58,8 +58,8 @@ void
 oc_create_dev_sn_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_dev_sn_resource\n");
-  // cbor rt :dpa:0.11
-  // json rt :dpt.serNum
+  // rt :dpa:0.11
+  // rt :dpt.serNum
   oc_core_populate_resource(
     resource_idx, device, "/dev/sn", OC_IF_D, APPLICATION_CBOR, OC_DISCOVERABLE,
     oc_core_dev_sn_get_handler, 0, 0, 0, 2, ":dpa:0.11", "dpt.serNum");
@@ -131,9 +131,7 @@ oc_core_dev_fwv_get_handler(oc_request_t *request,
   if (device != NULL) {
     // Content-Format: "application/cbor"
     // Payload: [ 1, 2, 3 ]
-
     // oc_rep_add_int(&arrayEncoder, (int64_t)device->fwv.major);
-
     // oc_rep_close_array(root, fibonacci);
 
     CborEncoder arrayEncoder;
@@ -158,7 +156,7 @@ oc_create_dev_fwv_resource(int resource_idx, size_t device)
   oc_core_populate_resource(resource_idx, device, "/dev/fwv", OC_IF_D,
                             APPLICATION_CBOR, OC_DISCOVERABLE,
                             oc_core_dev_fwv_get_handler, 0, 0, 0, 2,
-                            ":dpa.0.54", ":dpt.version");
+                            ":dpa.0.25", ":dpt.version");
 }
 
 // -----------------------------------------------------------------------------
@@ -200,43 +198,6 @@ oc_create_dev_hwt_resource(int resource_idx, size_t device)
 
 // -----------------------------------------------------------------------------
 
-void
-oc_core_dev_name_get_handler(oc_request_t *request,
-                             oc_interface_mask_t iface_mask, void *data)
-{
-  (void)data;
-  (void)iface_mask;
-
-  /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
-    return;
-  }
-
-  size_t device_index = request->resource->device;
-  oc_device_info_t *device = oc_core_get_device_info(device_index);
-  if (device != NULL && oc_string(device->name) != NULL) {
-    cbor_encode_text_stringz(&g_encoder, oc_string(device->name));
-
-    oc_send_cbor_response(request, OC_STATUS_OK);
-    return;
-  }
-
-  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
-}
-
-void
-oc_create_dev_name_resource(int resource_idx, size_t device)
-{
-  OC_DBG("oc_create_dev_name_resource\n");
-  // cbor rt:
-  oc_core_populate_resource(
-    resource_idx, device, "/dev/name", OC_IF_D, APPLICATION_CBOR,
-    OC_DISCOVERABLE, oc_core_dev_name_get_handler, 0, 0, 0, 1, ":dpt.utf8");
-}
-
-// -----------------------------------------------------------------------------
-
 static void
 oc_core_dev_model_get_handler(oc_request_t *request,
                               oc_interface_mask_t iface_mask, void *data)
@@ -249,7 +210,6 @@ oc_core_dev_model_get_handler(oc_request_t *request,
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
-
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device != NULL && oc_string(device->model) != NULL) {
@@ -258,7 +218,6 @@ oc_core_dev_model_get_handler(oc_request_t *request,
     oc_send_cbor_response(request, OC_STATUS_OK);
     return;
   }
-
   oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
 }
 
@@ -266,9 +225,10 @@ void
 oc_create_dev_model_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_dev_model_resource\n");
-  oc_core_populate_resource(
-    resource_idx, device, "/dev/model", OC_IF_D, APPLICATION_CBOR,
-    OC_DISCOVERABLE, oc_core_dev_model_get_handler, 0, 0, 0, 1, ":dpa.0.15");
+  oc_core_populate_resource(resource_idx, device, "/dev/model", OC_IF_D,
+                            APPLICATION_CBOR, OC_DISCOVERABLE,
+                            oc_core_dev_model_get_handler, 0, 0, 0, 2,
+                            ":dpa.0.15", ":dpt.utf8");
 }
 
 // -----------------------------------------------------------------------------
@@ -416,7 +376,7 @@ oc_create_dev_hostname_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_dev_hostname_resource\n");
   oc_core_populate_resource(
-    resource_idx, device, "/dev/hame", OC_IF_P, APPLICATION_CBOR,
+    resource_idx, device, "/dev/hname", OC_IF_P, APPLICATION_CBOR,
     OC_DISCOVERABLE, oc_core_dev_hostname_get_handler,
     oc_core_dev_hostname_put_handler, 0, 0, 1, ":dpt.varString8859_1");
 }
@@ -735,7 +695,6 @@ oc_create_knx_device_resources(size_t device_index)
   oc_create_dev_hwv_resource(OC_DEV_HWV, device_index);
   oc_create_dev_fwv_resource(OC_DEV_FWV, device_index);
   oc_create_dev_hwt_resource(OC_DEV_HWT, device_index);
-  // oc_create_dev_name_resource(OC_DEV_NAME, device_index);
   oc_create_dev_model_resource(OC_DEV_MODEL, device_index);
   oc_create_dev_ia_resource(OC_DEV_IA, device_index);
   oc_create_dev_hostname_resource(OC_DEV_HOSTNAME, device_index);

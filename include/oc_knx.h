@@ -205,6 +205,15 @@ uint64_t oc_knx_get_osn();
  */
 void oc_knx_load_state(size_t device_index);
 
+/**
+ * @brief reset the device
+ * the reset value according to the specification
+ * - 2: reset to the default state (e.g. erase all)
+ * - 7: reset all except: adressing (ia) and security (credentials))
+ * @param device_index the device index
+ * @param reset_value the reset value
+ * @return int 0== success
+ */
 int oc_reset_device(size_t device_index, int reset_value);
 
 /**
