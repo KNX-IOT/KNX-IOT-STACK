@@ -457,6 +457,42 @@ oc_create_dev_iid_resource(int resource_idx, size_t device)
 // -----------------------------------------------------------------------------
 
 static void
+oc_core_dev_ipv6_get_handler(oc_request_t *request,
+                           oc_interface_mask_t iface_mask, void *data)
+{
+  (void)data;
+  (void)iface_mask;
+
+  /* check if the accept header is CBOR-format */
+  if (request->accept != APPLICATION_CBOR) {
+    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    return;
+  }
+
+  size_t device_index = request->resource->device;
+  oc_device_info_t *device = oc_core_get_device_info(device_index);
+  if (device != NULL) {
+    // TODO
+    //cbor_encode_boolean(&g_encoder, device->pm);
+    oc_send_cbor_response(request, OC_STATUS_OK);
+    return;
+  }
+
+  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+}
+
+void
+oc_create_dev_ipv6_resource(int resource_idx, size_t device)
+{
+  OC_DBG("oc_create_dev_ipv6_resource\n");
+  oc_core_populate_resource(
+    resource_idx, device, "/dev/ipv6", OC_IF_P, APPLICATION_CBOR, OC_DISCOVERABLE,
+                            oc_core_dev_ipv6_get_handler, 0, 0, 0, 1, ":dpt.ipv6");
+}
+
+// -----------------------------------------------------------------------------
+
+static void
 oc_core_dev_pm_get_handler(oc_request_t *request,
                            oc_interface_mask_t iface_mask, void *data)
 {
@@ -700,6 +736,7 @@ oc_create_knx_device_resources(size_t device_index)
   oc_create_dev_hostname_resource(OC_DEV_HOSTNAME, device_index);
   oc_create_dev_iid_resource(OC_DEV_IID, device_index);
   oc_create_dev_pm_resource(OC_DEV_PM, device_index);
+  oc_create_dev_ipv6_resource(OC_DEV_IPV6, device_index);
   // should be last of the dev/xxx resources, it will list those.
   oc_create_dev_dev_resource(OC_DEV, device_index);
 }

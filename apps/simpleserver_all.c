@@ -750,6 +750,7 @@ print_usage()
         "functionality)\n ");
   PRINT("-help : this message\n");
   PRINT("s-mode : does an event (to itself)\n");
+  PRINT("reset  : does an full reset of the device\n");
   exit(0);
 }
 
@@ -780,6 +781,11 @@ main(int argc, char *argv[])
     if (strcmp(argv[1], "s-mode") == 0) {
       do_send_s_mode = true;
       PRINT(" smode: %d\n", do_send_s_mode);
+    }
+    if (strcmp(argv[1], "reset") == 0) {
+      PRINT(" internal reset\n");
+      oc_knx_device_storage_reset(0, 0);
+      
     }
     if (strcmp(argv[1], "-help") == 0) {
       print_usage();

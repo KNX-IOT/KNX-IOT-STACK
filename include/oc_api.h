@@ -105,7 +105,7 @@ typedef struct
    * static void register_resources(void)
    * {
    *   oc_resource_t *bswitch = oc_new_resource(NULL, "/switch", 1, 0);
-   *   oc_resource_bind_resource_type(bswitch, "oic.r.switch.binary");
+   *   oc_resource_bind_resource_type(bswitch, "dpa.321.51");
    *   oc_resource_bind_resource_interface(bswitch, OC_IF_A);
    *   oc_resource_set_discoverable(bswitch, true);
    *   oc_resource_set_request_handler(bswitch, OC_GET, get_switch, NULL);
@@ -141,7 +141,7 @@ typedef struct
    * ```
    * static void issue_requests(void)
    * {
-   *   oc_do_ip_discovery("oic.r.switch.binary", &discovery, NULL);
+   *   oc_do_ip_discovery("dpa.321.51", &discovery, NULL);
    * }
    * ```
    *
@@ -180,9 +180,7 @@ typedef struct
  * {
  *   int ret = oc_init_platform("My Platform",
  *      set_additional_platform_properties, NULL);
- *   ret |= oc_add_device("/oic/d",
- *      "oic.d.light", "My light", "ocf.1.0.0", "ocf.res.1.0.0", NULL, NULL);
- *      return ret;
+ *   ret |= oc_add_device("my_name", "1.0.0", "//", "000005", NULL, NULL);
  * }
  * ```
  *
@@ -207,9 +205,8 @@ typedef void (*oc_init_platform_cb_t)(void *data);
  *
  * static int app_init(void)
  * {
- *   int ret = oc_init_platform("My Platform", NULL, NULL);
- *   ret |= oc_add_device("/oic/d", "oic.d.light", "My light", "ocf.1.0.0",
- *                        "ocf.res.1.0.0", set_device_custom_property, NULL);
+ *   int ret = oc_init_platform("My Platform", NULL, NULL);  
+ *   ret |= oc_add_device("my_name", "1.0.0", "//", "000005", NULL, NULL);
  *   return ret;
  * }
  * ```
@@ -269,79 +266,7 @@ void oc_main_shutdown(void);
  * "factory settings", e.g., this may be used to load a manufacturer
  * certificate.
  *
- * The following example illustrates the method of loading a manufacturer
- * certificate chain (end-entity certificate, intermediate CA certificate, and
- * root CA certificate) using oc_pki_xxx APIs.
  *
- * Example:
- * ```
- * void factory_presets_cb(size_t device, void *data)
- * {
- *   (void)device;
- *   (void)data;
- * #if defined(OC_SECURITY) && defined(OC_PKI)
- *   char cert[8192];
- *   size_t cert_len = 8192;
- *   if (read_pem("pki_certs/ee.pem", cert, &cert_len) < 0) {
- *     PRINT("ERROR: unable to read certificates\n");
- *     return;
- *   }
- *
- *   char key[4096];
- *   size_t key_len = 4096;
- *   if (read_pem("pki_certs/key.pem", key, &key_len) < 0) {
- *     PRINT("ERROR: unable to read private key");
- *     return;
- *   }
- *
- *   int ee_credid = oc_pki_add_mfg_cert(0, (const unsigned char *)cert,
- * cert_len, (const unsigned char *)key, key_len);
- *
- *   if (ee_credid < 0) {
- *     PRINT("ERROR installing manufacturer EE cert\n");
- *     return;
- *   }
- *
- *   cert_len = 8192;
- *   if (read_pem("pki_certs/subca1.pem", cert, &cert_len) < 0) {
- *     PRINT("ERROR: unable to read certificates\n");
- *     return;
- *   }
- *
- *   int subca_credid = oc_pki_add_mfg_intermediate_cert(
- *     0, ee_credid, (const unsigned char *)cert, cert_len);
- *
- *   if (subca_credid < 0) {
- *     PRINT("ERROR installing intermediate CA cert\n");
- *     return;
- *   }
- *
- *   cert_len = 8192;
- *   if (read_pem("pki_certs/rootca1.pem", cert, &cert_len) < 0) {
- *     PRINT("ERROR: unable to read certificates\n");
- *     return;
- *   }
- *
- *   int rootca_credid =
- *     oc_pki_add_mfg_trust_anchor(0, (const unsigned char *)cert, cert_len);
- *   if (rootca_credid < 0) {
- *     PRINT("ERROR installing root cert\n");
- *     return;
- *   }
- *
- *   oc_pki_set_security_profile(0, OC_SP_BLACK, OC_SP_BLACK, ee_credid);
- * #endif // OC_SECURITY && OC_PKI
- * }
- * ```
- * @param[in] device number of the device
- * @param[in] data context pointer that comes from the
- *                 oc_set_factory_presets_cb() function
- *
- * @see oc_set_factory_presets_cb
- * @see oc_pki_add_mfg_cert
- * @see oc_pki_add_mfg_intermediate_cert
- * @see oc_pki_add_mfg_trust_anchor
- * @see oc_pki_set_security_profile
  */
 typedef void (*oc_factory_presets_cb_t)(size_t device, void *data);
 
@@ -386,7 +311,7 @@ void oc_set_factory_presets_cb(oc_factory_presets_cb_t cb, void *data);
  * ```
  *
  * @param[in] name the user readable name of the device
- * @param[in] version The api version e.g. "1.0"
+ * @param[in] version The api version e.g. "1.0.0"
  * @param[in] base the base url e.g. "/"
  * @param[in] serial_number the serial number of the device
  * @param[in] add_device_cb callback function invoked during oc_add_device().
@@ -462,7 +387,7 @@ int oc_init_platform(const char *mfg_name,
 /* Server side */
 /**
   @defgroup doc_module_tag_server_side Server side
-  Optional group of functions OCF server support.
+  Optional group of server support functions.
   @{
 */
 /**
@@ -488,7 +413,7 @@ int oc_init_platform(const char *mfg_name,
  * static void register_resources(void)
  * {
  *   oc_resource_t *bswitch = oc_new_resource("light switch", "/switch", 1, 0);
- *   oc_resource_bind_resource_type(bswitch, "oic.r.switch.binary");
+ *   oc_resource_bind_resource_type(bswitch, "dpt.0.5");
  *   oc_resource_bind_resource_interface(bswitch, OC_IF_A);
  *   oc_resource_set_observable(bswitch, true);
  *   oc_resource_set_discoverable(bswitch, true);
@@ -515,7 +440,6 @@ int oc_init_platform(const char *mfg_name,
 oc_resource_t *oc_new_resource(const char *name, const char *uri,
                                uint8_t num_resource_types, size_t device);
 
-// UPDATE
 /**
  * Add the supported interface(s) to the resource.
  *
@@ -538,12 +462,6 @@ void oc_resource_bind_resource_interface(oc_resource_t *resource,
  * All resources require at least one Resource Type. The number of Resource
  * Types the resource contains is declared when the resource it created using
  * oc_new_resource() function.
- *
- * Resource Types use a dot "." naming scheme e.g. `oic.r.switch.binary`.
- * Resource Types starting with `oic` are reserved for a OCF defined Resource
- * Types.  Developers are strongly encouraged to try and use an OCF defined
- * Resource Type vs. creating their own. A repository of OCF defined resources
- * can be found on oneiota.org.
  *
  * Multi-value "rt" Resource means a resource with multiple Resource Types. i.e.
  * oc_resource_bind_resource_type() is called multiple times for a single
@@ -569,7 +487,7 @@ void oc_resource_bind_content_type(oc_resource_t *resource,
 
 /**
  * @defgroup doc_module_tag_collections Collection Support
- * Optional group of functions to support OCF compliant collections.
+ * Optional group of functions to support compliant collections.
  * @{
  */
 
@@ -577,7 +495,7 @@ void oc_resource_bind_content_type(oc_resource_t *resource,
 
 /**
  * Expose unsecured coap:// endpoints (in addition to secured coaps://
- * endpoints) for this resource in /oic/res.
+ * endpoints) for this resource in /well-known/core
  *
  * @note While the resource may advertise unsecured endpoints, the resource
  *       shall remain inaccessible until the hosting device is configured with
@@ -733,43 +651,6 @@ bool oc_delete_resource(oc_resource_t *resource);
  */
 void oc_delayed_delete_resource(oc_resource_t *resource);
 
-/**
-  @brief Callback for change notifications from the oic.wk.con resource.
-
-  This callback is invoked to notify a change of one or more properties
-  on the oic.wk.con resource. The `rep` parameter contains all properties,
-  the function is not invoked for each property.
-
-  When the function is invoked, all properties handled by the stack are
-  already updated. The callee can use the invocation to optionally store
-  the new values persistently.
-
-  Once the callback returns, the response will be sent to the client
-  and observers will be notified.
-
-  @note As of now only the attribute "n" is supported.
-  @note The callee shall not block for too long as the stack is blocked
-        during the invocation.
-
-  @param device_index index of the device to which the change was
-                      applied, 0 is the first device
-  @param rep list of properties and their new values
-*/
-typedef void (*oc_con_write_cb_t)(size_t device_index, oc_rep_t *rep);
-
-/**
- * Sets the callback to receive change notifications for
- * the `oic.wk.con` resource.
- *
- * The function can be used to set or unset the callback. Whenever
- * an attribute of the `oic.wk.con` resource is changed, the callback
- * will be invoked.
- *
- * @param callback The callback to register or NULL to unset it. If the function
- *                 is invoked a second time, then the previously set callback is
- *                 simply replaced.
- */
-void oc_set_con_write_cb(oc_con_write_cb_t callback);
 
 /**
  * This resets the query iterator to the start of the URI query parameter

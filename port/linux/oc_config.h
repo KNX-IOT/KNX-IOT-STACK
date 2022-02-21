@@ -28,7 +28,7 @@ extern "C" {
 
 typedef uint64_t oc_clock_time_t;
 #define OC_CLOCK_CONF_TICKS_PER_SECOND CLOCKS_PER_SEC
-//#define OC_SPEC_VER_OIC
+
 /* Security Layer */
 /* Max inactivity timeout before tearing down DTLS connection */
 #define OC_DTLS_INACTIVITY_TIMEOUT (600)
@@ -84,8 +84,8 @@ typedef uint64_t oc_clock_time_t;
 /* Maximum number of nodes in a payload tree structure */
 #define OC_MAX_NUM_REP_OBJECTS (150)
 
-/* Number of devices on the OCF platform */
-#define OC_MAX_NUM_DEVICES (2)
+/* Number of devices on the platform */
+#define OC_MAX_NUM_DEVICES (1)
 
 /* Maximum number of endpoints */
 #define OC_MAX_NUM_ENDPOINTS (20)

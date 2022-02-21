@@ -840,7 +840,7 @@ add_periodic_observe_callback(oc_resource_t *resource)
     event_cb->callback = periodic_observe_handler;
     OC_PROCESS_CONTEXT_BEGIN(&timed_callback_events);
     oc_etimer_set(&event_cb->timer,
-                  resource->observe_period_seconds * OC_CLOCK_SECOND);
+                  (uint64_t)resource->observe_period_seconds * OC_CLOCK_SECOND);
     OC_PROCESS_CONTEXT_END(&timed_callback_events);
     oc_list_add(observe_callbacks, event_cb);
   }
@@ -1074,7 +1074,7 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
         // char.
         if (((int)(uri_path_len + 1) >= len_resource) &&
             strncmp((const char *)oc_string(resource->uri) + 1, uri_path,
-                    len_resource - 2) == 0) {
+                    (size_t)len_resource - 2) == 0) {
           request_obj.resource = cur_resource = resource;
           break;
         }

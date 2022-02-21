@@ -527,7 +527,7 @@ oc_knx_swu_a_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 void
 oc_create_knx_swu_a_resource(int resource_idx, size_t device)
 {
-  OC_DBG("oc_create_knx_reset_resource\n");
+  OC_DBG("oc_create_knx_swu_a_resource\n");
   oc_core_populate_resource(resource_idx, device, "a/swu", OC_IF_NONE,
                             APPLICATION_CBOR, OC_DISCOVERABLE, 0,
                             oc_knx_swu_a_put_handler, oc_knx_swu_a_post_handler,
@@ -720,6 +720,8 @@ oc_create_knx_swu_resources(size_t device_index)
   oc_swu_set_last_update("");
   oc_swu_set_package_version(0, 0, 0);
 }
+
+// ----------------------------------------------------------------------------
 
 void
 oc_swu_set_package_name(char *name)
