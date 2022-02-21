@@ -343,7 +343,7 @@ oc_core_dev_hostname_put_handler(oc_request_t *request,
 
     oc_hostname_t *my_hostname = oc_get_hostname_cb();
     if (my_hostname && my_hostname->cb) {
-      my_hostname->cb(device_index, oc_string(rep->value.string),
+      my_hostname->cb(device_index, rep->value.string,
                       my_hostname->data);
     }
 
