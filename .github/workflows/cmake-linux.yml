@@ -35,11 +35,11 @@ jobs:
           cd linuxbuild
           cmake ../.
           make all  OSCORE=1
-          ./apitest
-          ./platformtest
+          ./api/unittest/apitest
+          ./port/unittest/platformtest
           #./storage_test
-          ./messagingtest
-          ./securitytest
+          ./messaging/coap/unittest/messagingtest
+          ./security/unittest/securitytest
 
   # This workflow contains a single job called "check_code_style"
   cmake_linux_unsecured:
@@ -61,8 +61,8 @@ jobs:
           cd linuxbuild_sec
           cmake ../.
           make all OSCORE=0
-          ./apitest
-          ./platformtest
+          ./api/unittest/apitest
+          ./port/unittest/platformtest
           #./storage_test
-          ./messagingtest
+          ./messaging/coap/unittest/messagingtest
     

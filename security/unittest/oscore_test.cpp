@@ -14,7 +14,7 @@
 // limitations under the License.
 */
 
-#if defined(OC_SECURITY) && defined(OC_OSCORE)
+#if defined(OC_OSCORE)
 
 #include "messaging/coap/coap.h"
 #include "messaging/coap/oscore.h"

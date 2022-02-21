@@ -225,48 +225,18 @@ if(BUILD_TESTING AND UNIX)
     set(CMAKE_CXX_STANDARD 11)
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
     set(CMAKE_CXX_EXTENSIONS OFF)
-    list(APPEND TEST_COMPILE_OPTIONS "-Wall" "-Wextra")
-    list(APPEND TEST_LINK_LIBS kis-port kisClientServer gtest gtest_main Threads::Threads)
-    if(CMAKE_COMPILER_IS_GNUCXX)
-        list(APPEND TEST_COMPILE_OPTIONS "-fprofile-arcs" "-ftest-coverage" "-fpermissive")
-        list(APPEND TEST_LINK_LIBS gcov)
-    endif()
 
     # Disable clang-tidy for gtest
     disable_clang_tidy()
 
     # Build googletest
-    add_subdirectory(${PROJECT_SOURCE_DIR}/deps/gtest gtest)
+    add_subdirectory(${PROJECT_SOURCE_DIR}/deps/gtest)
+    target_include_directories(gtest PUBLIC ${PROJECT_SOURCE_DIR}/deps/gtest/include)
 
-    # Helper macro to build unit test
-    macro(package_add_test TESTNAME FOLDER)
-        add_executable(${TESTNAME} ${PROJECT_SOURCE_DIR}/${FOLDER}/${TESTNAME}.cpp)
-        target_compile_options(${TESTNAME} PRIVATE ${TEST_COMPILE_OPTIONS})
-        target_compile_features(${TESTNAME} PRIVATE cxx_nullptr)
-        target_include_directories(${TESTNAME} PRIVATE ${PROJECT_SOURCE_DIR}/deps/gtest/include)
-        target_link_libraries(${TESTNAME} PUBLIC ${TEST_LINK_LIBS})
-        add_test(NAME ${TESTNAME} COMMAND ${TESTNAME})
-        set_target_properties(${TESTNAME} PROPERTIES FOLDER unittests)
-    endmacro()
-
-    # Unit tests
-    file(GLOB APITEST_SRC api/unittest/*.cpp)
-    package_add_test(apitest api/unittest ${APITEST_SRC})
-
-    file(GLOB PLATFORMTEST_SRC port/unittest/*.cpp)
-    file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/storage_test)
-    package_add_test(platformtest port/unittest ${PLATFORMTEST_SRC} )
-
-    file(GLOB MESSAGINGTEST_SRC messaging/coap/unittest/*.cpp)
-    package_add_test(messagingtest messaging/coap/unittest ${MESSAGINGTEST_SRC})
-
-    if(OC_OSCORE_ENABLED)
-        file(GLOB SECURITYTEST_SRC security/unittest/*.cpp)
-        package_add_test(securitytest security/unittest ${SECURITYTEST_SRC})
-    endif()
-
-    # reenable clang-tidy for any remaining targets
-    enable_clang_tidy()
+    add_subdirectory(api/unittest)
+    add_subdirectory(port/unittest)
+    add_subdirectory(messaging/coap/unittest)
+    add_subdirectory(security/unittest)
 endif()
 
 # https://stackoverflow.com/questions/37957583/how-to-use-gcov-with-cmake
