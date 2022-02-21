@@ -61,8 +61,8 @@ jobs:
           cd linuxbuild_sec
           cmake ../.
           make all OSCORE=0
-          ./apitest
-          ./platformtest
+          ./api/unittest/apitest
+          ./port/unittest/platformtest
           #./storage_test
-          ./messagingtest
+          ./messaging/coap/unittest/messagingtest
     
