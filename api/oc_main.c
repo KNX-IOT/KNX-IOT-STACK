@@ -77,7 +77,6 @@ oc_get_factory_presets_cb(void)
   return &factory_presets;
 }
 
-
 // -----------------------------------------------------------------------------
 
 void
@@ -92,7 +91,6 @@ oc_get_reset_cb(void)
 {
   return &app_reset;
 }
-
 
 // -----------------------------------------------------------------------------
 
@@ -124,7 +122,6 @@ oc_get_hostname_cb(void)
 }
 
 // -----------------------------------------------------------------------------
-
 
 #ifdef OC_DYNAMIC_ALLOCATION
 #include "oc_buffer_settings.h"

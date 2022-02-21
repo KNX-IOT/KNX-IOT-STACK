@@ -661,7 +661,7 @@ reset_cb(size_t device, int reset_value, void *data)
 {
   (void)data;
 
-   PRINT("reset_cb %d\n", reset_value);
+  PRINT("reset_cb %d\n", reset_value);
 }
 
 /**
@@ -694,7 +694,6 @@ hostname_cb(size_t device, oc_string_t host_name, void *data)
   PRINT("-----host name ------- %s\n", oc_string(host_name));
 }
 
-
 /* separate files for each call to transport a block of data*/
 void
 swu_cb(size_t device, size_t offset, const uint8_t *payload, size_t len,
@@ -707,12 +706,10 @@ swu_cb(size_t device, size_t offset, const uint8_t *payload, size_t len,
   fseek(fp, offset, SEEK_SET);
   size_t written = fwrite(payload, len, 1, fp);
   if (written != len) {
-    PRINT(" swu_cb returned %d != %d (expected)\n", (int)written,
-          (int)len);
+    PRINT(" swu_cb returned %d != %d (expected)\n", (int)written, (int)len);
   }
   fclose(fp);
 }
-
 
 /**
  * initializes the global variables
@@ -927,7 +924,7 @@ main(int argc, char *argv[])
 #endif
 
   char *fname = "myswu_app";
-  
+
   oc_set_hostname_cb(hostname_cb, NULL);
   oc_set_reset_cb(reset_cb, NULL);
   oc_set_restart_cb(restart_cb, NULL);

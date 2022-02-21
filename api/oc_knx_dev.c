@@ -343,8 +343,7 @@ oc_core_dev_hostname_put_handler(oc_request_t *request,
 
     oc_hostname_t *my_hostname = oc_get_hostname_cb();
     if (my_hostname && my_hostname->cb) {
-      my_hostname->cb(device_index, rep->value.string,
-                      my_hostname->data);
+      my_hostname->cb(device_index, rep->value.string, my_hostname->data);
     }
 
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
@@ -715,7 +714,7 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
     oc_knx_lsm_set_state(device_index, LSM_S_UNLOADED);
   }
 
-  oc_reset_t* my_reset_cb = oc_get_reset_cb();
+  oc_reset_t *my_reset_cb = oc_get_reset_cb();
   if (my_reset_cb && my_reset_cb->cb) {
     my_reset_cb->cb(device_index, reset_mode, my_reset_cb->data);
   }

@@ -448,7 +448,6 @@ oc_create_knx_swu_pkgv_resource(int resource_idx, size_t device)
     OC_DISCOVERABLE, oc_knx_swu_pkgv_get_handler, 0, 0, 0, 1, "dpt.version");
 }
 
-
 static void
 oc_knx_swu_a_put_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
                          void *data)
@@ -496,7 +495,7 @@ oc_knx_swu_a_put_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   char filebase[20];
   sprintf((char *)&filebase, "block_%d", block_size);
 
-  oc_swu_t* my_cb = oc_get_swu_cb();
+  oc_swu_t *my_cb = oc_get_swu_cb();
   if (my_cb && my_cb->cb) {
     my_cb->cb(device_index, block_offset, payload, len, my_cb->data);
   }

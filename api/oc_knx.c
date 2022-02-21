@@ -81,8 +81,8 @@ int
 restart_device(size_t device_index)
 {
   PRINT("restart device\n");
-  
-  oc_restart_t* my_restart = oc_get_restart_cb();
+
+  oc_restart_t *my_restart = oc_get_restart_cb();
   if (my_restart && my_restart->cb) {
     // do a reboot on application level
     my_restart->cb(device_index, my_restart->data);
@@ -172,7 +172,6 @@ oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   // int code;
 
   PRINT("oc_core_knx_post_handler\n");
-
 
   char buffer[200];
   memset(buffer, 200, 1);

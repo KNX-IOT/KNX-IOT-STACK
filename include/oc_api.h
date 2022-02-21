@@ -288,7 +288,7 @@ void oc_set_factory_presets_cb(oc_factory_presets_cb_t cb, void *data);
 /**
  * Callback invoked by the stack initialization to perform any
  * application reset.
- *      
+ *
  * @param[in] device the device index
  * @param[in] reset_value reset value per KNX
  * @param[in] data the user supplied data
@@ -310,8 +310,6 @@ typedef void (*oc_reset_cb_t)(size_t device, int reset_value, void *data);
  *                 call completes.
  */
 void oc_set_reset_cb(oc_reset_cb_t cb, void *data);
-
-
 
 /**
  * Callback invoked by the stack to invoke a restart
@@ -337,7 +335,6 @@ typedef void (*oc_restart_cb_t)(size_t device, void *data);
  */
 void oc_set_restart_cb(oc_restart_cb_t cb, void *data);
 
-
 /**
  * Callback invoked by the stack to set the host name
  *
@@ -346,12 +343,14 @@ void oc_set_restart_cb(oc_restart_cb_t cb, void *data);
  * @param[in] data the user supplied data
  *
  */
-typedef void (*oc_hostname_cb_t)(size_t device, oc_string_t host_name, void *data);
+typedef void (*oc_hostname_cb_t)(size_t device, oc_string_t host_name,
+                                 void *data);
 
 /**
  * Set the host name callback.
  *
- * The host name callback is called by the stack when the host name needs to be set
+ * The host name callback is called by the stack when the host name needs to be
+ * set
  *
  * @note oc_set_hostname_cb() must be called before oc_main_init().
  *
@@ -361,7 +360,6 @@ typedef void (*oc_hostname_cb_t)(size_t device, oc_string_t host_name, void *dat
  *                 call completes.
  */
 void oc_set_hostname_cb(oc_hostname_cb_t cb, void *data);
-
 
 /**
  * Add an a device to the stack.

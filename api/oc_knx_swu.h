@@ -112,7 +112,6 @@ void oc_swu_set_qurl(char *qurl);
  */
 void oc_swu_set_result(oc_swu_result_t result);
 
-
 /**
  * Callback invoked by the stack to set the software
  *
@@ -140,7 +139,6 @@ typedef void (*oc_swu_cb_t)(size_t device, size_t block_offset,
  *                 call completes.
  */
 void oc_set_swu_cb(oc_swu_cb_t cb, void *data);
-
 
 #ifdef __cplusplus
 }
