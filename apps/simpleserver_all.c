@@ -117,6 +117,7 @@ bool g_352_51_1_state = false; /**< state variable for dp 352.51 instance 1 */
 bool g_352_52_state = false;   /**< state variable for dp 352.52 instance 0 */
 bool g_353_52_state = false;   /**< state variable for dp 353.52 instance 0 */
 volatile int quit = 0;         /**< stop variable, used by handle_signal */
+bool g_reset = false;
 
 /**
  * @brief callback for the smode response
@@ -642,6 +643,11 @@ factory_presets_cb(size_t device, void *data)
 {
   (void)device;
   (void)data;
+
+  if (g_reset) {
+    PRINT("======> resetting device\n");
+    oc_knx_device_storage_reset(0, 2);
+  }
 }
 
 /**
@@ -777,14 +783,14 @@ main(int argc, char *argv[])
     printf("argv[%d] = %s\n", i, argv[i]);
   }
   if (argc > 1) {
-    PRINT("s-mode: %s\n", argv[1]);
+    PRINT("arg[1]: %s\n", argv[1]);
     if (strcmp(argv[1], "s-mode") == 0) {
       do_send_s_mode = true;
       PRINT(" smode: %d\n", do_send_s_mode);
     }
     if (strcmp(argv[1], "reset") == 0) {
       PRINT(" internal reset\n");
-      oc_knx_device_storage_reset(0, 0);
+      g_reset = true;
       
     }
     if (strcmp(argv[1], "-help") == 0) {

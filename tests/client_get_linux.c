@@ -121,8 +121,11 @@ app_init_client(void)
   int ret;
 
   ret = oc_init_platform("Intel", NULL, NULL);
-  ret |= oc_add_device("/oic/d", "oic.d.test-client", "Client Test", "1.0",
-                       "1.0", NULL, NULL);
+  ret |= oc_add_device("my_name", "1.0.0", "//", "000005", NULL, NULL);
+  //oc_device_info_t *device = oc_core_get_device_info(0);
+
+  //ret |= oc_add_device("/oic/d", "oic.d.test-client", "Client Test", "1.0",
+  //                     "1.0", NULL, NULL);
 
   return ret;
 }
@@ -183,9 +186,11 @@ app_init(void)
   int r = oc_init_platform("Intel", NULL, NULL);
   if (r != 0)
     return r;
+  ret |= oc_add_device("my_name", "1.0.0", "//", "000005", NULL, NULL);
+  oc_device_info_t *device = oc_core_get_device_info(0);
 
-  return oc_add_device("/oic/d", "constrained.d.server-test", "Server Test",
-                       "1.0", "1.0", NULL, NULL);
+  //return oc_add_device("/oic/d", "constrained.d.server-test", "Server Test",
+  //                     "1.0", "1.0", NULL, NULL);
 }
 
 static void
