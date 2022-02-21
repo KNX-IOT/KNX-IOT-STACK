@@ -617,9 +617,9 @@ oc_do_s_mode_with_scope(int scope, char *resource_url, char *rp)
       // issue the s-mode command
       oc_issue_s_mode(scope, sia_value, group_address, rp, buffer, value_size);
 
-      // the recipient table contains the list of destinations that will receive data.
-      // loop over the full recipient table and 
-      // send a message if the group is there
+      // the recipient table contains the list of destinations that will receive
+      // data. loop over the full recipient table and send a message if the
+      // group is there
       for (int j = 0; j < oc_core_get_recipient_table_size(); j++) {
         bool found =
           oc_core_check_recipient_index_on_group_address(j, group_address);

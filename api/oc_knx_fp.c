@@ -638,7 +638,6 @@ oc_create_fp_g_x_resource(int resource_idx, size_t device)
 
 // ----------------------------------------------------------------------------
 
-
 #ifdef OC_PUBLISHER_TABLE
 
 int
@@ -979,7 +978,6 @@ oc_create_fp_p_x_resource(int resource_idx, size_t device)
                             oc_core_fp_p_x_get_handler, 0, 0,
                             oc_core_fp_p_x_del_handler, 0, 1, "urn:knx:if.c");
 }
-
 
 #endif /* OC_PUBLISHER_TABLE */
 
@@ -1353,7 +1351,6 @@ oc_core_get_recipient_index_url_or_path(int index)
   }
   return NULL;
 }
-
 
 //#endif /* OC_RECIPIENT_TABLE */
 
@@ -1791,7 +1788,6 @@ oc_core_get_recipient_table_size()
 {
   return GRT_MAX_ENTRIES;
 }
-
 
 #ifdef OC_PUBLISHER_TABLE
 int
