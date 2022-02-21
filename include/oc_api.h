@@ -355,12 +355,12 @@ typedef void (*oc_hostname_cb_t)(size_t device, oc_string_t host_name, void *dat
  *
  * @note oc_set_hostname_cb() must be called before oc_main_init().
  *
- * @param[in] cb oc_hostanme_cb_t function pointer to be called
+ * @param[in] cb oc_hostname_cb_t function pointer to be called
  * @param[in] data context pointer that is passed to the oc_restart_cb_t
  *                 the pointer must be a valid pointer till after oc_main_init()
  *                 call completes.
  */
-void oc_set_hostname_cb(oc_restart_cb_t cb, void *data);
+void oc_set_hostname_cb(oc_hostname_cb_t cb, void *data);
 
 /**
  * Add an a device to the stack.
