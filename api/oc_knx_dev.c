@@ -18,6 +18,7 @@
 #include "api/oc_knx_dev.h"
 #include "api/oc_knx_fp.h"
 #include "api/oc_knx_sec.h"
+#include "api/oc_main.h"
 
 #include "oc_core_res.h"
 #include "oc_discovery.h"
@@ -339,6 +340,11 @@ oc_core_dev_hostname_put_handler(oc_request_t *request,
     oc_storage_write(KNX_STORAGE_HOSTNAME,
                      (uint8_t *)oc_string(rep->value.string),
                      oc_string_len(rep->value.string));
+
+    oc_hostname_t *my_hostname = oc_get_hostname_cb();
+    if (my_hostname && my_hostname->cb) {
+      my_hostname->cb(device_index, rep->value.string, my_hostname->data);
+    }
 
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
     return;
@@ -706,6 +712,11 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
     oc_delete_group_rp_table();
     // load state: unloaded
     oc_knx_lsm_set_state(device_index, LSM_S_UNLOADED);
+  }
+
+  oc_reset_t *my_reset_cb = oc_get_reset_cb();
+  if (my_reset_cb && my_reset_cb->cb) {
+    my_reset_cb->cb(device_index, reset_mode, my_reset_cb->data);
   }
 }
 

@@ -286,6 +286,82 @@ typedef void (*oc_factory_presets_cb_t)(size_t device, void *data);
 void oc_set_factory_presets_cb(oc_factory_presets_cb_t cb, void *data);
 
 /**
+ * Callback invoked by the stack initialization to perform any
+ * application reset.
+ *
+ * @param[in] device the device index
+ * @param[in] reset_value reset value per KNX
+ * @param[in] data the user supplied data
+ *
+ */
+typedef void (*oc_reset_cb_t)(size_t device, int reset_value, void *data);
+
+/**
+ * Set the reset callback.
+ *
+ * The reset callback is called by the stack to enable per-device
+ * reset on application level.
+ *
+ * @note oc_set_reset_cb() must be called before oc_main_init().
+ *
+ * @param[in] cb oc_reset_cb_t function pointer to be called
+ * @param[in] data context pointer that is passed to the oc_reset_cb_t
+ *                 the pointer must be a valid pointer till after oc_main_init()
+ *                 call completes.
+ */
+void oc_set_reset_cb(oc_reset_cb_t cb, void *data);
+
+/**
+ * Callback invoked by the stack to invoke a restart
+ *
+ * @param[in] device the device index
+ * @param[in] data the user supplied data
+ *
+ */
+typedef void (*oc_restart_cb_t)(size_t device, void *data);
+
+/**
+ * Set the restart callback.
+ *
+ * The restart callback is called by the stack to enable per-device
+ * reset on application level.
+ *
+ * @note oc_set_restart_cb() must be called before oc_main_init().
+ *
+ * @param[in] cb oc_restart_cb_t function pointer to be called
+ * @param[in] data context pointer that is passed to the oc_restart_cb_t
+ *                 the pointer must be a valid pointer till after oc_main_init()
+ *                 call completes.
+ */
+void oc_set_restart_cb(oc_restart_cb_t cb, void *data);
+
+/**
+ * Callback invoked by the stack to set the host name
+ *
+ * @param[in] device the device index
+ * @param[in] host_name the host name to be set
+ * @param[in] data the user supplied data
+ *
+ */
+typedef void (*oc_hostname_cb_t)(size_t device, oc_string_t host_name,
+                                 void *data);
+
+/**
+ * Set the host name callback.
+ *
+ * The host name callback is called by the stack when the host name needs to be
+ * set
+ *
+ * @note oc_set_hostname_cb() must be called before oc_main_init().
+ *
+ * @param[in] cb oc_hostname_cb_t function pointer to be called
+ * @param[in] data context pointer that is passed to the oc_restart_cb_t
+ *                 the pointer must be a valid pointer till after oc_main_init()
+ *                 call completes.
+ */
+void oc_set_hostname_cb(oc_hostname_cb_t cb, void *data);
+
+/**
  * Add an a device to the stack.
  *
  * This function is typically called as part of the stack initialization

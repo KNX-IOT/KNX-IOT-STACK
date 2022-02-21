@@ -31,6 +31,30 @@ typedef struct oc_factory_presets_t
 
 oc_factory_presets_t *oc_get_factory_presets_cb(void);
 
+typedef struct oc_reset_t
+{
+  oc_reset_cb_t cb;
+  void *data;
+} oc_reset_t;
+
+oc_reset_t *oc_get_reset_cb(void);
+
+typedef struct oc_restart_t
+{
+  oc_restart_cb_t cb;
+  void *data;
+} oc_restart_t;
+
+oc_restart_t *oc_get_restart_cb(void);
+
+typedef struct oc_hostname_t
+{
+  oc_hostname_cb_t cb;
+  void *data;
+} oc_hostname_t;
+
+oc_hostname_t *oc_get_hostname_cb(void);
+
 bool oc_main_initialized(void);
 
 /**

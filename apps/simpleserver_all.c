@@ -645,9 +645,70 @@ factory_presets_cb(size_t device, void *data)
   (void)data;
 
   if (g_reset) {
-    PRINT("======> resetting device\n");
+    PRINT("resetting device\n");
     oc_knx_device_storage_reset(0, 2);
   }
+}
+
+/**
+ * application reset
+ *
+ * @param device the device identifier of the list of devices
+ * @param data the supplied data.
+ */
+void
+reset_cb(size_t device, int reset_value, void *data)
+{
+  (void)data;
+
+  PRINT("reset_cb %d\n", reset_value);
+}
+
+/**
+ * restart the device (application depended)
+ *
+ * @param device the device identifier of the list of devices
+ * @param data the supplied data.
+ */
+void
+restart_cb(size_t device, void *data)
+{
+  (void)data;
+
+  PRINT("-----restart_cb -------\n");
+  exit(0);
+}
+
+/**
+ * set the host name on the device (application depended)
+ *
+ * @param device the device identifier of the list of devices
+ * @param host_name the host name to be set on the device
+ * @param data the supplied data.
+ */
+void
+hostname_cb(size_t device, oc_string_t host_name, void *data)
+{
+  (void)data;
+
+  PRINT("-----host name ------- %s\n", oc_string(host_name));
+}
+
+/* separate files for each call to transport a block of data*/
+void
+swu_cb(size_t device, size_t offset, const uint8_t *payload, size_t len,
+       void *data)
+{
+  char *fname = (char *)data;
+  PRINT(" swu_cb %s block=%lld size=%lld \n", fname, offset, len);
+
+  FILE *fp = fopen(fname, "rw");
+  fseek(fp, offset, SEEK_SET);
+  size_t written = fwrite(payload, len, 1, fp);
+  if (written != len) {
+    PRINT(" swu_cb returned %d != %d (expected)\n", (int)written, (int)len);
+  }
+  fclose(fp);
 }
 
 /**
@@ -746,7 +807,7 @@ issue_requests_s_mode(void)
 }
 
 /**
- * prints the usage of the applicaton
+ * prints the usage of the application
  */
 void
 print_usage()
@@ -862,7 +923,13 @@ main(int argc, char *argv[])
   }
 #endif
 
+  char *fname = "myswu_app";
+
+  oc_set_hostname_cb(hostname_cb, NULL);
+  oc_set_reset_cb(reset_cb, NULL);
+  oc_set_restart_cb(restart_cb, NULL);
   oc_set_factory_presets_cb(factory_presets_cb, NULL);
+  oc_set_swu_cb(swu_cb, (void *)fname);
 
   /* start the stack */
   init = oc_main_init(&handler);
