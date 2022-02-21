@@ -205,7 +205,7 @@ typedef void (*oc_init_platform_cb_t)(void *data);
  *
  * static int app_init(void)
  * {
- *   int ret = oc_init_platform("My Platform", NULL, NULL);  
+ *   int ret = oc_init_platform("My Platform", NULL, NULL);
  *   ret |= oc_add_device("my_name", "1.0.0", "//", "000005", NULL, NULL);
  *   return ret;
  * }
@@ -650,7 +650,6 @@ bool oc_delete_resource(oc_resource_t *resource);
  * @param[in] resource the resource to delete
  */
 void oc_delayed_delete_resource(oc_resource_t *resource);
-
 
 /**
  * This resets the query iterator to the start of the URI query parameter

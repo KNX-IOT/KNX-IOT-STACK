@@ -769,17 +769,17 @@ oc_oscore_send_message(oc_message_t *msg)
 
     /* Set the Proxy-uri option to the OCF URI bearing the peer's UUID */
     // TODO
-    //char uuid[37];
-    //oc_uuid_to_str(&message->endpoint.di, uuid, OC_UUID_LEN);
-    //oc_string_t proxy_uri;
-    //oc_concat_strings(&proxy_uri, "ocf://", uuid);
-    //coap_set_header_proxy_uri(coap_pkt, oc_string(proxy_uri));
+    // char uuid[37];
+    // oc_uuid_to_str(&message->endpoint.di, uuid, OC_UUID_LEN);
+    // oc_string_t proxy_uri;
+    // oc_concat_strings(&proxy_uri, "ocf://", uuid);
+    // coap_set_header_proxy_uri(coap_pkt, oc_string(proxy_uri));
 
     /* Serialize OSCORE message to oc_message_t */
     OC_DBG_OSCORE("### serializing OSCORE message ###");
     message->length = oscore_serialize_message(coap_pkt, message->data);
     OC_DBG_OSCORE("### serialized OSCORE message ###");
-    //oc_free_string(&proxy_uri);
+    // oc_free_string(&proxy_uri);
   }
 oscore_send_dispatch:
   OC_DBG_OSCORE("#################################");

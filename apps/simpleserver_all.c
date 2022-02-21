@@ -791,7 +791,6 @@ main(int argc, char *argv[])
     if (strcmp(argv[1], "reset") == 0) {
       PRINT(" internal reset\n");
       g_reset = true;
-      
     }
     if (strcmp(argv[1], "-help") == 0) {
       print_usage();

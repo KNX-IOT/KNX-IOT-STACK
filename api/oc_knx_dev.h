@@ -49,7 +49,7 @@ void oc_knx_device_storage_read(size_t device);
  * - group object table
  * - recipient object table
  * - publisher object table
- *      
+ *
  *  reset = 7 (reset tables)
  * - group object table
  * - recipient object table

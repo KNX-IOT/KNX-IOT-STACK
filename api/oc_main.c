@@ -262,7 +262,7 @@ oc_main_init(const oc_handler_t *handler)
 
   initialized = true;
 
-  oc_factory_presets_t* presets = oc_get_factory_presets_cb();
+  oc_factory_presets_t *presets = oc_get_factory_presets_cb();
   if (presets->cb) {
     presets->cb(0, presets->data);
   }

@@ -458,7 +458,7 @@ oc_create_dev_iid_resource(int resource_idx, size_t device)
 
 static void
 oc_core_dev_ipv6_get_handler(oc_request_t *request,
-                           oc_interface_mask_t iface_mask, void *data)
+                             oc_interface_mask_t iface_mask, void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -473,7 +473,7 @@ oc_core_dev_ipv6_get_handler(oc_request_t *request,
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device != NULL) {
     // TODO
-    //cbor_encode_boolean(&g_encoder, device->pm);
+    // cbor_encode_boolean(&g_encoder, device->pm);
     oc_send_cbor_response(request, OC_STATUS_OK);
     return;
   }
@@ -486,8 +486,8 @@ oc_create_dev_ipv6_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_dev_ipv6_resource\n");
   oc_core_populate_resource(
-    resource_idx, device, "/dev/ipv6", OC_IF_P, APPLICATION_CBOR, OC_DISCOVERABLE,
-                            oc_core_dev_ipv6_get_handler, 0, 0, 0, 1, ":dpt.ipv6");
+    resource_idx, device, "/dev/ipv6", OC_IF_P, APPLICATION_CBOR,
+    OC_DISCOVERABLE, oc_core_dev_ipv6_get_handler, 0, 0, 0, 1, ":dpt.ipv6");
 }
 
 // -----------------------------------------------------------------------------
