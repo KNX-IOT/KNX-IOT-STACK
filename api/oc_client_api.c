@@ -196,7 +196,6 @@ oc_do_multicast_update(void)
   }
 
   if (payload_size > 0) {
-    // coap_set_header_content_format(request, APPLICATION_VND_OCF_CBOR);
     coap_set_header_content_format(request, APPLICATION_OSCORE);
   }
 
@@ -250,12 +249,8 @@ oc_init_multicast_update(oc_endpoint_t *mcast, const char *uri,
   }
 
   memcpy(&multicast_update->endpoint, mcast, sizeof(oc_endpoint_t));
-
   oc_rep_new(multicast_update->data + COAP_MAX_HEADER_SIZE, OC_BLOCK_SIZE);
-
   coap_udp_init_message(request, type, OC_POST, coap_get_mid());
-
-  // coap_set_header_accept(request, APPLICATION_VND_OCF_CBOR);
   coap_set_header_accept(request, APPLICATION_OSCORE);
 
   request->token_len = 8;

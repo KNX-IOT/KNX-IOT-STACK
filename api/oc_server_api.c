@@ -90,15 +90,7 @@ response_length(void)
 void
 oc_send_response(oc_request_t *request, oc_status_t response_code)
 {
-#ifdef OC_SPEC_VER_OIC
-  if (request->origin && request->origin->version == OIC_VER_1_1_0) {
-    request->response->response_buffer->content_format = APPLICATION_CBOR;
-  } else
-#endif /* OC_SPEC_VER_OIC */
-  {
-    request->response->response_buffer->content_format =
-      APPLICATION_VND_OCF_CBOR;
-  }
+  request->response->response_buffer->content_format = APPLICATION_VND_OCF_CBOR;
   request->response->response_buffer->response_length = response_length();
   request->response->response_buffer->code = oc_status_code(response_code);
 }

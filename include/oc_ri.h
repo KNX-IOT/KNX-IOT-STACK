@@ -237,6 +237,7 @@ typedef enum {
   OC_DEV_HOSTNAME,          /**< Device host name for DNS resolution. */
   OC_DEV_IID,               /**< KNX installation ID */
   OC_DEV_PM,                /**< Programming Mode */
+  OC_DEV_IPV6,              /**< IPV6 */
   OC_DEV,                   /**< core link */
   OC_KNX_SPAKE,             /**< spake */
   OC_KNX_IDEVID,            /**< IDevID */
@@ -571,7 +572,7 @@ int oc_ri_query_nth_key_exists(const char *query, size_t query_len, char **key,
 /**
  * @brief retrieve the interface mask from the interface name
  *
- * @param iface the interface (e.g. "if=oic.if.s")
+ * @param iface the interface (e.g. "if=if.s")
  * @param if_len the interface length
  * @return oc_interface_mask_t the mask value of the interface
  */

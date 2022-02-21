@@ -319,7 +319,7 @@ app_init(void)
 {
   int ret = oc_init_platform("Cascoda", NULL, NULL);
 
-  ret |= oc_add_device("py-client", "1.0", "//", "012349", NULL, NULL);
+  ret |= oc_add_device("py-client", "1.0.0", "//", "012349", NULL, NULL);
 
   return ret;
 }

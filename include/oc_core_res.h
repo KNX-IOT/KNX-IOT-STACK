@@ -363,24 +363,6 @@ bool oc_core_is_SVR(oc_resource_t *resource, size_t device);
 bool oc_core_is_vertical_resource(oc_resource_t *resource, size_t device);
 
 /**
- * set the latency (lat) property in eps of oic.wk.res resource.
- * The latency is implemented globally e.g. for all the resource instances.
- * The default behavior is that if nothing is set (e.g. value is 0) the lat
- * property will not be framed in the eps property. Setting the value on 0 will
- * cause that the lat property will not be framed in the eps property.
- * @param[in] latency the latency in seconds
- */
-void oc_core_set_latency(int latency);
-
-/**
- * retrieves the latency (lat) property in eps of the oic.wk.res resource.
- * the lat value is implemented globally for the stack
- * @return
- *  - the latency in seconds
- */
-int oc_core_get_latency(void);
-
-/**
  * @brief return the number of registered devices
  *
  * @return size_t The number of registered devices

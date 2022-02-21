@@ -151,26 +151,7 @@ static const char *
 get_iface_query(oc_interface_mask_t iface_mask)
 {
   (void)iface_mask;
-  /*
-  switch (iface_mask) {
-  case OC_IF_LL:
-    return "if=oic.if.ll";
-  case OC_IF_B:
-    return "if=oic.if.b";
-  case OC_IF_R:
-    return "if=oic.if.r";
-  case OC_IF_RW:
-    return "if=oic.if.rw";
-  case OC_IF_A:
-    return "if=oic.if.a";
-  case OC_IF_S:
-    return "if=oic.if.s";
-  case OC_IF_CREATE:
-    return "if=oic.if.create";
-  default:
-    break;
-  }
-  */
+
   return NULL;
 }
 

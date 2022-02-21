@@ -29,8 +29,11 @@ app_init(void)
   ret = oc_init_platform("Intel", NULL, NULL);
   ASSERT(ret == 0);
 
-  ret = oc_add_device("/oic/d", "oic.d.test-client-init", "Client init test",
-                      "1.0", "1.0", NULL, NULL);
+  ret |= oc_add_device("my_name", "1.0.0", "//", "000005", NULL, NULL);
+  oc_device_info_t *device = oc_core_get_device_info(0);
+
+  // ret = oc_add_device("/oic/d", "oic.d.test-client-init", "Client init test",
+  //                    "1.0", "1.0", NULL, NULL);
   return ret;
 }
 

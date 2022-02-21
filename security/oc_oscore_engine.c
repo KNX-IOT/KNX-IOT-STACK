@@ -386,7 +386,7 @@ oc_oscore_send_multicast_message(oc_message_t *message)
     OC_DBG_OSCORE("### protecting multicast request ###");
     /* Use context->SSN as Partial IV */
     oscore_store_piv(oscore_ctx->ssn, piv, &piv_len);
-    OC_DBG_OSCORE("---using SSN as Partial IV: %lu", oscore_ctx->ssn);
+    OC_DBG_OSCORE("---using SSN as Partial IV: %llu", oscore_ctx->ssn);
     OC_LOGbytes_OSCORE(piv, piv_len);
     /* Increment SSN */
     oscore_ctx->ssn++;
@@ -523,7 +523,6 @@ oc_oscore_send_message(oc_message_t *msg)
    *    Set OSCORE packet payload length to the plain text size + tag length (8)
    *    Set OSCORE option in OSCORE packet
    *    Reflect the Observe option (if present in the CoAP packet)
-   *    Set the Proxy-uri option to the OCF URI bearing the peer's UUID
    *    Set the Outer code for the OSCORE packet (POST/FETCH:2.04/2.05)
    *    Serialize OSCORE message to oc_message_t
    * Dispatch oc_message_t to the TLS layer
@@ -604,7 +603,7 @@ oc_oscore_send_message(oc_message_t *msg)
       /* Request */
       /* Use context->SSN as Partial IV */
       oscore_store_piv(oscore_ctx->ssn, piv, &piv_len);
-      OC_DBG_OSCORE("---using SSN as Partial IV: %lu", oscore_ctx->ssn);
+      OC_DBG_OSCORE("---using SSN as Partial IV: %llu", oscore_ctx->ssn);
       OC_LOGbytes(piv, piv_len);
       /* Increment SSN */
       oscore_ctx->ssn++;
@@ -657,7 +656,7 @@ oc_oscore_send_message(oc_message_t *msg)
       }
       OC_DBG("### protecting outgoing response ###");
       /* Response */
-      /* Per OCF specification, all responses must include a new Partial IV */
+      /* Per specification, all responses must include a new Partial IV */
       /* Use context->SSN as partial IV */
       oscore_store_piv(oscore_ctx->ssn, piv, &piv_len);
       OC_DBG("---using SSN as Partial IV: %lu", oscore_ctx->ssn);
@@ -770,17 +769,17 @@ oc_oscore_send_message(oc_message_t *msg)
 
     /* Set the Proxy-uri option to the OCF URI bearing the peer's UUID */
     // TODO
-    char uuid[37];
-    oc_uuid_to_str(&message->endpoint.di, uuid, OC_UUID_LEN);
-    oc_string_t proxy_uri;
-    oc_concat_strings(&proxy_uri, "ocf://", uuid);
-    coap_set_header_proxy_uri(coap_pkt, oc_string(proxy_uri));
+    // char uuid[37];
+    // oc_uuid_to_str(&message->endpoint.di, uuid, OC_UUID_LEN);
+    // oc_string_t proxy_uri;
+    // oc_concat_strings(&proxy_uri, "ocf://", uuid);
+    // coap_set_header_proxy_uri(coap_pkt, oc_string(proxy_uri));
 
     /* Serialize OSCORE message to oc_message_t */
     OC_DBG_OSCORE("### serializing OSCORE message ###");
     message->length = oscore_serialize_message(coap_pkt, message->data);
     OC_DBG_OSCORE("### serialized OSCORE message ###");
-    oc_free_string(&proxy_uri);
+    // oc_free_string(&proxy_uri);
   }
 oscore_send_dispatch:
   OC_DBG_OSCORE("#################################");

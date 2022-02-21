@@ -42,7 +42,6 @@ static oc_device_info_t oc_device_info[OC_MAX_NUM_DEVICES];
 #endif /* !OC_DYNAMIC_ALLOCATION */
 static oc_platform_info_t oc_platform_info;
 
-static int res_latency = 0;
 static size_t device_count = 0;
 
 void
@@ -227,18 +226,6 @@ size_t
 oc_core_get_num_devices(void)
 {
   return device_count;
-}
-
-void
-oc_core_set_latency(int latency)
-{
-  res_latency = latency;
-}
-
-int
-oc_core_get_latency(void)
-{
-  return res_latency;
 }
 
 int
