@@ -276,11 +276,13 @@ void oc_delete_group_object_table();
  */
 void oc_delete_group_rp_table();
 
+
+
 /**
  * @brief checks if the group address is part of the recipient table at index
  *
  * @param index the index in the recipient table
- * @param group_address the group address to check fo
+ * @param group_address the group address to check
  * @return true is part of the recipient entry
  * @return false is not part of the recipient entry
  */
@@ -309,6 +311,8 @@ int oc_core_get_recipient_ia(int index);
  * @return int the size of the table
  */
 int oc_core_get_recipient_table_size();
+
+
 
 /**
  * @brief add points to the well-known core discovery response
