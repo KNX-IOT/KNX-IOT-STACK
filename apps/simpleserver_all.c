@@ -645,9 +645,53 @@ factory_presets_cb(size_t device, void *data)
   (void)data;
 
   if (g_reset) {
-    PRINT("======> resetting device\n");
+    PRINT("resetting device\n");
     oc_knx_device_storage_reset(0, 2);
   }
+}
+
+/**
+ * application reset
+ *
+ * @param device the device identifier of the list of devices
+ * @param data the supplied data.
+ */
+void
+reset_cb(size_t device, int reset_value, void *data)
+{
+  (void)data;
+
+   PRINT("reset_cb %d\n", reset_value);
+}
+
+/**
+ * restart the device (application depended)
+ *
+ * @param device the device identifier of the list of devices
+ * @param data the supplied data.
+ */
+void
+restart_cb(size_t device, void *data)
+{
+  (void)data;
+
+  PRINT("-----restart_cb -------\n");
+  exit(0);
+}
+
+/**
+ * set the host name on the device (application depended)
+ *
+ * @param device the device identifier of the list of devices
+ * @param host_name the host name to be set on the device
+ * @param data the supplied data.
+ */
+void
+hostname_cb(size_t device, oc_string_t host_name, void *data)
+{
+  (void)data;
+
+  PRINT("-----host name ------- %s\n", oc_string(host_name));
 }
 
 /**
@@ -746,7 +790,7 @@ issue_requests_s_mode(void)
 }
 
 /**
- * prints the usage of the applicaton
+ * prints the usage of the application
  */
 void
 print_usage()
@@ -862,6 +906,10 @@ main(int argc, char *argv[])
   }
 #endif
 
+  
+  oc_set_hostname_cb(hostname_cb, NULL);
+  oc_set_reset_cb(reset_cb, NULL);
+  oc_set_restart_cb(restart_cb, NULL);
   oc_set_factory_presets_cb(factory_presets_cb, NULL);
 
   /* start the stack */

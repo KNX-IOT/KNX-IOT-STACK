@@ -21,6 +21,7 @@
 #include "oc_knx_client.h"
 #include "oc_knx_sec.h"
 #include "oc_core_res.h"
+#include "oc_main.h"
 #include <stdio.h>
 #include "oc_rep.h" // should not be needed
 
@@ -77,9 +78,14 @@ convert_cmd(char *cmd)
 }
 
 int
-restart_device()
+restart_device(size_t device_index)
 {
   PRINT("restart device\n");
+  
+  oc_restart_t* my_restart = oc_get_restart_cb();
+  if (my_restart && my_restart->cb) {
+    my_restart->cb(device_index, my_restart->data);
+  }
 
   // do a reboot...
   return 0;
@@ -167,6 +173,7 @@ oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 
   PRINT("oc_core_knx_post_handler\n");
 
+
   char buffer[200];
   memset(buffer, 200, 1);
   oc_rep_to_json(request->request_payload, (char *)&buffer, 200, true);
@@ -202,12 +209,13 @@ oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   PRINT("  value : %d\n", value);
 
   bool error = true;
+  size_t device_index = request->resource->device;
 
   if (cmd == RESTART_DEVICE) {
-    restart_device();
+    restart_device(device_index);
     error = false;
   } else if (cmd == RESET_DEVICE) {
-    oc_reset_device(0, value);
+    oc_reset_device(device_index, value);
     error = false;
   }
 

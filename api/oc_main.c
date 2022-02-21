@@ -58,6 +58,11 @@ static bool drop_commands[OC_MAX_NUM_DEVICES];
 static bool initialized = false;
 static const oc_handler_t *app_callbacks;
 static oc_factory_presets_t factory_presets;
+static oc_reset_t app_reset;
+static oc_restart_t app_restart;
+static oc_hostname_t app_hostname;
+
+// -----------------------------------------------------------------------------
 
 void
 oc_set_factory_presets_cb(oc_factory_presets_cb_t cb, void *data)
@@ -71,6 +76,55 @@ oc_get_factory_presets_cb(void)
 {
   return &factory_presets;
 }
+
+
+// -----------------------------------------------------------------------------
+
+void
+oc_set_reset_cb(oc_reset_cb_t cb, void *data)
+{
+  app_reset.cb = cb;
+  app_reset.data = data;
+}
+
+oc_reset_t *
+oc_get_reset_cb(void)
+{
+  return &app_reset;
+}
+
+
+// -----------------------------------------------------------------------------
+
+void
+oc_set_restart_cb(oc_restart_cb_t cb, void *data)
+{
+  app_restart.cb = cb;
+  app_restart.data = data;
+}
+
+oc_restart_t *
+oc_get_restart_cb(void)
+{
+  return &app_restart;
+}
+// -----------------------------------------------------------------------------
+
+void
+oc_set_hostname_cb(oc_hostname_cb_t cb, void *data)
+{
+  app_hostname.cb = cb;
+  app_hostname.data = data;
+}
+
+oc_hostname_t *
+oc_get_hostname_cb(void)
+{
+  return &app_hostname;
+}
+
+// -----------------------------------------------------------------------------
+
 
 #ifdef OC_DYNAMIC_ALLOCATION
 #include "oc_buffer_settings.h"
@@ -263,7 +317,7 @@ oc_main_init(const oc_handler_t *handler)
   initialized = true;
 
   oc_factory_presets_t *presets = oc_get_factory_presets_cb();
-  if (presets->cb) {
+  if (presets && presets->cb) {
     presets->cb(0, presets->data);
   }
 
