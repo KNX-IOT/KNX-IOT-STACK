@@ -5,6 +5,7 @@ if(OC_OSCORE_ENABLED)
 		${PROJECT_SOURCE_DIR}/oscore_hkdf_test.cpp
 		${PROJECT_SOURCE_DIR}/oscore_test.cpp
 		${PROJECT_SOURCE_DIR}/securitytest.cpp
+		${PROJECT_SOURCE_DIR}/spake_test.cpp
 	)
 
 	target_link_libraries(securitytest kisClientServer gtest_main)
