@@ -236,7 +236,8 @@ if(BUILD_TESTING AND UNIX)
     disable_clang_tidy()
 
     # Build googletest
-    add_subdirectory(${PROJECT_SOURCE_DIR}/deps/gtest gtest)
+    add_subdirectory(${PROJECT_SOURCE_DIR}/deps/gtest)
+    target_include_directories(gtest PUBLIC ${PROJECT_SOURCE_DIR}/deps/gtest/include)
 
     # Helper macro to build unit test
     macro(package_add_test TESTNAME FOLDER)
