@@ -54,7 +54,7 @@ oc_restart_t *oc_get_restart_cb(void);
 
 typedef struct oc_hostname_t
 {
-  oc_restart_cb_t cb;
+  oc_hostname_cb_t cb;
   void *data;
 } oc_hostname_t;
 

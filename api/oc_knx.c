@@ -84,10 +84,10 @@ restart_device(size_t device_index)
   
   oc_restart_t* my_restart = oc_get_restart_cb();
   if (my_restart && my_restart->cb) {
+    // do a reboot on application level
     my_restart->cb(device_index, my_restart->data);
   }
 
-  // do a reboot...
   return 0;
 }
 
