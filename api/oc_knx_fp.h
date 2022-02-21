@@ -280,7 +280,7 @@ void oc_delete_group_rp_table();
  * @brief checks if the group address is part of the recipient table at index
  *
  * @param index the index in the recipient table
- * @param group_address the group address to check fo
+ * @param group_address the group address to check
  * @return true is part of the recipient entry
  * @return false is not part of the recipient entry
  */

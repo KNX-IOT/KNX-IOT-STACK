@@ -23,8 +23,12 @@
 #define TAGS_AS_STRINGS
 
 #define GOT_STORE "GOT_STORE"
-#define GRT_STORE "GRT_STORE"
 #define GPT_STORE "GPT_STORE"
+#define GRT_STORE "GRT_STORE"
+
+#ifdef OC_PUBLISHER_TABLE
+#define GPT_STORE "GPT_STORE"
+#endif /* OC_PUBLISHER_TABLE */
 
 /**
  * @brief Group Address Mapping Table Resource
@@ -71,8 +75,10 @@ static oc_group_address_mapping_table_t g_groups[GAMT_MAX_ENTRIES];
 #define GOT_MAX_ENTRIES 20
 static oc_group_object_table_t g_got[GOT_MAX_ENTRIES];
 
+#ifdef OC_PUBLISHER_TABLE
 #define GPT_MAX_ENTRIES 20
 static oc_group_rp_table_t g_gpt[GPT_MAX_ENTRIES];
+#endif /* OC_PUBLISHER_TABLE */
 
 #define GRT_MAX_ENTRIES 20
 static oc_group_rp_table_t g_grt[GRT_MAX_ENTRIES];
@@ -93,165 +99,6 @@ static int oc_core_find_index_in_rp_table_from_id(int id,
 
 int find_empty_slot_in_rp_table(int id, oc_group_rp_table_t *rp_table,
                                 int max_size);
-
-// -----------------------------------------------------------------------------
-
-static void
-oc_core_fp_gm_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
-                          void *data)
-{
-  (void)data;
-  (void)iface_mask;
-  size_t response_length = 0;
-  int i;
-  int length = 0;
-  PRINT("oc_core_fp_gm_get_handler\n");
-
-  /* check if the accept header is link-format */
-  if (request->accept != APPLICATION_LINK_FORMAT) {
-    request->response->response_buffer->code =
-      oc_status_code(OC_STATUS_BAD_REQUEST);
-    return;
-  }
-  /* example entry: </fp/gm/1>;ct=60 (cbor)*/
-  for (i = 0; i < GAMT_MAX_ENTRIES; i++) {
-    if (i > 0) {
-      length = oc_rep_add_line_to_buffer(",\n");
-      response_length += length;
-    }
-    if (oc_string_len(g_groups[i].dpt) == 0) {
-      // index not in use
-      break;
-    }
-
-    length = oc_rep_add_line_to_buffer("<fp/gm/");
-    response_length += length;
-    char string[10];
-    sprintf((char *)&string, "%d", i + 1);
-    length = oc_rep_add_line_to_buffer(string);
-    response_length += length;
-
-    length = oc_rep_add_line_to_buffer(";ct=60");
-    response_length += length;
-  }
-
-  if (response_length > 0) {
-    oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
-  } else {
-    oc_send_linkformat_response(request, OC_STATUS_INTERNAL_SERVER_ERROR, 0);
-  }
-
-  PRINT("oc_core_fp_gm_get_handler - end\n");
-}
-
-static void
-oc_core_fp_gm_post_handler(oc_request_t *request,
-                           oc_interface_mask_t iface_mask, void *data)
-{
-  (void)data;
-  (void)iface_mask;
-  size_t response_length = 0;
-
-  /* check if the accept header is cbor-format */
-  if (request->accept != APPLICATION_CBOR) {
-    request->response->response_buffer->code =
-      oc_status_code(OC_STATUS_BAD_REQUEST);
-    return;
-  }
-  // size_t device_index = request->resource->device;
-
-  request->response->response_buffer->content_format = APPLICATION_CBOR;
-  request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
-  request->response->response_buffer->response_length = response_length;
-}
-
-void
-oc_create_fp_gm_resource(int resource_idx, size_t device)
-{
-  OC_DBG("oc_create_fp_gm_resource\n");
-  oc_core_populate_resource(
-    resource_idx, device, "/fp/gm", OC_IF_D, APPLICATION_CBOR, OC_DISCOVERABLE,
-    oc_core_fp_gm_get_handler, oc_core_fp_gm_post_handler, 0, 0, 0, 1,
-    "urn:knx:if.c");
-}
-
-static void
-oc_core_fp_gm_x_get_handler(oc_request_t *request,
-                            oc_interface_mask_t iface_mask, void *data)
-{
-  (void)data;
-  (void)iface_mask;
-  PRINT("oc_core_fp_gm_x_get_handler\n");
-
-  /* check if the accept header is link-format */
-  if (request->accept != APPLICATION_CBOR) {
-    request->response->response_buffer->code =
-      oc_status_code(OC_STATUS_BAD_REQUEST);
-    return;
-  }
-
-  int value = oc_uri_get_wildcard_value_as_int(
-    oc_string(request->resource->uri), oc_string_len(request->resource->uri),
-    request->uri_path, request->uri_path_len);
-
-  if (value >= GAMT_MAX_ENTRIES) {
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
-    return;
-  }
-
-  // if ( oc_string_len(&g_groups[value - 1].dpt) == 0) {
-  // it is empty
-  //  oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
-  //  return;
-  //}
-
-  oc_rep_begin_root_object();
-  // ga- 7
-  oc_rep_i_set_int(root, 7, g_groups[value - 1].ga);
-  // dpt- 116
-  oc_rep_i_set_text_string(root, 116, oc_string(g_groups[value - 1].dpt));
-  // note add also classic.
-
-  oc_rep_end_root_object();
-
-  oc_send_cbor_response(request, OC_STATUS_OK);
-  return;
-}
-
-static void
-oc_core_fp_gm_x_del_handler(oc_request_t *request,
-                            oc_interface_mask_t iface_mask, void *data)
-{
-  (void)data;
-  (void)iface_mask;
-  PRINT("oc_core_fp_gm_x_del_handler\n");
-
-  int value = oc_uri_get_wildcard_value_as_int(
-    oc_string(request->resource->uri), oc_string_len(request->resource->uri),
-    request->uri_path, request->uri_path_len);
-
-  if (value >= GAMT_MAX_ENTRIES) {
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
-    return;
-  }
-
-  oc_free_string(&g_groups[value - 1].dpt);
-  oc_new_string(&g_groups[value - 1].dpt, "", 0);
-
-  PRINT("oc_core_fp_gm_x_del_handler - end\n");
-
-  oc_send_cbor_response(request, OC_STATUS_OK);
-}
-
-void
-oc_create_fp_gm_x_resource(int resource_idx, size_t device)
-{
-  OC_DBG("oc_create_fp_gm_resource\n");
-  oc_core_populate_resource(resource_idx, device, "/fp/gm/*", OC_IF_D,
-                            APPLICATION_CBOR, OC_DISCOVERABLE,
-                            oc_core_fp_gm_x_get_handler, 0, 0,
-                            oc_core_fp_gm_x_del_handler, 0, 1, "urn:knx:if.c");
-}
 
 // -----------------------------------------------------------------------------
 
@@ -791,8 +638,10 @@ oc_create_fp_g_x_resource(int resource_idx, size_t device)
 
 // ----------------------------------------------------------------------------
 
+#ifdef OC_PUBLISHER_TABLE
+
 int
-oc_core_find_reciepient_table_index(int group_address)
+oc_core_find_publisher_table_index(int group_address)
 {
   int i, j;
   for (i = 0; i < GAMT_MAX_ENTRIES; i++) {
@@ -809,7 +658,7 @@ oc_core_find_reciepient_table_index(int group_address)
 }
 
 oc_string_t
-oc_core_find_reciepient_table_url_from_index(int index)
+oc_core_find_publisher_table_url_from_index(int index)
 {
   // TODO
   return g_gpt[index].url;
@@ -1098,7 +947,7 @@ oc_core_fp_p_x_del_handler(oc_request_t *request,
   int index =
     oc_core_find_index_in_rp_table_from_id(id, g_gpt, GPT_MAX_ENTRIES);
 
-  if (index >= GRT_MAX_ENTRIES) {
+  if (index >= GPT_MAX_ENTRIES) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -1130,7 +979,11 @@ oc_create_fp_p_x_resource(int resource_idx, size_t device)
                             oc_core_fp_p_x_del_handler, 0, 1, "urn:knx:if.c");
 }
 
+#endif /* OC_PUBLISHER_TABLE */
+
 // -----------------------------------------------------------------------------
+
+//#ifdef OC_RECIPIENT_TABLE
 
 static void
 oc_core_fp_r_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
@@ -1318,7 +1171,7 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       OC_ERR("  path is longer than %d \n", (int)OC_MAX_URL_LENGTH);
     }
 
-    oc_print_group_rp_table_entry(index, GPT_STORE, g_grt, GRT_MAX_ENTRIES);
+    oc_print_group_rp_table_entry(index, GRT_STORE, g_grt, GRT_MAX_ENTRIES);
     if (do_save) {
       oc_dump_group_rp_table_entry(index, GRT_STORE, g_grt, GRT_MAX_ENTRIES);
     }
@@ -1498,6 +1351,8 @@ oc_core_get_recipient_index_url_or_path(int index)
   }
   return NULL;
 }
+
+//#endif /* OC_RECIPIENT_TABLE */
 
 // -----------------------------------------------------------------------------
 
@@ -1848,17 +1703,20 @@ oc_load_group_rp_table_entry(int entry, char *Store,
 void
 oc_load_rp_object_table()
 {
+
   PRINT("Loading Group Recipient Table from Persistent storage\n");
   for (int i = 0; i < GRT_MAX_ENTRIES; i++) {
     oc_load_group_rp_table_entry(i, GRT_STORE, g_grt, GRT_MAX_ENTRIES);
     oc_print_group_rp_table_entry(i, GRT_STORE, g_grt, GRT_MAX_ENTRIES);
   }
 
+#ifdef OC_PUBLISHER_TABLE
   PRINT("Loading Group Publisher Table from Persistent storage\n");
   for (int i = 0; i < GPT_MAX_ENTRIES; i++) {
     oc_load_group_rp_table_entry(i, GPT_STORE, g_gpt, GPT_MAX_ENTRIES);
     oc_print_group_rp_table_entry(i, GPT_STORE, g_gpt, GPT_MAX_ENTRIES);
   }
+#endif /* OC_PUBLISHER_TABLE */
 }
 
 static void
@@ -1892,12 +1750,14 @@ oc_delete_group_rp_table()
     oc_dump_group_rp_table_entry(i, GRT_STORE, g_grt, GRT_MAX_ENTRIES);
   }
 
+#ifdef OC_PUBLISHER_TABLE
   PRINT("Deleting Group Publisher Table from Persistent storage\n");
   for (int i = 0; i < GPT_MAX_ENTRIES; i++) {
     oc_delete_group_rp_table_entry(i, GPT_STORE, g_gpt, GPT_MAX_ENTRIES);
     oc_print_group_rp_table_entry(i, GPT_STORE, g_gpt, GPT_MAX_ENTRIES);
     oc_dump_group_rp_table_entry(i, GPT_STORE, g_gpt, GPT_MAX_ENTRIES);
   }
+#endif OC_PUBLISHER_TABLE
 }
 
 int
@@ -1929,15 +1789,25 @@ oc_core_get_recipient_table_size()
   return GRT_MAX_ENTRIES;
 }
 
+#ifdef OC_PUBLISHER_TABLE
+int
+oc_core_get_publisher_table_size()
+{
+  return GPT_MAX_ENTRIES;
+}
+#endif /* OC_PUBLISHER_TABLE */
+
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 
 void
 oc_init_tables()
 {
+#ifdef OC_PUBLISHER_TABLE
   for (int i = 0; i < GPT_MAX_ENTRIES; i++) {
     oc_delete_group_rp_table_entry(i, GPT_STORE, g_gpt, GPT_MAX_ENTRIES);
   }
+#endif /* OC_PUBLISHER_TABLE */
   for (int i = 0; i < GRT_MAX_ENTRIES; i++) {
     oc_delete_group_rp_table_entry(i, GRT_STORE, g_grt, GRT_MAX_ENTRIES);
   }
@@ -1953,14 +1823,13 @@ oc_create_knx_fp_resources(size_t device_index)
 {
   OC_DBG("oc_create_knx_fp_resources");
 
-  oc_create_fp_gm_resource(OC_KNX_FP_GM, device_index);
-  oc_create_fp_gm_x_resource(OC_KNX_FP_GM_X, device_index);
-
   oc_create_fp_g_resource(OC_KNX_FP_G, device_index);
   oc_create_fp_g_x_resource(OC_KNX_FP_G_X, device_index);
 
+#ifdef OC_PUBLISHER_TABLE
   oc_create_fp_p_resource(OC_KNX_FP_P, device_index);
   oc_create_fp_p_x_resource(OC_KNX_FP_P_X, device_index);
+#endif /* OC_PUBLISHER_TABLE */
 
   oc_create_fp_r_resource(OC_KNX_FP_R, device_index);
   oc_create_fp_r_x_resource(OC_KNX_FP_R_X, device_index);
