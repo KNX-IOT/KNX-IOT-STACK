@@ -112,6 +112,36 @@ void oc_swu_set_qurl(char *qurl);
  */
 void oc_swu_set_result(oc_swu_result_t result);
 
+
+/**
+ * Callback invoked by the stack to set the software
+ *
+ * @param[in] device the device index
+ * @param[in] block_offset the offset (in the file)
+ * @param[in] block_data the block data
+ * @param[in] block_len the size of the block_data
+ * @param[in] data the user supplied data
+ *
+ */
+typedef void (*oc_swu_cb_t)(size_t device, size_t block_offset,
+                            uint8_t *block_data, size_t block_len, void *data);
+
+/**
+ * Set the software update callback.
+ *
+ * The host name callback is called by the stack when the software update is
+ * performed
+ *
+ * @note oc_set_hostname_cb() must be called before oc_main_init().
+ *
+ * @param[in] cb oc_swu_cb_t function pointer to be called
+ * @param[in] data context pointer that is passed to the oc_restart_cb_t
+ *                 the pointer must be a valid pointer till after oc_main_init()
+ *                 call completes.
+ */
+void oc_set_swu_cb(oc_swu_cb_t cb, void *data);
+
+
 #ifdef __cplusplus
 }
 #endif

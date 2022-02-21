@@ -20,6 +20,12 @@
 #include "oc_core_res.h"
 #include <stdio.h>
 
+typedef struct oc_swu_t
+{
+  oc_swu_cb_t cb;
+  void *data;
+} oc_swu_t;
+
 /* MAX DEFER*/
 #define KNX_STORAGE_SWU_MAX_DEFER "swu_knx_max_defer"
 static int g_swu_max_defer = 0;
@@ -62,6 +68,25 @@ static oc_string_t g_swu_qurl;
 /* note will be initialized with "" during creation of the resource*/
 #define KNX_STORAGE_UPDATE_RESULT "swu_knx_update_result"
 static oc_swu_result_t g_swu_result = OC_SWU_RESULT_INIT;
+
+static oc_swu_t app_swu;
+
+// -----------------------------------------------------------------------------
+
+void
+oc_set_swu_cb(oc_swu_cb_t cb, void *data)
+{
+  app_swu.cb = cb;
+  app_swu.data = data;
+}
+
+oc_swu_cb_t *
+oc_get_swu_cb(void)
+{
+  return &app_swu;
+}
+
+// -----------------------------------------------------------------------------
 
 static void
 oc_knx_swu_protocol_get_handler(oc_request_t *request,
@@ -423,21 +448,6 @@ oc_create_knx_swu_pkgv_resource(int resource_idx, size_t device)
     OC_DISCOVERABLE, oc_knx_swu_pkgv_get_handler, 0, 0, 0, 1, "dpt.version");
 }
 
-/* separate files for each call to transport a block of data*/
-void
-write_to_file(char *fname, int offset, const uint8_t *payload, size_t len)
-{
-  (void)offset; // needed later to convert this function into writing all chunks
-                // to a single file
-
-  FILE *fp = fopen(fname, "w");
-  size_t written = fwrite(payload, len, 1, fp);
-  if (written != len) {
-    PRINT(" write_to_file returned %d != %d (expected)\n", (int)written,
-          (int)len);
-  }
-  fclose(fp);
-}
 
 static void
 oc_knx_swu_a_put_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
@@ -477,6 +487,7 @@ oc_knx_swu_a_put_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   //  oc_send_response(request, OC_STATUS_BAD_REQUEST);
   //  return;
   //}
+  size_t device_index = request->resource->device;
 
   bool berr =
     oc_get_request_payload_raw(request, &payload, &len, &content_format);
@@ -485,13 +496,10 @@ oc_knx_swu_a_put_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   char filebase[20];
   sprintf((char *)&filebase, "block_%d", block_size);
 
-#ifdef WIN32
-  write_to_file((char *)filebase, block_offset, payload, len);
-#endif
-
-#ifdef __linux__
-  write_to_file((char *)filebase, block_offset, payload, len);
-#endif
+  oc_swu_t* my_cb = oc_get_swu_cb();
+  if (my_cb && my_cb->cb) {
+    my_cb->cb(device_index, block_offset, payload, len, my_cb->data);
+  }
 
   oc_send_json_response(request, OC_STATUS_OK);
 }

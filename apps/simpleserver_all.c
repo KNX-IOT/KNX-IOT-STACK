@@ -694,6 +694,26 @@ hostname_cb(size_t device, oc_string_t host_name, void *data)
   PRINT("-----host name ------- %s\n", oc_string(host_name));
 }
 
+
+/* separate files for each call to transport a block of data*/
+void
+swu_cb(size_t device, size_t offset, const uint8_t *payload, size_t len,
+       void *data)
+{
+  char *fname = (char *)data;
+  PRINT(" swu_cb %s block=%lld size=%lld \n", fname, offset, len);
+
+  FILE *fp = fopen(fname, "rw");
+  fseek(fp, offset, SEEK_SET);
+  size_t written = fwrite(payload, len, 1, fp);
+  if (written != len) {
+    PRINT(" swu_cb returned %d != %d (expected)\n", (int)written,
+          (int)len);
+  }
+  fclose(fp);
+}
+
+
 /**
  * initializes the global variables
  * registers and starts the handler
@@ -906,11 +926,13 @@ main(int argc, char *argv[])
   }
 #endif
 
+  char *fname = "myswu_app";
   
   oc_set_hostname_cb(hostname_cb, NULL);
   oc_set_reset_cb(reset_cb, NULL);
   oc_set_restart_cb(restart_cb, NULL);
   oc_set_factory_presets_cb(factory_presets_cb, NULL);
+  oc_set_swu_cb(swu_cb, (void *)fname);
 
   /* start the stack */
   init = oc_main_init(&handler);
