@@ -207,7 +207,7 @@ oc_do_multicast_update(void)
     goto do_multicast_update_error;
   }
 
-#ifdef OC_IPV4x
+#ifdef OC_IPV4
   oc_message_t *multicast_update4 = oc_internal_allocate_outgoing_message();
   if (multicast_update4) {
     oc_make_ipv4_endpoint(mcast4, IPV4 | MULTICAST | SECURED, 5683, 0xe0, 0x00,

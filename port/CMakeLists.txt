@@ -35,7 +35,7 @@ if(UNIX OR WIN32)
             ${PORT_DIR}/mutex.c
             ${PORT_DIR}/network_addresses.c
         )
-        target_compile_definitions(kis-port PUBLIC OC_IPV4)
+        #target_compile_definitions(kis-port PUBLIC OC_IPV4)
     endif()
 
     target_link_libraries(kis-port PUBLIC kis-common)
