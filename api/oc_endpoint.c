@@ -56,13 +56,13 @@ oc_free_endpoint(oc_endpoint_t *endpoint)
   }
 }
 
-void
-oc_endpoint_set_di(oc_endpoint_t *endpoint, oc_uuid_t *di)
-{
-  if (endpoint && di) {
-    memcpy(endpoint->di.id, di->id, 16);
-  }
-}
+//void
+//oc_endpoint_set_di(oc_endpoint_t *endpoint, oc_uuid_t *di)
+//{
+//  if (endpoint && di) {
+//    memcpy(endpoint->di.id, di->id, 16);
+//  }
+//}
 
 #ifdef OC_IPV4
 static void
