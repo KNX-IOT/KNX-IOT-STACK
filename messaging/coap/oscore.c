@@ -46,7 +46,7 @@ oscore_send_error(void *packet, uint8_t code, oc_endpoint_t *endpoint)
   oc_message_t *message = oc_internal_allocate_outgoing_message();
   if (message) {
     memcpy(&message->endpoint, endpoint, sizeof(*endpoint));
-    memset(&message->endpoint.di, 0, sizeof(oc_uuid_t));
+    // memset(&message->endpoint.di, 0, sizeof(oc_uuid_t));
     if (oscore_pkt->token_len > 0) {
       coap_set_token(msg, oscore_pkt->token, oscore_pkt->token_len);
     }
