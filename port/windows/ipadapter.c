@@ -455,7 +455,7 @@ refresh_endpoints_list(ip_context_t *dev, ifaddr_t *ifaddr_list)
   }
   get_interface_addresses(ifaddr_list, dev, AF_INET6, dev->port, false, false);
 #ifdef OC_SECURITY
-//#ifdef OC_OSCORE
+  //#ifdef OC_OSCORE
   get_interface_addresses(ifaddr_list, dev, AF_INET6, dev->dtls_port, true,
                           false);
 #endif /* OC_SECURITY */
@@ -746,12 +746,12 @@ network_event_thread(void *data)
   events_list_size++;
 #endif                 /* OC_IPV4 */
 #elif defined(OC_IPV4) /* OC_SECURITY */
-    DWORD MCAST4 = events_list_size;
-    events_list[events_list_size] = mcast4_event;
-    events_list_size++;
-    DWORD SERVER4 = events_list_size;
-    events_list[events_list_size] = server4_event;
-    events_list_size++;
+  DWORD MCAST4 = events_list_size;
+  events_list[events_list_size] = mcast4_event;
+  events_list_size++;
+  DWORD SERVER4 = events_list_size;
+  events_list[events_list_size] = server4_event;
+  events_list_size++;
 #endif                 /* !OC_SECURITY */
 
   DWORD i, index;
@@ -1062,10 +1062,10 @@ send_msg(SOCKET sock, struct sockaddr_storage *receiver, oc_message_t *message)
            message->endpoint.addr_local.ipv4.address, 4);
   }
 #else  /* OC_IPV4 */
-    else {
-      OC_ERR("invalid endpoint");
-      return -1;
-    }
+  else {
+    OC_ERR("invalid endpoint");
+    return -1;
+  }
 #endif /* !OC_IPV4 */
 
   DWORD NumberOfBytes = 0;
@@ -1108,7 +1108,7 @@ oc_send_buffer(oc_message_t *message)
     r->sin_port = htons(message->endpoint.addr.ipv4.port);
   } else {
 #else
-    {
+  {
 #endif
     struct sockaddr_in6 *r = (struct sockaddr_in6 *)&receiver;
     memcpy(r->sin6_addr.s6_addr, message->endpoint.addr.ipv6.address,
@@ -1147,9 +1147,9 @@ oc_send_buffer(oc_message_t *message)
     send_sock = dev->server_sock;
   }
 #else  /* OC_IPV4 */
-    {
-      send_sock = dev->server_sock;
-    }
+  {
+    send_sock = dev->server_sock;
+  }
 #endif /* !OC_IPV4 */
 
   return send_msg(send_sock, &receiver, message);
@@ -1470,7 +1470,7 @@ oc_connectivity_init(size_t device)
   }
   oc_list_add(ip_contexts, dev);
 #else  /* OC_DYNAMIC_ALLOCATION */
-    ip_context_t *dev = &devices[device];
+  ip_context_t *dev = &devices[device];
 #endif /* !OC_DYNAMIC_ALLOCATION */
   dev->device = device;
   OC_LIST_STRUCT_INIT(dev, eps);
