@@ -1,6 +1,6 @@
 /*
 // Copyright (c) 2016 Intel Corporation
-// Copyright (c) 2021 Cascoda Ltd
+// Copyright (c) 2021-2022 Cascoda Ltd
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -405,7 +405,7 @@ main(int argc, char *argv[])
     }
   }
 
-  PRINT("Simple Client:\n");
+  PRINT("testclient_all:\n");
 
 #ifdef WIN32
   /* windows specific */
@@ -437,7 +437,7 @@ main(int argc, char *argv[])
   oc_clock_time_t next_event;
 
 #ifdef OC_STORAGE
-  oc_storage_config("./simpleclient_all_creds");
+  oc_storage_config("./testclient_all_creds");
 #endif /* OC_STORAGE */
 
   init = oc_main_init(&handler);
@@ -450,7 +450,7 @@ main(int argc, char *argv[])
   PRINT("Security - Disabled\n");
 #endif /* OC_SECURITY */
 
-  PRINT("SimpleClient running, waiting on incoming "
+  PRINT("testclient_all running, waiting on incoming "
         "connections.\n");
 
 #ifdef WIN32

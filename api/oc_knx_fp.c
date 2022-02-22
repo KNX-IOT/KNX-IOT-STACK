@@ -660,7 +660,6 @@ oc_core_find_publisher_table_index(int group_address)
 oc_string_t
 oc_core_find_publisher_table_url_from_index(int index)
 {
-  // TODO
   return g_gpt[index].url;
 }
 
