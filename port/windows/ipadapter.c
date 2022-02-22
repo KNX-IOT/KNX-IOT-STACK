@@ -360,8 +360,8 @@ update_mcast_socket(SOCKET mcast_sock, int sa_family, ifaddr_t *ifaddr_list)
     } else if (sa_family == AF_INET && ifaddr->addr.ss_family == AF_INET) {
       struct sockaddr_in *a = (struct sockaddr_in *)&ifaddr->addr;
       ret += add_mcast_sock_to_ipv4_mcast_group(mcast_sock, &a->sin_addr);
-    }
 #endif
+    }
   }
 
   if (!ifaddr_supplied) {
@@ -454,8 +454,8 @@ refresh_endpoints_list(ip_context_t *dev, ifaddr_t *ifaddr_list)
     ifaddr_supplied = true;
   }
   get_interface_addresses(ifaddr_list, dev, AF_INET6, dev->port, false, false);
-//#ifdef OC_SECURITY
-#ifdef OC_OSCORE
+#ifdef OC_SECURITY
+//#ifdef OC_OSCORE
   get_interface_addresses(ifaddr_list, dev, AF_INET6, dev->dtls_port, true,
                           false);
 #endif /* OC_SECURITY */
