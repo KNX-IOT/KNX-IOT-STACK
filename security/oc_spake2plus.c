@@ -212,11 +212,13 @@ oc_spake_calc_w0_w1(const char *pw, size_t len_salt, const uint8_t *salt,
 {
   int ret;
   mbedtls_md_context_t ctx;
+  uint8_t *input = malloc(3 * sizeof(uint64_t) + strlen(pw));
+  size_t len_input = 0;
 
   // Hmm, SPAKE2+ mandates this be 40 bytes or longer,
   // but KNX-IoT says it's 32 bytes maybe?
 //  const size_t output_len = 40;
-#define output_len 40
+#define output_len 80
   uint8_t output[output_len];
 
   mbedtls_mpi w0s, w1s;
@@ -225,11 +227,14 @@ oc_spake_calc_w0_w1(const char *pw, size_t len_salt, const uint8_t *salt,
   mbedtls_mpi_init(&w0s);
   mbedtls_mpi_init(&w1s);
 
+  len_input += encode_string(pw, input); // password
+  len_input += encode_uint(0, input);    // null idProver
+  len_input += encode_uint(0, input);    // null idVerifier
+
   MBEDTLS_MPI_CHK(
     mbedtls_md_setup(&ctx, mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), 1));
-  MBEDTLS_MPI_CHK(mbedtls_pkcs5_pbkdf2_hmac(&ctx, (const unsigned char *)pw,
-                                            strlen(pw), salt, len_salt, it,
-                                            output_len, output));
+  MBEDTLS_MPI_CHK(mbedtls_pkcs5_pbkdf2_hmac(&ctx, input, len_input, salt,
+                                            len_salt, it, output_len, output));
 
   // extract w0s and w1s from the output
   MBEDTLS_MPI_CHK(mbedtls_mpi_read_binary(&w0s, output, output_len / 2));
@@ -246,6 +251,7 @@ cleanup:
   mbedtls_md_free(&ctx);
   mbedtls_mpi_free(&w0s);
   mbedtls_mpi_free(&w1s);
+  free(input);
   return ret;
 }
 
