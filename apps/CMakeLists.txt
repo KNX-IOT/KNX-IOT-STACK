@@ -1,22 +1,22 @@
 project(knx-iot-stack-apps)
 
-# code example
-add_executable(simpleserver_all
-    ${PROJECT_SOURCE_DIR}/simpleserver_all.c
+# test example
+add_executable(testserver_all
+    ${PROJECT_SOURCE_DIR}/testserver_all.c
 )
-target_link_libraries(simpleserver_all
+target_link_libraries(testserver_all
         kisClientServer
     )
-file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/simpleserver_all_creds)
+file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/testserver_all_creds)
 
-# code example
-add_executable(simpleclient_all
-    ${PROJECT_SOURCE_DIR}/simpleclient_all.c
+# test example
+add_executable(testclient_all
+    ${PROJECT_SOURCE_DIR}/testclient_all.c
 )
-target_link_libraries(simpleclient_all
+target_link_libraries(testclient_all
         kisClientServer
     )
-file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/simpleclient_all_creds)
+file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/testclient_all_creds)
 
 add_executable(simpleclient_spake_all
     ${PROJECT_SOURCE_DIR}/simpleclient_spake_all.c

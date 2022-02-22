@@ -412,9 +412,6 @@ oc_core_init_platform(const char *mfg_name, oc_core_init_platform_cb_t init_cb,
     return &oc_platform_info;
   }
 
-  // todo remove uuid stuff
-  oc_gen_uuid(&oc_platform_info.pi);
-
   oc_new_string(&oc_platform_info.mfg_name, mfg_name, strlen(mfg_name));
   oc_platform_info.init_platform_cb = init_cb;
   oc_platform_info.data = data;

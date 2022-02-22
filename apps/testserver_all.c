@@ -875,7 +875,7 @@ main(int argc, char *argv[])
   sigaction(SIGINT, &sa, NULL);
 #endif
 
-  PRINT("KNX-IOT Server name : \"simple_server_all\"\n");
+  PRINT("KNX-IOT Server name : \"testserver_all\"\n");
 
   char buff[FILENAME_MAX];
   char *retbuf = NULL;
@@ -889,8 +889,8 @@ main(int argc, char *argv[])
    the folder is created in the makefile, with $target as name with _cred as
    post fix.
   */
-  PRINT("\tstorage at './simpleserver_all_creds' \n");
-  oc_storage_config("./simpleserver_all_creds");
+  PRINT("\tstorage at './testserver_all_creds' \n");
+  oc_storage_config("./testserver_all_creds");
 
 #ifdef OC_SECURITY
   PRINT("Security - Enabled\n");
@@ -942,7 +942,7 @@ main(int argc, char *argv[])
   oc_device_info_t *device = oc_core_get_device_info(0);
   PRINT("serial number: %s\n", oc_string(device->serialnumber));
   oc_device_mode_display(0);
-  PRINT("Server \"simple_server_all\" running (polling), waiting on incoming "
+  PRINT("Server \"testserver_all\" running (polling), waiting on incoming "
         "connections.\n\n\n");
 
 #ifdef WIN32

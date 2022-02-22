@@ -136,7 +136,6 @@ typedef struct
    *
    * Callback is invoked after the device initialization callback.
    *
-   *      TODO
    * Example:
    * ```
    * static void issue_requests(void)

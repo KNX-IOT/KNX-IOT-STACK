@@ -47,7 +47,6 @@ typedef void (*oc_core_add_device_cb_t)(void *data);
  */
 typedef struct oc_platform_info_t
 {
-  oc_uuid_t pi;                                /**< the platform identifier */
   oc_string_t mfg_name;                        /**< manufacturer name */
   oc_core_init_platform_cb_t init_platform_cb; /**< callback function */
   void *data; /**< user data for the callback function */
