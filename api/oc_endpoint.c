@@ -1,5 +1,6 @@
 /*
 // Copyright (c) 2017 Intel Corporation
+// Copyright (c) 2022 Cascoda Ltd.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -62,7 +63,6 @@ oc_endpoint_set_serial_number(oc_endpoint_t *endpoint, oc_string_t serial_number
   if (endpoint) {
     oc_free_string(&endpoint->serial_number);
     oc_new_string(&endpoint->serial_number, oc_string(serial_number), oc_string_len(serial_number));
-
   }
 }
 
