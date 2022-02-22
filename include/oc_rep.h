@@ -497,7 +497,7 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
  *
  * ~~~{.c}
  *     int fib[] = {1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89 };
- *     oc_rep_start_root_object();
+ *     oc_rep_begin_root_object();
  *     oc_rep_set_key(oc_rep_object(root), "fibonacci");
  *     oc_rep_begin_array(oc_rep_object(root), fibonacci);
  *     for(size_t i = 0; i < (sizeof(fib)/ sizeof(fib[0])); i++) {
@@ -549,14 +549,6 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
   g_err |= cbor_encoder_close_container(&g_encoder, &links_array)
 
 /**
- * This macro has been replaced with oc_rep_begin_root_object
- *
- * @see oc_rep_begin_root_object
- * @see oc_rep_end_root_object
- */
-#define oc_rep_start_root_object() oc_rep_begin_root_object()
-
-/**
  * Begin the root object. Items can be added to the root object till
  * oc_rep_end_root_object is called
  *
@@ -603,7 +595,7 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
  *                      0x13, 0x21, 0x34, 0x55, 0x89};
  *     uint8_t ba3[] = {0x00, 0x00, 0xff, 0x00, 0x00};
  *     // add values to root object
- *     oc_rep_start_root_object();
+ *     oc_rep_begin_root_object();
  *     oc_rep_open_array(root, barray);
  *     oc_rep_add_byte_string(barray, ba1, sizeof(ba1));
  *     oc_rep_add_byte_string(barray, ba2, sizeof(ba2));
@@ -649,7 +641,7 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
  * member.";
  *
  *     // add values to root object
- *     oc_rep_start_root_object();
+ *     oc_rep_begin_root_object();
  *     oc_rep_open_array(root, quotes);
  *     oc_rep_add_text_string(quotes, str0);
  *     oc_rep_add_text_string(quotes, str1);
@@ -701,7 +693,7 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
  *
  * ~~~{.c}
  *     double math_constants[] = { 3.14159, 2.71828, 1.414121, 1.61803 };
- *     oc_rep_start_root_object();
+ *     oc_rep_begin_root_object();
  *     oc_rep_open_array(root, math_constants);
  *     for(size_t i = 0; i < (sizeof(math_constants)/
  *           sizeof(math_constants[0])); i++) {
@@ -740,7 +732,7 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
  *
  * ~~~{.c}
  *     int fib[] = {1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89 };
- *     oc_rep_start_root_object();
+ *     oc_rep_begin_root_object();
  *     oc_rep_open_array(root, fibonacci);
  *     for(size_t i = 0; i < (sizeof(fib)/ sizeof(fib[0])); i++) {
  *         oc_rep_add_int(fibonacci, fib[i]);
@@ -778,7 +770,7 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
  * The following code could be used:
  * ~~~{.c}
  *     bool flip[] = {false, false, true, false, false };
- *     oc_rep_start_root_object();
+ *     oc_rep_begin_root_object();
  *     oc_rep_open_array(root, flip);
  *     for(size_t i = 0; i < (sizeof(flip)/ sizeof(flip[0])); i++) {
  *         oc_rep_add_boolean(flip, flip[i]);
@@ -913,7 +905,7 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
  *
  * The following code could be used:
  * ~~~{.c}
- *     oc_rep_start_root_object();
+ *     oc_rep_begin_root_object();
  *     oc_rep_set_array(root, space2001);
  *
  *     oc_rep_object_array_begin_item(space2001);
@@ -971,7 +963,7 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
  *
  * The following code could be used:
  * ~~~{.c}
- *     oc_rep_start_root_object();
+ *     oc_rep_begin_root_object();
  *     oc_rep_set_object(root, my_object);
  *     oc_rep_set_int(my_object, a, 1);
  *     oc_rep_set_boolean(my_object, b, false);
@@ -1010,7 +1002,7 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
  *
  * ~~~{.c}
  *     int fib[] = {1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89 };
- *     oc_rep_start_root_object();
+ *     oc_rep_begin_root_object();
  *     oc_rep_set_int_array(root,
  *                          fibonacci,
  *                          fib,
@@ -1047,7 +1039,7 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
  *
  * ~~~{.c}
  *     int fib[] = {1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89 };
- *     oc_rep_start_root_object();
+ *     oc_rep_begin_root_object();
  *     oc_rep_i_set_int_array(root,
  *                            3,
  *                            fib,
@@ -1085,7 +1077,7 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
  *
  * ~~~{.c}
  *     bool flip[] = {false, false, true, false, false };
- *     oc_rep_start_root_object();
+ *     oc_rep_begin_root_object();
  *     oc_rep_set_bool_array(root,
  *                           flip,
  *                           flip,
@@ -1122,7 +1114,7 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
  *
  * ~~~{.c}
  *     bool flip[] = {false, false, true, false, false };
- *     oc_rep_start_root_object();
+ *     oc_rep_begin_root_object();
  *     oc_rep_i_set_bool_array(root,
  *                             4,
  *                             flip,
@@ -1160,7 +1152,7 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
  *
  * ~~~{.c}
  *     double math_constants[] = { 3.14159, 2.71828, 1.414121, 1.61803 };
- *     oc_rep_start_root_object();
+ *     oc_rep_begin_root_object();
  *     oc_rep_set_double_array(root,
  *                             math_constants,
  *                             math_constants,
@@ -1199,7 +1191,7 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
  *
  * ~~~{.c}
  *     double math_constants[] = { 3.14159, 2.71828, 1.414121, 1.61803 };
- *     oc_rep_start_root_object();
+ *     oc_rep_begin_root_object();
  *     oc_rep_i_set_double_array(root,
  *                               6,
  *                               math_constants,
@@ -1260,7 +1252,7 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
  *     oc_string_array_add_item(quotes, str3);
  *
  *     //add values to root object
- *     oc_rep_start_root_object();
+ *     oc_rep_begin_root_object();
  *     oc_rep_set_string_array(root, quotes, quotes);
  *     oc_rep_end_root_object();
  *     oc_free_string_array(&quotes);
@@ -1323,7 +1315,7 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
  *     oc_string_array_add_item(quotes, str3);
  *
  *     //add values to root object
- *     oc_rep_start_root_object();
+ *     oc_rep_begin_root_object();
  *     oc_rep_i_set_string_array(root, 4, quotes);
  *     oc_rep_end_root_object();
  *     oc_free_string_array(&quotes);

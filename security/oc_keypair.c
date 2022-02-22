@@ -106,7 +106,7 @@ oc_sec_encode_ecdsa_keypair(size_t device)
     return false;
   }
 
-  oc_rep_start_root_object();
+  oc_rep_begin_root_object();
   oc_rep_set_byte_string(root, public_key, kp->public_key,
                          OC_ECDSA_PUBKEY_SIZE);
   oc_rep_set_byte_string(root, private_key, kp->private_key,

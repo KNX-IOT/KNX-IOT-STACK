@@ -1337,23 +1337,25 @@ py_oc_rep_to_json(oc_rep_t *rep, char *buf, size_t buf_size, bool pretty_print)
   int tab = 1;
 
   bool object_array =
-    (rep && (rep->type == OC_REP_ARRAY) && (oc_string_len(rep->name) == 0));
-  bool object =
-    (rep && (rep->type == OC_REP_OBJECT) && (oc_string_len(rep->name) == 0));
+    (rep && (rep->type == OC_REP_ARRAY) && 
+            (oc_string_len(rep->name) == 0) &&
+             (rep->iname == -1) );
+  bool object = (rep && (rep->type == OC_REP_OBJECT) &&
+                 (oc_string_len(rep->name) == 0) && (rep->iname == -1));
 
-  PRINT("===> py_oc_rep_to_json: %d %d", object_array, object);
+  PRINT("===> py_oc_rep_to_json: array:%d object:%d", object_array, object);
   if (rep) {
-    PRINT(" %d", rep->type);
+    PRINT(" type: %d", rep->type);
     if ((rep->type != OC_REP_ARRAY) && (rep->type != OC_REP_OBJECT)) {
       tab = 0;
     }
   }
-  PRINT(" %d \n\n", tab);
+  PRINT(" tab: %d \n\n", tab);
 
-  // TODO fix this...
-  // reserve space                            {'0':
-  num_char_printed = snprintf(buf, buf_size, "     ");
+  // reserve space
+  num_char_printed = snprintf(buf, buf_size, " ");
   OC_JSON_UPDATE_BUFFER_AND_TOTAL;
+
 
   if (object_array) {
     num_char_printed = (pretty_print) ? snprintf(buf, buf_size, "[\n")
@@ -1370,24 +1372,34 @@ py_oc_rep_to_json(oc_rep_t *rep, char *buf, size_t buf_size, bool pretty_print)
     oc_rep_to_json_format(rep, buf, buf_size, tab, pretty_print);
   OC_JSON_UPDATE_BUFFER_AND_TOTAL;
 
-  // note that the python layer above this function will fix the {x with the
-  // appropriate sequence: { or { "0": e.g. what ever will make it correct json
   char *found = strchr((const char *)my_buf, ':');
   if (found != NULL) {
+    // content is an object
     object = true;
     my_buf[0] = '{';
-    my_buf[1] = 'x';
+  } else {
+    // check if the contents maybe an array
+    char *found = strchr((const char *)my_buf, ',');
+    if (found != NULL) {
+      // content is an array
+      object_array = true;
+      my_buf[0] = '[';
+    }
   }
 
   if (object_array) {
     num_char_printed = (pretty_print) ? snprintf(buf, buf_size, "]\n")
                                       : snprintf(buf, buf_size, "]");
+    OC_JSON_UPDATE_BUFFER_AND_TOTAL;
   }
   if (object) {
     num_char_printed = (pretty_print) ? snprintf(buf, buf_size, "}\n")
                                       : snprintf(buf, buf_size, "}");
+    OC_JSON_UPDATE_BUFFER_AND_TOTAL;
   }
 
-  OC_JSON_UPDATE_BUFFER_AND_TOTAL;
+  PRINT(" total printed: %d \n", (int)total_char_printed);
+  PRINT("%s\n", my_buf);
+
   return total_char_printed;
 }

@@ -499,10 +499,10 @@ general_get_cb(oc_client_response_t *data)
     } else if (data->content_format == APPLICATION_CBOR) {
       py_mutex_lock(app_sync_lock);
       memset(buffer, 0, buffer_size);
-      py_oc_rep_to_json(data->payload, (char *)&buffer, buffer_size, false);
+      int json_size = py_oc_rep_to_json(data->payload, (char *)&buffer, buffer_size, false);
       inform_client_python((char *)my_data->sn, status, "json",
                            (char *)my_data->r_id, (char *)my_data->url,
-                           (int)data->_payload_len, (char *)buffer);
+                           (int)json_size, (char *)buffer);
       py_mutex_unlock(app_sync_lock);
     } else {
       PRINT(" [C]informing python with error \n");

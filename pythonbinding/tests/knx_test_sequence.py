@@ -64,6 +64,10 @@ def safe_print(response):
         print("no response")
 
 def compare_dict(dict1, dict2):
+    if dict1 is None:
+        return False
+    if dict2 is None:
+        return False
     dict1_set = set(dict1.keys())
     dict2_set = set(dict2.keys())
     # compare the keys
@@ -151,6 +155,11 @@ def do_sequence_dev(my_stack):
 
     print("-------------------")
     response =  my_stack.issue_cbor_get(sn,"/dev/iid")
+    safe_print(response)
+    my_stack.purge_response(response)
+
+    print("-------------------")
+    response =  my_stack.issue_cbor_get(sn,"/dev/ipv6")
     safe_print(response)
     my_stack.purge_response(response)
 
@@ -316,6 +325,7 @@ def do_sequence_lsm(my_stack):
     my_stack.purge_response(response)
     response =  my_stack.issue_cbor_get(sn, "/a/lsm")
     safe_print(response)
+    
     if compare_dict(expect, response.get_payload_dict()):
         print("PASS : /a/lsm ", expect, response.get_payload_dict())
     else:

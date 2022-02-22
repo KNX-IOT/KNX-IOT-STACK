@@ -193,7 +193,7 @@ RIHelper::getLightCb(oc_request_t *request, oc_interface_mask_t interface,
 {
   PRINT("getLightCb:\n");
   (void)user_data;
-  oc_rep_start_root_object();
+  oc_rep_begin_root_object();
   switch (interface) {
   case OC_IF_BASELINE:
     // oc_process_baseline_interface(request->resource);
@@ -385,7 +385,7 @@ RIHelper::postRequestResource()
   s_isRequestSucessfull = false;
   if (oc_init_post(s_lightUri, s_pLightEndpoint, NULL, &postLightClientCb,
                    LOW_QOS, NULL)) {
-    oc_rep_start_root_object();
+    oc_rep_begin_root_object();
     oc_rep_set_boolean(root, state, !s_lightState);
     oc_rep_end_root_object();
     if (oc_do_post())
@@ -404,7 +404,7 @@ RIHelper::putRequestResource()
   s_isRequestSucessfull = false;
   if (oc_init_put(s_lightUri, s_pLightEndpoint, NULL, &putLightClientCb,
                   LOW_QOS, NULL)) {
-    oc_rep_start_root_object();
+    oc_rep_begin_root_object();
     oc_rep_set_boolean(root, state, !s_lightState);
     oc_rep_end_root_object();
     if (oc_do_put())

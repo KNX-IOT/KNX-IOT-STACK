@@ -35,7 +35,7 @@ TEST(TestRep, OCRepEncodedPayloadSizeTooSmall)
   uint8_t buf[10]; // Purposely small buffer
   oc_rep_new(&buf[0], 10);
 
-  oc_rep_start_root_object();
+  oc_rep_begin_root_object();
   EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
   oc_rep_set_text_string(root, "hello", "world");
   EXPECT_EQ(CborErrorOutOfMemory, oc_rep_get_cbor_errno());
@@ -69,7 +69,7 @@ TEST(TestRep, OCRepSetGetDouble)
   oc_rep_new(&buf[0], 1024);
 
   /* add int values to root object */
-  oc_rep_start_root_object();
+  oc_rep_begin_root_object();
   oc_rep_set_double(root, pi, 3.14159);
   oc_rep_end_root_object();
 
@@ -119,7 +119,7 @@ TEST(TestRep, OCRepSetGetInt)
   oc_rep_new(&buf[0], 1024);
 
   /* add values to root object */
-  oc_rep_start_root_object();
+  oc_rep_begin_root_object();
   EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
   oc_rep_set_int(root, ultimate_answer, 10000000000);
   EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
@@ -192,7 +192,7 @@ TEST(TestRep, OCRepSetGetUint)
   oc_rep_new(&buf[0], 1024);
 
   /* add values to root object */
-  oc_rep_start_root_object();
+  oc_rep_begin_root_object();
   EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
   oc_rep_set_uint(root, ultimate_answer, 42);
   EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
@@ -268,7 +268,7 @@ TEST(TestRep, OCRepSetGetBool)
   oc_rep_new(&buf[0], 1024);
 
   /* add values to root object */
-  oc_rep_start_root_object();
+  oc_rep_begin_root_object();
   EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
   oc_rep_set_boolean(root, true_flag, true);
   EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
@@ -342,7 +342,7 @@ TEST(TestRep, OCRepSetGetTextString)
   oc_rep_new(&buf[0], 1024);
 
   /* add text string value "hal9000":"Dave" to root object */
-  oc_rep_start_root_object();
+  oc_rep_begin_root_object();
   EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
   oc_rep_set_text_string(root, hal9000, "Dave");
   EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
@@ -419,7 +419,7 @@ TEST(TestRep, OCRepSetGetByteString)
   oc_rep_new(&buf[0], 1024);
 
   /* add text string value "hal9000":"Dave" to root object */
-  oc_rep_start_root_object();
+  oc_rep_begin_root_object();
   EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
   const uint8_t test_byte_string[] = { 0x01, 0x02, 0x03, 0x04, 0x02, 0x00 };
   oc_rep_set_byte_string(root, test_byte_string, test_byte_string, 6u);
@@ -497,7 +497,7 @@ TEST(TestRep, OCRepSetGetIntArray)
   oc_rep_new(&buf[0], 1024);
 
   /* add values to root object */
-  oc_rep_start_root_object();
+  oc_rep_begin_root_object();
   EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
   int64_t fib[] = { 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 10000000000 };
   oc_rep_set_int_array(root, fibonacci, fib,
@@ -567,7 +567,7 @@ TEST(TestRep, OCRepAddGetIntArray)
   oc_rep_new(&buf[0], 1024);
 
   /* add values to root object */
-  oc_rep_start_root_object();
+  oc_rep_begin_root_object();
   EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
   int64_t fib[] = { 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89 };
 
@@ -635,7 +635,7 @@ TEST(TestRep, OCRepAddGetIntArrayUsingSetKeyAndBeginArray)
   oc_rep_new(&buf[0], 1024);
 
   /* add values to root object */
-  oc_rep_start_root_object();
+  oc_rep_begin_root_object();
   EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
   int64_t fib[] = { 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89 };
 
@@ -701,7 +701,7 @@ TEST(TestRep, OCRepSetGetBoolArray)
   oc_rep_new(&buf[0], 1024);
 
   /* add values to root object */
-  oc_rep_start_root_object();
+  oc_rep_begin_root_object();
   EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
   bool flip[] = { false, false, true, false, false };
   oc_rep_set_bool_array(root, flip, flip,
@@ -769,7 +769,7 @@ TEST(TestRep, OCRepAddGetBoolArray)
   oc_rep_new(&buf[0], 1024);
 
   /* add values to root object */
-  oc_rep_start_root_object();
+  oc_rep_begin_root_object();
   EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
   bool flip[] = { false, false, true, false, false };
 
@@ -833,7 +833,7 @@ TEST(TestRep, OCRepSetGetDoubleArray)
   oc_rep_new(&buf[0], 1024);
 
   /* add values to root object */
-  oc_rep_start_root_object();
+  oc_rep_begin_root_object();
   EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
   double math_constants[] = { 3.14159, 2.71828, 1.414121, 1.61803 };
   oc_rep_set_double_array(
@@ -911,7 +911,7 @@ TEST(TestRep, OCRepAddGetDoubleArray)
   oc_rep_new(&buf[0], 1024);
 
   /* add values to root object */
-  oc_rep_start_root_object();
+  oc_rep_begin_root_object();
   EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
   double math_constants[] = { 3.14159, 2.71828, 1.414121, 1.61803 };
   oc_rep_open_array(root, math_constants);
@@ -989,7 +989,7 @@ TEST(TestRep, OCRepSetGetObject)
    * }
    */
   /* add values to root object */
-  oc_rep_start_root_object();
+  oc_rep_begin_root_object();
   EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
   oc_rep_set_object(root, my_object);
   EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
@@ -1072,7 +1072,7 @@ TEST(TestRep, OCRepSetGetObjectArray)
    *   ]
    */
   /* add values to root object */
-  oc_rep_start_root_object();
+  oc_rep_begin_root_object();
   EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
   oc_rep_set_array(root, space_2001);
   EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
@@ -1220,7 +1220,7 @@ TEST(TestRep, OCRepAddGetByteStringArray)
   uint8_t ba4[] = { 0x00, 0x00, 0xff, 0x00, 0x00 };
 
   /* add values to root object */
-  oc_rep_start_root_object();
+  oc_rep_begin_root_object();
   EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
   oc_rep_set_array(root, barray);
   EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
@@ -1322,7 +1322,7 @@ TEST(TestRep, OCRepSetGetStringArray)
   oc_string_array_add_item(quotes, str2);
   oc_string_array_add_item(quotes, str3);
   /* add values to root object */
-  oc_rep_start_root_object();
+  oc_rep_begin_root_object();
   EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
   oc_rep_set_string_array(root, quotes, quotes);
   EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
@@ -1405,7 +1405,7 @@ TEST(TestRep, OCRepAddGetStringArray)
     "I refuse to join any club that would have me as a member.";
 
   /* add values to root object */
-  oc_rep_start_root_object();
+  oc_rep_begin_root_object();
   EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
   oc_rep_open_array(root, quotes);
   EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
@@ -1619,7 +1619,7 @@ TEST(TestRep, OCRepISetGetDouble)
   oc_rep_new(&buf[0], 1024);
 
   /* add int values to root object */
-  oc_rep_start_root_object();
+  oc_rep_begin_root_object();
   oc_rep_i_set_double(root, 5, 3.14159);
   oc_rep_end_root_object();
 
@@ -1667,7 +1667,7 @@ TEST(TestRep, OCRepISetGetDoubleArray)
   oc_rep_new(&buf[0], 1024);
 
   /* add values to root object */
-  oc_rep_start_root_object();
+  oc_rep_begin_root_object();
   EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
   double math_constants[] = { 3.14159, 2.71828, 1.414121, 1.61803 };
   oc_rep_i_set_double_array(
@@ -1741,7 +1741,7 @@ TEST(TestRep, OCRepISetGetInt)
   oc_rep_new(&buf[0], 1024);
 
   /* add values to root object */
-  oc_rep_start_root_object();
+  oc_rep_begin_root_object();
   EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
   oc_rep_i_set_int(root, 2, 10000000000);
   EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
@@ -1812,7 +1812,7 @@ TEST(TestRep, OCRepISetGetUint)
   oc_rep_new(&buf[0], 1024);
 
   /* add values to root object */
-  oc_rep_start_root_object();
+  oc_rep_begin_root_object();
   EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
   oc_rep_i_set_uint(root, 2, 42);
   EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
@@ -1887,7 +1887,7 @@ TEST(TestRep, OCRepISetGetBool)
   oc_rep_new(&buf[0], 1024);
 
   /* add values to root object */
-  oc_rep_start_root_object();
+  oc_rep_begin_root_object();
   EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
   oc_rep_i_set_boolean(root, 2, true);
   EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
@@ -1949,7 +1949,7 @@ TEST(TestRep, OCRepISetGetBoolArray)
   oc_rep_new(&buf[0], 1024);
 
   /* add values to root object */
-  oc_rep_start_root_object();
+  oc_rep_begin_root_object();
   EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
   bool flip[] = { false, false, true, false, false };
   oc_rep_i_set_bool_array(root, 3, flip, (int)(sizeof(flip) / sizeof(flip[0])));
@@ -2024,7 +2024,7 @@ TEST(TestRep, OCRepISetGetTextString)
   oc_rep_new(&buf[0], 1024);
 
   /* add text string value "2":"Dave" to root object */
-  oc_rep_start_root_object();
+  oc_rep_begin_root_object();
   EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
   oc_rep_i_set_text_string(root, 2, "Dave");
   EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
@@ -2111,7 +2111,7 @@ TEST(TestRep, OCRepISetGetStringArray)
   oc_string_array_add_item(quotes, str2);
   oc_string_array_add_item(quotes, str3);
   /* add values to root object */
-  oc_rep_start_root_object();
+  oc_rep_begin_root_object();
   EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
   oc_rep_i_set_string_array(root, 3, quotes);
   EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
@@ -2189,7 +2189,7 @@ TEST(TestRep, OCRepISetGetByteString)
   oc_rep_new(&buf[0], 1024);
 
   /* add text string value "2":"Dave" to root object */
-  oc_rep_start_root_object();
+  oc_rep_begin_root_object();
   EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
   const uint8_t test_byte_string[] = { 0x01, 0x02, 0x03, 0x04, 0x02, 0x00 };
   oc_rep_i_set_byte_string(root, 2, test_byte_string, 6u);
@@ -2266,7 +2266,7 @@ TEST(TestRep, OCRepISetGetIntArray)
   oc_rep_new(&buf[0], 1024);
 
   /* add values to root object */
-  oc_rep_start_root_object();
+  oc_rep_begin_root_object();
   EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
   int64_t fib[] = { 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 10000000000 };
   oc_rep_i_set_int_array(root, 2, fib, (int)(sizeof(fib) / sizeof(fib[0])));
@@ -2335,7 +2335,7 @@ TEST(TestRep, OCRepIAddGetIntArray)
   oc_rep_new(&buf[0], 1024);
 
   /* add values to root object */
-  oc_rep_start_root_object();
+  oc_rep_begin_root_object();
   EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
   int64_t fib[] = { 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89 };
 

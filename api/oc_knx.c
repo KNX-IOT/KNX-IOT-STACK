@@ -136,7 +136,7 @@ oc_core_knx_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     request->response->response_buffer->response_length = response_length;
   } else {
 
-    oc_rep_start_root_object();
+    oc_rep_begin_root_object();
 
     oc_rep_set_text_string(root, base, "/");
 
@@ -226,7 +226,7 @@ oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   if (error == false) {
 
     // oc_rep_begin_root_object ();
-    oc_rep_start_root_object();
+    oc_rep_begin_root_object();
 
     // TODO note need to figure out how to fill in the correct response values
     oc_rep_set_int(root, code, 5);
@@ -381,7 +381,7 @@ oc_core_knx_lsm_get_handler(oc_request_t *request,
   }
   oc_lsm_state_t lsm = oc_knx_lsm_state(device_index);
 
-  oc_rep_start_root_object();
+  oc_rep_begin_root_object();
   oc_rep_i_set_int(root, 3, lsm);
   oc_rep_end_root_object();
 
@@ -434,7 +434,7 @@ oc_core_knx_lsm_post_handler(oc_request_t *request,
 
   /* input was set, so create the response*/
   if (changed == true) {
-    oc_rep_start_root_object();
+    oc_rep_begin_root_object();
     oc_rep_i_set_int(root, 3, (int)oc_knx_lsm_state(device_index));
     oc_rep_end_root_object();
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
