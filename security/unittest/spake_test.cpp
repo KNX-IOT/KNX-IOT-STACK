@@ -6,7 +6,9 @@
 #include "mbedtls/hkdf.h"
 #include "mbedtls/pkcs5.h"
 
+extern "C" {
 #include "security/oc_spake2plus.h"
+}
 
 static mbedtls_entropy_context entropy_ctx;
 static mbedtls_ctr_drbg_context ctr_drbg_ctx;
@@ -129,7 +131,7 @@ const uint8_t cB[] = { 0x07, 0x2a, 0x94, 0xd9, 0xa5, 0x4e, 0xdc, 0x20,
 #define ASSERT_RET(x) do { ASSERT_EQ(x, 0); } while(0)
 #define EXPECT_RET(x) do { EXPECT_EQ(x, 0); } while(0)
 
-TEST_F(Spake2Plus, CalculateX) {
+TEST_F(Spake2Plus, CalculatePublicA) {
   // =========================
   // Check that X = x*P + w0*M
   // =========================
@@ -156,6 +158,39 @@ TEST_F(Spake2Plus, CalculateX) {
 
   // check the value of X is correct
   ASSERT_TRUE(0 == memcmp(bytes_X, cmpbuf, cmplen));
+  mbedtls_mpi_free(&x);
+  mbedtls_mpi_free(&w0);
+}
+
+TEST_F(Spake2Plus, CalculatePublicB) {
+  // =========================
+  // Check that Y = y*P + w0*N
+  // =========================
+  mbedtls_mpi y, w0;
+  mbedtls_mpi_init(&y);
+  mbedtls_mpi_init(&w0);
+  uint8_t cmpbuf[128];
+  size_t cmplen;
+
+  ASSERT_RET(mbedtls_mpi_read_binary(&w0, bytes_w0, sizeof(bytes_w0)));
+
+  ASSERT_RET(mbedtls_mpi_read_binary(&y, bytes_y, sizeof(bytes_y)));
+
+  mbedtls_ecp_point Y, pubB;
+  mbedtls_ecp_point_init(&Y);
+  mbedtls_ecp_point_init(&pubB);
+  // pubB = y*P
+  ASSERT_RET(mbedtls_ecp_mul(&grp, &pubB, &y, &grp.G,
+                                  mbedtls_ctr_drbg_random, &ctr_drbg_ctx));
+
+  // Y = pubB + w0*N
+  ASSERT_RET(oc_spake_calc_pB(&Y, &pubB, &w0));
+  ASSERT_RET(mbedtls_ecp_point_write_binary(
+    &grp, &Y, MBEDTLS_ECP_PF_UNCOMPRESSED, &cmplen, cmpbuf, sizeof(cmpbuf)));
+  // check the value of Y is correct
+  ASSERT_TRUE(memcmp(bytes_Y, cmpbuf, cmplen) == 0);
+  mbedtls_mpi_free(&y);
+  mbedtls_mpi_free(&w0);
 }
 
 
@@ -163,91 +198,6 @@ TEST_F(Spake2Plus, CalculateX) {
 int
 oc_spake_test_vector()
 {
-  // Using third set, as we only have easy access to the server (e.g. device)
-  // identity.
-  uint8_t cmpbuf[128];
-  size_t cmplen;
-  int ret;
-
-  // initialize rng
-  oc_spake_init();
-
-  // =========================
-  // Check that Y = y*P + w0*N
-  // =========================
-  mbedtls_mpi y;
-  mbedtls_mpi_init(&y);
-
-  MBEDTLS_MPI_CHK(mbedtls_mpi_read_binary(&y, bytes_y, sizeof(bytes_y)));
-
-  mbedtls_ecp_point Y, pubB;
-  mbedtls_ecp_point_init(&Y);
-  mbedtls_ecp_point_init(&pubB);
-  // pubB = y*P
-  MBEDTLS_MPI_CHK(mbedtls_ecp_mul(&grp, &pubB, &y, &grp.G,
-                                  mbedtls_ctr_drbg_random, &ctr_drbg_ctx));
-
-  // Y = pubB + w0*N
-  MBEDTLS_MPI_CHK(oc_spake_calc_pB(&Y, &pubB, &w0));
-  MBEDTLS_MPI_CHK(mbedtls_ecp_point_write_binary(
-    &grp, &Y, MBEDTLS_ECP_PF_UNCOMPRESSED, &cmplen, cmpbuf, sizeof(cmpbuf)));
-  // check the value of Y is correct
-  assert(memcmp(bytes_Y, cmpbuf, cmplen) == 0);
-
-  // ==============================
-  // Check that altering the inputs
-  // does indeed change the result
-  // ==============================
-  mbedtls_mpi bad_y;
-  mbedtls_ecp_point bad_pubB, bad_Y;
-  mbedtls_mpi_init(&bad_y);
-  mbedtls_ecp_point_init(&bad_pubB);
-  mbedtls_ecp_point_init(&bad_Y);
-
-  bytes_y[5]++;
-  mbedtls_mpi_read_binary(&bad_y, bytes_y, sizeof(bytes_y));
-  bytes_y[5]--;
-
-  // pubB = y*P
-  MBEDTLS_MPI_CHK(mbedtls_ecp_mul(&grp, &bad_pubB, &bad_y, &grp.G,
-                                  mbedtls_ctr_drbg_random, &ctr_drbg_ctx));
-
-  // Y = pubB + w0*N
-  MBEDTLS_MPI_CHK(oc_spake_calc_pB(&bad_Y, &bad_pubB, &w0));
-  MBEDTLS_MPI_CHK(
-    mbedtls_ecp_point_write_binary(&grp, &bad_Y, MBEDTLS_ECP_PF_UNCOMPRESSED,
-                                   &cmplen, cmpbuf, sizeof(cmpbuf)));
-  // check the value of Y is NOT correct
-  assert(memcmp(bytes_Y, cmpbuf, cmplen) != 0);
-
-  // ================================
-  // Check that party A can calculate
-  // the shared secret key material
-  // ================================
-
-  mbedtls_ecp_point Z;
-  mbedtls_ecp_point_init(&Z);
-
-  // Z = h*x*(Y - w0*N)
-  MBEDTLS_MPI_CHK(calculate_ZV_N(&Z, &x, &Y, &w0));
-
-  MBEDTLS_MPI_CHK(mbedtls_ecp_point_write_binary(
-    &grp, &Z, MBEDTLS_ECP_PF_UNCOMPRESSED, &cmplen, cmpbuf, sizeof(cmpbuf)));
-  assert(memcmp(bytes_Z, cmpbuf, cmplen) == 0);
-
-  mbedtls_ecp_point V;
-  mbedtls_ecp_point_init(&V);
-
-  mbedtls_mpi w1;
-  mbedtls_mpi_init(&w1);
-  mbedtls_mpi_read_binary(&w1, bytes_w1, sizeof(bytes_w1));
-
-  // V = h*w1*(Y - w0*N)
-  MBEDTLS_MPI_CHK(calculate_ZV_N(&V, &w1, &Y, &w0));
-  MBEDTLS_MPI_CHK(mbedtls_ecp_point_write_binary(
-    &grp, &V, MBEDTLS_ECP_PF_UNCOMPRESSED, &cmplen, cmpbuf, sizeof(cmpbuf)));
-  assert(memcmp(bytes_V, cmpbuf, cmplen) == 0);
-
   // ================================
   // Check that party B can calculate
   // the shared secret key material
