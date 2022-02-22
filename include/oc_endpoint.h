@@ -116,7 +116,8 @@ void oc_free_endpoint(oc_endpoint_t *endpoint);
  * @param endpoint the end point
  * @param serial_number the device serial number
  */
-void oc_endpoint_set_serial_number(oc_endpoint_t *endpoint, oc_string_t serial_number);
+void oc_endpoint_set_serial_number(oc_endpoint_t *endpoint,
+                                   oc_string_t serial_number);
 
 /**
  * @brief convert the endpoint to a human readable string (e.g.

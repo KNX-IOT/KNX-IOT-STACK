@@ -2065,7 +2065,7 @@ read_application_data(oc_tls_peer_t *peer)
     }
 #endif /* OC_INOUT_BUFFER_SIZE */
     memcpy(&msg->endpoint, &message->endpoint, sizeof(oc_endpoint_t));
-    //memcpy(&msg->endpoint.di.id, &peer->uuid.id, 16);
+    // memcpy(&msg->endpoint.di.id, &peer->uuid.id, 16);
     msg->length = message->length;
     memcpy(msg->data, message->data, message->length);
 #ifdef OC_OSCORE

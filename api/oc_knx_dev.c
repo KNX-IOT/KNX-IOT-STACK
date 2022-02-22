@@ -478,9 +478,10 @@ oc_core_dev_ipv6_get_handler(oc_request_t *request,
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device != NULL) {
-    // bytestring cbor_encode_byte_string(CborEncoder *encoder, const uint8_t *string, size_t length);
-    
-   // cbor_encode_byte_string(&g_encoder, device->pm, );
+    // bytestring cbor_encode_byte_string(CborEncoder *encoder, const uint8_t
+    // *string, size_t length);
+
+    // cbor_encode_byte_string(&g_encoder, device->pm, );
     oc_send_cbor_response(request, OC_STATUS_OK);
     return;
   }
