@@ -56,13 +56,15 @@ oc_free_endpoint(oc_endpoint_t *endpoint)
   }
 }
 
-//void
-//oc_endpoint_set_di(oc_endpoint_t *endpoint, oc_uuid_t *di)
-//{
-//  if (endpoint && di) {
-//    memcpy(endpoint->di.id, di->id, 16);
-//  }
-//}
+void
+oc_endpoint_set_serial_number(oc_endpoint_t *endpoint, oc_string_t serial_number)
+{
+  if (endpoint) {
+    oc_free_string(&endpoint->serial_number);
+    oc_new_string(&endpoint->serial_number, oc_string(serial_number), oc_string_len(serial_number));
+
+  }
+}
 
 #ifdef OC_IPV4
 static void

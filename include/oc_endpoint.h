@@ -74,7 +74,6 @@ typedef struct oc_endpoint_t
   struct oc_endpoint_t *next; /**< pointer to the next structure */
   size_t device;              /**< device index */
   enum transport_flags flags; /**< the transport flags */
-  //oc_uuid_t di;               /**< device di */
   oc_string_t serial_number;  /**< serial number */
   union dev_addr {
     oc_ipv6_addr_t ipv6; /**< ipv6 address */
@@ -112,12 +111,12 @@ oc_endpoint_t *oc_new_endpoint(void);
 void oc_free_endpoint(oc_endpoint_t *endpoint);
 
 /**
- * @brief set device identifier (di) for the endpoint
+ * @brief set device serial number for the endpoint
  *
  * @param endpoint the end point
- * @param di the device identifier
+ * @param serial_number the device serial number
  */
-//void oc_endpoint_set_di(oc_endpoint_t *endpoint, oc_uuid_t *di);
+void oc_endpoint_set_serial_number(oc_endpoint_t *endpoint, oc_string_t serial_number);
 
 /**
  * @brief convert the endpoint to a human readable string (e.g.

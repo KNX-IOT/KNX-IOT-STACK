@@ -688,6 +688,14 @@ void oc_resource_set_properties_cbs(oc_resource_t *resource,
  */
 void oc_resource_set_secure_mcast(oc_resource_t *resource, bool supported);
 
+/**
+ * @brief set a resource to a specific function block instance
+ * default is instance 0, if there is just 1 instance of the
+ * function block this function does not have to be called.
+ * 
+ * @param resource the resource
+ * @param instance the instance id.
+ */
 void oc_resource_set_function_block_instance(oc_resource_t *resource,
                                              uint8_t instance);
 
