@@ -8,6 +8,16 @@
 
 extern "C" {
 #include "security/oc_spake2plus.h"
+
+// Use implementation of Spake2+ with testing context
+int calc_transcript_initiator(mbedtls_mpi *w0, mbedtls_mpi *w1, mbedtls_mpi *x,
+                              mbedtls_ecp_point *X,
+                              const uint8_t Y_enc[kPubKeySize],
+                              uint8_t Ka_Ke[32], bool use_testing_context);
+
+int calc_transcript_responder(spake_data_t *spake_data,
+                              uint8_t X_enc[kPubKeySize], mbedtls_ecp_point *Y,
+                              bool use_testing_context);
 }
 
 static mbedtls_entropy_context entropy_ctx;
@@ -187,14 +197,38 @@ TEST_F(Spake2Plus, CalculatePublicB)
     &grp, &Y, MBEDTLS_ECP_PF_UNCOMPRESSED, &cmplen, cmpbuf, sizeof(cmpbuf)));
   // check the value of Y is correct
   ASSERT_TRUE(memcmp(bytes_Y, cmpbuf, cmplen) == 0);
+
   mbedtls_mpi_free(&y);
   mbedtls_mpi_free(&w0);
 }
 
 TEST_F(Spake2Plus, CalculateSecretA)
 {
-  // revision 5 of the RFC removed the test vectors for transcripts
-  // with null identities
+  mbedtls_mpi w0, w1, x;
+  mbedtls_ecp_point X;
+  uint8_t Ka_Ke[32];
+
+  mbedtls_mpi_init(&w0);
+  mbedtls_mpi_init(&w1);
+  mbedtls_mpi_init(&x);
+  mbedtls_ecp_point_init(&X);
+
+  ASSERT_RET(mbedtls_mpi_read_binary(&w0, bytes_w0, sizeof(bytes_w0)));
+  ASSERT_RET(mbedtls_mpi_read_binary(&w1, bytes_w1, sizeof(bytes_w1)));
+  ASSERT_RET(mbedtls_mpi_read_binary(&x, bytes_x, sizeof(bytes_x)));
+  ASSERT_RET(mbedtls_ecp_point_read_binary(&grp, &X, bytes_X, sizeof(bytes_X)));
+
+  ASSERT_RET(calc_transcript_initiator(&w0, &w1, &x, &X, bytes_Y, Ka_Ke, true));
+
+  // bummer, test vector aint workin
+  // tomorrow - look at transcript and compaaaaaaaaaaaaaaaaaaaaaaaare
+  EXPECT_TRUE(memcmp(Ka, Ka_Ke, 16) == 0);
+  EXPECT_TRUE(memcmp(Ke, Ka_Ke + 16, 16) == 0);
+
+  mbedtls_mpi_free(&w0);
+  mbedtls_mpi_free(&w1);
+  mbedtls_mpi_free(&x);
+  mbedtls_ecp_point_free(&X);
 }
 
 #if 0

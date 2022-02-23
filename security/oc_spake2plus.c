@@ -402,9 +402,8 @@ cleanup:
 }
 
 int
-oc_spake_calc_transcript_responder(spake_data_t *spake_data,
-                                   uint8_t X_enc[kPubKeySize],
-                                   mbedtls_ecp_point *Y)
+calc_transcript_responder(spake_data_t *spake_data, uint8_t X_enc[kPubKeySize],
+                          mbedtls_ecp_point *Y, bool use_testing_context)
 {
   int ret = 0;
   mbedtls_ecp_point Z, V, X;
@@ -428,7 +427,11 @@ oc_spake_calc_transcript_responder(spake_data_t *spake_data,
 
   // calculate transcript
   // Context
-  ttlen += encode_string(SPAKE_CONTEXT, ttbuf + ttlen);
+  if (use_testing_context) {
+    ttlen += encode_string("SPAKE2+-P256-SHA256-HKDF draft-01", ttbuf + ttlen);
+  } else {
+    ttlen += encode_string(SPAKE_CONTEXT, ttbuf + ttlen);
+  }
   // null idProver
   ttlen += encode_string("", ttbuf + ttlen);
   // null idVerifier
@@ -467,10 +470,19 @@ cleanup:
 }
 
 int
-oc_spake_calc_transcript_initiator(mbedtls_mpi *w0, mbedtls_mpi *w1,
-                                   mbedtls_mpi *x, mbedtls_ecp_point *X,
-                                   uint8_t Y_enc[kPubKeySize],
-                                   uint8_t Ka_Ke[32])
+oc_spake_calc_transcript_responder(spake_data_t *spake_data,
+                                   uint8_t X_enc[kPubKeySize],
+                                   mbedtls_ecp_point *Y)
+{
+
+  return calc_transcript_responder(spake_data, X_enc, Y, false);
+}
+
+int
+calc_transcript_initiator(mbedtls_mpi *w0, mbedtls_mpi *w1, mbedtls_mpi *x,
+                          mbedtls_ecp_point *X,
+                          const uint8_t Y_enc[kPubKeySize], uint8_t Ka_Ke[32],
+                          bool use_testing_context)
 
 {
   int ret;
@@ -491,7 +503,15 @@ oc_spake_calc_transcript_initiator(mbedtls_mpi *w0, mbedtls_mpi *w1,
 
   // calculate transcript
   // Context
-  ttlen += encode_string(SPAKE_CONTEXT, ttbuf + ttlen);
+  if (use_testing_context) {
+    ttlen += encode_string("SPAKE2+-P256-SHA256-HKDF draft-01", ttbuf + ttlen);
+  } else {
+    ttlen += encode_string(SPAKE_CONTEXT, ttbuf + ttlen);
+  }
+  // null idProver
+  ttlen += encode_string("", ttbuf + ttlen);
+  // null idVerifier
+  ttlen += encode_string("", ttbuf + ttlen);
   // M
   mbedtls_ecp_point M;
   mbedtls_ecp_point_init(&M);
@@ -523,6 +543,16 @@ cleanup:
   mbedtls_ecp_point_free(&Z);
   mbedtls_ecp_point_free(&V);
   return ret;
+}
+
+int
+oc_spake_calc_transcript_initiator(mbedtls_mpi *w0, mbedtls_mpi *w1,
+                                   mbedtls_mpi *x, mbedtls_ecp_point *X,
+                                   const uint8_t Y_enc[kPubKeySize],
+                                   uint8_t Ka_Ke[32])
+{
+
+  return calc_transcript_initiator(w0, w1, x, X, Y_enc, Ka_Ke, false);
 }
 
 int
