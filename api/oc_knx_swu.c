@@ -80,7 +80,7 @@ oc_set_swu_cb(oc_swu_cb_t cb, void *data)
   app_swu.data = data;
 }
 
-oc_swu_cb_t *
+oc_swu_t *
 oc_get_swu_cb(void)
 {
   return &app_swu;
@@ -497,7 +497,7 @@ oc_knx_swu_a_put_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 
   oc_swu_t *my_cb = oc_get_swu_cb();
   if (my_cb && my_cb->cb) {
-    my_cb->cb(device_index, block_offset, payload, len, my_cb->data);
+    my_cb->cb(device_index, block_offset, (uint8_t *)payload, len, my_cb->data);
   }
 
   oc_send_json_response(request, OC_STATUS_OK);
