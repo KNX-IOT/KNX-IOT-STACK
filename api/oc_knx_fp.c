@@ -1756,7 +1756,7 @@ oc_delete_group_rp_table()
     oc_print_group_rp_table_entry(i, GPT_STORE, g_gpt, GPT_MAX_ENTRIES);
     oc_dump_group_rp_table_entry(i, GPT_STORE, g_gpt, GPT_MAX_ENTRIES);
   }
-#endif OC_PUBLISHER_TABLE
+#endif /*  OC_PUBLISHER_TABLE */
 }
 
 int
