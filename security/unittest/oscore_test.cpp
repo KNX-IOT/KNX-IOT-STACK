@@ -1130,6 +1130,6 @@ TEST_F(TestOSCORE, ServerResponse2_P)
     testvec,
     "64445d1f00003974920100ff4d4c13669384b67354b2b6175ff4b8658c666a6cf88e");
 }
-#else  /* OC_SECURITY && OC_OSCORE */
+#else  /* OC_OSCORE */
 typedef int dummy_declaration;
-#endif /* !OC_SECURITY && !OC_OSCORE */
+#endif /* !OC_OSCORE */
