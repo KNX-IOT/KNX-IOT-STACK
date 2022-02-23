@@ -353,13 +353,6 @@ typedef struct oc_properties_cb_t
   void *user_data;
 } oc_properties_cb_t;
 
-// TODO: do we need this???
-typedef struct oc_resource_defaults_data_t
-{
-  oc_resource_t *resource;
-  oc_interface_mask_t iface_mask;
-} oc_resource_defaults_data_t;
-
 /**
  * @brief resource structure
  *

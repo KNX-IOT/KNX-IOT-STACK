@@ -578,7 +578,6 @@ oc_endpoint_compare_address(const oc_endpoint_t *ep1, const oc_endpoint_t *ep2)
     return -1;
   }
 #endif /* OC_IPV4 */
-  // TODO: Add support for other endpoint types
   return -1;
 }
 
@@ -609,7 +608,6 @@ oc_endpoint_compare(const oc_endpoint_t *ep1, const oc_endpoint_t *ep2)
     return -1;
   }
 #endif /* OC_IPV4 */
-  // TODO: Add support for other endpoint types
   return -1;
 }
 

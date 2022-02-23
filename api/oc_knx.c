@@ -656,6 +656,13 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
       oc_resource_t *my_resource = oc_ri_get_app_resource_by_uri(
         oc_string(myurl), oc_string_len(myurl), device_index);
 
+      // check if the data is allowed to write or update
+      oc_cflag_mask_t cflags = oc_core_group_object_table_cflag_entries(index);
+      if ((cflags & OC_CFLAG_WRITE) || (cflags & OC_CFLAG_UPDATE)) {
+        PRINT(" skipping index %d due to flags %d", index, cflags);
+        break;
+      }
+
       if (my_resource != NULL) {
         if (do_write) {
           // write the value to the resource

@@ -67,7 +67,6 @@
 OC_LIST(app_resources);
 OC_LIST(observe_callbacks);
 OC_MEMB(app_resources_s, oc_resource_t, OC_MAX_APP_RESOURCES);
-OC_MEMB(resource_default_s, oc_resource_defaults_data_t, OC_MAX_APP_RESOURCES);
 #endif /* OC_SERVER */
 
 #ifdef OC_CLIENT
@@ -610,12 +609,6 @@ oc_resource_t *
 oc_ri_alloc_resource(void)
 {
   return oc_memb_alloc(&app_resources_s);
-}
-
-oc_resource_defaults_data_t *
-oc_ri_alloc_resource_defaults(void)
-{
-  return oc_memb_alloc(&resource_default_s);
 }
 
 bool

@@ -99,7 +99,7 @@ oc_rep_t *oc_s_mode_get_value(oc_request_t *request);
 void oc_do_s_mode(char *resource_url, char *rp);
 
 /**
- * @brief sends an s-mode message
+ * @brief sends (transmits) an s-mode message
  * the value comes from the GET of the resource indicated by the resource_url
  * The uri is hard coded to use ALL CoAP nodes (TODO).
  * the path is ".knx"
@@ -108,6 +108,11 @@ void oc_do_s_mode(char *resource_url, char *rp);
  * url (path) if more than one entry in the group object table, then all group
  * address are used to send the POST request too.
  *
+ * The function adheres to the Group object table entries, only sends messages when
+ * - Read flag is set OR
+ * - Init flag is set OR
+ * - Transmission flag is set
+ *      
  * @param scope the multi-cast scope
  * @param resource_url URI of the resource (e.g. implemented on the device that
  * is calling this function)

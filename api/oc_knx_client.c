@@ -209,8 +209,9 @@ do_credential_exchange(oc_client_response_t *data)
     rep = rep->next;
   }
 
-  // WARNING: init without free leaks memory every time it is called,
+  // TODO WARNING: init without free leaks memory every time it is called,
   // but for the test client this is not important
+  // use mbedtls_mpi_free(mbedtls_mpi * X);
   mbedtls_mpi_init(&w0);
   mbedtls_mpi_init(&w1);
   mbedtls_mpi_init(&privA);
@@ -498,11 +499,6 @@ oc_s_mode_get_resource_value(char *resource_url, char *rp, uint8_t *buf,
     return 0;
   }
 
-  // get the sender ia
-  // size_t device_index = 0;
-  // oc_device_info_t *device = oc_core_get_device_info(device_index);
-  // int sia_value = device->ia;
-
   uint8_t *buffer = malloc(100);
   if (!buffer) {
     OC_WRN("oc_do_s_mode: out of memory allocating buffer");
@@ -548,12 +544,10 @@ oc_s_mode_get_resource_value(char *resource_url, char *rp, uint8_t *buf,
   my_resource->get_handler.cb(&request, iface_mask, NULL);
 
   // get the data
-  // int value_size = request.response->response_buffer->buffer_size;
   int value_size = oc_rep_get_encoded_payload_size();
   uint8_t *value_data = request.response->response_buffer->buffer;
 
   // Cache value data, as it gets overwritten in oc_issue_do_s_mode
-  // uint8_t buf[100];
   if (value_size < buf_size) {
     memcpy(buf, value_data, value_size);
     return value_size;
@@ -596,7 +590,7 @@ oc_do_s_mode_with_scope(int scope, char *resource_url, char *rp)
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   int sia_value = device->ia;
 
-  int group_address = 0;
+  int group_address = -1;
 
   // loop over all group addresses and issue the s-mode command
   int index = oc_core_find_group_object_table_url(resource_url);
@@ -605,9 +599,15 @@ oc_do_s_mode_with_scope(int scope, char *resource_url, char *rp)
     oc_cflag_mask_t cflags = oc_core_group_object_table_cflag_entries(index);
     PRINT(" index %d rp = %s cflags %d", index, rp, cflags);
 
-    // if (cflags & OC_CFLAG_WRITE) {
-    //  break;
-    //}
+    
+    // With a read command to a Group Object, the device send this Group Object’s value.
+    if ((cflags & OC_CFLAG_READ) || (cflags & OC_CFLAG_TRANSMISSION) ||
+        (cflags & OC_CFLAG_INIT))
+    {
+      PRINT(" skipping index %d due to flags %d", index, cflags);
+      break;
+    }
+
     for (int j = 0; j < ga_len; j++) {
       group_address = oc_core_find_group_object_table_group_entry(index, j);
       PRINT("   ga : %d\n", group_address);
