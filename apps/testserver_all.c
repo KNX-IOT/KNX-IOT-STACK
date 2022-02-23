@@ -74,6 +74,9 @@
 #include "port/oc_clock.h"
 #include <signal.h>
 
+// test purpose only
+#include "api/oc_knx.h"
+
 #ifdef INCLUDE_EXTERNAL
 /* import external definitions from header file*/
 /* this file should be externally supplied */
@@ -700,7 +703,7 @@ swu_cb(size_t device, size_t offset, const uint8_t *payload, size_t len,
        void *data)
 {
   char *fname = (char *)data;
-  PRINT(" swu_cb %s block=%lld size=%lld \n", fname, offset, len);
+  PRINT(" swu_cb %s block=%d size=%d \n", fname, (int)offset, (int)len);
 
   FILE *fp = fopen(fname, "rw");
   fseek(fp, offset, SEEK_SET);
