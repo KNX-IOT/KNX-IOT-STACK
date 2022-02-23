@@ -32,7 +32,7 @@ extern "C" {
 typedef enum {
   OC_CFLAG_NONE = 0, /**< Communication */
   OC_CFLAG_COMMUNICATION =
-    1 << 2, /**< false = Group Object value cannot read or writen.*/
+    1 << 2, /**< false = Group Object value cannot read or written.*/
   OC_CFLAG_READ = 1 << 3, /**< 8 false = Group Object value cannot be read.*/
   OC_CFLAG_WRITE =
     1 << 4, /**< 16 false = Group Object value cannot be written.*/

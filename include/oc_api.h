@@ -38,6 +38,7 @@
 #include "oc_signal_event_loop.h"
 #include "port/oc_storage.h"
 #include "api/oc_knx_client.h"
+#include "api/oc_knx_swu.h"
 
 #include "oc_programming_mode.h"
 

@@ -129,7 +129,7 @@ struct oc_message_s
 /**
  * @brief send buffer
  *
- * @param message message to send
+ * @param message the message to send
  * @return int 0 = success
  */
 int oc_send_buffer(oc_message_t *message);
@@ -165,7 +165,7 @@ void oc_connectivity_end_session(oc_endpoint_t *endpoint);
 
 #ifdef OC_DNS_LOOKUP
 /**
- * @brief dns look up
+ * @brief DNS look up
  *
  * @param domain the url
  * @param addr the address
@@ -201,7 +201,7 @@ void handle_network_interface_event_callback(oc_interface_event_t event);
 /**
  * @brief the session callback
  *
- * @param endpoint endpoint for the session
+ * @param endpoint the endpoint for the session
  * @param state the state of the session
  */
 void handle_session_event_callback(const oc_endpoint_t *endpoint,
