@@ -75,7 +75,7 @@
 #include <signal.h>
 
 // test purpose only
-#include "api/oc_knx.h"
+#include "api/oc_knx_dev.h"
 
 #ifdef INCLUDE_EXTERNAL
 /* import external definitions from header file*/
