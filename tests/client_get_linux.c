@@ -197,7 +197,7 @@ static void
 get_light(oc_request_t *request, oc_interface_mask_t iface_mask,
           void *user_data)
 {
-  oc_rep_start_root_object();
+  oc_rep_begin_root_object();
   bool light = *(bool *)user_data;
 
   switch (iface_mask) {

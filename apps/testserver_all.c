@@ -944,10 +944,10 @@ main(int argc, char *argv[])
   oc_device_mode_display(0);
 
   oc_endpoint_t *my_ep = oc_connectivity_get_endpoints(0);
-  while (my_ep != NULL) {
+  if (my_ep != NULL) {
     PRINTipaddr(*my_ep);
     PRINT("\n");
-    my_ep = my_ep->next;
+    // my_ep = my_ep->next;
   }
 
   PRINT("Server \"testserver_all\" running (polling), waiting on incoming "

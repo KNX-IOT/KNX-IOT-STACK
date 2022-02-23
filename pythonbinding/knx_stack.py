@@ -678,8 +678,8 @@ class KNXIOTStack():
         if c_format == "json" :
             print("ClientCB: json")
             try:
-                temp_payload = cb_payload[:cb_payload_size]
-                payload = temp_payload.decode("utf-8")
+                #temp_payload = cb_payload[:cb_payload_size]
+                payload = cb_payload.decode("utf-8")
             except:
                 payload = cb_payload
         if c_format == "error" :

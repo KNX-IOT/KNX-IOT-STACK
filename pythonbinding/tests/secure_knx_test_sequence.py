@@ -154,6 +154,11 @@ def do_sequence_dev(my_stack):
     safe_print(response)
     my_stack.purge_response(response)
 
+    print("-------------------")
+    response =  my_stack.issue_cbor_get(sn,"/dev/ipv6")
+    safe_print(response)
+    my_stack.purge_response(response)
+
 # no json tags as strings
 def do_sequence_dev_programming_mode(my_stack):
     sn = my_stack.device_array[0].sn
@@ -793,6 +798,7 @@ if __name__ == '__main__':  # pragma: no cover
     try:
         do_sn_discovery(the_stack, args.scope, str(args.sn))
         do_spake(the_stack, str(args.password) )
+        do_sequence_dev(the_stack)
         do_auth_at(the_stack)
         #do_sequence_dev_programming_mode(the_stack)
     except:

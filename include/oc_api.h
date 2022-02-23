@@ -1009,7 +1009,7 @@ void oc_ignore_request(oc_request_t *request);
  * if (sep_response.active) {
  *   oc_set_separate_response_buffer(&sep_response);
  *   printf("Handle separate response for GET handler:\n");
- *   oc_rep_start_root_object();
+ *   oc_rep_begin_root_object();
  *   oc_rep_set_boolean(root, value, true);
  *   oc_rep_set_int(root, dimmingSetting, 75);
  *   oc_rep_end_root_object();
@@ -1264,7 +1264,7 @@ bool oc_do_delete(const char *uri, oc_endpoint_t *endpoint, const char *query,
  * }
  *
  * if (oc_init_put(server_uri, server_ep, NULL, &put_switch, LOW_QOS, NULL)) {
- *   oc_rep_start_root_object();
+ *   oc_rep_begin_root_object();
  *   oc_rep_set_boolean(root, value, true);
  *   oc_rep_end_root_object();
  *   if (oc_do_put(APPLICATION_CBOR, APPLICATION_CBOR))
@@ -1333,7 +1333,7 @@ bool oc_do_put_ex(oc_content_format_t content, oc_content_format_t accept);
  * }
  *
  * if (oc_init_post(server_uri, server_ep, NULL, &put_switch, LOW_QOS, NULL)) {
- *   oc_rep_start_root_object();
+ *   oc_rep_begin_root_object();
  *   oc_rep_set_boolean(root, value, true);
  *   oc_rep_end_root_object();
  *   if (oc_do_put(APPLICATION_CBOR, APPLICATION_CBOR))
