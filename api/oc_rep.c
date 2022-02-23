@@ -1336,10 +1336,8 @@ py_oc_rep_to_json(oc_rep_t *rep, char *buf, size_t buf_size, bool pretty_print)
   char *my_buf = buf;
   int tab = 1;
 
-  bool object_array =
-    (rep && (rep->type == OC_REP_ARRAY) && 
-            (oc_string_len(rep->name) == 0) &&
-             (rep->iname == -1) );
+  bool object_array = (rep && (rep->type == OC_REP_ARRAY) &&
+                       (oc_string_len(rep->name) == 0) && (rep->iname == -1));
   bool object = (rep && (rep->type == OC_REP_OBJECT) &&
                  (oc_string_len(rep->name) == 0) && (rep->iname == -1));
 
@@ -1355,7 +1353,6 @@ py_oc_rep_to_json(oc_rep_t *rep, char *buf, size_t buf_size, bool pretty_print)
   // reserve space
   num_char_printed = snprintf(buf, buf_size, " ");
   OC_JSON_UPDATE_BUFFER_AND_TOTAL;
-
 
   if (object_array) {
     num_char_printed = (pretty_print) ? snprintf(buf, buf_size, "[\n")

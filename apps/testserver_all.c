@@ -947,7 +947,7 @@ main(int argc, char *argv[])
   if (my_ep != NULL) {
     PRINTipaddr(*my_ep);
     PRINT("\n");
-    //my_ep = my_ep->next;
+    // my_ep = my_ep->next;
   }
 
   PRINT("Server \"testserver_all\" running (polling), waiting on incoming "

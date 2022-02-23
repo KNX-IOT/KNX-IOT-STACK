@@ -499,7 +499,8 @@ general_get_cb(oc_client_response_t *data)
     } else if (data->content_format == APPLICATION_CBOR) {
       py_mutex_lock(app_sync_lock);
       memset(buffer, 0, buffer_size);
-      int json_size = py_oc_rep_to_json(data->payload, (char *)&buffer, buffer_size, false);
+      int json_size =
+        py_oc_rep_to_json(data->payload, (char *)&buffer, buffer_size, false);
       inform_client_python((char *)my_data->sn, status, "json",
                            (char *)my_data->r_id, (char *)my_data->url,
                            (int)json_size, (char *)buffer);
