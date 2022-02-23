@@ -30,7 +30,6 @@
 # pylint: disable=C0201
 # pylint: disable=C0209
 # pylint: disable=C0413
-# pylint: disable=C0911
 # pylint: disable=R0801
 # pylint: disable=R0902
 # pylint: disable=R0913
@@ -64,7 +63,7 @@ def safe_print(response):
     else:
         print("no response")
 
-def compare_dict(dict1, dict2): 
+def compare_dict(dict1, dict2): # pylint: disable=R0911
     if dict1 is None:
         return False
     if dict2 is None:
