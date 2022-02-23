@@ -108,11 +108,12 @@ void oc_do_s_mode(char *resource_url, char *rp);
  * url (path) if more than one entry in the group object table, then all group
  * address are used to send the POST request too.
  *
- * The function adheres to the Group object table entries, only sends messages when
+ * The function adheres to the Group object table entries, only sends messages
+ * when
  * - Read flag is set OR
  * - Init flag is set OR
  * - Transmission flag is set
- *      
+ *
  * @param scope the multi-cast scope
  * @param resource_url URI of the resource (e.g. implemented on the device that
  * is calling this function)

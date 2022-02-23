@@ -26,7 +26,7 @@ void
 oscore_send_error(void *packet, uint8_t code, oc_endpoint_t *endpoint)
 {
   if (endpoint->flags & OSCORE) {
-     return;
+    return;
   }
 
   coap_packet_t const *oscore_pkt = (coap_packet_t *)packet;

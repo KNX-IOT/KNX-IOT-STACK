@@ -599,11 +599,10 @@ oc_do_s_mode_with_scope(int scope, char *resource_url, char *rp)
     oc_cflag_mask_t cflags = oc_core_group_object_table_cflag_entries(index);
     PRINT(" index %d rp = %s cflags %d", index, rp, cflags);
 
-    
-    // With a read command to a Group Object, the device send this Group Object’s value.
+    // With a read command to a Group Object, the device send this Group
+    // Object’s value.
     if ((cflags & OC_CFLAG_READ) || (cflags & OC_CFLAG_TRANSMISSION) ||
-        (cflags & OC_CFLAG_INIT))
-    {
+        (cflags & OC_CFLAG_INIT)) {
       PRINT(" skipping index %d due to flags %d", index, cflags);
       break;
     }
