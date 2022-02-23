@@ -153,7 +153,7 @@ def do_sequence_dev(my_stack):
     response =  my_stack.issue_cbor_get(sn,"/dev/iid")
     safe_print(response)
     my_stack.purge_response(response)
-    
+
     print("-------------------")
     response =  my_stack.issue_cbor_get(sn,"/dev/ipv6")
     safe_print(response)
