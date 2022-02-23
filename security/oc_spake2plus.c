@@ -402,7 +402,7 @@ cleanup:
 }
 
 int
-calc_transcript_responder(spake_data_t *spake_data, uint8_t X_enc[kPubKeySize],
+calc_transcript_responder(spake_data_t *spake_data, const uint8_t X_enc[kPubKeySize],
                           mbedtls_ecp_point *Y, bool use_testing_context)
 {
   int ret = 0;
@@ -471,7 +471,7 @@ cleanup:
 
 int
 oc_spake_calc_transcript_responder(spake_data_t *spake_data,
-                                   uint8_t X_enc[kPubKeySize],
+                                   const uint8_t X_enc[kPubKeySize],
                                    mbedtls_ecp_point *Y)
 {
 

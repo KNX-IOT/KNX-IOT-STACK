@@ -16,7 +16,7 @@ int calc_transcript_initiator(mbedtls_mpi *w0, mbedtls_mpi *w1, mbedtls_mpi *x,
                               uint8_t Ka_Ke[32], bool use_testing_context);
 
 int calc_transcript_responder(spake_data_t *spake_data,
-                              uint8_t X_enc[kPubKeySize], mbedtls_ecp_point *Y,
+                              const uint8_t X_enc[kPubKeySize], mbedtls_ecp_point *Y,
                               bool use_testing_context);
 }
 
@@ -66,6 +66,8 @@ const uint8_t bytes_w1[] = { 0x24, 0xb5, 0xae, 0x4a, 0xbd, 0xa8, 0x68, 0xec,
                              0x93, 0x36, 0xff, 0xc3, 0xb7, 0x8e, 0xe3, 0x1c,
                              0x57, 0x55, 0xbe, 0xf1, 0x75, 0x92, 0x27, 0xef,
                              0x53, 0x72, 0xca, 0x13, 0x9b, 0x94, 0xe5, 0x12 };
+
+const uint8_t bytes_L[] = { 0x04, 0x95, 0x64, 0x5c, 0xfb, 0x74, 0xdf, 0x6e, 0x58, 0xf9, 0x74, 0x8b, 0xb8, 0x3a, 0x86, 0x62, 0x0b, 0xab, 0x7c, 0x82, 0xe1, 0x07, 0xf5, 0x7d, 0x68, 0x70, 0xda, 0x8c, 0xbc, 0xb2, 0xff, 0x9f, 0x70, 0x63, 0xa1, 0x4b, 0x64, 0x02, 0xc6, 0x2f, 0x99, 0xaf, 0xcb, 0x97, 0x06, 0xa4, 0xd1, 0xa1, 0x43, 0x27, 0x32, 0x59, 0xfe, 0x76, 0xf1, 0xc6, 0x05, 0xa3, 0x63, 0x97, 0x45, 0xa9, 0x21, 0x54, 0xb9 };
 
 const uint8_t bytes_x[] = { 0x5b, 0x47, 0x86, 0x19, 0x80, 0x4f, 0x49, 0x38,
                             0xd3, 0x61, 0xfb, 0xba, 0x3a, 0x20, 0x64, 0x87,
@@ -204,6 +206,10 @@ TEST_F(Spake2Plus, CalculatePublicB)
 
 TEST_F(Spake2Plus, CalculateSecretA)
 {
+  // =================================
+  // Checks values of Z, V, TT & Ka_Ke
+  // for Party A (the initiator)
+  // =================================
   mbedtls_mpi w0, w1, x;
   mbedtls_ecp_point X;
   uint8_t Ka_Ke[32];
@@ -220,8 +226,6 @@ TEST_F(Spake2Plus, CalculateSecretA)
 
   ASSERT_RET(calc_transcript_initiator(&w0, &w1, &x, &X, bytes_Y, Ka_Ke, true));
 
-  // bummer, test vector aint workin
-  // tomorrow - look at transcript and compaaaaaaaaaaaaaaaaaaaaaaaare
   EXPECT_TRUE(memcmp(Ka, Ka_Ke, 16) == 0);
   EXPECT_TRUE(memcmp(Ke, Ka_Ke + 16, 16) == 0);
 
@@ -231,103 +235,32 @@ TEST_F(Spake2Plus, CalculateSecretA)
   mbedtls_ecp_point_free(&X);
 }
 
-#if 0
-int
-oc_spake_test_vector()
+TEST_F(Spake2Plus, CalculateSecretB)
 {
-  // ================================
-  // Check that party B can calculate
-  // the shared secret key material
-  // ================================
+  // =================================
+  // Checks values of Z, V, TT & Ka_Ke
+  // for Party B (the responder)
+  // =================================
 
-  // Z = h*y*(X - w0*M)
-  MBEDTLS_MPI_CHK(calculate_Z_M(&Z, &y, &X, &w0));
-  MBEDTLS_MPI_CHK(mbedtls_ecp_point_write_binary(
-    &grp, &Z, MBEDTLS_ECP_PF_UNCOMPRESSED, &cmplen, cmpbuf, sizeof(cmpbuf)));
-  assert(memcmp(bytes_Z, cmpbuf, cmplen) == 0);
+  // input: y, Y, w0, L
+  spake_data_t spake_data;
+  mbedtls_ecp_point Y;
+  mbedtls_mpi_init(&spake_data.y);
+  mbedtls_mpi_init(&spake_data.w0);
+  mbedtls_ecp_point_init(&spake_data.L);
+  mbedtls_ecp_point_init(&Y);
 
-  // V = h*y*L, where L = w1*P
-  mbedtls_ecp_point L;
-  mbedtls_ecp_point_init(&L);
-
-  MBEDTLS_MPI_CHK(mbedtls_ecp_mul(&grp, &L, &w1, &grp.G,
-                                  mbedtls_ctr_drbg_random, &ctr_drbg_ctx));
-  MBEDTLS_MPI_CHK(
-    mbedtls_ecp_mul(&grp, &V, &y, &L, mbedtls_ctr_drbg_random, &ctr_drbg_ctx));
-
-  MBEDTLS_MPI_CHK(mbedtls_ecp_point_write_binary(
-    &grp, &V, MBEDTLS_ECP_PF_UNCOMPRESSED, &cmplen, cmpbuf, sizeof(cmpbuf)));
-  assert(memcmp(bytes_V, cmpbuf, cmplen) == 0);
-
-  // ====================
-  // Calculate transcript
-  // ====================
-
-  uint8_t ttbuf[2048];
-  size_t ttlen = 0;
-  // Context
-  ttlen += encode_string(Context, ttbuf + ttlen);
-  // A
-  ttlen += encode_string(A, ttbuf + ttlen);
-  // B
-  ttlen += encode_string(B, ttbuf + ttlen);
-  // M
-  mbedtls_ecp_point M;
-  mbedtls_ecp_point_init(&M);
-  MBEDTLS_MPI_CHK(
-    mbedtls_ecp_point_read_binary(&grp, &M, bytes_M, sizeof(bytes_M)));
-  ttlen += encode_point(&grp, &M, ttbuf + ttlen);
-  // N
-  mbedtls_ecp_point N;
-  mbedtls_ecp_point_init(&N);
-  MBEDTLS_MPI_CHK(
-    mbedtls_ecp_point_read_binary(&grp, &N, bytes_N, sizeof(bytes_N)));
-  ttlen += encode_point(&grp, &N, ttbuf + ttlen);
-  // X
-  ttlen += encode_point(&grp, &X, ttbuf + ttlen);
-  // Y
-  ttlen += encode_point(&grp, &Y, ttbuf + ttlen);
-  // Z
-  ttlen += encode_point(&grp, &Z, ttbuf + ttlen);
-  // V
-  ttlen += encode_point(&grp, &V, ttbuf + ttlen);
-  // w0
-  ttlen += encode_mpi(&w0, ttbuf + ttlen);
-
-  // ===================
-  // Calculate Key & Key
-  //     Confirmation
-  // ===================
-  uint8_t Ka_Ke[32];
-
-  mbedtls_sha256(ttbuf, ttlen, Ka_Ke, 0);
-  // first half of Ka_Ke
-  assert(memcmp(Ka, Ka_Ke, 16) == 0);
-  // second half of Ka_Ke
-  assert(memcmp(Ke, Ka_Ke + 16, 16) == 0);
-
-  // Calculate KcA, KcB
-
-  // |KcA| + |KcB| = 16 bytes
-  uint8_t KcA_KcB[32];
-  mbedtls_hkdf(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), NULL, 0, Ka,
-               sizeof(Ka), (const unsigned char *)"ConfirmationKeys",
-               strlen("ConfirmationKeys"), KcA_KcB, 32);
-
-  assert(memcmp(KcA, KcA_KcB, 16) == 0);
-  assert(memcmp(KcB, KcA_KcB + 16, 16) == 0);
-
-  // Calculate cA and cB
-  uint8_t test_cA[32];
-  uint8_t test_cB[32];
-  mbedtls_md_hmac(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), KcA,
-                  sizeof(KcA), bytes_Y, sizeof(bytes_Y), test_cA);
-  mbedtls_md_hmac(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), KcB,
-                  sizeof(KcB), bytes_X, sizeof(bytes_X), test_cB);
-  assert(memcmp(cA, test_cA, 32) == 0);
-  assert(memcmp(cB, test_cB, 32) == 0);
-
-cleanup:
-  return ret;
+  mbedtls_mpi_read_binary(&spake_data.y, bytes_y, sizeof(bytes_y));
+  mbedtls_mpi_read_binary(&spake_data.w0, bytes_w0, sizeof(bytes_w0));
+  mbedtls_ecp_point_read_binary(&grp, &spake_data.L, bytes_L, sizeof(bytes_L));
+  mbedtls_ecp_point_read_binary(&grp, &Y, bytes_Y, sizeof(bytes_Y));
+  
+  ASSERT_RET(calc_transcript_responder(&spake_data, bytes_X, &Y, true));
+  EXPECT_TRUE(memcmp(Ka, spake_data.Ka_Ke, 16) == 0);
+  EXPECT_TRUE(memcmp(Ke, spake_data.Ka_Ke + 16, 16) == 0);
+  
+  mbedtls_mpi_free(&spake_data.y);
+  mbedtls_mpi_free(&spake_data.w0);
+  mbedtls_ecp_point_free(&spake_data.L);
+  mbedtls_ecp_point_free(&Y);
 }
-#endif
