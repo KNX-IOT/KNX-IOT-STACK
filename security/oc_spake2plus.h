@@ -142,7 +142,7 @@ int oc_spake_encode_pubkey(mbedtls_ecp_point *P, uint8_t out[kPubKeySize]);
  * @return int 0 on success, mbedtls error code on failure
  */
 int oc_spake_calc_transcript_responder(spake_data_t *spake_data,
-                                       uint8_t X_enc[kPubKeySize],
+                                       const uint8_t X_enc[kPubKeySize],
                                        mbedtls_ecp_point *Y);
 
 /**
@@ -159,7 +159,7 @@ int oc_spake_calc_transcript_responder(spake_data_t *spake_data,
  */
 int oc_spake_calc_transcript_initiator(mbedtls_mpi *w0, mbedtls_mpi *w1,
                                        mbedtls_mpi *x, mbedtls_ecp_point *X,
-                                       uint8_t Y_enc[kPubKeySize],
+                                       const uint8_t Y_enc[kPubKeySize],
                                        uint8_t Ka_Ke[32]);
 
 int oc_spake_calc_cA(uint8_t *Ka_Ke, uint8_t cA[32],
