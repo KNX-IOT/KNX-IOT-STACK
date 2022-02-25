@@ -697,9 +697,10 @@ hostname_cb(size_t device, oc_string_t host_name, void *data)
   PRINT("-----host name ------- %s\n", oc_string(host_name));
 }
 
+
 /* separate files for each call to transport a block of data*/
 void
-swu_cb(size_t device, size_t offset, const uint8_t *payload, size_t len,
+swu_cb(size_t device, size_t offset, uint8_t *payload, size_t len,
        void *data)
 {
   char *fname = (char *)data;
