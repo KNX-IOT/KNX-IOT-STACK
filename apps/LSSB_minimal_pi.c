@@ -164,10 +164,10 @@ get_dpa_421_61(oc_request_t *request, oc_interface_mask_t interfaces,
 {
   (void)user_data; /* variable not used */
 
-  /* TODO: SENSOR add here the code to talk to the HW if one implements a
-     sensor. the call to the HW needs to fill in the global variable before it
-     returns to this function here. alternative is to have a callback from the
-     hardware that sets the global variables.
+  /* MANUFACTORER_CHANGE: SENSOR add here the code to talk to the HW if one
+     implements a sensor. the call to the HW needs to fill in the global
+     variable before it returns to this function here. alternative is to have a
+     callback from the hardware that sets the global variables.
   */
   bool error_state = false; /**< the error state, the generated code */
   int oc_status_code = OC_STATUS_OK;

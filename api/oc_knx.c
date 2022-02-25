@@ -1117,7 +1117,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     oc_new_string(&os_token.id, "spake", strlen("spake"));
     os_token.ga_len = 0;
     os_token.profile = OC_PROFILE_COAP_OSCORE;
-    os_token.interface = OC_IF_SEC | OC_IF_D | OC_IF_P;
+    os_token.scope = OC_IF_SEC | OC_IF_D | OC_IF_P;
     oc_new_string(&os_token.osc_ms, shared_key, 16);
     oc_new_string(&os_token.osc_id, "responderkey", strlen("responderkey"));
     oc_new_string(&os_token.sub, "", 0);
