@@ -316,7 +316,7 @@ int oc_conv_hex_string_to_byte_array(const char *hex_str, size_t hex_str_len,
 bool oc_uri_contains_wildcard(const char *uri);
 
 /**
- * @brief retrieve the wildcard value as integer
+ * @brief retrieve the wild card value as integer
  * The invoked URI is checked against the URI of a resource
  * that might contain a wild card, if the resource URI contains a wild card
  * then the invoked URI is compared against this URI and
@@ -326,7 +326,7 @@ bool oc_uri_contains_wildcard(const char *uri);
  *
  * NOTE: the wild card part of the URL should only contain a number, e.g. no
  * prefix to the number
- * @param uri_resource The URI with wildcard
+ * @param uri_resource The URI with wild card
  * @param uri_len The length of the URI with wild card
  * @param uri_invoked The URI that should match a wild card
  * @param invoked_len The URI length of the invoked URI
@@ -338,10 +338,10 @@ int oc_uri_get_wildcard_value_as_int(const char *uri_resource, size_t uri_len,
                                      size_t invoked_len);
 
 /**
- * @brief function to check if in the wildcard section is a "_" (underscore)
+ * @brief function to check if in the wild card section is a "_" (underscore)
  * underscores can be used in functional block uri to have more than 1 instance
  * e.g. fb* as wild card and fb333_1 as url
- * @param uri_resource The URI with wildcard
+ * @param uri_resource The URI with wild card
  * @param uri_len The length of the URI with wild card
  * @param uri_invoked The URI that should match a wild card
  * @param invoked_len The URI length of the invoked URI
@@ -355,8 +355,8 @@ bool oc_uri_contains_wildcard_value_underscore(const char *uri_resource,
 
 /**
  * @brief retrieve the integer after the "_" (underscore)
- * e.g. retrieve 1 from fb333_1 as url and fb* as wildcard
- * @param uri_resource The URI with wildcard
+ * e.g. retrieve 1 from fb333_1 as url and fb* as wild card
+ * @param uri_resource The URI with wild card
  * @param uri_len The length of the URI with wild card
  * @param uri_invoked The URI that should match a wild card
  * @param invoked_len The URI length of the invoked URI
@@ -368,7 +368,7 @@ int oc_uri_get_wildcard_value_as_int_after_underscore(const char *uri_resource,
                                                       size_t invoked_len);
 
 /*
- * @brief retrieve the wildcard value as string
+ * @brief retrieve the wild card value as string
  * The invoked URI is checked against the URI of a resource
  * that might contain a wild card, if the resource URI contains a wild card
  * then the invoked URI is compared against this URI and
@@ -376,11 +376,11 @@ int oc_uri_get_wildcard_value_as_int_after_underscore(const char *uri_resource,
  * invoked URI: / abc / y
  * return will be y.
  *
- * @param uri_resource The URI with wildcard
+ * @param uri_resource The URI with wild card
  * @param uri_len The length of the URI with wild card
  * @param uri_invoked The URI that should match a wild card
  * @param invoked_len The URI length of the invoked URI
- * @param value the actual value that represents the wildcard
+ * @param value the actual value that represents the wild card
  * @return int -1 is error, otherwise the value is the integer length of the
  * string
  */

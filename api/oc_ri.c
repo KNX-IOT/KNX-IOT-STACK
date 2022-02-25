@@ -143,8 +143,8 @@ set_mpro_status_codes(void)
 }
 
 static const char *interface_strings[] = {
-  "if.i", "if.o",  "if.g.s.[ga]", "if.c",   "if.p",   "if.d",  "if.a",
-  "if.s", "if.ll", "if.b",        "if.sec", "if.swu", "if.pm", "if.m.x"
+  "if.i", "if.o",  "if.g.s", "if.c", "if.p", "if.d", "if.a",
+  "if.s", "if.ll", "if.b", "if.sec", "if.swu", "if.pm", "if.m.x"
 };
 
 const char *

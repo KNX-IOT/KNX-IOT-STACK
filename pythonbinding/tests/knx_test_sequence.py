@@ -713,6 +713,10 @@ def do_auth_at(my_stack):
     content = [ { 0: "my_dtls_token", 2: "<asn>", 9 : ["if.a", "if.c", "if.sec"], 19: 1,
                   8 : {3: "mykid" } },
                 { 0: "my_oscore_token", 9 : ["if.a", "if.pm"], 19:2,
+                  8 : { 4: { 6: "mykid", 2: "my_ms", 4:"AES-CCM-16-64-128" } } },
+                { 0: "my_oscore_token_ga_1", 9 : [100], 19:2,
+                  8 : { 4: { 6: "mykid", 2: "my_ms", 4:"AES-CCM-16-64-128" } } },
+                { 0: "my_oscore_token_2", 3: "myaudience", 9 : [500, 600, 700], 19:2,
                   8 : { 4: { 6: "mykid", 2: "my_ms", 4:"AES-CCM-16-64-128" } } }
               ]
     response =  my_stack.issue_cbor_post(sn,"/auth/at",content)

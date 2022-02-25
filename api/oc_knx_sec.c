@@ -176,11 +176,9 @@ oc_core_knx_p_oscore_replwdo_put_handler(oc_request_t *request,
   }
 
   if ((rep != NULL) && (rep->type == OC_REP_INT)) {
-    // PRINT("  oc_core_knx_p_oscore_replwdo_put_handler received : %d\n",
-    //      rep->value.integer);
     g_oscore_replaywindow = rep->value.integer;
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
-    // oc_storage_write(KNX_STORAGE_PM, (uint8_t *)&(rep->value.boolean), 1);
+    // TODO: does this value needs to be stored in persistent memory?
     return;
   }
 
@@ -239,7 +237,7 @@ void
 oc_create_knx_f_oscore_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_f_oscore_resource\n");
-  //
+  // TODO: what is resource type?
   oc_core_populate_resource(resource_idx, device, "/f/oscore", OC_IF_LI,
                             APPLICATION_LINK_FORMAT, OC_DISCOVERABLE,
                             oc_core_knx_f_oscore_get_handler, 0, 0, 0, 1,
@@ -299,8 +297,8 @@ oc_core_a_sen_post_handler(oc_request_t *request,
   /* input was set, so create the response*/
   if (changed == true) {
     PRINT("  oc_core_a_sen_post_handler cmd %d\n", cmd);
-    // renew the
-    // c_reset_device(request->resource->device, cmd);
+    // renew the credentials.
+    // note: this is optional for now
 
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
     return;
@@ -449,7 +447,7 @@ oc_core_auth_at_post_handler(oc_request_t *request,
   PRINT("oc_core_auth_at_post_handler\n");
 
   /* check if the accept header is cbor-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (request->accept != APPLICATION_CBOR) { 
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -484,17 +482,44 @@ oc_core_auth_at_post_handler(oc_request_t *request,
         if (object->type == OC_REP_STRING_ARRAY) {
           // scope
           if (object->iname == 9) {
-            // scope: e.g. list of interfaces
+            // scope: array of interfaces as string
             oc_string_array_t str_array;
             size_t str_array_size = 0;
             oc_interface_mask_t interfaces = OC_IF_NONE;
             oc_rep_i_get_string_array(object, 9, &str_array, &str_array_size);
             for (size_t i = 0; i < str_array_size; i++) {
               char *if_str = oc_string_array_get_item(str_array, i);
-              int if_mask = oc_ri_get_interface_mask(if_str, strlen(if_str));
+              oc_interface_mask_t if_mask = oc_ri_get_interface_mask(if_str, strlen(if_str));
               interfaces = interfaces + if_mask;
             }
-            g_at_entries[index].interface = interfaces;
+            g_at_entries[index].scope = interfaces;
+          }
+        } else if (object->type == OC_REP_INT_ARRAY) {
+          // scope
+          if (object->iname == 9) {
+            g_at_entries[index].scope = OC_IF_NONE;
+            int64_t *array = 0;
+            size_t array_size = 0;
+            // not making a deep copy
+            oc_rep_i_get_int_array(object, 9, &array, &array_size);
+            if (array_size > 0) {
+              // make the deep copy
+              if (g_at_entries[index].ga_len > 0) {
+                free(&g_at_entries[index].ga);
+              }
+              g_at_entries[index].ga_len = array_size;
+              int64_t *new_array =
+                (int64_t *)malloc(array_size * sizeof(uint64_t));
+
+              if (new_array) {
+                for (int i = 0; i < array_size; i++) {
+                  new_array[i] = array[i];
+                }
+                g_at_entries[index].ga = new_array;
+              } else {
+                OC_ERR("out of memory");
+              }
+            }
           }
         } else if (object->type == OC_REP_STRING) {
           // old, but keep it there for now...
@@ -507,6 +532,13 @@ oc_core_auth_at_post_handler(oc_request_t *request,
             // sub
             oc_free_string(&(g_at_entries[index].sub));
             oc_new_string(&g_at_entries[index].sub,
+                          oc_string(object->value.string),
+                          oc_string_len(object->value.string));
+          }
+          if (object->iname == 3) {
+            // aud
+            oc_free_string(&(g_at_entries[index].aud));
+            oc_new_string(&g_at_entries[index].aud,
                           oc_string(object->value.string),
                           oc_string_len(object->value.string));
           }
@@ -640,17 +672,31 @@ oc_core_auth_at_x_get_handler(oc_request_t *request,
   }
   // return the data
   oc_rep_begin_root_object();
+  // id : 0
   oc_rep_i_set_text_string(root, 0, oc_string(g_at_entries[index].id));
+  // profile : 19
   oc_rep_i_set_int(root, 19, g_at_entries[index].profile);
-  // the cflags
-  int nr_entries = oc_total_interface_in_mask(g_at_entries[index].interface);
-  oc_string_array_t cflags_entries;
-  oc_new_string_array(&cflags_entries, (size_t)nr_entries);
-  int framed = oc_get_interface_in_mask_in_string_array(
-    g_at_entries[index].interface, nr_entries, cflags_entries);
-  PRINT("  entries in cflags %d framed: %d \n", nr_entries, framed);
-  oc_rep_i_set_string_array(root, 9, cflags_entries);
-  oc_free_string_array(&cflags_entries);
+  // audience : 3
+  if (oc_string_len(g_at_entries[index].aud) > 0) {
+    oc_rep_i_set_text_string(root, 3, oc_string(g_at_entries[index].aud));
+  }
+
+  // the scope as list of cflags or group object table entries
+  int nr_entries = oc_total_interface_in_mask(g_at_entries[index].scope);
+  if (nr_entries > 0) {
+    // interface list
+    oc_string_array_t cflags_entries;
+    oc_new_string_array(&cflags_entries, (size_t)nr_entries);
+    int framed = oc_get_interface_in_mask_in_string_array(
+      g_at_entries[index].scope, nr_entries, cflags_entries);
+    PRINT("  entries in cflags %d framed: %d \n", nr_entries, framed);
+    oc_rep_i_set_string_array(root, 9, cflags_entries);
+    oc_free_string_array(&cflags_entries);
+  } else {
+    // group object list
+    oc_rep_i_set_int_array(root, 9, g_at_entries[index].ga,
+                             g_at_entries[index].ga_len);
+  }
   if (g_at_entries[index].profile == OC_PROFILE_COAP_DTLS) {
     if (oc_string_len(g_at_entries[index].sub) > 0) {
       PRINT("    sub    : %s\n", oc_string(g_at_entries[index].sub));
@@ -835,7 +881,7 @@ oc_at_entry_print(int index)
 
       PRINT("  at index: %d\n", index);
       PRINT("    id (0)        : %s\n", oc_string(g_at_entries[index].id));
-      PRINT("    interfaces : %d\n", g_at_entries[index].interface);
+      PRINT("    interfaces : %d\n", g_at_entries[index].scope);
       PRINT("    profile (38)  : %d (%s)\n", g_at_entries[index].profile,
             oc_at_profile_to_string(g_at_entries[index].profile));
       if (g_at_entries[index].profile == OC_PROFILE_COAP_DTLS) {
@@ -874,7 +920,7 @@ oc_at_delete_entry(int index)
   // generic
   oc_free_string(&g_at_entries[index].id);
   oc_new_string(&g_at_entries[index].id, "", 0);
-  g_at_entries[index].interface = OC_IF_NONE;
+  g_at_entries[index].scope = OC_IF_NONE;
   // oscore
   oc_free_string(&g_at_entries[index].osc_alg);
   oc_new_string(&g_at_entries[index].osc_alg, "", 0);
@@ -904,7 +950,7 @@ oc_at_dump_entry(int entry)
   // id 0
   oc_rep_i_set_text_string(root, 0, oc_string(g_at_entries[entry].id));
   // interface 9 /// this is different than the response on the wire
-  oc_rep_i_set_int(root, 9, g_at_entries[entry].interface);
+  oc_rep_i_set_int(root, 9, g_at_entries[entry].scope);
   oc_rep_i_set_int(root, 19, g_at_entries[entry].profile);
 
   oc_rep_i_set_text_string(root, 842, oc_string(g_at_entries[entry].osc_id));
@@ -953,7 +999,7 @@ oc_at_load_entry(int entry)
 
         case OC_REP_INT:
           if (rep->iname == 9) {
-            g_at_entries[entry].interface = (int)rep->value.integer;
+            g_at_entries[entry].scope = (int)rep->value.integer;
           }
           if (rep->iname == 19) {
             g_at_entries[entry].profile = (int)rep->value.integer;
@@ -998,21 +1044,27 @@ oc_at_load_entry(int entry)
           break;
         case OC_REP_INT_ARRAY:
           if (rep->iname == 777) {
-            int64_t *arr = oc_int_array(rep->value.array);
+            int64_t *array = oc_int_array(rep->value.array);
             int array_size = (int)oc_int_array_size(rep->value.array);
-            int *new_array = (int *)malloc(array_size * sizeof(int));
-            // int*  new_array;
-            // oc_new_int_array(&new_array, array_size);
 
-            for (int i = 0; i < array_size; i++) {
-              new_array[i] = arr[i];
+            if (array_size > 0) {
+              // make the deep copy
+              if (g_at_entries[entry].ga_len > 0) {
+                free(&g_at_entries[entry].ga);
+              }
+              g_at_entries[entry].ga_len = array_size;
+              int64_t *new_array =
+                (int64_t *)malloc(array_size * sizeof(uint64_t));
+
+              if (new_array) {
+                for (int i = 0; i < array_size; i++) {
+                  new_array[i] = array[i];
+                }
+                g_at_entries[entry].ga = new_array;
+              } else {
+                OC_ERR("out of memory");
+              }
             }
-            if (g_at_entries[entry].ga != 0) {
-              free(g_at_entries[entry].ga);
-            }
-            PRINT("  ga size %d\n", array_size);
-            g_at_entries[entry].ga_len = array_size;
-            g_at_entries[entry].ga = new_array;
           }
           break;
         default:
@@ -1034,7 +1086,7 @@ oc_core_set_at_table(int index, oc_auth_at_t entry)
     oc_free_string(&g_at_entries[index].id);
     oc_new_string(&g_at_entries[index].id, oc_string(entry.id),
                   oc_string_len(entry.id));
-    g_at_entries[index].interface = entry.interface;
+    g_at_entries[index].scope = entry.scope;
     g_at_entries[index].profile = entry.profile;
     oc_free_string(&g_at_entries[index].sub);
     oc_new_string(&g_at_entries[index].sub, oc_string(entry.sub),
@@ -1054,18 +1106,26 @@ oc_core_set_at_table(int index, oc_auth_at_t entry)
 
     g_at_entries[index].ga_len = entry.ga_len;
 
-    int array_size = (int)entry.ga_len;
-    int *new_array = (int *)malloc(array_size * sizeof(int));
+    // make deep copy..
+    size_t array_size = (int)entry.ga_len;
+    // not making a deep copy
+    if (array_size > 0) {
+      // make the deep copy
+      if (g_at_entries[index].ga_len > 0) {
+        free(&g_at_entries[index].ga);
+      }
+      g_at_entries[index].ga_len = array_size;
+      int64_t *new_array = (int64_t *)malloc(array_size * sizeof(uint64_t));
 
-    for (int i = 0; i < array_size; i++) {
-      new_array[i] = entry.ga[i];
+      if (new_array) {
+        for (int i = 0; i < array_size; i++) {
+          new_array[i] = entry.ga[i];
+        }
+        g_at_entries[index].ga = new_array;
+      } else {
+        OC_ERR("out of memory");
+      }
     }
-    if (g_at_entries[index].ga != 0) {
-      free(g_at_entries[index].ga);
-    }
-    PRINT("  ga size %d\n", array_size);
-    g_at_entries[index].ga_len = array_size;
-    g_at_entries[index].ga = new_array;
 
     oc_at_dump_entry(index);
   }
@@ -1109,7 +1169,7 @@ oc_oscore_set_auth(uint8_t *shared_key, int shared_key_size)
   oc_new_string(&os_token.id, "spake", strlen("spake"));
   os_token.ga_len = 0;
   os_token.profile = OC_PROFILE_COAP_OSCORE;
-  os_token.interface = OC_IF_SEC | OC_IF_D | OC_IF_P;
+  os_token.scope = OC_IF_SEC | OC_IF_D | OC_IF_P;
   oc_new_string(&os_token.osc_ms, (char *)shared_key, shared_key_size);
   oc_new_string(&os_token.osc_id, "responderkey", strlen("responderkey"));
   oc_new_string(&os_token.sub, "", strlen("spake2+"));
@@ -1381,7 +1441,7 @@ oc_knx_sec_check_interface(oc_resource_t *resource, oc_string_t *token)
     return false;
   }
 
-  return oc_knx_contains_interface(g_at_entries[index].interface,
+  return oc_knx_contains_interface(g_at_entries[index].scope,
                                    resource_interfaces);
 }
 
