@@ -447,7 +447,7 @@ oc_core_auth_at_post_handler(oc_request_t *request,
   PRINT("oc_core_auth_at_post_handler\n");
 
   /* check if the accept header is cbor-format */
-  if (request->accept != APPLICATION_CBOR) { 
+  if (request->accept != APPLICATION_CBOR) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -489,7 +489,8 @@ oc_core_auth_at_post_handler(oc_request_t *request,
             oc_rep_i_get_string_array(object, 9, &str_array, &str_array_size);
             for (size_t i = 0; i < str_array_size; i++) {
               char *if_str = oc_string_array_get_item(str_array, i);
-              oc_interface_mask_t if_mask = oc_ri_get_interface_mask(if_str, strlen(if_str));
+              oc_interface_mask_t if_mask =
+                oc_ri_get_interface_mask(if_str, strlen(if_str));
               interfaces = interfaces + if_mask;
             }
             g_at_entries[index].scope = interfaces;
@@ -695,7 +696,7 @@ oc_core_auth_at_x_get_handler(oc_request_t *request,
   } else {
     // group object list
     oc_rep_i_set_int_array(root, 9, g_at_entries[index].ga,
-                             g_at_entries[index].ga_len);
+                           g_at_entries[index].ga_len);
   }
   if (g_at_entries[index].profile == OC_PROFILE_COAP_DTLS) {
     if (oc_string_len(g_at_entries[index].sub) > 0) {

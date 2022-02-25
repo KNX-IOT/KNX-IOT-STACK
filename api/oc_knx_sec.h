@@ -51,7 +51,7 @@ char *oc_at_profile_to_string(oc_at_profile_t at_profile);
  * "id": "<kid>",
  * "ms": "f9af8s.6bd94e6f"
  * }}}
- *      
+ *
  * second example of (json) payload for a group address:
  *{
  * "id": "OC5BLLhkAG ...",
@@ -102,23 +102,26 @@ char *oc_at_profile_to_string(oc_at_profile_t at_profile);
  */
 typedef struct oc_auth_at_t
 {
-  oc_string_t id;                /**< (0) token id*/
-  oc_interface_mask_t scope;     /**< (9) the scope (interfaces) */
-  oc_at_profile_t profile;       /**< (19) "coap_oscore" or "coap_dtls"*/
-  oc_string_t aud;               /**< (13) audience (for out going requests) */
-  oc_string_t sub;               /**< (2) dtls 2 sub*/
-  oc_string_t kid;               /**< (8:2) dtls cnf:kid*/
-  oc_string_t osc_id;            /**< (18:4:0) oscore cnf:osc:id */
-  oc_string_t osc_version;       /**< (18:4:1) oscore cnf:osc:version (optional) */
-  oc_string_t osc_ms;            /**< (18:4:2) oscore cnf:osc:ms */
-  oc_string_t osc_hkdf;          /**< (18:4:3) oscore cnf:osc:hkdf (optional) */
-  oc_string_t osc_alg;           /**< (18:4:4) oscore cnf:osc:alg */
-  oc_string_t osc_salt;          /**< (18:4:5) oscore cnf:osc:salt (optional) empty string */
-  oc_string_t osc_contextid;     /**< (18:4:6) oscore cnf:osc:contextid (optional) */
-  int nbf;                       /**< token not valid before (optional) */
+  oc_string_t id;            /**< (0) token id*/
+  oc_interface_mask_t scope; /**< (9) the scope (interfaces) */
+  oc_at_profile_t profile;   /**< (19) "coap_oscore" or "coap_dtls"*/
+  oc_string_t aud;           /**< (13) audience (for out going requests) */
+  oc_string_t sub;           /**< (2) dtls 2 sub*/
+  oc_string_t kid;           /**< (8:2) dtls cnf:kid*/
+  oc_string_t osc_id;        /**< (18:4:0) oscore cnf:osc:id */
+  oc_string_t osc_version;   /**< (18:4:1) oscore cnf:osc:version (optional) */
+  oc_string_t osc_ms;        /**< (18:4:2) oscore cnf:osc:ms */
+  oc_string_t osc_hkdf;      /**< (18:4:3) oscore cnf:osc:hkdf (optional) */
+  oc_string_t osc_alg;       /**< (18:4:4) oscore cnf:osc:alg */
+  oc_string_t
+    osc_salt; /**< (18:4:5) oscore cnf:osc:salt (optional) empty string */
+  oc_string_t
+    osc_contextid; /**< (18:4:6) oscore cnf:osc:contextid (optional) */
+  int nbf;         /**< token not valid before (optional) */
 
-  int ga_len;                   /**< length of the group addresses (ga) in the scope */
-  int64_t *ga;                  /**< (scope) array of group addresses, for the group objects in the scope */
+  int ga_len;  /**< length of the group addresses (ga) in the scope */
+  int64_t *ga; /**< (scope) array of group addresses, for the group objects in
+                  the scope */
 } oc_auth_at_t;
 
 /**

@@ -142,10 +142,10 @@ set_mpro_status_codes(void)
     PROXYING_NOT_SUPPORTED_5_05;
 }
 
-static const char *interface_strings[] = {
-  "if.i", "if.o",  "if.g.s", "if.c", "if.p", "if.d", "if.a",
-  "if.s", "if.ll", "if.b", "if.sec", "if.swu", "if.pm", "if.m.x"
-};
+static const char *interface_strings[] = { "if.i",  "if.o",  "if.g.s", "if.c",
+                                           "if.p",  "if.d",  "if.a",   "if.s",
+                                           "if.ll", "if.b",  "if.sec", "if.swu",
+                                           "if.pm", "if.m.x" };
 
 const char *
 get_interface_string(oc_interface_mask_t mask)
