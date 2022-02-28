@@ -1206,7 +1206,7 @@ oc_oscore_set_auth(uint8_t *shared_key, int shared_key_size)
   oc_new_string(&os_token.osc_id, "responderkey", strlen("responderkey"));
   oc_new_string(&os_token.sub, "", strlen("spake2+"));
   oc_new_string(&os_token.kid, "+", strlen("spake2+"));
-  oc_core_set_at_table(0, 0, os_token);
+  oc_core_set_at_table((size_t)0, 0, os_token);
 
   // add the oscore context...
   oc_init_oscore(0);
@@ -1249,10 +1249,6 @@ oc_create_knx_sec_resources(size_t device_index)
 void
 oc_init_oscore(size_t device_index)
 {
-  (void)device_index;
-
-  device_index = 0;
-
   // TODO
 #ifdef OC_OSCORE
   int i;
@@ -1261,7 +1257,7 @@ oc_init_oscore(size_t device_index)
   for (i = 0; i < G_AT_MAX_ENTRIES; i++) {
 
     if (oc_string_len(g_at_entries[i].id) > 0) {
-      oc_at_entry_print(i);
+      oc_at_entry_print(device_index, i);
       oc_oscore_context_t *ctx =
         oc_oscore_add_context(device_index, "sender", "reci", oc_knx_get_osn(),
                               "desc", oc_string(g_at_entries[i].osc_ms),

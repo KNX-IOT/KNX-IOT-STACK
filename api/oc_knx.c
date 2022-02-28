@@ -1125,7 +1125,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     // store in at tables at position 0
     // note there should be no entries.
     // if there is an entry then overwrite it..
-    oc_core_set_at_table(0, os_token);
+    oc_core_set_at_table((size_t)0, 0, os_token);
 
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
     // handshake completed successfully - clear state
