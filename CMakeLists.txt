@@ -157,7 +157,7 @@ add_library(kisClientServer
     ${COAP_SOURCES}
     ${CORE_SOURCES}
 )
-target_compile_definitions(kisClientServer PUBLIC)
+target_compile_definitions(kisClientServer PUBLIC OC_CLIENT OC_SERVER)
 target_link_libraries(kisClientServer PUBLIC
     kis-common
     mbedtls
