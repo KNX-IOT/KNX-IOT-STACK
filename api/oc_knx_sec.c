@@ -36,9 +36,9 @@ oc_auth_at_t g_at_entries[G_AT_MAX_ENTRIES];
 
 // ----------------------------------------------------------------------------
 
-static void oc_at_entry_print(int index);
-static void oc_at_delete_entry(int index);
-static void oc_at_dump_entry(int entry);
+static void oc_at_entry_print(size_t device_index, int index);
+static void oc_at_delete_entry(size_t device_index, int index);
+static void oc_at_dump_entry(size_t device_index, int entry);
 
 // ----------------------------------------------------------------------------
 
@@ -451,6 +451,8 @@ oc_core_auth_at_post_handler(oc_request_t *request,
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
+  size_t device_index = request->resource->device;
+
   rep = request->request_payload;
   while (rep != NULL) {
     if (rep->type == OC_REP_OBJECT) {
@@ -616,15 +618,37 @@ oc_core_auth_at_post_handler(oc_request_t *request,
       } // while (inner object)
     }   // if type == object
     // show the entry on screen
-    oc_at_entry_print(index);
+    oc_at_entry_print(device_index, index);
     // dump the entry to persistent storage
-    oc_at_dump_entry(index);
+    oc_at_dump_entry(device_index, index);
     rep = rep->next;
   } // while (rep)
 
   PRINT("oc_core_auth_at_post_handler - end\n");
   oc_send_cbor_response(request, OC_STATUS_CHANGED);
 }
+
+
+
+static void
+oc_core_auth_at_delete_handler(oc_request_t *request,
+                               oc_interface_mask_t iface_mask, void *data)
+{
+  (void)data;
+  (void)iface_mask;
+  PRINT("oc_core_auth_at_delete_handler\n");
+
+  size_t device_index = request->resource->device;
+
+  oc_delete_at_table(device_index);
+
+
+  // set pm back
+  // set loadstate on unloaded
+  // oc_knx_lsm_set_state(device_index, LSM_S_UNLOADED);
+
+}
+
 
 void
 oc_create_auth_at_resource(int resource_idx, size_t device)
@@ -634,7 +658,8 @@ oc_create_auth_at_resource(int resource_idx, size_t device)
   oc_core_populate_resource(resource_idx, device, "/auth/at",
                             OC_IF_B | OC_IF_SEC, APPLICATION_LINK_FORMAT,
                             OC_DISCOVERABLE, oc_core_auth_at_get_handler, 0,
-                            oc_core_auth_at_post_handler, 0, 1, "dpt.a[n]");
+                            oc_core_auth_at_post_handler,
+                            oc_core_auth_at_delete_handler, 1, "dpt.a[n]");
 }
 
 // ----------------------------------------------------------------------------
@@ -668,7 +693,7 @@ oc_core_auth_at_x_get_handler(oc_request_t *request,
   // - delete the index.
   if (index < 0) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
-    PRINT("index in struct not found\n");
+    PRINT("index in structure not found\n");
     return;
   }
   // return the data
@@ -792,6 +817,8 @@ oc_core_auth_at_x_delete_handler(oc_request_t *request,
     return;
   }
   PRINT("oc_core_auth_at_x_delete_handler\n");
+  size_t device_index = request->resource->device;
+
   // - find the id from the URL
   value_len = oc_uri_get_wildcard_value_as_string(
     oc_string(request->resource->uri), oc_string_len(request->resource->uri),
@@ -812,9 +839,9 @@ oc_core_auth_at_x_delete_handler(oc_request_t *request,
     return;
   }
   // actual delete of the context id so that this entry is seen as empty
-  oc_at_delete_entry(index);
+  oc_at_delete_entry(device_index, index);
   // do the persistent storage
-  oc_at_dump_entry(index);
+  oc_at_dump_entry(device_index, index);
   PRINT("oc_core_auth_at_x_delete_handler - done\n");
   oc_send_cbor_response(request, OC_STATUS_OK);
 }
@@ -874,8 +901,9 @@ oc_create_knx_auth_resource(int resource_idx, size_t device)
 }
 
 static void
-oc_at_entry_print(int index)
+oc_at_entry_print(size_t device_index, int index)
 {
+  (void)device_index;
   // PRINT("  at index: %d\n", index);
   if (index > -1) {
     if (g_at_entries[index].profile != OC_PROFILE_UNKNOWN) {
@@ -916,8 +944,9 @@ oc_at_entry_print(int index)
 }
 
 static void
-oc_at_delete_entry(int index)
+oc_at_delete_entry(size_t device_index, int index)
 {
+  (void)device_index;
   // generic
   oc_free_string(&g_at_entries[index].id);
   oc_new_string(&g_at_entries[index].id, "", 0);
@@ -937,8 +966,9 @@ oc_at_delete_entry(int index)
 }
 
 static void
-oc_at_dump_entry(int entry)
+oc_at_dump_entry(size_t device_index, int entry)
 {
+  (void)device_index;
   char filename[20];
   snprintf(filename, 20, "%s_%d", AT_STORE, entry);
   uint8_t *buf = malloc(OC_MAX_APP_DATA_SIZE);
@@ -1080,8 +1110,9 @@ oc_at_load_entry(int entry)
 }
 
 int
-oc_core_set_at_table(int index, oc_auth_at_t entry)
+oc_core_set_at_table(size_t device_index, int index, oc_auth_at_t entry)
 {
+  (void)device_index;
   if (index < G_AT_MAX_ENTRIES) {
 
     oc_free_string(&g_at_entries[index].id);
@@ -1128,32 +1159,32 @@ oc_core_set_at_table(int index, oc_auth_at_t entry)
       }
     }
 
-    oc_at_dump_entry(index);
+    oc_at_dump_entry(device_index, index);
   }
 
   return 0;
 }
 
 void
-oc_load_at_table()
+oc_load_at_table(size_t device_index)
 {
   PRINT("Loading AT Table from Persistent storage\n");
   for (int i = 0; i < G_AT_MAX_ENTRIES; i++) {
     oc_at_load_entry(i);
     if (oc_string_len(g_at_entries[i].id) > 0) {
-      oc_at_entry_print(i);
+      oc_at_entry_print(device_index, i);
     }
   }
 }
 
 void
-oc_delete_at_table()
+oc_delete_at_table(size_t device_index)
 {
   PRINT("Deleting Group Object Table from Persistent storage\n");
   for (int i = 0; i < G_AT_MAX_ENTRIES; i++) {
-    oc_at_delete_entry(i);
-    oc_at_entry_print(i);
-    oc_at_dump_entry(i);
+    oc_at_delete_entry(device_index, i);
+    oc_at_entry_print(device_index, i);
+    oc_at_dump_entry(device_index, i);
   }
 }
 
@@ -1175,7 +1206,7 @@ oc_oscore_set_auth(uint8_t *shared_key, int shared_key_size)
   oc_new_string(&os_token.osc_id, "responderkey", strlen("responderkey"));
   oc_new_string(&os_token.sub, "", strlen("spake2+"));
   oc_new_string(&os_token.kid, "+", strlen("spake2+"));
-  oc_core_set_at_table(0, os_token);
+  oc_core_set_at_table(0, 0, os_token);
 
   // add the oscore context...
   oc_init_oscore(0);
@@ -1202,7 +1233,7 @@ oc_create_knx_sec_resources(size_t device_index)
 {
   OC_DBG("oc_create_knx_sec_resources");
 
-  oc_load_at_table();
+  oc_load_at_table(device_index);
 
   oc_create_knx_p_oscore_replwdo_resource(OC_KNX_P_OSCORE_REPLWDO,
                                           device_index);
