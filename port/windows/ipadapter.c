@@ -1754,3 +1754,10 @@ oc_dns_lookup(const char *domain, oc_string_t *addr, enum transport_flags flags)
   return ret;
 }
 #endif /* OC_DNS_LOOKUP */
+
+void
+oc_connectivity_subscribe_mcast_ipv6(size_t device, const uint8_t *address)
+{
+  (void)device;
+  (void)address;
+}
