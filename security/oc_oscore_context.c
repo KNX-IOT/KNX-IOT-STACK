@@ -36,9 +36,9 @@ oc_oscore_find_group_context(uint64_t group_id)
 {
   oc_oscore_context_t *ctx = (oc_oscore_context_t *)oc_list_head(contexts);
 
-   while (ctx != NULL) {
+  while (ctx != NULL) {
     if (group_id == ctx->group_id) {
-       return ctx;
+      return ctx;
     }
     ctx = ctx->next;
   }

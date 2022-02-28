@@ -628,8 +628,6 @@ oc_core_auth_at_post_handler(oc_request_t *request,
   oc_send_cbor_response(request, OC_STATUS_CHANGED);
 }
 
-
-
 static void
 oc_core_auth_at_delete_handler(oc_request_t *request,
                                oc_interface_mask_t iface_mask, void *data)
@@ -642,13 +640,10 @@ oc_core_auth_at_delete_handler(oc_request_t *request,
 
   oc_delete_at_table(device_index);
 
-
   // set pm back
   // set loadstate on unloaded
   // oc_knx_lsm_set_state(device_index, LSM_S_UNLOADED);
-
 }
-
 
 void
 oc_create_auth_at_resource(int resource_idx, size_t device)

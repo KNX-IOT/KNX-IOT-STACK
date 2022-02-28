@@ -358,7 +358,7 @@ oc_oscore_send_multicast_message(oc_message_t *message)
    */
   uint64_t group_id = 0;
 
-  //group_id = message->data.
+  // group_id = message->data.
 
   oc_oscore_context_t *oscore_ctx = oc_oscore_find_group_context(group_id);
 
