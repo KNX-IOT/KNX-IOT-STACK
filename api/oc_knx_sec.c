@@ -946,6 +946,7 @@ oc_at_delete_entry(size_t device_index, int index)
   oc_free_string(&g_at_entries[index].id);
   oc_new_string(&g_at_entries[index].id, "", 0);
   g_at_entries[index].scope = OC_IF_NONE;
+  g_at_entries[index].profile = OC_PROFILE_UNKNOWN;
   // oscore
   oc_free_string(&g_at_entries[index].osc_alg);
   oc_new_string(&g_at_entries[index].osc_alg, "", 0);
@@ -1175,7 +1176,7 @@ oc_load_at_table(size_t device_index)
 void
 oc_delete_at_table(size_t device_index)
 {
-  PRINT("Deleting Group Object Table from Persistent storage\n");
+  PRINT("Deleting AT Object Table from Persistent storage\n");
   for (int i = 0; i < G_AT_MAX_ENTRIES; i++) {
     oc_at_delete_entry(device_index, i);
     oc_at_entry_print(device_index, i);
@@ -1281,6 +1282,7 @@ oc_is_resource_secure(oc_method_t method, oc_resource_t *resource)
 {
   // see table 6.1.3: all resources with methods that do not have
   // an interface are unsecure
+  // note: /dev/sn : to be discussed if this one is unsecured
   if (method == OC_GET &&
       ((oc_string_len(resource->uri) == 17 &&
         memcmp(oc_string(resource->uri), "/.well-known/core", 17) == 0) ||
@@ -1297,14 +1299,6 @@ oc_is_resource_secure(oc_method_t method, oc_resource_t *resource)
       ((oc_string_len(resource->uri) == 22 &&
         memcmp(oc_string(resource->uri), "/.well-known/knx/spake", 22) == 0))) {
     return false;
-  }
-
-  // not needed, but now this is very explicit
-  // POSTING to /.well-known/knx is secure, this is a device reset
-  if (method == OC_POST &&
-      ((oc_string_len(resource->uri) == 16 &&
-        memcmp(oc_string(resource->uri), "/.well-known/knx", 16) == 0))) {
-    return true;
   }
 
   return true;
@@ -1431,7 +1425,8 @@ method_allowed(oc_method_t method, oc_resource_t *resource,
   if ((endpoint->flags & OSCORE) == 0) {
     // not an oscore protected message, but oscore is enabled
     // so the is call is unproteced and should not go ahead
-    OC_DBG_OSCORE("unprotected message, access denied\n");
+    OC_DBG_OSCORE("unprotected message, access denied for: %s [%s]",
+                  get_method_name(method), oc_string(resource->uri));
     return false;
   }
 #endif

@@ -105,6 +105,17 @@ kisCS_EXPORT void py_install_spakeCB(spakeCB spakeCB);
  */
 kisCS_EXPORT void py_cbor_get(char *sn, char *uri, char *query, char *r_id);
 
+
+/**
+ * @brief issue a GET request with expected content type CBOR (unsecured)
+ *
+ * @param sn the serial number of the device (is unique)
+ * @param uri the local path
+ * @param query the query
+ * @param r_id the r_id (string)
+ */
+kisCS_EXPORT void py_cbor_get_unsecured(char *sn, char *uri, char *query, char *r_id);
+
 /**
  * @brief issue a GET request with expected content type LINK-FORMAT
  *
@@ -114,6 +125,18 @@ kisCS_EXPORT void py_cbor_get(char *sn, char *uri, char *query, char *r_id);
  * @param r_id the r_id (string)
  */
 kisCS_EXPORT void py_linkformat_get(char *sn, char *uri, char *query,
+                                    char *r_id);
+
+
+/*
+ * @brief issue a GET request with expected content type LINK-FORMAT unsecured
+ *
+ * @param sn the serial number of the device (is unique)
+ * @param uri the local path
+ * @param query the query
+ * @param r_id the r_id (string)
+ */
+kisCS_EXPORT void py_linkformat_get_unsecured(char *sn, char *uri, char *query,
                                     char *r_id);
 
 /**

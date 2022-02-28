@@ -98,7 +98,7 @@ def test_discover(my_stack):
 def get_sn(my_stack):
     print("Get SN :")
     sn = my_stack.device_array[0].sn
-    response = my_stack.issue_cbor_get(sn, "/dev/sn")
+    response = my_stack.issue_cbor_get_unsecured(sn, "/dev/sn")
     print ("response:", response)
     if response is not None:
         safe_print(response)
@@ -852,7 +852,7 @@ if __name__ == '__main__':  # pragma: no cover
     try:
         do_sn_discovery(the_stack, args.scope, str(args.sn))
         do_spake(the_stack, str(args.password) )
-        do_sequence_dev(the_stack)
+        #do_sequence_dev(the_stack)
         #do_auth_at_with_delete(the_stack)
         #do_auth_at_with_delete_all(the_stack)
         do_auth_at_with_config(the_stack)

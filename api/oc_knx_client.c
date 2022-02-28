@@ -171,7 +171,7 @@ do_credential_exchange(oc_client_response_t *data)
 
   OC_DBG_SPAKE("  code: %d\n", data->code);
   if (data->code != OC_STATUS_CHANGED) {
-    OC_DBG_SPAKE("Error in Parameter Response!!!\n");
+    OC_DBG_SPAKE("Error in Parameter Response!!! %d\n", data->code);
     return;
   }
 
