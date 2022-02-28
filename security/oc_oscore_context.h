@@ -30,11 +30,10 @@ extern "C" {
 
 typedef struct oc_oscore_context_t
 {
-  struct oc_oscore_context_t *next;
+  struct oc_oscore_context_t *next; /**< pointer to the next, NULL if there is not any */
   /* Provisioned parameters */
-  // void *cred; /* cred entry contains the master secret */
-  oc_string_t destination_serial_number;
-  uint64_t group_id; /**<  the group id as oscore contextid */
+  oc_string_t destination_serial_number;   /**< the destination serial number of the device */
+  uint64_t group_id;                       /**<  the group id as oscore contextid */
   uint8_t token_id[OSCORE_IDCTX_LEN];
   uint8_t master_secret[OSCORE_IDCTX_LEN];
   size_t device;

@@ -1,5 +1,6 @@
 /*
 // Copyright (c) 2020 Intel Corporation
+// Copyright (c) 2022 Cascoda Ltd.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,7 +15,6 @@
 // limitations under the License.
 */
 
-//#if defined(OC_SECURITY) && defined(OC_OSCORE)
 #if defined(OC_OSCORE)
 
 #define OC_OSCORE_DBG PRINT
@@ -62,7 +62,6 @@ oc_oscore_find_context_by_kid(oc_oscore_context_t *ctx, size_t device,
     PRINT("  ---> : =%s=\n  recvid:", (char *)(ctx->token_id));
     OC_LOGbytes_OSCORE(ctx->recvid, ctx->recvid_len);
 
-    // if (ctx->device == device && kid_len == ctx->recvid_len &&
     if (kid_len == ctx->recvid_len && memcmp(kid, ctx->recvid, kid_len) == 0) {
       PRINT("  FOUND\n");
       return ctx;
@@ -79,7 +78,6 @@ oc_oscore_find_context_by_token_mid(size_t device, uint8_t *token,
                                     uint8_t *request_piv_len, bool tcp)
 {
   (void)device;
-  // oc_uuid_t *uuid;
 #ifdef OC_CLIENT
   /* Search for client cb by token */
   oc_client_cb_t *cb = oc_ri_find_client_cb_by_token(token, token_len);
@@ -87,7 +85,6 @@ oc_oscore_find_context_by_token_mid(size_t device, uint8_t *token,
   if (cb) {
     *request_piv = cb->piv;
     *request_piv_len = cb->piv_len;
-    // uuid = &cb->endpoint.di;
   } else {
 #endif /* OC_CLIENT */
     /* Search transactions by token and mid */
@@ -103,7 +100,6 @@ oc_oscore_find_context_by_token_mid(size_t device, uint8_t *token,
     }
     *request_piv = t->message->endpoint.piv;
     *request_piv_len = t->message->endpoint.piv_len;
-    // uuid = &t->message->endpoint.di;
 #ifdef OC_CLIENT
   }
 #endif /* OC_CLIENT */
@@ -129,8 +125,6 @@ oc_oscore_find_context_by_serial_number(size_t device,
   while (ctx != NULL) {
     oc_string_t ctx_serial_number = ctx->destination_serial_number;
     if (oc_string_cmp(serial_number, ctx_serial_number) == 0) {
-      // if (memcmp(cred->subjectuuid.id, uuid->id, 16) == 0 &&
-      //    ctx->device == device) {
       return ctx;
     }
     ctx = ctx->next;
@@ -323,6 +317,6 @@ oc_oscore_context_derive_param(const uint8_t *id, uint8_t id_len,
                      cbor_encoder_get_buffer_size(&e, info), param, param_len);
 }
 
-#else  /* OC_SECURITY && OC_OSCORE */
+#else  /* OC_OSCORE */
 typedef int dummy_declaration;
-#endif /* !OC_SECURITY && !OC_OSCORE */
+#endif /* !OC_OSCORE */

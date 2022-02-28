@@ -51,13 +51,6 @@
 #include "oc_blockwise.h"
 #endif /* OC_BLOCK_WISE */
 
-//#ifdef OC_SECURITY
-//#include "security/oc_tls.h"
-//#ifdef OC_OSCORE
-//#include "security/oc_oscore.h"
-//#endif /* OC_OSCORE */
-//#endif /* OC_SECURITY */
-
 #ifdef OC_OSCORE
 #include "security/oc_tls.h"
 #include "security/oc_oscore.h"
@@ -511,6 +504,7 @@ start_processes(void)
   oc_process_start(&coap_engine, NULL);
   oc_process_start(&message_buffer_handler, NULL);
 
+// TODO
 //#ifdef OC_SECURITY
 #ifdef OC_OSCORE
   oc_process_start(&oc_tls_handler, NULL);
@@ -1551,7 +1545,6 @@ oc_ri_invoke_client_cb(void *response, oc_client_cb_t *cb,
   coap_get_header_observe(pkt, (uint32_t *)&client_response.observe_option);
 #endif /* !OC_BLOCK_WISE */
 
-//#if defined(OC_OSCORE) && defined(OC_SECURITY)
 #if defined(OC_OSCORE)
   if (client_response.observe_option > 1) {
     uint64_t notification_num = 0;
@@ -1561,7 +1554,7 @@ oc_ri_invoke_client_cb(void *response, oc_client_cb_t *cb,
     }
     cb->notification_num = notification_num;
   }
-#endif /* OC_OSCORE && OC_SECURITY */
+#endif /* OC_OSCORE */
 
   bool separate = false;
 

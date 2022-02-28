@@ -1244,15 +1244,17 @@ oc_create_knx_sec_resources(size_t device_index)
 void
 oc_init_oscore(size_t device_index)
 {
-  // TODO
-#ifdef OC_OSCORE
+#ifndef OC_OSCORE
+  (void)device_index;
+#else /* OC_OSCORE */
   int i;
-  PRINT("oc_init_oscore adding oscore context\n ");
+  PRINT("oc_init_oscore adding oscore context\n");
 
   for (i = 0; i < G_AT_MAX_ENTRIES; i++) {
 
     if (oc_string_len(g_at_entries[i].id) > 0) {
       oc_at_entry_print(device_index, i);
+
       oc_oscore_context_t *ctx =
         oc_oscore_add_context(device_index, "sender", "reci", oc_knx_get_osn(),
                               "desc", oc_string(g_at_entries[i].osc_ms),
@@ -1285,7 +1287,9 @@ oc_is_resource_secure(oc_method_t method, oc_resource_t *resource)
        (oc_string_len(resource->uri) == 16 &&
         memcmp(oc_string(resource->uri), "/.well-known/knx", 16) == 0) ||
        (oc_string_len(resource->uri) == 20 &&
-        memcmp(oc_string(resource->uri), "/.well-known/knx/osn", 20) == 0))) {
+        memcmp(oc_string(resource->uri), "/.well-known/knx/osn", 20) == 0) ||
+       (oc_string_len(resource->uri) == 7 &&
+        memcmp(oc_string(resource->uri), "/dev/sn", 7) == 0))) {
     return false;
   }
   // not secure: needed for SPAKE handshake
@@ -1416,11 +1420,21 @@ oc_if_method_allowed_according_to_mask(oc_interface_mask_t iface_mask,
 }
 
 static bool
-method_allowed(oc_method_t method, oc_resource_t *resource)
+method_allowed(oc_method_t method, oc_resource_t *resource,
+               oc_endpoint_t *endpoint)
 {
   if (oc_is_resource_secure(method, resource) == false) {
     return true;
   }
+
+#ifdef OC_OSCORE
+  if ((endpoint->flags & OSCORE) == 0) {
+    // not an oscore protected message, but oscore is enabled
+    // so the is call is unproteced and should not go ahead
+    OC_DBG_OSCORE("unprotected message, access denied\n");
+    return false;
+  }
+#endif
 
   return oc_if_method_allowed_according_to_mask(resource->interfaces, method);
 }
@@ -1472,10 +1486,10 @@ bool
 oc_knx_sec_check_acl(oc_method_t method, oc_resource_t *resource,
                      oc_endpoint_t *endpoint)
 {
-  (void)endpoint;
-
   // first check if the method is allowed on the resource
-  if (method_allowed(method, resource) == true) {
+  // also checks if the resource is unsecured (public)
+  // and if OSCORE is enabled
+  if (method_allowed(method, resource, endpoint) == true) {
     return true;
   }
   PRINT("oc_knx_sec_check_acl: method %s NOT allowed on %s\n",

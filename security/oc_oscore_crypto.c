@@ -14,7 +14,6 @@
 // limitations under the License.
 */
 
-//#if defined(OC_SECURITY) && defined(OC_OSCORE)
 #if defined(OC_OSCORE)
 
 #include "oc_oscore_crypto.h"
@@ -277,6 +276,6 @@ oc_oscore_decrypt(uint8_t *ciphertext, size_t ciphertext_len, size_t tag_len,
   return ret;
 }
 
-#else  /* OC_SECURITY && OC_OSCORE */
+#else  /* OC_OSCORE */
 typedef int dummy_declaration;
-#endif /* !OC_SECURITY && !OC_OSCORE */
+#endif /* !OC_OSCORE */
