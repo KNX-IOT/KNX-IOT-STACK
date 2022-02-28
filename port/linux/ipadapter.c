@@ -1882,3 +1882,10 @@ ip_context_rfds_fd_copy(ip_context_t *dev)
   pthread_mutex_unlock(&dev->rfds_mutex);
   return setfds;
 }
+
+void
+oc_connectivity_subscribe_mcast_ipv6(size_t device, const uint8_t *address)
+{
+  (void)device;
+  (void)address;
+}

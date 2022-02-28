@@ -207,6 +207,15 @@ void handle_network_interface_event_callback(oc_interface_event_t event);
 void handle_session_event_callback(const oc_endpoint_t *endpoint,
                                    oc_session_state_t state);
 
+/**
+ * @brief Subscribe to a multicast address
+ *
+ * @param device ID of device to subscribe
+ * @param address 16-byte array containing multicast address
+ */
+void oc_connectivity_subscribe_mcast_ipv6(size_t device,
+                                          const uint8_t *address);
+
 #ifdef OC_TCP
 /**
  * @brief The CSM states
