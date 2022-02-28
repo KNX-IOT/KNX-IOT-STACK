@@ -356,7 +356,11 @@ oc_oscore_send_multicast_message(oc_message_t *message)
    *   Serialize OSCORE message to oc_message_t
    * Dispatch oc_message_t to IP layer
    */
-  oc_oscore_context_t *oscore_ctx = oc_oscore_find_group_context();
+  uint64_t group_id = 0;
+
+  // group_id = message->data.
+
+  oc_oscore_context_t *oscore_ctx = oc_oscore_find_group_context(group_id);
 
   if (oscore_ctx) {
     OC_DBG_OSCORE("#################################");
@@ -386,7 +390,7 @@ oc_oscore_send_multicast_message(oc_message_t *message)
     OC_DBG_OSCORE("### protecting multicast request ###");
     /* Use context->SSN as Partial IV */
     oscore_store_piv(oscore_ctx->ssn, piv, &piv_len);
-    OC_DBG_OSCORE("---using SSN as Partial IV: %lu", oscore_ctx->ssn);
+    OC_DBG_OSCORE("---using SSN as Partial IV: %llu", oscore_ctx->ssn);
     OC_LOGbytes_OSCORE(piv, piv_len);
     /* Increment SSN */
     oscore_ctx->ssn++;
@@ -603,7 +607,7 @@ oc_oscore_send_message(oc_message_t *msg)
       /* Request */
       /* Use context->SSN as Partial IV */
       oscore_store_piv(oscore_ctx->ssn, piv, &piv_len);
-      OC_DBG_OSCORE("---using SSN as Partial IV: %lu", oscore_ctx->ssn);
+      OC_DBG_OSCORE("---using SSN as Partial IV: %llu", oscore_ctx->ssn);
       OC_LOGbytes(piv, piv_len);
       /* Increment SSN */
       oscore_ctx->ssn++;

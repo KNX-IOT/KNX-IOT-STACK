@@ -127,11 +127,12 @@ typedef struct oc_auth_at_t
 /**
  * @brief set an entry in the auth/at table
  *
+ * @param device_index index of the device
  * @param index index in the table, will overwrite if something is there
  * @param entry the auth/at entry
  * @return int 0 == successfull
  */
-int oc_core_set_at_table(int index, oc_auth_at_t entry);
+int oc_core_set_at_table(size_t device_index, int index, oc_auth_at_t entry);
 
 /**
  * @brief set shared (SPAKE) key
@@ -145,8 +146,10 @@ void oc_oscore_set_auth(uint8_t *shared_key, int shared_key_size);
 /**
  * @brief delete the /auth/at table
  * will be used in reset of the device
+ *
+ * @param device_index the device index
  */
-void oc_delete_at_table();
+void oc_delete_at_table(size_t device_index);
 
 /**
  * @brief retrieve the replay window

@@ -32,18 +32,16 @@ OC_LIST(contexts);
 OC_MEMB(ctx_s, oc_oscore_context_t, 1);
 
 oc_oscore_context_t *
-oc_oscore_find_group_context(void)
+oc_oscore_find_group_context(uint64_t group_id)
 {
   oc_oscore_context_t *ctx = (oc_oscore_context_t *)oc_list_head(contexts);
 
-  // while (ctx != NULL) {
-  //  oc_sec_cred_t *cred = (oc_sec_cred_t *)ctx->cred;
-
-  //  if (cred->credtype == OC_CREDTYPE_OSCORE_MCAST_CLIENT) {
-  //    return ctx;
-  //  }
-  //  ctx = ctx->next;
-  //}
+  while (ctx != NULL) {
+    if (group_id == ctx->group_id) {
+      return ctx;
+    }
+    ctx = ctx->next;
+  }
 
   return ctx;
 }
