@@ -1,0 +1,29 @@
+@startuml
+skinparam sequenceMessageAlign center
+
+actor       Actor       as Foo1
+box "Device Internal" #LightBlue
+participant Device as Dev
+participant Resource as Resource 
+participant "Group Object Table" as GOT
+end box
+participant Device2 as Dev2
+
+== runtime with s-mode ==
+
+Foo1 -> Dev : interaction with resource "X"
+
+Dev -> Resource : GET value
+Dev <- Resource : value
+
+Dev -> GOT : Get groupId's for sending message
+Dev <- GOT : GroupId's
+
+group per GroupID [on multi-cast groupid address]
+    Dev --> Dev2 : s-mode [GroupID, value]
+end
+
+
+
+
+@enduml
