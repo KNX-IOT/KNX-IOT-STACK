@@ -798,7 +798,7 @@ def do_auth_at_with_config(my_stack):
     print(" lines:", lf.get_nr_lines())
     for line in lf.get_lines():
         print(line)
-        
+
 
 def do_sn_discovery(my_stack, scope, sn):
     """
