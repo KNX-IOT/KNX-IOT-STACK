@@ -72,10 +72,10 @@ int
 oc_device_mode_display(int device_index)
 {
   if (oc_is_device_mode_in_programming(device_index)) {
-    PRINT(" Device is in programming mode\n");
+    PRINT("Device is in programming mode\n");
   }
   if (oc_is_device_mode_in_normal(device_index)) {
-    PRINT(" Device is in normal operation mode\n");
+    PRINT("Device is in normal operation mode\n");
   }
 
   return 0;

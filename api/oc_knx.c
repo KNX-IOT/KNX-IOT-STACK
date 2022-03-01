@@ -1110,22 +1110,8 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     uint8_t *shared_key = spake_data.Ka_Ke + 16;
     size_t shared_key_len = 16;
 
-    // create the token
-    oc_auth_at_t os_token;
-    memset(&os_token, 0, sizeof(os_token));
-    // password...
-    oc_new_string(&os_token.id, "spake", strlen("spake"));
-    os_token.ga_len = 0;
-    os_token.profile = OC_PROFILE_COAP_OSCORE;
-    os_token.scope = OC_IF_SEC | OC_IF_D | OC_IF_P;
-    oc_new_string(&os_token.osc_ms, shared_key, 16);
-    oc_new_string(&os_token.osc_id, "responderkey", strlen("responderkey"));
-    oc_new_string(&os_token.sub, "", 0);
-    oc_new_string(&os_token.kid, "", 0);
-    // store in at tables at position 0
-    // note there should be no entries.
-    // if there is an entry then overwrite it..
-    oc_core_set_at_table((size_t)0, 0, os_token);
+    // set thet /auth/at entry with the calculated shared key.
+    oc_oscore_set_auth(shared_key, shared_key_len);
 
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
     // handshake completed successfully - clear state

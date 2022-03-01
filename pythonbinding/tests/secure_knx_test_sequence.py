@@ -852,6 +852,7 @@ if __name__ == '__main__':  # pragma: no cover
     try:
         do_sn_discovery(the_stack, args.scope, str(args.sn))
         do_spake(the_stack, str(args.password) )
+        time.sleep(1)
         #do_sequence_dev(the_stack)
         #do_auth_at_with_delete(the_stack)
         #do_auth_at_with_delete_all(the_stack)

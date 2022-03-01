@@ -1157,6 +1157,10 @@ oc_core_set_at_table(size_t device_index, int index, oc_auth_at_t entry)
 
     oc_at_dump_entry(device_index, index);
   }
+  if (index == 0) {
+    // set the oscore stuff
+
+  }
 
   return 0;
 }
@@ -1424,7 +1428,7 @@ method_allowed(oc_method_t method, oc_resource_t *resource,
 #ifdef OC_OSCORE
   if ((endpoint->flags & OSCORE) == 0) {
     // not an oscore protected message, but oscore is enabled
-    // so the is call is unproteced and should not go ahead
+    // so the is call is unprotected and should not go ahead
     OC_DBG_OSCORE("unprotected message, access denied for: %s [%s]",
                   get_method_name(method), oc_string(resource->uri));
     return false;

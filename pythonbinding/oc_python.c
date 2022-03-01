@@ -535,7 +535,7 @@ py_cbor_get(char *sn, char *uri, char *query, char *cbdata)
   PRINT("  [C]py_cbor_get: [%s], [%s] [%s] [%s]\n", sn, uri, query, cbdata);
 #ifdef OC_OSCORE
   device->ep.flags += OSCORE;
-  PRINT("  [C] OSCORE\n");
+  PRINT("  [C] enable OSCORE encryption\n");
 #endif
 
   ret = oc_do_get_ex(uri, &device->ep, query, general_get_cb, HIGH_QOS,
@@ -583,7 +583,7 @@ py_linkformat_get(char *sn, char *uri, char *query, char *cbdata)
         cbdata);
 #ifdef OC_OSCORE
   device->ep.flags += OSCORE;
-  PRINT("  [C] OSCORE\n");
+  PRINT("  [C] enable OSCORE encryption\n");
 #endif
 
   user_struct_t *new_cbdata;
@@ -650,7 +650,7 @@ py_cbor_post(char *sn, char *uri, char *query, char *id, int size, char *data)
         size);
 #ifdef OC_OSCORE
   device->ep.flags += OSCORE;
-  PRINT("  [C] OSCORE\n");
+  PRINT("  [C] enable OSCORE encryption\n");
 #endif
 
   user_struct_t *new_cbdata;
@@ -686,7 +686,7 @@ py_cbor_put(char *sn, char *uri, char *query, char *id, int size, char *data)
         size);
 #ifdef OC_OSCORE
   device->ep.flags += OSCORE;
-  PRINT("  [C] OSCORE\n");
+  PRINT("  [C] enable OSCORE encryption\n");
 #endif
 
   user_struct_t *new_cbdata;
@@ -721,7 +721,7 @@ py_cbor_delete(char *sn, char *uri, char *query, char *id)
   PRINT("  [C]py_cbor_delete: [%s], [%s] [%s] [%s]\n", sn, uri, id, query);
 #ifdef OC_OSCORE
   device->ep.flags += OSCORE;
-  PRINT("  [C] OSCORE\n");
+  PRINT("  [C] enable OSCORE encryption\n");
 #endif
 
   user_struct_t *new_cbdata;
