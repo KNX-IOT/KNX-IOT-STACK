@@ -38,7 +38,7 @@ This command opens a windows developer shell that knows all paths of visual stud
 in this shell issue the commands to build in this folder.
 
 ```bash
-cmake -G"NMake Makefiles" ..
+cmake -G"NMake Makefiles" .. -DOC_OSCORE_ENABLED=true
 nmake
 ```
 
@@ -54,6 +54,27 @@ Therefore the python code can be used directly from this folder.
 
 ```bash
 python knx_stack.py
+```
+
+### commandline arguments
+
+debugging with visual studion:
+adding command line options to the application can be done via the visual studio add-on:
+
+https://marketplace.visualstudio.com/items?itemName=MBulli.SmartCommandlineArguments
+
+or add to the launch.vs.json file the args section in the configuration.
+
+```
+  {
+      "type": "default",
+      "project": "CMakeLists.txt",
+      "projectTarget": "testserver_all.exe (apps\\testserver_all.exe)",
+      "name": "testserver_all.exe (apps\\testserver_all.exe)",
+      "args": [
+        "reset"
+      ]
+    }
 ```
 
 ## Build Shared Library on Linux

@@ -98,7 +98,7 @@ def test_discover(my_stack):
 def get_sn(my_stack):
     print("Get SN :")
     sn = my_stack.device_array[0].sn
-    response = my_stack.issue_cbor_get(sn, "/dev/sn")
+    response = my_stack.issue_cbor_get_unsecured(sn, "/dev/sn")
     print ("response:", response)
     if response is not None:
         safe_print(response)
@@ -659,12 +659,12 @@ def do_sequence_f(my_stack):
     my_stack.purge_response(response)
 
 
-def do_auth_at(my_stack):
+def do_auth_at_with_delete(my_stack):
     if my_stack.get_nr_devices() == 0:
         return
 
     sn = my_stack.device_array[0].sn
-    print("========/auth/at=========")
+    print("========/auth/at=========delete individual")
     #response =  my_stack.issue_linkformat_get(sn, "/auth/at")
     #print ("response:", response)
     #lf = knx_stack.LinkFormat(response.payload)
@@ -746,6 +746,60 @@ def do_auth_at(my_stack):
         print(line)
 
 
+def do_auth_at_with_delete_all(my_stack):
+    if my_stack.get_nr_devices() == 0:
+        return
+
+    sn = my_stack.device_array[0].sn
+    print("========/auth/at=========delete all")
+    content = [ { 0: "my_dtls_token", 2: "<asn>", 9 : ["if.a", "if.c", "if.sec"], 19: 1,
+                  8 : {3: "mykid" } },
+                { 0: "my_oscore_token", 9 : ["if.a", "if.pm"], 19:2,
+                  8 : { 4: { 6: "mykid", 2: "my_ms", 4:"AES-CCM-16-64-128" } } }
+              ]
+    response =  my_stack.issue_cbor_post(sn,"/auth/at",content)
+    my_stack.purge_response(response)
+    response =  my_stack.issue_linkformat_get(sn, "/auth/at")
+    print ("response:", response)
+
+
+def do_auth_at_with_config(my_stack):
+    if my_stack.get_nr_devices() == 0:
+        return
+
+    sn = my_stack.device_array[0].sn
+    print("========/auth/at=========")
+
+    content = [ { 0: "my_dtls_token", 2: "<asn>", 9 : ["if.a", "if.c", "if.sec"], 19: 1,
+                  8 : {3: "mykid" } },
+                { 0: "my_oscore_token", 9 : ["if.a", "if.pm"], 19:2,
+                  8 : { 4: { 6: "mykid", 2: "my_ms", 4:"AES-CCM-16-64-128" } } }
+              ]
+    response =  my_stack.issue_cbor_post(sn,"/auth/at",content)
+    my_stack.purge_response(response)
+    response =  my_stack.issue_linkformat_get(sn, "/auth/at")
+    print ("response:", response)
+    lf = knx_stack.LinkFormat(response.payload)
+    print(" lines:", lf.get_nr_lines())
+    for line in lf.get_lines():
+        print(line)
+    for line in lf.get_lines():
+        print(" -------------------------")
+        print(" url :", lf.get_url(line))
+        print(" ct  :", lf.get_ct(line))
+        print(" rt  :", lf.get_rt(line))
+        response3 =  my_stack.issue_cbor_get(sn, lf.get_url(line))
+        print ("response:",response3)
+        print ("    value:", response3.get_payload_dict())
+        my_stack.purge_response(response3)
+    response =  my_stack.issue_linkformat_get(sn, "/auth/at")
+    print ("response:", response)
+    lf = knx_stack.LinkFormat(response.payload)
+    print(" lines:", lf.get_nr_lines())
+    for line in lf.get_lines():
+        print(line)
+
+
 def do_sn_discovery(my_stack, scope, sn):
     """
     fb discovery recursive
@@ -798,8 +852,11 @@ if __name__ == '__main__':  # pragma: no cover
     try:
         do_sn_discovery(the_stack, args.scope, str(args.sn))
         do_spake(the_stack, str(args.password) )
-        do_sequence_dev(the_stack)
-        do_auth_at(the_stack)
+        time.sleep(1)
+        #do_sequence_dev(the_stack)
+        #do_auth_at_with_delete(the_stack)
+        #do_auth_at_with_delete_all(the_stack)
+        do_auth_at_with_config(the_stack)
         #do_sequence_dev_programming_mode(the_stack)
     except:
         traceback.print_exc()

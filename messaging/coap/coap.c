@@ -380,7 +380,7 @@ coap_serialize_signal_options(void *packet, uint8_t *option_array)
 }
 #endif /* OC_TCP */
 /*---------------------------------------------------------------------------*/
-/* It just caculates size of option when option_array is NULL */
+/* It just calculates size of option when option_array is NULL */
 static size_t
 coap_serialize_options(void *packet, uint8_t *option_array, bool inner,
                        bool outer, bool oscore)

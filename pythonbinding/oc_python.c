@@ -535,8 +535,34 @@ py_cbor_get(char *sn, char *uri, char *query, char *cbdata)
   PRINT("  [C]py_cbor_get: [%s], [%s] [%s] [%s]\n", sn, uri, query, cbdata);
 #ifdef OC_OSCORE
   device->ep.flags += OSCORE;
-  PRINT("  [C] OSCORE\n");
+  PRINT("  [C] enable OSCORE encryption\n");
 #endif
+
+  ret = oc_do_get_ex(uri, &device->ep, query, general_get_cb, HIGH_QOS,
+                     APPLICATION_CBOR, APPLICATION_CBOR, new_cbdata);
+  if (ret >= 0) {
+    PRINT("  [C]Successfully issued GET request\n");
+  } else {
+    PRINT("  [C]ERROR issuing GET request\n");
+  }
+}
+
+void
+py_cbor_get_unsecured(char *sn, char *uri, char *query, char *cbdata)
+{
+  int ret = -1;
+  device_handle_t *device = py_getdevice_from_sn(sn);
+
+  user_struct_t *new_cbdata;
+  new_cbdata = (user_struct_t *)malloc(sizeof(user_struct_t));
+  if (new_cbdata != NULL) {
+    strcpy(new_cbdata->r_id, cbdata);
+    strcpy(new_cbdata->url, uri);
+    strcpy(new_cbdata->sn, sn);
+  }
+
+  PRINT("  [C]py_cbor_get_unsecured: [%s], [%s] [%s] [%s]\n", sn, uri, query,
+        cbdata);
 
   ret = oc_do_get_ex(uri, &device->ep, query, general_get_cb, HIGH_QOS,
                      APPLICATION_CBOR, APPLICATION_CBOR, new_cbdata);
@@ -558,8 +584,39 @@ py_linkformat_get(char *sn, char *uri, char *query, char *cbdata)
         cbdata);
 #ifdef OC_OSCORE
   device->ep.flags += OSCORE;
-  PRINT("  [C] OSCORE\n");
+  PRINT("  [C] enable OSCORE encryption\n");
 #endif
+
+  user_struct_t *new_cbdata;
+  new_cbdata = (user_struct_t *)malloc(sizeof(user_struct_t));
+  if (new_cbdata != NULL) {
+    strcpy(new_cbdata->r_id, cbdata);
+    strcpy(new_cbdata->url, uri);
+    strcpy(new_cbdata->sn, sn);
+  }
+
+  oc_endpoint_print(&device->ep);
+  if (&ep != NULL) {
+    ret = oc_do_get_ex(uri, &device->ep, query, general_get_cb, HIGH_QOS,
+                       APPLICATION_LINK_FORMAT, APPLICATION_LINK_FORMAT,
+                       new_cbdata);
+  }
+  if (ret >= 0) {
+    PRINT("  [C]Successfully issued GET request\n");
+  } else {
+    PRINT("  [C]ERROR issuing GET request\n");
+  }
+}
+
+void
+py_linkformat_get_unsecured(char *sn, char *uri, char *query, char *cbdata)
+{
+  int ret = -1;
+  oc_endpoint_t ep;
+  device_handle_t *device = py_getdevice_from_sn(sn);
+
+  PRINT("  [C]py_linkformat_get_unsecured: [%s], [%s] [%s] [%s]\n", sn, uri,
+        query, cbdata);
 
   user_struct_t *new_cbdata;
   new_cbdata = (user_struct_t *)malloc(sizeof(user_struct_t));
@@ -594,7 +651,7 @@ py_cbor_post(char *sn, char *uri, char *query, char *id, int size, char *data)
         size);
 #ifdef OC_OSCORE
   device->ep.flags += OSCORE;
-  PRINT("  [C] OSCORE\n");
+  PRINT("  [C] enable OSCORE encryption\n");
 #endif
 
   user_struct_t *new_cbdata;
@@ -630,7 +687,7 @@ py_cbor_put(char *sn, char *uri, char *query, char *id, int size, char *data)
         size);
 #ifdef OC_OSCORE
   device->ep.flags += OSCORE;
-  PRINT("  [C] OSCORE\n");
+  PRINT("  [C] enable OSCORE encryption\n");
 #endif
 
   user_struct_t *new_cbdata;
@@ -665,7 +722,7 @@ py_cbor_delete(char *sn, char *uri, char *query, char *id)
   PRINT("  [C]py_cbor_delete: [%s], [%s] [%s] [%s]\n", sn, uri, id, query);
 #ifdef OC_OSCORE
   device->ep.flags += OSCORE;
-  PRINT("  [C] OSCORE\n");
+  PRINT("  [C] enable OSCORE encryption\n");
 #endif
 
   user_struct_t *new_cbdata;

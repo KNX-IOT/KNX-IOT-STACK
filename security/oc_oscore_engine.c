@@ -113,7 +113,7 @@ oc_oscore_recv_message(oc_message_t *message)
     OC_DBG_OSCORE("#################################");
     oc_oscore_context_t *oscore_ctx = NULL;
     // message->endpoint.flags |= SECURED;
-    message->endpoint.flags |= OSCORE;
+    message->endpoint.flags += OSCORE;
 
     coap_packet_t oscore_pkt[1];
 

@@ -128,9 +128,9 @@ typedef struct oc_auth_at_t
  * @brief set an entry in the auth/at table
  *
  * @param device_index index of the device
- * @param index index in the table, will overwrite if something is there
+ * @param index the index in the table, will overwrite if something is there
  * @param entry the auth/at entry
- * @return int 0 == successfull
+ * @return int 0 == successful
  */
 int oc_core_set_at_table(size_t device_index, int index, oc_auth_at_t entry);
 

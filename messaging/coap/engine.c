@@ -145,7 +145,7 @@ close_all_tls_sessions(void *data)
   oc_set_drop_commands(device, false);
   return OC_EVENT_DONE;
 }
-#endif /* OC_SECURITY */
+#endif /* OC_OSCORE */
 
 /*---------------------------------------------------------------------------*/
 /*- Internal API ------------------------------------------------------------*/

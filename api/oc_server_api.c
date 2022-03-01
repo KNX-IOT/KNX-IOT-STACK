@@ -1,5 +1,6 @@
 /*
 // Copyright (c) 2016 Intel Corporation
+// Copyright (c) 2022 Cascoda Ltd.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,17 +31,6 @@
 #include "oc_core_res.h"
 
 static size_t query_iterator;
-
-// int
-// oc_add_device(const char *uri, const char *rt, const char *name,
-//              const char *spec_version, const char *data_model_version,
-//              oc_add_device_cb_t add_device_cb, void *data)
-//{
-//  if (!oc_core_add_new_device(uri, rt, name, spec_version, data_model_version,
-//                              add_device_cb, data))
-//    return -1;
-//  return 0;
-//}
 
 int
 oc_add_device(const char *name, const char *version, const char *base,
