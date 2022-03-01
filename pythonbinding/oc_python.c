@@ -561,7 +561,8 @@ py_cbor_get_unsecured(char *sn, char *uri, char *query, char *cbdata)
     strcpy(new_cbdata->sn, sn);
   }
 
-  PRINT("  [C]py_cbor_get_unsecured: [%s], [%s] [%s] [%s]\n", sn, uri, query, cbdata);
+  PRINT("  [C]py_cbor_get_unsecured: [%s], [%s] [%s] [%s]\n", sn, uri, query,
+        cbdata);
 
   ret = oc_do_get_ex(uri, &device->ep, query, general_get_cb, HIGH_QOS,
                      APPLICATION_CBOR, APPLICATION_CBOR, new_cbdata);
@@ -614,8 +615,8 @@ py_linkformat_get_unsecured(char *sn, char *uri, char *query, char *cbdata)
   oc_endpoint_t ep;
   device_handle_t *device = py_getdevice_from_sn(sn);
 
-  PRINT("  [C]py_linkformat_get_unsecured: [%s], [%s] [%s] [%s]\n", sn, uri, query,
-        cbdata);
+  PRINT("  [C]py_linkformat_get_unsecured: [%s], [%s] [%s] [%s]\n", sn, uri,
+        query, cbdata);
 
   user_struct_t *new_cbdata;
   new_cbdata = (user_struct_t *)malloc(sizeof(user_struct_t));

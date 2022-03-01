@@ -105,7 +105,6 @@ kisCS_EXPORT void py_install_spakeCB(spakeCB spakeCB);
  */
 kisCS_EXPORT void py_cbor_get(char *sn, char *uri, char *query, char *r_id);
 
-
 /**
  * @brief issue a GET request with expected content type CBOR (unsecured)
  *
@@ -114,7 +113,8 @@ kisCS_EXPORT void py_cbor_get(char *sn, char *uri, char *query, char *r_id);
  * @param query the query
  * @param r_id the r_id (string)
  */
-kisCS_EXPORT void py_cbor_get_unsecured(char *sn, char *uri, char *query, char *r_id);
+kisCS_EXPORT void py_cbor_get_unsecured(char *sn, char *uri, char *query,
+                                        char *r_id);
 
 /**
  * @brief issue a GET request with expected content type LINK-FORMAT
@@ -127,7 +127,6 @@ kisCS_EXPORT void py_cbor_get_unsecured(char *sn, char *uri, char *query, char *
 kisCS_EXPORT void py_linkformat_get(char *sn, char *uri, char *query,
                                     char *r_id);
 
-
 /*
  * @brief issue a GET request with expected content type LINK-FORMAT unsecured
  *
@@ -137,7 +136,7 @@ kisCS_EXPORT void py_linkformat_get(char *sn, char *uri, char *query,
  * @param r_id the r_id (string)
  */
 kisCS_EXPORT void py_linkformat_get_unsecured(char *sn, char *uri, char *query,
-                                    char *r_id);
+                                              char *r_id);
 
 /**
  * @brief issue a POST request, content type CBOR

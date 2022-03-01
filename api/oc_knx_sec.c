@@ -1159,7 +1159,6 @@ oc_core_set_at_table(size_t device_index, int index, oc_auth_at_t entry)
   }
   if (index == 0) {
     // set the oscore stuff
-
   }
 
   return 0;

@@ -551,4 +551,3 @@ oscore_parse_outer_message(oc_message_t *msg, void *packet)
 #else  /* OC_OSCORE */
 typedef int dummy_declaration;
 #endif /* !OC_OSCORE */
-
