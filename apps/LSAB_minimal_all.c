@@ -1,6 +1,6 @@
 /*
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
- Copyright (c) 2021 Cascoda Ltd
+ Copyright (c) 2021-2022 Cascoda Ltd
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -53,18 +53,13 @@
  *       updates the global variables
  *
  * ## stack specific defines
- *
- *  - OC_SECURITY
-      enable security
- *    - OC_PKI
- *      enable use of PKI
  * - __linux__
  *   build for linux
  * - WIN32
  *   build for windows
- *
+ * - OC_OSCORE
+ *   oscore is enabled as compile flag
  * ## File specific defines
- *
  * - NO_MAIN
  *   compile out the function main()
  * - INCLUDE_EXTERNAL
@@ -76,6 +71,8 @@
 #include "oc_core_res.h"
 #include "port/oc_clock.h"
 #include <signal.h>
+// test purpose only
+#include "api/oc_knx_dev.h"
 
 #ifdef INCLUDE_EXTERNAL
 /* import external definitions from header file*/
@@ -111,15 +108,21 @@ STATIC CRITICAL_SECTION cs;   /**< event loop variable */
 
 #define btoa(x) ((x) ? "true" : "false")
 
-volatile int quit = 0; /**< stop variable, used by handle_signal */
+bool g_mystate = false; /**< the state of the dpa 417.61 */
+volatile int quit = 0;  /**< stop variable, used by handle_signal */
+bool g_reset = false;   /**< reset the device (from startup) */
 
 /**
- * function to set up the device.
+ *  @brief function to set up the device.
  *
  * sets the:
  * - serial number
- * - friendly device name
- * - spec version
+ * - base path
+ * - knx spec version
+ * - hardware version
+ * - firmware version
+ * - hardware type
+ * - device model
  *
  */
 int
@@ -151,9 +154,6 @@ app_init(void)
 
   return ret;
 }
-
-/** the state of the dpa 417.61 */
-bool g_mystate = false;
 
 /**
  * get method for "p/light" resource.
@@ -264,15 +264,10 @@ post_dpa_417_61(oc_request_t *request, oc_interface_mask_t interfaces,
 void
 register_resources(void)
 {
-  PRINT("Register Resource with local path \"/p/light\"\n");
-
+  PRINT("Register Resource with local path \"/p/1\"\n");
   PRINT("Light Switching actuator 417 (LSAB) : SwitchOnOff \n");
   PRINT("Data point 417.61 (DPT_Switch) \n");
-
-  PRINT("Register Resource with local path \"/p/light\"\n");
-
-  oc_resource_t *res_light =
-    oc_new_resource("light actuation", "p/light", 2, 0);
+  oc_resource_t *res_light = oc_new_resource("light actuation", "p/1", 2, 0);
   oc_resource_bind_resource_type(res_light, "urn:knx:dpa.417.61");
   oc_resource_bind_resource_type(res_light, "DPT_Switch");
   oc_resource_bind_content_type(res_light, APPLICATION_CBOR);
@@ -297,8 +292,8 @@ register_resources(void)
 }
 
 /**
- * initiate preset for device
- *
+ * @brief initiate preset for device
+ * current implementation: device reset as command line argument
  * @param device the device identifier of the list of devices
  * @param data the supplied data.
  */
@@ -307,10 +302,88 @@ factory_presets_cb(size_t device, void *data)
 {
   (void)device;
   (void)data;
+
+  if (g_reset) {
+    PRINT("factory_presets_cb: resetting device\n");
+    oc_knx_device_storage_reset(0, 2);
+  }
 }
 
 /**
- * initializes the global variables
+ * @brief application reset
+ *
+ * @param device the device identifier of the list of devices
+ * @param data the supplied data.
+ */
+void
+reset_cb(size_t device_index, int reset_value, void *data)
+{
+  (void)device_index;
+  (void)data;
+
+  PRINT("reset_cb %d\n", reset_value);
+}
+
+/**
+ * @brief restart the device (application depended)
+ *
+ * @param device_index the device identifier of the list of devices
+ * @param data the supplied data.
+ */
+void
+restart_cb(size_t device_index, void *data)
+{
+  (void)device_index;
+  (void)data;
+
+  PRINT("-----restart_cb -------\n");
+  exit(0);
+}
+
+/**
+ * @brief set the host name on the device (application depended)
+ *
+ * @param device_index the device identifier of the list of devices
+ * @param host_name the host name to be set on the device
+ * @param data the supplied data.
+ */
+void
+hostname_cb(size_t device_index, oc_string_t host_name, void *data)
+{
+  (void)device_index;
+  (void)data;
+
+  PRINT("-----host name ------- %s\n", oc_string(host_name));
+}
+
+/**
+ * @brief software update callback
+ *
+ * @param device_index the device index
+ * @param offset the offset of the image
+ * @param payload the image data
+ * @param len the length of the image data
+ * @param data the user data
+ */
+void
+swu_cb(size_t device_index, size_t offset, uint8_t *payload, size_t len,
+       void *data)
+{
+  (void)device_index;
+  char *fname = (char *)data;
+  PRINT(" swu_cb %s block=%d size=%d \n", fname, (int)offset, (int)len);
+
+  FILE *fp = fopen(fname, "rw");
+  fseek(fp, offset, SEEK_SET);
+  size_t written = fwrite(payload, len, 1, fp);
+  if (written != len) {
+    PRINT(" swu_cb returned %d != %d (expected)\n", (int)written, (int)len);
+  }
+  fclose(fp);
+}
+
+/**
+ * @brief initializes the global variables
  * registers and starts the handler
  */
 void
@@ -358,42 +431,33 @@ handle_signal(int signal)
   quit = 1;
 }
 
-#ifdef OC_SECURITY
 /**
- * oc_ownership_status_cb callback implementation
- * handler to print out the DI after onboarding
+ * @brief print usage and quits
  *
- * @param device_uuid the device ID
- * @param device_index the index in the list of device IDs
- * @param owned owned or unowned indication
- * @param user_data the supplied user data.
  */
 void
-oc_ownership_status_cb(const oc_uuid_t *device_uuid, size_t device_index,
-                       bool owned, void *user_data)
+print_usage()
 {
-  (void)user_data;
-  (void)device_index;
-  (void)owned;
-
-  char uuid[37] = { 0 };
-  oc_uuid_to_str(device_uuid, uuid, OC_UUID_LEN);
-  PRINT(" oc_ownership_status_cb: DI: '%s'\n", uuid);
+  PRINT("Usage:\n");
+  PRINT("no arguments : starts the server\n");
+  PRINT("-help  : this message\n");
+  PRINT("reset : does an full reset of the device\n");
+  exit(0);
 }
-#endif /* OC_SECURITY */
 
 /**
- * main application.
- *       * initializes the global variables
+ * @brief main application.
+ * initializes the global variables
  * registers and starts the handler
- *       * handles (in a loop) the next event.
+ * handles (in a loop) the next event.
  * shuts down the stack
  */
 int
-main(void)
+main(int argc, char *argv[])
 {
   int init;
   oc_clock_time_t next_event;
+  char *fname = "my_software_image";
 
 #ifdef WIN32
   /* windows specific */
@@ -411,6 +475,19 @@ main(void)
   /* install Ctrl-C */
   sigaction(SIGINT, &sa, NULL);
 #endif
+
+  for (int i = 0; i < argc; i++) {
+    printf("argv[%d] = %s\n", i, argv[i]);
+  }
+  if (argc > 1) {
+    if (strcmp(argv[1], "reset") == 0) {
+      PRINT(" internal reset\n");
+      g_reset = true;
+    }
+    if (strcmp(argv[1], "-help") == 0) {
+      print_usage();
+    }
+  }
 
   PRINT("KNX-IOT Server name : \"%s\"\n", MY_NAME);
 
@@ -442,7 +519,12 @@ main(void)
 #endif
   };
 
+  /* set the application callbacks */
+  oc_set_hostname_cb(hostname_cb, NULL);
+  oc_set_reset_cb(reset_cb, NULL);
+  oc_set_restart_cb(restart_cb, NULL);
   oc_set_factory_presets_cb(factory_presets_cb, NULL);
+  oc_set_swu_cb(swu_cb, (void *)fname);
 
   /* start the stack */
   init = oc_main_init(&handler);
@@ -451,24 +533,20 @@ main(void)
     PRINT("oc_main_init failed %d, exiting.\n", init);
     return init;
   }
-
-#ifdef OC_SECURITY
-  /* print out the current DI of the device */
-  char uuid[37] = { 0 };
-  oc_uuid_to_str(oc_core_get_device_id(0), uuid, OC_UUID_LEN);
-  PRINT(" DI: '%s'\n", uuid);
-  oc_add_ownership_status_cb(oc_ownership_status_cb, NULL);
-#endif /* OC_SECURITY */
-
-#ifdef OC_SECURITY
-  PRINT("Security - Enabled\n");
+#ifdef OC_OSCORE
+  PRINT("OSCORE - Enabled\n");
 #else
-  PRINT("Security - Disabled\n");
-#endif /* OC_SECURITY */
+  PRINT("OSCORE - Disabled\n");
+#endif /* OC_OSCORE */
 
   oc_device_info_t *device = oc_core_get_device_info(0);
   PRINT("serial number: %s", oc_string(device->serialnumber));
-
+  oc_device_mode_display(0);
+  oc_endpoint_t *my_ep = oc_connectivity_get_endpoints(0);
+  if (my_ep != NULL) {
+    PRINTipaddr(*my_ep);
+    PRINT("\n");
+  }
   PRINT("Server \"%s\" running, waiting on incoming "
         "connections.\n",
         MY_NAME);

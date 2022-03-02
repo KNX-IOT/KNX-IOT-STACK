@@ -104,7 +104,7 @@ def do_install_device(my_stack, sn, ia, iid, fp_content):
     # url (11)= /p/light
     # ga (7 )= 1
     # cflags (8) = ["r" ] ; read = 1, write = 2, transmit = 3 update = 4
-    content = [ {0: 1, 11: "p/push", 7:[1], 8: [2] } ]
+    content = [ {0: 1, 11: "p/1", 7:[1], 8: [2] } ]
     content = fp_content
     response =  my_stack.issue_cbor_post(sn,"/fp/g",content)
     print ("response:",response)
@@ -120,7 +120,7 @@ def do_install_device(my_stack, sn, ia, iid, fp_content):
     # url (11)= .knx
     # ga (7 )= 1
     # cflags (8) = ["r" ] ; read = 1, write = 2, transmit = 3 update = 4
-    content = [ {0: 1, 11: "/p/push", 7:[1], 12 :"blah.blah" } ]
+    content = [ {0: 1, 11: "/p/1", 7:[1], 12 :"blah.blah" } ]
     response =  my_stack.issue_cbor_post(sn,"/fp/r",content)
     print ("response:",response)
     my_stack.purge_response(response)
@@ -172,20 +172,20 @@ def do_install(my_stack):
     if "000001" == sn :
         # LSAB
         ia = 2
-        fp_content = [ { 0: 1, 11: "/p/light", 7:[1], 8: [1] } ]
+        fp_content = [ { 0: 1, 11: "/p/1", 7:[1], 8: [1] } ]
     if "000003" == sn :
         # LSSB
         ia = 1
-        fp_content = [ {0: 1, 11: "p/push", 7:[1], 8: [2] } ]
+        fp_content = [ {0: 1, 11: "p/1", 7:[1], 8: [2] } ]
 
     if "000002" == sn :
         # LSAB-PI
         ia = 3
-        fp_content = [ { 0: 1, 11: "/p/light", 7:[1], 8: [1] } ]
+        fp_content = [ { 0: 1, 11: "/p/1", 7:[1], 8: [1] } ]
     if "000004" == sn :
         # LSSB-PI
         ia = 4
-        fp_content = [ {0: 1, 11: "p/push", 7:[1], 8: [2] } ]
+        fp_content = [ {0: 1, 11: "p/1", 7:[1], 8: [2] } ]
     do_install_device(my_stack, sn, ia, iid, fp_content )
 
 if __name__ == '__main__':  # pragma: no cover
