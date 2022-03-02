@@ -162,20 +162,6 @@ typedef struct
  *
  * Example:
  * ```
- * static void set_additional_platform_properties(void *data)
- * {
- *   (void)data;
- *   // Manufactures Details Link
- *   oc_set_custom_platform_property(mnml,
- * "http://www.example.com/manufacture");
- *   // Model Number
- *   oc_set_custom_platform_property(mnmo, "Model No1");
- *   // Date of Manufacture
- *   oc_set_custom_platform_property(mndt,"2020/01/17");
- *   //Serial Number
- *   oc_set_custom_platform_property(mnsel, "1234567890");
- * }
- *
  * static int app_init(void)
  * {
  *   int ret = oc_init_platform("My Platform",

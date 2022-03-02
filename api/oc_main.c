@@ -57,10 +57,10 @@ static bool drop_commands[OC_MAX_NUM_DEVICES];
 
 static bool initialized = false;
 static const oc_handler_t *app_callbacks;
-static oc_factory_presets_t factory_presets;
-static oc_reset_t app_reset;
-static oc_restart_t app_restart;
-static oc_hostname_t app_hostname;
+static oc_factory_presets_t factory_presets = { NULL, NULL };
+static oc_reset_t app_reset = { NULL, NULL };
+static oc_restart_t app_restart = { NULL, NULL };
+static oc_hostname_t app_hostname = { NULL, NULL };
 
 // -----------------------------------------------------------------------------
 

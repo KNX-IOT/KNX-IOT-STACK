@@ -30,6 +30,56 @@ extern "C" {
  */
 void oc_create_knx_gm_resources(size_t device);
 
+/**
+  @defgroup doc_module_tag_gateway gateway
+  Optional group of KNX-IOT to Classic gateway functions.
+  @{
+*/
+
+/**
+ * Callback invoked for all s-mode communication
+ * e.g. to be used to create a KNX-IOT to CLASSIC gateway
+ */
+typedef void (*oc_gateway_s_mode_cb_t)(size_t device, void *data);
+
+/**
+ * @brief The gateway info
+ *
+ */
+typedef struct oc_gateway_t
+{
+  oc_gateway_s_mode_cb_t cb; /**< the callback */
+  void *data;                /**< the callback user data */
+} oc_gateway_t;
+
+/**
+ * @brief retrieve the gateway info, e.g. the callback and callback data
+ *
+ * @return oc_gateway_t* the s-mode gateway data
+ */
+oc_gateway_t *oc_get_gateway_cb(void);
+
+/**
+ * Initialize the gateway callbacks.
+ *
+ * This function is typically called as part of an KNX-IOT to Classic gateway
+ *
+ * @param[in] oc_gateway_s_mode_cb_t callback function invoked for each received
+ * s-mode message.
+ * @param[in] data context pointer that is passed to the oc_gateway_s_mode_cb_t
+ *
+ * @return
+ *   - `0` on success
+ *   - `-1` on failure
+ *
+ * @see init
+ * @see oc_gateway_s_mode_cb_t
+ */
+int oc_set_gateway_cb(oc_gateway_s_mode_cb_t oc_gateway_s_mode_cb_t,
+                      void *data);
+
+/** @} */ // end of doc_module_tag_gateway
+
 #ifdef __cplusplus
 }
 #endif

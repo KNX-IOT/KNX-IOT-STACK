@@ -225,8 +225,8 @@ int oc_reset_device(size_t device_index, int reset_value);
  * - /.well-known/knx
  * - /.well-known/knx/osn
  * - /.well-known/knx/f (fingerprint)
- * - /.well-known/knx/ldevid
- * - /.well-known/knx/idevid
+ * - /.well-known/knx/ldevid (optional)
+ * - /.well-known/knx/idevid (optional)
  * - /.well-known/knx/spake
  *
  * @param device index of the device to which the resource is to be created
