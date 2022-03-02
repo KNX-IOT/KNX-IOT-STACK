@@ -21,19 +21,19 @@ naming convention:
 | LSAB_minimal_pi   | 000002 |
 | LSSB_minimal_all  | 000003 |
 | LSSB_minimal_pi   | 000004 |
-| simpleserver_all  | 000005 |
-| simpleclient_all  | 000006 |
+| testserver_all    | 000005 |
+| testclient_all    | 000006 |
 
-### simpleserver_all.c
+### testserver_all.c
 
-Server example on Windows & Linux.
+Test server on Windows & Linux.
 
 - no KNX compliant application
 - example to receive data to other device
 
-### simpleclient_all.c
+### testclient_all.c
 
-Client example on Windows & Linux.
+Test Client on Windows & Linux.
 
 - KNX client application
    example to send data to other device
