@@ -53,18 +53,13 @@
  *       updates the global variables
  *
  * ## stack specific defines
- *
- *  - OC_SECURITY
-      enable security
- *    - OC_PKI
- *      enable use of PKI
  * - __linux__
  *   build for linux
  * - WIN32
  *   build for windows
- *
+ * - OC_OSCORE
+ *   oscore is enabled as compile flag
  * ## File specific defines
- *
  * - NO_MAIN
  *   compile out the function main()
  * - INCLUDE_EXTERNAL
@@ -103,15 +98,21 @@ STATIC CRITICAL_SECTION cs;   /**< event loop variable */
 
 #define btoa(x) ((x) ? "true" : "false")
 
+bool g_mystate = false; /**<  the state of the dpa 421.61 */
 volatile int quit = 0; /**< stop variable, used by handle_signal */
+bool g_reset = false;  /**< reset the device (from startup) */
 
 /**
  * function to set up the device.
  *
  * sets the:
  * - serial number
- * - friendly device name
- * - spec version
+ * - base path
+ * - knx spec version
+ * - hardware version
+ * - firmware version
+ * - hardware type
+ * - device model
  *
  */
 int
@@ -143,11 +144,9 @@ app_init(void)
   return ret;
 }
 
-/** the state of the dpa 421.61 */
-volatile bool g_mystate = false;
 
 /**
- * get method for "p/push" resource.
+ * get method for "p/1" resource.
  * function is called to initialize the return values of the GET method.
  * initialization of the returned values are done from the global property
  * values. Resource Description: This Resource describes a binary switch
@@ -194,48 +193,6 @@ get_dpa_421_61(oc_request_t *request, oc_interface_mask_t interfaces,
   PRINT("-- End get_dpa_421_61\n");
 }
 
-/**
- * post method for "p/push" resource.
- * The function has as input the request body, which are the input values of the
- * POST method.
- * The input values (as a set) are checked if all supplied values are correct.
- * If the input values are correct, they will be assigned to the global property
- * values.
- * Resource Description:
- *
- * @param request the request representation.
- * @param interfaces the used interfaces during the request.
- * @param user_data the supplied user data.
- */
-void
-post_dpa_421_61(oc_request_t *request, oc_interface_mask_t interfaces,
-                void *user_data)
-{
-  (void)interfaces;
-  (void)user_data;
-  bool error_state = false;
-  PRINT("-- Begin post_dpa_421_61:\n");
-  oc_rep_t *rep = NULL;
-
-  if (oc_is_s_mode_request(request)) {
-    PRINT(" S-MODE\n");
-
-    rep = oc_s_mode_get_value(request);
-
-  } else {
-    rep = request->request_payload;
-  }
-  if ((rep != NULL) && (rep->type == OC_REP_BOOL)) {
-    PRINT("  post_dpa_421_61 received : %d\n", rep->value.boolean);
-    g_mystate = rep->value.boolean;
-    oc_send_cbor_response(request, OC_STATUS_CHANGED);
-    PRINT("-- End post_dpa_421_61\n");
-    return;
-  }
-
-  oc_send_response(request, OC_STATUS_BAD_REQUEST);
-  PRINT("-- End post_dpa_421_61\n");
-}
 
 oc_group_object_notification_t g_send_notification;
 bool g_bool_value = false;
@@ -246,7 +203,7 @@ oc_event_callback_retval_t post_callback(void *data);
 static void
 issue_requests_s_mode(void)
 {
-  oc_do_s_mode("p/push", "w");
+  oc_do_s_mode("p/1", "w");
   // post_callback(NULL);
 }
 
@@ -392,15 +349,12 @@ poll_python(void *data)
 void
 register_resources(void)
 {
-  PRINT("Register Resource with local path \"/p/push\"\n");
-
   PRINT("Light Switching Sensor 421.61 (LSSB) : SwitchOnOff \n");
   PRINT("Data point 61 (DPT_Switch) \n");
-
-  PRINT("Register Resource with local path \"/p/push\"\n");
+  PRINT("Register Resource with local path \"/p/1\"\n");
 
   oc_resource_t *res_pushbutton =
-    oc_new_resource("push button", "p/push", 2, 0);
+    oc_new_resource("push button", "p/1", 2, 0);
   oc_resource_bind_resource_type(res_pushbutton, "urn:knx:dpa.421.61");
   oc_resource_bind_resource_type(res_pushbutton, "DPT_Switch");
   oc_resource_bind_content_type(res_pushbutton, APPLICATION_CBOR);
@@ -416,14 +370,13 @@ register_resources(void)
     an interrupt when something is read from the hardware. */
   /*oc_resource_set_observable(res_352, true); */
   oc_resource_set_request_handler(res_pushbutton, OC_GET, get_dpa_421_61, NULL);
-  oc_resource_set_request_handler(res_pushbutton, OC_POST, post_dpa_421_61,
-                                  NULL);
   oc_add_resource(res_pushbutton);
 }
 
+
 /**
- * initiate preset for device
- *
+ * @brief initiate preset for device
+ * current implementation: device reset as commandline argument
  * @param device the device identifier of the list of devices
  * @param data the supplied data.
  */
@@ -432,10 +385,84 @@ factory_presets_cb(size_t device, void *data)
 {
   (void)device;
   (void)data;
+
+  if (g_reset) {
+    PRINT("factory_presets_cb: resetting device\n");
+    oc_knx_device_storage_reset(0, 2);
+  }
 }
 
 /**
- * initializes the global variables
+ * @brief application reset
+ *
+ * @param device the device identifier of the list of devices
+ * @param data the supplied data.
+ */
+void
+reset_cb(size_t device, int reset_value, void *data)
+{
+  (void)data;
+
+  PRINT("reset_cb %d\n", reset_value);
+}
+
+/**
+ * @brief restart the device (application depended)
+ *
+ * @param device the device identifier of the list of devices
+ * @param data the supplied data.
+ */
+void
+restart_cb(size_t device, void *data)
+{
+  (void)data;
+
+  PRINT("-----restart_cb -------\n");
+  exit(0);
+}
+
+/**
+ * @brief set the host name on the device (application depended)
+ *
+ * @param device the device identifier of the list of devices
+ * @param host_name the host name to be set on the device
+ * @param data the supplied data.
+ */
+void
+hostname_cb(size_t device, oc_string_t host_name, void *data)
+{
+  (void)data;
+
+  PRINT("-----host name ------- %s\n", oc_string(host_name));
+}
+
+/**
+ * @brief software update callback
+ *
+ * @param device_index the device index
+ * @param offset the offset of the image
+ * @param payload the image data
+ * @param len the length of the image data
+ * @param data the user data
+ */
+void
+swu_cb(size_t device_index, size_t offset, uint8_t *payload, size_t len,
+       void *data)
+{
+  char *fname = (char *)data;
+  PRINT(" swu_cb %s block=%d size=%d \n", fname, (int)offset, (int)len);
+
+  FILE *fp = fopen(fname, "rw");
+  fseek(fp, offset, SEEK_SET);
+  size_t written = fwrite(payload, len, 1, fp);
+  if (written != len) {
+    PRINT(" swu_cb returned %d != %d (expected)\n", (int)written, (int)len);
+  }
+  fclose(fp);
+}
+
+/**
+ * @brief  initializes the global variables
  * registers and starts the handler
  */
 void
@@ -479,30 +506,6 @@ handle_signal(int signal)
   printf("quit signal received");
   quit = 1;
 }
-
-#ifdef OC_SECURITY
-/**
- * oc_ownership_status_cb callback implementation
- * handler to print out the DI after onboarding
- *
- * @param device_uuid the device ID
- * @param device_index the index in the list of device IDs
- * @param owned owned or unowned indication
- * @param user_data the supplied user data.
- */
-void
-oc_ownership_status_cb(const oc_uuid_t *device_uuid, size_t device_index,
-                       bool owned, void *user_data)
-{
-  (void)user_data;
-  (void)device_index;
-  (void)owned;
-
-  char uuid[37] = { 0 };
-  oc_uuid_to_str(device_uuid, uuid, OC_UUID_LEN);
-  PRINT(" oc_ownership_status_cb: DI: '%s'\n", uuid);
-}
-#endif /* OC_SECURITY */
 
 /**
  * main application.

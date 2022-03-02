@@ -24,7 +24,6 @@ naming convention:
 | simpleserver_all  | 000005 |
 | simpleclient_all  | 000006 |
 
-
 ### simpleserver_all.c
 
 Server example on Windows & Linux.
