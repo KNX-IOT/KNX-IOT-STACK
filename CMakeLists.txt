@@ -67,6 +67,7 @@ set(API_SOURCES
     ${PROJECT_SOURCE_DIR}/api/oc_knx_dev.c
     ${PROJECT_SOURCE_DIR}/api/oc_knx_fb.c
     ${PROJECT_SOURCE_DIR}/api/oc_knx_fp.c
+    ${PROJECT_SOURCE_DIR}/api/oc_knx_gm.c
     ${PROJECT_SOURCE_DIR}/api/oc_knx_sec.c
     ${PROJECT_SOURCE_DIR}/api/oc_knx_swu.c
     ${PROJECT_SOURCE_DIR}/api/c-timestamp/timestamp_compare.c
