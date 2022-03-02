@@ -108,9 +108,8 @@ STATIC CRITICAL_SECTION cs;   /**< event loop variable */
 
 #define btoa(x) ((x) ? "true" : "false")
 
-
 bool g_mystate = false; /**< the state of the dpa 417.61 */
-volatile int quit = 0; /**< stop variable, used by handle_signal */
+volatile int quit = 0;  /**< stop variable, used by handle_signal */
 bool g_reset = false;   /**< reset the device (from startup) */
 
 /**
@@ -268,8 +267,7 @@ register_resources(void)
   PRINT("Register Resource with local path \"/p/1\"\n");
   PRINT("Light Switching actuator 417 (LSAB) : SwitchOnOff \n");
   PRINT("Data point 417.61 (DPT_Switch) \n");
-  oc_resource_t *res_light =
-    oc_new_resource("light actuation", "p/1", 2, 0);
+  oc_resource_t *res_light = oc_new_resource("light actuation", "p/1", 2, 0);
   oc_resource_bind_resource_type(res_light, "urn:knx:dpa.417.61");
   oc_resource_bind_resource_type(res_light, "DPT_Switch");
   oc_resource_bind_content_type(res_light, APPLICATION_CBOR);
@@ -371,7 +369,7 @@ void
 swu_cb(size_t device_index, size_t offset, uint8_t *payload, size_t len,
        void *data)
 {
-  (void) device_index;
+  (void)device_index;
   char *fname = (char *)data;
   PRINT(" swu_cb %s block=%d size=%d \n", fname, (int)offset, (int)len);
 
@@ -520,7 +518,6 @@ main(int argc, char *argv[])
                                         .requests_entry = 0
 #endif
   };
-
 
   /* set the application callbacks */
   oc_set_hostname_cb(hostname_cb, NULL);

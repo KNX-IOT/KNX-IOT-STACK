@@ -114,7 +114,7 @@ bool g_reset = false;   /**< reset the device (from startup) */
 /**
  * @brief s-mode response callback
  * will be called when a response is received on an s-mode read request
- * 
+ *
  * @param url the url
  * @param rep the full response
  * @param rep_value the parsed value of the response
@@ -279,7 +279,6 @@ factory_presets_cb(size_t device_index, void *data)
   }
 }
 
-
 /**
  * @brief application reset
  *
@@ -328,7 +327,7 @@ hostname_cb(size_t device_index, oc_string_t host_name, void *data)
 
 /**
  * @brief software update callback
- * 
+ *
  * @param device_index the device index
  * @param offset the offset of the image
  * @param payload the image data
@@ -336,7 +335,8 @@ hostname_cb(size_t device_index, oc_string_t host_name, void *data)
  * @param data the user data
  */
 void
-swu_cb(size_t device_index, size_t offset, uint8_t *payload, size_t len, void *data)
+swu_cb(size_t device_index, size_t offset, uint8_t *payload, size_t len,
+       void *data)
 {
   (void)device_index;
   char *fname = (char *)data;
@@ -363,7 +363,7 @@ initialize_variables(void)
 }
 
 /**
- *  @brief send a multicast s-mode message 
+ *  @brief send a multicast s-mode message
  */
 static void
 issue_requests_s_mode(void)
@@ -414,7 +414,7 @@ handle_signal(int signal)
 
 /**
  * @brief print usage and quits
- * 
+ *
  */
 void
 print_usage()
@@ -523,7 +523,6 @@ main(int argc, char *argv[])
     PRINT("oc_main_init failed %d, exiting.\n", init);
     return init;
   }
-
 
 #ifdef OC_OSCORE
   PRINT("OSCORE - Enabled\n");

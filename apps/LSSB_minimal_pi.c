@@ -99,8 +99,8 @@ STATIC CRITICAL_SECTION cs;   /**< event loop variable */
 #define btoa(x) ((x) ? "true" : "false")
 
 bool g_mystate = false; /**<  the state of the dpa 421.61 */
-volatile int quit = 0; /**< stop variable, used by handle_signal */
-bool g_reset = false;  /**< reset the device (from startup) */
+volatile int quit = 0;  /**< stop variable, used by handle_signal */
+bool g_reset = false;   /**< reset the device (from startup) */
 
 /**
  * function to set up the device.
@@ -143,7 +143,6 @@ app_init(void)
 
   return ret;
 }
-
 
 /**
  * get method for "p/1" resource.
@@ -192,7 +191,6 @@ get_dpa_421_61(oc_request_t *request, oc_interface_mask_t interfaces,
   }
   PRINT("-- End get_dpa_421_61\n");
 }
-
 
 oc_group_object_notification_t g_send_notification;
 bool g_bool_value = false;
@@ -353,8 +351,7 @@ register_resources(void)
   PRINT("Data point 61 (DPT_Switch) \n");
   PRINT("Register Resource with local path \"/p/1\"\n");
 
-  oc_resource_t *res_pushbutton =
-    oc_new_resource("push button", "p/1", 2, 0);
+  oc_resource_t *res_pushbutton = oc_new_resource("push button", "p/1", 2, 0);
   oc_resource_bind_resource_type(res_pushbutton, "urn:knx:dpa.421.61");
   oc_resource_bind_resource_type(res_pushbutton, "DPT_Switch");
   oc_resource_bind_content_type(res_pushbutton, APPLICATION_CBOR);
@@ -373,7 +370,6 @@ register_resources(void)
   oc_add_resource(res_pushbutton);
 }
 
-
 /**
  * @brief initiate preset for device
  * current implementation: device reset as command line argument
@@ -386,7 +382,7 @@ factory_presets_cb(size_t device, void *data)
   (void)device;
   (void)data;
 
-  //if (g_reset) {
+  // if (g_reset) {
   //  PRINT("factory_presets_cb: resetting device\n");
   //  oc_knx_device_storage_reset(0, 2);
   //}
