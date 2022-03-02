@@ -24,7 +24,6 @@
 extern "C" {
 #endif
 
-
 /**
  * @brief The factory presets info
  *
@@ -37,7 +36,7 @@ typedef struct oc_factory_presets_t
 
 /**
  * @brief retrieve the factory reset info, e.g. the callback and callback data
- * 
+ *
  * @return oc_factory_presets_t* the preset data
  */
 oc_factory_presets_t *oc_get_factory_presets_cb(void);
@@ -48,13 +47,13 @@ oc_factory_presets_t *oc_get_factory_presets_cb(void);
  */
 typedef struct oc_reset_t
 {
-  oc_reset_cb_t cb;/**< the callback */
-  void *data;/**< the callback user data */
+  oc_reset_cb_t cb; /**< the callback */
+  void *data;       /**< the callback user data */
 } oc_reset_t;
 
 /**
  * @brief retrieve the reset info, e.g. the callback and callback data
- * 
+ *
  * @return oc_reset_t* the reset data
  */
 oc_reset_t *oc_get_reset_cb(void);
@@ -65,13 +64,13 @@ oc_reset_t *oc_get_reset_cb(void);
  */
 typedef struct oc_restart_t
 {
-  oc_restart_cb_t cb;/**< the callback */
-  void *data;/**< the callback user data */
+  oc_restart_cb_t cb; /**< the callback */
+  void *data;         /**< the callback user data */
 } oc_restart_t;
 
 /**
  * @brief retrieve the restart info, e.g. the callback and callback data
- * 
+ *
  * @return oc_restart_t* the restart data
  */
 oc_restart_t *oc_get_restart_cb(void);
@@ -82,22 +81,22 @@ oc_restart_t *oc_get_restart_cb(void);
  */
 typedef struct oc_hostname_t
 {
-  oc_hostname_cb_t cb;/**< the callback */
-  void *data; /**< the callback user data */
+  oc_hostname_cb_t cb; /**< the callback */
+  void *data;          /**< the callback user data */
 } oc_hostname_t;
 
 /**
  * @brief retrieve the hostname info, e.g. the callback and callback data
- * 
+ *
  * @return oc_hostname_t* the hostname info
  */
 oc_hostname_t *oc_get_hostname_cb(void);
 
 /**
  * @brief is main initialized
- * 
- * @return true 
- * @return false 
+ *
+ * @return true
+ * @return false
  */
 bool oc_main_initialized(void);
 
