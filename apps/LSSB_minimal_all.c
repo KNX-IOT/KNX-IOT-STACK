@@ -70,6 +70,8 @@
 #include "oc_core_res.h"
 #include "port/oc_clock.h"
 #include <signal.h>
+// test purpose only
+#include "api/oc_knx_dev.h"
 
 #ifdef INCLUDE_EXTERNAL
 /* import external definitions from header file*/

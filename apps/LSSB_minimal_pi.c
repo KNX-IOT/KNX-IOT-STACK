@@ -386,10 +386,10 @@ factory_presets_cb(size_t device, void *data)
   (void)device;
   (void)data;
 
-  if (g_reset) {
-    PRINT("factory_presets_cb: resetting device\n");
-    oc_knx_device_storage_reset(0, 2);
-  }
+  //if (g_reset) {
+  //  PRINT("factory_presets_cb: resetting device\n");
+  //  oc_knx_device_storage_reset(0, 2);
+  //}
 }
 
 /**
