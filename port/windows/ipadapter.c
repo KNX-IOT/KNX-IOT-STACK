@@ -1762,25 +1762,26 @@ oc_connectivity_subscribe_mcast_ipv6(size_t device, const uint8_t *address)
 
   // for every interface...
   int ret = 0;
-  struct ifaddrs *ifs = NULL, *interface = NULL;
+  struct ifaddr_t *ifs = NULL, *interface = NULL;
   if (getifaddrs(&ifs) < 0) {
     return;
   }
-  for (interface = ifs; interface != NULL; interface = interface->ifa_next) {
-    /* Ignore interfaces that are down and the loopback interface */
+  for (interface = ifs; interface != NULL; interface = interface->next) {
+    /*
     if (!(interface->ifa_flags & IFF_UP) ||
         (interface->ifa_flags & IFF_LOOPBACK)) {
       continue;
     }
-    /* Ignore interfaces not belonging to the address family under consideration
-     */
+
     if (interface->ifa_addr && interface->ifa_addr->sa_family != AF_INET6) {
       continue;
     }
+    */
     /* Obtain interface index for this address */
-    int if_index = if_nametoindex(interface->ifa_name);
+    int if_index = interface->if_index;
     /* Accordingly handle IPv6/IPv4 addresses */
-    struct sockaddr_in6 *a = (struct sockaddr_in6 *)interface->ifa_addr;
+    // This is probably a very bad cast - double check
+    ifaddr_t *a = &interface->addr;
     if (a) {
       // Subscribe to multicast group
       // ret += add_mcast_sock_to_ipv6_mcast_group(dev->mcast_sock, if_index);
