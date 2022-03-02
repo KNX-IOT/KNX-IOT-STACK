@@ -179,7 +179,6 @@ oc_create_fp_gm_x_resource(int resource_idx, size_t device)
                             oc_core_fp_gm_x_del_handler, 0, 1, "urn:knx:if.c");
 }
 
-
 #endif /* OC_GM_TABLE */
 
 // -----------------------------------------------------------------------------
@@ -189,7 +188,7 @@ oc_create_knx_gm_resources(size_t device_index)
 {
   (void)device_index;
 #ifdef OC_GM_TABLE
-    OC_DBG("oc_create_knx_gm_resources");
+  OC_DBG("oc_create_knx_gm_resources");
 
   oc_create_fp_gm_resource(OC_KNX_FP_GM, device_index);
   oc_create_fp_gm_x_resource(OC_KNX_FP_GM_X, device_index);
@@ -197,12 +196,11 @@ oc_create_knx_gm_resources(size_t device_index)
 #endif /* OC_GM_TABLE */
 }
 
-
 // -----------------------------------------------------------------------------
 
 static oc_gateway_t app_gateway = { NULL, NULL };
 
-int 
+int
 oc_set_gateway_cb(oc_gateway_s_mode_cb_t cb, void *data)
 {
   app_gateway.cb = cb;
