@@ -295,7 +295,7 @@ register_resources(void)
 
 /**
  * @brief initiate preset for device
- * current implementation: device reset as commandline argument
+ * current implementation: device reset as command line argument
  * @param device the device identifier of the list of devices
  * @param data the supplied data.
  */
@@ -318,8 +318,9 @@ factory_presets_cb(size_t device, void *data)
  * @param data the supplied data.
  */
 void
-reset_cb(size_t device, int reset_value, void *data)
+reset_cb(size_t device_index, int reset_value, void *data)
 {
+  (void)device_index;
   (void)data;
 
   PRINT("reset_cb %d\n", reset_value);
@@ -328,12 +329,13 @@ reset_cb(size_t device, int reset_value, void *data)
 /**
  * @brief restart the device (application depended)
  *
- * @param device the device identifier of the list of devices
+ * @param device_index the device identifier of the list of devices
  * @param data the supplied data.
  */
 void
-restart_cb(size_t device, void *data)
+restart_cb(size_t device_index, void *data)
 {
+  (void)device_index;
   (void)data;
 
   PRINT("-----restart_cb -------\n");
@@ -343,13 +345,14 @@ restart_cb(size_t device, void *data)
 /**
  * @brief set the host name on the device (application depended)
  *
- * @param device the device identifier of the list of devices
+ * @param device_index the device identifier of the list of devices
  * @param host_name the host name to be set on the device
  * @param data the supplied data.
  */
 void
-hostname_cb(size_t device, oc_string_t host_name, void *data)
+hostname_cb(size_t device_index, oc_string_t host_name, void *data)
 {
+  (void)device_index;
   (void)data;
 
   PRINT("-----host name ------- %s\n", oc_string(host_name));
@@ -368,6 +371,7 @@ void
 swu_cb(size_t device_index, size_t offset, uint8_t *payload, size_t len,
        void *data)
 {
+  (void) device_index;
   char *fname = (char *)data;
   PRINT(" swu_cb %s block=%d size=%d \n", fname, (int)offset, (int)len);
 

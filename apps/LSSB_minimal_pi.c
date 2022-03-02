@@ -376,7 +376,7 @@ register_resources(void)
 
 /**
  * @brief initiate preset for device
- * current implementation: device reset as commandline argument
+ * current implementation: device reset as command line argument
  * @param device the device identifier of the list of devices
  * @param data the supplied data.
  */

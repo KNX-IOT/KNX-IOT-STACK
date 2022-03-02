@@ -382,9 +382,9 @@ register_resources(void)
  * @param data the supplied data.
  */
 void
-factory_presets_cb(size_t device, void *data)
+factory_presets_cb(size_t device_index, void *data)
 {
-  (void)device;
+  (void)device_index;
   (void)data;
 }
 
@@ -439,9 +439,9 @@ handle_signal(int signal)
 
 /**
  * main application.
- *       * initializes the global variables
+ * initializes the global variables
  * registers and starts the handler
- *       * handles (in a loop) the next event.
+ * handles (in a loop) the next event.
  * shuts down the stack
  */
 int
