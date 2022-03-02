@@ -347,7 +347,7 @@ swu_cb(size_t device_index, size_t offset, uint8_t *payload, size_t len, void *d
 }
 
 /**
- * @brief  initializes the global variables
+ * @brief initializes the global variables
  * registers and starts the handler
  */
 void
