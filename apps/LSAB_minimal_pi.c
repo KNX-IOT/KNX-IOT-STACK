@@ -527,9 +527,6 @@ main(void)
     PRINTipaddr(*my_ep);
     PRINT("\n");
   }
-  oc_device_info_t *device = oc_core_get_device_info(0);
-  PRINT("serial number: %s", oc_string(device->serialnumber));
-
   PRINT("Server \"%s\" running, waiting on incoming "
         "connections.\n",
         MY_NAME);
