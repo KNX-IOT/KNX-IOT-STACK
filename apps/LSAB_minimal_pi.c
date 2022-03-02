@@ -234,7 +234,7 @@ app_init(void)
 bool g_mystate = false;
 
 /**
- * get method for "p/light" resource.
+ * get method for "p/1" resource.
  * function is called to initialize the return values of the GET method.
  * initialization of the returned values are done from the global property
  * values. Resource Description: This Resource describes a binary switch
@@ -282,7 +282,7 @@ get_dpa_417_61(oc_request_t *request, oc_interface_mask_t interfaces,
 }
 
 /**
- * post method for "p/light" resource.
+ * post method for "p/1" resource.
  * The function has as input the request body, which are the input values of the
  * POST method.
  * The input values (as a set) are checked if all supplied values are correct.
@@ -347,15 +347,11 @@ post_dpa_417_61(oc_request_t *request, oc_interface_mask_t interfaces,
 void
 register_resources(void)
 {
-  PRINT("Register Resource with local path \"/p/light\"\n");
-
+  PRINT("Register Resource with local path \"/p/1\"\n");
   PRINT("Light Switching actuator 417 (LSAB) : SwitchOnOff \n");
   PRINT("Data point 417.61 (DPT_Switch) \n");
-
-  PRINT("Register Resource with local path \"/p/light\"\n");
-
   oc_resource_t *res_light =
-    oc_new_resource("light actuation", "p/light", 2, 0);
+    oc_new_resource("light actuation", "p/1", 2, 0);
   oc_resource_bind_resource_type(res_light, "urn:knx:dpa.417.61");
   oc_resource_bind_resource_type(res_light, "DPT_Switch");
   oc_resource_bind_content_type(res_light, APPLICATION_CBOR);
@@ -441,30 +437,6 @@ handle_signal(int signal)
   quit = 1;
 }
 
-#ifdef OC_SECURITY
-/**
- * oc_ownership_status_cb callback implementation
- * handler to print out the DI after onboarding
- *
- * @param device_uuid the device ID
- * @param device_index the index in the list of device IDs
- * @param owned owned or unowned indication
- * @param user_data the supplied user data.
- */
-void
-oc_ownership_status_cb(const oc_uuid_t *device_uuid, size_t device_index,
-                       bool owned, void *user_data)
-{
-  (void)user_data;
-  (void)device_index;
-  (void)owned;
-
-  char uuid[37] = { 0 };
-  oc_uuid_to_str(device_uuid, uuid, OC_UUID_LEN);
-  PRINT(" oc_ownership_status_cb: DI: '%s'\n", uuid);
-}
-#endif /* OC_SECURITY */
-
 /**
  * main application.
  *       * initializes the global variables
@@ -475,10 +447,8 @@ oc_ownership_status_cb(const oc_uuid_t *device_uuid, size_t device_index,
 int
 main(void)
 {
-
   int init;
   oc_clock_time_t next_event;
-
 #ifdef WIN32
   /* windows specific */
   InitializeCriticalSection(&cs);
@@ -497,7 +467,6 @@ main(void)
 #endif
 
   PRINT("KNX-IOT Server name : \"%s\"\n", MY_NAME);
-
   char buff[FILENAME_MAX];
   char *retbuf = NULL;
   retbuf = GetCurrentDir(buff, FILENAME_MAX);
@@ -544,20 +513,20 @@ main(void)
     return init;
   }
 
-#ifdef OC_SECURITY
-  /* print out the current DI of the device */
-  char uuid[37] = { 0 };
-  oc_uuid_to_str(oc_core_get_device_id(0), uuid, OC_UUID_LEN);
-  PRINT(" DI: '%s'\n", uuid);
-  oc_add_ownership_status_cb(oc_ownership_status_cb, NULL);
-#endif /* OC_SECURITY */
-
-#ifdef OC_SECURITY
-  PRINT("Security - Enabled\n");
+#ifdef OC_OSCORE
+  PRINT("OSCORE - Enabled\n");
 #else
-  PRINT("Security - Disabled\n");
-#endif /* OC_SECURITY */
+  PRINT("OSCORE - Disabled\n");
+#endif /* OC_OSCORE */
 
+  oc_device_info_t *device = oc_core_get_device_info(0);
+  PRINT("serial number: %s", oc_string(device->serialnumber));
+  oc_device_mode_display(0);
+  oc_endpoint_t *my_ep = oc_connectivity_get_endpoints(0);
+  if (my_ep != NULL) {
+    PRINTipaddr(*my_ep);
+    PRINT("\n");
+  }
   oc_device_info_t *device = oc_core_get_device_info(0);
   PRINT("serial number: %s", oc_string(device->serialnumber));
 
