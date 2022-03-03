@@ -1763,9 +1763,8 @@ oc_connectivity_subscribe_mcast_ipv6(size_t device, const uint8_t *address)
   // for every interface...
   int ret = 0;
   struct ifaddr_t *ifs = NULL, *interface = NULL;
-  if (getifaddrs(&ifs) < 0) {
-    return;
-  }
+  ifs = get_network_addresses();
+   
   for (interface = ifs; interface != NULL; interface = interface->next) {
     /*
     if (!(interface->ifa_flags & IFF_UP) ||
@@ -1781,7 +1780,7 @@ oc_connectivity_subscribe_mcast_ipv6(size_t device, const uint8_t *address)
     int if_index = interface->if_index;
     /* Accordingly handle IPv6/IPv4 addresses */
     // This is probably a very bad cast - double check
-    ifaddr_t *a = &interface->addr;
+    struct sockaddr_storage *a = &interface->addr;
     if (a) {
       // Subscribe to multicast group
       // ret += add_mcast_sock_to_ipv6_mcast_group(dev->mcast_sock, if_index);
@@ -1793,9 +1792,9 @@ oc_connectivity_subscribe_mcast_ipv6(size_t device, const uint8_t *address)
       mreq.ipv6mr_interface = if_index;
 
       (void)setsockopt(dev->mcast_sock, IPPROTO_IPV6, IPV6_DROP_MEMBERSHIP,
-                       &mreq, sizeof(mreq));
+                       (char *)&mreq, sizeof(mreq));
 
-      if (setsockopt(dev->mcast_sock, IPPROTO_IPV6, IPV6_ADD_MEMBERSHIP, &mreq,
+      if (setsockopt(dev->mcast_sock, IPPROTO_IPV6, IPV6_ADD_MEMBERSHIP, (char *) &mreq,
                      sizeof(mreq)) == -1) {
         OC_ERR("Failed to add IPv6 multicast membership!");
         return;
@@ -1803,6 +1802,5 @@ oc_connectivity_subscribe_mcast_ipv6(size_t device, const uint8_t *address)
     }
   }
 
-  freeifaddrs(ifs);
   return;
 }
