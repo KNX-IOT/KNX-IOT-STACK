@@ -1764,7 +1764,7 @@ oc_connectivity_subscribe_mcast_ipv6(size_t device, const uint8_t *address)
   int ret = 0;
   struct ifaddr_t *ifs = NULL, *interface = NULL;
   ifs = get_network_addresses();
-   
+
   for (interface = ifs; interface != NULL; interface = interface->next) {
     /*
     if (!(interface->ifa_flags & IFF_UP) ||
@@ -1794,8 +1794,8 @@ oc_connectivity_subscribe_mcast_ipv6(size_t device, const uint8_t *address)
       (void)setsockopt(dev->mcast_sock, IPPROTO_IPV6, IPV6_DROP_MEMBERSHIP,
                        (char *)&mreq, sizeof(mreq));
 
-      if (setsockopt(dev->mcast_sock, IPPROTO_IPV6, IPV6_ADD_MEMBERSHIP, (char *) &mreq,
-                     sizeof(mreq)) == -1) {
+      if (setsockopt(dev->mcast_sock, IPPROTO_IPV6, IPV6_ADD_MEMBERSHIP,
+                     (char *)&mreq, sizeof(mreq)) == -1) {
         OC_ERR("Failed to add IPv6 multicast membership!");
         return;
       }
