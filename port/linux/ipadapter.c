@@ -1911,7 +1911,6 @@ oc_connectivity_subscribe_mcast_ipv6(size_t device, const uint8_t *address)
     struct sockaddr_in6 *a = (struct sockaddr_in6 *)interface->ifa_addr;
     if (a) {
       // Subscribe to multicast group
-      // ret += add_mcast_sock_to_ipv6_mcast_group(dev->mcast_sock, if_index);
       struct ipv6_mreq mreq;
 
       /* Link-local scope */
