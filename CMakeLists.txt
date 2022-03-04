@@ -16,6 +16,7 @@ set(OC_OSCORE_ENABLED ON CACHE BOOL "Enable oscore")
 set(OC_PKI_ENABLED OFF CACHE BOOL "Enable PKI security")
 set(OC_DEBUG_ENABLED OFF CACHE BOOL "Enable debug messages")
 set(OC_BUILTIN_MBEDTLS ON CACHE BOOL "Use builtin mbedTLS, as opposed to external lib from different project")
+set(OC_BUILTIN_TINYCBOR ON CACHE BOOL "Use builtin TinyCBOR, as opposed to external lib from different project")
 set(CLANG_TIDY_ENABLED OFF CACHE BOOL "Enable clang-tidy analysis during compilation.")
 
 include(tools/clang-tidy.cmake)
@@ -152,7 +153,6 @@ endif()
 set(KNX_INCLUDE_DIRS 
     ${PROJECT_SOURCE_DIR}/
     ${PROJECT_SOURCE_DIR}/include
-    ${PROJECT_SOURCE_DIR}/deps/tinycbor/src
     ${PROJECT_SOURCE_DIR}/security
     ${API_INCLUDE_DIRS}
     ${COAP_INCLUDE_DIRS}
