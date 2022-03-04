@@ -3,6 +3,7 @@
 
 #include "mbedtls/bignum.h"
 #include "mbedtls/ecp.h"
+#include "oc_helpers.h"
 
 enum { kPubKeySize = 65 };
 

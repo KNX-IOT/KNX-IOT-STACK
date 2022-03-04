@@ -7,7 +7,6 @@
 #include <assert.h>
 
 #include "oc_spake2plus.h"
-#include "oc_helpers.h"
 
 static mbedtls_entropy_context entropy_ctx;
 static mbedtls_ctr_drbg_context ctr_drbg_ctx;
