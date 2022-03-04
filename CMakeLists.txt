@@ -15,31 +15,34 @@ option(ENABLE_TESTING "Build mbed TLS tests." OFF)
 set(OC_OSCORE_ENABLED ON CACHE BOOL "Enable oscore")
 set(OC_PKI_ENABLED OFF CACHE BOOL "Enable PKI security")
 set(OC_DEBUG_ENABLED OFF CACHE BOOL "Enable debug messages")
+set(OC_BUILTIN_MBEDTLS ON CACHE BOOL "Use builtin mbedTLS, as opposed to external lib from different project")
 set(CLANG_TIDY_ENABLED OFF CACHE BOOL "Enable clang-tidy analysis during compilation.")
 
 include(tools/clang-tidy.cmake)
 
-# If an mbedtls platform layer is defined, add it to the mbedtls list of libs
-if(TARGET mbedtls-plat)
-    set(libs ${libs} mbedtls-plat)
-endif()
+if(OC_BUILTIN_MBEDTLS)
+    # If an mbedtls platform layer is defined, add it to the mbedtls list of libs
+    if(TARGET mbedtls-plat)
+        set(libs ${libs} mbedtls-plat)
+    endif()
 
-add_subdirectory(${PROJECT_SOURCE_DIR}/deps/mbedtls)
+    add_subdirectory(${PROJECT_SOURCE_DIR}/deps/mbedtls)
 
-target_include_directories(mbedcrypto PUBLIC
-    ${PROJECT_SOURCE_DIR}
-    ${PROJECT_SOURCE_DIR}/include
-    ${PROJECT_SOURCE_DIR}/deps/mbedtls/include
-    ${PROJECT_SOURCE_DIR}/security
-)
+    target_include_directories(mbedcrypto PUBLIC
+        ${PROJECT_SOURCE_DIR}
+        ${PROJECT_SOURCE_DIR}/include
+        ${PROJECT_SOURCE_DIR}/deps/mbedtls/include
+        ${PROJECT_SOURCE_DIR}/security
+    )
 
-target_compile_definitions(mbedcrypto
-    PUBLIC
-    MBEDTLS_CONFIG_FILE=\"knx_mbedtls_config.h\"
-)
+    target_compile_definitions(mbedcrypto
+        PUBLIC
+        MBEDTLS_CONFIG_FILE=\"knx_mbedtls_config.h\"
+    )
 
-if(TARGET mbedcrypto-plat)
-	target_link_libraries(mbedcrypto mbedcrypto-plat)
+    if(TARGET mbedcrypto-plat)
+        target_link_libraries(mbedcrypto mbedcrypto-plat)
+    endif()
 endif()
 
 
@@ -127,18 +130,21 @@ set(COAP_INCLUDE_DIRS
 add_library(kis-common INTERFACE)
 
 if(OC_OSCORE_ENABLED)
-   target_compile_definitions(mbedcrypto PUBLIC OC_OSCORE)
+   # TODO - IS THIS OKAY TO COMPILE OUT NOW THAT THE PATCHES ARE GONE?
+   # target_compile_definitions(mbedcrypto PUBLIC OC_OSCORE)
    target_compile_definitions(kis-common INTERFACE OC_OSCORE)
    target_compile_definitions(kis-common INTERFACE OC_SPAKE)
 endif()
 
 if(OC_PKI_ENABLED)
-    target_compile_definitions(mbedcrypto PUBLIC OC_PKI)
+    # TODO - IS THIS OKAY TO COMPILE OUT NOW THAT THE PATCHES ARE GONE?
+    #target_compile_definitions(mbedcrypto PUBLIC OC_PKI)
 endif()
 
 if(OC_DEBUG_ENABLED)
     target_compile_definitions(kis-common INTERFACE OC_DEBUG)
-    target_compile_definitions(mbedcrypto PUBLIC OC_DEBUG)
+    # TODO - IS THIS OKAY TO COMPILE OUT NOW THAT THE PATCHES ARE GONE?
+    #target_compile_definitions(mbedcrypto PUBLIC OC_DEBUG)
 endif()
 
 
@@ -167,31 +173,33 @@ target_link_libraries(kisClientServer PUBLIC
 )
 target_include_directories(kisClientServer PUBLIC ${KNX_INCLUDE_DIRS})
 
-include (GenerateExportHeader)
+if(WIN32 OR UNIX)
+    include (GenerateExportHeader)
 
-add_library(kisCS SHARED 
-    ${PROJECT_SOURCE_DIR}/pythonbinding/oc_python.c
-    ${API_SOURCES}
-    ${COAP_SOURCES}
-    ${CORE_SOURCES}
-)
-GENERATE_EXPORT_HEADER( kisCS
-             BASE_NAME kisCS
-             EXPORT_MACRO_NAME kisCS_EXPORT
-             EXPORT_FILE_NAME kisCS_Export.h
-             STATIC_DEFINE kisCS_BUILT_AS_STATIC
-)
+    add_library(kisCS SHARED 
+        ${PROJECT_SOURCE_DIR}/pythonbinding/oc_python.c
+        ${API_SOURCES}
+        ${COAP_SOURCES}
+        ${CORE_SOURCES}
+    )
+    GENERATE_EXPORT_HEADER( kisCS
+                BASE_NAME kisCS
+                EXPORT_MACRO_NAME kisCS_EXPORT
+                EXPORT_FILE_NAME kisCS_Export.h
+                STATIC_DEFINE kisCS_BUILT_AS_STATIC
+    )
 
-target_compile_definitions(kisCS PUBLIC OC_SERVER OC_CLIENT)
-target_link_libraries(kisCS PUBLIC
-    kis-common
-    mbedtls
-    tinycbor-master
-    kis-port
-)
-target_link_libraries(kisCS PUBLIC kis-common)
+    target_compile_definitions(kisCS PUBLIC OC_SERVER OC_CLIENT)
+    target_link_libraries(kisCS PUBLIC
+        kis-common
+        mbedtls
+        tinycbor-master
+        kis-port
+    )
+    target_link_libraries(kisCS PUBLIC kis-common)
 
-target_include_directories(kisCS PRIVATE ${PROJECT_BINARY_DIR} ${KNX_INCLUDE_DIRS})
+    target_include_directories(kisCS PRIVATE ${PROJECT_BINARY_DIR} ${KNX_INCLUDE_DIRS})
+endif()
 
 # do not treat warnings as errors on Windows
 if(MSVC)
