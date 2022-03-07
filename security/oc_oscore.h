@@ -18,7 +18,7 @@
 #define OC_OSCORE_H
 
 #include "port/oc_connectivity.h"
-#include "security/oc_cred_internal.h"
+//#include "security/oc_cred_internal.h"
 #include "util/oc_list.h"
 #include "util/oc_process.h"
 

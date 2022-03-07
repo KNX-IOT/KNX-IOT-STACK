@@ -98,9 +98,9 @@ set(CORE_SOURCES
     ${PROJECT_SOURCE_DIR}/util/oc_process.c
     ${PROJECT_SOURCE_DIR}/util/oc_timer.c
     # Security
-    ${PROJECT_SOURCE_DIR}/security/oc_certs.c
-    ${PROJECT_SOURCE_DIR}/security/oc_cred.c
-    ${PROJECT_SOURCE_DIR}/security/oc_keypair.c
+    #${PROJECT_SOURCE_DIR}/security/oc_certs.c
+    #${PROJECT_SOURCE_DIR}/security/oc_cred.c
+    #${PROJECT_SOURCE_DIR}/security/oc_keypair.c
     ${PROJECT_SOURCE_DIR}/security/oc_oscore_context.c
     ${PROJECT_SOURCE_DIR}/security/oc_oscore_crypto.c
     ${PROJECT_SOURCE_DIR}/security/oc_oscore_engine.c
