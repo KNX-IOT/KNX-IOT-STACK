@@ -230,7 +230,6 @@ oc_tls_free_invalid_peer(oc_tls_peer_t *peer)
 
   oc_list_remove(tls_peers, peer);
 
-
   oc_ri_remove_timed_event_callback(peer, oc_tls_inactive);
 
   mbedtls_ssl_free(&peer->ssl_ctx);
@@ -518,7 +517,6 @@ oc_tls_pbkdf2(const unsigned char *pin, size_t pin_len, oc_uuid_t *uuid,
 
   return ret;
 }
-
 
 static int
 ssl_get_timer(void *ctx)
@@ -1178,7 +1176,7 @@ oc_tls_populate_ssl_config(mbedtls_ssl_config *conf, size_t device, int role,
   // if ((ps->s > OC_DOS_RFOTM) || (role != MBEDTLS_SSL_IS_SERVER)) {
   //  mbedtls_ssl_conf_authmode(conf, MBEDTLS_SSL_VERIFY_REQUIRED);
   // }
-  //mbedtls_ssl_conf_psk_cb(conf, get_psk_cb, NULL);
+  // mbedtls_ssl_conf_psk_cb(conf, get_psk_cb, NULL);
   if (transport_type == MBEDTLS_SSL_TRANSPORT_DATAGRAM) {
     mbedtls_ssl_conf_dtls_cookies(conf, mbedtls_ssl_cookie_write,
                                   mbedtls_ssl_cookie_check, &cookie_ctx);
