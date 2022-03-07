@@ -22,6 +22,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 
 #define STORE_PATH_SIZE 64
 
@@ -80,8 +81,10 @@ oc_storage_write(const char *store, uint8_t *buf, size_t size)
   if (!fp)
     return -EINVAL;
 
-  size = fwrite(buf, 1, size, fp);
+  size_t wsize = fwrite(buf, 1, size, fp);
+  fflush(fp);
+  fsync(fileno(fp));
   fclose(fp);
-  return size;
+  return (long)wsize;
 }
 #endif /* OC_STORAGE */

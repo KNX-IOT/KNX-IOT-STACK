@@ -15,12 +15,13 @@
  */
 
 #include "oc_api.h"
-#include "oc_knx.h"
-#include "oc_knx_fp.h"
-#include "oc_knx_dev.h"
-#include "oc_knx_client.h"
-#include "oc_knx_sec.h"
 #include "oc_core_res.h"
+#include "oc_knx.h"
+#include "oc_knx_client.h"
+#include "oc_knx_dev.h"
+#include "oc_knx_fp.h"
+#include "oc_knx_gm.h"
+#include "oc_knx_sec.h"
 #include "oc_main.h"
 #include <stdio.h>
 #include "oc_rep.h" // should not be needed
@@ -620,6 +621,13 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
       break;
     }
     rep = rep->next;
+  }
+
+  // gateway functionality: call back for all s-mode calls
+  oc_gateway_t *my_gw = oc_get_gateway_cb();
+  if (my_gw != NULL && my_gw->cb) {
+    // call the gateway function
+    my_gw->cb(device_index, &g_received_notification, my_gw->data);
   }
 
   bool do_write = false;
