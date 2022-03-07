@@ -138,6 +138,19 @@ oc_add_s_mode_response_cb(char *url, oc_rep_t *rep, oc_rep_t *rep_value)
   PRINT("oc_add_s_mode_response_cb %s\n", url);
 }
 
+void
+oc_gateway_s_mode_cb(size_t device_index,
+                     oc_group_object_notification_t *s_mode_message, void *data)
+{
+  (void)data;
+
+  PRINT("oc_gateway_s_mode_cb %d\n", device_index);
+  PRINT("   ga  = %d\n", s_mode_message->ga);
+  PRINT("   sia = %d\n", s_mode_message->sia);
+  PRINT("   st  = %s\n", oc_string(s_mode_message->st));
+  PRINT("   val = %s\n", oc_string(s_mode_message->value));
+}
+
 /**
  * function to set up the device.
  *
@@ -184,6 +197,9 @@ app_init(void)
 
   /* set the client callback, for testing purposes only */
   oc_set_s_mode_response_cb(oc_add_s_mode_response_cb);
+
+  /* set the gateway call back for receiving all s-mode messages */
+  oc_set_gateway_cb(oc_gateway_s_mode_cb, NULL);
 
   return ret;
 }
@@ -838,7 +854,7 @@ main(int argc, char *argv[])
 {
   int init;
 
-  bool do_send_s_mode = false;
+  bool do_send_s_mode = true;
 
   oc_clock_time_t next_event;
 
@@ -920,7 +936,7 @@ main(int argc, char *argv[])
   };
 #ifdef OC_CLIENT
   if (do_send_s_mode) {
-    //  handler.requests_entry = issue_requests_s_mode;
+    handler.requests_entry = issue_requests_s_mode;
   }
 #endif
 
