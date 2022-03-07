@@ -47,7 +47,7 @@
 #include "oc_client_state.h"
 #include "oc_config.h"
 #include "oc_core_res.h"
-#include "oc_cred_internal.h"
+//#include "oc_cred_internal.h"
 #include "oc_endpoint.h"
 #include "oc_tls.h"
 
@@ -220,15 +220,6 @@ is_peer_active(oc_tls_peer_t *peer)
   return false;
 }
 
-// static oc_event_callback_retval_t
-// reset_in_RFOTM(void *data)
-//{
-//  (void)data;
-// size_t device = (size_t)data;
-// oc_pstat_reset_device(device, true);
-//  return OC_EVENT_DONE;
-//}
-
 static oc_event_callback_retval_t oc_tls_inactive(void *data);
 
 #ifdef OC_CLIENT
@@ -239,11 +230,6 @@ oc_tls_free_invalid_peer(oc_tls_peer_t *peer)
 
   oc_list_remove(tls_peers, peer);
 
-  // size_t device = peer->endpoint.device;
-  // oc_sec_pstat_t *pstat = oc_sec_get_pstat(device);
-  // if (pstat->s == OC_DOS_RFOTM) {
-  //  oc_set_delayed_callback((void *)device, &reset_in_RFOTM, 0);
-  //}
 
   oc_ri_remove_timed_event_callback(peer, oc_tls_inactive);
 
@@ -277,12 +263,6 @@ oc_tls_free_peer(oc_tls_peer_t *peer, bool inactivity_cb)
 {
   OC_DBG("\noc_tls: removing peer");
   oc_list_remove(tls_peers, peer);
-
-  // size_t device = peer->endpoint.device;
-  // oc_sec_pstat_t *pstat = oc_sec_get_pstat(device);
-  // if (pstat->s == OC_DOS_RFOTM) {
-  //  oc_set_delayed_callback((void *)device, &reset_in_RFOTM, 0);
-  //}
 
 #ifdef OC_SERVER
   /* remove all observations by this peer */
@@ -356,16 +336,6 @@ oc_tls_remove_peer(oc_endpoint_t *endpoint)
   if (peer) {
     oc_tls_free_peer(peer, false);
   }
-}
-
-bool
-oc_tls_is_pin_otm_supported(size_t device)
-{
-  (void)device;
-  // if (random_pin.cb) {
-  //  return true;
-  //}
-  return false;
 }
 
 #ifdef OC_PKI
@@ -549,95 +519,6 @@ oc_tls_pbkdf2(const unsigned char *pin, size_t pin_len, oc_uuid_t *uuid,
   return ret;
 }
 
-/*
-static void
-oc_tls_audit_log(const char *aeid, const char *message, uint8_t category,
-                 uint8_t priority, oc_tls_peer_t *peer)
-{
-  char buff[IPADDR_BUFF_SIZE];
-  if (peer) {
-    SNPRINTFipaddr(buff, IPADDR_BUFF_SIZE, peer->endpoint);
-  } else {
-    buff[0] = '\0';
-  }
-  char *aux[] = { buff };
-  oc_audit_log((peer) ? peer->endpoint.device : 0, aeid, message, category,
-               priority, (const char **)aux, 1);
-}
-*/
-
-static int
-get_psk_cb(void *data, mbedtls_ssl_context *ssl, const unsigned char *identity,
-           size_t identity_len)
-{
-  (void)data;
-  (void)identity_len;
-  OC_DBG("oc_tls: In PSK callback");
-  oc_tls_peer_t *peer = oc_list_head(tls_peers);
-  while (peer != NULL) {
-    if (&peer->ssl_ctx == ssl) {
-      break;
-    }
-    peer = peer->next;
-  }
-  if (peer) {
-    OC_DBG("oc_tls: Found peer object");
-    // oc_sec_pstat_t *ps = oc_sec_get_pstat(peer->endpoint.device);
-    /* To an OBT performing the PIN OTM, a device signals its identity
-     * with the oic.sec.doxm.rdp: prefix.
-     */
-    // if (ps->s == OC_DOS_RFNOP && identity_len > 16 &&
-    //    memcmp(identity, "oic.sec.doxm.rdp:", 17) == 0) {
-    //  identity += 17;
-    //  identity_len -= 17;
-    //}
-    oc_sec_cred_t *cred = NULL;
-    // oc_sec_find_cred((oc_uuid_t *)identity, OC_CREDTYPE_PSK,
-    //                 OC_CREDUSAGE_NULL, peer->endpoint.device);
-    if (cred) {
-      OC_DBG("oc_tls: Found peer credential");
-      memcpy(peer->uuid.id, identity, 16);
-      OC_DBG("oc_tls: Setting the key:");
-      OC_LOGbytes(oc_string(cred->privatedata.data), 16);
-      if (mbedtls_ssl_set_hs_psk(
-            ssl, oc_cast(cred->privatedata.data, const uint8_t), 16) != 0) {
-        return -1;
-      }
-      OC_DBG("oc_tls: Set peer credential to SSL handle");
-      return 0;
-    } else {
-      // oc_sec_doxm_t *doxm = oc_sec_get_doxm(peer->endpoint.device);
-      // if (ps->s == OC_DOS_RFOTM && doxm->oxmsel == OC_OXMTYPE_RDP) {
-      //  if (identity_len != 16 ||
-      //      memcmp(identity, "oic.sec.doxm.rdp", 16) != 0) {
-      //    OC_ERR("oc_tls: OBT identity incorrectly set for PIN OTM");
-      //    return -1;
-      //  }
-      //   OC_DBG("oc_tls: deriving PPSK for PIN OTM");
-      //    memcpy(peer->uuid.id, identity, 16);
-
-      //    uint8_t key[16];
-
-      //    if (oc_tls_pbkdf2(PIN, PIN_LEN, &doxm->deviceuuid, 1000, key, 16) !=
-      //        0) {
-      //       OC_ERR("oc_tls: error deriving PPSK");
-      //       return -1;
-      //     }
-
-      //    if (mbedtls_ssl_set_hs_psk(ssl, key, 16) != 0) {
-      //      OC_ERR("oc_tls: error applying PPSK to current handshake");
-      //      return -1;
-      //    }
-      //    return 0;
-      //  }
-    }
-  }
-  OC_ERR("oc_tls: could not find peer credential");
-  // oc_tls_audit_log("AUTH-1",
-  //                 "DLTS handshake error, could not find peer credential",
-  //                 0x08, 1, peer);
-  return -1;
-}
 
 static int
 ssl_get_timer(void *ctx)
@@ -670,7 +551,7 @@ oc_tls_refresh_certs(oc_sec_credusage_t credusage,
     oc_sec_creds_t *creds = oc_sec_get_creds(device);
     oc_sec_cred_t *cred = (oc_sec_cred_t *)oc_list_head(creds->creds);
     for (; cred != NULL; cred = cred->next) {
-      /* Pick all "leaf" certficiates with matching credusage */
+      /* Pick all "leaf" certificiates with matching credusage */
       if ((cred->credusage & credusage) != 0 && !cred->child) {
 
         if (is_known_cert(cred)) {
@@ -1297,7 +1178,7 @@ oc_tls_populate_ssl_config(mbedtls_ssl_config *conf, size_t device, int role,
   // if ((ps->s > OC_DOS_RFOTM) || (role != MBEDTLS_SSL_IS_SERVER)) {
   //  mbedtls_ssl_conf_authmode(conf, MBEDTLS_SSL_VERIFY_REQUIRED);
   // }
-  mbedtls_ssl_conf_psk_cb(conf, get_psk_cb, NULL);
+  //mbedtls_ssl_conf_psk_cb(conf, get_psk_cb, NULL);
   if (transport_type == MBEDTLS_SSL_TRANSPORT_DATAGRAM) {
     mbedtls_ssl_conf_dtls_cookies(conf, mbedtls_ssl_cookie_write,
                                   mbedtls_ssl_cookie_check, &cookie_ctx);

@@ -14,14 +14,15 @@
 // limitations under the License.
 */
 
+// Note this is not removed, since this file is the base part of supporting TLS
+// which will be enabled in a future version
+
 #ifndef OC_TLS_H
 #define OC_TLS_H
 
 #include "mbedtls/ssl.h"
 #include "oc_uuid.h"
 #include "port/oc_connectivity.h"
-#include "security/oc_cred_internal.h"
-#include "security/oc_keypair.h"
 #include "util/oc_etimer.h"
 #include "util/oc_list.h"
 #include "util/oc_process.h"
@@ -87,10 +88,8 @@ void oc_tls_select_mfg_cert_chain(int credid);
 void oc_tls_select_identity_cert_chain(int credid);
 void oc_tls_select_psk_ciphersuite(void);
 void oc_tls_select_anon_ciphersuite(void);
-void oc_tls_select_cloud_ciphersuite(void);
 
 /* Internal interface for checking supported OTMs */
-bool oc_tls_is_pin_otm_supported(size_t device);
 bool oc_tls_is_cert_otm_supported(size_t device);
 
 /* Internal interface for generating a random PIN */
@@ -107,11 +106,9 @@ int oc_tls_pbkdf2(const unsigned char *pin, size_t pin_len, oc_uuid_t *uuid,
 
 /* Internal interface for refreshing identity certificate chains */
 void oc_tls_refresh_identity_certs(void);
-void oc_tls_remove_identity_cert(oc_sec_cred_t *cred);
 
 /* Internal interface for refreshing trust anchor credentials */
 void oc_tls_refresh_trust_anchors(void);
-void oc_tls_remove_trust_anchor(oc_sec_cred_t *cred);
 
 mbedtls_x509_crt *oc_tls_get_trust_anchors(void);
 
