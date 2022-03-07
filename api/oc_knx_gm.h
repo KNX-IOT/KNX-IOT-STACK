@@ -27,7 +27,8 @@ extern "C" {
 /**
  * @brief Creation of the gm resources
  *
- * @param device_index index of the device to which the resource are to be created
+ * @param device_index index of the device to which the resource are to be
+ * created
  */
 void oc_create_knx_gm_resources(size_t device_index);
 
@@ -42,7 +43,8 @@ void oc_create_knx_gm_resources(size_t device_index);
  * e.g. to be used to create a KNX-IOT to CLASSIC gateway
  */
 typedef void (*oc_gateway_s_mode_cb_t)(
-  size_t device_index, oc_group_object_notification_t* s_mode_message, void *data);
+  size_t device_index, oc_group_object_notification_t *s_mode_message,
+  void *data);
 
 /**
  * @brief The gateway info
