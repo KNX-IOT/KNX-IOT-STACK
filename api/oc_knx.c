@@ -624,7 +624,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
   }
 
   // gateway functionality: call back for all s-mode calls
-  oc_gateway_t* my_gw = oc_get_gateway_cb();
+  oc_gateway_t *my_gw = oc_get_gateway_cb();
   if (my_gw != NULL && my_gw->cb) {
     // call the gateway function
     my_gw->cb(device_index, &g_received_notification, my_gw->data);
