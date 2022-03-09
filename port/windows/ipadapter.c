@@ -1756,7 +1756,7 @@ oc_dns_lookup(const char *domain, oc_string_t *addr, enum transport_flags flags)
 #endif /* OC_DNS_LOOKUP */
 
 void
-oc_connectivity_subscribe_mcast_ipv6(size_t device, oc_endpoint_t *address)
+oc_connectivity_subscribe_mcast_ipv6(oc_endpoint_t *address)
 {
   ip_context_t *dev = get_ip_context_for_device(address->device);
 
