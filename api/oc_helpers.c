@@ -331,6 +331,21 @@ oc_string_cmp(oc_string_t string1, oc_string_t string2)
                  oc_string_len(string1));
 }
 
+
+int
+oc_url_cmp(oc_string_t string1, oc_string_t string2)
+{
+  char *str1 = oc_string(string1);
+  char *str2 = oc_string(string2);
+
+  if (str1[0] == '/')
+    str1++;
+  if (str2[0] == '/')
+    str2++;
+
+  return strncmp(str1, str2, strlen(str1));
+}
+
 bool
 oc_uri_contains_wildcard(const char *uri)
 {
