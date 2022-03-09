@@ -117,13 +117,13 @@ TEST(HELPER_cmp, oc_url_cmp)
   oc_string_t compare3;
   oc_new_string(&compare3, "abddc", 4);
   
-  int value = oc_urlcmp(compare1, compare1);
+  int value = oc_url_cmp(compare1, compare1);
   EXPECT_EQ(0, value);
-  value = oc_string_cmp(compare1, compare2);
+  value = oc_url_cmp(compare1, compare2);
   EXPECT_EQ(0, value);
-  value = oc_string_cmp(compare1, compare3);
+  value = oc_url_cmp(compare1, compare3);
   EXPECT_NE(0, value);
-  value = oc_string_cmp(compare2, compare3);
+  value = oc_url_cmp(compare2, compare3);
   EXPECT_NE(0, value);
   
   oc_free_string(&compare1);
