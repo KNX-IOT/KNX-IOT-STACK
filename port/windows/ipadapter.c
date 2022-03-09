@@ -1756,9 +1756,9 @@ oc_dns_lookup(const char *domain, oc_string_t *addr, enum transport_flags flags)
 #endif /* OC_DNS_LOOKUP */
 
 void
-oc_connectivity_subscribe_mcast_ipv6(size_t device, const uint8_t *address)
+oc_connectivity_subscribe_mcast_ipv6(size_t device, oc_endpoint_t *address)
 {
-  ip_context_t *dev = get_ip_context_for_device(device);
+  ip_context_t *dev = get_ip_context_for_device(address->device);
 
   // for every interface...
   int ret = 0;
@@ -1787,7 +1787,7 @@ oc_connectivity_subscribe_mcast_ipv6(size_t device, const uint8_t *address)
 
       /* Link-local scope */
       memset(&mreq, 0, sizeof(mreq));
-      memcpy(mreq.ipv6mr_multiaddr.s6_addr, address, 16);
+      memcpy(mreq.ipv6mr_multiaddr.s6_addr, address->addr.ipv6.address, 16);
       mreq.ipv6mr_interface = if_index;
 
       (void)setsockopt(dev->mcast_sock, IPPROTO_IPV6, IPV6_DROP_MEMBERSHIP,
