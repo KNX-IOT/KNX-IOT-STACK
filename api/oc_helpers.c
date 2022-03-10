@@ -38,7 +38,7 @@ oc_malloc(
     func,
 #endif
     block, num_items, pool_type);
-  //oc_assert(alloc_ret > 0);
+  // oc_assert(alloc_ret > 0);
 }
 
 static void
@@ -331,7 +331,6 @@ oc_string_cmp(oc_string_t string1, oc_string_t string2)
                  oc_string_len(string1));
 }
 
-
 int
 oc_url_cmp(oc_string_t string1, oc_string_t string2)
 {
@@ -344,8 +343,8 @@ oc_url_cmp(oc_string_t string1, oc_string_t string2)
     /* skip the leading / */
     cmp1 = &str1[1];
   }
-    
-if ((strlen(str2) > 1) && (str2[0] == '/')) {
+
+  if ((strlen(str2) > 1) && (str2[0] == '/')) {
     /* skip the leading / */
     cmp2 = &str2[1];
   }

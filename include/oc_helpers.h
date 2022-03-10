@@ -390,7 +390,7 @@ int oc_uri_get_wildcard_value_as_string(const char *uri_resource,
 
 /**
  * @brief oc_string compare
- * 
+ *
  * @param string1 string 1 to be compared
  * @param string2 string 2 to be compared
  * @return int 0 == equal
@@ -400,7 +400,7 @@ int oc_string_cmp(oc_string_t string1, oc_string_t string2);
 /**
  * @brief url compare
  * same as string compare but ignores the leading / of the urls
- * 
+ *
  * @param string1 url to be compared
  * @param string2 url to be compared
  * @return int 0 == equal
