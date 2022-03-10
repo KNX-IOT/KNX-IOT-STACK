@@ -112,7 +112,7 @@ TEST(HELPER_cmp, oc_url_cmp)
   oc_new_string(&compare1, "/abcd", 5);
   
   oc_string_t compare2;
-  oc_new_string(&compare2, "abdc", 4);
+  oc_new_string(&compare2, "abcd", 4);
   
   oc_string_t compare3;
   oc_new_string(&compare3, "abddc", 4);
