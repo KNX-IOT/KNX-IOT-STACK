@@ -309,7 +309,7 @@ oc_belongs_href_to_resource(oc_string_t href, size_t device_index)
         !(resource->properties & OC_DISCOVERABLE)) {
       continue;
     }
-    if (oc_string_cmp(href, resource->uri) == 0) {
+    if (oc_url_cmp(href, resource->uri) == 0) {
       return true;
     }
   }
