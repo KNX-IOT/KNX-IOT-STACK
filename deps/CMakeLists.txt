@@ -1,6 +1,6 @@
 project(knx-iot-stack-deps)
 
-if(OC_EXTERNAL_TINYCBOR)
+if(KNX_BUILTIN_TINYCBOR)
     add_library(tinycbor-master
         ${PROJECT_SOURCE_DIR}/tinycbor/src/cborerrorstrings.c
         ${PROJECT_SOURCE_DIR}/tinycbor/src/cborencoder.c

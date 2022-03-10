@@ -15,13 +15,14 @@ option(ENABLE_TESTING "Build mbed TLS tests." OFF)
 set(OC_OSCORE_ENABLED ON CACHE BOOL "Enable oscore")
 set(OC_PKI_ENABLED OFF CACHE BOOL "Enable PKI security")
 set(OC_DEBUG_ENABLED OFF CACHE BOOL "Enable debug messages")
-set(OC_BUILTIN_MBEDTLS ON CACHE BOOL "Use builtin mbedTLS, as opposed to external lib from different project")
-set(OC_BUILTIN_TINYCBOR ON CACHE BOOL "Use builtin TinyCBOR, as opposed to external lib from different project")
 set(CLANG_TIDY_ENABLED OFF CACHE BOOL "Enable clang-tidy analysis during compilation.")
+
+set(KNX_BUILTIN_MBEDTLS ON CACHE BOOL "Use builtin mbedTLS, as opposed to external lib from different project")
+set(KNX_BUILTIN_TINYCBOR ON CACHE BOOL "Use builtin TinyCBOR, as opposed to external lib from different project")
 
 include(tools/clang-tidy.cmake)
 
-if(OC_BUILTIN_MBEDTLS)
+if(KNX_BUILTIN_MBEDTLS)
     # If an mbedtls platform layer is defined, add it to the mbedtls list of libs
     if(TARGET mbedtls-plat)
         set(libs ${libs} mbedtls-plat)
