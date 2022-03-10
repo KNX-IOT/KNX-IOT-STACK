@@ -38,7 +38,7 @@ oc_malloc(
     func,
 #endif
     block, num_items, pool_type);
-  oc_assert(alloc_ret > 0);
+  //oc_assert(alloc_ret > 0);
 }
 
 static void
@@ -338,10 +338,13 @@ oc_url_cmp(oc_string_t string1, oc_string_t string2)
   char *str1 = oc_string(string1);
   char *str2 = oc_string(string2);
 
-  if (str1[0] == '/')
+  if ((strlen(str1) > 1) && (str1[0] == '/')) {
     str1++;
-  if (str2[0] == '/')
+  }
+    
+if ((strlen(str2) > 1) && (str2[0] == '/')) {
     str2++;
+  }
 
   return strncmp(str1, str2, strlen(str1));
 }
