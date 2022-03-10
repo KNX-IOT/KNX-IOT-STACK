@@ -1,5 +1,9 @@
 project(knx-iot-stack-apps)
 
+if(NOT WIN32 AND NOT UNIX)
+    return()
+endif()
+
 # test example
 add_executable(testserver_all
     ${PROJECT_SOURCE_DIR}/testserver_all.c
