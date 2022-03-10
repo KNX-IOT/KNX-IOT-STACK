@@ -22,6 +22,8 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 #define STORE_PATH_SIZE 64
 
@@ -32,6 +34,7 @@ static bool path_set = false;
 int
 oc_storage_config(const char *store)
 {
+  char temp_dir[60];
   if (!store || !*store)
     return -EINVAL;
   store_path_len = strlen(store);
@@ -47,6 +50,17 @@ oc_storage_config(const char *store)
     store_path[store_path_len - 1] = '\\';
   }
   path_set = true;
+
+  strcpy(temp_dir, store);
+  if ((strlen(store) > 2) && (store[0] == '.') && (store[1] == '/')) {
+    strcpy(temp_dir, &store[2]);
+  }
+  int dir_len = strlen(temp_dir);
+  if (temp_dir[dir_len - 1] == '/') {
+    temp_dir[dir_len - 1] = 0;
+  }
+
+  int retval = mkdir(temp_dir);
 
   return 0;
 }
