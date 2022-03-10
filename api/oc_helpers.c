@@ -337,16 +337,20 @@ oc_url_cmp(oc_string_t string1, oc_string_t string2)
 {
   char *str1 = oc_string(string1);
   char *str2 = oc_string(string2);
+  char *cmp1 = str1;
+  char *cmp2 = str2;
 
   if ((strlen(str1) > 1) && (str1[0] == '/')) {
-    str1++;
+    /* skip the leading / */
+    cmp1 = &str1[1];
   }
     
 if ((strlen(str2) > 1) && (str2[0] == '/')) {
-    str2++;
+    /* skip the leading / */
+    cmp2 = &str2[1];
   }
 
-  return strncmp(str1, str2, strlen(str1));
+  return strncmp(cmp1, cmp2, strlen(cmp1));
 }
 
 bool
