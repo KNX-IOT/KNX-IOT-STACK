@@ -237,7 +237,9 @@ if(BUILD_TESTING AND UNIX)
     add_subdirectory(api/unittest)
     add_subdirectory(port/unittest)
     add_subdirectory(messaging/coap/unittest)
+if(OC_OSCORE_ENABLED)
     add_subdirectory(security/unittest)
+endif()
 endif()
 
 # https://stackoverflow.com/questions/37957583/how-to-use-gcov-with-cmake
