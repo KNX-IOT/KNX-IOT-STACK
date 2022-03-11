@@ -33,14 +33,14 @@ jobs:
           # create the make files in a subfolder
           mkdir linuxbuild
           cd linuxbuild
-          cmake ../.
-          make all  OSCORE=1
+          cmake ../. -DOC_OSCORE_ENABLED=ON
+          make all OSCORE=1
           ./api/unittest/apitest
           ./port/unittest/platformtest
           #./storage_test
           ./messaging/coap/unittest/messagingtest
           ./security/unittest/securitytest
-
+          
   # This workflow contains a single job called "check_code_style"
   cmake_linux_unsecured:
     # The type of runner that the job will run on
@@ -59,10 +59,9 @@ jobs:
           # create the make files in a subfolder
           mkdir linuxbuild_sec
           cd linuxbuild_sec
-          cmake ../.
+          cmake ../. -DOC_OSCORE_ENABLED=OFF
           make all OSCORE=0
           ./api/unittest/apitest
           ./port/unittest/platformtest
           #./storage_test
           ./messaging/coap/unittest/messagingtest
-    

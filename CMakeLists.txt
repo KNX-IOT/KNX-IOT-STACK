@@ -12,7 +12,7 @@ option(ENABLE_TESTING "Build mbed TLS tests." OFF)
 
 #set(OC_SECURITY_ENABLED ON CACHE BOOL "Enable security")
 
-set(OC_OSCORE_ENABLED ON CACHE BOOL "Enable oscore")
+set(OC_OSCORE_ENABLED OFF CACHE BOOL "Enable oscore")
 set(OC_PKI_ENABLED OFF CACHE BOOL "Enable PKI security")
 set(OC_DEBUG_ENABLED OFF CACHE BOOL "Enable debug messages")
 set(CLANG_TIDY_ENABLED OFF CACHE BOOL "Enable clang-tidy analysis during compilation.")
@@ -237,7 +237,9 @@ if(BUILD_TESTING AND UNIX)
     add_subdirectory(api/unittest)
     add_subdirectory(port/unittest)
     add_subdirectory(messaging/coap/unittest)
+if(OC_OSCORE_ENABLED)
     add_subdirectory(security/unittest)
+endif()
 endif()
 
 # https://stackoverflow.com/questions/37957583/how-to-use-gcov-with-cmake
