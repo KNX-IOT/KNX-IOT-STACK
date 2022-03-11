@@ -12,7 +12,7 @@ option(ENABLE_TESTING "Build mbed TLS tests." OFF)
 
 #set(OC_SECURITY_ENABLED ON CACHE BOOL "Enable security")
 
-set(OC_OSCORE_ENABLED ON CACHE BOOL "Enable oscore")
+set(OC_OSCORE_ENABLED OFF CACHE BOOL "Enable oscore")
 set(OC_PKI_ENABLED OFF CACHE BOOL "Enable PKI security")
 set(OC_DEBUG_ENABLED OFF CACHE BOOL "Enable debug messages")
 set(CLANG_TIDY_ENABLED OFF CACHE BOOL "Enable clang-tidy analysis during compilation.")
