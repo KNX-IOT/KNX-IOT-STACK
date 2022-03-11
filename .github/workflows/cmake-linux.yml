@@ -33,6 +33,7 @@ jobs:
         with:
           submodules: "true"
       - name: build
+        run: |
           mkdir linuxbuild
           cd linuxbuild
           cmake ../. ${{ matrix.args }} -DBUILD_TESTING=ON
