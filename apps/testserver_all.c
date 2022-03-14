@@ -793,7 +793,7 @@ issue_requests_s_mode_delayed(void *data)
   (void)data;
 
   PRINT(" issue_requests_s_mode_delayed\n");
-  int ga_values[5] = { 2, 255, 256 , 1024, 1024* 256};
+  int ga_values[5] = { 2, 255, 256, 1024, 1024 * 256 };
   oc_string_t href;
   oc_new_string(&href, "/p/c", strlen("/p/c"));
 
@@ -904,7 +904,6 @@ main(int argc, char *argv[])
   if (retbuf != NULL) {
     PRINT("Current working dir: %s\n", buff);
   }
-
 
   /*
    The storage folder depends on the build system

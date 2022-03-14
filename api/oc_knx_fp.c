@@ -1883,40 +1883,37 @@ oc_add_points_in_group_object_table_to_response(oc_request_t *request,
   return false;
 }
 
-
-
 oc_endpoint_t
-create_multicast_address(oc_endpoint_t in, int group_nr, int ula_prefix, int scope)
+create_multicast_address(oc_endpoint_t in, int group_nr, int ula_prefix,
+                         int scope)
 {
   // FF35::30: <ULA-routing-prefix>::<group id>
   //    | 5 == scope
   //   | 3 == multicast
-  // 
+  //
   // create the multicast address from group and scope
 
   uint8_t byte_1 = (uint8_t)group_nr;
   uint8_t byte_2 = (uint8_t)(group_nr >> 8);
-  uint8_t byte_3 = (uint8_t)(group_nr >>16);
+  uint8_t byte_3 = (uint8_t)(group_nr >> 16);
   uint8_t byte_4 = (uint8_t)(group_nr >> 24);
 
   oc_make_ipv6_endpoint(group_mcast, IPV6 | MULTICAST, 5683, 0xff, 0x30 + scope,
                         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, byte_4, byte_3, byte_2,
                         byte_1);
-  PRINT(" create_multicast_address S=%d U=%d G=%d B4=%d B3=%d B2=%d B1=%d\n", scope, ula_prefix, group_nr, 
-    byte_4, byte_3, byte_2, byte_1);
+  PRINT(" create_multicast_address S=%d U=%d G=%d B4=%d B3=%d B2=%d B1=%d\n",
+        scope, ula_prefix, group_nr, byte_4, byte_3, byte_2, byte_1);
   PRINTipaddr(group_mcast);
   PRINT("\n");
 
-
   return group_mcast;
 }
-
 
 void
 subscribe_group_to_multicast(int group_nr, int ula_prefix, int scope)
 {
   // FF35::30: <ULA-routing-prefix>::<group id>
-  // 
+  //
   // create the multicast address from group and scope
   oc_endpoint_t group_mcast;
   memset(&group_mcast, 0, sizeof(group_mcast));
@@ -1937,7 +1934,8 @@ oc_register_group_multicasts()
   for (index = 0; index < GOT_MAX_ENTRIES; index++) {
     int nr_entries = g_got[index].ga_len;
     for (int i = 0; i < nr_entries; i++) {
-      PRINT(" oc_register_group_multicasts index=%d i=%d group: %d\n", index, i, g_got[index].ga[i]);
+      PRINT(" oc_register_group_multicasts index=%d i=%d group: %d\n", index, i,
+            g_got[index].ga[i]);
       subscribe_group_to_multicast(g_got[index].ga[i], ula_prefix, 2);
       subscribe_group_to_multicast(g_got[index].ga[i], ula_prefix, 5);
     }
