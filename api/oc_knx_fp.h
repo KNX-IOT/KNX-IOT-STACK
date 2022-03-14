@@ -150,7 +150,22 @@ typedef struct oc_group_rp_table_t
   int ga_len;       /**< length of the array of ga identifiers*/
 } oc_group_rp_table_t;
 
+/**
+ * @brief set an entry in teh group
+ *
+ * @param index the index where to add the entry
+ * @param entry the group object entry
+ * @return int 0 == success
+ */
 int oc_core_set_group_object_table(int index, oc_group_object_table_t entry);
+
+/**
+ * @brief register the group entries in the Group Object table
+ * as multicast receive addresses
+ *
+ * function to be called when the device is (re)started in run-time mode
+ */
+void oc_register_group_multicasts();
 
 /**
  * @brief find index belonging to the id

@@ -144,7 +144,7 @@ oc_gateway_s_mode_cb(size_t device_index,
 {
   (void)data;
 
-  PRINT("oc_gateway_s_mode_cb %d\n", device_index);
+  PRINT("oc_gateway_s_mode_cb %d\n", (int)device_index);
   PRINT("   ga  = %d\n", s_mode_message->ga);
   PRINT("   sia = %d\n", s_mode_message->sia);
   PRINT("   st  = %s\n", oc_string(s_mode_message->st));
@@ -793,7 +793,7 @@ issue_requests_s_mode_delayed(void *data)
   (void)data;
 
   PRINT(" issue_requests_s_mode_delayed\n");
-  int ga_values[2] = { 2 };
+  int ga_values[5] = { 2, 255, 256, 1024, 1024 * 256 };
   oc_string_t href;
   oc_new_string(&href, "/p/c", strlen("/p/c"));
 
@@ -801,11 +801,13 @@ issue_requests_s_mode_delayed(void *data)
   entry.cflags = OC_CFLAG_WRITE | OC_CFLAG_READ;
   entry.id = 55;
   entry.href = href;
-  entry.ga_len = 1;
+  entry.ga_len = 5;
   entry.ga = (int *)&ga_values;
 
   oc_core_set_group_object_table(0, entry);
   oc_print_group_object_table_entry(0);
+
+  oc_register_group_multicasts();
 
   PRINT(" issue_requests_s_mode: issue\n");
   oc_do_s_mode_with_scope(2, "/p/c", "w");
@@ -855,6 +857,7 @@ main(int argc, char *argv[])
   int init;
 
   bool do_send_s_mode = true;
+  g_reset = true;
 
   oc_clock_time_t next_event;
 
