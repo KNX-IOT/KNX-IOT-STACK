@@ -1303,8 +1303,12 @@ oc_is_resource_secure(oc_method_t method, oc_resource_t *resource)
         memcmp(oc_string(resource->uri), "/.well-known/knx/spake", 22) == 0))) {
     return false;
   }
-
+#ifdef OC_OSCORE
   return true;
+#else
+  PRINT("oc_is_resource_secure: OSCORE is turned off\n");
+  return false;
+#endif /* OC_OSCORE*/
 }
 
 bool
