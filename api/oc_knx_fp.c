@@ -170,13 +170,15 @@ oc_core_set_group_object_table(int index, oc_group_object_table_t entry)
   g_got[index].ga_len = entry.ga_len;
   int *new_array = (int *)malloc(entry.ga_len * sizeof(int));
 
-  for (int i = 0; i < entry.ga_len; i++) {
-    new_array[i] = entry.ga[i];
+  if (new_array != NULL) {
+    for (int i = 0; i < entry.ga_len; i++) {
+      new_array[i] = entry.ga[i];
+    }
+    if (g_got[index].ga != 0) {
+      free(g_got[index].ga);
+    }
+    g_got[index].ga = new_array;
   }
-  if (g_got[index].ga != 0) {
-    free(g_got[index].ga);
-  }
-  g_got[index].ga = new_array;
   return 0;
 }
 
@@ -1335,7 +1337,7 @@ oc_core_get_recipient_index_url_or_path(int index)
 
     } else {
       // do .knx
-      PRINT("      oc_core_get_recipient_index_url_or_patho (default) %s\n",
+      PRINT("      oc_core_get_recipient_index_url_or_path (default) %s\n",
             ".knx");
       return ".knx";
     }
@@ -1884,29 +1886,41 @@ oc_add_points_in_group_object_table_to_response(oc_request_t *request,
 }
 
 oc_endpoint_t
-create_multicast_address(oc_endpoint_t in, int group_nr, int ula_prefix,
-                         int scope)
+oc_create_multicast_group_address(oc_endpoint_t in, int group_nr,
+                                  int ula_prefix, int scope)
 {
+  // create the multicast address from group and scope
   // FF35::30: <ULA-routing-prefix>::<group id>
   //    | 5 == scope
-  //   | 3 == multicast
-  //
-  // create the multicast address from group and scope
+  //   | 3 == mult icast
 
+  // group number to the various bytes
   uint8_t byte_1 = (uint8_t)group_nr;
   uint8_t byte_2 = (uint8_t)(group_nr >> 8);
   uint8_t byte_3 = (uint8_t)(group_nr >> 16);
   uint8_t byte_4 = (uint8_t)(group_nr >> 24);
 
-  oc_make_ipv6_endpoint(group_mcast, IPV6 | MULTICAST, 5683, 0xff, 0x30 + scope,
-                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, byte_4, byte_3, byte_2,
-                        byte_1);
-  PRINT(" create_multicast_address S=%d U=%d G=%d B4=%d B3=%d B2=%d B1=%d\n",
+  // TODO:
+  // ula prefix to various bytes
+
+  int my_transport_flags = 0;
+  my_transport_flags += IPV6;
+  my_transport_flags += MULTICAST;
+#ifdef OC_OSCORE
+  my_transport_flags += OSCORE;
+#endif
+
+  oc_make_ipv6_endpoint(group_mcast, my_transport_flags, 5683, 0xff,
+                        0x30 + scope, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, byte_4,
+                        byte_3, byte_2, byte_1);
+  PRINT("  oc_create_multicast_group_address S=%d U=%d G=%d B4=%d B3=%d B2=%d "
+        "B1=%d\n",
         scope, ula_prefix, group_nr, byte_4, byte_3, byte_2, byte_1);
   PRINTipaddr(group_mcast);
   PRINT("\n");
+  memcpy(&in, &group_mcast, sizeof(oc_endpoint_t));
 
-  return group_mcast;
+  return in;
 }
 
 void
@@ -1914,12 +1928,12 @@ subscribe_group_to_multicast(int group_nr, int ula_prefix, int scope)
 {
   // FF35::30: <ULA-routing-prefix>::<group id>
   //
-  // create the multicast address from group and scope
+  // create the multi cast address from group and scope
   oc_endpoint_t group_mcast;
   memset(&group_mcast, 0, sizeof(group_mcast));
 
   group_mcast =
-    create_multicast_address(group_mcast, group_nr, ula_prefix, scope);
+    oc_create_multicast_group_address(group_mcast, group_nr, ula_prefix, scope);
 
   // subscribe
   oc_connectivity_subscribe_mcast_ipv6(&group_mcast);
@@ -1933,6 +1947,7 @@ oc_register_group_multicasts()
   int index;
   for (index = 0; index < GOT_MAX_ENTRIES; index++) {
     int nr_entries = g_got[index].ga_len;
+    // TODO: add check if the group address is used for receiving.
     for (int i = 0; i < nr_entries; i++) {
       PRINT(" oc_register_group_multicasts index=%d i=%d group: %d\n", index, i,
             g_got[index].ga[i]);

@@ -83,23 +83,23 @@ if __name__ == '__main__':  # pragma: no cover
     parser = argparse.ArgumentParser()
     # input (files etc.)
     parser.add_argument("-scope", "--scope", default=2,
-                    help="scope of the multicast request", nargs='?',
+                    help="scope of the multicast request (defaul =2 : same machine)", nargs='?',
                     const="", required=False)
     parser.add_argument("-sia", "--sia", default=2,
-                    help="sending internal address", nargs='?',
+                    help="sending internal address (default ia=2)", nargs='?',
                     const="", required=False)
     parser.add_argument("-st", "--st", default="w",
                     help="send target ,e.g w,r,rp", nargs='?',
                     const="", required=False)
     parser.add_argument("-ga", "--ga", default=1,
-                    help="group address", nargs='?', const="",
+                    help="group address (default = 1)", nargs='?', const="",
                     required=False)
     parser.add_argument("-valuetype", "--valuetype", default=1,
-                    help="1=boolean, 2=int, 3=float", nargs='?',
-                    const="", required=False)
+                    help="1=boolean, 2=int, 3=float (default boolean)", nargs='?',
+                    const="1", required=False)
     parser.add_argument("-value", "--value", default=True,
-                    help="value of the valuetype ", nargs='?',
-                    const="", required=False)
+                    help="value of the valuetype (default True)", nargs='?',
+                    const="true", required=False)
 
     # (args) supports batch scripts providing arguments
     print(sys.argv)

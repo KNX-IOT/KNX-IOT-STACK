@@ -668,14 +668,6 @@ void oc_resource_set_properties_cbs(oc_resource_t *resource,
                                     void *set_props_user_data);
 
 /**
- * @brief sets the support of the secure multicast feature
- *
- * @param resource the resource
- * @param supported true: supported
- */
-void oc_resource_set_secure_mcast(oc_resource_t *resource, bool supported);
-
-/**
  * @brief set a resource to a specific function block instance
  * default is instance 0, if there is just 1 instance of the
  * function block this function does not have to be called.

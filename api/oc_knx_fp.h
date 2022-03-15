@@ -350,6 +350,9 @@ bool oc_add_points_in_group_object_table_to_response(oc_request_t *request,
  */
 void oc_create_knx_fp_resources(size_t device);
 
+oc_endpoint_t oc_create_multicast_group_address(oc_endpoint_t in, int group_nr,
+                                                int ula_prefix, int scope);
+
 #ifdef __cplusplus
 }
 #endif
