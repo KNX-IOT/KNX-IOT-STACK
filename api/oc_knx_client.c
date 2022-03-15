@@ -400,8 +400,12 @@ oc_issue_s_mode(int scope, int sia_value, int group_address, char *rp,
   oc_make_ipv6_endpoint(group_mcast, IPV6 | MULTICAST | OSCORE, COAP_PORT, 0xff,
                         -scope, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0xfd);
 #else
-  oc_make_ipv6_endpoint(group_mcast, IPV6 | MULTICAST, COAP_PORT, 0xff, scope,
-                        0, 0, -0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0xfd);
+  oc_make_ipv6_endpoint(group_mcast, IPV6 | DISCOVERY | MULTICAST, COAP_PORT,
+                        0xff, scope, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00,
+                        0xfd);
+  // oc_make_ipv6_endpoint(mcast, IPV6 | DISCOVERY | MULTICAST, 5683, 0xff,
+  // scope,
+  //                      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0xfd);
 #endif
 
 #else
@@ -454,7 +458,7 @@ oc_send_s_mode(oc_endpoint_t *endpoint, char *path, int sia_value,
     oc_rep_i_set_text_string(value, 6, rp);
 
     // set the "value" key
-    oc_rep_i_set_key(&value_map, 5);
+    oc_rep_i_set_key(&value_map, 1);
     // copy the data, this is already in cbor from the fake response of the
     // resource GET function
     oc_rep_encode_raw_encoder(&value_map, value_data, value_size);
