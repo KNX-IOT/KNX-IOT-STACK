@@ -831,17 +831,17 @@ py_discover_devices_with_query(int scope, const char *query)
 // -----------------------------------------------------------------------------
 
 void
-py_initate_spake(char *sn, char *password)
+py_initiate_spake(char *sn, char *password)
 {
   int ret = -1;
   device_handle_t *device = py_getdevice_from_sn(sn);
 
-  PRINT("  [C]py_initate_spake: [%s] [%s]\n", sn, password);
+  PRINT("  [C]py_initiate_spake: [%s] [%s]\n", sn, password);
   if (oc_string_len(device->ep.serial_number) == 0) {
     oc_new_string(&device->ep.serial_number, sn, strlen(sn));
   }
   ret = oc_initiate_spake(&device->ep, password);
-  PRINT("  [C]py_initate_spake: [%d]-- done\n", ret);
+  PRINT("  [C]py_initiate_spake: [%d]-- done\n", ret);
   if (ret == -1) {
     // failure, so unblock python
     inform_spake_python(sn, ret, "", 0);
@@ -905,8 +905,17 @@ py_issue_requests_s_mode(int scope, int sia, int ga, char *st, int value_type,
     cbor_encoder_close_container_checked(&root_map, &value_map);
     oc_rep_end_root_object();
 
+    PRINT("S-MODE Payload Size: %d\n", oc_rep_get_encoded_payload_size());
+    OC_LOGbytes_OSCORE(oc_rep_get_encoder_buf(),
+                       oc_rep_get_encoded_payload_size());
+
+#ifndef OC_OSCORE
     if (oc_do_post_ex(APPLICATION_CBOR, APPLICATION_CBOR)) {
       PRINT("  Sent POST request\n");
+#else
+    if (oc_do_multicast_update()) {
+      PRINT("  Sent oc_do_multicast_update update\n");
+#endif
     } else {
       PRINT("  Could not send POST request\n");
     }
