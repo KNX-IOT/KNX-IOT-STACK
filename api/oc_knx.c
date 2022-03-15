@@ -666,7 +666,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
 
       // check if the data is allowed to write or update
       oc_cflag_mask_t cflags = oc_core_group_object_table_cflag_entries(index);
-      if ((cflags & OC_CFLAG_WRITE) || (cflags & OC_CFLAG_UPDATE)) {
+      if (((cflags & OC_CFLAG_WRITE) == 0 ) && ((cflags & OC_CFLAG_UPDATE) == 0)) {
         PRINT(" skipping index %d due to flags %d", index, cflags);
         break;
       }
