@@ -808,7 +808,7 @@ issue_requests_s_mode_delayed(void *data)
   oc_print_group_object_table_entry(0);
 
   oc_group_object_table_t entry2;
-  entry2.cflags = OC_CFLAG_TRANSMISSION ;
+  entry2.cflags = OC_CFLAG_TRANSMISSION;
   entry2.id = 5;
   entry2.href = href;
   entry2.ga_len = 1;
