@@ -396,14 +396,12 @@ oc_issue_s_mode(int scope, int sia_value, int group_address, char *rp,
   int ula_prefix = 0;
 
 #ifndef GROUP_ADDRESSING
-#ifdef OC_OSCORE 
-  oc_make_ipv6_endpoint(group_mcast, IPV6 | MULTICAST | OSCORE,
-                                            COAP_PORT, 0xff, -scope, 0, 0, 0, 0,
-                                            0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0xfd);
-#else 
-  oc_make_ipv6_endpoint(group_mcast, IPV6 | MULTICAST, COAP_PORT, 0xff,
-                                 scope, 0, 0, -0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                                 0x00, 0xfd);
+#ifdef OC_OSCORE
+  oc_make_ipv6_endpoint(group_mcast, IPV6 | MULTICAST | OSCORE, COAP_PORT, 0xff,
+                        -scope, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0xfd);
+#else
+  oc_make_ipv6_endpoint(group_mcast, IPV6 | MULTICAST, COAP_PORT, 0xff, scope,
+                        0, 0, -0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0xfd);
 #endif
 
 #else
@@ -418,8 +416,7 @@ oc_issue_s_mode(int scope, int sia_value, int group_address, char *rp,
 #endif
 
   oc_send_s_mode(&group_mcast, "/.knx", sia_value, group_address, rp,
-                 value_data,
-                 value_size);
+                 value_data, value_size);
 }
 
 static void
@@ -603,7 +600,8 @@ oc_do_s_mode_with_scope(int scope, char *resource_url, char *rp)
 
     // With a read command to a Group Object, the device send this Group
     // Object’s value.
-    if (((cflags & OC_CFLAG_READ) == 0) && ((cflags & OC_CFLAG_TRANSMISSION) == 0) &&
+    if (((cflags & OC_CFLAG_READ) == 0) &&
+        ((cflags & OC_CFLAG_TRANSMISSION) == 0) &&
         ((cflags & OC_CFLAG_INIT) > 0)) {
       PRINT("    skipping index %d due to cflags %d flags=", index, cflags);
       oc_print_cflags(cflags);

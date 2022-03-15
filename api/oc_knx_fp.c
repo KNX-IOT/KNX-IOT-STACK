@@ -171,13 +171,13 @@ oc_core_set_group_object_table(int index, oc_group_object_table_t entry)
   int *new_array = (int *)malloc(entry.ga_len * sizeof(int));
 
   if (new_array != NULL) {
-  for (int i = 0; i < entry.ga_len; i++) {
-    new_array[i] = entry.ga[i];
-  }
-  if (g_got[index].ga != 0) {
-    free(g_got[index].ga);
-  }
-  g_got[index].ga = new_array;
+    for (int i = 0; i < entry.ga_len; i++) {
+      new_array[i] = entry.ga[i];
+    }
+    if (g_got[index].ga != 0) {
+      free(g_got[index].ga);
+    }
+    g_got[index].ga = new_array;
   }
   return 0;
 }
@@ -1886,10 +1886,8 @@ oc_add_points_in_group_object_table_to_response(oc_request_t *request,
 }
 
 oc_endpoint_t
-oc_create_multicast_group_address(oc_endpoint_t in, 
-                                  int group_nr,
-                                  int ula_prefix,
-                                  int scope)
+oc_create_multicast_group_address(oc_endpoint_t in, int group_nr,
+                                  int ula_prefix, int scope)
 {
   // create the multicast address from group and scope
   // FF35::30: <ULA-routing-prefix>::<group id>
@@ -1906,17 +1904,17 @@ oc_create_multicast_group_address(oc_endpoint_t in,
   // ula prefix to various bytes
 
   int my_transport_flags = 0;
-  my_transport_flags += IPV6;  
+  my_transport_flags += IPV6;
   my_transport_flags += MULTICAST;
 #ifdef OC_OSCORE
   my_transport_flags += OSCORE;
 #endif
 
   oc_make_ipv6_endpoint(group_mcast, my_transport_flags, 5683, 0xff,
-                        0x30 + scope,
-                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, byte_4, byte_3, byte_2,
-                        byte_1);
-  PRINT("  oc_create_multicast_group_address S=%d U=%d G=%d B4=%d B3=%d B2=%d B1=%d\n",
+                        0x30 + scope, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, byte_4,
+                        byte_3, byte_2, byte_1);
+  PRINT("  oc_create_multicast_group_address S=%d U=%d G=%d B4=%d B3=%d B2=%d "
+        "B1=%d\n",
         scope, ula_prefix, group_nr, byte_4, byte_3, byte_2, byte_1);
   PRINTipaddr(group_mcast);
   PRINT("\n");

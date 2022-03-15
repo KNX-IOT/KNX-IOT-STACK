@@ -1759,7 +1759,7 @@ void
 oc_connectivity_subscribe_mcast_ipv6(oc_endpoint_t *address)
 {
   ip_context_t *dev = get_ip_context_for_device(address->device);
-  
+
   if (dev == NULL) {
     OC_ERR(" dev is NULL");
     return;
