@@ -1890,7 +1890,7 @@ oc_connectivity_subscribe_mcast_ipv6(oc_endpoint_t *address)
 
   if (dev == NULL) {
     OC_ERR(" dev is NULL");
-    return
+    return;
   }
 
   // for every interface...
