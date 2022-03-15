@@ -395,7 +395,6 @@ oc_resource_set_request_handler(oc_resource_t *resource, oc_method_t method,
   }
 }
 
-
 bool
 oc_add_resource(oc_resource_t *resource)
 {
