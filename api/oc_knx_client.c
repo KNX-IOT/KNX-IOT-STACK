@@ -386,18 +386,6 @@ oc_s_mode_get_value(oc_request_t *request)
   return NULL;
 }
 
-/*
-oc_endpoint_t *
-oc_group_address_to_endpoint(int group_address, int scope)
-{
-  // see line 1577 (section 2.6.5)
-
-  oc_make_ipv6_endpoint(group, IPV6 | MULTICAST, 5683, 0xff, scope,
-                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0xfd);
-  return &group;
-}
-*/
-
 static void
 oc_issue_s_mode(int scope, int sia_value, int group_address, char *rp,
                 uint8_t *value_data, int value_size)
@@ -405,19 +393,32 @@ oc_issue_s_mode(int scope, int sia_value, int group_address, char *rp,
   //(void)sia_value; /* variable not used */
 
   PRINT("  oc_issue_s_mode : scope %d\n", scope);
+  int ula_prefix = 0;
 
-#ifdef OC_OSCORE
-  oc_make_ipv6_endpoint(mcast, IPV6 | MULTICAST | OSCORE, COAP_PORT, 0xff,
-                        scope, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0xfd);
-#else
-  oc_make_ipv6_endpoint(mcast, IPV6 | MULTICAST, COAP_PORT, 0xff, scope, 0, 0,
-                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0xfd);
+#ifndef GROUP_ADDRESSING
+#ifdef OC_OSCORE 
+  oc_make_ipv6_endpoint(group_mcast, IPV6 | MULTICAST | OSCORE,
+                                            COAP_PORT, 0xff, -scope, 0, 0, 0, 0,
+                                            0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0xfd);
+#else 
+  oc_make_ipv6_endpoint(group_mcast, IPV6 | MULTICAST, COAP_PORT, 0xff,
+                                 scope, 0, 0, -0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                 0x00, 0xfd);
 #endif
-  PRINT("  ");
-  PRINTipaddr(mcast);
-  PRINT("\n");
 
-  oc_send_s_mode(&mcast, "/.knx", sia_value, group_address, rp, value_data,
+#else
+  /* using group addressing */
+  oc_endpoint_t group_mcast;
+  memset(&group_mcast, 0, sizeof(group_mcast));
+  group_mcast = oc_create_multicast_group_address(group_mcast, group_address,
+                                                  ula_prefix, scope);
+  PRINT("  ");
+  PRINTipaddr(group_mcast);
+  PRINT("\n");
+#endif
+
+  oc_send_s_mode(&group_mcast, "/.knx", sia_value, group_address, rp,
+                 value_data,
                  value_size);
 }
 
@@ -597,34 +598,37 @@ oc_do_s_mode_with_scope(int scope, char *resource_url, char *rp)
   while (index != -1) {
     int ga_len = oc_core_find_group_object_table_number_group_entries(index);
     oc_cflag_mask_t cflags = oc_core_group_object_table_cflag_entries(index);
-    PRINT(" index %d rp = %s cflags %d", index, rp, cflags);
+    PRINT(" index %d rp = %s cflags %d flags=", index, rp, cflags);
+    oc_print_cflags(cflags);
 
     // With a read command to a Group Object, the device send this Group
     // Object’s value.
-    if ((cflags & OC_CFLAG_READ) || (cflags & OC_CFLAG_TRANSMISSION) ||
-        (cflags & OC_CFLAG_INIT)) {
-      PRINT(" skipping index %d due to flags %d", index, cflags);
-      break;
-    }
+    if (((cflags & OC_CFLAG_READ) == 0) && ((cflags & OC_CFLAG_TRANSMISSION) == 0) &&
+        ((cflags & OC_CFLAG_INIT) > 0)) {
+      PRINT("    skipping index %d due to cflags %d flags=", index, cflags);
+      oc_print_cflags(cflags);
+    } else {
+      PRINT("    handling: index %d\n", index);
+      for (int j = 0; j < ga_len; j++) {
+        group_address = oc_core_find_group_object_table_group_entry(index, j);
+        PRINT("      ga : %d\n", group_address);
+        // issue the s-mode command
+        oc_issue_s_mode(scope, sia_value, group_address, rp, buffer,
+                        value_size);
 
-    for (int j = 0; j < ga_len; j++) {
-      group_address = oc_core_find_group_object_table_group_entry(index, j);
-      PRINT("   ga : %d\n", group_address);
-      // issue the s-mode command
-      oc_issue_s_mode(scope, sia_value, group_address, rp, buffer, value_size);
-
-      // the recipient table contains the list of destinations that will receive
-      // data. loop over the full recipient table and send a message if the
-      // group is there
-      for (int j = 0; j < oc_core_get_recipient_table_size(); j++) {
-        bool found =
-          oc_core_check_recipient_index_on_group_address(j, group_address);
-        if (found) {
-          char *url = oc_core_get_recipient_index_url_or_path(j);
-          if (url) {
-            PRINT(" broker send: %s\n", url);
-            int ia = oc_core_get_recipient_ia(j);
-            oc_knx_client_do_broker_request(resource_url, ia, url, rp);
+        // the recipient table contains the list of destinations that will
+        // receive data. loop over the full recipient table and send a message
+        // if the group is there
+        for (int j = 0; j < oc_core_get_recipient_table_size(); j++) {
+          bool found =
+            oc_core_check_recipient_index_on_group_address(j, group_address);
+          if (found) {
+            char *url = oc_core_get_recipient_index_url_or_path(j);
+            if (url) {
+              PRINT(" broker send: %s\n", url);
+              int ia = oc_core_get_recipient_ia(j);
+              oc_knx_client_do_broker_request(resource_url, ia, url, rp);
+            }
           }
         }
       }

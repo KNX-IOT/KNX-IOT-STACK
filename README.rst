@@ -104,9 +104,18 @@ port/\*.h
 
 port/<OS>/*
   contains adaptations for each OS.
+  Platforms:
+  
+  - Linux
+    storage folder is created by the make system
+  - Windows
+    storage folder is automatic created by the make system.
+    as extra also the stack creates the storage folder.
+    This allows copying of the executables to other folders without having to know which folder to create.
+  
 
 apps/*
-  contains sample  applications.
+  contains sample applications.
 
 
 Build instructions

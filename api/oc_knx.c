@@ -715,7 +715,7 @@ void
 oc_create_knx_knx_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_knx_resource\n");
-  // "/a/lsm"
+
   oc_core_populate_resource(resource_idx, device, "/.knx", OC_IF_LI | OC_IF_G,
                             APPLICATION_CBOR, OC_DISCOVERABLE,
                             oc_core_knx_knx_get_handler, 0,
