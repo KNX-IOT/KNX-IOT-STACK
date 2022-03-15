@@ -793,7 +793,7 @@ issue_requests_s_mode_delayed(void *data)
   (void)data;
 
   PRINT(" issue_requests_s_mode_delayed\n");
-  int ga_values[5] = { 2, 255, 256, 1024, 1024 * 256 };
+  int ga_values[5] = { 1, 255, 256, 1024, 1024 * 256 };
   oc_string_t href;
   oc_new_string(&href, "/p/c", strlen("/p/c"));
 
@@ -801,11 +801,22 @@ issue_requests_s_mode_delayed(void *data)
   entry.cflags = OC_CFLAG_WRITE | OC_CFLAG_READ;
   entry.id = 55;
   entry.href = href;
-  entry.ga_len = 5;
+  entry.ga_len = 1;
   entry.ga = (int *)&ga_values;
 
   oc_core_set_group_object_table(0, entry);
   oc_print_group_object_table_entry(0);
+
+  oc_group_object_table_t entry2;
+  entry2.cflags = OC_CFLAG_TRANSMISSION ;
+  entry2.id = 5;
+  entry2.href = href;
+  entry2.ga_len = 1;
+  entry2.ga = (int *)&ga_values;
+
+  oc_core_set_group_object_table(1, entry2);
+  PRINT("\n");
+  oc_print_group_object_table_entry(1);
 
   oc_register_group_multicasts();
 
