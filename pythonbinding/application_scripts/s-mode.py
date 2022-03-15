@@ -94,9 +94,9 @@ if __name__ == '__main__':  # pragma: no cover
     parser.add_argument("-ga", "--ga", default=1,
                     help="group address (default = 1)", nargs='?', const="",
                     required=False)
-    parser.add_argument("-valuetype", "--valuetype", default=1,
-                    help="1=boolean, 2=int, 3=float (default boolean)", nargs='?',
-                    const="1", required=False)
+    parser.add_argument("-valuetype", "--valuetype", default=0,
+                    help="0=boolean, 1=integer, 2=float (default boolean)", nargs='?',
+                    const="", required=False)
     parser.add_argument("-value", "--value", default=True,
                     help="value of the valuetype (default True)", nargs='?',
                     const="true", required=False)
