@@ -1284,17 +1284,14 @@ bool
 oc_is_resource_secure(oc_method_t method, oc_resource_t *resource)
 {
   // see table 6.1.3: all resources with methods that do not have
-  // an interface are unsecure
-  // note: /dev/sn : to be discussed if this one is unsecured
+  // an interface that is not secure
   if (method == OC_GET &&
       ((oc_string_len(resource->uri) == 17 &&
         memcmp(oc_string(resource->uri), "/.well-known/core", 17) == 0) ||
        (oc_string_len(resource->uri) == 16 &&
         memcmp(oc_string(resource->uri), "/.well-known/knx", 16) == 0) ||
        (oc_string_len(resource->uri) == 20 &&
-        memcmp(oc_string(resource->uri), "/.well-known/knx/osn", 20) == 0) ||
-       (oc_string_len(resource->uri) == 7 &&
-        memcmp(oc_string(resource->uri), "/dev/sn", 7) == 0))) {
+        memcmp(oc_string(resource->uri), "/.well-known/knx/osn", 20) == 0))) {
     return false;
   }
   // not secure: needed for SPAKE handshake
