@@ -62,7 +62,7 @@ kisCS_EXPORT void py_set_max_app_data_size(int data_size);
 /**
  * @brief install the changed callback
  *
- * @param changedCB
+ * @param changedCB the changed callback
  */
 kisCS_EXPORT void py_install_changedCB(changedCB changedCB);
 
@@ -70,7 +70,6 @@ kisCS_EXPORT void py_install_changedCB(changedCB changedCB);
  * @brief install the resource callback (not yet used)
  *
  * @param resourceCB the resource callback
- * @return kisCS_EXPORT
  */
 kisCS_EXPORT void py_install_resourceCB(resourceCB resourceCB);
 
@@ -189,9 +188,8 @@ kisCS_EXPORT void py_initate_spake(char *sn, char *password);
  * @param sia the sender address
  * @param ga the group address
  * @param st the service type ["r","w","rp"]
- * @param value_type the value type [1=boolean, 2=integer, 2= float]
+ * @param value_type the value type [0=boolean, 1=integer, 2=float]
  * @param value the value (as string)
- * @return kisCS_EXPORT
  */
 kisCS_EXPORT void py_issue_requests_s_mode(int scope, int sia, int ga, char *st,
                                            int value_type, char *value);
@@ -236,8 +234,6 @@ kisCS_EXPORT char *py_get_sn(int index);
 
 /**
  * @brief starts the C library.
- *
- * @return kisCS_EXPORT
  */
 kisCS_EXPORT int py_main(void);
 
@@ -245,7 +241,6 @@ kisCS_EXPORT int py_main(void);
  * @brief stops the C library
  *
  * @param signal the signal to stop
- * @return kisCS_EXPORT
  */
 kisCS_EXPORT void py_exit(int signal);
 
