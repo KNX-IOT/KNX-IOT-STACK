@@ -858,13 +858,13 @@ class KNXIOTStack():
         print("Discovered DEVICE ARRAY {}".format(self.device_array))
         return self.discovery_data
 
-    def initate_spake(self, sn, password):
+    def initiate_spake(self, sn, password):
         print("initiate spake: ", sn, password)
         # application
         spake_event.clear()
         self.discovery_data = None
-        self.lib.py_initate_spake.argtypes = [ String, String ]
-        self.lib.py_initate_spake(sn, password)
+        self.lib.py_initiate_spake.argtypes = [ String, String ]
+        self.lib.py_initiate_spake(sn, password)
         #time.sleep(self.timout)
         # python callback application
         #print("[P] discovery- done")
