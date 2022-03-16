@@ -696,9 +696,8 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
     device->ia = zero;
     device->iid = zero;
     oc_free_string(&device->hostname);
-    oc_new_string(&device->hostname, "",
-                  strlen(""));
-    
+    oc_new_string(&device->hostname, "", strlen(""));
+
     oc_delete_group_object_table();
     oc_delete_group_rp_table();
 
