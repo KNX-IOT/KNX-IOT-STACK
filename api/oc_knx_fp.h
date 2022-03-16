@@ -151,13 +151,29 @@ typedef struct oc_group_rp_table_t
 } oc_group_rp_table_t;
 
 /**
- * @brief set an entry in teh group
+ * @brief set an entry in the group object table
  *
  * @param index the index where to add the entry
  * @param entry the group object entry
  * @return int 0 == success
  */
 int oc_core_set_group_object_table(int index, oc_group_object_table_t entry);
+
+/**
+ * @brief retrieve the group object table total size,
+ * e.g. the number of entries that can be stored
+ *
+ * @return int the total number of entries
+ */
+int oc_core_get_group_object_table_total_size();
+
+/**
+ * @brief retrieve the group object table entry
+ *
+ * @param index the index in the group object table
+ * @return oc_group_object_table_t* pointer to the entry
+ */
+oc_group_object_table_t *oc_core_get_group_object_table_entry(int index);
 
 /**
  * @brief register the group entries in the Group Object table
@@ -350,6 +366,15 @@ bool oc_add_points_in_group_object_table_to_response(oc_request_t *request,
  */
 void oc_create_knx_fp_resources(size_t device);
 
+/**
+ * @brief create the group multi cast address
+ *
+ * @param in the endpoint to adapt
+ * @param group_nr the group number
+ * @param ula_prefix the ula prefix
+ * @param scope the address scope
+ * @return oc_endpoint_t the modified endpoint
+ */
 oc_endpoint_t oc_create_multicast_group_address(oc_endpoint_t in, int group_nr,
                                                 int ula_prefix, int scope);
 

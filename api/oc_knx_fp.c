@@ -183,6 +183,24 @@ oc_core_set_group_object_table(int index, oc_group_object_table_t entry)
 }
 
 int
+oc_core_get_group_object_table_total_size()
+{
+  return GOT_MAX_ENTRIES;
+}
+
+oc_group_object_table_t *
+oc_core_get_group_object_table_entry(int index)
+{
+  if (index < 0) {
+    return NULL;
+  }
+  if (index >= GOT_MAX_ENTRIES) {
+    return NULL;
+  }
+  return &g_got[index];
+}
+
+int
 oc_core_find_index_in_group_object_table_from_id(int id)
 {
   for (int i = 0; i < GOT_MAX_ENTRIES; i++) {

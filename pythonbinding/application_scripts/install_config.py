@@ -146,7 +146,7 @@ def do_install_device(my_stack, sn, ia, iid, got_content, rec_content, pub_conte
     print ("response:",response)
     my_stack.purge_response(response)
 
-    content = ia
+    content = int(ia)
     print("set IA :", content)
     response = my_stack.issue_cbor_put(sn,"/dev/ia",content)
     print ("response:",response)
