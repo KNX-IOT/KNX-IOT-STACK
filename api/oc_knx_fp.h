@@ -43,8 +43,23 @@ typedef enum {
     1 << 7, /**< 128 false = Group Object value is not updated.*/
 } oc_cflag_mask_t;
 
+/**
+ * @brief print the cflags to standart output
+ * cflags in ascii e.g. "w" "r" "i" "t" "u" without quotes
+ * 
+ * @param cflags the cflags
+ */
 void oc_print_cflags(oc_cflag_mask_t cflags);
 
+/**
+ * @brief adds the cflags a preallocated buffer
+
+ * cflags in ascii e.g. "w" "r" "i" "t" "u" without quotes
+ * if the flag does not exist, then a "." will be added instead
+ * 
+ * @param buffer the string buffer to add the cflags too
+ * @param cflags the cflags
+ */
 void oc_cflags_as_string(char *buffer, oc_cflag_mask_t cflags);
 
 /**
@@ -179,7 +194,7 @@ oc_group_object_table_t *oc_core_get_group_object_table_entry(int index);
 
 /**
  * @brief register the group entries in the Group Object table
- * as multicast receive addresses
+ * as multi cast receive addresses
  *
  * function to be called when the device is (re)started in run-time mode
  */
