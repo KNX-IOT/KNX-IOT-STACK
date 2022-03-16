@@ -1376,6 +1376,39 @@ oc_core_get_recipient_index_url_or_path(int index)
 // -----------------------------------------------------------------------------
 
 void
+oc_cflags_as_string(char* buffer, oc_cflag_mask_t cflags)
+{
+
+
+  if (cflags & OC_CFLAG_READ) {
+    strcat(buffer,"r");
+  } else {
+    strcat(buffer, ".");
+  }
+  if (cflags & OC_CFLAG_WRITE) {
+    strcat(buffer, "w");
+  } else {
+    strcat(buffer, ".");
+  }
+  if (cflags & OC_CFLAG_INIT) {
+    strcat(buffer, "i");
+  } else {
+    strcat(buffer, ".");
+  }
+  if (cflags & OC_CFLAG_TRANSMISSION) {
+    strcat(buffer, "t");
+  } else {
+    strcat(buffer, ".");
+  }
+  if (cflags & OC_CFLAG_UPDATE) {
+    strcat(buffer, "u");
+  } else {
+    strcat(buffer, ".");
+  }
+}
+
+
+void
 oc_print_cflags(oc_cflag_mask_t cflags)
 {
 
