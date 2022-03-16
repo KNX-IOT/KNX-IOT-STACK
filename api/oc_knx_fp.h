@@ -160,16 +160,16 @@ typedef struct oc_group_rp_table_t
 int oc_core_set_group_object_table(int index, oc_group_object_table_t entry);
 
 /**
- * @brief retrieve the group object table total size, 
+ * @brief retrieve the group object table total size,
  * e.g. the number of entries that can be stored
- * 
+ *
  * @return int the total number of entries
  */
 int oc_core_get_group_object_table_total_size();
 
 /**
  * @brief retrieve the group object table entry
- * 
+ *
  * @param index the index in the group object table
  * @return oc_group_object_table_t* pointer to the entry
  */
@@ -368,7 +368,7 @@ void oc_create_knx_fp_resources(size_t device);
 
 /**
  * @brief create the group multi cast address
- * 
+ *
  * @param in the endpoint to adapt
  * @param group_nr the group number
  * @param ula_prefix the ula prefix

@@ -200,9 +200,6 @@ oc_core_get_group_object_table_entry(int index)
   return &g_got[index];
 }
 
-
-
-
 int
 oc_core_find_index_in_group_object_table_from_id(int id)
 {
