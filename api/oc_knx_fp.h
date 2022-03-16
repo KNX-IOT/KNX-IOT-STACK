@@ -45,6 +45,8 @@ typedef enum {
 
 void oc_print_cflags(oc_cflag_mask_t cflags);
 
+void oc_cflags_as_string(char *buffer, oc_cflag_mask_t cflags);
+
 /**
  * @brief Group Object Table Resource (/fp/g)
  *
