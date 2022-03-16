@@ -686,13 +686,19 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
      to default ex-factory state. */
     // writing the empty values
     oc_storage_write(KNX_STORAGE_IA, (char *)&zero, sizeof(int));
-    oc_storage_write(KNX_STORAGE_HOSTNAME, (char *)&buf, 1);
     oc_storage_write(KNX_STORAGE_IID, (char *)&zero, sizeof(uint32_t));
     oc_storage_write(KNX_STORAGE_PM, (char *)&zero, sizeof(uint8_t));
-    // load state: unloaded
+    oc_storage_write(KNX_STORAGE_HOSTNAME, (char *)&buf, 1);
+    // load state: unloaded, and programming mode is true
     oc_knx_lsm_set_state(device_index, LSM_S_UNLOADED);
-    // oc_storage_write(KNX_STORAGE_PM, (char *)&zero, sizeof(uint8_t));
-
+    oc_device_info_t *device = oc_core_get_device_info(device_index);
+    // set the other data to null
+    device->ia = zero;
+    device->iid = zero;
+    oc_free_string(&device->hostname);
+    oc_new_string(&device->hostname, "",
+                  strlen(""));
+    
     oc_delete_group_object_table();
     oc_delete_group_rp_table();
 
