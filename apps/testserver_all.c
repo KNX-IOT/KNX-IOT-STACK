@@ -68,6 +68,7 @@
 #include "oc_api.h"
 #include "oc_core_res.h"
 #include "api/oc_knx_fp.h"
+#include "api/oc_knx_gm.h"
 #ifdef OC_SPAKE
 #include "security/oc_spake2plus.h"
 #endif
