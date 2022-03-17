@@ -303,7 +303,6 @@ oc_main_init(const oc_handler_t *handler)
 
   OC_DBG("oc_main: stack initialized");
 
-
   initialized = true;
 
   oc_factory_presets_t *presets = oc_get_factory_presets_cb();

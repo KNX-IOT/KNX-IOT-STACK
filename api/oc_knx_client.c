@@ -409,8 +409,8 @@ oc_issue_s_mode(int scope, int sia_value, int group_address, int iid, char *rp,
   /* using group addressing */
   oc_endpoint_t group_mcast;
   memset(&group_mcast, 0, sizeof(group_mcast));
-  group_mcast = oc_create_multicast_group_address(group_mcast, group_address,
-                                                  iid, scope);
+  group_mcast =
+    oc_create_multicast_group_address(group_mcast, group_address, iid, scope);
   PRINT("  ");
   PRINTipaddr(group_mcast);
   PRINT("\n");
@@ -564,7 +564,7 @@ oc_do_s_mode(char *resource_url, char *rp)
   oc_do_s_mode_with_scope(scope, resource_url, rp);
 }
 
-void 
+void
 oc_do_s_mode_read(size_t group_address)
 {
   size_t device_index = 0;

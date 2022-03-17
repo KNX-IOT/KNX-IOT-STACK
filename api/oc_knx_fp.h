@@ -396,7 +396,7 @@ void oc_create_knx_fp_resources(size_t device);
  * @return oc_endpoint_t the modified endpoint
  */
 oc_endpoint_t oc_create_multicast_group_address(oc_endpoint_t in, int group_nr,
-                                                 int iid, int scope);
+                                                int iid, int scope);
 
 #ifdef __cplusplus
 }

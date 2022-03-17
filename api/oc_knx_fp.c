@@ -1885,7 +1885,7 @@ oc_create_knx_fp_resources(size_t device_index)
   oc_load_group_object_table();
   oc_load_rp_object_table();
 
-  //oc_register_group_multicasts();
+  // oc_register_group_multicasts();
 }
 
 // -----------------------------------------------------------------------------
@@ -1948,7 +1948,6 @@ oc_create_multicast_group_address(oc_endpoint_t in, int group_nr, int iid,
   uint8_t byte_3 = (uint8_t)(group_nr >> 16);
   uint8_t byte_4 = (uint8_t)(group_nr >> 24);
 
-
   // iid as  ula prefix to various bytes
   uint8_t ula_1 = (uint8_t)iid;
   uint8_t ula_2 = (uint8_t)(iid >> 8);
@@ -1963,8 +1962,8 @@ oc_create_multicast_group_address(oc_endpoint_t in, int group_nr, int iid,
 #endif
 
   oc_make_ipv6_endpoint(group_mcast, my_transport_flags, 5683, 0xff,
-                        0x30 + scope, ula_4, ula_3, ula_2, ula_1, 0, 0, 0, 0, 0, 0, byte_4,
-                        byte_3, byte_2, byte_1);
+                        0x30 + scope, ula_4, ula_3, ula_2, ula_1, 0, 0, 0, 0, 0,
+                        0, byte_4, byte_3, byte_2, byte_1);
   PRINT("  oc_create_multicast_group_address S=%d U=%d G=%d B4=%d B3=%d B2=%d "
         "B1=%d\n",
         scope, iid, group_nr, byte_4, byte_3, byte_2, byte_1);
@@ -2001,12 +2000,11 @@ oc_register_group_multicasts()
   int index;
   for (index = 0; index < GOT_MAX_ENTRIES; index++) {
     int nr_entries = g_got[index].ga_len;
-    
-     oc_cflag_mask_t cflags = g_got[index].cflags;
+
+    oc_cflag_mask_t cflags = g_got[index].cflags;
     // check if the group address is used for receiving.
     // e.g. WRITE or UPDATE
-    if ( ((cflags & OC_CFLAG_WRITE) > 0) || 
-         ((cflags & OC_CFLAG_UPDATE) > 0) ){
+    if (((cflags & OC_CFLAG_WRITE) > 0) || ((cflags & OC_CFLAG_UPDATE) > 0)) {
 
       for (int i = 0; i < nr_entries; i++) {
         PRINT(" oc_register_group_multicasts index=%d i=%d group: %d  cflags=",
@@ -2026,7 +2024,7 @@ oc_init_datapoints_from_got()
 
   for (index = 0; index < GOT_MAX_ENTRIES; index++) {
     int nr_entries = g_got[index].ga_len;
-    
+
     if (nr_entries > 0) {
       oc_cflag_mask_t cflags = g_got[index].cflags;
       if ((cflags & OC_CFLAG_INIT) > 0) {
