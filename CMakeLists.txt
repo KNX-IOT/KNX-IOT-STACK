@@ -9,6 +9,7 @@ add_compile_definitions(OC_DYNAMIC_ALLOCATION)
 # Do not build anything except for the library
 option(ENABLE_PROGRAMS "Build mbed TLS programs." OFF)
 option(ENABLE_TESTING "Build mbed TLS tests." OFF)
+option(BUILD_TESTING "Build KNX tests" OFF)
 
 #set(OC_SECURITY_ENABLED ON CACHE BOOL "Enable security")
 
@@ -193,12 +194,15 @@ target_link_libraries(kisCS PUBLIC kis-common)
 
 target_include_directories(kisCS PRIVATE ${PROJECT_BINARY_DIR} ${KNX_INCLUDE_DIRS})
 
-# do not treat warnings as errors on Windows
 if(MSVC)
-    target_compile_options(mbedtls PRIVATE /W1 /WX-)
-    target_compile_options(mbedx509 PRIVATE /W1 /WX-)
-    target_compile_options(mbedcrypto PRIVATE /W1 /WX-)
-    target_compile_options(kis-common INTERFACE /W1 /WX-)
+    # do not treat warnings as errors on Windows
+    add_compile_options(/W1 /WX-)
+elseif(NOT BUILD_TESTING)
+    # enable warnings as errors on GCC-based toolchains
+
+    # do not do this for the testing tree as there are warnings
+    # within gtest
+    add_compile_options(-Werror)
 endif()
 
 # copy Python binding files to build directory
