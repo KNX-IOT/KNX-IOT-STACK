@@ -547,13 +547,6 @@ void oc_resource_bind_resource_type(oc_resource_t *resource, const char *type);
 void oc_resource_bind_content_type(oc_resource_t *resource,
                                    oc_content_format_t content_type);
 
-/**
- * @defgroup doc_module_tag_collections Collection Support
- * Optional group of functions to support compliant collections.
- * @{
- */
-
-/** @} */ // end of doc_module_tag_collections
 
 /**
  * Expose unsecured coap:// endpoints (in addition to secured coaps://
