@@ -486,7 +486,7 @@ oc_ri_query_exists(const char *query, size_t query_len, const char *key)
   return found;
 }
 
-static void
+void
 allocate_events(void)
 {
   int i = 0;
