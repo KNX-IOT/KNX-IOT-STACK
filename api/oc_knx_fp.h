@@ -46,7 +46,7 @@ typedef enum {
 /**
  * @brief print the cflags to standard output
  * cflags in ASCII e.g. "w" "r" "i" "t" "u" without quotes
- * 
+ *
  * @param cflags the cflags
  */
 void oc_print_cflags(oc_cflag_mask_t cflags);
@@ -56,7 +56,7 @@ void oc_print_cflags(oc_cflag_mask_t cflags);
 
  * cflags in ASCII e.g. "w" "r" "i" "t" "u" without quotes
  * if the flag does not exist, then a "." will be added instead
- * 
+ *
  * @param buffer the string buffer to add the cflags too
  * @param cflags The cflags
  */
