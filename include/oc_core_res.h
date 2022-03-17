@@ -21,7 +21,7 @@
 #define OC_CORE_RES_H
 
 #include "oc_ri.h"
-#include "oc_device_mode.h"
+#include "oc_programming_mode.h"
 #include "oc_knx.h"
 #include <stdint.h>
 
