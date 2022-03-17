@@ -98,6 +98,8 @@ oc_rep_t *oc_s_mode_get_value(oc_request_t *request);
  */
 void oc_do_s_mode(char *resource_url, char *rp);
 
+void oc_do_s_mode_read(size_t group_address);
+
 /**
  * @brief sends (transmits) an s-mode message
  * the value comes from the GET of the resource indicated by the resource_url

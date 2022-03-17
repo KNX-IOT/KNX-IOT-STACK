@@ -178,7 +178,6 @@ OC_PROCESS_THREAD(message_buffer_handler, ev, data)
 {
   OC_PROCESS_BEGIN();
   OC_DBG("Started buffer handler process");
-  PRINT("Started buffer handler process\n");
   while (1) {
     OC_PROCESS_YIELD();
 

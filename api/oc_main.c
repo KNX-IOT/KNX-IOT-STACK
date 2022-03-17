@@ -31,6 +31,7 @@
 #include "oc_signal_event_loop.h"
 
 #include "oc_knx_dev.h"
+#include "oc_knx_fp.h"
 
 #ifdef OC_OSCORE
 #include "security/oc_tls.h"
@@ -308,6 +309,11 @@ oc_main_init(const oc_handler_t *handler)
   if (presets && presets->cb) {
     presets->cb(0, presets->data);
   }
+
+#ifdef OC_SERVER
+  // listen to the group addresses multicasts (if there are any)
+  oc_register_group_multicasts();
+#endif
 
 #ifdef OC_CLIENT
   if (app_callbacks->requests_entry) {

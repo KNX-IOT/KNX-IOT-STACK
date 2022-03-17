@@ -391,12 +391,12 @@ void oc_create_knx_fp_resources(size_t device);
  *
  * @param in the endpoint to adapt
  * @param group_nr the group number
- * @param ula_prefix the ula prefix
+ * @param iid the installation id
  * @param scope the address scope
  * @return oc_endpoint_t the modified endpoint
  */
 oc_endpoint_t oc_create_multicast_group_address(oc_endpoint_t in, int group_nr,
-                                                int ula_prefix, int scope);
+                                                int iid, int scope);
 
 #ifdef __cplusplus
 }

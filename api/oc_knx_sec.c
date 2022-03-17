@@ -845,8 +845,7 @@ void
 oc_create_auth_at_x_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_auth_at_x_resource\n");
-  PRINT("oc_create_auth_at_x_resource\n");
-  // "/a/sen"
+
   oc_core_populate_resource(resource_idx, device, "/auth/at/*", OC_IF_SEC,
                             APPLICATION_CBOR, OC_DISCOVERABLE,
                             oc_core_auth_at_x_get_handler, 0, 0,

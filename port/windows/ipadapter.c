@@ -247,8 +247,6 @@ add_mcast_sock_to_ipv6_mcast_group(SOCKET mcast_sock, DWORD if_index)
 {
   struct ipv6_mreq mreq;
 
-  PRINT("add_mcast_sock_to_ipv6_mcast_group\n");
-
   /* Link-local scope */
   memset(&mreq, 0, sizeof(mreq));
   memcpy(mreq.ipv6mr_multiaddr.s6_addr, ALL_OCF_NODES_LL, 16);

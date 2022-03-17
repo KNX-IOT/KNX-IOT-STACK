@@ -14,7 +14,6 @@
 // limitations under the License.
 */
 
-//#if defined (OC_SECURITY) && defined(OC_OSCORE)
 #if defined(OC_OSCORE)
 
 #include "api/oc_events.h"
