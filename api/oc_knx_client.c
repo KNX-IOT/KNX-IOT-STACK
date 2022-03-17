@@ -387,13 +387,10 @@ oc_s_mode_get_value(oc_request_t *request)
 }
 
 static void
-oc_issue_s_mode(int scope, int sia_value, int group_address, char *rp,
+oc_issue_s_mode(int scope, int sia_value, int group_address, int iid, char *rp,
                 uint8_t *value_data, int value_size)
 {
-  //(void)sia_value; /* variable not used */
-
   PRINT("  oc_issue_s_mode : scope %d\n", scope);
-  int ula_prefix = 0;
 
 #ifndef GROUP_ADDRESSING
 #ifdef OC_OSCORE
@@ -413,7 +410,7 @@ oc_issue_s_mode(int scope, int sia_value, int group_address, char *rp,
   oc_endpoint_t group_mcast;
   memset(&group_mcast, 0, sizeof(group_mcast));
   group_mcast = oc_create_multicast_group_address(group_mcast, group_address,
-                                                  ula_prefix, scope);
+                                                  iid, scope);
   PRINT("  ");
   PRINTipaddr(group_mcast);
   PRINT("\n");
@@ -573,10 +570,11 @@ oc_do_s_mode_read(size_t group_address)
   size_t device_index = 0;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   int sia_value = device->ia;
+  int iid = device->iid;
 
   if (group_address > 0) {
-    oc_issue_s_mode(2, sia_value, group_address, "r", 0, 0);
-    oc_issue_s_mode(5, sia_value, group_address, "r", 0, 0);
+    oc_issue_s_mode(2, sia_value, group_address, iid, "r", 0, 0);
+    oc_issue_s_mode(5, sia_value, group_address, iid, "r", 0, 0);
   }
 }
 
@@ -606,7 +604,7 @@ oc_do_s_mode_with_scope(int scope, char *resource_url, char *rp)
   size_t device_index = 0;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   int sia_value = device->ia;
-
+  int iid = device->iid;
   int group_address = -1;
 
   // loop over all group addresses and issue the s-mode command
@@ -631,7 +629,7 @@ oc_do_s_mode_with_scope(int scope, char *resource_url, char *rp)
         if (group_address > 0) {
           PRINT("      ga : %d\n", group_address);
           // issue the s-mode command
-          oc_issue_s_mode(scope, sia_value, group_address, rp, buffer,
+          oc_issue_s_mode(scope, sia_value, group_address, iid, rp, buffer,
                           value_size);
           // the recipient table contains the list of destinations that will
           // receive data. loop over the full recipient table and send a message

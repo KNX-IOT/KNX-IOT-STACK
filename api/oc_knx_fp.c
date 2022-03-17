@@ -1532,9 +1532,8 @@ oc_load_group_object_table_entry(int entry)
             int64_t *arr = oc_int_array(rep->value.array);
             int array_size = (int)oc_int_array_size(rep->value.array);
             int *new_array = (int *)malloc(array_size * sizeof(int));
-            // int*  new_array;
-            // oc_new_int_array(&new_array, array_size);
 
+            // TODO check  if new array is not NULL
             for (int i = 0; i < array_size; i++) {
               new_array[i] = arr[i];
             }
@@ -1935,8 +1934,8 @@ oc_add_points_in_group_object_table_to_response(oc_request_t *request,
 }
 
 oc_endpoint_t
-oc_create_multicast_group_address(oc_endpoint_t in, int group_nr,
-                                  int ula_prefix, int scope)
+oc_create_multicast_group_address(oc_endpoint_t in, int group_nr, int iid,
+                                  int scope)
 {
   // create the multicast address from group and scope
   // FF35::30: <ULA-routing-prefix>::<group id>
@@ -1949,8 +1948,12 @@ oc_create_multicast_group_address(oc_endpoint_t in, int group_nr,
   uint8_t byte_3 = (uint8_t)(group_nr >> 16);
   uint8_t byte_4 = (uint8_t)(group_nr >> 24);
 
-  // TODO:
-  // ula prefix to various bytes
+
+  // iid as  ula prefix to various bytes
+  uint8_t ula_1 = (uint8_t)iid;
+  uint8_t ula_2 = (uint8_t)(iid >> 8);
+  uint8_t ula_3 = (uint8_t)(iid >> 16);
+  uint8_t ula_4 = (uint8_t)(iid >> 24);
 
   int my_transport_flags = 0;
   my_transport_flags += IPV6;
@@ -1960,11 +1963,11 @@ oc_create_multicast_group_address(oc_endpoint_t in, int group_nr,
 #endif
 
   oc_make_ipv6_endpoint(group_mcast, my_transport_flags, 5683, 0xff,
-                        0x30 + scope, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, byte_4,
+                        0x30 + scope, ula_4, ula_3, ula_2, ula_1, 0, 0, 0, 0, 0, 0, byte_4,
                         byte_3, byte_2, byte_1);
   PRINT("  oc_create_multicast_group_address S=%d U=%d G=%d B4=%d B3=%d B2=%d "
         "B1=%d\n",
-        scope, ula_prefix, group_nr, byte_4, byte_3, byte_2, byte_1);
+        scope, iid, group_nr, byte_4, byte_3, byte_2, byte_1);
   PRINTipaddr(group_mcast);
   PRINT("\n");
   memcpy(&in, &group_mcast, sizeof(oc_endpoint_t));
@@ -1973,7 +1976,7 @@ oc_create_multicast_group_address(oc_endpoint_t in, int group_nr,
 }
 
 void
-subscribe_group_to_multicast(int group_nr, int ula_prefix, int scope)
+subscribe_group_to_multicast(int group_nr, int iid, int scope)
 {
   // FF35::30: <ULA-routing-prefix>::<group id>
   //
@@ -1982,7 +1985,7 @@ subscribe_group_to_multicast(int group_nr, int ula_prefix, int scope)
   memset(&group_mcast, 0, sizeof(group_mcast));
 
   group_mcast =
-    oc_create_multicast_group_address(group_mcast, group_nr, ula_prefix, scope);
+    oc_create_multicast_group_address(group_mcast, group_nr, iid, scope);
 
   // subscribe
   oc_connectivity_subscribe_mcast_ipv6(&group_mcast);
@@ -1991,8 +1994,10 @@ subscribe_group_to_multicast(int group_nr, int ula_prefix, int scope)
 void
 oc_register_group_multicasts()
 {
-  // FD11:2222:3333::
-  int ula_prefix = 0;
+  // installation id will be used as ULA prefix
+  oc_device_info_t *device = oc_core_get_device_info(0);
+  uint32_t installation_id = device->iid;
+
   int index;
   for (index = 0; index < GOT_MAX_ENTRIES; index++) {
     int nr_entries = g_got[index].ga_len;
@@ -2007,8 +2012,8 @@ oc_register_group_multicasts()
         PRINT(" oc_register_group_multicasts index=%d i=%d group: %d  cflags=",
               index, i, g_got[index].ga[i]);
         oc_print_cflags(cflags);
-        subscribe_group_to_multicast(g_got[index].ga[i], ula_prefix, 2);
-        subscribe_group_to_multicast(g_got[index].ga[i], ula_prefix, 5);
+        subscribe_group_to_multicast(g_got[index].ga[i], installation_id, 2);
+        subscribe_group_to_multicast(g_got[index].ga[i], installation_id, 5);
       }
     }
   }

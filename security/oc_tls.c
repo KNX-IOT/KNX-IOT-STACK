@@ -2023,7 +2023,6 @@ OC_PROCESS_THREAD(oc_tls_handler, ev, data)
 {
   OC_PROCESS_POLLHANDLER(close_all_tls_sessions());
   OC_PROCESS_BEGIN();
-  PRINT("tls engine\n");
   while (1) {
     OC_PROCESS_YIELD();
 

@@ -347,7 +347,7 @@ oc_core_add_device(const char *name, const char *version, const char *base,
 #else /* !OC_DYNAMIC_ALLOCATION */
   // note: there is always 1 resource, the initial one in the list
   size_t new_num = 1 + WELLKNOWNCORE * (device_count + 1);
-  PRINT(" oc_core_add_device  %d\n", (int)new_num);
+
   core_resources =
     (oc_resource_t *)realloc(core_resources, new_num * sizeof(oc_resource_t));
 
