@@ -193,12 +193,12 @@ target_link_libraries(kisCS PUBLIC kis-common)
 
 target_include_directories(kisCS PRIVATE ${PROJECT_BINARY_DIR} ${KNX_INCLUDE_DIRS})
 
-# do not treat warnings as errors on Windows
 if(MSVC)
-    target_compile_options(mbedtls PRIVATE /W1 /WX-)
-    target_compile_options(mbedx509 PRIVATE /W1 /WX-)
-    target_compile_options(mbedcrypto PRIVATE /W1 /WX-)
-    target_compile_options(kis-common INTERFACE /W1 /WX-)
+    # do not treat warnings as errors on Windows
+    add_compile_options(/W1 /WX-)
+else()
+    # enable warnings as errors on GCC-based toolchains
+    add_compile_options(-Werror)
 endif()
 
 # copy Python binding files to build directory
