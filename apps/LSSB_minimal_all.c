@@ -264,7 +264,7 @@ register_resources(void)
 /**
  * @brief initiate preset for device
  * current implementation: device reset as command line argument
- * @param device the device identifier of the list of devices
+ * @param device_index the device identifier of the list of devices
  * @param data the supplied data.
  */
 void
@@ -282,7 +282,8 @@ factory_presets_cb(size_t device_index, void *data)
 /**
  * @brief application reset
  *
- * @param device the device identifier of the list of devices
+ * @param device_index the device identifier of the list of devices
+ * @param reset_value the knx reset value
  * @param data the supplied data.
  */
 void
@@ -296,7 +297,7 @@ reset_cb(size_t device_index, int reset_value, void *data)
 /**
  * @brief restart the device (application depended)
  *
- * @param device the device identifier of the list of devices
+ * @param device_index the device identifier of the list of devices
  * @param data the supplied data.
  */
 void
@@ -312,7 +313,7 @@ restart_cb(size_t device_index, void *data)
 /**
  * @brief set the host name on the device (application depended)
  *
- * @param device the device identifier of the list of devices
+ * @param device_index the device identifier of the list of devices
  * @param host_name the host name to be set on the device
  * @param data the supplied data.
  */

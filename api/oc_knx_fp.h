@@ -1,5 +1,5 @@
 /*
-// Copyright (c) 2021 Cascoda Ltd
+// Copyright (c) 2021-2022 Cascoda Ltd
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -44,9 +44,9 @@ typedef enum {
 } oc_cflag_mask_t;
 
 /**
- * @brief print the cflags to standart output
- * cflags in ascii e.g. "w" "r" "i" "t" "u" without quotes
- * 
+ * @brief print the cflags to standard output
+ * cflags in ASCII e.g. "w" "r" "i" "t" "u" without quotes
+ *
  * @param cflags the cflags
  */
 void oc_print_cflags(oc_cflag_mask_t cflags);
@@ -54,11 +54,11 @@ void oc_print_cflags(oc_cflag_mask_t cflags);
 /**
  * @brief adds the cflags a preallocated buffer
 
- * cflags in ascii e.g. "w" "r" "i" "t" "u" without quotes
+ * cflags in ASCII e.g. "w" "r" "i" "t" "u" without quotes
  * if the flag does not exist, then a "." will be added instead
- * 
+ *
  * @param buffer the string buffer to add the cflags too
- * @param cflags the cflags
+ * @param cflags The cflags
  */
 void oc_cflags_as_string(char *buffer, oc_cflag_mask_t cflags);
 
@@ -110,7 +110,7 @@ void oc_cflags_as_string(char *buffer, oc_cflag_mask_t cflags);
 typedef struct oc_group_object_table_t
 {
   int id;                 /**< contents of id*/
-  oc_string_t href;       /**<  contents of href*/
+  oc_string_t href;       /**< contents of href*/
   oc_cflag_mask_t cflags; /**< contents of cflags as bitmap*/
   int ga_len;             /**< length of the array of ga identifiers*/
   int *ga;                /**< array of integers*/
@@ -229,17 +229,17 @@ int oc_core_find_next_group_object_table_index(int group_address,
 /**
  * @brief find (first) index in the group address table via url
  *
- * @param url the url to find
- * @return int the index in the table or -1
+ * @param url The url to find
+ * @return int The index in the table or -1
  */
 int oc_core_find_group_object_table_url(char *url);
 
 /**
  * @brief find next index in the group address table via url
  *
- * @param  url the url to find
- * @param cur_index  the current index to start from.
- * @return int the index in the table or -1
+ * @param  url The url to find
+ * @param cur_index  The current index to start from.
+ * @return int The index in the table or -1
  */
 int oc_core_find_next_group_object_table_url(char *url, int cur_index);
 

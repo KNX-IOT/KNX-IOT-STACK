@@ -1376,12 +1376,11 @@ oc_core_get_recipient_index_url_or_path(int index)
 // -----------------------------------------------------------------------------
 
 void
-oc_cflags_as_string(char* buffer, oc_cflag_mask_t cflags)
+oc_cflags_as_string(char *buffer, oc_cflag_mask_t cflags)
 {
 
-
   if (cflags & OC_CFLAG_READ) {
-    strcat(buffer,"r");
+    strcat(buffer, "r");
   } else {
     strcat(buffer, ".");
   }
@@ -1406,7 +1405,6 @@ oc_cflags_as_string(char* buffer, oc_cflag_mask_t cflags)
     strcat(buffer, ".");
   }
 }
-
 
 void
 oc_print_cflags(oc_cflag_mask_t cflags)

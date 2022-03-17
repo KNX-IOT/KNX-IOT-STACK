@@ -312,7 +312,8 @@ factory_presets_cb(size_t device, void *data)
 /**
  * @brief application reset
  *
- * @param device the device identifier of the list of devices
+ * @param device_index the device identifier of the list of devices
+ * @param reset_value the knx reset value
  * @param data the supplied data.
  */
 void
