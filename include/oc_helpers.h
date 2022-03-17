@@ -367,7 +367,7 @@ int oc_uri_get_wildcard_value_as_int_after_underscore(const char *uri_resource,
                                                       const char *uri_invoked,
                                                       size_t invoked_len);
 
-/*
+/**
  * @brief retrieve the wild card value as string
  * The invoked URI is checked against the URI of a resource
  * that might contain a wild card, if the resource URI contains a wild card

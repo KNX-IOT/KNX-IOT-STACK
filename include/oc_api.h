@@ -46,6 +46,10 @@
 extern "C" {
 #endif
 
+/**
+ * @brief maximum URL length (as specified by KNX)
+ *
+ */
 #define OC_MAX_URL_LENGTH (30)
 
 /**
