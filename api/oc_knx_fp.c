@@ -1886,7 +1886,7 @@ oc_create_knx_fp_resources(size_t device_index)
   oc_load_group_object_table();
   oc_load_rp_object_table();
 
-  oc_register_group_multicasts();
+  //oc_register_group_multicasts();
 }
 
 // -----------------------------------------------------------------------------
@@ -1996,12 +1996,37 @@ oc_register_group_multicasts()
   int index;
   for (index = 0; index < GOT_MAX_ENTRIES; index++) {
     int nr_entries = g_got[index].ga_len;
-    // TODO: add check if the group address is used for receiving.
-    for (int i = 0; i < nr_entries; i++) {
-      PRINT(" oc_register_group_multicasts index=%d i=%d group: %d\n", index, i,
-            g_got[index].ga[i]);
-      subscribe_group_to_multicast(g_got[index].ga[i], ula_prefix, 2);
-      subscribe_group_to_multicast(g_got[index].ga[i], ula_prefix, 5);
+    
+     oc_cflag_mask_t cflags = g_got[index].cflags;
+    // check if the group address is used for receiving.
+    // e.g. WRITE or UPDATE
+    if ( ((cflags & OC_CFLAG_WRITE) > 0) || 
+         ((cflags & OC_CFLAG_UPDATE) > 0) ){
+
+      for (int i = 0; i < nr_entries; i++) {
+        PRINT(" oc_register_group_multicasts index=%d i=%d group: %d  cflags=",
+              index, i, g_got[index].ga[i]);
+        oc_print_cflags(cflags);
+        subscribe_group_to_multicast(g_got[index].ga[i], ula_prefix, 2);
+        subscribe_group_to_multicast(g_got[index].ga[i], ula_prefix, 5);
+      }
+    }
+  }
+}
+
+void
+oc_init_datapoints_from_got()
+{
+  int index;
+
+  for (index = 0; index < GOT_MAX_ENTRIES; index++) {
+    int nr_entries = g_got[index].ga_len;
+    
+    if (nr_entries > 0) {
+      oc_cflag_mask_t cflags = g_got[index].cflags;
+      if ((cflags & OC_CFLAG_INIT) > 0) {
+        oc_do_s_mode_read(g_got[index].ga[0]);
+      }
     }
   }
 }

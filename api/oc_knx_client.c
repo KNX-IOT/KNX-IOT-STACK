@@ -461,7 +461,9 @@ oc_send_s_mode(oc_endpoint_t *endpoint, char *path, int sia_value,
     oc_rep_i_set_key(&value_map, 1);
     // copy the data, this is already in cbor from the fake response of the
     // resource GET function
-    oc_rep_encode_raw_encoder(&value_map, value_data, value_size);
+    if (value_size > 0) {
+      oc_rep_encode_raw_encoder(&value_map, value_data, value_size);
+    }
 
     cbor_encoder_close_container_checked(&root_map, &value_map);
 
@@ -563,6 +565,19 @@ oc_do_s_mode(char *resource_url, char *rp)
 {
   int scope = 2;
   oc_do_s_mode_with_scope(scope, resource_url, rp);
+}
+
+void 
+oc_do_s_mode_read(size_t group_address)
+{
+  size_t device_index = 0;
+  oc_device_info_t *device = oc_core_get_device_info(device_index);
+  int sia_value = device->ia;
+
+  if (group_address > 0) {
+    oc_issue_s_mode(2, sia_value, group_address, "r", 0, 0);
+    oc_issue_s_mode(5, sia_value, group_address, "r", 0, 0);
+  }
 }
 
 void
