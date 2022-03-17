@@ -38,11 +38,11 @@ typedef enum {
   INTERFACE_DOWN,
   INTERFACE_UP,
   TLS_CLOSE_ALL_SESSIONS,
-//#ifdef OC_OSCORE
+  //#ifdef OC_OSCORE
   INBOUND_OSCORE_EVENT,
   OUTBOUND_OSCORE_EVENT,
   OUTBOUND_GROUP_OSCORE_EVENT,
-//#endif /* OC_OSCORE */
+  //#endif /* OC_OSCORE */
   __NUM_OC_EVENT_TYPES__
 } oc_events_t;
 
