@@ -48,9 +48,9 @@ extern "C" {
 
 /**
  * @brief maximum URL length (as specified by KNX)
- * 
+ *
  */
-#define OC_MAX_URL_LENGTH (30) 
+#define OC_MAX_URL_LENGTH (30)
 
 /**
  * Call back handlers that are invoked in response to oc_main_init()
