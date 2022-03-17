@@ -613,25 +613,28 @@ oc_do_s_mode_with_scope(int scope, char *resource_url, char *rp)
       PRINT("    handling: index %d\n", index);
       for (int j = 0; j < ga_len; j++) {
         group_address = oc_core_find_group_object_table_group_entry(index, j);
-        PRINT("      ga : %d\n", group_address);
-        // issue the s-mode command
-        oc_issue_s_mode(scope, sia_value, group_address, rp, buffer,
-                        value_size);
-
-        // the recipient table contains the list of destinations that will
-        // receive data. loop over the full recipient table and send a message
-        // if the group is there
-        for (int j = 0; j < oc_core_get_recipient_table_size(); j++) {
-          bool found =
-            oc_core_check_recipient_index_on_group_address(j, group_address);
-          if (found) {
-            char *url = oc_core_get_recipient_index_url_or_path(j);
-            if (url) {
-              PRINT(" broker send: %s\n", url);
-              int ia = oc_core_get_recipient_ia(j);
-              oc_knx_client_do_broker_request(resource_url, ia, url, rp);
+        if (group_address > 0) {
+          PRINT("      ga : %d\n", group_address);
+          // issue the s-mode command
+          oc_issue_s_mode(scope, sia_value, group_address, rp, buffer,
+                          value_size);
+          // the recipient table contains the list of destinations that will
+          // receive data. loop over the full recipient table and send a message
+          // if the group is there
+          for (int j = 0; j < oc_core_get_recipient_table_size(); j++) {
+            bool found =
+              oc_core_check_recipient_index_on_group_address(j, group_address);
+            if (found) {
+              char *url = oc_core_get_recipient_index_url_or_path(j);
+              if (url) {
+                PRINT(" broker send: %s\n", url);
+                int ia = oc_core_get_recipient_ia(j);
+                oc_knx_client_do_broker_request(resource_url, ia, url, rp);
+              }
             }
           }
+        } else {
+          PRINT("      ga cannot be 0\n");
         }
       }
     }
