@@ -65,6 +65,8 @@ void oc_cflags_as_string(char *buffer, oc_cflag_mask_t cflags);
 /**
  * @brief Group Object Table Resource (/fp/g)
  *
+ * Example:
+ * ```
  * the will be an array of objects (as json):
  * [
  *    {
@@ -80,6 +82,7 @@ void oc_cflags_as_string(char *buffer, oc_cflag_mask_t cflags);
  *        "cflag":["t"]  // note this is an integer
  *     }
  * ]
+ * ```
  *
  * cflag translation
  * | string | bit     |  value |
