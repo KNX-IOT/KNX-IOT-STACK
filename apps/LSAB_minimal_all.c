@@ -25,8 +25,7 @@
  *  Example code for Function Block LSAB
  *  Implements only data point 61: switch on/off
  *  This implementation is a actuator, e.g. receives data
- */
-/**
+ *
  * ## Application Design
  *
  * support functions:

@@ -15,6 +15,7 @@
  limitations under the License.
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 */
+
 #ifndef DOXYGEN
 // Force doxygen to document static inline
 #define STATIC static
@@ -25,8 +26,7 @@
  *  Example code for Function Block LSSB
  *  Implements only data point 61: switch on/off
  *  This implementation is a sensor, e.g. transmits data
- */
-/**
+ *
  * ## Application Design
  *
  * support functions:

@@ -21,10 +21,19 @@
 */
 
 /**
-  \mainpage API
+  \mainpage KNX_IOT Stack
 
   The file \link oc_api.h \endlink is the main entry for all
   server and client related stack functions.
+
+  An KNX device contains:
+
+  - initialization functionality
+  - \ref doc_module_tag_server_side Server exposing data points
+  - \ref doc_module_tag_client_state Client sending s-mode commands
+
+
+
 */
 
 #ifndef OC_API_H
