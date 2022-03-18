@@ -255,6 +255,8 @@ kisCS_EXPORT int py_main(void);
  */
 kisCS_EXPORT void py_exit(int signal);
 
+/** @} */ // end of doc_module_tag_dll
+
 #ifdef __cplusplus
 }
 #endif

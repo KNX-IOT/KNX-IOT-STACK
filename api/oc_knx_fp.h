@@ -208,7 +208,7 @@ void oc_register_group_multicasts();
 /**
  * @brief find index belonging to the id
  *
- * @param the identifier of the entry
+ * @param id the identifier of the entry
  * @return int the index in the table or -1
  */
 int oc_core_find_index_in_group_object_table_from_id(int id);
