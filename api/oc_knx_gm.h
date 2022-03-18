@@ -38,7 +38,8 @@ void oc_create_knx_gm_resources(size_t device_index);
   @defgroup doc_module_tag_gateway Gateway
   Optional group of KNX-IOT to Classic gateway functions.
 
-  Currently implemented: register a generic call back to route all s-mode messages
+  Currently implemented: register a generic call back to route all s-mode
+  messages
   @{
 */
 

@@ -36,9 +36,10 @@
 extern "C" {
 #endif
 
-  /**
+/**
 @defgroup doc_module_tag_dll DLL
-Group of exported functions, so that these functions can be used with a dll or shared object.
+Group of exported functions, so that these functions can be used with a dll or
+shared object.
 
 Note: prefix will change from py to ets
 @{
