@@ -18,6 +18,7 @@
 #include "oc_api.h"
 #include "oc_core_res.h"
 #include "port/oc_clock.h"
+#include "api/oc_knx_fp.h"
 
 #if defined(_WIN32)
 #include <windows.h>
@@ -863,8 +864,8 @@ py_issue_requests_s_mode(int scope, int sia, int ga, int iid, char *st, int valu
 {
   PRINT(" [C] py_issue_requests_s_mode\n");
 
-  oc_endpoint_t group_mcast;
-  memset(&mcast, 0, sizeof(group_mcast));
+  oc_endpoint_t mcast;
+  memset(&mcast, 0, sizeof(mcast));
   mcast = oc_create_multicast_group_address(mcast, ga, iid, scope);
 
   // oc_make_ipv6_endpoint(mcast, IPV6 | DISCOVERY | MULTICAST, 5683, 0xff, scope,
@@ -903,7 +904,7 @@ py_issue_requests_s_mode(int scope, int sia, int ga, int iid, char *st, int valu
     }
     if (value_type == 2) {
       // float
-      int float_value = atof(value);
+      double float_value = atof(value);
       oc_rep_i_set_double(value, 1, (double)float_value);
     }
     cbor_encoder_close_container_checked(&root_map, &value_map);
