@@ -71,7 +71,7 @@ typedef struct oc_pase_t
  *
  *  { 4: "sia", 5: { 6: "st", 7: "ga", 1: "value" } }
  * ```
- *      
+ *
  * Key translation
  * | Json Key | Integer Value | type   |
  * | -------- | ------------- |--------|

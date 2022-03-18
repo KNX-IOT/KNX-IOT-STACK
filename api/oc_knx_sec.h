@@ -68,7 +68,7 @@ char *oc_at_profile_to_string(oc_at_profile_t at_profile);
  * "id": "<kid>",
  * "ms": "f9af8s.6bd94e6f"
  * }}}
-  * ```
+ * ```
  * scope : "coap_oscore" [OSCORE] or "coap_dtls"
  *
  *  | name      | CBOR key | CBOR type  | mandatory  |
