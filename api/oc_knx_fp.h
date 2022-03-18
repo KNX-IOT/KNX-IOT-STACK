@@ -66,10 +66,9 @@ void oc_cflags_as_string(char *buffer, oc_cflag_mask_t cflags);
 
 /**
  * @brief Group Object Table Resource (/fp/g)
- *
- * Example:
+ * The payload is an array of objects.
+ * Example (JSON):
  * ```
- * the will be an array of objects (as json):
  * [
  *    {
  *        "id": "1",
@@ -128,7 +127,8 @@ typedef struct oc_group_object_table_t
  * the only difference is the confirmable/not confirmable flag.
  * There will be 2 arrays of the structure to store the /fp/r or /fp/p data
  *
- * array of objects (as json)
+ * Example (JSON): array of objects
+ * ```
  * [
  *    {
  *        "id": "1",
@@ -142,6 +142,7 @@ typedef struct oc_group_object_table_t
  *        "ga": [2305, 2306, 2307, 2308]
  *     }
  * ]
+ * ```
  *
  * Key translation
  * | Json Key | Integer Value |

@@ -41,8 +41,9 @@ char *oc_at_profile_to_string(oc_at_profile_t at_profile);
 
 /**
  * @brief Access Token (at) Information
- *
- * example of (json) payload for a unicast message:
+ * payload for a unicast message
+ * Example(JSON):
+ * ```
  *{
  * "id": "OC5BLLhkAG ...",
  * "profile": "coap_oscore",
@@ -54,8 +55,9 @@ char *oc_at_profile_to_string(oc_at_profile_t at_profile);
  * "id": "<kid>",
  * "ms": "f9af8s.6bd94e6f"
  * }}}
- *
+ * ```
  * second example of (json) payload for a group address:
+ * ```
  *{
  * "id": "OC5BLLhkAG ...",
  * "profile": "coap_oscore",
@@ -66,7 +68,7 @@ char *oc_at_profile_to_string(oc_at_profile_t at_profile);
  * "id": "<kid>",
  * "ms": "f9af8s.6bd94e6f"
  * }}}
- *
+  * ```
  * scope : "coap_oscore" [OSCORE] or "coap_dtls"
  *
  *  | name      | CBOR key | CBOR type  | mandatory  |
@@ -92,16 +94,18 @@ char *oc_at_profile_to_string(oc_at_profile_t at_profile);
  * | ms | 2    | byte string  | OSCORE Master Secret value (shall be PSK) | - |
  * | hkdf | 3    | text string / integer | HKDF value | HKDF SHA-256  |
  * | alg | 4  | text string / integer | AEAD Algorithm | AES-CCM-16-64-128 (10)|
- * | salt | 5 | byte string | Master Salt | Default SHALL be an empty byte
- *string | | contextId | 6    | byte string | OSCORE ID Context value | omit  |
+ * | salt | 5 | byte string | Master Salt | Default empty byte string |
+ * | contextId | 6    | byte string | OSCORE ID Context value | omit  |
  *
+ * Example payload:
+ * ```
  * {
  *   "alg" : "AES-CCM-16-64-128",
  *   "id" : b64'AQ=='
  *   "ms" : b64'+a+Dg2jjU+eIiOFCa9lObw'
  * }
- *
- *     Note: maps are not stored.
+ * ```
+ * Note: maps are not stored.
  */
 typedef struct oc_auth_at_t
 {

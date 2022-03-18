@@ -28,7 +28,7 @@
 // use the (generated) DLL export macros
 #include "kisCS_Export.h"
 #else
-// Force doxygen to document to ignore kisCS_EXPORT
+// Force linux to ingore the kisCS_EXPORT
 #define kisCS_EXPORT
 #endif
 

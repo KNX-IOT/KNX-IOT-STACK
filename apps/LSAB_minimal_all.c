@@ -177,7 +177,7 @@ get_dpa_417_61(oc_request_t *request, oc_interface_mask_t interfaces,
      returns to this function here. alternative is to have a callback from the
      hardware that sets the global variables.
   */
-  bool error_state = false; /**< the error state, the generated code */
+  bool error_state = false; /* the error state, the generated code */
   int oc_status_code = OC_STATUS_OK;
 
   PRINT("-- Begin get_dpa_417_61: interface %d\n", interfaces);

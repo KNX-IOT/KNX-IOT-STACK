@@ -66,10 +66,12 @@ typedef struct oc_pase_t
  * Can be used for receiving messages or sending messages.
  *
  *  generic structures:
+ * ```
  *  { 5: { 6: "st value" , 7: "ga value", 1: "value" } }
  *
  *  { 4: "sia", 5: { 6: "st", 7: "ga", 1: "value" } }
- *
+ * ```
+ *      
  * Key translation
  * | Json Key | Integer Value | type   |
  * | -------- | ------------- |--------|
