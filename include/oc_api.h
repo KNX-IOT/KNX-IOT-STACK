@@ -39,7 +39,7 @@
   - wellknown/core discovery
 
   Hence an KNX_IOT application exist of:
-  
+
   - code for each specific data points (handling GET/POST)
   - own code to talk to hardware
   - device specific (functional specific) callbacks
@@ -50,8 +50,8 @@
   - main loop
 
   Examples of functional devices :
-  - LSAB_minimal_all.c an example that implements Functional Block LSAB 
-  - LSSB_minimal_all.c an example that implements Functional Block LSSB 
+  - LSAB_minimal_all.c an example that implements Functional Block LSAB
+  - LSSB_minimal_all.c an example that implements Functional Block LSSB
 
 */
 
