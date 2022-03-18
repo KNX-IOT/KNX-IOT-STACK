@@ -13,6 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 */
+/**
+  @file
+*/
 
 #ifndef OC_KNX_INTERNAL_H
 #define OC_KNX_INTERNAL_H
@@ -111,15 +114,17 @@ typedef enum {
 /**
  * @brief retrieve the current lsm state
  *
- * @param device index of the device to which the resource is to be created
+ * @param device_index index of the device to which the resource is to be
+ * created
  * @return the lsm state
  */
-oc_lsm_state_t oc_knx_lsm_state(size_t device);
+oc_lsm_state_t oc_knx_lsm_state(size_t device_index);
 
 /**
  * @brief retrieve the current lsm state
  *
- * @param device index of the device to which the resource is to be created
+ * @param device_index index of the device to which the resource is to be
+ * created
  * @param new_state the new lsm_state
  * @return 0 == success
  */
@@ -142,20 +147,20 @@ const char *oc_core_get_lsm_event_as_string(oc_lsm_event_t lsm_e);
 const char *oc_core_get_lsm_state_as_string(oc_lsm_state_t lsm_s);
 
 /**
- * @brief sets the ldevid
- *
- * @param ldevid the ldevid certificate
- * @param len the length of the certificate
- */
-void oc_knx_set_idevid(const char *idevid, int len);
-
-/**
  * @brief sets the idevid
  *
  * @param idevid the idevid certificate
  * @param len the length of the certificate
  */
-void oc_knx_set_ldevid(char *idevid, int len);
+void oc_knx_set_idevid(const char *idevid, int len);
+
+/**
+ * @brief sets the ldevid
+ *
+ * @param ldevid the ldevid certificate
+ * @param len the length of the certificate
+ */
+void oc_knx_set_ldevid(char *ldevid, int len);
 
 /**
  * @brief sets the fingerprint value (of the loaded materials)
