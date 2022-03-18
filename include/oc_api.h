@@ -32,21 +32,25 @@
   - \ref doc_module_tag_server_side Server exposing data points
   - \ref doc_module_tag_client_state Client sending s-mode commands
 
-  The Stack implements:
+  The Stack implements functionality like:
 
   - the CoAP client and server
   - OSCORE security
-  - wellknown/core discovery
+  - .well-known/core discovery
+  - Table implementation:
+    - Group object table
+    - Credential table (e.g. auth/at entries)
+    - Recipient table
 
-  Hence an KNX_IOT application exist of:
+  Therefore an KNX_IOT application exist of:
 
-  - code for each specific data points (handling GET/POST)
+  - Code for each specific data points (handling GET/POST)
   - own code to talk to hardware
-  - device specific (functional specific) callbacks
-     - reset mechanism
-     - software update
-     - setting domain names
-     - ..
+  - Device specific (functional specific) callbacks
+     - reset \ref oc_reset_t
+     - restart \ref oc_restart_t
+     - software update \ref oc_set_swu_cb(oc_swu_cb_t,void)
+     - setting host name  \ref oc_hostname_t
   - main loop
 
   Examples of functional devices :
