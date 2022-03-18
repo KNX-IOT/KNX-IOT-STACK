@@ -454,7 +454,7 @@ int oc_init_platform(const char *mfg_name,
 /**
   @defgroup doc_module_tag_server_side Server side
   Group of server support functions.
-  
+
   Functions to create resources and expose them through well-known/core.
 
 
