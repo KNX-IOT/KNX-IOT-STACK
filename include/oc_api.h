@@ -49,7 +49,7 @@
   - Device specific (functional specific) callbacks
      - reset \ref oc_reset_t
      - restart \ref oc_restart_t
-     - software update \ref oc_set_swu_cb(oc_swu_cb_t,void)
+     - software update 
      - setting host name  \ref oc_hostname_t
   - main loop
 
