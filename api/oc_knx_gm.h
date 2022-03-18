@@ -13,7 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 */
-
+/**
+  @file
+*/
 #ifndef OC_KNX_GM_INTERNAL_H
 #define OC_KNX_GM_INTERNAL_H
 
@@ -33,8 +35,10 @@ extern "C" {
 void oc_create_knx_gm_resources(size_t device_index);
 
 /**
-  @defgroup doc_module_tag_gateway gateway
+  @defgroup doc_module_tag_gateway Gateway
   Optional group of KNX-IOT to Classic gateway functions.
+
+  Currently implemented: register a generic call back to route all s-mode messages
   @{
 */
 

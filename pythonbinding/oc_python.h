@@ -13,6 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 */
+/**
+  @file
+*/
 #ifndef OC_PYTHON_H
 #define OC_PYTHON_H
 
@@ -32,6 +35,14 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+  /**
+@defgroup doc_module_tag_dll DLL
+Group of exported functions, so that these functions can be used with a dll or shared object.
+
+Note: prefix will change from py to ets
+@{
+*/
 
 typedef void (*spakeCB)(char *sn, int state, char *secret, int secret_size);
 

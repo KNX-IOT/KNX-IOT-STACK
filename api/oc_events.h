@@ -14,7 +14,9 @@
  // See the License for the specific language governing permissions and
  // limitations under the License.
  */
-
+/**
+  @file
+*/
 #ifndef OC_EVENTS_H
 #define OC_EVENTS_H
 
@@ -38,11 +40,9 @@ typedef enum {
   INTERFACE_DOWN,
   INTERFACE_UP,
   TLS_CLOSE_ALL_SESSIONS,
-  //#ifdef OC_OSCORE
   INBOUND_OSCORE_EVENT,
   OUTBOUND_OSCORE_EVENT,
   OUTBOUND_GROUP_OSCORE_EVENT,
-  //#endif /* OC_OSCORE */
   __NUM_OC_EVENT_TYPES__
 } oc_events_t;
 
