@@ -332,36 +332,6 @@ bool oc_filter_resource_by_if(oc_resource_t *resource, oc_request_t *request);
 int oc_frame_interfaces_mask_in_response(oc_interface_mask_t iface_mask);
 
 /**
- * @brief determine if a resource is a Device Configuration Resource
- *
- * @param resource the resource
- * @param device the device index to which the resource belongs too
- * @return true is DCR resource
- * @return false is not DCR resource
- */
-bool oc_core_is_DCR(oc_resource_t *resource, size_t device);
-
-/**
- * @brief determine if a resource is Security Vertical Resource
- *
- * @param resource the resource
- * @param device the device index to which the resource belongs too
- * @return true is SRV resource
- * @return false is not SVR resource
- */
-bool oc_core_is_SVR(oc_resource_t *resource, size_t device);
-
-/**
- * @brief determine if a resource is a vertical resource
- *
- * @param resource the resource
- * @param device the device index to which the resource belongs too
- * @return true : is vertical resource
- * @return false : is not a vertical resource
- */
-bool oc_core_is_vertical_resource(oc_resource_t *resource, size_t device);
-
-/**
  * @brief return the number of registered devices
  *
  * @return size_t The number of registered devices
