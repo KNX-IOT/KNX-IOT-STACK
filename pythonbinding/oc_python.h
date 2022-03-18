@@ -199,11 +199,12 @@ kisCS_EXPORT void py_initiate_spake(char *sn, char *password);
  * @param scope the multicast scope, [2,3,5]
  * @param sia the sender address
  * @param ga the group address
+ * @param iid the installation id
  * @param st the service type ["r","w","rp"]
  * @param value_type the value type [0=boolean, 1=integer, 2=float]
  * @param value the value (as string)
  */
-kisCS_EXPORT void py_issue_requests_s_mode(int scope, int sia, int ga, char *st,
+kisCS_EXPORT void py_issue_requests_s_mode(int scope, int sia, int ga, int iid, char *st,
                                            int value_type, char *value);
 
 /**

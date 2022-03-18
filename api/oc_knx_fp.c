@@ -1940,7 +1940,7 @@ oc_create_multicast_group_address(oc_endpoint_t in, int group_nr, int iid,
   // create the multicast address from group and scope
   // FF35::30: <ULA-routing-prefix>::<group id>
   //    | 5 == scope
-  //   | 3 == mult icast
+  //   | 3 == multicast
 
   // group number to the various bytes
   uint8_t byte_1 = (uint8_t)group_nr;
@@ -1957,6 +1957,7 @@ oc_create_multicast_group_address(oc_endpoint_t in, int group_nr, int iid,
   int my_transport_flags = 0;
   my_transport_flags += IPV6;
   my_transport_flags += MULTICAST;
+  my_transport_flags += DISCOVERY;
 #ifdef OC_OSCORE
   my_transport_flags += OSCORE;
 #endif
@@ -1967,6 +1968,7 @@ oc_create_multicast_group_address(oc_endpoint_t in, int group_nr, int iid,
   PRINT("  oc_create_multicast_group_address S=%d U=%d G=%d B4=%d B3=%d B2=%d "
         "B1=%d\n",
         scope, iid, group_nr, byte_4, byte_3, byte_2, byte_1);
+  PRINT("  ");
   PRINTipaddr(group_mcast);
   PRINT("\n");
   memcpy(&in, &group_mcast, sizeof(oc_endpoint_t));
@@ -1997,6 +1999,8 @@ oc_register_group_multicasts()
   oc_device_info_t *device = oc_core_get_device_info(0);
   uint32_t installation_id = device->iid;
 
+  PRINT("oc_register_group_multicasts\n");
+
   int index;
   for (index = 0; index < GOT_MAX_ENTRIES; index++) {
     int nr_entries = g_got[index].ga_len;
@@ -2018,9 +2022,10 @@ oc_register_group_multicasts()
 }
 
 void
-oc_init_datapoints_from_got()
+oc_init_datapoints_at_initialization()
 {
   int index;
+  PRINT("oc_init_datapoints_at_initialization\n");
 
   for (index = 0; index < GOT_MAX_ENTRIES; index++) {
     int nr_entries = g_got[index].ga_len;

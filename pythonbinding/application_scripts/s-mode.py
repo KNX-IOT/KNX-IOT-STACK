@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #############################
 #
-#    copyright 2021 Cascoda Ltd.
+#    copyright 2021-2022 Cascoda Ltd.
 #    Redistribution and use in source and binary forms, with or without modification,
 #    are permitted provided that the following conditions are met:
 #    1.  Redistributions of source code must retain the above copyright notice,
@@ -88,6 +88,9 @@ if __name__ == '__main__':  # pragma: no cover
     parser.add_argument("-sia", "--sia", default=2,
                     help="sending internal address (default ia=2)", nargs='?',
                     const="", required=False)
+    parser.add_argument("-iid", "--iid", default=5,
+                    help="sending installation identifier (default iid=5)", nargs='?',
+                    const="", required=False)
     parser.add_argument("-st", "--st", default="w",
                     help="send target ,e.g w,r,rp", nargs='?',
                     const="", required=False)
@@ -109,6 +112,7 @@ if __name__ == '__main__':  # pragma: no cover
     print("sia        :" + str(args.sia))
     print("st         :" + str(args.st))
     print("ga         :" + str(args.ga))
+    print("iid         :" + str(args.iid))
     print("valuetype  :" + str(args.valuetype))
     print("value      :" + str(args.value))
 
@@ -118,7 +122,7 @@ if __name__ == '__main__':  # pragma: no cover
     time.sleep(2)
 
     try:
-        the_stack.issue_s_mode(args.scope, args.sia, args.ga,
+        the_stack.issue_s_mode(args.scope, args.sia, args.ga, args.iid,
            str(args.st), args.valuetype, str(args.value))
     except:
         traceback.print_exc()

@@ -30,11 +30,14 @@ extern "C" {
 /**
  * @brief Pase Resource Object
  *
+ * Example Json:
+ * ```
  *  { "rnd": x}
  *  { "pa": x}
  *  { "pb": x}
  *  { "ca": x}
  *  { "pbkdf2" : { "salt" : "xxxx", "it" : 5}}}
+ * ```
  *
  * Key translation
  * | Json Key | Integer Value |  type       |

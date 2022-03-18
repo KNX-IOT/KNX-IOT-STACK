@@ -392,7 +392,7 @@ oc_issue_s_mode(int scope, int sia_value, int group_address, int iid, char *rp,
 {
   PRINT("  oc_issue_s_mode : scope %d\n", scope);
 
-#ifndef GROUP_ADDRESSING
+#ifdef S_MODE_ALL_COAP_NODES
 #ifdef OC_OSCORE
   oc_make_ipv6_endpoint(group_mcast, IPV6 | MULTICAST | OSCORE, COAP_PORT, 0xff,
                         -scope, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0xfd);
@@ -411,9 +411,6 @@ oc_issue_s_mode(int scope, int sia_value, int group_address, int iid, char *rp,
   memset(&group_mcast, 0, sizeof(group_mcast));
   group_mcast =
     oc_create_multicast_group_address(group_mcast, group_address, iid, scope);
-  PRINT("  ");
-  PRINTipaddr(group_mcast);
-  PRINT("\n");
 #endif
 
   oc_send_s_mode(&group_mcast, "/.knx", sia_value, group_address, rp,
@@ -553,7 +550,7 @@ oc_s_mode_get_resource_value(char *resource_url, char *rp, uint8_t *buf,
     memcpy(buf, value_data, value_size);
     return value_size;
   }
-  OC_ERR(" allocated buf too small to contain s-mode value");
+  OC_ERR(" allocated buffer too small to contain s-mode value");
   return 0;
 }
 
@@ -571,6 +568,9 @@ oc_do_s_mode_read(size_t group_address)
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   int sia_value = device->ia;
   int iid = device->iid;
+
+  PRINT("oc_do_s_mode_read : ga=%d ia=%d, iid=%d\n", 
+    group_address, sia_value, iid);
 
   if (group_address > 0) {
     oc_issue_s_mode(2, sia_value, group_address, iid, "r", 0, 0);
