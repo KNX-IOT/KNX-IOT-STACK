@@ -211,7 +211,7 @@ void oc_register_group_multicasts();
 /**
  * @brief initializes the data points at initialisation
  * e.g. sends out an read s-mode message when the I flag is set.
- * 
+ *
  */
 void oc_init_datapoints_at_initialization();
 
@@ -394,15 +394,17 @@ bool oc_add_points_in_group_object_table_to_response(oc_request_t *request,
 /**
  * @brief Creation of the KNX feature point resources.
  *
- * @param device_index index of the device to which the resource are to be created
+ * @param device_index index of the device to which the resource are to be
+ * created
  */
 void oc_create_knx_fp_resources(size_t device_index);
 
 /**
  * @brief free the fp resources
  * e.g. frees up all allocated memory.
- * 
- * @param device_index index of the device to which the resource are to be freed.
+ *
+ * @param device_index index of the device to which the resource are to be
+ * freed.
  */
 void oc_free_knx_fp_resources(size_t device_index);
 

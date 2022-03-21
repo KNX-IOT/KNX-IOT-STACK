@@ -1596,7 +1596,9 @@ oc_delete_group_object_table()
   }
 }
 
-void oc_free_group_object_table() {
+void
+oc_free_group_object_table()
+{
   PRINT("Free Group Object Table\n");
   for (int i = 0; i < GOT_MAX_ENTRIES; i++) {
     oc_free_group_object_table_entry(i);
@@ -1795,9 +1797,8 @@ oc_free_group_rp_table_entry(int entry, char *Store,
   rp_table[entry].ga = NULL;
 
   rp_table[entry].ga_len = 0;
-  //rp_table[entry].cflags = 0;
+  // rp_table[entry].cflags = 0;
 }
-
 
 static void
 oc_delete_group_rp_table_entry(int entry, char *Store,
@@ -1841,7 +1842,6 @@ oc_free_group_rp_table()
   }
 #endif /*  OC_PUBLISHER_TABLE */
 }
-
 
 int
 find_empty_slot_in_rp_table(int id, oc_group_rp_table_t *rp_table, int max_size)
@@ -1923,7 +1923,6 @@ oc_create_knx_fp_resources(size_t device_index)
 
   // oc_register_group_multicasts();
 }
-
 
 void
 oc_free_knx_fp_resources(size_t device_index)
