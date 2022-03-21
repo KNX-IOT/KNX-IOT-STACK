@@ -103,24 +103,22 @@ if __name__ == '__main__':  # pragma: no cover
     the_stack = knx_stack.KNXIOTStack()
     signal.signal(signal.SIGINT, the_stack.sig_handler)
 
-    if (args.internal_address):
+    if args.internal_address:
         try:
             do_ia_discover(the_stack, args.internal_address, args.scope)
         except:
             traceback.print_exc()
-
-    if (args.programming_mode):
+    if args.programming_mode:
         try:
             do_pm_discover(the_stack, args.scope)
         except:
             traceback.print_exc()
-            
-    if (args.serial_number):
+    if args.serial_number:
         try:
             do_sn_discover(the_stack, args.serial_number, args.scope)
         except:
             traceback.print_exc()
-            
+
     time.sleep(2)
     the_stack.quit()
     sys.exit()
