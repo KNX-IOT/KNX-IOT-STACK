@@ -43,7 +43,8 @@ void oc_knx_device_storage_read(size_t device);
 
 /**
  * @brief clear the persistent storage
- *  reset = 2 (reset all)
+ *  reset = 2 (reset all) :
+ *
  * - internal address (ia)
  * - host name (hname)
  * - Installation ID (iid)
@@ -52,7 +53,8 @@ void oc_knx_device_storage_read(size_t device);
  * - recipient object table
  * - publisher object table
  *
- *  reset = 7 (reset tables)
+ *  reset = 7 (reset tables):
+ *
  * - group object table
  * - recipient object table
  * - publisher object table

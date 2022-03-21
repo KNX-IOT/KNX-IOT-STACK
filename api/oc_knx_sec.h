@@ -36,7 +36,20 @@ typedef enum {
   OC_PROFILE_COAP_OSCORE  /**< "coap_oscore" */
 } oc_at_profile_t;
 
+/**
+ * @brief string to accesst token profile
+ *
+ * @param str input string
+ * @return oc_at_profile_t the token profile
+ */
 oc_at_profile_t oc_string_to_at_profile(oc_string_t str);
+
+/**
+ * @brief access token profile to string
+ *
+ * @param at_profile the access token profile
+ * @return char* the string denoting the at accss token profile
+ */
 char *oc_at_profile_to_string(oc_at_profile_t at_profile);
 
 /**
@@ -195,6 +208,15 @@ void oc_create_knx_sec_resources(size_t device);
  */
 void oc_init_oscore(size_t device_index);
 
+/**
+ * @brief function to check if the at_interface is listed in the resource
+ * interfaces
+ *
+ * @param at_interface interface to be checked
+ * @param resource_interface list of interfaces.
+ * @return true at_interface listed in resource_interface list
+ * @return false at_interface not listed in resource_interface list
+ */
 bool oc_knx_contains_interface(oc_interface_mask_t at_interface,
                                oc_interface_mask_t resource_interface);
 
