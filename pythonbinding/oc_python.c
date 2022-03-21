@@ -998,7 +998,7 @@ ets_main(void)
   struct sigaction sa;
   sigfillset(&sa.sa_mask);
   sa.sa_flags = 0;
-  sa.sa_handler = py_exit;
+  sa.sa_handler = ets_exit;
   sigaction(SIGINT, &sa, NULL);
 #endif
 
