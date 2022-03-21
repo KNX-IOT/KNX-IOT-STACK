@@ -38,7 +38,7 @@ typedef enum {
 
 /**
  * @brief string to accesst token profile
- * 
+ *
  * @param str input string
  * @return oc_at_profile_t the token profile
  */
@@ -46,7 +46,7 @@ oc_at_profile_t oc_string_to_at_profile(oc_string_t str);
 
 /**
  * @brief access token profile to string
- * 
+ *
  * @param at_profile the access token profile
  * @return char* the string denoting the at accss token profile
  */
@@ -209,8 +209,9 @@ void oc_create_knx_sec_resources(size_t device);
 void oc_init_oscore(size_t device_index);
 
 /**
- * @brief function to check if the at_interface is listed in the resource interfaces
- * 
+ * @brief function to check if the at_interface is listed in the resource
+ * interfaces
+ *
  * @param at_interface interface to be checked
  * @param resource_interface list of interfaces.
  * @return true at_interface listed in resource_interface list

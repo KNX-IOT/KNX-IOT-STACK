@@ -44,7 +44,7 @@ void oc_knx_device_storage_read(size_t device);
 /**
  * @brief clear the persistent storage
  *  reset = 2 (reset all) :
- * 
+ *
  * - internal address (ia)
  * - host name (hname)
  * - Installation ID (iid)
