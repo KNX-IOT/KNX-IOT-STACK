@@ -108,8 +108,9 @@ void oc_cflags_as_string(char *buffer, oc_cflag_mask_t cflags);
  * There are function to find
  * - empty index in the array
  * - find the index with a specific id
- * - delete an index, e.g. free the array entry of data
+ * - delete an index, e.g. delete the array entry of data (persistent)
  * - make the entry persistent
+ * - free the data
  */
 typedef struct oc_group_object_table_t
 {
@@ -159,8 +160,9 @@ typedef struct oc_group_object_table_t
  * There are function to find:
  * - empty index in the array
  * - find the index with a specific id
- * - delete an index, e.g. free the array entry of data
+ * - delete an index, e.g. delete the array entry of data
  * - make the entry persistent
+ * - free up the allocated data
  */
 typedef struct oc_group_rp_table_t
 {
@@ -206,6 +208,11 @@ oc_group_object_table_t *oc_core_get_group_object_table_entry(int index);
  */
 void oc_register_group_multicasts();
 
+/**
+ * @brief initializes the data points at initialisation
+ * e.g. sends out an read s-mode message when the I flag is set.
+ *
+ */
 void oc_init_datapoints_at_initialization();
 
 /**
@@ -387,9 +394,19 @@ bool oc_add_points_in_group_object_table_to_response(oc_request_t *request,
 /**
  * @brief Creation of the KNX feature point resources.
  *
- * @param device index of the device to which the resource are to be created
+ * @param device_index index of the device to which the resource are to be
+ * created
  */
-void oc_create_knx_fp_resources(size_t device);
+void oc_create_knx_fp_resources(size_t device_index);
+
+/**
+ * @brief free the fp resources
+ * e.g. frees up all allocated memory.
+ *
+ * @param device_index index of the device to which the resource are to be
+ * freed.
+ */
+void oc_free_knx_fp_resources(size_t device_index);
 
 /**
  * @brief create the group multi cast address

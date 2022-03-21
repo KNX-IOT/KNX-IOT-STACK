@@ -89,6 +89,11 @@ oc_core_shutdown(void)
       oc_device_info_t *oc_device_info_item = &oc_device_info[i];
       oc_core_free_device_info_properties(oc_device_info_item);
     }
+    //
+    for (i = 0; i < device_count; ++i) {
+      oc_free_knx_fp_resources(i);
+    }
+
 #ifdef OC_DYNAMIC_ALLOCATION
     free(oc_device_info);
     oc_device_info = NULL;
