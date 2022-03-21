@@ -65,7 +65,7 @@ typedef struct oc_pase_t
 } oc_pase_t;
 
 /**
- * @brief Group Object Notification
+ * @brief Group Object Notification (s-mode messages)
  * Can be used for receiving messages or sending messages.
  *
  *  generic structures:
@@ -151,13 +151,15 @@ const char *oc_core_get_lsm_event_as_string(oc_lsm_event_t lsm_e);
  */
 const char *oc_core_get_lsm_state_as_string(oc_lsm_state_t lsm_s);
 
+bool oc_is_device_in_runtime(size_t device_index);
+
 /**
  * @brief sets the idevid
  *
  * @param idevid the idevid certificate
- * @param len the length of the certificate
+ * @param length the length of the certificate
  */
-void oc_knx_set_idevid(const char *idevid, int len);
+void oc_knx_set_idevid(const char *idevid, int length);
 
 /**
  * @brief sets the ldevid
