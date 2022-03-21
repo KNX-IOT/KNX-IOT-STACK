@@ -776,21 +776,21 @@ class KNXIOTStack():
         print (self.lib)
         print ("...")
         self.debug=debug
-        value = self.lib.py_get_max_app_data_size()
+        value = self.lib.ets_get_max_app_data_size()
         print("py_get_max_app_data_size :", value)
         self.counter = 1
         self.changedCBFunc = CHANGED_CALLBACK(self.changedCB)
-        self.lib.py_install_changedCB(self.changedCBFunc)
+        self.lib.ets_install_changedCB(self.changedCBFunc)
         #ret = self.lib.oc_storage_config("./onboarding_tool_creds");
         #print("oc_storage_config : {}".format(ret))
         self.resourceCBFunc = RESOURCE_CALLBACK(self.resourceCB)
-        self.lib.py_install_resourceCB(self.resourceCBFunc)
+        self.lib.ets_install_resourceCB(self.resourceCBFunc)
         self.clientCBFunc = CLIENT_CALLBACK(self.clientCB)
-        self.lib.py_install_clientCB(self.clientCBFunc)
+        self.lib.ets_install_clientCB(self.clientCBFunc)
         self.discoveryCBFunc = DISCOVERY_CALLBACK(self.discoveryCB)
-        self.lib.py_install_discoveryCB(self.discoveryCBFunc)
+        self.lib.ets_install_discoveryCB(self.discoveryCBFunc)
         self.spakeCBFunc = SPAKE_CALLBACK(self.spakeCB)
-        self.lib.py_install_spakeCB(self.spakeCBFunc)
+        self.lib.ets_install_spakeCB(self.spakeCBFunc)
         print ("...")
         self.threadid = threading.Thread(target=self.thread_function, args=())
         self.threadid.start()
@@ -805,11 +805,11 @@ class KNXIOTStack():
         this function is threaded in python.
         """
         print ("thread_function: thread started")
-        self.lib.py_main()
+        self.lib.ets_main()
 
-    def get_result(self):
-        self.lib.get_cb_result.restype = bool
-        return self.lib.get_cb_result()
+    #def get_result(self):
+    #    self.lib.get_cb_result.restype = bool
+    #    return self.lib.get_cb_result()
 
     def purge_device_array(self, sn):
         for index, device in enumerate(self.device_array):
@@ -820,11 +820,11 @@ class KNXIOTStack():
         print("Discover Devices: scope", scope)
         # application
         discover_event.clear()
-        self.lib.py_discover_devices(c_int(scope))
+        self.lib.ets_discover_devices(c_int(scope))
         time.sleep(self.timout)
         # python callback application
         print("[P] discovery- done")
-        self.lib.py_get_nr_devices()
+        self.lib.ets_get_nr_devices()
         discover_event.wait(self.timout)
         print("Discovered DEVICE ARRAY {}".format(self.device_array))
         return self.device_array
@@ -833,12 +833,12 @@ class KNXIOTStack():
         print("Discover Devices with Query: scope", scope, query)
         # application
         discover_event.clear()
-        self.lib.py_discover_devices_with_query.argtypes = [c_int, String ]
-        self.lib.py_discover_devices_with_query(scope, query)
+        self.lib.ets_discover_devices_with_query.argtypes = [c_int, String ]
+        self.lib.ets_discover_devices_with_query(scope, query)
         time.sleep(self.timout)
         # python callback application
         print("[P] discovery- done")
-        self.lib.py_get_nr_devices()
+        self.lib.ets_get_nr_devices()
         discover_event.wait(self.timout)
         print("Discovered DEVICE ARRAY {}".format(self.device_array))
         return self.device_array
@@ -848,12 +848,12 @@ class KNXIOTStack():
         # application
         discover_data_event.clear()
         self.discovery_data = None
-        self.lib.py_discover_devices_with_query.argtypes = [c_int, String ]
-        self.lib.py_discover_devices_with_query(int(scope), query)
+        self.lib.ets_discover_devices_with_query.argtypes = [c_int, String ]
+        self.lib.ets_discover_devices_with_query(int(scope), query)
         time.sleep(self.timout)
         # python callback application
         print("[P] discovery- done")
-        self.lib.py_get_nr_devices()
+        self.lib.ets_get_nr_devices()
         discover_data_event.wait(self.timout)
         print("Discovered DEVICE ARRAY {}".format(self.device_array))
         return self.discovery_data
@@ -863,8 +863,8 @@ class KNXIOTStack():
         # application
         spake_event.clear()
         self.discovery_data = None
-        self.lib.py_initiate_spake.argtypes = [ String, String ]
-        self.lib.py_initiate_spake(sn, password)
+        self.lib.ets_initiate_spake.argtypes = [ String, String ]
+        self.lib.ets_initiate_spake(sn, password)
         #time.sleep(self.timout)
         # python callback application
         #print("[P] discovery- done")
@@ -909,9 +909,9 @@ class KNXIOTStack():
     def issue_cbor_get(self, sn, uri, query=None) :
         r_id = self.get_r_id()
         print("issue_cbor_get", sn, uri, query, r_id)
-        self.lib.py_cbor_get.argtypes = [String, String, String, String]
+        self.lib.ets_cbor_get.argtypes = [String, String, String, String]
         client_event.clear()
-        self.lib.py_cbor_get(sn, uri, query, r_id)
+        self.lib.ets_cbor_get(sn, uri, query, r_id)
         client_event.wait(self.timout)
         my_response =  self.find_response(r_id)
         if my_response is None :
@@ -921,9 +921,9 @@ class KNXIOTStack():
     def issue_cbor_get_unsecured(self, sn, uri, query=None) :
         r_id = self.get_r_id()
         print("issue_cbor_get_unsecured", sn, uri, query, r_id)
-        self.lib.py_cbor_get_unsecured.argtypes = [String, String, String, String]
+        self.lib.ets_cbor_get_unsecured.argtypes = [String, String, String, String]
         client_event.clear()
-        self.lib.py_cbor_get_unsecured(sn, uri, query, r_id)
+        self.lib.ets_cbor_get_unsecured(sn, uri, query, r_id)
         client_event.wait(self.timout)
         my_response =  self.find_response(r_id)
         if my_response is None :
@@ -933,18 +933,18 @@ class KNXIOTStack():
     def issue_linkformat_get(self, sn, uri, query=None) :
         r_id = self.get_r_id()
         print("issue_linkformat_get", sn, uri, query, r_id)
-        self.lib.py_linkformat_get.argtypes = [String, String, String, String]
+        self.lib.ets_linkformat_get.argtypes = [String, String, String, String]
         client_event.clear()
-        self.lib.py_linkformat_get(sn, uri, query, r_id)
+        self.lib.ets_linkformat_get(sn, uri, query, r_id)
         client_event.wait(self.timout)
         return self.find_response(r_id)
 
     def issue_linkformat_get_unsecured(self, sn, uri, query=None) :
         r_id = self.get_r_id()
         print("issue_linkformat_get_unsecured", sn, uri, query, r_id)
-        self.lib.py_linkformat_get_unsecured.argtypes = [String, String, String, String]
+        self.lib.ets_linkformat_get_unsecured.argtypes = [String, String, String, String]
         client_event.clear()
-        self.lib.py_linkformat_get_unsecured(sn, uri, query, r_id)
+        self.lib.ets_linkformat_get_unsecured(sn, uri, query, r_id)
         client_event.wait(self.timout)
         return self.find_response(r_id)
 
@@ -957,8 +957,8 @@ class KNXIOTStack():
             payload_len = len(payload)
             print(" len :", payload_len)
             print(" cbor :", payload)
-            self.lib.py_cbor_post.argtypes = [String, String, String, String, c_int, String]
-            self.lib.py_cbor_post(sn, uri, query, r_id, payload_len, payload)
+            self.lib.ets_cbor_post.argtypes = [String, String, String, String, c_int, String]
+            self.lib.ets_cbor_post(sn, uri, query, r_id, payload_len, payload)
         except:
             pass
         # print(" issue_cbor_post - done")
@@ -974,8 +974,8 @@ class KNXIOTStack():
             payload_len = len(payload)
             print(" len :", payload_len)
             print(" cbor :", payload)
-            self.lib.py_cbor_put.argtypes = [String, String, String, String, c_int, String]
-            self.lib.py_cbor_put(sn, uri, query, r_id, payload_len, payload)
+            self.lib.ets_cbor_put.argtypes = [String, String, String, String, c_int, String]
+            self.lib.ets_cbor_put(sn, uri, query, r_id, payload_len, payload)
         except:
             pass
         print(" issue_cbor_put - done")
@@ -987,8 +987,8 @@ class KNXIOTStack():
         client_event.clear()
         print(" issue_cbor_delete", sn, uri, query, r_id)
         try:
-            self.lib.py_cbor_delete.argtypes = [String, String, String, String]
-            self.lib.py_cbor_delete(sn, uri, query, r_id)
+            self.lib.ets_cbor_delete.argtypes = [String, String, String, String]
+            self.lib.ets_cbor_delete(sn, uri, query, r_id)
         except:
             pass
         print(" issue_cbor_delete - done")
@@ -999,16 +999,16 @@ class KNXIOTStack():
         print(" issue_s_mode: scope:{} sia:{} ga:{} iid:{} value_type:{} value:{}".
                format(scope, sia, ga, iid, value_type, value))
         try:
-            self.lib.py_issue_requests_s_mode.argtypes = [c_int,
+            self.lib.ets_issue_requests_s_mode.argtypes = [c_int,
                        c_int, c_int, c_int, String, c_int, String]
-            self.lib.py_issue_requests_s_mode(int(scope), int(sia), int(ga), int(iid),
+            self.lib.ets_issue_requests_s_mode(int(scope), int(sia), int(ga), int(iid),
                                               str(st), int(value_type), str(value))
         except:
             traceback.print_exc()
         print(" issue_s_mode - done")
 
     def quit(self):
-        self.lib.py_exit(c_int(0))
+        self.lib.ets_exit(c_int(0))
 
     def sig_handler(self, _signum, _frame):
         print ("sig_handler..")
@@ -1019,9 +1019,9 @@ class KNXIOTStack():
     def get_nr_devices(self):
         # retrieves the number of discovered devices
         # note that a discovery request has to be executed before this call
-        self.lib.py_get_nr_devices.argtypes = []
-        self.lib.py_get_nr_devices.restype = c_int
-        return self.lib.py_get_nr_devices()
+        self.lib.ets_get_nr_devices.argtypes = []
+        self.lib.ets_get_nr_devices.restype = c_int
+        return self.lib.ets_get_nr_devices()
 
 if __name__ == "__main__":
     my_stack = KNXIOTStack()

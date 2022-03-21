@@ -11,16 +11,6 @@ Most of the application needs the serial number of the device so that the applic
 ## application scripts
 
 
-### list_devices.py
-
-script to list all the devices, issuing:
-
-- discovery with query : rt=urn:knx:dpa.*
-
-```bash
-python list_devices.py -h
-```
-
 ### reset_device.py
 
 script to reset the device, issuing:
@@ -33,11 +23,14 @@ python reset_device.py -h
 ```
 
 
-### list_device_with_ia.py
+### list_devices.py
 
 script to list the device with internal address, issuing:
 
-- discovery with query : if=urn:knx:ia.[ia]
+- discovery of device with internal address using query : if=urn:knx:ia.[ia]
+- discovery of device in programming mode using query : if=urn:knx:if.pm
+- discovery with query : rt=urn:knx:dpa.*
+
 
 ```bash
 python list_device_with_ia.py -h

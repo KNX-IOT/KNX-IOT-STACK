@@ -163,22 +163,22 @@ print_rep(oc_rep_t *rep, bool pretty_print)
 // -----------------------------------------------------------------------------
 
 /**
- * function to install callbacks, called from python
+ * function to install callbacks
  *
  */
 void
-py_install_changedCB(changedCB changedCB)
+ets_install_changedCB(changedCB changedCB)
 {
   PRINT("[C]install_changedCB\n");
   my_CBFunctions.changedFCB = changedCB;
 }
 
 /**
- * function to install resource callbacks, called from python
+ * function to install resource callbacks
  *
  */
 void
-py_install_resourceCB(resourceCB resourceCB)
+ets_install_resourceCB(resourceCB resourceCB)
 {
   PRINT("[C]install_resourceCB\n");
   my_CBFunctions.resourceFCB = resourceCB;
@@ -188,7 +188,7 @@ py_install_resourceCB(resourceCB resourceCB)
  *
  */
 void
-py_install_clientCB(clientCB clientCB)
+ets_install_clientCB(clientCB clientCB)
 {
   PRINT("[C]install_clientCB\n");
   my_CBFunctions.clientFCB = clientCB;
@@ -199,7 +199,7 @@ py_install_clientCB(clientCB clientCB)
  *
  */
 void
-py_install_discoveryCB(discoveryCB discoveryCB)
+ets_install_discoveryCB(discoveryCB discoveryCB)
 {
   PRINT("[C]installdiscoveryCB\n");
   my_CBFunctions.discoveryFCB = discoveryCB;
@@ -210,7 +210,7 @@ py_install_discoveryCB(discoveryCB discoveryCB)
  *
  */
 void
-py_install_spakeCB(spakeCB spakeCB)
+ets_install_spakeCB(spakeCB spakeCB)
 {
   PRINT("[C]installspakeCB\n");
   my_CBFunctions.spakeFCB = spakeCB;
@@ -346,7 +346,7 @@ signal_event_loop(void)
  *
  */
 void
-py_exit(int signal)
+ets_exit(int signal)
 {
   (void)signal;
   quit = 1;
@@ -520,7 +520,7 @@ general_get_cb(oc_client_response_t *data)
 }
 
 void
-py_cbor_get(char *sn, char *uri, char *query, char *cbdata)
+ets_cbor_get(char *sn, char *uri, char *query, char *cbdata)
 {
   int ret = -1;
   device_handle_t *device = py_getdevice_from_sn(sn);
@@ -549,7 +549,7 @@ py_cbor_get(char *sn, char *uri, char *query, char *cbdata)
 }
 
 void
-py_cbor_get_unsecured(char *sn, char *uri, char *query, char *cbdata)
+ets_cbor_get_unsecured(char *sn, char *uri, char *query, char *cbdata)
 {
   int ret = -1;
   device_handle_t *device = py_getdevice_from_sn(sn);
@@ -575,7 +575,7 @@ py_cbor_get_unsecured(char *sn, char *uri, char *query, char *cbdata)
 }
 
 void
-py_linkformat_get(char *sn, char *uri, char *query, char *cbdata)
+ets_linkformat_get(char *sn, char *uri, char *query, char *cbdata)
 {
   int ret = -1;
   oc_endpoint_t ep;
@@ -610,7 +610,7 @@ py_linkformat_get(char *sn, char *uri, char *query, char *cbdata)
 }
 
 void
-py_linkformat_get_unsecured(char *sn, char *uri, char *query, char *cbdata)
+ets_linkformat_get_unsecured(char *sn, char *uri, char *query, char *cbdata)
 {
   int ret = -1;
   oc_endpoint_t ep;
@@ -643,7 +643,7 @@ py_linkformat_get_unsecured(char *sn, char *uri, char *query, char *cbdata)
 // -----------------------------------------------------------------------------
 
 void
-py_cbor_post(char *sn, char *uri, char *query, char *id, int size, char *data)
+ets_cbor_post(char *sn, char *uri, char *query, char *id, int size, char *data)
 {
   int ret = -1;
   device_handle_t *device = py_getdevice_from_sn(sn);
@@ -679,7 +679,7 @@ py_cbor_post(char *sn, char *uri, char *query, char *id, int size, char *data)
 // -----------------------------------------------------------------------------
 
 void
-py_cbor_put(char *sn, char *uri, char *query, char *id, int size, char *data)
+ets_cbor_put(char *sn, char *uri, char *query, char *id, int size, char *data)
 {
   int ret = -1;
   device_handle_t *device = py_getdevice_from_sn(sn);
@@ -715,7 +715,7 @@ py_cbor_put(char *sn, char *uri, char *query, char *id, int size, char *data)
 // -----------------------------------------------------------------------------
 
 void
-py_cbor_delete(char *sn, char *uri, char *query, char *id)
+ets_cbor_delete(char *sn, char *uri, char *query, char *id)
 {
   int ret = -1;
   device_handle_t *device = py_getdevice_from_sn(sn);
@@ -810,7 +810,7 @@ discovery_cb(const char *payload, int len, oc_endpoint_t *endpoint,
 }
 
 void
-py_discover_devices(int scope)
+ets_discover_devices(int scope)
 {
   py_mutex_lock(app_sync_lock);
   oc_do_wk_discovery_all("rt=urn:knx:dpa.*", scope, discovery_cb, NULL);
@@ -820,7 +820,7 @@ py_discover_devices(int scope)
 }
 
 void
-py_discover_devices_with_query(int scope, const char *query)
+ets_discover_devices_with_query(int scope, const char *query)
 {
   py_mutex_lock(app_sync_lock);
   oc_do_wk_discovery_all(query, scope, discovery_cb, NULL);
@@ -832,7 +832,7 @@ py_discover_devices_with_query(int scope, const char *query)
 // -----------------------------------------------------------------------------
 
 void
-py_initiate_spake(char *sn, char *password)
+ets_initiate_spake(char *sn, char *password)
 {
   int ret = -1;
   device_handle_t *device = py_getdevice_from_sn(sn);
@@ -859,7 +859,7 @@ spake_callback(int error, uint8_t *secret, int secret_size)
 
 /* send a multicast s-mode message */
 void
-py_issue_requests_s_mode(int scope, int sia, int ga, int iid, char *st,
+ets_issue_requests_s_mode(int scope, int sia, int ga, int iid, char *st,
                          int value_type, char *value)
 {
   PRINT(" [C] py_issue_requests_s_mode\n");
@@ -931,52 +931,11 @@ py_issue_requests_s_mode(int scope, int sia, int ga, int iid, char *st,
 // -----------------------------------------------------------------------------
 
 /**
- * function to retrieve the device name of the owned/unowned device
- *
- */
-char *
-get_device_name(int index)
-{
-  device_handle_t *device = NULL;
-
-  device = (device_handle_t *)oc_list_head(discovered_devices);
-  int i = 0;
-  while (device != NULL) {
-    if (index == i) {
-      return device->device_name;
-    }
-    i++;
-    device = device->next;
-  }
-  return " empty ";
-}
-
-/**
- * function to retrieve the device name belonging to the sn
- *
- */
-char *
-get_device_name_from_sn(char *uuid)
-{
-  device_handle_t *device = NULL;
-  device = (device_handle_t *)oc_list_head(discovered_devices);
-  int i = 0;
-  while (device != NULL) {
-    if (strcmp(device->device_serial_number, uuid) == 0) {
-      return device->device_name;
-    }
-    i++;
-    device = device->next;
-  }
-  return " empty ";
-}
-
-/**
  * function to retrieve the sn of the discovered device
  *
  */
 char *
-py_get_sn(int index)
+ets_get_sn(int index)
 {
   device_handle_t *device = NULL;
   device = (device_handle_t *)oc_list_head(discovered_devices);
@@ -997,7 +956,7 @@ py_get_sn(int index)
  *
  */
 int
-py_get_nr_devices(void)
+ets_get_nr_devices(void)
 {
   return (oc_list_length(discovered_devices));
 }
@@ -1007,7 +966,7 @@ py_get_nr_devices(void)
  *
  */
 void
-py_reset_device(char *sn)
+ets_reset_device(char *sn)
 {
   device_handle_t *device = py_getdevice_from_sn(sn);
 
@@ -1026,30 +985,10 @@ py_reset_device(char *sn)
   // py_mutex_unlock(app_sync_lock);
 }
 
-// void
-// display_device_uuid()
-//{
-//  char buffer[OC_UUID_LEN];
-//  oc_uuid_to_str(oc_core_get_device_id(0), buffer, sizeof(buffer));
-
-//  PRINT("[C] Started device with ID: %s\n", buffer);
-//}
-
-// char *
-// py_get_obt_uuid()
-//{
-//  char buffer[OC_UUID_LEN];
-//  oc_uuid_to_str(oc_core_get_device_id(0), buffer, sizeof(buffer));
-
-//  char *uuid = malloc(sizeof(char) * OC_UUID_LEN);
-//  strncpy(uuid, buffer, OC_UUID_LEN);
-//  return uuid;
-//}
-
 // -----------------------------------------------------------------------------
 
 int
-py_main(void)
+ets_main(void)
 {
 #if defined(_WIN32)
   InitializeCriticalSection(&cs);
@@ -1140,13 +1079,13 @@ py_main(void)
 // -----------------------------------------------------------------------------
 
 long
-py_get_max_app_data_size(void)
+ets_get_max_app_data_size(void)
 {
   return oc_get_max_app_data_size();
 }
 
 void
-py_set_max_app_data_size(int data_size)
+ets_set_max_app_data_size(int data_size)
 {
   oc_set_max_app_data_size((size_t)data_size);
 }

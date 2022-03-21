@@ -23,7 +23,6 @@
 #    EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #############################
-
 # pylint: disable=C0103
 # pylint: disable=C0114
 # pylint: disable=C0115
@@ -53,8 +52,25 @@ sys.path.append(parentdir)
 
 import knx_stack
 
-def do_discover_all(my_stack, scope = 2):
-    my_stack.discover_devices( int(scope))
+def do_ia_discover(my_stack, internal_address, scope = 2):
+    time.sleep(1)
+    query = "if=urn:knx:ia."+str(internal_address)
+    my_stack.discover_devices_with_query( query, int(scope))
+    if my_stack.get_nr_devices() > 0:
+        print ("SN :", my_stack.device_array[0].sn)
+
+
+def do_pm_discover(my_stack, scope = 2):
+    time.sleep(1)
+    query = "if=urn:knx:if.pm"
+    my_stack.discover_devices_with_query( query, int(scope))
+    if my_stack.get_nr_devices() > 0:
+        print ("SN :", my_stack.device_array[0].sn)
+
+def do_sn_discover(my_stack, serial_number, scope = 2):
+    time.sleep(1)
+    query = "ep=urn:knx:sn."+str(serial_number)
+    my_stack.discover_devices_with_query( query, int(scope))
     if my_stack.get_nr_devices() > 0:
         print ("SN :", my_stack.device_array[0].sn)
 
@@ -63,6 +79,15 @@ if __name__ == '__main__':  # pragma: no cover
     parser = argparse.ArgumentParser()
 
     # input (files etc.)
+    parser.add_argument("-ia", "--internal_address",
+                    help="internal address of the device", nargs='?',
+                    const=1, required=False)
+    parser.add_argument("-pm", "--programming_mode",
+                    help="device in programming mode", nargs='?',
+                    const=1, required=False)
+    parser.add_argument("-sn", "--serial_number",
+                    help="serial number", nargs='?',
+                    const=1, required=False)
     parser.add_argument("-scope", "--scope",
                     help="scope of the multicast request [2,5]", nargs='?',
                     default=2, const=1, required=False)
@@ -70,16 +95,32 @@ if __name__ == '__main__':  # pragma: no cover
     print(sys.argv)
     args = parser.parse_args()
 
-    print("scope         :" + str(args.scope))
+    print("scope            :" + str(args.scope))
+    print("internal address :" + str(args.internal_address))
+    print("programming mode :" + str(args.programming_mode))
+    print("serial number    :" + str(args.serial_number))
 
     the_stack = knx_stack.KNXIOTStack()
     signal.signal(signal.SIGINT, the_stack.sig_handler)
-    # wait until the stack is initialized
-    time.sleep(1)
 
-    try:
-        do_discover_all(the_stack, args.scope)
-    except:
-        traceback.print_exc()
+    if (args.internal_address):
+        try:
+            do_ia_discover(the_stack, args.internal_address, args.scope)
+        except:
+            traceback.print_exc()
+
+    if (args.programming_mode):
+        try:
+            do_pm_discover(the_stack, args.scope)
+        except:
+            traceback.print_exc()
+            
+    if (args.serial_number):
+        try:
+            do_sn_discover(the_stack, args.serial_number, args.scope)
+        except:
+            traceback.print_exc()
+            
+    time.sleep(2)
     the_stack.quit()
     sys.exit()
