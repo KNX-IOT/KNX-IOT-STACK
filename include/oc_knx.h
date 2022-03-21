@@ -151,6 +151,17 @@ const char *oc_core_get_lsm_event_as_string(oc_lsm_event_t lsm_e);
  */
 const char *oc_core_get_lsm_state_as_string(oc_lsm_state_t lsm_s);
 
+/**
+ * @brief checks if the device is in "run-time" mode
+ * run-time is:
+ * - ia initialized (e.g. larger than 0)
+ * - iid initalized (e.g. larger than 0)
+ * - load statemachine (lsm) == loaded
+ * 
+ * @param device_index The device index.
+ * @return true in runtime
+ * @return false not in run time
+ */
 bool oc_is_device_in_runtime(size_t device_index);
 
 /**
