@@ -569,8 +569,8 @@ oc_do_s_mode_read(size_t group_address)
   int sia_value = device->ia;
   int iid = device->iid;
 
-  PRINT("oc_do_s_mode_read : ga=%d ia=%d, iid=%d\n", 
-    (int)group_address, sia_value, iid);
+  PRINT("oc_do_s_mode_read : ga=%d ia=%d, iid=%d\n", (int)group_address,
+        sia_value, iid);
 
   if (group_address > 0) {
     oc_issue_s_mode(2, sia_value, group_address, iid, "r", 0, 0);

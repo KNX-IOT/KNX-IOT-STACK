@@ -859,8 +859,8 @@ spake_callback(int error, uint8_t *secret, int secret_size)
 
 /* send a multicast s-mode message */
 void
-py_issue_requests_s_mode(int scope, int sia, int ga, int iid, char *st, int value_type,
-                         char *value)
+py_issue_requests_s_mode(int scope, int sia, int ga, int iid, char *st,
+                         int value_type, char *value)
 {
   PRINT(" [C] py_issue_requests_s_mode\n");
 
@@ -868,7 +868,8 @@ py_issue_requests_s_mode(int scope, int sia, int ga, int iid, char *st, int valu
   memset(&mcast, 0, sizeof(mcast));
   mcast = oc_create_multicast_group_address(mcast, ga, iid, scope);
 
-  // oc_make_ipv6_endpoint(mcast, IPV6 | DISCOVERY | MULTICAST, 5683, 0xff, scope,
+  // oc_make_ipv6_endpoint(mcast, IPV6 | DISCOVERY | MULTICAST, 5683, 0xff,
+  // scope,
   //                      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0xfd);
 
   if (oc_init_post("/.knx", &mcast, NULL, NULL, LOW_QOS, NULL)) {

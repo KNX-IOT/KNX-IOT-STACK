@@ -206,7 +206,6 @@ oc_group_object_table_t *oc_core_get_group_object_table_entry(int index);
  */
 void oc_register_group_multicasts();
 
-
 void oc_init_datapoints_at_initialization();
 
 /**

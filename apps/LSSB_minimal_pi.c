@@ -202,7 +202,6 @@ issue_requests_s_mode(void)
   oc_do_s_mode("p/1", "w");
 }
 
-
 PyObject *pModule;
 // Action to take on left button press
 // This is exposed in the corresponding Python script

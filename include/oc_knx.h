@@ -157,7 +157,7 @@ const char *oc_core_get_lsm_state_as_string(oc_lsm_state_t lsm_s);
  * - ia initialized (e.g. larger than 0)
  * - iid initalized (e.g. larger than 0)
  * - load statemachine (lsm) == loaded
- * 
+ *
  * @param device_index The device index.
  * @return true in runtime
  * @return false not in run time

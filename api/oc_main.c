@@ -316,7 +316,6 @@ oc_main_init(const oc_handler_t *handler)
   oc_register_group_multicasts();
 #endif
 
-
 #ifdef OC_CLIENT
   if (app_callbacks->requests_entry) {
     app_callbacks->requests_entry();

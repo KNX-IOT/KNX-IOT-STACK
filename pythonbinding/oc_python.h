@@ -204,8 +204,9 @@ kisCS_EXPORT void py_initiate_spake(char *sn, char *password);
  * @param value_type the value type [0=boolean, 1=integer, 2=float]
  * @param value the value (as string)
  */
-kisCS_EXPORT void py_issue_requests_s_mode(int scope, int sia, int ga, int iid, char *st,
-                                           int value_type, char *value);
+kisCS_EXPORT void py_issue_requests_s_mode(int scope, int sia, int ga, int iid,
+                                           char *st, int value_type,
+                                           char *value);
 
 /**
  * @brief discover KNX devices on the network

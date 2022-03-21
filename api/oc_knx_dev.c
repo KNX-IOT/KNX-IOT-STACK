@@ -274,7 +274,7 @@ oc_core_dev_ia_put_handler(oc_request_t *request,
 
   // only set ia in programming mode
   size_t device_index = request->resource->device;
-  //if (oc_knx_device_in_programming_mode(device_index) == false) {
+  // if (oc_knx_device_in_programming_mode(device_index) == false) {
   //  PRINT("oc_core_dev_ia_put_handler: not in programming mode\n");
   //  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
   //  return;
@@ -297,7 +297,6 @@ oc_core_dev_ia_put_handler(oc_request_t *request,
       oc_register_group_multicasts();
       oc_init_datapoints_at_initialization();
     }
-
 
     return;
   }
@@ -411,7 +410,7 @@ oc_core_dev_iid_put_handler(oc_request_t *request,
 
   size_t device_index = request->resource->device;
   // only set ia in programming mode
-  //if (oc_knx_device_in_programming_mode(device_index) == false) {
+  // if (oc_knx_device_in_programming_mode(device_index) == false) {
   //  PRINT("oc_core_dev_iid_put_handler: not in programming mode\n");
   //  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
   //  return;

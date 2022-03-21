@@ -669,8 +669,7 @@ factory_presets_cb(size_t device_index, void *data)
   }
 
   oc_core_set_device_ia(device_index, 5);
-  oc_core_set_device_iid(device_index,7);
-
+  oc_core_set_device_iid(device_index, 7);
 }
 
 /**
@@ -798,8 +797,8 @@ issue_requests_s_mode_delayed(void *data)
 
   // setting the test data
   oc_device_info_t *device = oc_core_get_device_info(0);
-  //device->ia = 5;
-  //device->iid = 7;
+  // device->ia = 5;
+  // device->iid = 7;
 
   PRINT(" issue_requests_s_mode_delayed : config data\n");
   int ga_values[5] = { 1, 255, 256, 1024, 1024 * 256 };
@@ -823,7 +822,6 @@ issue_requests_s_mode_delayed(void *data)
   entry2.ga_len = 1;
   entry2.ga = (int *)&ga_values;
 
-  
   oc_core_set_group_object_table(1, entry2);
   PRINT("\n");
   oc_print_group_object_table_entry(1);

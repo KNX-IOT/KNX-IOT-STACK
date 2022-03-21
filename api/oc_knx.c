@@ -1316,7 +1316,8 @@ oc_create_knx_resources(size_t device_index)
 
 // ----------------------------------------------------------------------------
 
-bool oc_is_device_in_runtime(size_t device_index)
+bool
+oc_is_device_in_runtime(size_t device_index)
 {
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device->ia <= 0) {
