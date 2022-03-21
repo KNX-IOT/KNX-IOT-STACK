@@ -311,7 +311,8 @@ oc_main_init(const oc_handler_t *handler)
   }
 
 #ifdef OC_SERVER
-  // listen to the group addresses multicasts (if there are any)
+  // listen to the group addresses multi-casts
+  // that are registered in the group object table
   oc_register_group_multicasts();
 #endif
 
@@ -319,6 +320,9 @@ oc_main_init(const oc_handler_t *handler)
   if (app_callbacks->requests_entry) {
     app_callbacks->requests_entry();
   }
+  // do initialization of the data points according the I flag in
+  // in the group object table
+  oc_init_datapoints_at_initialization();
 #endif
 
   return 0;

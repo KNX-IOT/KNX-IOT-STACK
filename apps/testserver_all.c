@@ -655,29 +655,32 @@ register_resources(void)
 /**
  * initiate preset for device
  *
- * @param device the device identifier of the list of devices
+ * @param device_index the device identifier of the list of devices
  * @param data the supplied data.
  */
 void
-factory_presets_cb(size_t device, void *data)
+factory_presets_cb(size_t device_index, void *data)
 {
-  (void)device;
+  (void)device_index;
   (void)data;
 
   if (g_reset) {
     PRINT("resetting device\n");
     oc_knx_device_storage_reset(0, 2);
   }
+
+  oc_core_set_device_ia(device_index, 5);
+  oc_core_set_device_iid(device_index, 7);
 }
 
 /**
  * application reset
  *
- * @param device the device identifier of the list of devices
+ * @param device_index the device identifier of the list of devices
  * @param data the supplied data.
  */
 void
-reset_cb(size_t device, int reset_value, void *data)
+reset_cb(size_t device_index, int reset_value, void *data)
 {
   (void)data;
 
@@ -687,11 +690,11 @@ reset_cb(size_t device, int reset_value, void *data)
 /**
  * restart the device (application depended)
  *
- * @param device the device identifier of the list of devices
+ * @param device_index the device identifier of the list of devices
  * @param data the supplied data.
  */
 void
-restart_cb(size_t device, void *data)
+restart_cb(size_t device_index, void *data)
 {
   (void)data;
 
@@ -702,12 +705,12 @@ restart_cb(size_t device, void *data)
 /**
  * set the host name on the device (application depended)
  *
- * @param device the device identifier of the list of devices
+ * @param device_index the device identifier of the list of devices
  * @param host_name the host name to be set on the device
  * @param data the supplied data.
  */
 void
-hostname_cb(size_t device, oc_string_t host_name, void *data)
+hostname_cb(size_t device_index, oc_string_t host_name, void *data)
 {
   (void)data;
 
@@ -793,7 +796,12 @@ issue_requests_s_mode_delayed(void *data)
 {
   (void)data;
 
-  PRINT(" issue_requests_s_mode_delayed\n");
+  // setting the test data
+  oc_device_info_t *device = oc_core_get_device_info(0);
+  // device->ia = 5;
+  // device->iid = 7;
+
+  PRINT(" issue_requests_s_mode_delayed : config data\n");
   int ga_values[5] = { 1, 255, 256, 1024, 1024 * 256 };
   oc_string_t href;
   oc_new_string(&href, "/p/c", strlen("/p/c"));
@@ -819,11 +827,26 @@ issue_requests_s_mode_delayed(void *data)
   PRINT("\n");
   oc_print_group_object_table_entry(1);
 
+  oc_group_object_table_t entry3;
+  entry3.cflags = OC_CFLAG_INIT;
+  entry3.id = 5;
+  entry3.href = href;
+  entry3.ga_len = 1;
+  entry3.ga = (int *)&ga_values;
+
+  oc_core_set_group_object_table(2, entry3);
+  PRINT("\n");
+  oc_print_group_object_table_entry(2);
+
+  // testing, since the data is already reset...
   oc_register_group_multicasts();
 
-  PRINT(" issue_requests_s_mode: issue\n");
+  PRINT("  issue_requests_s_mode: issue\n");
   oc_do_s_mode_with_scope(2, "/p/c", "w");
   oc_do_s_mode_with_scope(5, "/p/c", "w");
+
+  // test invoking read on initialization.
+  oc_init_datapoints_at_initialization();
 
   return OC_EVENT_DONE;
 }

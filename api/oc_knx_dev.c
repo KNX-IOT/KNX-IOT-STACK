@@ -274,11 +274,11 @@ oc_core_dev_ia_put_handler(oc_request_t *request,
 
   // only set ia in programming mode
   size_t device_index = request->resource->device;
-  if (oc_knx_device_in_programming_mode(device_index) == false) {
-    PRINT("oc_core_dev_ia_put_handler: not in programming mode\n");
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
-    return;
-  }
+  // if (oc_knx_device_in_programming_mode(device_index) == false) {
+  //  PRINT("oc_core_dev_ia_put_handler: not in programming mode\n");
+  //  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+  //  return;
+  //}
 
   // parse the data.
   oc_rep_t *rep = request->request_payload;
@@ -292,6 +292,12 @@ oc_core_dev_ia_put_handler(oc_request_t *request,
     oc_storage_write(KNX_STORAGE_IA, (uint8_t *)&temp, sizeof(temp));
 
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
+
+    if (oc_is_device_in_runtime(device_index)) {
+      oc_register_group_multicasts();
+      oc_init_datapoints_at_initialization();
+    }
+
     return;
   }
 
@@ -404,11 +410,11 @@ oc_core_dev_iid_put_handler(oc_request_t *request,
 
   size_t device_index = request->resource->device;
   // only set ia in programming mode
-  if (oc_knx_device_in_programming_mode(device_index) == false) {
-    PRINT("oc_core_dev_iid_put_handler: not in programming mode\n");
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
-    return;
-  }
+  // if (oc_knx_device_in_programming_mode(device_index) == false) {
+  //  PRINT("oc_core_dev_iid_put_handler: not in programming mode\n");
+  //  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+  //  return;
+  //}
 
   oc_rep_t *rep = request->request_payload;
   if ((rep != NULL) && (rep->type == OC_REP_INT)) {
@@ -420,6 +426,12 @@ oc_core_dev_iid_put_handler(oc_request_t *request,
     oc_storage_write(KNX_STORAGE_IID, (uint8_t *)&rep->value.integer,
                      sizeof(uint32_t));
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
+
+    if (oc_is_device_in_runtime(device_index)) {
+      oc_register_group_multicasts();
+      oc_init_datapoints_at_initialization();
+    }
+
     return;
   }
 

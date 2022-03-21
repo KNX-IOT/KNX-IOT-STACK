@@ -1,5 +1,5 @@
 /*
- // Copyright (c) 2021 Cascoda Ltd
+ // Copyright (c) 2021-2022 Cascoda Ltd
  //
  // Licensed under the Apache License, Version 2.0 (the "License");
  // you may not use this file except in compliance with the License.
@@ -439,6 +439,12 @@ oc_core_knx_lsm_post_handler(oc_request_t *request,
     oc_rep_i_set_int(root, 3, (int)oc_knx_lsm_state(device_index));
     oc_rep_end_root_object();
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
+
+    if (oc_is_device_in_runtime(device_index)) {
+      oc_register_group_multicasts();
+      oc_init_datapoints_at_initialization();
+    }
+
     return;
   }
 
@@ -1306,4 +1312,23 @@ oc_create_knx_resources(size_t device_index)
   oc_create_knx_idevid_resource(OC_KNX_IDEVID, device_index);
   oc_create_knx_spake_resource(OC_KNX_SPAKE, device_index);
   oc_create_knx_resource(OC_KNX, device_index);
+}
+
+// ----------------------------------------------------------------------------
+
+bool
+oc_is_device_in_runtime(size_t device_index)
+{
+  oc_device_info_t *device = oc_core_get_device_info(device_index);
+  if (device->ia <= 0) {
+    return false;
+  }
+  if (device->iid <= 0) {
+    return false;
+  }
+  if (device->lsm_s != LSM_S_LOADED) {
+    return false;
+  }
+
+  return true;
 }

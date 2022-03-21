@@ -995,13 +995,13 @@ class KNXIOTStack():
         client_event.wait(self.timout)
         return self.find_response(r_id)
 
-    def issue_s_mode(self, scope, sia, ga, st, value_type, value) :
-        print(" issue_s_mode: scope:{} sia:{} ga:{} value_type:{} value:{}".
-               format(scope, sia, ga, value_type, value))
+    def issue_s_mode(self, scope, sia, ga, iid, st, value_type, value) :
+        print(" issue_s_mode: scope:{} sia:{} ga:{} iid:{} value_type:{} value:{}".
+               format(scope, sia, ga, iid, value_type, value))
         try:
             self.lib.py_issue_requests_s_mode.argtypes = [c_int,
-                       c_int, c_int, String, c_int, String]
-            self.lib.py_issue_requests_s_mode(int(scope), int(sia), int(ga),
+                       c_int, c_int, c_int, String, c_int, String]
+            self.lib.py_issue_requests_s_mode(int(scope), int(sia), int(ga), int(iid),
                                               str(st), int(value_type), str(value))
         except:
             traceback.print_exc()
