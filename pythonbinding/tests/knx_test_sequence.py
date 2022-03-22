@@ -163,37 +163,9 @@ def do_sequence_dev(my_stack):
     safe_print(response)
     my_stack.purge_response(response)
 
-# no json tags as strings
-def do_sequence_dev_programming_mode(my_stack):
+def do_sequence_dev_programming_mode_network(my_stack):
     sn = my_stack.device_array[0].sn
-    print("========dev programming=========")
-
-    print("-------------------")
-    content = True
-    print("set PM :", content)
-    response =  my_stack.issue_cbor_put(sn,"/dev/pm",content)
-    safe_print(response)
-    my_stack.purge_response(response)
-    response =  my_stack.issue_cbor_get(sn,"/dev/pm")
-    safe_print(response)
-    safe_print(response)
-    if content == response.get_payload_boolean():
-        print("PASS : /dev/pm ", content)
-    my_stack.purge_response(response)
-
-    print("-------------------")
-    content = 44
-    print("set IA :", content)
-    response =  my_stack.issue_cbor_put(sn,"/dev/ia",content)
-    safe_print(response)
-    my_stack.purge_response(response)
-    response =  my_stack.issue_cbor_get(sn,"/dev/ia")
-    safe_print(response)
-    if content == response.get_payload_int():
-        print("PASS : /dev/ia ", content)
-    else:
-        print_fail(msg="/dev/ia")
-    my_stack.purge_response(response)
+    print("========dev network programming=========")
 
     print("-------------------")
     content = "my host name"
@@ -208,21 +180,6 @@ def do_sequence_dev_programming_mode(my_stack):
     else:
         print_fail(msg="/dev/hostname")
     my_stack.purge_response(response)
-
-    print("-------------------")
-    content = 555
-    print("set iid :", content)
-    response =  my_stack.issue_cbor_put(sn,"/dev/iid", content)
-    safe_print(response)
-    my_stack.purge_response(response)
-    response =  my_stack.issue_cbor_get(sn,"/dev/iid")
-    safe_print(response)
-    if content == response.get_payload_int():
-        print("PASS : /dev/iid ", content)
-    else:
-        print_fail(msg="/dev/iid")
-    my_stack.purge_response(response)
-    print("-------------------")
 
     content = 7777
     print("set sa :", content)
@@ -266,6 +223,53 @@ def do_sequence_dev_programming_mode(my_stack):
     my_stack.purge_response(response)
     print("-------------------")
 
+# no json tags as strings
+def do_sequence_dev_programming_mode(my_stack):
+    sn = my_stack.device_array[0].sn
+    do_sequence_dev_programming_mode_network(my_stack)
+    print("========dev programming=========")
+
+    print("-------------------")
+    content = True
+    print("set PM :", content)
+    response =  my_stack.issue_cbor_put(sn,"/dev/pm",content)
+    safe_print(response)
+    my_stack.purge_response(response)
+    response =  my_stack.issue_cbor_get(sn,"/dev/pm")
+    safe_print(response)
+    safe_print(response)
+    if content == response.get_payload_boolean():
+        print("PASS : /dev/pm ", content)
+    my_stack.purge_response(response)
+
+    print("-------------------")
+    content = 44
+    print("set IA :", content)
+    response =  my_stack.issue_cbor_put(sn,"/dev/ia",content)
+    safe_print(response)
+    my_stack.purge_response(response)
+    response =  my_stack.issue_cbor_get(sn,"/dev/ia")
+    safe_print(response)
+    if content == response.get_payload_int():
+        print("PASS : /dev/ia ", content)
+    else:
+        print_fail(msg="/dev/ia")
+    my_stack.purge_response(response)
+
+    print("-------------------")
+    content = 555
+    print("set iid :", content)
+    response =  my_stack.issue_cbor_put(sn,"/dev/iid", content)
+    safe_print(response)
+    my_stack.purge_response(response)
+    response =  my_stack.issue_cbor_get(sn,"/dev/iid")
+    safe_print(response)
+    if content == response.get_payload_int():
+        print("PASS : /dev/iid ", content)
+    else:
+        print_fail(msg="/dev/iid")
+    my_stack.purge_response(response)
+    print("-------------------")
 
     # reset programming mode
     content = False
@@ -286,6 +290,8 @@ def do_sequence_dev_programming_mode(my_stack):
 def do_sequence_dev_programming_mode_fail(my_stack):
     sn = my_stack.device_array[0].sn
     print("========dev programming fail=========")
+    # do not check, since the programming mode does not block anything anymore
+    return 
 
     print("-------------------")
     content = False
