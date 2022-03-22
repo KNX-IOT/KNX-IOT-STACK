@@ -195,7 +195,7 @@ oc_add_function_blocks_to_response(oc_request_t *request, size_t device_index,
     length = oc_rep_add_line_to_buffer("</f/");
     *response_length += length;
     if (g_int_array[1][i] > 0) {
-      snprintf(number, 23, "%3d_%2d", g_int_array[0][i], g_int_array[1][i]);
+      snprintf(number, 23, "%03d_%02d", g_int_array[0][i], g_int_array[1][i]);
     } else {
       snprintf(number, 5, "%d", g_int_array[0][i]);
     }

@@ -284,6 +284,12 @@ oc_wkcore_discovery_handler(oc_request_t *request,
     if (if_ia_i == device->ia) {
       /* return the ll entry: </dev/ia>;rt="dpt.value2Ucount";ct=50 */
       int size =
+        oc_rep_add_line_to_buffer("</dev/sa>;rt=\"dpa.0.57\";ct=50,");
+      response_length = response_length + size;
+      size =
+        oc_rep_add_line_to_buffer("</dev/dp>;rt=\"dpa.0.58\";ct=50,");
+      response_length = response_length + size;
+      size =
         oc_rep_add_line_to_buffer("</dev/ia>;rt=\"dpt.value2Ucount\";ct=50");
       response_length = response_length + size;
 
