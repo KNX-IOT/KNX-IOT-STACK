@@ -146,7 +146,7 @@ app_init(void)
   oc_core_set_device_hwt(0, "Pi");
 
   /* set the programming mode */
-  oc_core_set_device_pm(0, true);
+  oc_core_set_device_pm(0, false);
 
   /* set the model */
   oc_core_set_device_model(0, "Cascoda Actuator");
