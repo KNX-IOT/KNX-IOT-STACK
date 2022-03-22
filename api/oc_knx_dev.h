@@ -26,10 +26,22 @@ extern "C" {
 #endif
 
 /**
-@brief Creation of the KNX device resources.
-e.g. the / dev / * resources
-
-@param device index of the device to which the resource is to be created
+ * @brief Creation of the KNX device resources.
+ * e.g. the dev resources:
+ *  - sn (serial number)
+ *  - hwv (hardware version)
+ *  - fwv (firmware version)
+ *  - hwt (hardware type)
+ *  - model (device model)
+ *  - sa (sub address)
+ *  - da (device address)
+ *  - ipv6 (ipv6 address)
+ *  - hname (host name)
+ *  - ia (internal address)
+ *  - iid (installation identifier)
+ *  - port (port address)
+ *
+ * @param device index of the device to which the resource is to be created
 */
 void oc_create_knx_device_resources(size_t device);
 
@@ -49,6 +61,8 @@ void oc_knx_device_storage_read(size_t device);
  * - host name (hname)
  * - Installation ID (iid)
  * - programming mode (pm)
+ * - device address (da)
+ * - sub address (sa)
  * - group object table
  * - recipient object table
  * - publisher object table
@@ -66,10 +80,6 @@ void oc_knx_device_storage_reset(size_t device_index, int reset_mode);
 
 /**
  * @brief function checks if the device is in programming mode
- * the following resources can be changed when in programming mode
- * - ia
- * - hostname
- * - idd
  *
  * @param device_index the device index
  * @return true in programming mode

@@ -38,9 +38,10 @@ is_device_in_mode(int device_index, oc_device_mode_t mode)
 }
 
 bool
-oc_is_device_mode_in_programming(int device_index)
+oc_is_device_mode_in_programming(size_t device_index)
 {
-  return is_device_in_mode(device_index, OC_PROGRAMMING_MODE);
+  oc_device_info_t *device = oc_core_get_device_info(device_index);
+  return device->pm;
 }
 
 bool

@@ -48,7 +48,7 @@ typedef enum oc_device_mode_t {
  * @return true = in programming mode
  * @return false = not in programming mode
  */
-bool oc_is_device_mode_in_programming(int device_index);
+bool oc_is_device_mode_in_programming(size_t device_index);
 
 /**
  * @brief is the device in normal mode (e.g. operational)
@@ -57,7 +57,7 @@ bool oc_is_device_mode_in_programming(int device_index);
  * @return true = in normal (operational) mode
  * @return false = not in normal mode
  */
-bool oc_is_device_mode_in_normal(int device_index);
+bool oc_is_device_mode_in_normal(size_t device_index);
 
 /**
  * @brief set the device in a specific mode

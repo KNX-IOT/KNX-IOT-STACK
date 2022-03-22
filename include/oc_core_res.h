@@ -83,6 +83,9 @@ typedef struct oc_device_info_t
   oc_string_t hostname;      /**< knx host name */
   uint32_t iid;              /**< knx idd (installation id) */
   bool pm;                   /**< knx programming mode */
+  uint32_t sa;               /**< sub address */
+  uint32_t da;               /**< device address */
+  uint32_t port;             /**< coap port number */
   oc_lsm_state_t lsm_s;      /**< knx lsm states */
   oc_device_mode_t
     device_mode; /**< device mode (programming, normal operation) */

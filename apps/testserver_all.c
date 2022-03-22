@@ -189,6 +189,9 @@ app_init(void)
   /* set the model */
   oc_core_set_device_model(0, "my model");
 
+  /* set the programming mode */
+  oc_core_set_device_pm(0, false);
+
 #ifdef OC_SPAKE
 #define PASSWORD "LETTUCE"
   oc_spake_set_password(PASSWORD);

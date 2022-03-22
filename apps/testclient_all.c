@@ -232,51 +232,7 @@ issue_requests_s_mode(void)
   int scope = 5;
   PRINT(" issue_requests_s_mode\n");
 
-  oc_make_ipv6_endpoint(mcast, IPV6 | DISCOVERY | MULTICAST, 5683, 0xff, scope,
-                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0xfd);
 
-  if (oc_init_post("/.knx", &mcast, NULL, NULL, LOW_QOS, NULL)) {
-
-    /*
-    { 4: sia, 5: { 6: <st>, 7: <ga>, 1: <value> } }
-    */
-
-    oc_rep_begin_root_object();
-
-    oc_rep_i_set_int(root, 4, g_send_notification.sia);
-
-    oc_rep_i_set_key(&root_map, 5);
-    CborEncoder value_map;
-    cbor_encoder_create_map(&root_map, &value_map, CborIndefiniteLength);
-    // ga
-    oc_rep_i_set_int(value, 7, g_send_notification.ga);
-    // st M Service type code(write = w, read = r, response = rp) Enum : w, r,
-    // rp
-    // oc_rep_i_set_text_string(value, 6, oc_string(g_send_notification.st));
-    oc_rep_i_set_text_string(value, 6, "w");
-    if (g_value_type == 0) {
-      // boolean
-      oc_rep_i_set_boolean(value, 1, g_bool_value);
-    }
-    if (g_value_type == 1) {
-      // integer
-      oc_rep_i_set_int(value, 1, (int)g_int_value);
-    }
-    if (g_value_type == 2) {
-      // float
-      oc_rep_i_set_double(value, 1, (double)g_float_value);
-    }
-
-    cbor_encoder_close_container_checked(&root_map, &value_map);
-
-    oc_rep_end_root_object();
-
-    if (oc_do_post_ex(APPLICATION_CBOR, APPLICATION_CBOR)) {
-      PRINT("  Sent POST request\n");
-    } else {
-      PRINT("  Could not send POST request\n");
-    }
-  }
 }
 
 /* do normal discovery */

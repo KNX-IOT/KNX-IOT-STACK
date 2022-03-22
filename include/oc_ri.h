@@ -238,6 +238,9 @@ typedef enum {
   OC_DEV_IID,               /**< KNX installation ID */
   OC_DEV_PM,                /**< Programming Mode */
   OC_DEV_IPV6,              /**< IPV6 */
+  OC_DEV_SA,                /**< /dev/sa subnet address */
+  OC_DEV_DA,                /**< /dev/da device address */
+  OC_DEV_PORT,              /**< /dev/port the coap port number */
   OC_DEV,                   /**< core link */
   OC_KNX_SPAKE,             /**< spake */
   OC_KNX_IDEVID,            /**< IDevID */

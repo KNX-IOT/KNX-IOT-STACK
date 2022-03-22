@@ -224,6 +224,49 @@ def do_sequence_dev_programming_mode(my_stack):
     my_stack.purge_response(response)
     print("-------------------")
 
+    content = 7777
+    print("set sa :", content)
+    response =  my_stack.issue_cbor_put(sn,"/dev/sa", content)
+    safe_print(response)
+    my_stack.purge_response(response)
+    response =  my_stack.issue_cbor_get(sn,"/dev/sa")
+    safe_print(response)
+    if content == response.get_payload_int():
+        print("PASS : /dev/sa ", content)
+    else:
+        print_fail(msg="/dev/sa")
+    my_stack.purge_response(response)
+    print("-------------------")
+
+    content = 777788
+    print("set da :", content)
+    response =  my_stack.issue_cbor_put(sn,"/dev/da", content)
+    safe_print(response)
+    my_stack.purge_response(response)
+    response =  my_stack.issue_cbor_get(sn,"/dev/da")
+    safe_print(response)
+    if content == response.get_payload_int():
+        print("PASS : /dev/da ", content)
+    else:
+        print_fail(msg="/dev/da")
+    my_stack.purge_response(response)
+    print("-------------------")
+
+    content = 9777788
+    print("set port :", content)
+    response =  my_stack.issue_cbor_put(sn,"/dev/port", content)
+    safe_print(response)
+    my_stack.purge_response(response)
+    response =  my_stack.issue_cbor_get(sn,"/dev/port")
+    safe_print(response)
+    if content == response.get_payload_int():
+        print("PASS : /dev/port", content)
+    else:
+        print_fail(msg="/dev/port")
+    my_stack.purge_response(response)
+    print("-------------------")
+
+
     # reset programming mode
     content = False
     response =  my_stack.issue_cbor_put(sn,"/dev/pm",content)
