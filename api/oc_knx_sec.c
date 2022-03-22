@@ -507,9 +507,9 @@ oc_core_auth_at_post_handler(oc_request_t *request,
             oc_rep_i_get_int_array(object, 9, &array, &array_size);
             if (array_size > 0) {
               // make the deep copy
-              if ((g_at_entries[index].ga_len > 0) && 
-                ( &g_at_entries[index].ga != NULL)) {
-                uint64_t* cur_arr = g_at_entries[index].ga;
+              if ((g_at_entries[index].ga_len > 0) &&
+                  (&g_at_entries[index].ga != NULL)) {
+                uint64_t *cur_arr = g_at_entries[index].ga;
                 if (cur_arr) {
                   free(cur_arr);
                 }
@@ -1079,7 +1079,7 @@ oc_at_load_entry(int entry)
                   free(cur_arr);
                 }
                 g_at_entries[entry].ga = NULL;
-                //free(&g_at_entries[entry].ga);
+                // free(&g_at_entries[entry].ga);
               }
               g_at_entries[entry].ga_len = array_size;
               int64_t *new_array =
@@ -1146,7 +1146,7 @@ oc_core_set_at_table(size_t device_index, int index, oc_auth_at_t entry)
         if (cur_arr) {
           free(cur_arr);
         }
-        //free(&g_at_entries[index].ga);
+        // free(&g_at_entries[index].ga);
       }
       g_at_entries[index].ga_len = array_size;
       int64_t *new_array = (int64_t *)malloc(array_size * sizeof(uint64_t));

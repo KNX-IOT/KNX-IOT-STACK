@@ -231,8 +231,6 @@ issue_requests_s_mode(void)
 {
   int scope = 5;
   PRINT(" issue_requests_s_mode\n");
-
-
 }
 
 /* do normal discovery */

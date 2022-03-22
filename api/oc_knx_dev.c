@@ -630,8 +630,6 @@ oc_create_dev_dev_resource(int resource_idx, size_t device)
     oc_core_dev_dev_get_handler, 0, 0, 0, 1, "urn:knx:fb.0");
 }
 
-
-
 // -----------------------------------------------------------------------------
 
 static void
@@ -762,18 +760,17 @@ void
 oc_create_dev_da_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_dev_da_resource\n");
-  oc_core_populate_resource(resource_idx, device, "/dev/da", OC_IF_P,
-                            APPLICATION_CBOR, OC_DISCOVERABLE,
-                            oc_core_dev_da_get_handler,
-                            oc_core_dev_da_put_handler, 0, 0, 2, ":dpa.0.58", ":dpt.value1Ucount");
+  oc_core_populate_resource(
+    resource_idx, device, "/dev/da", OC_IF_P, APPLICATION_CBOR, OC_DISCOVERABLE,
+    oc_core_dev_da_get_handler, oc_core_dev_da_put_handler, 0, 0, 2,
+    ":dpa.0.58", ":dpt.value1Ucount");
 }
 
 // -----------------------------------------------------------------------------
 
-
 static void
 oc_core_dev_port_get_handler(oc_request_t *request,
-                           oc_interface_mask_t iface_mask, void *data)
+                             oc_interface_mask_t iface_mask, void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -797,7 +794,7 @@ oc_core_dev_port_get_handler(oc_request_t *request,
 
 static void
 oc_core_dev_port_put_handler(oc_request_t *request,
-                           oc_interface_mask_t iface_mask, void *data)
+                             oc_interface_mask_t iface_mask, void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -832,13 +829,12 @@ oc_create_dev_port_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_dev_port_resource\n");
   oc_core_populate_resource(
-    resource_idx, device, "/dev/port", OC_IF_P, APPLICATION_CBOR, OC_DISCOVERABLE,
-    oc_core_dev_port_get_handler, oc_core_dev_port_put_handler, 0, 0, 1,
-    ":dpt.value2Ucount");
+    resource_idx, device, "/dev/port", OC_IF_P, APPLICATION_CBOR,
+    OC_DISCOVERABLE, oc_core_dev_port_get_handler, oc_core_dev_port_put_handler,
+    0, 0, 1, ":dpt.value2Ucount");
 }
 
 // -----------------------------------------------------------------------------
-
 
 void
 oc_knx_device_storage_read(size_t device_index)
@@ -888,13 +884,11 @@ oc_knx_device_storage_read(size_t device_index)
     PRINT("  pm (storage) %d\n", device->pm);
   }
 
-  
   /* KNX_STORAGE_SA */
   temp_size =
     oc_storage_read(KNX_STORAGE_SA, (uint8_t *)&device->sa, sizeof(uint32_t));
   PRINT("  sa (storage) %d\n", device->sa);
 
-  
   /* KNX_STORAGE_DA */
   temp_size =
     oc_storage_read(KNX_STORAGE_DA, (uint8_t *)&device->da, sizeof(uint32_t));
@@ -925,7 +919,8 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
     oc_storage_write(KNX_STORAGE_PM, (char *)&zero, sizeof(uint8_t));
     oc_storage_write(KNX_STORAGE_SA, (char *)&zero, sizeof(uint32_t));
     oc_storage_write(KNX_STORAGE_DA, (char *)&zero, sizeof(uint32_t));
-    uint32_t port = 5683; // TODO: should be using all coap nodes define from the stack 
+    uint32_t port =
+      5683; // TODO: should be using all coap nodes define from the stack
     oc_storage_write(KNX_STORAGE_PORT, (char *)&port, sizeof(uint32_t));
     oc_storage_write(KNX_STORAGE_HOSTNAME, (char *)&buf, 1);
     // load state: unloaded, and programming mode is true

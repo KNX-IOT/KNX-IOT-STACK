@@ -42,7 +42,7 @@ extern "C" {
  *  - port (port address)
  *
  * @param device index of the device to which the resource is to be created
-*/
+ */
 void oc_create_knx_device_resources(size_t device);
 
 /**
