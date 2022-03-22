@@ -1122,13 +1122,12 @@ int oc_notify_observers(oc_resource_t *resource);
   @defgroup doc_module_tag_client_state Client side
   Client side support functions.
 
-  This module contains functions to communicate to a KNX server. It contains
+  This module contains functions to communicate to a KNX server for an Client.
 
   ## multicast
 
   The multicast communication is for:
   - Discovery
-  - s-mode (group) communication
 
   The multicast Discovery is issued is on CoAP .well-known/core
   The s-mode communication is performed at the (specific) group addresses.
@@ -1486,7 +1485,6 @@ void oc_stop_multicast(oc_client_response_t *response);
  * @return true
  * @return false
  */
-// bool oc_init_multicast_update(const char *uri, const char *query);
 bool oc_init_multicast_update(oc_endpoint_t *mcast, const char *uri,
                               const char *query);
 
