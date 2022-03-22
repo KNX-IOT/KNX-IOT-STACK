@@ -507,13 +507,17 @@ oc_core_auth_at_post_handler(oc_request_t *request,
             oc_rep_i_get_int_array(object, 9, &array, &array_size);
             if (array_size > 0) {
               // make the deep copy
-              if (g_at_entries[index].ga_len > 0) {
-                free(&g_at_entries[index].ga);
+              if ((g_at_entries[index].ga_len > 0) &&
+                  (&g_at_entries[index].ga != NULL)) {
+                uint64_t *cur_arr = g_at_entries[index].ga;
+                if (cur_arr) {
+                  free(cur_arr);
+                }
+                g_at_entries[index].ga = NULL;
               }
               g_at_entries[index].ga_len = array_size;
               int64_t *new_array =
                 (int64_t *)malloc(array_size * sizeof(uint64_t));
-
               if (new_array) {
                 for (int i = 0; i < array_size; i++) {
                   new_array[i] = array[i];
@@ -639,17 +643,11 @@ oc_core_auth_at_delete_handler(oc_request_t *request,
   size_t device_index = request->resource->device;
 
   oc_delete_at_table(device_index);
-
-  // set pm back
-  // set loadstate on unloaded
-  // oc_knx_lsm_set_state(device_index, LSM_S_UNLOADED);
 }
 
 void
 oc_create_auth_at_resource(int resource_idx, size_t device)
 {
-  OC_DBG("oc_create_auth_at_resource\n");
-  // "/a/sen"
   oc_core_populate_resource(resource_idx, device, "/auth/at",
                             OC_IF_B | OC_IF_SEC, APPLICATION_LINK_FORMAT,
                             OC_DISCOVERABLE, oc_core_auth_at_get_handler, 0,
@@ -1076,7 +1074,12 @@ oc_at_load_entry(int entry)
             if (array_size > 0) {
               // make the deep copy
               if (g_at_entries[entry].ga_len > 0) {
-                free(&g_at_entries[entry].ga);
+                uint64_t *cur_arr = g_at_entries[entry].ga;
+                if (cur_arr) {
+                  free(cur_arr);
+                }
+                g_at_entries[entry].ga = NULL;
+                // free(&g_at_entries[entry].ga);
               }
               g_at_entries[entry].ga_len = array_size;
               int64_t *new_array =
@@ -1139,7 +1142,11 @@ oc_core_set_at_table(size_t device_index, int index, oc_auth_at_t entry)
     if (array_size > 0) {
       // make the deep copy
       if (g_at_entries[index].ga_len > 0) {
-        free(&g_at_entries[index].ga);
+        int64_t *cur_arr = g_at_entries[index].ga;
+        if (cur_arr) {
+          free(cur_arr);
+        }
+        // free(&g_at_entries[index].ga);
       }
       g_at_entries[index].ga_len = array_size;
       int64_t *new_array = (int64_t *)malloc(array_size * sizeof(uint64_t));

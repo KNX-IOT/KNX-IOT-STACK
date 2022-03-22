@@ -23,7 +23,7 @@
 #include <string.h>
 
 bool
-is_device_in_mode(int device_index, oc_device_mode_t mode)
+is_device_in_mode(size_t device_index, oc_device_mode_t mode)
 {
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device == NULL) {
@@ -38,19 +38,20 @@ is_device_in_mode(int device_index, oc_device_mode_t mode)
 }
 
 bool
-oc_is_device_mode_in_programming(int device_index)
+oc_is_device_mode_in_programming(size_t device_index)
 {
-  return is_device_in_mode(device_index, OC_PROGRAMMING_MODE);
+  oc_device_info_t *device = oc_core_get_device_info(device_index);
+  return device->pm;
 }
 
 bool
-oc_is_device_mode_in_normal(int device_index)
+oc_is_device_mode_in_normal(size_t device_index)
 {
   return is_device_in_mode(device_index, OC_NORMAL_OPERATION);
 }
 
 int
-oc_device_mode_set_mode(int device_index, oc_device_mode_t mode)
+oc_device_mode_set_mode(size_t device_index, oc_device_mode_t mode)
 {
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device == NULL) {
@@ -69,7 +70,7 @@ oc_device_mode_set_mode(int device_index, oc_device_mode_t mode)
 }
 
 int
-oc_device_mode_display(int device_index)
+oc_device_mode_display(size_t device_index)
 {
   if (oc_is_device_mode_in_programming(device_index)) {
     PRINT("Device is in programming mode\n");
