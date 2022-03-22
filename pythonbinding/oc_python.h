@@ -41,7 +41,6 @@ extern "C" {
 Group of exported functions, so that these functions can be used with a dll or
 shared object.
 
-Note: prefix will change from py to ets
 @{
 */
 
