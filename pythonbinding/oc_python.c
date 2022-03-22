@@ -322,6 +322,9 @@ app_init(void)
 
   ret |= oc_add_device("py-client", "1.0.0", "//", "012349", NULL, NULL);
 
+  /* set the programming mode */
+  oc_core_set_device_pm(0, false);
+
   return ret;
 }
 
