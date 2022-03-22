@@ -49,15 +49,16 @@ int oc_initiate_spake(oc_endpoint_t *endpoint, char *password);
 typedef void (*oc_s_mode_response_cb_t)(char *url, oc_rep_t *rep,
                                         oc_rep_t *rep_value);
 
-
 /**
   @defgroup doc_module_tag_s_mode_server s-mode server
   S-mode server side support functions.
 
   This module contains the receiving side of the s-mode functionality.
-  The received s-mode messages are routed to the appropriate POST methods of the data point.
-  However since not all data is in the s-mode message the POST method needs to retrieve the data from the s-mode messsage
-  differently than for an normal CoAP post message (the message payload is constructed differently).
+  The received s-mode messages are routed to the appropriate POST methods of the
+  data point. However since not all data is in the s-mode message the POST
+  method needs to retrieve the data from the s-mode messsage differently than
+  for an normal CoAP post message (the message payload is constructed
+  differently).
 
   @{
 */
@@ -89,15 +90,16 @@ oc_s_mode_response_cb_t oc_get_s_mode_response_cb();
  */
 bool oc_is_s_mode_request(oc_request_t *request);
 
-
 /**
   @defgroup doc_module_tag_s_mode_client s-mode client
   S-mode Client side support functions.
 
   This module contains the sending side of the s-mode functionality.
-  The s-mode messages are send from the device that implements a resource with the CoAP GET functionality.
-  The s-mode functions will retrieve the data values and place it in the s-mode message.
-  The s-mode message will only be send to the groups that are listed in the Group Object Table with the appropriate flags.
+  The s-mode messages are send from the device that implements a resource with
+  the CoAP GET functionality. The s-mode functions will retrieve the data values
+  and place it in the s-mode message. The s-mode message will only be send to
+  the groups that are listed in the Group Object Table with the appropriate
+  flags.
 
   @{
 */
@@ -109,7 +111,6 @@ bool oc_is_s_mode_request(oc_request_t *request);
  * @return oc_rep_t* the rep
  */
 oc_rep_t *oc_s_mode_get_value(oc_request_t *request);
-
 
 /** @} */ // end of doc_module_tag_s_mode_server
 
@@ -158,7 +159,6 @@ void oc_do_s_mode_read(size_t group_address);
  * @param rp the "st" value to send e.g. "w" | "rp" | "r"
  */
 void oc_do_s_mode_with_scope(int scope, char *resource_url, char *rp);
-
 
 /** @} */ // end of doc_module_tag_s_mode_client
 
