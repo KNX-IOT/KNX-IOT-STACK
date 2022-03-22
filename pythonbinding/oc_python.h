@@ -47,32 +47,32 @@ Note: prefix will change from py to ets
 
 /**
  * @brief the spake callback function type
- * 
+ *
  */
 typedef void (*spakeCB)(char *sn, int state, char *secret, int secret_size);
 
 /**
  * @brief The changed callback function type
- * 
+ *
  */
 typedef void (*changedCB)(char *uuid, char *state, char *event);
 
 /**
  * @brief The discovery callback function type
- * 
+ *
  */
 typedef void (*discoveryCB)(int payload_size, char *payload);
 
 /**
  * @brief the resource callback function type
- * 
+ *
  */
 typedef void (*resourceCB)(char *anchor, char *uri, char *types,
                            char *interfaces);
 
 /**
  * @brief the client callback function type
- * 
+ *
  */
 typedef void (*clientCB)(char *sn, int status, char *r_format, char *r_id,
                          char *url, int payload_size, char *payload);
@@ -145,7 +145,7 @@ kisCS_EXPORT void ets_cbor_get(char *sn, char *uri, char *query, char *r_id);
  * @param r_id the r_id (string)
  */
 kisCS_EXPORT void ets_cbor_get_unsecured(char *sn, char *uri, char *query,
-                                        char *r_id);
+                                         char *r_id);
 
 /**
  * @brief issue a GET request with expected content type LINK-FORMAT
@@ -156,7 +156,7 @@ kisCS_EXPORT void ets_cbor_get_unsecured(char *sn, char *uri, char *query,
  * @param r_id the r_id (string)
  */
 kisCS_EXPORT void ets_linkformat_get(char *sn, char *uri, char *query,
-                                    char *r_id);
+                                     char *r_id);
 
 /*
  * @brief issue a GET request with expected content type LINK-FORMAT unsecured
@@ -167,7 +167,7 @@ kisCS_EXPORT void ets_linkformat_get(char *sn, char *uri, char *query,
  * @param r_id the r_id (string)
  */
 kisCS_EXPORT void ets_linkformat_get_unsecured(char *sn, char *uri, char *query,
-                                              char *r_id);
+                                               char *r_id);
 
 /**
  * @brief issue a POST request, content type CBOR
@@ -180,7 +180,7 @@ kisCS_EXPORT void ets_linkformat_get_unsecured(char *sn, char *uri, char *query,
  * @param data the request data (in cbor)
  */
 kisCS_EXPORT void ets_cbor_post(char *sn, char *uri, char *query, char *r_id,
-                               int size, char *data);
+                                int size, char *data);
 
 /**
  * @brief issue a PUT request, content type CBOR
@@ -193,7 +193,7 @@ kisCS_EXPORT void ets_cbor_post(char *sn, char *uri, char *query, char *r_id,
  * @param data the request data (in cbor)
  */
 kisCS_EXPORT void ets_cbor_put(char *sn, char *uri, char *query, char *r_id,
-                              int size, char *data);
+                               int size, char *data);
 
 /**
  * @brief issue a DELETE request, content type CBOR
@@ -225,8 +225,8 @@ kisCS_EXPORT void ets_initiate_spake(char *sn, char *password);
  * @param value the value (as string)
  */
 kisCS_EXPORT void ets_issue_requests_s_mode(int scope, int sia, int ga, int iid,
-                                           char *st, int value_type,
-                                           char *value);
+                                            char *st, int value_type,
+                                            char *value);
 
 /**
  * @brief discover KNX devices on the network

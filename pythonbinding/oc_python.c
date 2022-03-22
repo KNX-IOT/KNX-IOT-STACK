@@ -860,7 +860,7 @@ spake_callback(int error, uint8_t *secret, int secret_size)
 /* send a multicast s-mode message */
 void
 ets_issue_requests_s_mode(int scope, int sia, int ga, int iid, char *st,
-                         int value_type, char *value)
+                          int value_type, char *value)
 {
   PRINT(" [C] py_issue_requests_s_mode\n");
 
