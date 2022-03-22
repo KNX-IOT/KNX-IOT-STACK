@@ -500,9 +500,10 @@ int oc_init_platform(const char *mfg_name,
 
   # application specific data points
 
-  Applications have to define the functions (GET and PUT) for the application level data points.
-  Applications have to define for each instance these functions.
-  The functions are registered with the device and will be called when the other devices are interacting with it.
+  Applications have to define the functions (GET and PUT) for the application
+  level data points. Applications have to define for each instance these
+  functions. The functions are registered with the device and will be called
+  when the other devices are interacting with it.
 
   see for more details the examples.
 
@@ -1120,16 +1121,16 @@ int oc_notify_observers(oc_resource_t *resource);
 /**
   @defgroup doc_module_tag_client_state Client side
   Client side support functions.
-  
+
   This module contains functions to communicate to a KNX server. It contains
 
   ## multicast
-  
+
   The multicast communication is for:
   - Discovery
-  - s-mode (group) communication 
+  - s-mode (group) communication
 
-  The multicast Discovery is issued is on CoAP .well-known/core 
+  The multicast Discovery is issued is on CoAP .well-known/core
   The s-mode communication is performed at the (specific) group addresses.
 
 
@@ -1537,7 +1538,8 @@ bool oc_send_ping(bool custody, oc_endpoint_t *endpoint,
 /**
   @defgroup doc_module_tag_common_operations Common operations
 
-  This section contains common operations that can be used to schedule callbacks.
+  This section contains common operations that can be used to schedule
+  callbacks.
 
   @{
 */
