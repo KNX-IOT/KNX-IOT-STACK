@@ -21,7 +21,15 @@ int knx_publish_service()
 	if (avahi_pid == 0)
 	{
 		// we are in the child thread - execute Avahi
-		execlp("avahi-publish-service", "avahi-publish-service", (char *)NULL);
+		execlp("avahi-publish-service",
+			"avahi-publish-service",
+			"--subtype=_01CAFE1234._sub._knx._udp", // device address
+			"--subtype=_ia._sub._knx._udp", // individual address"
+			"FD123-321", // service name = KNX ULA prefix
+			"_knx._udp", // service type
+			"5683", //port
+			(char *)NULL
+		);
 	}
 	else if (avahi_pid > 0)
 	{
