@@ -41,37 +41,72 @@ extern "C" {
 Group of exported functions, so that these functions can be used with a dll or
 shared object.
 
+# request data
+The request data is in CBOR, e.g. the input data to a request (POST/PUT) has to be 
+created in advance before calling the functions.
+
+# response data
+The response data is in text, e.g. converted from CBOR into JSON or in link-format 
+
+# usage with python
+
+The python file knx_python.py is the counter part that is using the dll/shared object.
+The python code uses ets_start() ets_poll() and ets_stop() in an thread from python.
+
+
 @{
 */
 
 /**
  * @brief the spake callback function type
  *
+ * @param sn the serial number of the device
+ * @param state The state of the device 
+ * @param secret the negotiated master secret
+ * @param secret_size the negotiated master secret size
  */
 typedef void (*spakeCB)(char *sn, int state, char *secret, int secret_size);
 
 /**
  * @brief The changed callback function type
- *
+ *  NOT USED
  */
 typedef void (*changedCB)(char *uuid, char *state, char *event);
 
 /**
  * @brief The discovery callback function type
  *
+ * @param payload_size the size of the payload in bytes
+ * @param payload the ascii payload e.g. link-formatted data
  */
 typedef void (*discoveryCB)(int payload_size, char *payload);
 
 /**
  * @brief the resource callback function type
- *
+ * NOT USED 
  */
 typedef void (*resourceCB)(char *anchor, char *uri, char *types,
                            char *interfaces);
 
 /**
- * @brief the client callback function type
- *
+ * @brief the client callback function
+ * When one of the CoAP methods is called for interacting with an KNX device
+ * this callback is being called with the expected results.
+ * 
+ * @see ets_cbor_get
+ * @see ets_cbor_get_unsecured
+ * @see ets_linkformat_get
+ * @see ets_linkformat_get_unsecured
+ * @see ets_cbor_post
+ * @see ets_cbor_put
+ * @see ets_cbor_delete
+ * @param sn the serial number of the device
+ * @param status The state of the device 
+ * @param r_format the return format
+ * @param r_id the r_id (string), e.g. info that has been set on the call
+ * @param url the called url
+ * @param payload_size the size of the payload in bytes
+ * @param payload the ascii payload e.g. link-formatted data
  */
 typedef void (*clientCB)(char *sn, int status, char *r_format, char *r_id,
                          char *url, int payload_size, char *payload);
@@ -128,20 +163,22 @@ kisCS_EXPORT void ets_install_spakeCB(spakeCB spakeCB);
 /**
  * @brief issue a GET request with expected content type CBOR
  *
- * @param sn the serial number of the device (is unique?)
+ * @see clientCB
+ * @param sn the serial number of the device
  * @param uri the local path
  * @param query the query
- * @param r_id the r_id (string)
+ * @param r_id the r_id (string), e.g. info that will be returned by the callback
  */
 kisCS_EXPORT void ets_cbor_get(char *sn, char *uri, char *query, char *r_id);
 
 /**
  * @brief issue a GET request with expected content type CBOR (unsecured)
  *
- * @param sn the serial number of the device (is unique)
+ * @see clientCB
+ * @param sn the serial number of the device
  * @param uri the local path
  * @param query the query
- * @param r_id the r_id (string)
+ * @param r_id the r_id (string), e.g. info that will be returned by the callback
  */
 kisCS_EXPORT void ets_cbor_get_unsecured(char *sn, char *uri, char *query,
                                          char *r_id);
@@ -149,10 +186,11 @@ kisCS_EXPORT void ets_cbor_get_unsecured(char *sn, char *uri, char *query,
 /**
  * @brief issue a GET request with expected content type LINK-FORMAT
  *
- * @param sn the serial number of the device (is unique?)
+ * @see clientCB
+ * @param sn the serial number of the device
  * @param uri the local path
  * @param query the query
- * @param r_id the r_id (string)
+ * @param r_id the r_id (string), e.g. info that will be returned by the callback
  */
 kisCS_EXPORT void ets_linkformat_get(char *sn, char *uri, char *query,
                                      char *r_id);
@@ -160,10 +198,11 @@ kisCS_EXPORT void ets_linkformat_get(char *sn, char *uri, char *query,
 /*
  * @brief issue a GET request with expected content type LINK-FORMAT unsecured
  *
- * @param sn the serial number of the device (is unique)
+ * @see clientCB
+ * @param sn the serial number of the device
  * @param uri the local path
  * @param query the query
- * @param r_id the r_id (string)
+ * @param r_id the r_id (string), e.g. info that will be returned by the callback
  */
 kisCS_EXPORT void ets_linkformat_get_unsecured(char *sn, char *uri, char *query,
                                                char *r_id);
@@ -171,10 +210,11 @@ kisCS_EXPORT void ets_linkformat_get_unsecured(char *sn, char *uri, char *query,
 /**
  * @brief issue a POST request, content type CBOR
  *
- * @param sn the serial number of the device (is unique?)
+ * @see clientCB
+ * @param sn the serial number of the device
  * @param uri the local path
  * @param query the query
- * @param r_id the r_id (string)
+ * @param r_id the r_id (string), e.g. info that will be returned by the callback
  * @param size the size of the data
  * @param data the request data (in cbor)
  */
@@ -184,10 +224,11 @@ kisCS_EXPORT void ets_cbor_post(char *sn, char *uri, char *query, char *r_id,
 /**
  * @brief issue a PUT request, content type CBOR
  *
- * @param sn the serial number of the device (is unique?)
+ * @see clientCB
+ * @param sn the serial number of the device
  * @param uri the local path
  * @param query the query
- * @param r_id the r_id (string)
+ * @param r_id the r_id (string), e.g. info that will be returned by the callback
  * @param size the size of the data
  * @param data the request data (in cbor)
  */
@@ -197,17 +238,19 @@ kisCS_EXPORT void ets_cbor_put(char *sn, char *uri, char *query, char *r_id,
 /**
  * @brief issue a DELETE request, content type CBOR
  *
- * @param sn the serial number of the device (is unique?)
+ * @see clientCB
+ * @param sn the serial number of the device
  * @param uri the local path
  * @param query the query
- * @param r_id the r_id (string)
+ * @param r_id the r_id (string), e.g. info that will be returned by the callback
  */
 kisCS_EXPORT void ets_cbor_delete(char *sn, char *uri, char *query, char *r_id);
 
 /**
  * @brief initiate the spake handshake
- *
- * @param sn the serial number of the device (is unique?)
+ * the result of the handshake will be returned via the spa
+ * 
+ * @param sn the serial number of the device
  * @param password the password of the device
  */
 kisCS_EXPORT void ets_initiate_spake(char *sn, char *password);
@@ -267,15 +310,63 @@ kisCS_EXPORT char *ets_get_sn(int index);
 
 /**
  * @brief starts the C library.
+ *
+ *  This function starts the library in a thread.
+ *  thread should be stopped with ets_exit()
  */
 kisCS_EXPORT int ets_main(void);
+
 
 /**
  * @brief stops the C library
  *
+ * @see ets_main
  * @param signal the signal to stop
  */
 kisCS_EXPORT void ets_exit(int signal);
+
+/**
+ * @brief start the ETS server
+ * The initialisation of the KNX server code
+ * This function should by followed by a loop that calls ets_poll()
+ * The clean up can be done when the polling is finished by calling ets_stop()
+ * Example:
+ * ```
+ * ets_start("1234");
+ * while (true) {
+ *   ets_poll();
+ * }
+ * ets_stop();
+ * ```
+ * 
+ * @see ets_stop
+ * @see ets_poll
+ * 
+ * @param serial_number the serial number of the KNX device
+ * @return 0 == success
+ */
+kisCS_EXPORT int ets_start(char* serial_number);
+
+/**
+ * @brief stop the ETS server
+ *  e.g. free up the allocated resources when the ETS server has been started wiht ets_start()
+ * @see ets_start
+ * @see ets_poll
+ * @return 0 == success
+ */
+kisCS_EXPORT int ets_stop(void);
+
+/**
+ * @brief ets poll
+ * e.g. the tick to do processing on the KNX stack
+ * should be called at a regular pace, e.g. each milisecond.
+ * @see ets_start
+ * @see ets_stop
+ * @return 0 == success
+ */
+kisCS_EXPORT int ets_poll(void);
+
+
 
 /** @} */ // end of doc_module_tag_dll
 
