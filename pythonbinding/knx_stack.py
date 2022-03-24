@@ -750,7 +750,6 @@ class KNXIOTStack():
         self.spake = { "state": cb_state, "sec_size": cb_secret_size, "secret" : new_secret}
         secret_in_hex = binascii.hexlify(new_secret)
         print ("spakeCB: secret (in hex)",secret_in_hex)
-        #print (len(new_secret))
         spake_event.set()
 
     def __init__(self, debug=True):
@@ -794,7 +793,7 @@ class KNXIOTStack():
         self.lib.ets_install_spakeCB(self.spakeCBFunc)
         print ("...")
         use_main = False
-        if (use_main):
+        if use_main:
             self.threadid = threading.Thread(target=self.thread_function, args=())
             self.threadid.start()
         else:
@@ -822,15 +821,14 @@ class KNXIOTStack():
         self.lib.ets_start.argtypes = [ String ]
         self.lib.ets_start.restype = c_int
         return_value  = self.lib.ets_start("012345")
-        
         print ("thread_poll: start:", return_value)
         self.lib.ets_poll.argtypes = [  ]
         self.lib.ets_poll.restype = c_int
 
-        while (self.m_stop == False) :
+        while self.m_stop is False :
             try:
-              self.lib.ets_poll()
-              #print ("thread_poll: poll")
+                self.lib.ets_poll()
+                #print ("thread_poll: poll")
             except:
                 traceback.print_exc()
             #time.sleep(0.001)
