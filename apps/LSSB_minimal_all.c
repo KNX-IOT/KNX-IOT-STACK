@@ -69,6 +69,7 @@
 #include "oc_api.h"
 #include "oc_core_res.h"
 #include "port/oc_clock.h"
+#include "port/dns-sd.h"
 #include <signal.h>
 // test purpose only
 #include "api/oc_knx_dev.h"
@@ -524,6 +525,8 @@ main(int argc, char *argv[])
     PRINT("oc_main_init failed %d, exiting.\n", init);
     return init;
   }
+
+  knx_publish_service();
 
 #ifdef OC_OSCORE
   PRINT("OSCORE - Enabled\n");
