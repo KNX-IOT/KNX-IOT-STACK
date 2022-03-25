@@ -42,17 +42,17 @@
 
 /* Structure in app to track currently discovered owned/unowned devices */
 
-
 char g_serial_number[MAX_SERIAL_NUM_LENGTH]; /**< the serial number to be set on
                                                 the stack */
 
 typedef struct device_handle_t
 {
-  struct device_handle_t *next;  /**< next in the list */
-  char device_serial_number[MAX_SERIAL_NUM_LENGTH]; /**< serial number of the device*/
-  char device_name[64];          /**< the device name (not used) */
-  char ip_address[100];          /**< the ip address (ipv6 as string) */
-  oc_endpoint_t ep;              /**< the endpoint to talk to the device */
+  struct device_handle_t *next;                     /**< next in the list */
+  char device_serial_number[MAX_SERIAL_NUM_LENGTH]; /**< serial number of the
+                                                       device*/
+  char device_name[64]; /**< the device name (not used) */
+  char ip_address[100]; /**< the ip address (ipv6 as string) */
+  oc_endpoint_t ep;     /**< the endpoint to talk to the device */
 } device_handle_t;
 
 /* Pool of device handles */
@@ -70,7 +70,6 @@ static CRITICAL_SECTION cs;
 #define py_mutex_lock(m) EnterCriticalSection(&m)
 #define py_mutex_unlock(m) LeaveCriticalSection(&m)
 
-
 #elif defined(__linux__)
 static pthread_t event_thread;
 static pthread_mutex_t app_sync_lock;
@@ -85,12 +84,10 @@ static struct timespec ts;
 #endif
 static int quit = 0;
 
-
 // -----------------------------------------------------------------------------
 // forward declarations
 
 static void signal_event_loop(void);
-
 
 // -----------------------------------------------------------------------------
 
@@ -338,7 +335,7 @@ app_init(void)
   if (strlen(g_serial_number) > 0) {
     ret |=
       oc_add_device("py-client", "1.0.0", "//", g_serial_number, NULL, NULL);
-  
+
   } else {
 
     ret |= oc_add_device("py-client", "1.0.0", "//", "012349", NULL, NULL);
@@ -349,7 +346,6 @@ app_init(void)
 
   return ret;
 }
-
 
 // -----------------------------------------------------------------------------
 
@@ -927,7 +923,6 @@ ets_reset_device(char *sn)
   // py_mutex_unlock(app_sync_lock);
 }
 
-
 // -----------------------------------------------------------------------------
 
 int
@@ -937,8 +932,7 @@ ets_start(char *serial_number)
   strncpy(g_serial_number, serial_number, MAX_SERIAL_NUM_LENGTH);
 
   static const oc_handler_t handler = { .init = app_init,
-                                        .signal_event_loop =
-                                          signal_event_loop,
+                                        .signal_event_loop = signal_event_loop,
 #ifdef OC_SERVER
                                         .register_resources = NULL,
 #endif
@@ -957,7 +951,7 @@ ets_start(char *serial_number)
 
   int init = oc_main_init(&handler);
 
-  #if defined(_WIN32)
+#if defined(_WIN32)
   InitializeCriticalSection(&cs);
   InitializeConditionVariable(&cv);
   InitializeCriticalSection(&app_sync_lock);
@@ -991,16 +985,13 @@ ets_poll(void)
   oc_clock_time_t next_event;
   next_event = oc_main_poll();
 
-  //PRINT("blah");
-  //PRINT("    ---> %d", next_event);
+  // PRINT("blah");
+  // PRINT("    ---> %d", next_event);
 
   return 0;
 }
 
-
 // -----------------------------------------------------------------------------
-
-
 
 /**
  * event loop (window/linux) used for the python initiated thread.
@@ -1083,9 +1074,6 @@ func_event_thread(void *data)
   return NULL;
 }
 #endif
-
-
-
 
 int
 ets_main(void)
