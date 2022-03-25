@@ -526,7 +526,6 @@ main(int argc, char *argv[])
     return init;
   }
 
-
 #ifdef OC_OSCORE
   PRINT("OSCORE - Enabled\n");
 #else
