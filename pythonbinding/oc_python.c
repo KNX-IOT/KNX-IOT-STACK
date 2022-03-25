@@ -38,16 +38,21 @@
 #define MAX_NUM_RESOURCES (100)
 #define MAX_NUM_RT (50)
 #define MAX_URI_LENGTH (30)
+#define MAX_SERIAL_NUM_LENGTH (20)
 
 /* Structure in app to track currently discovered owned/unowned devices */
 
+
+char g_serial_number[MAX_SERIAL_NUM_LENGTH]; /**< the serial number to be set on
+                                                the stack */
+
 typedef struct device_handle_t
 {
-  struct device_handle_t *next;
-  char device_serial_number[10];
-  char device_name[64];
-  char ip_address[100];
-  oc_endpoint_t ep;
+  struct device_handle_t *next;  /**< next in the list */
+  char device_serial_number[MAX_SERIAL_NUM_LENGTH]; /**< serial number of the device*/
+  char device_name[64];          /**< the device name (not used) */
+  char ip_address[100];          /**< the ip address (ipv6 as string) */
+  oc_endpoint_t ep;              /**< the endpoint to talk to the device */
 } device_handle_t;
 
 /* Pool of device handles */
@@ -330,7 +335,14 @@ app_init(void)
 {
   int ret = oc_init_platform("Cascoda", NULL, NULL);
 
-  ret |= oc_add_device("py-client", "1.0.0", "//", "012349", NULL, NULL);
+  if (strlen(g_serial_number) > 0) {
+    ret |=
+      oc_add_device("py-client", "1.0.0", "//", g_serial_number, NULL, NULL);
+  
+  } else {
+
+    ret |= oc_add_device("py-client", "1.0.0", "//", "012349", NULL, NULL);
+  }
 
   /* set the programming mode */
   oc_core_set_device_pm(0, false);
@@ -861,7 +873,7 @@ ets_issue_requests_s_mode(int scope, int sia, int ga, int iid, char *st,
 // -----------------------------------------------------------------------------
 
 /**
- * function to retrieve the sn of the discovered device
+ * function to retrieve the serial number of the discovered device
  *
  */
 char *
@@ -882,7 +894,7 @@ ets_get_sn(int index)
 }
 
 /**
- * function to retrieve the number of discovered device
+ * function to retrieve the amount of discovered devices
  *
  */
 int
@@ -922,6 +934,8 @@ int
 ets_start(char *serial_number)
 {
 
+  strncpy(g_serial_number, serial_number, MAX_SERIAL_NUM_LENGTH);
+
   static const oc_handler_t handler = { .init = app_init,
                                         .signal_event_loop =
                                           signal_event_loop,
@@ -954,7 +968,6 @@ ets_start(char *serial_number)
   sa.sa_handler = ets_exit;
   sigaction(SIGINT, &sa, NULL);
 #endif
-
 
   return init;
 }
@@ -1102,6 +1115,8 @@ ets_main(void)
 #endif
 
   int init;
+
+  strncpy(g_serial_number, "01234", MAX_SERIAL_NUM_LENGTH);
 
   static const oc_handler_t handler = { .init = app_init,
                                         .signal_event_loop = signal_event_loop,
