@@ -167,7 +167,7 @@ oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   (void)iface_mask;
   // size_t response_length = 0;
 
-  int value = -1;
+  int64_t value = -1;
   int cmd = -1;
   // int time;
   // int code;
@@ -420,7 +420,7 @@ oc_core_knx_lsm_post_handler(oc_request_t *request,
   while (rep != NULL) {
     if (rep->type == OC_REP_INT) {
       if (rep->iname == 2) {
-        event = rep->value.integer;
+        event = (int)rep->value.integer;
         changed = true;
         break;
       }
@@ -565,7 +565,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
     case OC_REP_INT: {
       // sia
       if (rep->iname == 4) {
-        g_received_notification.sia = rep->value.integer;
+        g_received_notification.sia = (int)rep->value.integer;
       }
     } break;
     case OC_REP_OBJECT: {
@@ -597,20 +597,20 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
 #ifdef TAGS_AS_STRINGS
           if (oc_string_len(object->name) == 3 &&
               memcmp(oc_string(object->name), "sia", 3) == 0) {
-            g_received_notification.sia = object->value.integer;
+            g_received_notification.sia = (int)object->value.integer;
           }
           if (oc_string_len(object->name) == 2 &&
               memcmp(oc_string(object->name), "ga", 2) == 0) {
-            g_received_notification.ga = object->value.integer;
+            g_received_notification.ga = (int)object->value.integer;
           }
 #endif
           // sia
           if (object->iname == 4) {
-            g_received_notification.sia = object->value.integer;
+            g_received_notification.sia = (int)object->value.integer;
           }
           // ga
           if (object->iname == 7) {
-            g_received_notification.ga = object->value.integer;
+            g_received_notification.ga = (int)object->value.integer;
           }
         } break;
         case OC_REP_NIL:
@@ -745,7 +745,10 @@ oc_core_knx_fingerprint_get_handler(oc_request_t *request,
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
-  cbor_encode_uint(&g_encoder, g_fingerprint);
+  //cbor_encode_uint(&g_encoder, g_fingerprint);
+  oc_rep_begin_root_object();
+  oc_rep_i_set_int(root, 1, g_fingerprint);
+  oc_rep_end_root_object();
 
   PRINT("oc_core_knx_fingerprint_get_handler - done\n");
   oc_send_cbor_response(request, OC_STATUS_OK);
@@ -776,7 +779,10 @@ oc_core_knx_osn_get_handler(oc_request_t *request,
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
-  cbor_encode_uint(&g_encoder, g_osn);
+  //cbor_encode_uint(&g_encoder, g_osn);
+  oc_rep_begin_root_object();
+  oc_rep_i_set_int(root, 1, g_osn);
+  oc_rep_end_root_object();
 
   PRINT("oc_core_knx_osn_get_handler - done\n");
   oc_send_cbor_response(request, OC_STATUS_OK);
