@@ -750,7 +750,6 @@ class KNXIOTStack():
         self.spake = { "state": cb_state, "sec_size": cb_secret_size, "secret" : new_secret}
         secret_in_hex = binascii.hexlify(new_secret)
         print ("spakeCB: secret (in hex)",secret_in_hex)
-        #print (len(new_secret))
         spake_event.set()
 
     def __init__(self, debug=True):
@@ -764,6 +763,7 @@ class KNXIOTStack():
         libdir = os.path.dirname(__file__)
         print ("at :", libdir)
         self.timout = 3
+        self.m_stop = False
         self.lib=ctl.load_library(libname, libdir)
         # python list of copied unowned devices on the local network
         # will be updated from the C layer automatically by the CHANGED_CALLBACK
@@ -792,8 +792,13 @@ class KNXIOTStack():
         self.spakeCBFunc = SPAKE_CALLBACK(self.spakeCB)
         self.lib.ets_install_spakeCB(self.spakeCBFunc)
         print ("...")
-        self.threadid = threading.Thread(target=self.thread_function, args=())
-        self.threadid.start()
+        use_main = False
+        if use_main:
+            self.threadid = threading.Thread(target=self.thread_function, args=())
+            self.threadid.start()
+        else:
+            self.threadid = threading.Thread(target=self.thread_poll, args=())
+            self.threadid.start()
         print ("...")
 
     def get_r_id(self):
@@ -807,9 +812,31 @@ class KNXIOTStack():
         print ("thread_function: thread started")
         self.lib.ets_main()
 
-    #def get_result(self):
-    #    self.lib.get_cb_result.restype = bool
-    #    return self.lib.get_cb_result()
+    def thread_poll(self):
+        """ starts the main function in C.
+        this function is threaded in python.
+        """
+        print ("thread_poll: thread started")
+
+        self.lib.ets_start.argtypes = [ String ]
+        self.lib.ets_start.restype = c_int
+        return_value  = self.lib.ets_start("012345")
+        print ("thread_poll: start:", return_value)
+        self.lib.ets_poll.argtypes = [  ]
+        self.lib.ets_poll.restype = c_int
+
+        while self.m_stop is False :
+            try:
+                self.lib.ets_poll()
+                #print ("thread_poll: poll")
+            except:
+                traceback.print_exc()
+            #time.sleep(0.001)
+        print ("thread_poll: stopped")
+        self.lib.ets_stop.argtypes = [ ]
+        self.lib.ets_stop.restype = c_int
+        self.lib.ets_stop()
+
 
     def purge_device_array(self, sn):
         for index, device in enumerate(self.device_array):
@@ -1008,10 +1035,12 @@ class KNXIOTStack():
         print(" issue_s_mode - done")
 
     def quit(self):
+        self.m_stop = True
         self.lib.ets_exit(c_int(0))
 
     def sig_handler(self, _signum, _frame):
         print ("sig_handler..")
+        self.m_stop = True
         time.sleep(1)
         self.quit()
         sys.exit()

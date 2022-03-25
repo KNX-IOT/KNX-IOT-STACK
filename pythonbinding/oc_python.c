@@ -38,16 +38,21 @@
 #define MAX_NUM_RESOURCES (100)
 #define MAX_NUM_RT (50)
 #define MAX_URI_LENGTH (30)
+#define MAX_SERIAL_NUM_LENGTH (20)
 
 /* Structure in app to track currently discovered owned/unowned devices */
 
+char g_serial_number[MAX_SERIAL_NUM_LENGTH]; /**< the serial number to be set on
+                                                the stack */
+
 typedef struct device_handle_t
 {
-  struct device_handle_t *next;
-  char device_serial_number[10];
-  char device_name[64];
-  char ip_address[100];
-  oc_endpoint_t ep;
+  struct device_handle_t *next;                     /**< next in the list */
+  char device_serial_number[MAX_SERIAL_NUM_LENGTH]; /**< serial number of the
+                                                       device*/
+  char device_name[64]; /**< the device name (not used) */
+  char ip_address[100]; /**< the ip address (ipv6 as string) */
+  oc_endpoint_t ep;     /**< the endpoint to talk to the device */
 } device_handle_t;
 
 /* Pool of device handles */
@@ -78,6 +83,13 @@ static pthread_cond_t cv;
 static struct timespec ts;
 #endif
 static int quit = 0;
+
+// -----------------------------------------------------------------------------
+// forward declarations
+
+static void signal_event_loop(void);
+
+// -----------------------------------------------------------------------------
 
 /**
  * structure with the callbacks
@@ -320,7 +332,14 @@ app_init(void)
 {
   int ret = oc_init_platform("Cascoda", NULL, NULL);
 
-  ret |= oc_add_device("py-client", "1.0.0", "//", "012349", NULL, NULL);
+  if (strlen(g_serial_number) > 0) {
+    ret |=
+      oc_add_device("py-client", "1.0.0", "//", g_serial_number, NULL, NULL);
+
+  } else {
+
+    ret |= oc_add_device("py-client", "1.0.0", "//", "012349", NULL, NULL);
+  }
 
   /* set the programming mode */
   oc_core_set_device_pm(0, false);
@@ -328,87 +347,7 @@ app_init(void)
   return ret;
 }
 
-/**
- * event loop (window/linux) used for the python initiated thread.
- *
- */
-static void
-signal_event_loop(void)
-{
-#if defined(_WIN32)
-  WakeConditionVariable(&cv);
-#elif defined(__linux__)
-  py_mutex_lock(mutex);
-  pthread_cond_signal(&cv);
-  py_mutex_unlock(mutex);
-#endif
-}
-
-/**
- * function to quit the event loop
- *
- */
-void
-ets_exit(int signal)
-{
-  (void)signal;
-  quit = 1;
-  signal_event_loop();
-}
-
-/**
- * the event thread (windows or Linux)
- *
- */
-#if defined(_WIN32)
-DWORD WINAPI
-func_event_thread(LPVOID lpParam)
-{
-  oc_clock_time_t next_event;
-  while (quit != 1) {
-    py_mutex_lock(app_sync_lock);
-    next_event = oc_main_poll();
-    py_mutex_unlock(app_sync_lock);
-
-    if (next_event == 0) {
-      SleepConditionVariableCS(&cv, &cs, INFINITE);
-    } else {
-      oc_clock_time_t now = oc_clock_time();
-      if (now < next_event) {
-        SleepConditionVariableCS(
-          &cv, &cs, (DWORD)((next_event - now) * 1000 / OC_CLOCK_SECOND));
-      }
-    }
-  }
-
-  oc_main_shutdown();
-  return TRUE;
-}
-#elif defined(__linux__)
-static void *
-func_event_thread(void *data)
-{
-  (void)data;
-  oc_clock_time_t next_event;
-  while (quit != 1) {
-    py_mutex_lock(app_sync_lock);
-    next_event = oc_main_poll();
-    py_mutex_unlock(app_sync_lock);
-
-    py_mutex_lock(mutex);
-    if (next_event == 0) {
-      pthread_cond_wait(&cv, &mutex);
-    } else {
-      ts.tv_sec = (next_event / OC_CLOCK_SECOND);
-      ts.tv_nsec = (next_event % OC_CLOCK_SECOND) * 1.e09 / OC_CLOCK_SECOND;
-      pthread_cond_timedwait(&cv, &mutex, &ts);
-    }
-    py_mutex_unlock(mutex);
-  }
-  oc_main_shutdown();
-  return NULL;
-}
-#endif
+// -----------------------------------------------------------------------------
 
 /* Application utility functions */
 static device_handle_t *
@@ -871,10 +810,6 @@ ets_issue_requests_s_mode(int scope, int sia, int ga, int iid, char *st,
   memset(&mcast, 0, sizeof(mcast));
   mcast = oc_create_multicast_group_address(mcast, ga, iid, scope);
 
-  // oc_make_ipv6_endpoint(mcast, IPV6 | DISCOVERY | MULTICAST, 5683, 0xff,
-  // scope,
-  //                      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0xfd);
-
   if (oc_init_post("/.knx", &mcast, NULL, NULL, LOW_QOS, NULL)) {
     /*
     { 4: sia, 5: { 6: <st>, 7: <ga>, 1: <value> } }
@@ -934,7 +869,7 @@ ets_issue_requests_s_mode(int scope, int sia, int ga, int iid, char *st,
 // -----------------------------------------------------------------------------
 
 /**
- * function to retrieve the sn of the discovered device
+ * function to retrieve the serial number of the discovered device
  *
  */
 char *
@@ -955,7 +890,7 @@ ets_get_sn(int index)
 }
 
 /**
- * function to retrieve the number of discovered device
+ * function to retrieve the amount of discovered devices
  *
  */
 int
@@ -991,6 +926,156 @@ ets_reset_device(char *sn)
 // -----------------------------------------------------------------------------
 
 int
+ets_start(char *serial_number)
+{
+
+  strncpy(g_serial_number, serial_number, MAX_SERIAL_NUM_LENGTH);
+
+  static const oc_handler_t handler = { .init = app_init,
+                                        .signal_event_loop = signal_event_loop,
+#ifdef OC_SERVER
+                                        .register_resources = NULL,
+#endif
+#ifdef OC_CLIENT
+                                        .requests_entry = NULL
+#endif
+  };
+
+#ifdef OC_STORAGE
+  oc_storage_config("./ets_creds");
+#endif /* OC_STORAGE */
+       // oc_set_factory_presets_cb(factory_presets_cb, NULL);
+  oc_set_max_app_data_size(16384);
+
+  oc_set_spake_response_cb(spake_callback);
+
+  int init = oc_main_init(&handler);
+
+#if defined(_WIN32)
+  InitializeCriticalSection(&cs);
+  InitializeConditionVariable(&cv);
+  InitializeCriticalSection(&app_sync_lock);
+#elif defined(__linux__)
+  struct sigaction sa;
+  sigfillset(&sa.sa_mask);
+  sa.sa_flags = 0;
+  sa.sa_handler = ets_exit;
+  sigaction(SIGINT, &sa, NULL);
+#endif
+
+  return init;
+}
+
+int
+ets_stop(void)
+{
+
+  /* Free all device_handle_t objects allocated by this application */
+  device_handle_t *device = (device_handle_t *)oc_list_pop(discovered_devices);
+  while (device) {
+    oc_memb_free(&device_handles, device);
+    device = (device_handle_t *)oc_list_pop(discovered_devices);
+  }
+  return 0;
+}
+
+int
+ets_poll(void)
+{
+  oc_clock_time_t next_event;
+  next_event = oc_main_poll();
+
+  // PRINT("blah");
+  // PRINT("    ---> %d", next_event);
+
+  return 0;
+}
+
+// -----------------------------------------------------------------------------
+
+/**
+ * event loop (window/linux) used for the python initiated thread.
+ *
+ */
+static void
+signal_event_loop(void)
+{
+#if defined(_WIN32)
+  WakeConditionVariable(&cv);
+#elif defined(__linux__)
+  py_mutex_lock(mutex);
+  pthread_cond_signal(&cv);
+  py_mutex_unlock(mutex);
+#endif
+}
+
+/**
+ * function to quit the event loop
+ *
+ */
+void
+ets_exit(int signal)
+{
+  (void)signal;
+  quit = 1;
+  signal_event_loop();
+}
+
+/**
+ * the event thread (windows or Linux)
+ *
+ */
+#if defined(_WIN32)
+DWORD WINAPI
+func_event_thread(LPVOID lpParam)
+{
+  oc_clock_time_t next_event;
+  while (quit != 1) {
+    py_mutex_lock(app_sync_lock);
+    next_event = oc_main_poll();
+    py_mutex_unlock(app_sync_lock);
+
+    if (next_event == 0) {
+      SleepConditionVariableCS(&cv, &cs, INFINITE);
+    } else {
+      oc_clock_time_t now = oc_clock_time();
+      if (now < next_event) {
+        SleepConditionVariableCS(
+          &cv, &cs, (DWORD)((next_event - now) * 1000 / OC_CLOCK_SECOND));
+      }
+    }
+  }
+
+  oc_main_shutdown();
+  return TRUE;
+}
+#elif defined(__linux__)
+static void *
+func_event_thread(void *data)
+{
+  (void)data;
+  oc_clock_time_t next_event;
+  while (quit != 1) {
+    py_mutex_lock(app_sync_lock);
+    next_event = oc_main_poll();
+    py_mutex_unlock(app_sync_lock);
+
+    py_mutex_lock(mutex);
+    if (next_event == 0) {
+      pthread_cond_wait(&cv, &mutex);
+    } else {
+      ts.tv_sec = (next_event / OC_CLOCK_SECOND);
+      ts.tv_nsec = (next_event % OC_CLOCK_SECOND) * 1.e09 / OC_CLOCK_SECOND;
+      pthread_cond_timedwait(&cv, &mutex, &ts);
+    }
+    py_mutex_unlock(mutex);
+  }
+  oc_main_shutdown();
+  return NULL;
+}
+#endif
+
+int
 ets_main(void)
 {
 #if defined(_WIN32)
@@ -1019,6 +1104,8 @@ ets_main(void)
 
   int init;
 
+  strncpy(g_serial_number, "01234", MAX_SERIAL_NUM_LENGTH);
+
   static const oc_handler_t handler = { .init = app_init,
                                         .signal_event_loop = signal_event_loop,
 #ifdef OC_SERVER
@@ -1030,7 +1117,7 @@ ets_main(void)
   };
 
 #ifdef OC_STORAGE
-  oc_storage_config("./onboarding_tool_creds");
+  oc_storage_config("./ets_creds");
 #endif /* OC_STORAGE */
        // oc_set_factory_presets_cb(factory_presets_cb, NULL);
   oc_set_max_app_data_size(16384);

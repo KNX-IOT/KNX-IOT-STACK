@@ -4,7 +4,7 @@ The python bindings are based on python ctypes.
 The python code is using the shared library (dll) containing an KNX-IOT stack based device that can act as an client.
 The python code uses the device to interact with other KNX-IOT devices on the network.
 
-![python architecture}](../images/python-architecture.png)
+![python architecture](../images/python-architecture.png)
 
 ## requirements
 
@@ -25,7 +25,6 @@ run the following command from the build directory in a git bash shell:
 cmake .
 ```
 
-
 ## Build Shared Library on Windows for debugging
 
 Retrieving all code that is needed for building (in bash):
@@ -33,6 +32,8 @@ Retrieving all code that is needed for building (in bash):
 ```bash
 # retrieve the repo from github
 git clone https://github.com/KNX-IOT/KNX-IOT-STACK.git
+# go to the created folder
+cd KNX-IOT-STACK
 # make sure that all dependencies are downloaded as well
 git submodule update --init --recursive
 ```
@@ -44,6 +45,7 @@ This batch file opens a windows developer shell that knows all paths of visual s
 ```bash
 start_shell.bat
 ```
+
 In this shell issue the commands to build the applications (in this folder).
 The first command the configuring command for the stack.
 e.g. this checks the visual studio environment and creates the nmake based make file that enables building the stack.
@@ -101,19 +103,24 @@ python knx_stack.py
 
 ### known issues
 
-####
-Note that the windows dll is build for win32 or x64, depending on the default installation of visual studio
+#### building with visual studio 2019
+
+Note that the windows dll is build for win32 or x64, depending on the default installation of visual studio (e.g. visual studio 2019)
 Hence the python interpreter MUST match that.
 
 Both combinations (win32 and x64) are known to work.
 
 For more information: https://stackoverflow.com/questions/48000185/python-ctypes-dll-is-not-a-valid-win32-application
 
+#### building with visual studio 2020
+
+Visual studio 2020 has improved support for Cmake.
+Select the debug and/or release targets in CMake:
+![visual studio cmake](../images/visual_studio_2020_cmake.png)
+Then select the build in visual studio:
+![visual studio cmake](../images/visual_studio_2020_build.png)
 
 ### build dir changes
 
-Assuming the build directory has been configured correctly, this command ensures that the latest
-version of the scripts are copied into the build dir. Since the scripts are copied at configure time,
-you need to use this command whenever you want to test a change to the scripts, or you will see the
-old behaviour instead.
-
+Assuming the build directory has been configured correctly, this command ensures that the latest version of the scripts are copied into the build dir.
+Since the scripts are copied at configure time, you need to use this command whenever you want to test a change to the scripts, or you will see the old behaviour instead.
