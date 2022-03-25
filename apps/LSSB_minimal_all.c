@@ -526,7 +526,6 @@ main(int argc, char *argv[])
     return init;
   }
 
-  knx_publish_service();
 
 #ifdef OC_OSCORE
   PRINT("OSCORE - Enabled\n");
@@ -535,7 +534,9 @@ main(int argc, char *argv[])
 #endif /* OC_OSCORE */
 
   oc_device_info_t *device = oc_core_get_device_info(0);
-  PRINT("serial number: %s", oc_string(device->serialnumber));
+  PRINT("serial number: %s\n", oc_string(device->serialnumber));
+  knx_publish_service(oc_string(device->serialnumber));
+
   oc_device_mode_display(0);
   oc_endpoint_t *my_ep = oc_connectivity_get_endpoints(0);
   if (my_ep != NULL) {
