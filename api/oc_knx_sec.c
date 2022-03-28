@@ -741,6 +741,10 @@ oc_core_auth_at_x_get_handler(oc_request_t *request,
     oc_rep_i_set_key(&cnf_map, 4);
     CborEncoder osc_map;
     cbor_encoder_create_map(&cnf_map, &osc_map, CborIndefiniteLength);
+    if (oc_string_len(g_at_entries[index].osc_id) > 0) {
+      oc_rep_i_set_text_string(
+        osc, 0, oc_string(g_at_entries[index].osc_id)); // root::cnf::osc::id
+    }
     if (oc_string_len(g_at_entries[index].osc_ms) > 0) {
       oc_rep_i_set_text_string(
         osc, 2, oc_string(g_at_entries[index].osc_ms)); // root::cnf::osc::ms
@@ -749,9 +753,9 @@ oc_core_auth_at_x_get_handler(oc_request_t *request,
       oc_rep_i_set_text_string(
         osc, 4, oc_string(g_at_entries[index].osc_alg)); // root::cnf::osc::alg
     }
-    if (oc_string_len(g_at_entries[index].osc_id) > 0) {
+    if (oc_string_len(g_at_entries[index].osc_contextid) > 0) {
       oc_rep_i_set_text_string(
-        osc, 6, oc_string(g_at_entries[index].osc_id)); // root::cnf::osc::id
+        osc, 6, oc_string(g_at_entries[index].osc_contextid)); // root::cnf::osc::contextid
     }
     cbor_encoder_close_container_checked(&cnf_map, &osc_map);
     cbor_encoder_close_container_checked(&root_map, &cnf_map);
@@ -985,7 +989,7 @@ oc_at_dump_entry(size_t device_index, int entry)
   oc_rep_i_set_int(root, 9, g_at_entries[entry].scope);
   oc_rep_i_set_int(root, 19, g_at_entries[entry].profile);
 
-  oc_rep_i_set_text_string(root, 842, oc_string(g_at_entries[entry].osc_id));
+  oc_rep_i_set_text_string(root, 840, oc_string(g_at_entries[entry].osc_id));
   oc_rep_i_set_text_string(root, 844, oc_string(g_at_entries[entry].osc_alg));
   oc_rep_i_set_text_string(root, 846, oc_string(g_at_entries[entry].osc_ms));
 
@@ -1043,7 +1047,7 @@ oc_at_load_entry(int entry)
             oc_new_string(&g_at_entries[entry].id, oc_string(rep->value.string),
                           oc_string_len(rep->value.string));
           }
-          if (rep->iname == 842) {
+          if (rep->iname == 840) {
             oc_free_string(&g_at_entries[entry].osc_id);
             oc_new_string(&g_at_entries[entry].osc_id,
                           oc_string(rep->value.string),
