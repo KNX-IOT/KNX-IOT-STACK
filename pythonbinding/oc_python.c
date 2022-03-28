@@ -102,6 +102,7 @@ typedef struct py_cb_struct
   clientCB clientFCB;
   discoveryCB discoveryFCB;
   spakeCB spakeFCB;
+  gatewayCB gatewayFCB;
 } py_cb_struct_t;
 
 /**
@@ -226,6 +227,37 @@ ets_install_spakeCB(spakeCB spakeCB)
 {
   PRINT("[C]installspakeCB\n");
   my_CBFunctions.spakeFCB = spakeCB;
+}
+
+
+void
+internal_gw_cb(size_t device_index,
+                     oc_group_object_notification_t *s_mode_message, void *data)
+{
+  (void)data;
+  char buffer[300];
+
+  PRINT("[c]internal_gw_cb %d\n", (int)device_index);
+  PRINT("   ga  = %d\n", s_mode_message->ga);
+  PRINT("   sia = %d\n", s_mode_message->sia);
+  PRINT("   st  = %s\n", oc_string(s_mode_message->st));
+  PRINT("   val = %s\n", oc_string(s_mode_message->value));
+
+  oc_s_mode_notification_to_json(buffer, 300, *s_mode_message);
+  if (my_CBFunctions.gatewayFCB) {
+    my_CBFunctions.gatewayFCB(300, buffer);
+  }
+}
+
+void
+ets_install_gatewayCB(gatewayCB gatewayCB)
+{
+  PRINT("[C]installgatewayCB\n");
+  // set the python callback, e.g. do the conversion from s-mode message to json
+  my_CBFunctions.gatewayFCB = gatewayCB;
+
+  // set the gateway callback on the stack
+  oc_set_gateway_cb(internal_gw_cb, NULL);
 }
 
 /**
@@ -913,7 +945,7 @@ ets_reset_device(char *sn)
     return;
   }
 
-  // py_mutex_lock(app_sync_lock);
+  // py_mutex_lock(app_sync_lock);B
   // int ret = oc_obt_device_hard_reset(&device->uuid, reset_device_cb, device);
   // if (ret >= 0) {
   //  PRINT("[C]\nSuccessfully issued request to perform hard RESET\n");
@@ -930,6 +962,7 @@ ets_start(char *serial_number)
 {
 
   strncpy(g_serial_number, serial_number, MAX_SERIAL_NUM_LENGTH);
+  memset(&my_CBFunctions, 0, sizeof(my_CBFunctions));
 
   static const oc_handler_t handler = { .init = app_init,
                                         .signal_event_loop = signal_event_loop,

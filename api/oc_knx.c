@@ -255,6 +255,7 @@ oc_create_knx_resource(int resource_idx, size_t device)
                             oc_core_knx_post_handler, 0, 0, "");
 }
 
+
 // ----------------------------------------------------------------------------
 
 oc_lsm_state_t
@@ -512,6 +513,26 @@ oc_core_knx_knx_get_handler(oc_request_t *request,
   PRINT("oc_core_knx_knx_get_handler - done\n");
 }
 
+// ----------------------------------------------------------------------------
+
+bool
+oc_s_mode_notification_to_json(char *buffer, size_t buffer_size,
+                         oc_group_object_notification_t notification)
+{
+  // { 5: { 6: <st>, 7: <ga>, 1: <value> } }
+  // { "s": { "st": <st>,  "ga": <ga>, "value": <value> } }
+  int size = snprintf(
+    buffer, buffer_size, "{ \"sia\": %d \"s\":{ \"st\": \"%s\" , \"ga\":%d, \"value\": %s }  }",
+    notification.sia,
+    oc_string(notification.st), 
+    notification.ga, 
+    oc_string(notification.value));
+  if (size > buffer_size) {
+    return false;
+  }
+  return true;
+}
+
 void
 oc_reset_g_received_notification()
 {
@@ -638,21 +659,24 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
 
   bool do_write = false;
   bool do_read = false;
-  bool do_response = false;
   // handle the request
   // loop over the group addresses of the /fp/r
   PRINT(" .knx : sia   %d\n", g_received_notification.sia);
   PRINT(" .knx : ga    %d\n", g_received_notification.ga);
   PRINT(" .knx : st    %s\n", oc_string(g_received_notification.st));
   if (strcmp(oc_string(g_received_notification.st), "w") == 0) {
+    // case_1 :
+    // Received from bus: -st w, any ga ==> @receiver:
+    // clags = w -> overwrite object value
+    do_write = true;
+  } else if (strcmp(oc_string(g_received_notification.st), "rp") == 0) {
+    //Case 2)
+    //Received from bus: -st rp, any ga
+    //@receiver: clags = u -> overwrite object value
     do_write = true;
   } else if (strcmp(oc_string(g_received_notification.st), "r") == 0) {
     do_read = true;
-  } else {
-    do_response = true;
-    PRINT(" .knx : st : no reading/writing: ignoring request\n");
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
-  }
+  } 
 
   int index = oc_core_find_group_object_table_index(g_received_notification.ga);
   PRINT(" .knx : index %d\n", index);
@@ -669,34 +693,49 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
       // get the resource to do the fake post on
       oc_resource_t *my_resource = oc_ri_get_app_resource_by_uri(
         oc_string(myurl), oc_string_len(myurl), device_index);
+      if (my_resource == NULL) {
+        return;
+      }
 
       // check if the data is allowed to write or update
       oc_cflag_mask_t cflags = oc_core_group_object_table_cflag_entries(index);
-      if (((cflags & OC_CFLAG_WRITE) == 0) &&
-          ((cflags & OC_CFLAG_UPDATE) == 0)) {
-        PRINT(" skipping index %d due to flags %d", index, cflags);
-        break;
+      if (((cflags & OC_CFLAG_WRITE) > 0) && (do_write)) {
+        PRINT(" index %d handled due to flags %d", index, cflags);
+        // CASE 1:
+        // Received from bus: -st w, any ga
+        // @receiver : clags = w->overwrite object value
+        my_resource->post_handler.cb(request, iface_mask, data);
+        if ((cflags & OC_CFLAG_TRANSMISSION) > 0) {
+        // Case 3) part 1
+        // @sender : updated object value + cflags = t 
+        //Sent : -st w, sending association(1st assigned ga)
+          oc_do_s_mode_with_scope(2, oc_string(myurl), "w");
+          oc_do_s_mode_with_scope(5, oc_string(myurl), "w");
+        }
       }
-
-      if (my_resource != NULL) {
-        if (do_write) {
-          // write the value to the resource
-          my_resource->post_handler.cb(request, iface_mask, data);
+      if (((cflags & OC_CFLAG_UPDATE) > 0) && (do_write)) {
+        PRINT(" index %d handled due to flags %d", index, cflags);
+        // Case 2)
+        // Received from bus: -st rp , any ga
+        // @receiver : clags = u->overwrite object value
+        my_resource->post_handler.cb(request, iface_mask, data);
+        if ((cflags & OC_CFLAG_TRANSMISSION) > 0) {
+          // Case 3) part 2
+          // @sender : updated object value + cflags = t
+          // Sent : -st w, sending association(1st assigned ga)
+          oc_do_s_mode_with_scope(2, oc_string(myurl), "w");
+          oc_do_s_mode_with_scope(5, oc_string(myurl), "w");
         }
-        if (do_read) {
-          // do the actual read from the resource and
-          // send the reply
-          oc_do_s_mode(oc_string(my_resource->uri), "rp");
-        }
-        if (do_response) {
-          // send the response to the callback
-          oc_s_mode_response_cb_t m_s_mode_cb = oc_get_s_mode_response_cb();
-          if (m_s_mode_cb) {
-            rep = request->request_payload;
-            rep_value = oc_s_mode_get_value(request);
-            m_s_mode_cb(oc_string(my_resource->uri), rep, rep_value);
-          }
-        }
+      }
+      if (((cflags & OC_CFLAG_READ) > 0) && (do_read)) {
+        PRINT(" index %d handled due to flags %d", index, cflags);
+        // Case 4)
+        // @sender: cflags = r
+        // Received from bus: -st r
+        // Sent: -st rp, sending association (1st assigned ga)
+        //oc_do_s_mode(oc_string(myurl), "rp");
+        oc_do_s_mode_with_scope(2, oc_string(myurl), "rp");
+        oc_do_s_mode_with_scope(5, oc_string(myurl), "rp");
       }
     }
     // get the next index in the table to get the url from.

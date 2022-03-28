@@ -90,6 +90,17 @@ typedef void (*discoveryCB)(int payload_size, char *payload);
 typedef void (*resourceCB)(char *anchor, char *uri, char *types,
                            char *interfaces);
 
+
+
+/**
+ * @brief The gateway callback function type
+ *
+ * @param payload_size the size of the payload in bytes
+ * @param payload the ascii payload json
+ */
+typedef void (*gatewayCB)(int payload_size, char *payload);
+
+
 /**
  * @brief the client callback function
  * When one of the CoAP methods is called for interacting with an KNX device
@@ -161,6 +172,16 @@ kisCS_EXPORT void ets_install_discoveryCB(discoveryCB discoveryCB);
  * @param spakeCB the spake callback
  */
 kisCS_EXPORT void ets_install_spakeCB(spakeCB spakeCB);
+
+
+/**
+ * @brief install the gateway callback
+ * This function is called when an s-mode message is received.
+ * e.g. on all received s-mode messages.
+ * e.g. on all received s-mode messages.
+ * @param gatewayCB the gateway callback
+ */
+kisCS_EXPORT void ets_install_gatewayCB(gatewayCB gatewayCB);
 
 /**
  * @brief issue a GET request with expected content type CBOR

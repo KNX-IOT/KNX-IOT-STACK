@@ -41,6 +41,8 @@
     - Group object table
     - Credential table (e.g. auth/at entries)
     - Recipient table
+    - functionality to handle the s-mode objects & transmission flags.
+
 
   Therefore an KNX_IOT application exist of:
 
@@ -57,6 +59,25 @@
   - LSAB_minimal_all.c an example that implements Functional Block LSAB
   - LSSB_minimal_all.c an example that implements Functional Block LSSB
 
+  # handling of transmission flags
+  Case 1:
+    - Received from bus: -st w, any ga
+    - @receiver: c flags = w -> overwrite object value
+  Case 2:
+    -  Received from bus: -st rp, any ga
+    - @receiver: c flags = u -> overwrite object value
+  Case 3:
+    - @sender: updated object value + cflags = t
+    - Sent: -st w, sending association (1st assigned ga)
+      Note: this will be done when Case 1 & Case 2 have updated a value.
+  Case 4:
+    - @sender: c flags = r
+    - Received from bus: -st r
+    - Sent: -st rp, sending association (1st assigned ga)
+  Case 5:
+    - @sender: c flags = i
+    - After device restart (power up)
+    - Sent: -st r, sending association (1st assigned ga)
 */
 
 #ifndef OC_API_H

@@ -133,6 +133,10 @@ void oc_do_s_mode(char *resource_url, char *rp);
 /**
  * @brief sends out an s-mode read request.
  * The read request has no data value
+ * 
+ * Note: function does not check the flags on the resources
+ * 
+ * @See oc_do_s_mode_with_scope
  * @param group_address the group address to invoke a read on
  */
 void oc_do_s_mode_read(size_t group_address);
@@ -140,18 +144,15 @@ void oc_do_s_mode_read(size_t group_address);
 /**
  * @brief sends (transmits) an s-mode message
  * the value comes from the GET of the resource indicated by the resource_url
- * The uri is hard coded to use ALL CoAP nodes (TODO).
  * the path is ".knx"
  * the sia (sender individual address) is taken from the device
  * the ga is coming from the group address table that is listing the resource
- * url (path) if more than one entry in the group object table, then all group
- * address are used to send the POST request too.
- *
- * The function adheres to the Group object table entries, only sends messages
- * when
- * - Read flag is set OR
- * - Init flag is set OR
- * - Transmission flag is set
+ * url (path) the url of the resource to obtain the value from.
+ * 
+ * only the first group address is used to send the s-mode message
+ * for the recipient table all entries are used to send the unicast communication.
+ * 
+ * Note: function does not check the flags on the resources
  *
  * @param scope the multi-cast scope
  * @param resource_url URI of the resource (e.g. implemented on the device that
