@@ -117,42 +117,35 @@ def do_sequence_dev(my_stack):
     safe_print(response)
     safe_print(response)
     my_stack.purge_response(response)
-
     print("===================")
-    print("Get HWV :");
+    print("Get HWV :")
     response =  my_stack.issue_cbor_get(sn, "/dev/hwv")
     safe_print(response)
     my_stack.purge_response(response)
-
     print("===================")
-    print("Get FWV :");
+    print("Get FWV :")
     response =  my_stack.issue_cbor_get(sn, "/dev/fwv")
     safe_print(response)
     my_stack.purge_response(response)
-
     print("===================")
     print("-------------------")
     print("Get Model :")
     response =  my_stack.issue_cbor_get(sn,"/dev/model")
     safe_print(response)
     my_stack.purge_response(response)
-
     print("-------------------")
     response =  my_stack.issue_cbor_get(sn,"/dev/pm")
     safe_print(response)
     my_stack.purge_response(response)
-
     print("-------------------")
     my_stack.purge_response(response)
     response =  my_stack.issue_cbor_get(sn,"/dev/ia")
     safe_print(response)
     my_stack.purge_response(response)
-
     print("-------------------")
     response =  my_stack.issue_cbor_get(sn,"/dev/hname")
     safe_print(response)
     my_stack.purge_response(response)
-
     print("-------------------")
     response =  my_stack.issue_cbor_get(sn,"/dev/iid")
     safe_print(response)
@@ -546,7 +539,7 @@ def do_sequence_knx_knx_recipient(my_stack):
     content = { 2: "startLoading"}
     content = { 2: 1}  # startLoading
     print("lsm :", content)
-    response =  my_stack.issue_cbor_post(sn,"/a/lsm",content)
+    response = my_stack.issue_cbor_post(sn,"/a/lsm",content)
     safe_print(response)
     my_stack.purge_response(response)
 
@@ -559,24 +552,24 @@ def do_sequence_knx_knx_recipient(my_stack):
                 {0: 2, 12: 1, 112: ".knx-temp", 7:[2] },
                 {0: 10, 12: 1, 7:[2] },
                 {0: 225, 10: "coap://p/light255", 7:[2] }]
-    response =  my_stack.issue_cbor_post(sn,"/fp/r",content)
+    response = my_stack.issue_cbor_post(sn,"/fp/r",content)
     if response is not None:
         print ("response:",response.get_payload())
     my_stack.purge_response(response)
     #do_check_table(my_stack, sn, "/fp/g",content)
     content = {2 : 2 } # loadComplete
     print("lsm :", content)
-    response =  my_stack.issue_cbor_post(sn,"/a/lsm",content)
+    response = my_stack.issue_cbor_post(sn,"/a/lsm",content)
     print ("response:", response)
     my_stack.purge_response(response)
-    response =  my_stack.issue_cbor_get(sn, "/.knx")
+    response = my_stack.issue_cbor_get(sn, "/.knx")
     safe_print(response)
     my_stack.purge_response(response)
     content = {"value": { 4 : 5, 7: 7777 , 6 : "rp"}}
     response =  my_stack.issue_cbor_post(sn,"/a/lsm",content)
     safe_print(response)
     my_stack.purge_response(response)
-    response =  my_stack.issue_cbor_get(sn, "/.knx")
+    response = my_stack.issue_cbor_get(sn, "/.knx")
     safe_print(response)
     my_stack.purge_response(response)
 

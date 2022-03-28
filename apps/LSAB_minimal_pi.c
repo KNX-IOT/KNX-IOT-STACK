@@ -1,6 +1,6 @@
 /*
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
- Copyright (c) 2021 Cascoda Ltd
+ Copyright (c) 2021-2022 Cascoda Ltd
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -223,9 +223,6 @@ app_init(void)
   /* set the hardware type*/
   oc_core_set_device_hwt(0, "Pi");
 
-  /* set the programming mode */
-  oc_core_set_device_pm(0, false);
-
   /* set the model */
   oc_core_set_device_model(0, "Cascoda Actuator");
 
@@ -269,7 +266,12 @@ get_dpa_417_61(oc_request_t *request, oc_interface_mask_t interfaces,
   }
 
   CborError error;
-  error = cbor_encode_boolean(&g_encoder, g_mystate);
+  //error = cbor_encode_boolean(&g_encoder, g_mystate);
+  oc_rep_begin_root_object();
+  oc_rep_i_set_boolean(root, 1, g_mystate);
+  oc_rep_end_root_object();
+  error = g_err;
+
   if (error) {
     oc_status_code = true;
   }
@@ -319,14 +321,18 @@ post_dpa_417_61(oc_request_t *request, oc_interface_mask_t interfaces,
   oc_rep_to_json(rep, (char *)&buffer, 200, true);
   PRINT("%s", buffer);
 
-  // handle the type of payload correctly.
-  if ((rep != NULL) && (rep->type == OC_REP_BOOL)) {
-    PRINT("  post_dpa_417_61 received : %d\n", rep->value.boolean);
-    g_mystate = rep->value.boolean;
-    set_backlight(g_mystate);
-    oc_send_cbor_response(request, OC_STATUS_CHANGED);
-    PRINT("-- End post_dpa_417_61\n");
-    return;
+  while (rep != NULL) {
+    if (rep->type == OC_REP_BOOL) {
+      if (rep->iname == 1) {
+        PRINT("  post_dpa_417_61 received : %d\n", rep->value.boolean);
+        g_mystate = rep->value.boolean;
+        set_backlight(g_mystate);
+        oc_send_cbor_response(request, OC_STATUS_CHANGED);
+        PRINT("-- End post_dpa_417_61\n");
+        return;
+      }
+    }
+    rep = rep->next;
   }
 
   oc_send_response(request, OC_STATUS_BAD_REQUEST);
