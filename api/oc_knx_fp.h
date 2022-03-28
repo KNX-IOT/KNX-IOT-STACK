@@ -376,11 +376,11 @@ int oc_core_get_recipient_table_size();
 /**
  * @brief add points to the well-known core discovery response
  *  when the request has query option
- * .well-known/core?d=urn:knx:g.s.[group-address].
+ * .well-known/core?d=urn:knx:g.s.[group-address]
  * @param request The request
  * @param device_index The device index
  * @param group_address the parsed group address from the query option
- * @param response_length the response lenght
+ * @param response_length the response length
  * @param matches if there are matches
  * @return true
  * @return false
