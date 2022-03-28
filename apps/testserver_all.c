@@ -670,7 +670,7 @@ register_resources(void)
   oc_resource_bind_resource_type(res_353, "urn:knx:dpa.353.52");
   oc_resource_bind_content_type(res_353, APPLICATION_CBOR);
   oc_resource_bind_resource_interface(res_353,
-                                      OC_IF_S | OC_IF_A); /* if.s && if.a */
+                                      OC_IF_S ); /* if.s  */
   oc_resource_set_discoverable(res_353, true);
   /* periodic observable
      to be used when one wants to send an event per time slice
@@ -871,6 +871,9 @@ issue_requests_s_mode_delayed(void *data)
   oc_core_set_group_object_table(2, entry3);
   PRINT("\n");
   oc_print_group_object_table_entry(2);
+
+  // set loaded
+  device->lsm_s = LSM_S_LOADED;
 
   // testing, since the data is already reset...
   oc_register_group_multicasts();

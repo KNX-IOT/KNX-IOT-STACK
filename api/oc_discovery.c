@@ -252,15 +252,24 @@ oc_wkcore_discovery_handler(oc_request_t *request,
     if (lsm != LSM_S_LOADED) {
       /* handle bad request..
       note below layer ignores this message if it is a multi cast request */
+      PRINT(" not loaded!");
       request->response->response_buffer->code =
         oc_status_code(OC_STATUS_BAD_REQUEST);
       return;
     }
     // create the response
-    oc_add_points_in_group_object_table_to_response(
+    bool added = oc_add_points_in_group_object_table_to_response(
       request, device_index, group_address, &response_length, matches);
-    request->response->response_buffer->response_length = response_length;
-    request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
+    if (added) {
+      request->response->response_buffer->content_format =
+        APPLICATION_LINK_FORMAT;
+      request->response->response_buffer->response_length = response_length;
+      request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
+    } else {
+      request->response->response_buffer->code =
+        oc_status_code(OC_STATUS_BAD_REQUEST);
+    }
+
     return;
   }
 
