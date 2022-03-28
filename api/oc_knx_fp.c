@@ -1966,8 +1966,8 @@ oc_add_points_in_group_object_table_to_response(oc_request_t *request,
       if (is_in_array(group_address, g_got[index].ga, g_got[index].ga_len)) {
         // add the resource
         // note, not checked if the resource is already there...
-        PRINT("oc_add_points_in_group_object_table_to_response [%d] %s\n", index,
-              oc_string(g_got[index].href));
+        PRINT("oc_add_points_in_group_object_table_to_response [%d] %s\n",
+              index, oc_string(g_got[index].href));
         oc_add_resource_to_wk(oc_ri_get_app_resource_by_uri(
                                 oc_string(g_got[index].href),
                                 oc_string_len(g_got[index].href), device_index),

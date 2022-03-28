@@ -667,8 +667,7 @@ register_resources(void)
   oc_resource_t *res_353 = oc_new_resource("myname_c", "p/c", 1, 0);
   oc_resource_bind_resource_type(res_353, "urn:knx:dpa.353.52");
   oc_resource_bind_content_type(res_353, APPLICATION_CBOR);
-  oc_resource_bind_resource_interface(res_353,
-                                      OC_IF_S ); /* if.s  */
+  oc_resource_bind_resource_interface(res_353, OC_IF_S); /* if.s  */
   oc_resource_set_discoverable(res_353, true);
   /* periodic observable
      to be used when one wants to send an event per time slice
