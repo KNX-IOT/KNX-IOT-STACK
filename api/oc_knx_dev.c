@@ -50,7 +50,12 @@ oc_core_dev_sn_get_handler(oc_request_t *request,
   if (device != NULL) {
     // Content-Format: "application/cbor"
     // Payload: "123ABC"
-    cbor_encode_text_stringz(&g_encoder, oc_string(device->serialnumber));
+    // cbor_encode_text_stringz(&g_encoder, oc_string(device->serialnumber));
+
+    oc_rep_begin_root_object();
+    oc_rep_i_set_text_string(root, 1, oc_string(device->serialnumber));
+    oc_rep_end_root_object();
+
     oc_send_cbor_response(request, OC_STATUS_OK);
     return;
   }
@@ -90,12 +95,21 @@ oc_core_dev_hwv_get_handler(oc_request_t *request,
   if (device != NULL) {
     // Content-Format: "application/cbor"
     // Payload: [ 1, 2, 3 ]
-    CborEncoder arrayEncoder;
-    cbor_encoder_create_array(&g_encoder, &arrayEncoder, 3);
-    cbor_encode_int(&arrayEncoder, (int64_t)device->hwv.major);
-    cbor_encode_int(&arrayEncoder, (int64_t)device->hwv.minor);
-    cbor_encode_int(&arrayEncoder, (int64_t)device->hwv.third);
-    cbor_encoder_close_container_checked(&g_encoder, &arrayEncoder);
+    // CborEncoder arrayEncoder;
+    // cbor_encoder_create_array(&g_encoder, &arrayEncoder, 3);
+    // cbor_encode_int(&arrayEncoder, (int64_t)device->hwv.major);
+    // cbor_encode_int(&arrayEncoder, (int64_t)device->hwv.minor);
+    // cbor_encode_int(&arrayEncoder, (int64_t)device->hwv.third);
+    // cbor_encoder_close_container_checked(&g_encoder, &arrayEncoder);
+
+    uint64_t array[3];
+    array[0] = device->hwv.major;
+    array[1] = device->hwv.minor;
+    array[2] = device->hwv.third;
+
+    oc_rep_begin_root_object();
+    oc_rep_i_set_int_array(root, 1, array, 3);
+    oc_rep_end_root_object();
 
     oc_send_cbor_response(request, OC_STATUS_OK);
     return;
@@ -138,13 +152,22 @@ oc_core_dev_fwv_get_handler(oc_request_t *request,
     // oc_rep_add_int(&arrayEncoder, (int64_t)device->fwv.major);
     // oc_rep_close_array(root, fibonacci);
 
-    CborEncoder arrayEncoder;
+    // CborEncoder arrayEncoder;
 
-    cbor_encoder_create_array(&g_encoder, &arrayEncoder, 3);
-    cbor_encode_int(&arrayEncoder, (int64_t)device->fwv.major);
-    cbor_encode_int(&arrayEncoder, (int64_t)device->fwv.minor);
-    cbor_encode_int(&arrayEncoder, (int64_t)device->fwv.third);
-    cbor_encoder_close_container_checked(&g_encoder, &arrayEncoder);
+    // cbor_encoder_create_array(&g_encoder, &arrayEncoder, 3);
+    // cbor_encode_int(&arrayEncoder, (int64_t)device->fwv.major);
+    // cbor_encode_int(&arrayEncoder, (int64_t)device->fwv.minor);
+    // cbor_encode_int(&arrayEncoder, (int64_t)device->fwv.third);
+    // cbor_encoder_close_container_checked(&g_encoder, &arrayEncoder);
+
+    uint64_t array[3];
+    array[0] = device->fwv.major;
+    array[1] = device->fwv.minor;
+    array[2] = device->fwv.third;
+
+    oc_rep_begin_root_object();
+    oc_rep_i_set_int_array(root, 1, array, 3);
+    oc_rep_end_root_object();
 
     oc_send_cbor_response(request, OC_STATUS_OK);
     return;
@@ -181,7 +204,12 @@ oc_core_dev_hwt_get_handler(oc_request_t *request,
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device != NULL && oc_string(device->hwt) != NULL) {
-    cbor_encode_text_stringz(&g_encoder, oc_string(device->hwt));
+    // cbor_encode_text_stringz(&g_encoder, oc_string(device->hwt));
+
+    oc_rep_begin_root_object();
+    oc_rep_i_set_text_string(root, 1, oc_string(device->hwt));
+    oc_rep_end_root_object();
+
     oc_send_cbor_response(request, OC_STATUS_OK);
     return;
   }
@@ -217,7 +245,10 @@ oc_core_dev_model_get_handler(oc_request_t *request,
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device != NULL && oc_string(device->model) != NULL) {
-    cbor_encode_text_stringz(&g_encoder, oc_string(device->model));
+    // cbor_encode_text_stringz(&g_encoder, oc_string(device->model));
+    oc_rep_begin_root_object();
+    oc_rep_i_set_text_string(root, 1, oc_string(device->model));
+    oc_rep_end_root_object();
 
     oc_send_cbor_response(request, OC_STATUS_OK);
     return;
@@ -254,7 +285,12 @@ oc_core_dev_ia_get_handler(oc_request_t *request,
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device != NULL) {
-    cbor_encode_int(&g_encoder, (int64_t)device->ia);
+    // cbor_encode_int(&g_encoder, (int64_t)device->ia);
+
+    oc_rep_begin_root_object();
+    oc_rep_i_set_int(root, 1, (int64_t)device->ia);
+    oc_rep_end_root_object();
+
     oc_send_cbor_response(request, OC_STATUS_OK);
     return;
   }
@@ -275,33 +311,30 @@ oc_core_dev_ia_put_handler(oc_request_t *request,
     return;
   }
 
-  // only set ia in programming mode
   size_t device_index = request->resource->device;
-  // if (oc_knx_device_in_programming_mode(device_index) == false) {
-  //  PRINT("oc_core_dev_ia_put_handler: not in programming mode\n");
-  //  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
-  //  return;
-  //}
 
-  // parse the data.
   oc_rep_t *rep = request->request_payload;
-  if ((rep != NULL) && (rep->type == OC_REP_INT)) {
-    int temp;
-    PRINT("  oc_core_dev_ia_put_handler received : %d\n",
-          (int)rep->value.integer);
-    oc_core_set_device_ia(device_index, (int)rep->value.integer);
-    temp = (int)rep->value.integer;
+  while (rep != NULL) {
+    if (rep->type == OC_REP_INT) {
+      if (rep->iname == 1) {
+        PRINT("  oc_core_dev_ia_put_handler received : %d\n",
+              (int)rep->value.integer);
+        oc_core_set_device_ia(device_index, (int)rep->value.integer);
+        int temp = (int)rep->value.integer;
 
-    oc_storage_write(KNX_STORAGE_IA, (uint8_t *)&temp, sizeof(temp));
+        oc_storage_write(KNX_STORAGE_IA, (uint8_t *)&temp, sizeof(temp));
+        oc_send_cbor_response(request, OC_STATUS_CHANGED);
 
-    oc_send_cbor_response(request, OC_STATUS_CHANGED);
+        // do the run time installation
+        if (oc_is_device_in_runtime(device_index)) {
+          oc_register_group_multicasts();
+          oc_init_datapoints_at_initialization();
+        }
 
-    if (oc_is_device_in_runtime(device_index)) {
-      oc_register_group_multicasts();
-      oc_init_datapoints_at_initialization();
+        return;
+      }
     }
-
-    return;
+    rep = rep->next;
   }
 
   oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
@@ -333,30 +366,28 @@ oc_core_dev_hostname_put_handler(oc_request_t *request,
   }
 
   size_t device_index = request->resource->device;
-  // only set ia in programming mode
-  if (oc_knx_device_in_programming_mode(device_index) == false) {
-    PRINT("oc_core_dev_hostname_put_handler: not in programming mode\n");
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
-    return;
-  }
-
   oc_rep_t *rep = request->request_payload;
-  if ((rep != NULL) && (rep->type == OC_REP_STRING)) {
-    PRINT("  oc_core_dev_hostname_put_handler received : %s\n",
-          oc_string(rep->value.string));
-    oc_core_set_device_hostname(device_index, oc_string(rep->value.string));
+  while (rep != NULL) {
+    if (rep->type == OC_REP_STRING) {
+      if (rep->iname == 1) {
+        PRINT("  oc_core_dev_hostname_put_handler received : %s\n",
+              oc_string(rep->value.string));
+        oc_core_set_device_hostname(device_index, oc_string(rep->value.string));
 
-    oc_storage_write(KNX_STORAGE_HOSTNAME,
-                     (uint8_t *)oc_string(rep->value.string),
-                     oc_string_len(rep->value.string));
+        oc_storage_write(KNX_STORAGE_HOSTNAME,
+                         (uint8_t *)oc_string(rep->value.string),
+                         oc_string_len(rep->value.string));
 
-    oc_hostname_t *my_hostname = oc_get_hostname_cb();
-    if (my_hostname && my_hostname->cb) {
-      my_hostname->cb(device_index, rep->value.string, my_hostname->data);
+        oc_hostname_t *my_hostname = oc_get_hostname_cb();
+        if (my_hostname && my_hostname->cb) {
+          my_hostname->cb(device_index, rep->value.string, my_hostname->data);
+        }
+
+        oc_send_cbor_response(request, OC_STATUS_OK);
+        return;
+      }
     }
-
-    oc_send_cbor_response(request, OC_STATUS_CHANGED);
-    return;
+    rep = rep->next;
   }
 
   oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
@@ -378,7 +409,11 @@ oc_core_dev_hostname_get_handler(oc_request_t *request,
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device != NULL && oc_string(device->hostname) != NULL) {
-    cbor_encode_text_stringz(&g_encoder, oc_string(device->hostname));
+    // cbor_encode_text_stringz(&g_encoder, oc_string(device->hostname));
+    oc_rep_begin_root_object();
+    oc_rep_i_set_text_string(root, 1, oc_string(device->hostname));
+    oc_rep_end_root_object();
+
     oc_send_cbor_response(request, OC_STATUS_OK);
     return;
   }
@@ -412,30 +447,27 @@ oc_core_dev_iid_put_handler(oc_request_t *request,
   }
 
   size_t device_index = request->resource->device;
-  // only set ia in programming mode
-  // if (oc_knx_device_in_programming_mode(device_index) == false) {
-  //  PRINT("oc_core_dev_iid_put_handler: not in programming mode\n");
-  //  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
-  //  return;
-  //}
-
   oc_rep_t *rep = request->request_payload;
-  if ((rep != NULL) && (rep->type == OC_REP_INT)) {
-    PRINT("  oc_core_dev_iid_put_handler received : %d\n",
-          (int)rep->value.integer);
-    // set the current value
-    oc_core_set_device_iid(device_index, rep->value.integer);
-    // make the value persistent
-    oc_storage_write(KNX_STORAGE_IID, (uint8_t *)&rep->value.integer,
-                     sizeof(uint32_t));
-    oc_send_cbor_response(request, OC_STATUS_CHANGED);
+  while (rep != NULL) {
+    if (rep->type == OC_REP_INT) {
+      if (rep->iname == 1) {
+        PRINT("  oc_core_dev_iid_put_handler received : %d\n",
+              (int)rep->value.integer);
+        oc_core_set_device_iid(device_index, (int)rep->value.integer);
+        // make the value persistent
+        oc_storage_write(KNX_STORAGE_IID, (uint8_t *)&rep->value.integer,
+                         sizeof(uint32_t));
+        oc_send_cbor_response(request, OC_STATUS_CHANGED);
 
-    if (oc_is_device_in_runtime(device_index)) {
-      oc_register_group_multicasts();
-      oc_init_datapoints_at_initialization();
+        // do the run time installation
+        if (oc_is_device_in_runtime(device_index)) {
+          oc_register_group_multicasts();
+          oc_init_datapoints_at_initialization();
+        }
+        return;
+      }
     }
-
-    return;
+    rep = rep->next;
   }
 
   oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
@@ -457,7 +489,11 @@ oc_core_dev_iid_get_handler(oc_request_t *request,
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device != NULL) {
-    cbor_encode_int(&g_encoder, device->iid);
+    // cbor_encode_int(&g_encoder, device->iid);
+    oc_rep_begin_root_object();
+    oc_rep_i_set_int(root, 1, device->iid);
+    oc_rep_end_root_object();
+
     oc_send_cbor_response(request, OC_STATUS_OK);
     return;
   }
@@ -530,7 +566,11 @@ oc_core_dev_pm_get_handler(oc_request_t *request,
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device != NULL) {
-    cbor_encode_boolean(&g_encoder, device->pm);
+    // cbor_encode_boolean(&g_encoder, device->pm);
+    oc_rep_begin_root_object();
+    oc_rep_i_set_boolean(root, 1, device->pm);
+    oc_rep_end_root_object();
+
     oc_send_cbor_response(request, OC_STATUS_OK);
     return;
   }
@@ -554,17 +594,19 @@ oc_core_dev_pm_put_handler(oc_request_t *request,
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   oc_rep_t *rep = request->request_payload;
-  // debugging
-  if (rep != NULL) {
-    PRINT("  oc_core_dev_pm_put_handler type: %d\n", rep->type);
-  }
+  while (rep != NULL) {
+    if (rep->type == OC_REP_BOOL) {
+      if (rep->iname == 1) {
+        PRINT("  oc_core_dev_pm_put_handler received : %d\n",
+              (int)rep->value.boolean);
+        device->pm = rep->value.boolean;
+        oc_send_cbor_response(request, OC_STATUS_CHANGED);
 
-  if ((rep != NULL) && (rep->type == OC_REP_BOOL)) {
-    PRINT("  oc_core_dev_pm_put_handler received : %d\n", rep->value.boolean);
-    device->pm = rep->value.boolean;
-    oc_send_cbor_response(request, OC_STATUS_CHANGED);
-    oc_storage_write(KNX_STORAGE_PM, (uint8_t *)&(rep->value.boolean), 1);
-    return;
+        oc_storage_write(KNX_STORAGE_PM, (uint8_t *)&(rep->value.boolean), 1);
+        return;
+      }
+    }
+    rep = rep->next;
   }
 
   oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
@@ -648,7 +690,11 @@ oc_core_dev_sa_get_handler(oc_request_t *request,
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device != NULL) {
-    cbor_encode_int(&g_encoder, device->sa);
+    // cbor_encode_int(&g_encoder, device->sa);
+    oc_rep_begin_root_object();
+    oc_rep_i_set_int(root, 1, device->sa);
+    oc_rep_end_root_object();
+
     oc_send_cbor_response(request, OC_STATUS_OK);
     return;
   }
@@ -678,8 +724,9 @@ oc_core_dev_sa_put_handler(oc_request_t *request,
   }
 
   if ((rep != NULL) && (rep->type == OC_REP_INT)) {
-    PRINT("  oc_core_dev_sa_put_handler received : %d\n", rep->value.integer);
-    device->sa = rep->value.integer;
+    PRINT("  oc_core_dev_sa_put_handler received : %d\n",
+          (int)rep->value.integer);
+    device->sa = (int)rep->value.integer;
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
     oc_storage_write(KNX_STORAGE_SA, (uint8_t *)&(rep->value.integer), 1);
     return;
@@ -716,7 +763,10 @@ oc_core_dev_da_get_handler(oc_request_t *request,
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device != NULL) {
-    cbor_encode_int(&g_encoder, device->da);
+    // cbor_encode_int(&g_encoder, device->da);
+    oc_rep_begin_root_object();
+    oc_rep_i_set_int(root, 1, device->da);
+    oc_rep_end_root_object();
     oc_send_cbor_response(request, OC_STATUS_OK);
     return;
   }
@@ -746,8 +796,9 @@ oc_core_dev_da_put_handler(oc_request_t *request,
   }
 
   if ((rep != NULL) && (rep->type == OC_REP_INT)) {
-    PRINT("  oc_core_dev_da_put_handler received : %d\n", rep->value.integer);
-    device->da = rep->value.integer;
+    PRINT("  oc_core_dev_da_put_handler received : %d\n",
+          (int)rep->value.integer);
+    device->da = (uint32_t)rep->value.integer;
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
     oc_storage_write(KNX_STORAGE_DA, (uint8_t *)&(rep->value.integer), 1);
     return;
@@ -784,7 +835,10 @@ oc_core_dev_port_get_handler(oc_request_t *request,
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device != NULL) {
-    cbor_encode_int(&g_encoder, device->port);
+    // cbor_encode_int(&g_encoder, device->port);
+    oc_rep_begin_root_object();
+    oc_rep_i_set_int(root, 1, device->port);
+    oc_rep_end_root_object();
     oc_send_cbor_response(request, OC_STATUS_OK);
     return;
   }
@@ -814,8 +868,9 @@ oc_core_dev_port_put_handler(oc_request_t *request,
   }
 
   if ((rep != NULL) && (rep->type == OC_REP_INT)) {
-    PRINT("  oc_core_dev_port_put_handler received : %d\n", rep->value.integer);
-    device->port = rep->value.integer;
+    PRINT("  oc_core_dev_port_put_handler received : %d\n",
+          (int)rep->value.integer);
+    device->port = (uint32_t)rep->value.integer;
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
     oc_storage_write(KNX_STORAGE_PORT, (uint8_t *)&(rep->value.integer), 1);
     return;
@@ -860,7 +915,7 @@ oc_knx_device_storage_read(size_t device_index)
   /* IA */
   temp_size = oc_storage_read(KNX_STORAGE_IA, (uint8_t *)&ia, sizeof(ia));
   if (temp_size > 0) {
-    device->ia = ia;
+    device->ia = (int)ia;
     PRINT("  ia (storage) %ld\n", (long)ia);
   }
 

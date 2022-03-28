@@ -140,18 +140,13 @@ def do_install_device(my_stack, sn, ia, iid, got_content, rec_content, pub_conte
     response =  my_stack.issue_cbor_post(sn,"/.well-known/knx",content)
     print ("response:",response)
     my_stack.purge_response(response)
-    content = True
-    print("set PM :", content)
-    response =  my_stack.issue_cbor_put(sn,"/dev/pm",content)
-    print ("response:",response)
-    my_stack.purge_response(response)
 
-    content = int(ia)
+    content = { 1: int(ia)}
     print("set IA :", content)
     response = my_stack.issue_cbor_put(sn,"/dev/ia",content)
     print ("response:",response)
     my_stack.purge_response(response)
-    content = iid
+    content = { 1: int(iid) }
     response =  my_stack.issue_cbor_put(sn,"/dev/iid",content)
     print ("response:",response)
     my_stack.purge_response(response)
@@ -196,12 +191,6 @@ def do_install_device(my_stack, sn, ia, iid, got_content, rec_content, pub_conte
         my_stack.purge_response(response)
     else:
         print ("no publisher table")
-    content = False
-    print("set PM :", content)
-    response =  my_stack.issue_cbor_put(sn,"/dev/pm",content)
-    print ("response:",response)
-    my_stack.purge_response(response)
-
     # content = { 2: "loadComplete"}
     content = { 2: 2}
     print("lsm :", content)

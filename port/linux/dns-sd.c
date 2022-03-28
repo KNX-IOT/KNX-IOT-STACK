@@ -23,7 +23,7 @@ knx_publish_service(char *serial_no)
     int error;
     error = execlp("avahi-publish-service", "avahi-publish-service",
                    //"--subtype=_ia._sub._knx._udp", // subtype present for
-                   //uncomissioned devices???
+                   // uncomissioned devices???
                    serial_no,   // service name = serial number
                    "_knx._udp", // service type
                    "5683",      // port

@@ -142,7 +142,8 @@ oc_device_info_t *oc_core_add_device(const char *name, const char *version,
  * @param minor2 the zzz number of xxx.yyy.zzz
  * @return int error status, 0 = OK
  */
-int oc_core_set_device_fwv(int device_index, int major, int minor, int minor2);
+int oc_core_set_device_fwv(size_t device_index, int major, int minor,
+                           int minor2);
 
 /**
  * @brief sets the hardware version number
@@ -153,7 +154,8 @@ int oc_core_set_device_fwv(int device_index, int major, int minor, int minor2);
  * @param minor2 the zzz number of xxx.yyy.zzz
  * @return int  error status, 0 = OK
  */
-int oc_core_set_device_hwv(int device_index, int major, int minor, int minor2);
+int oc_core_set_device_hwv(size_t device_index, int major, int minor,
+                           int minor2);
 
 /**
  * @brief sets the internal address
@@ -162,7 +164,7 @@ int oc_core_set_device_hwv(int device_index, int major, int minor, int minor2);
  * @param ia the internal address
  * @return int error status, 0 = OK
  */
-int oc_core_set_device_ia(int device_index, int ia);
+int oc_core_set_device_ia(size_t device_index, int ia);
 
 /**
  * @brief sets the hardware type (string)
@@ -171,7 +173,7 @@ int oc_core_set_device_ia(int device_index, int ia);
  * @param hardwaretype the hardware type
  * @return int error status, 0 = OK
  */
-int oc_core_set_device_hwt(int device_index, const char *hardwaretype);
+int oc_core_set_device_hwt(size_t device_index, const char *hardwaretype);
 
 /**
  * @brief sets the programming mode (boolean)
@@ -180,7 +182,7 @@ int oc_core_set_device_hwt(int device_index, const char *hardwaretype);
  * @param pm the programming mode
  * @return int error status, 0 = OK
  */
-int oc_core_set_device_pm(int device_index, bool pm);
+int oc_core_set_device_pm(size_t device_index, bool pm);
 
 /**
  * @brief sets the model (string)
@@ -189,7 +191,7 @@ int oc_core_set_device_pm(int device_index, bool pm);
  * @param model the device model
  * @return int error status, 0 = OK
  */
-int oc_core_set_device_model(int device_index, const char *model);
+int oc_core_set_device_model(size_t device_index, const char *model);
 
 /**
  * @brief sets the host name (string)
@@ -198,7 +200,7 @@ int oc_core_set_device_model(int device_index, const char *model);
  * @param hostname the host name
  * @return int error status, 0 = OK
  */
-int oc_core_set_device_hostname(int device_index, const char *hostname);
+int oc_core_set_device_hostname(size_t device_index, const char *hostname);
 
 /**
  * @brief sets the iid (unsigned int)
@@ -207,7 +209,7 @@ int oc_core_set_device_hostname(int device_index, const char *hostname);
  * @param iid the KNX installation id
  * @return int error status, 0 = OK
  */
-int oc_core_set_device_iid(int device_index, uint32_t iid);
+int oc_core_set_device_iid(size_t device_index, uint32_t iid);
 
 /**
  * @brief retrieve the amount of devices

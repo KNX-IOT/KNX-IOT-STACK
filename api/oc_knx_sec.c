@@ -84,7 +84,10 @@ oc_core_knx_f_oscore_osndelay_get_handler(oc_request_t *request,
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
-  cbor_encode_uint(&g_encoder, g_oscore_osndelay);
+  // cbor_encode_uint(&g_encoder, g_oscore_osndelay);
+  oc_rep_begin_root_object();
+  oc_rep_i_set_uint(root, 1, g_oscore_osndelay);
+  oc_rep_end_root_object();
 
   PRINT("oc_core_knx_f_oscore_osndelay_get_handler - done\n");
   oc_send_cbor_response(request, OC_STATUS_OK);
@@ -105,18 +108,17 @@ oc_core_knx_p_oscore_osndelay_put_handler(oc_request_t *request,
   }
 
   oc_rep_t *rep = request->request_payload;
-  // debugging
-  if (rep != NULL) {
-    PRINT("  oc_core_knx_p_oscore_osndelay_put_handler type: %d\n", rep->type);
-  }
-
-  if ((rep != NULL) && (rep->type == OC_REP_INT)) {
-    // PRINT("  oc_core_knx_p_oscore_osndelay_put_handler received : %d\n",
-    //      rep->value.integer);
-    g_oscore_osndelay = rep->value.integer;
-    oc_send_cbor_response(request, OC_STATUS_CHANGED);
-    // oc_storage_write(KNX_STORAGE_PM, (uint8_t *)&(rep->value.boolean), 1);
-    return;
+  while (rep != NULL) {
+    if (rep->type == OC_REP_INT) {
+      if (rep->iname == 1) {
+        PRINT("  oc_core_knx_p_oscore_osndelay_put_handler type: %d value %d\n",
+              rep->type, rep->value.integer);
+        g_oscore_osndelay = rep->value.integer;
+        oc_send_cbor_response(request, OC_STATUS_CHANGED);
+        return;
+      }
+    }
+    rep = rep->next;
   }
 
   oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
@@ -149,7 +151,10 @@ oc_core_knx_p_oscore_replwdo_get_handler(oc_request_t *request,
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
-  cbor_encode_uint(&g_encoder, g_oscore_replaywindow);
+  // cbor_encode_uint(&g_encoder, g_oscore_replaywindow);
+  oc_rep_begin_root_object();
+  oc_rep_i_set_uint(root, 1, g_oscore_replaywindow);
+  oc_rep_end_root_object();
 
   PRINT("oc_core_knx_f_oscore_osndelay_get_handler - done\n");
   oc_send_cbor_response(request, OC_STATUS_OK);
@@ -170,16 +175,17 @@ oc_core_knx_p_oscore_replwdo_put_handler(oc_request_t *request,
   }
 
   oc_rep_t *rep = request->request_payload;
-  // debugging
-  if (rep != NULL) {
-    PRINT("  oc_core_knx_p_oscore_replwdo_put_handler type: %d\n", rep->type);
-  }
-
-  if ((rep != NULL) && (rep->type == OC_REP_INT)) {
-    g_oscore_replaywindow = rep->value.integer;
-    oc_send_cbor_response(request, OC_STATUS_CHANGED);
-    // TODO: does this value needs to be stored in persistent memory?
-    return;
+  while (rep != NULL) {
+    if (rep->type == OC_REP_INT) {
+      if (rep->iname == 1) {
+        PRINT("  oc_core_knx_p_oscore_replwdo_put_handler type: %d value %d\n",
+              rep->type, rep->value.integer);
+        g_oscore_replaywindow = rep->value.integer;
+        oc_send_cbor_response(request, OC_STATUS_CHANGED);
+        return;
+      }
+    }
+    rep = rep->next;
   }
 
   oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);

@@ -17,14 +17,6 @@ The python code uses the device to interact with other KNX-IOT devices on the ne
 
 python -m pip install -r requirements.txt
 
-## Build Shared Library on Linux
-
-run the following command from the build directory in a git bash shell:
-
-```bash
-cmake .
-```
-
 ## Build Shared Library on Windows for debugging
 
 Retrieving all code that is needed for building (in bash):
@@ -116,8 +108,11 @@ For more information: https://stackoverflow.com/questions/48000185/python-ctypes
 
 Visual studio 2020 has improved support for Cmake.
 Select the debug and/or release targets in CMake:
+
 ![visual studio cmake](../images/visual_studio_2020_cmake.png)
+
 Then select the build in visual studio:
+
 ![visual studio cmake](../images/visual_studio_2020_build.png)
 
 ### build dir changes

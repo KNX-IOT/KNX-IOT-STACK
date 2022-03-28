@@ -162,9 +162,6 @@ app_init(void)
   /* set the hardware type*/
   oc_core_set_device_hwt(0, "Pi");
 
-  /* set the programming mode */
-  oc_core_set_device_pm(0, false);
-
   /* set the model */
   oc_core_set_device_model(0, "my model");
 
@@ -207,7 +204,11 @@ get_dpa_421_61(oc_request_t *request, oc_interface_mask_t interfaces,
   }
 
   CborError error;
-  error = cbor_encode_boolean(&g_encoder, g_mystate);
+  oc_rep_begin_root_object();
+  oc_rep_i_set_boolean(root, 1, g_mystate);
+  oc_rep_end_root_object();
+  error = g_err;
+
   if (error) {
     oc_status_code = true;
   }

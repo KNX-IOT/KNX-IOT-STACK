@@ -191,9 +191,6 @@ app_init(void)
   /* set the model */
   oc_core_set_device_model(0, "my model");
 
-  /* set the programming mode */
-  oc_core_set_device_pm(0, false);
-
 #ifdef OC_SPAKE
 #define PASSWORD "LETTUCE"
   oc_spake_set_password(PASSWORD);
@@ -238,7 +235,11 @@ get_dpa_352_51(oc_request_t *request, oc_interface_mask_t interfaces,
   }
 
   CborError error;
-  error = cbor_encode_boolean(&g_encoder, g_352_51_state);
+  // error = cbor_encode_boolean(&g_encoder, g_352_51_state);
+  oc_rep_begin_root_object();
+  oc_rep_i_set_boolean(root, 1, g_352_51_state);
+  oc_rep_end_root_object();
+  error = g_err;
   if (error) {
     oc_status_code = true;
   }
@@ -283,6 +284,11 @@ get_dpa_352_51_1(oc_request_t *request, oc_interface_mask_t interfaces,
 
   CborError error;
   error = cbor_encode_boolean(&g_encoder, g_352_51_1_state);
+  oc_rep_begin_root_object();
+  oc_rep_i_set_boolean(root, 1, g_352_51_1_state);
+  oc_rep_end_root_object();
+  error = g_err;
+
   if (error) {
     oc_status_code = true;
   }
@@ -325,7 +331,11 @@ get_dpa_352_52(oc_request_t *request, oc_interface_mask_t interfaces,
   }
 
   CborError error;
-  error = cbor_encode_boolean(&g_encoder, g_352_52_state);
+  // error = cbor_encode_boolean(&g_encoder, g_352_52_state);
+  oc_rep_begin_root_object();
+  oc_rep_i_set_boolean(root, 1, g_352_52_state);
+  oc_rep_end_root_object();
+  error = g_err;
   if (error) {
     oc_status_code = true;
   }
@@ -368,7 +378,11 @@ get_dpa_353_52(oc_request_t *request, oc_interface_mask_t interfaces,
     return;
   }
 
-  error = cbor_encode_boolean(&g_encoder, g_352_52_state);
+  // error = cbor_encode_boolean(&g_encoder, g_352_52_state);
+  oc_rep_begin_root_object();
+  oc_rep_i_set_boolean(root, 1, g_352_52_state);
+  oc_rep_end_root_object();
+  error = g_err;
   if (error) {
     oc_status_code = true;
   }
@@ -414,22 +428,21 @@ post_dpa_352_51(oc_request_t *request, oc_interface_mask_t interfaces,
   }
 
   // handle the type of payload correctly.
-  if ((rep != NULL) && (rep->type == OC_REP_BOOL)) {
-    PRINT("  post_dpa_352_51 received : %d\n", rep->value.boolean);
-    g_352_51_state = rep->value.boolean;
-    oc_send_cbor_response(request, OC_STATUS_CHANGED);
-    PRINT("-- End post_dpa_352_51\n");
-    return;
+  while (rep != NULL) {
+    if (rep->type == OC_REP_BOOL) {
+      if (rep->iname == 1) {
+        PRINT("  post_dpa_352_51 received : %d\n", rep->value.boolean);
+        g_352_51_state = rep->value.boolean;
+        oc_send_cbor_response(request, OC_STATUS_CHANGED);
+        PRINT("-- End post_dpa_352_51\n");
+        return;
+      }
+    }
+    rep = rep->next;
   }
 
-  /* if the input is ok, then process the input document and assign the global
-   * variables */
-  if (error_state == false) {
-    oc_send_cbor_response(request, OC_STATUS_OK);
-  } else {
-    PRINT("  Returning Error \n");
-    oc_send_response(request, OC_STATUS_BAD_REQUEST);
-  }
+  PRINT("  Returning Error \n");
+  oc_send_response(request, OC_STATUS_BAD_REQUEST);
   PRINT("-- End post_dpa_352_51\n");
 }
 
@@ -467,22 +480,21 @@ post_dpa_352_51_1(oc_request_t *request, oc_interface_mask_t interfaces,
   }
 
   // handle the type of payload correctly.
-  if ((rep != NULL) && (rep->type == OC_REP_BOOL)) {
-    PRINT("  post_dpa_352_51_1 received : %d\n", rep->value.boolean);
-    g_352_51_1_state = rep->value.boolean;
-    oc_send_cbor_response(request, OC_STATUS_CHANGED);
-    PRINT("-- End post_dpa_352_51_1\n");
-    return;
+  while (rep != NULL) {
+    if (rep->type == OC_REP_BOOL) {
+      if (rep->iname == 1) {
+        PRINT("  post_dpa_352_51_1 received : %d\n", rep->value.boolean);
+        g_352_51_1_state = rep->value.boolean;
+        oc_send_cbor_response(request, OC_STATUS_CHANGED);
+        PRINT("-- End post_dpa_352_51_1\n");
+        return;
+      }
+    }
+    rep = rep->next;
   }
 
-  /* if the input is ok, then process the input document and assign the global
-   * variables */
-  if (error_state == false) {
-    oc_send_cbor_response(request, OC_STATUS_OK);
-  } else {
-    PRINT("  Returning Error \n");
-    oc_send_response(request, OC_STATUS_BAD_REQUEST);
-  }
+  PRINT("  Returning Error \n");
+  oc_send_response(request, OC_STATUS_BAD_REQUEST);
   PRINT("-- End post_dpa_352_51_1\n");
 }
 
@@ -517,14 +529,25 @@ post_dpa_352_52(oc_request_t *request, oc_interface_mask_t interfaces,
     // the regular payload
     rep = request->request_payload;
   }
+
   /* loop over the request document to check if all inputs are ok */
-  if ((rep != NULL) && (rep->type == OC_REP_BOOL)) {
-    PRINT("  post_dpa_352_52 received : %d\n", rep->value.boolean);
-    g_352_52_state = rep->value.boolean;
-    oc_send_cbor_response(request, OC_STATUS_CHANGED);
-    PRINT("-- End post_dpa_352_52\n");
-    return;
+  while (rep != NULL) {
+    if (rep->type == OC_REP_BOOL) {
+      if (rep->iname == 1) {
+        PRINT("  post_dpa_352_52 received : %d\n", rep->value.boolean);
+        g_352_52_state = rep->value.boolean;
+        oc_send_cbor_response(request, OC_STATUS_CHANGED);
+        PRINT("-- End post_dpa_352_52\n");
+        return;
+      }
+    }
+    rep = rep->next;
   }
+
+  /* if the input is ok, then process the input document and assign the global
+   * variables */
+  PRINT("  Returning Error \n");
+  oc_send_response(request, OC_STATUS_BAD_REQUEST);
   PRINT("-- End post_dpa_352_52\n");
 }
 
@@ -556,12 +579,17 @@ post_dpa_353_52(oc_request_t *request, oc_interface_mask_t interfaces,
   } else {
     rep = request->request_payload;
   }
-  if ((rep != NULL) && (rep->type == OC_REP_BOOL)) {
-    PRINT("  post_dpa_353_52 received : %d\n", rep->value.boolean);
-    g_353_52_state = rep->value.boolean;
-    oc_send_cbor_response(request, OC_STATUS_CHANGED);
-    PRINT("-- End post_dpa_353_52\n");
-    return;
+  while (rep != NULL) {
+    if (rep->type == OC_REP_BOOL) {
+      if (rep->iname == 1) {
+        PRINT("  post_dpa_353_52 received : %d\n", rep->value.boolean);
+        g_353_52_state = rep->value.boolean;
+        oc_send_cbor_response(request, OC_STATUS_CHANGED);
+        PRINT("-- End post_dpa_353_52\n");
+        return;
+      }
+    }
+    rep = rep->next;
   }
   oc_send_response(request, OC_STATUS_BAD_REQUEST);
   PRINT("-- End post_dpa_353_52\n");

@@ -104,7 +104,7 @@ oc_add_resource_to_wk(oc_resource_t *resource, oc_request_t *request,
           *response_length += length;
         }
 
-        length = oc_rep_add_line_size_to_buffer(t, size);
+        length = oc_rep_add_line_size_to_buffer(t, (int)size);
         *response_length += length;
       }
     }

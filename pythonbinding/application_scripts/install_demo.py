@@ -72,19 +72,13 @@ def do_install_device(my_stack, sn, ia, iid, fp_content):
     print ("response:",response)
     my_stack.purge_response(response)
 
-    content = True
-    print("set PM :", content)
-    response =  my_stack.issue_cbor_put(sn,"/dev/pm",content)
-    print ("response:",response)
-    my_stack.purge_response(response)
-
-    content = ia
+    content = { 1: ia }
     print("set IA :", content)
     response =  my_stack.issue_cbor_put(sn,"/dev/ia",content)
     print ("response:",response)
     my_stack.purge_response(response)
 
-    content = iid
+    content = { 1: iid }
     response =  my_stack.issue_cbor_put(sn,"/dev/iid",content)
     print ("response:",response)
     my_stack.purge_response(response)
@@ -122,12 +116,6 @@ def do_install_device(my_stack, sn, ia, iid, fp_content):
     # cflags (8) = ["r" ] ; read = 1, write = 2, transmit = 3 update = 4
     content = [ {0: 1, 11: "/p/1", 7:[1], 12 :"blah.blah" } ]
     response =  my_stack.issue_cbor_post(sn,"/fp/r",content)
-    print ("response:",response)
-    my_stack.purge_response(response)
-
-    content = False
-    print("set PM :", content)
-    response =  my_stack.issue_cbor_put(sn,"/dev/pm",content)
     print ("response:",response)
     my_stack.purge_response(response)
 
