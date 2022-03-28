@@ -675,6 +675,10 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
     //@receiver: clags = u -> overwrite object value
     do_write = true;
   } else if (strcmp(oc_string(g_received_notification.st), "r") == 0) {
+    // Case 4)
+    // @sender: cflags = r
+    // Received from bus: -st r
+    // Sent: -st rp, sending association (1st assigned ga)
     do_read = true;
   } 
 

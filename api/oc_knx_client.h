@@ -136,7 +136,7 @@ void oc_do_s_mode(char *resource_url, char *rp);
  * 
  * Note: function does not check the flags on the resources
  * 
- * @See oc_do_s_mode_with_scope
+ * @see oc_do_s_mode_with_scope
  * @param group_address the group address to invoke a read on
  */
 void oc_do_s_mode_read(size_t group_address);
