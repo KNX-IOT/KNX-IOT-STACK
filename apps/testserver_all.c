@@ -235,7 +235,7 @@ get_dpa_352_51(oc_request_t *request, oc_interface_mask_t interfaces,
   }
 
   CborError error;
-  //error = cbor_encode_boolean(&g_encoder, g_352_51_state);
+  // error = cbor_encode_boolean(&g_encoder, g_352_51_state);
   oc_rep_begin_root_object();
   oc_rep_i_set_boolean(root, 1, g_352_51_state);
   oc_rep_end_root_object();
@@ -331,7 +331,7 @@ get_dpa_352_52(oc_request_t *request, oc_interface_mask_t interfaces,
   }
 
   CborError error;
-  //error = cbor_encode_boolean(&g_encoder, g_352_52_state);
+  // error = cbor_encode_boolean(&g_encoder, g_352_52_state);
   oc_rep_begin_root_object();
   oc_rep_i_set_boolean(root, 1, g_352_52_state);
   oc_rep_end_root_object();
@@ -378,7 +378,7 @@ get_dpa_353_52(oc_request_t *request, oc_interface_mask_t interfaces,
     return;
   }
 
-  //error = cbor_encode_boolean(&g_encoder, g_352_52_state);
+  // error = cbor_encode_boolean(&g_encoder, g_352_52_state);
   oc_rep_begin_root_object();
   oc_rep_i_set_boolean(root, 1, g_352_52_state);
   oc_rep_end_root_object();
@@ -549,7 +549,6 @@ post_dpa_352_52(oc_request_t *request, oc_interface_mask_t interfaces,
   PRINT("  Returning Error \n");
   oc_send_response(request, OC_STATUS_BAD_REQUEST);
   PRINT("-- End post_dpa_352_52\n");
-
 }
 
 /**
@@ -594,7 +593,6 @@ post_dpa_353_52(oc_request_t *request, oc_interface_mask_t interfaces,
   }
   oc_send_response(request, OC_STATUS_BAD_REQUEST);
   PRINT("-- End post_dpa_353_52\n");
-
 }
 
 /**
