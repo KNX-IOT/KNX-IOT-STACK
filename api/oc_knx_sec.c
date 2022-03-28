@@ -84,7 +84,7 @@ oc_core_knx_f_oscore_osndelay_get_handler(oc_request_t *request,
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
-  //cbor_encode_uint(&g_encoder, g_oscore_osndelay);
+  // cbor_encode_uint(&g_encoder, g_oscore_osndelay);
   oc_rep_begin_root_object();
   oc_rep_i_set_uint(root, 1, g_oscore_osndelay);
   oc_rep_end_root_object();
@@ -107,7 +107,7 @@ oc_core_knx_p_oscore_osndelay_put_handler(oc_request_t *request,
     return;
   }
 
-  oc_rep_t* rep = request->request_payload;
+  oc_rep_t *rep = request->request_payload;
   while (rep != NULL) {
     if (rep->type == OC_REP_INT) {
       if (rep->iname == 1) {
@@ -151,7 +151,7 @@ oc_core_knx_p_oscore_replwdo_get_handler(oc_request_t *request,
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
-  //cbor_encode_uint(&g_encoder, g_oscore_replaywindow);
+  // cbor_encode_uint(&g_encoder, g_oscore_replaywindow);
   oc_rep_begin_root_object();
   oc_rep_i_set_uint(root, 1, g_oscore_replaywindow);
   oc_rep_end_root_object();

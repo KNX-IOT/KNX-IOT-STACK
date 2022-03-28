@@ -745,7 +745,7 @@ oc_core_knx_fingerprint_get_handler(oc_request_t *request,
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
-  //cbor_encode_uint(&g_encoder, g_fingerprint);
+  // cbor_encode_uint(&g_encoder, g_fingerprint);
   oc_rep_begin_root_object();
   oc_rep_i_set_int(root, 1, g_fingerprint);
   oc_rep_end_root_object();
@@ -779,7 +779,7 @@ oc_core_knx_osn_get_handler(oc_request_t *request,
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
-  //cbor_encode_uint(&g_encoder, g_osn);
+  // cbor_encode_uint(&g_encoder, g_osn);
   oc_rep_begin_root_object();
   oc_rep_i_set_int(root, 1, g_osn);
   oc_rep_end_root_object();

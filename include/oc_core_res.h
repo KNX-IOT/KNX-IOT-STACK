@@ -154,7 +154,8 @@ int oc_core_set_device_fwv(size_t device_index, int major, int minor,
  * @param minor2 the zzz number of xxx.yyy.zzz
  * @return int  error status, 0 = OK
  */
-int oc_core_set_device_hwv(size_t device_index, int major, int minor, int minor2);
+int oc_core_set_device_hwv(size_t device_index, int major, int minor,
+                           int minor2);
 
 /**
  * @brief sets the internal address

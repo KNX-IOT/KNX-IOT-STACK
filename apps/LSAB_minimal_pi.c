@@ -266,7 +266,7 @@ get_dpa_417_61(oc_request_t *request, oc_interface_mask_t interfaces,
   }
 
   CborError error;
-  //error = cbor_encode_boolean(&g_encoder, g_mystate);
+  // error = cbor_encode_boolean(&g_encoder, g_mystate);
   oc_rep_begin_root_object();
   oc_rep_i_set_boolean(root, 1, g_mystate);
   oc_rep_end_root_object();
