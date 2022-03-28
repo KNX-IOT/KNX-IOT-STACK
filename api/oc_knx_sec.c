@@ -587,6 +587,14 @@ oc_core_auth_at_post_handler(oc_request_t *request,
               int oscobject_nr = subobject->iname;
               while (oscobject) {
                 if (oscobject->type == OC_REP_STRING) {
+                  if (oscobject->iname == 0 && subobject_nr == 8 &&
+                      oscobject_nr == 4) {
+                    // cnf::osc::kid (id)
+                    oc_free_string(&(g_at_entries[index].osc_id));
+                    oc_new_string(&g_at_entries[index].osc_id,
+                                  oc_string(oscobject->value.string),
+                                  oc_string_len(oscobject->value.string));
+                  }
                   if (oscobject->iname == 2 && subobject_nr == 8 &&
                       oscobject_nr == 4) {
                     // cnf::osc::ms
@@ -605,9 +613,9 @@ oc_core_auth_at_post_handler(oc_request_t *request,
                   }
                   if (oscobject->iname == 6 && subobject_nr == 8 &&
                       oscobject_nr == 4) {
-                    // cnf::osc::kid (id)
-                    oc_free_string(&(g_at_entries[index].osc_id));
-                    oc_new_string(&g_at_entries[index].osc_id,
+                    // cnf::osc::contextId
+                    oc_free_string(&(g_at_entries[index].osc_contextid));
+                    oc_new_string(&g_at_entries[index].osc_contextid,
                                   oc_string(oscobject->value.string),
                                   oc_string_len(oscobject->value.string));
                   }
