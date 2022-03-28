@@ -990,8 +990,8 @@ oc_at_dump_entry(size_t device_index, int entry)
   oc_rep_i_set_int(root, 19, g_at_entries[entry].profile);
 
   oc_rep_i_set_text_string(root, 840, oc_string(g_at_entries[entry].osc_id));
+  oc_rep_i_set_text_string(root, 842, oc_string(g_at_entries[entry].osc_ms));
   oc_rep_i_set_text_string(root, 844, oc_string(g_at_entries[entry].osc_alg));
-  oc_rep_i_set_text_string(root, 846, oc_string(g_at_entries[entry].osc_ms));
 
   oc_rep_i_set_text_string(root, 82, oc_string(g_at_entries[entry].sub));
   oc_rep_i_set_text_string(root, 81, oc_string(g_at_entries[entry].kid));
@@ -1053,15 +1053,15 @@ oc_at_load_entry(int entry)
                           oc_string(rep->value.string),
                           oc_string_len(rep->value.string));
           }
-          if (rep->iname == 844) {
-            oc_free_string(&g_at_entries[entry].osc_alg);
-            oc_new_string(&g_at_entries[entry].osc_alg,
+          if (rep->iname == 842) {
+            oc_free_string(&g_at_entries[entry].osc_ms);
+            oc_new_string(&g_at_entries[entry].osc_ms,
                           oc_string(rep->value.string),
                           oc_string_len(rep->value.string));
           }
-          if (rep->iname == 846) {
-            oc_free_string(&g_at_entries[entry].osc_ms);
-            oc_new_string(&g_at_entries[entry].osc_ms,
+          if (rep->iname == 844) {
+            oc_free_string(&g_at_entries[entry].osc_alg);
+            oc_new_string(&g_at_entries[entry].osc_alg,
                           oc_string(rep->value.string),
                           oc_string_len(rep->value.string));
           }
