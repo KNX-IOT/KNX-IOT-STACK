@@ -655,7 +655,6 @@ class KNXIOTStack():
 
     def gatewayCB(self, payload_size, payload):
         print("gateway event: Payload:{}".format(payload))
-        
 
 
     def clientCB(self, cb_sn, cb_status, cb_format, cb_id, cb_url, cb_payload_size, cb_payload):
@@ -804,7 +803,6 @@ class KNXIOTStack():
         self.lib.ets_install_spakeCB(self.spakeCBFunc)
         self.gatewayCBFunc = GATEWAY_CALLBACK(self.gatewayCB)
         self.lib.ets_install_gatewayCB(self.gatewayCBFunc)
-        
         print ("...")
         use_main = False
         if use_main:

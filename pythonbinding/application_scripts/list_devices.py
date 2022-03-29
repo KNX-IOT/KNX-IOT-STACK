@@ -63,7 +63,7 @@ def do_ia_discover(my_stack, internal_address, scope = 2):
 def do_pm_discover(my_stack, scope = 2):
     time.sleep(1)
     query = "if=urn:knx:if.pm"
-    print (" discovery with query: ", query);
+    print (" discovery with query: ", query)
     my_stack.discover_devices_with_query( query, int(scope))
     if my_stack.get_nr_devices() > 0:
         print ("SN :", my_stack.device_array[0].sn)
@@ -71,7 +71,7 @@ def do_pm_discover(my_stack, scope = 2):
 def do_sn_discover(my_stack, serial_number, scope = 2):
     time.sleep(1)
     query = "ep=urn:knx:sn."+str(serial_number)
-    print (" discovery with query: ", query);
+    print (" discovery with query: ", query)
     my_stack.discover_devices_with_query( query, int(scope))
     if my_stack.get_nr_devices() > 0:
         print ("SN :", my_stack.device_array[0].sn)
@@ -79,7 +79,7 @@ def do_sn_discover(my_stack, serial_number, scope = 2):
 def do_ga_discover(my_stack, group_address, scope = 2):
     time.sleep(1)
     query = "d=urn:knx:g.s."+str(group_address)
-    print (" discovery with query: ", query);
+    print (" discovery with query: ", query)
     my_stack.discover_devices_with_query( query, int(scope))
     if my_stack.get_nr_devices() > 0:
         print ("SN :", my_stack.device_array[0].sn)
