@@ -97,12 +97,12 @@ static void signal_event_loop(void);
  */
 typedef struct py_cb_struct
 {
-  changedCB changedFCB;
-  resourceCB resourceFCB;
-  clientCB clientFCB;
-  discoveryCB discoveryFCB;
-  spakeCB spakeFCB;
-  gatewayCB gatewayFCB;
+  volatile changedCB changedFCB;
+  volatile resourceCB resourceFCB;
+  volatile clientCB clientFCB;
+  volatile discoveryCB discoveryFCB;
+  volatile spakeCB spakeFCB;
+  volatile gatewayCB gatewayFCB;
 } py_cb_struct_t;
 
 /**
@@ -182,7 +182,7 @@ print_rep(oc_rep_t *rep, bool pretty_print)
 void
 ets_install_changedCB(changedCB changedCB)
 {
-  PRINT("[C]install_changedCB\n");
+  PRINT("[C]install_changedCB %p\n", changedCB);
   my_CBFunctions.changedFCB = changedCB;
 }
 
@@ -193,7 +193,7 @@ ets_install_changedCB(changedCB changedCB)
 void
 ets_install_resourceCB(resourceCB resourceCB)
 {
-  PRINT("[C]install_resourceCB\n");
+  PRINT("[C]install_resourceCB: %p\n", resourceCB);
   my_CBFunctions.resourceFCB = resourceCB;
 }
 /**
@@ -203,7 +203,7 @@ ets_install_resourceCB(resourceCB resourceCB)
 void
 ets_install_clientCB(clientCB clientCB)
 {
-  PRINT("[C]install_clientCB\n");
+  PRINT("[C]install_clientCB: %p\n", clientCB);
   my_CBFunctions.clientFCB = clientCB;
 }
 
@@ -214,7 +214,7 @@ ets_install_clientCB(clientCB clientCB)
 void
 ets_install_discoveryCB(discoveryCB discoveryCB)
 {
-  PRINT("[C]installdiscoveryCB\n");
+  PRINT("[C]install_discoveryCB: %p\n", discoveryCB);
   my_CBFunctions.discoveryFCB = discoveryCB;
 }
 
@@ -225,7 +225,7 @@ ets_install_discoveryCB(discoveryCB discoveryCB)
 void
 ets_install_spakeCB(spakeCB spakeCB)
 {
-  PRINT("[C]installspakeCB\n");
+  PRINT("[C]install_spakeCB: %p\n", spakeCB);
   my_CBFunctions.spakeFCB = spakeCB;
 }
 
@@ -251,7 +251,7 @@ internal_gw_cb(size_t device_index,
 void
 ets_install_gatewayCB(gatewayCB gatewayCB)
 {
-  PRINT("[C]installgatewayCB\n");
+  PRINT("[C]install_gatewayCB: %p\n", gatewayCB);
   // set the python callback, e.g. do the conversion from s-mode message to json
   my_CBFunctions.gatewayFCB = gatewayCB;
 
@@ -266,8 +266,9 @@ ets_install_gatewayCB(gatewayCB gatewayCB)
 void
 inform_python(const char *uuid, const char *state, const char *event)
 {
-  // PRINT("[C]inform_python %p\n",my_CBFunctions.changedFCB);
+  PRINT("[C]inform_python %p\n",my_CBFunctions.changedFCB);
   if (my_CBFunctions.changedFCB != NULL) {
+    PRINT("[C]inform_python CB %p\n", my_CBFunctions.changedFCB);
     my_CBFunctions.changedFCB((char *)uuid, (char *)state, (char *)event);
   }
 }
@@ -408,6 +409,7 @@ add_device_to_list(char *sn, const char *device_name, char *ip_address,
       return false;
     }
     strcpy(device->device_serial_number, sn);
+    PRINT("[C] add_device_to_list adding device %s\n", sn);
     oc_list_add(list, device);
   }
   if (ip_address) {
@@ -724,14 +726,20 @@ response_get_sn(oc_client_response_t *data)
         (int)data->_payload_len, data->_payload);
   oc_rep_t *rep = data->payload;
   oc_string_t my_address;
+  char *my_sn = NULL;
 
   oc_endpoint_to_string(data->endpoint, &my_address);
 
-  if ((rep != NULL) && (rep->type == OC_REP_STRING)) {
-    char *my_sn = oc_string(rep->value.string);
-    PRINT("[C]  get_sn received %s (address) :%s\n", my_sn,
-          oc_string(my_address));
+  while (rep != NULL) {
+    if ((rep->iname = 1) && (rep->type == OC_REP_STRING)) {
+      my_sn = oc_string(rep->value.string);
+      PRINT("[C]  get_sn received %s (address) :%s\n", my_sn,
+            oc_string(my_address));
+    }
+    rep = rep->next;
+  }
 
+  if (my_sn) {
     add_device_to_list(my_sn, NULL, oc_string(my_address), data->endpoint,
                        discovered_devices);
     inform_python(my_sn, oc_string(my_address), "discovered");
@@ -756,30 +764,57 @@ discovery_cb(const char *payload, int len, oc_endpoint_t *endpoint,
   PRINT("[C]DISCOVERY: %.*s\n", len, payload);
   int nr_entries = oc_lf_number_of_entries(payload, len);
   PRINT("[C] entries %d\n", nr_entries);
+  int found = 0;
 
   for (int i = 0; i < nr_entries; i++) {
 
     oc_lf_get_entry_uri(payload, len, i, &uri, &uri_len);
     PRINT("[C] DISCOVERY URL %.*s\n", uri_len, uri);
     // oc_string_to_endpoint()
-    oc_lf_get_entry_param(payload, len, i, "rt", &param, &param_len);
-    PRINT("[C] DISCOVERY RT %.*s\n", param_len, param);
-    oc_lf_get_entry_param(payload, len, i, "if", &param, &param_len);
-    PRINT("[C] DISCOVERY IF %.*s\n", param_len, param);
-    oc_lf_get_entry_param(payload, len, i, "ct", &param, &param_len);
-    PRINT("[C] DISCOVERY CT %.*s\n", param_len, param);
+    found = oc_lf_get_entry_param(payload, len, i, "rt", &param, &param_len);
+    if (found) {
+      PRINT("    RT %.*s\n", param_len, param);
+    }
+    found = oc_lf_get_entry_param(payload, len, i, "if", &param, &param_len);
+    if (found) {
+      PRINT("    IF %.*s\n", param_len, param);
+    }
+    found = oc_lf_get_entry_param(payload, len, i, "ct", &param, &param_len);
+    if (found) {
+      PRINT("    CT %.*s\n", param_len, param);
+    }
+    found = oc_lf_get_entry_param(payload, len, i, "ep", &param, &param_len);
+    if (found) {
+      PRINT("    EP %.*s\n", param_len, param);
+      char sn[30];
+      memset(sn, 0, 30);
+      PRINT("    PARAM %.*s \n", param_len, param);
+      // ep = urn:knx:sn.0004000
+      oc_string_t my_address;
+      oc_endpoint_to_string(endpoint, &my_address);
+      PRINT("    address: %s\n", oc_string(my_address));
+      if (param_len > 11) {
+
+        strncpy(sn, &param[11], param_len - 11);
+        PRINT("    SN: %s\n", sn);
+        add_device_to_list(sn, NULL, oc_string(my_address), endpoint,
+                         discovered_devices);
+        inform_python(sn, oc_string(my_address), "discovered");
+      }
+    }
   }
 
   inform_discovery_python(len, payload);
 
-  PRINT("[C] issue get on /dev/sn\n");
-  oc_endpoint_print(endpoint);
+ // PRINT("[C] issue get on /dev/sn\n");
+ //oc_endpoint_print(endpoint);
 
-  oc_do_get_ex("/dev/sn", endpoint, NULL, response_get_sn, HIGH_QOS,
-               APPLICATION_CBOR, APPLICATION_CBOR, endpoint);
+  //oc_do_get_ex("/dev/sn", endpoint, NULL, response_get_sn, HIGH_QOS,
+  //             APPLICATION_CBOR, APPLICATION_CBOR, endpoint);
 
   PRINT("[C] DISCOVERY- END\n");
-  return OC_CONTINUE_DISCOVERY;
+  //return OC_CONTINUE_DISCOVERY;
+  return OC_STOP_DISCOVERY;
 }
 
 void
@@ -787,7 +822,6 @@ ets_discover_devices(int scope)
 {
   py_mutex_lock(app_sync_lock);
   oc_do_wk_discovery_all("rt=urn:knx:dpa.*", scope, discovery_cb, NULL);
-
   py_mutex_unlock(app_sync_lock);
   signal_event_loop();
 }
@@ -797,7 +831,6 @@ ets_discover_devices_with_query(int scope, const char *query)
 {
   py_mutex_lock(app_sync_lock);
   oc_do_wk_discovery_all(query, scope, discovery_cb, NULL);
-
   py_mutex_unlock(app_sync_lock);
   signal_event_loop();
 }
@@ -944,7 +977,7 @@ ets_reset_device(char *sn)
     return;
   }
 
-  // py_mutex_lock(app_sync_lock);B
+  // py_mutex_lock(app_sync_lock);
   // int ret = oc_obt_device_hard_reset(&device->uuid, reset_device_cb, device);
   // if (ret >= 0) {
   //  PRINT("[C]\nSuccessfully issued request to perform hard RESET\n");
@@ -1016,6 +1049,11 @@ ets_poll(void)
 {
   oc_clock_time_t next_event;
   next_event = oc_main_poll();
+  signal_event_loop();
+    
+  //py_mutex_lock(app_sync_lock);
+  //next_event = oc_main_poll();
+  //py_mutex_unlock(app_sync_lock);
 
   // PRINT("blah");
   // PRINT("    ---> %d", next_event);
