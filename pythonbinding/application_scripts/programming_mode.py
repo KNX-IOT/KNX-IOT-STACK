@@ -58,15 +58,15 @@ def safe_print(response):
         response.print_payload()
     else:
         print("no response")
-        
+
 def do_discover(my_stack, serial_number, scope = 2):
     time.sleep(1)
     query = "ep=urn:knx:sn."+str(serial_number)
     my_stack.discover_devices_with_query( query, int(scope))
     if my_stack.get_nr_devices() > 0:
         print ("SN :", my_stack.device_array[0].sn)
-        
-def do_programming_mode(my_stack, serial_number, pm_value):
+
+def do_programming_mode(my_stack, pm_value):
     print("Get SN :")
     sn = my_stack.device_array[0].sn
     response = my_stack.issue_cbor_get(sn, "/dev/pm")
@@ -118,9 +118,9 @@ if __name__ == '__main__':  # pragma: no cover
     time.sleep(2)
 
     try:
-        do_discover(the_stack, args.serial_number, args.scope);
+        do_discover(the_stack, args.serial_number, args.scope)
         time.sleep(1)
-        do_programming_mode(the_stack, args.serial_number, value)
+        do_programming_mode(the_stack, value)
     except:
         traceback.print_exc()
 

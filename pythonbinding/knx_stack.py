@@ -874,7 +874,6 @@ class KNXIOTStack():
             if len(self.device_array) == 0:
                 dev = Device(self.get_sn_from_index(0) , ip_address="discovered")
                 self.device_array.append(dev)
-        
         print("Discovered DEVICE ARRAY {}".format(self.device_array))
         return self.device_array
 
@@ -1041,7 +1040,7 @@ class KNXIOTStack():
         self.lib.ets_get_nr_devices.argtypes = []
         self.lib.ets_get_nr_devices.restype = c_int
         return self.lib.ets_get_nr_devices()
-    
+
     def get_sn_from_index(self, index):
         if index < self.get_nr_devices():
             self.lib.ets_get_sn.argtypes = [c_int]
