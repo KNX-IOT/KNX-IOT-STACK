@@ -111,9 +111,8 @@ if __name__ == '__main__':  # pragma: no cover
     if  str(args.programming_mode) == "True":
         value = True
 
-
     the_stack = knx_stack.KNXIOTStack()
-
+    the_stack.start_thread()
     signal.signal(signal.SIGINT, the_stack.sig_handler)
     time.sleep(2)
 

@@ -792,8 +792,9 @@ class KNXIOTStack():
         self.lib.ets_install_spakeCB(self.spakeCBFunc)
         self.gatewayCBFunc = GATEWAY_CALLBACK(self.gatewayCB)
         self.lib.ets_install_gatewayCB(self.gatewayCBFunc)
-        print ("...")
-        use_main = False
+
+    def start_thread(self, use_main=True):
+        print ("start_thread :", use_main)
         if use_main:
             self.threadid = threading.Thread(target=self.thread_function, args=())
             self.threadid.start()

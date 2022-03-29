@@ -266,7 +266,7 @@ ets_install_gatewayCB(gatewayCB gatewayCB)
 void
 inform_python(const char *uuid, const char *state, const char *event)
 {
-  PRINT("[C]inform_python %p\n",my_CBFunctions.changedFCB);
+  PRINT("[C]inform_python %p\n", my_CBFunctions.changedFCB);
   if (my_CBFunctions.changedFCB != NULL) {
     PRINT("[C]inform_python CB %p\n", my_CBFunctions.changedFCB);
     my_CBFunctions.changedFCB((char *)uuid, (char *)state, (char *)event);
@@ -798,7 +798,7 @@ discovery_cb(const char *payload, int len, oc_endpoint_t *endpoint,
         strncpy(sn, &param[11], param_len - 11);
         PRINT("    SN: %s\n", sn);
         add_device_to_list(sn, NULL, oc_string(my_address), endpoint,
-                         discovered_devices);
+                           discovered_devices);
         inform_python(sn, oc_string(my_address), "discovered");
       }
     }
@@ -806,14 +806,14 @@ discovery_cb(const char *payload, int len, oc_endpoint_t *endpoint,
 
   inform_discovery_python(len, payload);
 
- // PRINT("[C] issue get on /dev/sn\n");
- //oc_endpoint_print(endpoint);
+  // PRINT("[C] issue get on /dev/sn\n");
+  // oc_endpoint_print(endpoint);
 
-  //oc_do_get_ex("/dev/sn", endpoint, NULL, response_get_sn, HIGH_QOS,
+  // oc_do_get_ex("/dev/sn", endpoint, NULL, response_get_sn, HIGH_QOS,
   //             APPLICATION_CBOR, APPLICATION_CBOR, endpoint);
 
   PRINT("[C] DISCOVERY- END\n");
-  //return OC_CONTINUE_DISCOVERY;
+  // return OC_CONTINUE_DISCOVERY;
   return OC_STOP_DISCOVERY;
 }
 
@@ -1050,10 +1050,10 @@ ets_poll(void)
   oc_clock_time_t next_event;
   next_event = oc_main_poll();
   signal_event_loop();
-    
-  //py_mutex_lock(app_sync_lock);
-  //next_event = oc_main_poll();
-  //py_mutex_unlock(app_sync_lock);
+
+  // py_mutex_lock(app_sync_lock);
+  // next_event = oc_main_poll();
+  // py_mutex_unlock(app_sync_lock);
 
   // PRINT("blah");
   // PRINT("    ---> %d", next_event);
