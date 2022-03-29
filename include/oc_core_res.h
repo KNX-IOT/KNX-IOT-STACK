@@ -129,7 +129,8 @@ oc_platform_info_t *oc_core_init_platform(const char *mfg_name,
  * @return oc_device_info_t* the device structure
  */
 oc_device_info_t *oc_core_add_device(const char *name, const char *version,
-                                     const char *base, const char *serial_number,
+                                     const char *base,
+                                     const char *serial_number,
                                      oc_core_add_device_cb_t add_device_cb,
                                      void *data);
 
