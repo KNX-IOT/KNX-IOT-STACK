@@ -6,8 +6,12 @@
  *
  * @param serial_no KNX serial number. The advertised service will be
  * "${serial_no}._knx._udp"
+ * @param iid KNX Installation ID. Set to NULL if the device has not been
+ * commissioned yet (in programming mode)
+ * @param ia KNX Individual Address. Set to NULL if the device has not been
+ * commissioned yet (in programming mode)
  * @return int 0 on success, -1 on error.
  */
-int knx_publish_service(char *serial_no);
+int knx_publish_service(char *serial_no, char* iid, char* ia);
 
 #endif // DNS_SD_H

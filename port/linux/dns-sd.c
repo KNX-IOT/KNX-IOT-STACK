@@ -7,7 +7,7 @@
 static pid_t avahi_pid = 0;
 
 int
-knx_publish_service(char *serial_no)
+knx_publish_service(char *serial_no, char* iid, char* ia)
 {
   if (avahi_pid != 0) {
     // A previously published service advertisment is still running
@@ -22,7 +22,7 @@ knx_publish_service(char *serial_no)
     // we are in the child thread - execute Avahi
     int error;
     error = execlp("avahi-publish-service", "avahi-publish-service",
-                   //"--subtype=_ia._sub._knx._udp", // subtype present for
+                   "--subtype=_ia0._sub._knx._udp", // subtype present for
                    // uncomissioned devices???
                    serial_no,   // service name = serial number
                    "_knx._udp", // service type
