@@ -459,6 +459,7 @@ RESOURCE_CALLBACK = CFUNCTYPE(None, c_char_p, c_char_p, c_char_p, c_char_p)
 CLIENT_CALLBACK = CFUNCTYPE(None, c_char_p, c_int, c_char_p, c_char_p, c_char_p, c_int, c_char_p)
 DISCOVERY_CALLBACK = CFUNCTYPE(None, c_int, c_char_p)
 SPAKE_CALLBACK = CFUNCTYPE(None, c_char_p, c_int, c_char_p, c_int)
+GATEWAY_CALLBACK = CFUNCTYPE(None, c_int, c_char_p)
 
 #----------LinkFormat parsing ---------------
 
@@ -652,6 +653,10 @@ class KNXIOTStack():
             self.device_array.append(dev)
             discover_event.set()
 
+    def gatewayCB(self, payload_size, payload):
+        print("gateway event: Payload:{}".format(payload))
+
+
     def clientCB(self, cb_sn, cb_status, cb_format, cb_id, cb_url, cb_payload_size, cb_payload):
         """ ********************************
         Call back handles client command callbacks.
@@ -796,6 +801,8 @@ class KNXIOTStack():
         self.lib.ets_install_discoveryCB(self.discoveryCBFunc)
         self.spakeCBFunc = SPAKE_CALLBACK(self.spakeCB)
         self.lib.ets_install_spakeCB(self.spakeCBFunc)
+        self.gatewayCBFunc = GATEWAY_CALLBACK(self.gatewayCB)
+        self.lib.ets_install_gatewayCB(self.gatewayCBFunc)
         print ("...")
         use_main = False
         if use_main:

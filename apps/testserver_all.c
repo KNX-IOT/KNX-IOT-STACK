@@ -829,8 +829,8 @@ issue_requests_s_mode_delayed(void *data)
 
   // setting the test data
   oc_device_info_t *device = oc_core_get_device_info(0);
-  // device->ia = 5;
-  // device->iid = 7;
+  device->ia = 5;
+  device->iid = 16;
 
   PRINT(" issue_requests_s_mode_delayed : config data\n");
   int ga_values[5] = { 1, 255, 256, 1024, 1024 * 256 };

@@ -103,7 +103,9 @@ if __name__ == '__main__':  # pragma: no cover
     parser.add_argument("-value", "--value", default=True,
                     help="value of the valuetype (default True)", nargs='?',
                     const="true", required=False)
-
+    parser.add_argument("-wait", "--wait",
+                    help="wait after issuing s-mode command", nargs='?',
+                    default=2, const=1, required=False)
     # (args) supports batch scripts providing arguments
     print(sys.argv)
     args = parser.parse_args()
@@ -112,9 +114,10 @@ if __name__ == '__main__':  # pragma: no cover
     print("sia        :" + str(args.sia))
     print("st         :" + str(args.st))
     print("ga         :" + str(args.ga))
-    print("iid         :" + str(args.iid))
+    print("iid        :" + str(args.iid))
     print("valuetype  :" + str(args.valuetype))
     print("value      :" + str(args.value))
+    print("wait [sec] :" + str(args.wait))
 
     the_stack = knx_stack.KNXIOTStack()
 
@@ -127,6 +130,6 @@ if __name__ == '__main__':  # pragma: no cover
     except:
         traceback.print_exc()
 
-    time.sleep(2)
+    time.sleep(int(args.wait))
     the_stack.quit()
     sys.exit()

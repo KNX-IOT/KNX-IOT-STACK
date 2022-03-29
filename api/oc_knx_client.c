@@ -452,11 +452,13 @@ oc_send_s_mode(oc_endpoint_t *endpoint, char *path, int sia_value,
     oc_rep_i_set_text_string(value, 6, rp);
 
     // set the "value" key
-    oc_rep_i_set_key(&value_map, 1);
+    // oc_rep_i_set_key(&value_map, 1);
     // copy the data, this is already in cbor from the fake response of the
     // resource GET function
-    if (value_size > 0) {
-      oc_rep_encode_raw_encoder(&value_map, value_data, value_size);
+    // the GET function retrieves the data = { 1 : <value> } e.g including
+    // the open/close object data. hence this needs to be removed.
+    if (value_size > 2) {
+      oc_rep_encode_raw_encoder(&value_map, &value_data[1], value_size - 2);
     }
 
     cbor_encoder_close_container_checked(&root_map, &value_map);
@@ -607,47 +609,55 @@ oc_do_s_mode_with_scope(int scope, char *resource_url, char *rp)
   int iid = device->iid;
   int group_address = -1;
 
+  bool send_flag_w = false;
+  bool send_flag_r = false;
+  bool send_flag_rp = false;
+
+  if (strcmp(rp, "w") == 0) {
+    send_flag_w = true;
+  }
+  if (strcmp(rp, "r") == 0) {
+    send_flag_r = true;
+  }
+  if (strcmp(rp, "rp") == 0) {
+    send_flag_rp = true;
+  }
+
   // loop over all group addresses and issue the s-mode command
   int index = oc_core_find_group_object_table_url(resource_url);
   while (index != -1) {
     int ga_len = oc_core_find_group_object_table_number_group_entries(index);
     oc_cflag_mask_t cflags = oc_core_group_object_table_cflag_entries(index);
+
     PRINT(" index %d rp = %s cflags %d flags=", index, rp, cflags);
     oc_print_cflags(cflags);
 
     // With a read command to a Group Object, the device send this Group
     // Object’s value.
-    if (((cflags & OC_CFLAG_READ) == 0) &&
-        ((cflags & OC_CFLAG_TRANSMISSION) == 0) &&
-        ((cflags & OC_CFLAG_INIT) > 0)) {
-      PRINT("    skipping index %d due to cflags %d flags=", index, cflags);
-      oc_print_cflags(cflags);
-    } else {
+    if (send_flag_w || send_flag_r || send_flag_rp) {
       PRINT("    handling: index %d\n", index);
       for (int j = 0; j < ga_len; j++) {
         group_address = oc_core_find_group_object_table_group_entry(index, j);
-        if (group_address > 0) {
-          PRINT("      ga : %d\n", group_address);
-          // issue the s-mode command
+        PRINT("      ga : %d\n", group_address);
+        if (j == 0) {
+          // issue the s-mode command, but only for the first ga entry
           oc_issue_s_mode(scope, sia_value, group_address, iid, rp, buffer,
                           value_size);
-          // the recipient table contains the list of destinations that will
-          // receive data. loop over the full recipient table and send a message
-          // if the group is there
-          for (int j = 0; j < oc_core_get_recipient_table_size(); j++) {
-            bool found =
-              oc_core_check_recipient_index_on_group_address(j, group_address);
-            if (found) {
-              char *url = oc_core_get_recipient_index_url_or_path(j);
-              if (url) {
-                PRINT(" broker send: %s\n", url);
-                int ia = oc_core_get_recipient_ia(j);
-                oc_knx_client_do_broker_request(resource_url, ia, url, rp);
-              }
+        }
+        // the recipient table contains the list of destinations that will
+        // receive data. loop over the full recipient table and send a message
+        // if the group is there
+        for (int j = 0; j < oc_core_get_recipient_table_size(); j++) {
+          bool found =
+            oc_core_check_recipient_index_on_group_address(j, group_address);
+          if (found) {
+            char *url = oc_core_get_recipient_index_url_or_path(j);
+            if (url) {
+              PRINT(" broker send: %s\n", url);
+              int ia = oc_core_get_recipient_ia(j);
+              oc_knx_client_do_broker_request(resource_url, ia, url, rp);
             }
           }
-        } else {
-          PRINT("      ga cannot be 0\n");
         }
       }
     }
