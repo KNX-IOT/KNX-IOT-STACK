@@ -84,7 +84,7 @@ def convert_char(value):
     if value == "r":
         return 8 # bit 3
     if value == "w":
-        return 16 # bit 4 
+        return 16 # bit 4
     if value == "i":
         return 32 # bit 5
     if value == "t":
