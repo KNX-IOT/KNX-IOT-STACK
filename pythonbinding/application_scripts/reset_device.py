@@ -96,6 +96,7 @@ if __name__ == '__main__':  # pragma: no cover
     print("serial number :" + str(args.serialnumber))
     print("reset value   :" + str(args.resetvalue))
     the_stack = knx_stack.KNXIOTStack()
+    the_stack.start_thread()
     signal.signal(signal.SIGINT, the_stack.sig_handler)
     try:
         do_discover(the_stack, args.serialnumber, args.scope)

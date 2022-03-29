@@ -119,6 +119,7 @@ if __name__ == '__main__':  # pragma: no cover
     print("wait [sec]       :" + str(args.wait))
 
     the_stack = knx_stack.KNXIOTStack()
+    the_stack.start_thread()
     signal.signal(signal.SIGINT, the_stack.sig_handler)
 
     if args.internal_address:

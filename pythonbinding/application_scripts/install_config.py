@@ -82,13 +82,15 @@ def load_json_file(filename, my_dir=None):
 
 def convert_char(value):
     if value == "r":
-        return 1
+        return 8 # bit 3
     if value == "w":
-        return 2
+        return 16 # bit 4 
+    if value == "i":
+        return 32 # bit 5
     if value == "t":
-        return 3
+        return 64 # bit 6
     if value == "u":
-        return 4
+        return 128 # bit 7
     print("convert_char : not a valid char:", value)
     return 0
 
@@ -113,10 +115,10 @@ def convert_json_tag2integer(table):
         if "ga" in item:
             new_item[7] = item["ga"]
         if "cflag" in item:
-            value = []
+            value = 0
             for x_value in item["cflag"]:
                 new_x = convert_char(x_value)
-                value.append(new_x)
+                value = value + new_x
             new_item[8] = value
         if "href" in item:
             new_item[11] = item["href"]
@@ -255,6 +257,7 @@ if __name__ == '__main__':  # pragma: no cover
     print("internal address :" + str(args.internal_address))
     print("filename         :" + str(args.file))
     the_knx_stack = knx_stack.KNXIOTStack()
+    the_knx_stack.start_thread()
     signal.signal(signal.SIGINT, the_knx_stack.sig_handler)
     try:
         do_discover(the_knx_stack, args.serialnumber)
