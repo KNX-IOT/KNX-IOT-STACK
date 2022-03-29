@@ -2054,7 +2054,8 @@ oc_register_group_multicasts()
     oc_cflag_mask_t cflags = g_got[index].cflags;
     // check if the group address is used for receiving.
     // e.g. WRITE or UPDATE
-    if (((cflags & OC_CFLAG_WRITE) > 0) || ((cflags & OC_CFLAG_UPDATE) > 0)) {
+    if (((cflags & OC_CFLAG_WRITE) > 0) || ((cflags & OC_CFLAG_UPDATE) > 0) ||
+        ((cflags & OC_CFLAG_READ) > 0)) {
 
       for (int i = 0; i < nr_entries; i++) {
         PRINT(" oc_register_group_multicasts index=%d i=%d group: %d  cflags=",
