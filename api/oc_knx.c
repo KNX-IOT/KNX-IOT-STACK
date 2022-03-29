@@ -167,7 +167,7 @@ oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   (void)iface_mask;
   // size_t response_length = 0;
 
-  int64_t value = -1;
+  int value = -1;
   int cmd = -1;
   // int time;
   // int code;
@@ -185,7 +185,7 @@ oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     case OC_REP_INT: {
       if (rep->iname == 1) {
         {
-          value = rep->value.integer;
+          value = (int) rep->value.integer;
         }
       }
     } break;
@@ -206,7 +206,7 @@ oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   }
 
   PRINT("  cmd   : %d\n", cmd);
-  PRINT("  value : %d\n", value);
+  PRINT("  value : %d\n", (int)value);
 
   bool error = true;
   size_t device_index = request->resource->device;
@@ -704,7 +704,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
       // check if the data is allowed to write or update
       oc_cflag_mask_t cflags = oc_core_group_object_table_cflag_entries(index);
       if (((cflags & OC_CFLAG_WRITE) > 0) && (do_write)) {
-        PRINT(" index %d handled due to flags %d", index, cflags);
+        PRINT(" (case1) index %d handled due to flags %d\n", index, cflags);
         // CASE 1:
         // Received from bus: -st w, any ga
         // @receiver : clags = w->overwrite object value
@@ -713,17 +713,19 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
         // Case 3) part 1
         // @sender : updated object value + cflags = t 
         //Sent : -st w, sending association(1st assigned ga)
+          PRINT("  (case3) sending \n");
           oc_do_s_mode_with_scope(2, oc_string(myurl), "w");
           oc_do_s_mode_with_scope(5, oc_string(myurl), "w");
         }
       }
       if (((cflags & OC_CFLAG_UPDATE) > 0) && (do_write)) {
-        PRINT(" index %d handled due to flags %d", index, cflags);
+        PRINT(" (case2) index %d handled due to flags %d\n", index, cflags);
         // Case 2)
         // Received from bus: -st rp , any ga
         // @receiver : clags = u->overwrite object value
         my_resource->post_handler.cb(request, iface_mask, data);
         if ((cflags & OC_CFLAG_TRANSMISSION) > 0) {
+          PRINT("  (case3) sending \n");
           // Case 3) part 2
           // @sender : updated object value + cflags = t
           // Sent : -st w, sending association(1st assigned ga)
@@ -732,7 +734,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
         }
       }
       if (((cflags & OC_CFLAG_READ) > 0) && (do_read)) {
-        PRINT(" index %d handled due to flags %d", index, cflags);
+        PRINT(" (case4) index %d handled due to flags %d\n", index, cflags);
         // Case 4)
         // @sender: cflags = r
         // Received from bus: -st r

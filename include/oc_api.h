@@ -66,7 +66,7 @@
   Case 2 (update data):
     - Received from bus: -st rp, any ga
     - receiver does: c flags = u -> overwrite object value
-  Case 3:
+  Case 3 (inform change):
     - sender: updated object value + cflags = t
     - Sent: -st w, sending association (1st assigned ga)
       Note: this will be done when Case 1 & Case 2 have updated a value.
@@ -74,7 +74,7 @@
     - sender: c flags = r
     - Received from bus: -st r
     - Sent: -st rp, sending association (1st assigned ga)
-  Case 5:
+  Case 5 (update at start up):
     - sender: c flags = i
     - After device restart (power up)
     - Sent: -st r, sending association (1st assigned ga)

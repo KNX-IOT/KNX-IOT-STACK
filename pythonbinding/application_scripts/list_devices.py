@@ -104,6 +104,9 @@ if __name__ == '__main__':  # pragma: no cover
     parser.add_argument("-scope", "--scope",
                     help="scope of the multicast request [2,5]", nargs='?',
                     default=2, const=1, required=False)
+    parser.add_argument("-wait", "--wait",
+                    help="wait after issuing s-mode command", nargs='?',
+                    default=2, const=1, required=False)
     # (args) supports batch scripts providing arguments
     print(sys.argv)
     args = parser.parse_args()
@@ -113,6 +116,7 @@ if __name__ == '__main__':  # pragma: no cover
     print("programming mode :" + str(args.programming_mode))
     print("serial number    :" + str(args.serial_number))
     print("group address    :" + str(args.group_address))
+    print("wait [sec]       :" + str(args.wait))
 
     the_stack = knx_stack.KNXIOTStack()
     signal.signal(signal.SIGINT, the_stack.sig_handler)
@@ -138,6 +142,6 @@ if __name__ == '__main__':  # pragma: no cover
         except:
             traceback.print_exc()
 
-    time.sleep(2)
+    time.sleep(int(args.wait))
     the_stack.quit()
     sys.exit()

@@ -452,11 +452,13 @@ oc_send_s_mode(oc_endpoint_t *endpoint, char *path, int sia_value,
     oc_rep_i_set_text_string(value, 6, rp);
 
     // set the "value" key
-    oc_rep_i_set_key(&value_map, 1);
+    //oc_rep_i_set_key(&value_map, 1);
     // copy the data, this is already in cbor from the fake response of the
     // resource GET function
-    if (value_size > 0) {
-      oc_rep_encode_raw_encoder(&value_map, value_data, value_size);
+    // the GET function retrieves the data = { 1 : <value> } e.g including
+    // the open/close object data. hence this needs to be removed.
+    if (value_size > 2) {
+      oc_rep_encode_raw_encoder(&value_map, &value_data[1], value_size -2);
     }
 
     cbor_encoder_close_container_checked(&root_map, &value_map);
