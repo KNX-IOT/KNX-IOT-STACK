@@ -755,7 +755,9 @@ oc_core_auth_at_x_get_handler(oc_request_t *request,
     }
     if (oc_string_len(g_at_entries[index].osc_contextid) > 0) {
       oc_rep_i_set_text_string(
-        osc, 6, oc_string(g_at_entries[index].osc_contextid)); // root::cnf::osc::contextid
+        osc, 6,
+        oc_string(
+          g_at_entries[index].osc_contextid)); // root::cnf::osc::contextid
     }
     cbor_encoder_close_container_checked(&cnf_map, &osc_map);
     cbor_encoder_close_container_checked(&root_map, &cnf_map);
@@ -942,6 +944,10 @@ oc_at_entry_print(size_t device_index, int index)
           PRINT("    osc:alg    : %s\n",
                 oc_string(g_at_entries[index].osc_alg));
         }
+        if (oc_string_len(g_at_entries[index].osc_contextid) > 0) {
+          PRINT("    osc:contextid     : %s\n",
+                oc_string(g_at_entries[index].osc_contextid));
+        }
       }
     }
   }
@@ -963,6 +969,8 @@ oc_at_delete_entry(size_t device_index, int index)
   oc_new_string(&g_at_entries[index].osc_id, "", 0);
   oc_free_string(&g_at_entries[index].osc_ms);
   oc_new_string(&g_at_entries[index].osc_ms, "", 0);
+  oc_free_string(&g_at_entries[index].osc_contextid);
+  oc_new_string(&g_at_entries[index].osc_contextid, "", 0);
   // dtls
   oc_free_string(&g_at_entries[index].sub);
   oc_new_string(&g_at_entries[index].sub, "", 0);
@@ -992,6 +1000,8 @@ oc_at_dump_entry(size_t device_index, int entry)
   oc_rep_i_set_text_string(root, 840, oc_string(g_at_entries[entry].osc_id));
   oc_rep_i_set_text_string(root, 842, oc_string(g_at_entries[entry].osc_ms));
   oc_rep_i_set_text_string(root, 844, oc_string(g_at_entries[entry].osc_alg));
+  oc_rep_i_set_text_string(root, 846,
+                           oc_string(g_at_entries[entry].osc_contextid));
 
   oc_rep_i_set_text_string(root, 82, oc_string(g_at_entries[entry].sub));
   oc_rep_i_set_text_string(root, 81, oc_string(g_at_entries[entry].kid));
@@ -1062,6 +1072,12 @@ oc_at_load_entry(int entry)
           if (rep->iname == 844) {
             oc_free_string(&g_at_entries[entry].osc_alg);
             oc_new_string(&g_at_entries[entry].osc_alg,
+                          oc_string(rep->value.string),
+                          oc_string_len(rep->value.string));
+          }
+          if (rep->iname == 846) {
+            oc_free_string(&g_at_entries[entry].osc_contextid);
+            oc_new_string(&g_at_entries[entry].osc_contextid,
                           oc_string(rep->value.string),
                           oc_string_len(rep->value.string));
           }
@@ -1145,6 +1161,10 @@ oc_core_set_at_table(size_t device_index, int index, oc_auth_at_t entry)
     oc_free_string(&g_at_entries[index].osc_id);
     oc_new_string(&g_at_entries[index].osc_alg, oc_string(entry.osc_alg),
                   oc_string_len(entry.osc_alg));
+    oc_free_string(&g_at_entries[index].osc_contextid);
+    oc_new_string(&g_at_entries[index].osc_contextid,
+                  oc_string(entry.osc_contextid),
+                  oc_string_len(entry.osc_contextid));
 
     g_at_entries[index].ga_len = entry.ga_len;
 
