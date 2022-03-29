@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #############################
 #
-#    copyright 2021 Cascoda Ltd.
+#    copyright 2021-2022 Cascoda Ltd.
 #    Redistribution and use in source and binary forms, with or without modification,
 #    are permitted provided that the following conditions are met:
 #    1.  Redistributions of source code must retain the above copyright notice,
@@ -408,35 +408,27 @@ class String(MutableString, Union):
         # Convert None or 0
         if obj is None or obj == 0:
             return cls(POINTER(c_char)())
-
         # Convert from String
         elif isinstance(obj, String):
             return obj
-
         # Convert from bytes
         elif isinstance(obj, bytes):
             return cls(obj)
-
         # Convert from str
         elif isinstance(obj, str):
             return cls(obj.encode())
-
         # Convert from c_char_p
         elif isinstance(obj, c_char_p):
             return obj
-
         # Convert from POINTER(c_char)
         elif isinstance(obj, POINTER(c_char)):
             return obj
-
         # Convert from raw pointer
         elif isinstance(obj, int):
             return cls(cast(obj, POINTER(c_char)))
-
         # Convert from c_char array
         elif isinstance(obj, c_char * len(obj)):
             return obj
-
         # Convert from object
         else:
             return String.from_param(obj._as_parameter_)
@@ -511,14 +503,12 @@ class LinkFormat():
         return mybase[0]
 
 #----------Devices ---------------
-
 class Device():
 
     def __init__(self, sn, ip_address=None, name="", _resources=None,
                  _resource_array=None, credentials=None, last_event=None):
         self.sn = sn
         self.ip_address = ip_address
-        #self.owned_state = owned_state
         self.name = name
         self.credentials = credentials
         self.resource_array = []
@@ -655,7 +645,6 @@ class KNXIOTStack():
 
     def gatewayCB(self, payload_size, payload):
         print("gateway event: Payload:{}".format(payload))
-
 
     def clientCB(self, cb_sn, cb_status, cb_format, cb_id, cb_url, cb_payload_size, cb_payload):
         """ ********************************
@@ -829,17 +818,17 @@ class KNXIOTStack():
         this function is threaded in python.
         """
         print ("thread_poll: thread started")
-
         self.lib.ets_start.argtypes = [ String ]
         self.lib.ets_start.restype = c_int
         return_value  = self.lib.ets_start("012345")
         print ("thread_poll: start:", return_value)
         self.lib.ets_poll.argtypes = [  ]
         self.lib.ets_poll.restype = c_int
-
         while self.m_stop is False :
             try:
                 self.lib.ets_poll()
+                time.sleep(0.0001)
+                #print(".")
                 #print ("thread_poll: poll")
             except:
                 traceback.print_exc()
@@ -848,7 +837,6 @@ class KNXIOTStack():
         self.lib.ets_stop.argtypes = [ ]
         self.lib.ets_stop.restype = c_int
         self.lib.ets_stop()
-
 
     def purge_device_array(self, sn):
         for index, device in enumerate(self.device_array):
@@ -874,28 +862,21 @@ class KNXIOTStack():
         discover_event.clear()
         self.lib.ets_discover_devices_with_query.argtypes = [c_int, String ]
         self.lib.ets_discover_devices_with_query(scope, query)
-        time.sleep(self.timout)
+        #time.sleep(self.timout)
         # python callback application
         print("[P] discovery- done")
-        self.lib.ets_get_nr_devices()
+        #self.lib.ets_get_nr_devices()
         discover_event.wait(self.timout)
+        print("Found devices {}".format(self.get_nr_devices))
+        print("Discovered DEVICE ARRAY {}".format(self.device_array))
+        if self.get_nr_devices() > 0:
+            print("Found devices {}".format(self.get_sn_from_index(0)))
+            if len(self.device_array) == 0:
+                dev = Device(self.get_sn_from_index(0) , ip_address="discovered")
+                self.device_array.append(dev)
+        
         print("Discovered DEVICE ARRAY {}".format(self.device_array))
         return self.device_array
-
-    def discover_devices_with_query_data(self, query, scope=2):
-        print("Discover Devices with Query: scope", scope, query)
-        # application
-        discover_data_event.clear()
-        self.discovery_data = None
-        self.lib.ets_discover_devices_with_query.argtypes = [c_int, String ]
-        self.lib.ets_discover_devices_with_query(int(scope), query)
-        time.sleep(self.timout)
-        # python callback application
-        print("[P] discovery- done")
-        self.lib.ets_get_nr_devices()
-        discover_data_event.wait(self.timout)
-        print("Discovered DEVICE ARRAY {}".format(self.device_array))
-        return self.discovery_data
 
     def initiate_spake(self, sn, password):
         print("initiate spake: ", sn, password)
@@ -905,9 +886,6 @@ class KNXIOTStack():
         self.lib.ets_initiate_spake.argtypes = [ String, String ]
         self.lib.ets_initiate_spake(sn, password)
         #time.sleep(self.timout)
-        # python callback application
-        #print("[P] discovery- done")
-        #self.lib.py_get_nr_devices()
         spake_event.wait(self.timout)
         print ("initate_spake data: ")
         return self.spake
@@ -1063,6 +1041,14 @@ class KNXIOTStack():
         self.lib.ets_get_nr_devices.argtypes = []
         self.lib.ets_get_nr_devices.restype = c_int
         return self.lib.ets_get_nr_devices()
+    
+    def get_sn_from_index(self, index):
+        if index < self.get_nr_devices():
+            self.lib.ets_get_sn.argtypes = [c_int]
+            self.lib.ets_get_sn.restype = String
+            return self.lib.ets_get_sn(int(index))
+        else:
+            return ""
 
 if __name__ == "__main__":
     my_stack = KNXIOTStack()
