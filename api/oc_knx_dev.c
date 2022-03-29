@@ -105,7 +105,7 @@ oc_core_dev_hwv_get_handler(oc_request_t *request,
     uint64_t array[3];
     array[0] = device->hwv.major;
     array[1] = device->hwv.minor;
-    array[2] = device->hwv.third;
+    array[2] = device->hwv.patch;
 
     oc_rep_begin_root_object();
     oc_rep_i_set_int_array(root, 1, array, 3);
@@ -163,7 +163,7 @@ oc_core_dev_fwv_get_handler(oc_request_t *request,
     uint64_t array[3];
     array[0] = device->fwv.major;
     array[1] = device->fwv.minor;
-    array[2] = device->fwv.third;
+    array[2] = device->fwv.patch;
 
     oc_rep_begin_root_object();
     oc_rep_i_set_int_array(root, 1, array, 3);

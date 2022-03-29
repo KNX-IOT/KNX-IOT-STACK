@@ -60,7 +60,7 @@ typedef struct oc_knx_version_info_t
 {
   int major; /**< major version number */
   int minor; /**< minor version number */
-  int third; /**< third version number */
+  int patch; /**< patch version number */
 } oc_knx_version_info_t;
 
 /**
@@ -123,13 +123,13 @@ oc_platform_info_t *oc_core_init_platform(const char *mfg_name,
  * @param name the name of the device
  * @param version the version of the KNX spec
  * @param base the base url
- * @param serialnumber the serial number of the device
+ * @param serial_number the serial number of the device
  * @param add_device_cb device callback
  * @param data the supplied user data
  * @return oc_device_info_t* the device structure
  */
 oc_device_info_t *oc_core_add_device(const char *name, const char *version,
-                                     const char *base, const char *serialnumber,
+                                     const char *base, const char *serial_number,
                                      oc_core_add_device_cb_t add_device_cb,
                                      void *data);
 
@@ -139,11 +139,11 @@ oc_device_info_t *oc_core_add_device(const char *name, const char *version,
  * @param device_index the device index
  * @param major the xxx number of xxx.yyy.zzz
  * @param minor the yyy number of xxx.yyy.zz
- * @param minor2 the zzz number of xxx.yyy.zzz
+ * @param patch the zzz number of xxx.yyy.zzz
  * @return int error status, 0 = OK
  */
 int oc_core_set_device_fwv(size_t device_index, int major, int minor,
-                           int minor2);
+                           int patch);
 
 /**
  * @brief sets the hardware version number
@@ -151,11 +151,11 @@ int oc_core_set_device_fwv(size_t device_index, int major, int minor,
  * @param device_index the device index
  * @param major the xxx number of xxx.yyy.zzz
  * @param minor the yyy number of xxx.yyy.zz
- * @param minor2 the zzz number of xxx.yyy.zzz
+ * @param patch the zzz number of xxx.yyy.zzz
  * @return int  error status, 0 = OK
  */
 int oc_core_set_device_hwv(size_t device_index, int major, int minor,
-                           int minor2);
+                           int patch);
 
 /**
  * @brief sets the internal address
@@ -170,10 +170,10 @@ int oc_core_set_device_ia(size_t device_index, int ia);
  * @brief sets the hardware type (string)
  *
  * @param device_index the device index
- * @param hardwaretype the hardware type
+ * @param hardware_type the hardware type
  * @return int error status, 0 = OK
  */
-int oc_core_set_device_hwt(size_t device_index, const char *hardwaretype);
+int oc_core_set_device_hwt(size_t device_index, const char *hardware_type);
 
 /**
  * @brief sets the programming mode (boolean)

@@ -1,6 +1,6 @@
 /*
 // Copyright (c) 2016-2019 Intel Corporation
-// Copyright (c) 2021 Cascoda Ltd
+// Copyright (c) 2021-2022 Cascoda Ltd
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -182,7 +182,6 @@ typedef struct
    * @see oc_resource_set_discoverable
    * @see oc_resource_set_observable
    * @see oc_resource_set_periodic_observable
-   * @see oc_resource_set_properties_cbs
    * @see oc_resource_set_request_handler
    * @see oc_add_resource
    */
