@@ -229,10 +229,9 @@ ets_install_spakeCB(spakeCB spakeCB)
   my_CBFunctions.spakeFCB = spakeCB;
 }
 
-
 void
 internal_gw_cb(size_t device_index,
-                     oc_group_object_notification_t *s_mode_message, void *data)
+               oc_group_object_notification_t *s_mode_message, void *data)
 {
   (void)data;
   char buffer[300];

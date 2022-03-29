@@ -452,13 +452,13 @@ oc_send_s_mode(oc_endpoint_t *endpoint, char *path, int sia_value,
     oc_rep_i_set_text_string(value, 6, rp);
 
     // set the "value" key
-    //oc_rep_i_set_key(&value_map, 1);
+    // oc_rep_i_set_key(&value_map, 1);
     // copy the data, this is already in cbor from the fake response of the
     // resource GET function
     // the GET function retrieves the data = { 1 : <value> } e.g including
     // the open/close object data. hence this needs to be removed.
     if (value_size > 2) {
-      oc_rep_encode_raw_encoder(&value_map, &value_data[1], value_size -2);
+      oc_rep_encode_raw_encoder(&value_map, &value_data[1], value_size - 2);
     }
 
     cbor_encoder_close_container_checked(&root_map, &value_map);
@@ -642,7 +642,7 @@ oc_do_s_mode_with_scope(int scope, char *resource_url, char *rp)
         if (j == 0) {
           // issue the s-mode command, but only for the first ga entry
           oc_issue_s_mode(scope, sia_value, group_address, iid, rp, buffer,
-                        value_size);
+                          value_size);
         }
         // the recipient table contains the list of destinations that will
         // receive data. loop over the full recipient table and send a message

@@ -2080,7 +2080,7 @@ oc_init_datapoints_at_initialization()
       oc_cflag_mask_t cflags = g_got[index].cflags;
       if ((cflags & OC_CFLAG_INIT) > 0) {
         // Case 5)
-        // @sender : cflags = i After device restart(power up) 
+        // @sender : cflags = i After device restart(power up)
         // Sent : -st r, sending association(1st assigned ga)
         oc_do_s_mode_read(g_got[index].ga[0]);
       }

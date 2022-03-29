@@ -116,9 +116,8 @@ typedef enum {
   LSM_E_UNLOAD = 4        /**< (4) cmd unload: state will be UNLOADED */
 } oc_lsm_event_t;
 
-
-bool gob_notification_to_json(char* buffer, int buffer_size,oc_group_object_notification_t notification);
-
+bool gob_notification_to_json(char *buffer, int buffer_size,
+                              oc_group_object_notification_t notification);
 
 /**
  * @brief retrieve the current lsm state

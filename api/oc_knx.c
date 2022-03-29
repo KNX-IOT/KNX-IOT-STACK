@@ -185,7 +185,7 @@ oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     case OC_REP_INT: {
       if (rep->iname == 1) {
         {
-          value = (int) rep->value.integer;
+          value = (int)rep->value.integer;
         }
       }
     } break;
@@ -254,7 +254,6 @@ oc_create_knx_resource(int resource_idx, size_t device)
                             OC_DISCOVERABLE, oc_core_knx_get_handler, 0,
                             oc_core_knx_post_handler, 0, 0, "");
 }
-
 
 // ----------------------------------------------------------------------------
 
@@ -517,15 +516,14 @@ oc_core_knx_knx_get_handler(oc_request_t *request,
 
 bool
 oc_s_mode_notification_to_json(char *buffer, size_t buffer_size,
-                         oc_group_object_notification_t notification)
+                               oc_group_object_notification_t notification)
 {
   // { 5: { 6: <st>, 7: <ga>, 1: <value> } }
   // { "s": { "st": <st>,  "ga": <ga>, "value": <value> } }
   int size = snprintf(
-    buffer, buffer_size, "{ \"sia\": %d \"s\":{ \"st\": \"%s\" , \"ga\":%d, \"value\": %s }  }",
-    notification.sia,
-    oc_string(notification.st), 
-    notification.ga, 
+    buffer, buffer_size,
+    "{ \"sia\": %d \"s\":{ \"st\": \"%s\" , \"ga\":%d, \"value\": %s }  }",
+    notification.sia, oc_string(notification.st), notification.ga,
     oc_string(notification.value));
   if (size > buffer_size) {
     return false;
@@ -670,8 +668,8 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
     // clags = w -> overwrite object value
     do_write = true;
   } else if (strcmp(oc_string(g_received_notification.st), "rp") == 0) {
-    //Case 2)
-    //Received from bus: -st rp, any ga
+    // Case 2)
+    // Received from bus: -st rp, any ga
     //@receiver: clags = u -> overwrite object value
     do_write = true;
   } else if (strcmp(oc_string(g_received_notification.st), "r") == 0) {
@@ -680,7 +678,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
     // Received from bus: -st r
     // Sent: -st rp, sending association (1st assigned ga)
     do_read = true;
-  } 
+  }
 
   int index = oc_core_find_group_object_table_index(g_received_notification.ga);
   PRINT(" .knx : index %d\n", index);
@@ -710,9 +708,9 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
         // @receiver : clags = w->overwrite object value
         my_resource->post_handler.cb(request, iface_mask, data);
         if ((cflags & OC_CFLAG_TRANSMISSION) > 0) {
-        // Case 3) part 1
-        // @sender : updated object value + cflags = t 
-        //Sent : -st w, sending association(1st assigned ga)
+          // Case 3) part 1
+          // @sender : updated object value + cflags = t
+          // Sent : -st w, sending association(1st assigned ga)
           PRINT("  (case3) sending \n");
           oc_do_s_mode_with_scope(2, oc_string(myurl), "w");
           oc_do_s_mode_with_scope(5, oc_string(myurl), "w");
@@ -739,7 +737,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
         // @sender: cflags = r
         // Received from bus: -st r
         // Sent: -st rp, sending association (1st assigned ga)
-        //oc_do_s_mode(oc_string(myurl), "rp");
+        // oc_do_s_mode(oc_string(myurl), "rp");
         oc_do_s_mode_with_scope(2, oc_string(myurl), "rp");
         oc_do_s_mode_with_scope(5, oc_string(myurl), "rp");
       }

@@ -90,8 +90,6 @@ typedef void (*discoveryCB)(int payload_size, char *payload);
 typedef void (*resourceCB)(char *anchor, char *uri, char *types,
                            char *interfaces);
 
-
-
 /**
  * @brief The gateway callback function type
  *
@@ -99,7 +97,6 @@ typedef void (*resourceCB)(char *anchor, char *uri, char *types,
  * @param payload the ascii payload json
  */
 typedef void (*gatewayCB)(int payload_size, char *payload);
-
 
 /**
  * @brief the client callback function
@@ -172,7 +169,6 @@ kisCS_EXPORT void ets_install_discoveryCB(discoveryCB discoveryCB);
  * @param spakeCB the spake callback
  */
 kisCS_EXPORT void ets_install_spakeCB(spakeCB spakeCB);
-
 
 /**
  * @brief install the gateway callback

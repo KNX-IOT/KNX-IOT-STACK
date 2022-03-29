@@ -133,9 +133,9 @@ void oc_do_s_mode(char *resource_url, char *rp);
 /**
  * @brief sends out an s-mode read request.
  * The read request has no data value
- * 
+ *
  * Note: function does not check the flags on the resources
- * 
+ *
  * @see oc_do_s_mode_with_scope
  * @param group_address the group address to invoke a read on
  */
@@ -148,10 +148,11 @@ void oc_do_s_mode_read(size_t group_address);
  * the sia (sender individual address) is taken from the device
  * the ga is coming from the group address table that is listing the resource
  * url (path) the url of the resource to obtain the value from.
- * 
+ *
  * only the first group address is used to send the s-mode message
- * for the recipient table all entries are used to send the unicast communication.
- * 
+ * for the recipient table all entries are used to send the unicast
+ * communication.
+ *
  * Note: function does not check the flags on the resources
  *
  * @param scope the multi-cast scope
