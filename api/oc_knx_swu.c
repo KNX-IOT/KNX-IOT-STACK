@@ -433,7 +433,7 @@ oc_knx_swu_pkgv_get_handler(oc_request_t *request,
   cbor_encoder_create_array(&g_encoder, &arrayEncoder, 3);
   cbor_encode_int(&arrayEncoder, (int64_t)g_swu_package_version.major);
   cbor_encode_int(&arrayEncoder, (int64_t)g_swu_package_version.minor);
-  cbor_encode_int(&arrayEncoder, (int64_t)g_swu_package_version.third);
+  cbor_encode_int(&arrayEncoder, (int64_t)g_swu_package_version.patch);
   cbor_encoder_close_container(&g_encoder, &arrayEncoder);
 
   oc_send_json_response(request, OC_STATUS_OK);
@@ -755,7 +755,7 @@ oc_swu_set_package_version(int major, int minor, int minor2)
 {
   g_swu_package_version.major = major;
   g_swu_package_version.minor = minor;
-  g_swu_package_version.third = minor2;
+  g_swu_package_version.patch = minor2;
 }
 
 void

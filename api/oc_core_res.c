@@ -242,7 +242,7 @@ oc_core_set_device_fwv(size_t device_index, int major, int minor, int minor2)
   }
   oc_device_info[device_index].fwv.major = major;
   oc_device_info[device_index].fwv.minor = minor;
-  oc_device_info[device_index].fwv.third = minor2;
+  oc_device_info[device_index].fwv.patch = minor2;
   return 0;
 }
 
@@ -256,7 +256,7 @@ oc_core_set_device_hwv(size_t device_index, int major, int minor, int minor2)
 
   oc_device_info[device_index].hwv.major = major;
   oc_device_info[device_index].hwv.minor = minor;
-  oc_device_info[device_index].hwv.third = minor2;
+  oc_device_info[device_index].hwv.patch = minor2;
   return 0;
 }
 
