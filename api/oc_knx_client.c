@@ -89,6 +89,11 @@ finish_spake_handshake(oc_client_response_t *data)
 {
   if (data->code != OC_STATUS_CHANGED) {
     OC_DBG_SPAKE("Error in Credential Verification!!!\n");
+    mbedtls_mpi_free(&w0);
+    mbedtls_mpi_free(&w1);
+    mbedtls_mpi_free(&privA);
+    mbedtls_ecp_point_free(&pA);
+    mbedtls_ecp_point_free(&pubA);
     return;
   }
   // OC_DBG_SPAKE("SPAKE2+ Handshake Finished!\n");
@@ -126,6 +131,11 @@ do_credential_verification(oc_client_response_t *data)
   OC_DBG_SPAKE("  code: %d\n", data->code);
   if (data->code != OC_STATUS_CHANGED) {
     OC_DBG_SPAKE("Error in Credential Response!!!\n");
+    mbedtls_mpi_free(&w0);
+    mbedtls_mpi_free(&w1);
+    mbedtls_mpi_free(&privA);
+    mbedtls_ecp_point_free(&pA);
+    mbedtls_ecp_point_free(&pubA);
     return;
   }
 
