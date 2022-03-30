@@ -248,8 +248,7 @@ do_credential_exchange(oc_client_response_t *data)
 #endif /* OC_SPAKE */
 
 int
-// TODO add oscore id to API too
-oc_initiate_spake(oc_endpoint_t *endpoint, char *password)
+oc_initiate_spake(oc_endpoint_t *endpoint, char *password, oc_string_t oscore_id)
 {
   int return_value = -1;
 
@@ -260,12 +259,11 @@ oc_initiate_spake(oc_endpoint_t *endpoint, char *password)
   oc_init_post("/.well-known/knx/spake", endpoint, NULL,
                &do_credential_exchange, HIGH_QOS, NULL);
 
-  // Payload consists of just a random number? should be pretty easy...
   uint8_t
     rnd[32]; // not actually used by the server, so just send some gibberish
   oc_rep_begin_root_object();
+  oc_rep_i_set_byte_string(root, 0, oc_cast(oscore_id, uint8_t), oc_byte_string_len(oscore_id));
   oc_rep_i_set_byte_string(root, 15, rnd, 32);
-  // TODO add oscore id here
   oc_rep_end_root_object();
 
   strncpy((char *)&g_spake_ctx.spake_password, password, MAX_PASSWORD_LEN);
