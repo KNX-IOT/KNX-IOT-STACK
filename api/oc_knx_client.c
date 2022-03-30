@@ -14,10 +14,6 @@
  // limitations under the License.
  */
 
-// TEMPORARY
-// just for IDE, correct value comes from cmake
-#define OC_SPAKE
-
 #include "oc_api.h"
 #include "api/oc_knx_client.h"
 #include "api/oc_knx_fp.h"
