@@ -51,8 +51,6 @@ oc_core_dev_sn_get_handler(oc_request_t *request,
   if (device != NULL) {
     // Content-Format: "application/cbor"
     // Payload: "123ABC"
-    // cbor_encode_text_stringz(&g_encoder, oc_string(device->serialnumber));
-
     oc_rep_begin_root_object();
     oc_rep_i_set_text_string(root, 1, oc_string(device->serialnumber));
     oc_rep_end_root_object();
@@ -96,26 +94,16 @@ oc_core_dev_hwv_get_handler(oc_request_t *request,
   if (device != NULL) {
     // Content-Format: "application/cbor"
     // Payload: [ 1, 2, 3 ]
-    // CborEncoder arrayEncoder;
-    // cbor_encoder_create_array(&g_encoder, &arrayEncoder, 3);
-    // cbor_encode_int(&arrayEncoder, (int64_t)device->hwv.major);
-    // cbor_encode_int(&arrayEncoder, (int64_t)device->hwv.minor);
-    // cbor_encode_int(&arrayEncoder, (int64_t)device->hwv.third);
-    // cbor_encoder_close_container_checked(&g_encoder, &arrayEncoder);
-
     uint64_t array[3];
     array[0] = device->hwv.major;
     array[1] = device->hwv.minor;
     array[2] = device->hwv.patch;
-
     oc_rep_begin_root_object();
     oc_rep_i_set_int_array(root, 1, array, 3);
     oc_rep_end_root_object();
-
     oc_send_cbor_response(request, OC_STATUS_OK);
     return;
   }
-
   oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
 }
 
@@ -150,26 +138,13 @@ oc_core_dev_fwv_get_handler(oc_request_t *request,
   if (device != NULL) {
     // Content-Format: "application/cbor"
     // Payload: [ 1, 2, 3 ]
-    // oc_rep_add_int(&arrayEncoder, (int64_t)device->fwv.major);
-    // oc_rep_close_array(root, fibonacci);
-
-    // CborEncoder arrayEncoder;
-
-    // cbor_encoder_create_array(&g_encoder, &arrayEncoder, 3);
-    // cbor_encode_int(&arrayEncoder, (int64_t)device->fwv.major);
-    // cbor_encode_int(&arrayEncoder, (int64_t)device->fwv.minor);
-    // cbor_encode_int(&arrayEncoder, (int64_t)device->fwv.third);
-    // cbor_encoder_close_container_checked(&g_encoder, &arrayEncoder);
-
     uint64_t array[3];
     array[0] = device->fwv.major;
     array[1] = device->fwv.minor;
     array[2] = device->fwv.patch;
-
     oc_rep_begin_root_object();
     oc_rep_i_set_int_array(root, 1, array, 3);
     oc_rep_end_root_object();
-
     oc_send_cbor_response(request, OC_STATUS_OK);
     return;
   }
@@ -205,16 +180,12 @@ oc_core_dev_hwt_get_handler(oc_request_t *request,
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device != NULL && oc_string(device->hwt) != NULL) {
-    // cbor_encode_text_stringz(&g_encoder, oc_string(device->hwt));
-
     oc_rep_begin_root_object();
     oc_rep_i_set_text_string(root, 1, oc_string(device->hwt));
     oc_rep_end_root_object();
-
     oc_send_cbor_response(request, OC_STATUS_OK);
     return;
   }
-
   oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
 }
 
@@ -246,11 +217,9 @@ oc_core_dev_model_get_handler(oc_request_t *request,
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device != NULL && oc_string(device->model) != NULL) {
-    // cbor_encode_text_stringz(&g_encoder, oc_string(device->model));
     oc_rep_begin_root_object();
     oc_rep_i_set_text_string(root, 1, oc_string(device->model));
     oc_rep_end_root_object();
-
     oc_send_cbor_response(request, OC_STATUS_OK);
     return;
   }
@@ -286,16 +255,15 @@ oc_core_dev_ia_get_handler(oc_request_t *request,
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device != NULL) {
-    // cbor_encode_int(&g_encoder, (int64_t)device->ia);
-
     oc_rep_begin_root_object();
-    oc_rep_i_set_int(root, 1, (int64_t)device->ia);
+    oc_rep_i_set_int(root, 12, (int64_t)device->ia);
+    oc_rep_i_set_int(root, 26, (int64_t)device->iid);
+    oc_rep_i_set_int(root, 25, (int64_t)device->fid);
     oc_rep_end_root_object();
 
     oc_send_cbor_response(request, OC_STATUS_OK);
     return;
   }
-
   oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
 }
 
