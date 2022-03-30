@@ -112,7 +112,7 @@ oc_core_knx_p_oscore_osndelay_put_handler(oc_request_t *request,
     if (rep->type == OC_REP_INT) {
       if (rep->iname == 1) {
         PRINT("  oc_core_knx_p_oscore_osndelay_put_handler type: %d value %d\n",
-              rep->type, rep->value.integer);
+              (int)rep->type, (int)rep->value.integer);
         g_oscore_osndelay = rep->value.integer;
         oc_send_cbor_response(request, OC_STATUS_CHANGED);
         return;
