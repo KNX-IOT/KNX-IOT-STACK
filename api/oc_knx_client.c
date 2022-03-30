@@ -219,6 +219,10 @@ do_credential_exchange(oc_client_response_t *data)
         inner_rep = inner_rep->next;
       }
     }
+    // OSCORE context
+    if (rep->type == OC_REP_BYTE_STRING && rep->iname == 0) {
+      // TODO do something with rep->value.string
+    }
     rep = rep->next;
   }
 
