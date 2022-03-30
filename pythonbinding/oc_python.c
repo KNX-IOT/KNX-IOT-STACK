@@ -19,6 +19,7 @@
 #include "oc_core_res.h"
 #include "port/oc_clock.h"
 #include "api/oc_knx_fp.h"
+#include "api/oc_knx_gm.h"
 
 #if defined(_WIN32)
 #include <windows.h>
