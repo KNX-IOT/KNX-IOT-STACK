@@ -556,11 +556,15 @@ class CoAPResponse():
             return my_string
         return self.payload
 
-    def get_payload_boolean(self):
+    def get_payload_boolean(self, tag=1):
         if self.payload_type == "json":
             my_string = self.get_payload()
             json = self.get_payload_dict()
-            my_string = json["1"]
+            my_string = "";
+            try:
+                my_string = json[str(tag)]
+            except:
+                pass
             if my_string == "true":
                 return True
             if my_string == "false":
@@ -568,10 +572,14 @@ class CoAPResponse():
             return self.payload
         return self.payload
 
-    def get_payload_int(self):
+    def get_payload_int(self, tag=1):
         if self.payload_type == "json":
             json = self.get_payload_dict()
-            my_string = json["1"]
+            my_string = "";
+            try:
+                my_string = json[str(tag)]
+            except:
+                pass
             print("get_payload_int:", int(my_string))
             return int(my_string)
         return self.payload
