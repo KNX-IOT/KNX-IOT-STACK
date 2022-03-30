@@ -1032,8 +1032,6 @@ main(int argc, char *argv[])
   PRINT("serial number: %s\n", oc_string(device->serialnumber));
   knx_publish_service(oc_string(device->serialnumber));
 
-  oc_device_mode_display(0);
-
   oc_endpoint_t *my_ep = oc_connectivity_get_endpoints(0);
   if (my_ep != NULL) {
     PRINTipaddr(*my_ep);

@@ -66,6 +66,7 @@ typedef struct oc_knx_version_info_t
 /**
  * @brief device information
  *
+ * This structure contains 
  */
 typedef struct oc_device_info_t {
   oc_string_t serialnumber;  /**< knx serial number */
@@ -74,15 +75,14 @@ typedef struct oc_device_info_t {
   oc_string_t hwt;           /**< knx hardware type */
   oc_string_t model;         /**< knx model */
   uint32_t ia;               /**< knx ia Device individual address */
-  oc_string_t hostname;      /**< knx host name */
+  uint32_t fid;              /**< knx fabric id */
   uint32_t iid;              /**< knx iid (installation id) */
+  oc_string_t hostname;      /**< knx host name */
   bool pm;                   /**< knx programming mode */
   uint32_t sa;               /**< sub address */
   uint32_t da;               /**< device address */
   uint32_t port;             /**< coap port number */
   oc_lsm_state_t lsm_s;      /**< knx lsm states */
-  oc_device_mode_t
-    device_mode; /**< device mode (programming, normal operation) */
   oc_core_add_device_cb_t add_device_cb; /**< callback when device is changed */
   void *data;                            /**< user data */
 } oc_device_info_t;
