@@ -410,7 +410,7 @@ oc_fp_p_check_and_save(int index, size_t device_index, bool status_ok)
   }
   if (oc_belongs_href_to_resource(g_got[index].href, device_index) == false) {
     do_save = false;
-    OC_ERR("  index %d href does not belong to device '%s'", index,
+    OC_ERR("  index %d href '%s' does not belong to device\n", index,
            oc_string(g_got[index].href));
   }
 
@@ -2083,6 +2083,8 @@ oc_init_datapoints_at_initialization()
         // Case 5)
         // @sender : cflags = i After device restart(power up)
         // Sent : -st r, sending association(1st assigned ga)
+        PRINT("oc_init_datapoints_at_initialization: index: %d issue read on group address %d\n",
+          index, g_got [index].ga[0]);
         oc_do_s_mode_read(g_got[index].ga[0]);
       }
     }
