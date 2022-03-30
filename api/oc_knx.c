@@ -51,6 +51,7 @@ oc_string_t g_ldevid;
 // ----------------------------------------------------------------------------
 
 enum SpakeKeys {
+  SPAKE_ID = 0,
   SPAKE_SALT = 5,
   SPAKE_PA_SHARE_P = 10,
   SPAKE_PB_SHARE_V = 11,
@@ -1037,6 +1038,14 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
   }
   rep = request->request_payload;
+
+  if (valid_request == SPAKE_RND) {
+    // set the default id, in preparation for the response
+    // this gets overwritten if the ID is present in the
+    // request payload handled below
+    oc_free_string(&g_pase.id);
+    oc_new_string(&g_pase.id, "responderkey", strlen("responderkey"));
+  }
   // handle input
   while (rep != NULL) {
     switch (rep->type) {
@@ -1056,6 +1065,12 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
         oc_new_string(&g_pase.rnd, oc_string(rep->value.string),
                       oc_byte_string_len(rep->value.string));
       }
+      if (rep->iname == SPAKE_ID) {
+        // if the ID is present, overwrite the default
+        oc_free_string(&g_pase.id);
+        oc_new_string(&g_pase.id, oc_string(rep->value.string),
+                      oc_byte_string_len(rep->value.string));
+      }
     } break;
     default:
       break;
@@ -1071,6 +1086,9 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     oc_spake_parameter_exchange(&g_pase.rnd, &g_pase.salt, &g_pase.it);
 #endif /* OC_SPAKE */
     oc_rep_begin_root_object();
+    // id (0)
+    oc_rep_i_set_byte_string(root, SPAKE_ID, oc_cast(g_pase.id, uint8_t),
+                             oc_byte_string_len(g_pase.id));
     // rnd (15)
     oc_rep_i_set_byte_string(root, SPAKE_RND, oc_cast(g_pase.rnd, uint8_t),
                              oc_byte_string_len(g_pase.rnd));
