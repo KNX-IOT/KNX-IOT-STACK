@@ -2083,8 +2083,9 @@ oc_init_datapoints_at_initialization()
         // Case 5)
         // @sender : cflags = i After device restart(power up)
         // Sent : -st r, sending association(1st assigned ga)
-        PRINT("oc_init_datapoints_at_initialization: index: %d issue read on group address %d\n",
-          index, g_got [index].ga[0]);
+        PRINT("oc_init_datapoints_at_initialization: index: %d issue read on "
+              "group address %d\n",
+              index, g_got[index].ga[0]);
         oc_do_s_mode_read(g_got[index].ga[0]);
       }
     }
