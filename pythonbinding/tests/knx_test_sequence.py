@@ -236,14 +236,18 @@ def do_sequence_dev_programming_mode(my_stack):
     my_stack.purge_response(response)
 
     print("-------------------")
-    content = { 1 : 44 }
+    content = { 12 : 44, 26: 555 }
     print("set IA :", content)
     response =  my_stack.issue_cbor_put(sn,"/dev/ia",content)
     safe_print(response)
     my_stack.purge_response(response)
     response =  my_stack.issue_cbor_get(sn,"/dev/ia")
     safe_print(response)
-    if content[1] == response.get_payload_int():
+    if content[12] == response.get_payload_int(12):
+        print("PASS : /dev/ia ", content)
+    else:
+        print_fail(msg="/dev/ia")
+    if content[26] == response.get_payload_int(26):
         print("PASS : /dev/ia ", content)
     else:
         print_fail(msg="/dev/ia")
@@ -828,7 +832,6 @@ def do_security(my_stack):
     if my_stack.get_nr_devices() > 0:
         do_auth_at(my_stack)
 
-
 def do_spake(my_stack):
     """
     do spake handshake
@@ -859,6 +862,13 @@ def do_dev(my_stack):
     if my_stack.get_nr_devices() > 0:
         do_sequence(my_stack)
 
+def do_discover(my_stack, serial_number, scope = 2):
+    time.sleep(1)
+    query = "ep=urn:knx:sn."+str(serial_number)
+    my_stack.discover_devices_with_query( query, int(scope))
+    if my_stack.get_nr_devices() > 0:
+        print ("SN :", my_stack.device_array[0].sn)
+
 if __name__ == '__main__':  # pragma: no cover
 
     parser = argparse.ArgumentParser()
@@ -887,9 +897,13 @@ if __name__ == '__main__':  # pragma: no cover
     parser.add_argument("-dev", "--dev",
                     help="device dev/x", nargs='?',
                     default=False, const=1, required=False)
+    parser.add_argument("-sn", "--serialnumber",
+                    help="serial number of the device", nargs='?',
+                    const=1, required=True)
     print(sys.argv)
     args = parser.parse_args()
     print("scope         :" + str(args.scope))
+    print("serial number :" + str(args.serialnumber))
     print("sleep         :" + str(args.sleep))
     print("all           :" + str(args.all))
     print("discovery     :" + str(args.discovery))
@@ -899,8 +913,10 @@ if __name__ == '__main__':  # pragma: no cover
     print("dev           :" + str(args.dev))
     time.sleep(int(args.sleep))
     the_stack = knx_stack.KNXIOTStack()
+    the_stack.start_thread()
     signal.signal(signal.SIGINT, the_stack.sig_handler)
     try:
+        do_discover(the_stack, args.serialnumber, args.scope)
         test_discover(the_stack)
         if args.all:
             do_all(the_stack)

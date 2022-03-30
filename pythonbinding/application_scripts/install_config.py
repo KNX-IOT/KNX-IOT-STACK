@@ -143,15 +143,12 @@ def do_install_device(my_stack, sn, ia, iid, got_content, rec_content, pub_conte
     print ("response:",response)
     my_stack.purge_response(response)
 
-    content = { 1: int(ia)}
+    content = { 12: int(ia), 26:int(iid)}
     print("set IA :", content)
     response = my_stack.issue_cbor_put(sn,"/dev/ia",content)
     print ("response:",response)
     my_stack.purge_response(response)
-    content = { 1: int(iid) }
-    response =  my_stack.issue_cbor_put(sn,"/dev/iid",content)
-    print ("response:",response)
-    my_stack.purge_response(response)
+
     # content = { 2: "startLoading"}
     content = { 2: 1}
     print("lsm :", content)
@@ -256,15 +253,15 @@ if __name__ == '__main__':  # pragma: no cover
     print("serial number    :" + str(args.serialnumber))
     print("internal address :" + str(args.internal_address))
     print("filename         :" + str(args.file))
-    the_knx_stack = knx_stack.KNXIOTStack()
-    the_knx_stack.start_thread()
-    signal.signal(signal.SIGINT, the_knx_stack.sig_handler)
+    the_stack = knx_stack.KNXIOTStack()
+    the_stack.start_thread()
+    signal.signal(signal.SIGINT, the_stack.sig_handler)
     try:
-        do_discover(the_knx_stack, args.serialnumber)
-        do_install(the_knx_stack, args.internal_address, args.file)
+        do_discover(the_stack, args.serialnumber, args.scope)
+        do_install(the_stack, args.internal_address, args.file)
     except:
         traceback.print_exc()
 
     time.sleep(2)
-    the_knx_stack.quit()
+    the_stack.quit()
     sys.exit()

@@ -66,29 +66,24 @@ typedef struct oc_knx_version_info_t
 /**
  * @brief device information
  *
+ * This structure contains
  */
 typedef struct oc_device_info_t
 {
-  oc_uuid_t di;              /**< device identifier */
-  oc_uuid_t piid;            /**< Permanent Immutable ID */
-  oc_string_t name;          /**< name of the device */
-  oc_string_t icv;           /**< specification version */
-  oc_string_t dmv;           /**< data model version */
   oc_string_t serialnumber;  /**< knx serial number */
   oc_knx_version_info_t hwv; /**< knx hardware version */
   oc_knx_version_info_t fwv; /**< fwv firmware version number */
   oc_string_t hwt;           /**< knx hardware type */
   oc_string_t model;         /**< knx model */
-  uint32_t ia;               /**< knx ia Device individual address */
-  oc_string_t hostname;      /**< knx host name */
-  uint32_t iid;              /**< knx idd (installation id) */
-  bool pm;                   /**< knx programming mode */
   uint32_t sa;               /**< sub address */
   uint32_t da;               /**< device address */
+  oc_string_t hostname;      /**< knx host name */
+  uint32_t fid;              /**< knx fabric id */
+  uint32_t ia;               /**< knx ia Device individual address */
+  uint32_t iid;              /**< knx iid (installation id) */
   uint32_t port;             /**< coap port number */
+  bool pm;                   /**< knx programming mode */
   oc_lsm_state_t lsm_s;      /**< knx lsm states */
-  oc_device_mode_t
-    device_mode; /**< device mode (programming, normal operation) */
   oc_core_add_device_cb_t add_device_cb; /**< callback when device is changed */
   void *data;                            /**< user data */
 } oc_device_info_t;
@@ -198,13 +193,13 @@ int oc_core_set_device_model(size_t device_index, const char *model);
  * @brief sets the host name (string)
  *
  * @param device_index the device index
- * @param hostname the host name
+ * @param host_name the host name
  * @return int error status, 0 = OK
  */
-int oc_core_set_device_hostname(size_t device_index, const char *hostname);
+int oc_core_set_device_hostname(size_t device_index, const char *host_name);
 
 /**
- * @brief sets the iid (unsigned int)
+ * @brief sets the installation identifier (iid) (unsigned int)
  *
  * @param device_index the device index
  * @param iid the KNX installation id
@@ -213,19 +208,20 @@ int oc_core_set_device_hostname(size_t device_index, const char *hostname);
 int oc_core_set_device_iid(size_t device_index, uint32_t iid);
 
 /**
+ * @brief sets the fabric identifier (fid) (unsigned int)
+ *
+ * @param device_index the device index
+ * @param fid the fabric id
+ * @return int error status, 0 = OK
+ */
+int oc_core_set_device_fid(size_t device_index, uint32_t fid);
+
+/**
  * @brief retrieve the amount of devices
  *
  * @return size_t the amount of devices
  */
 size_t oc_core_get_num_devices(void);
-
-/**
- * @brief retrieve the id (uuid) of the device
- *
- * @param device the device index
- * @return oc_uuid_t* the device id
- */
-oc_uuid_t *oc_core_get_device_id(size_t device);
 
 /**
  * @brief retrieve the device info from the device index
@@ -336,13 +332,6 @@ bool oc_filter_resource_by_if(oc_resource_t *resource, oc_request_t *request);
  * @return int 0 = success
  */
 int oc_frame_interfaces_mask_in_response(oc_interface_mask_t iface_mask);
-
-/**
- * @brief return the number of registered devices
- *
- * @return size_t The number of registered devices
- */
-size_t oc_number_of_devices();
 
 #ifdef __cplusplus
 }

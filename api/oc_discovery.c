@@ -309,7 +309,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
       return;
     } else {
       /* should ignore this request*/
-      PRINT(" oc_wkcore_discovery_handler IA HANDLING: IGNORE\n");
+      // PRINT(" oc_wkcore_discovery_handler IA HANDLING: IGNORE\n");
       request->response->response_buffer->code = OC_IGNORE;
       return;
     }
