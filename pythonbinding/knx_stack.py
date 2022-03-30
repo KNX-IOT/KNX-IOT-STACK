@@ -560,7 +560,7 @@ class CoAPResponse():
         if self.payload_type == "json":
             my_string = self.get_payload()
             json = self.get_payload_dict()
-            my_string = "";
+            my_string = ""
             try:
                 my_string = json[str(tag)]
             except:
@@ -575,7 +575,7 @@ class CoAPResponse():
     def get_payload_int(self, tag=1):
         if self.payload_type == "json":
             json = self.get_payload_dict()
-            my_string = "";
+            my_string = ""
             try:
                 my_string = json[str(tag)]
             except:
