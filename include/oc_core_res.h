@@ -192,19 +192,28 @@ int oc_core_set_device_model(size_t device_index, const char *model);
  * @brief sets the host name (string)
  *
  * @param device_index the device index
- * @param hostname the host name
+ * @param host_name the host name
  * @return int error status, 0 = OK
  */
-int oc_core_set_device_hostname(size_t device_index, const char *hostname);
+int oc_core_set_device_hostname(size_t device_index, const char *host_name);
 
 /**
- * @brief sets the iid (unsigned int)
+ * @brief sets the installation identifier (iid) (unsigned int)
  *
  * @param device_index the device index
  * @param iid the KNX installation id
  * @return int error status, 0 = OK
  */
 int oc_core_set_device_iid(size_t device_index, uint32_t iid);
+
+/**
+ * @brief sets the fabric identifier (fid) (unsigned int)
+ *
+ * @param device_index the device index
+ * @param fid the fabric id
+ * @return int error status, 0 = OK
+ */
+int oc_core_set_device_fid(size_t device_index, uint32_t fid);
 
 /**
  * @brief retrieve the amount of devices

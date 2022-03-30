@@ -27,6 +27,7 @@
 #define KNX_STORAGE_IA "dev_knx_ia"
 #define KNX_STORAGE_HOSTNAME "dev_knx_hostname"
 #define KNX_STORAGE_IID "dev_knx_iid"
+#define KNX_STORAGE_FID "dev_knx_fid"
 #define KNX_STORAGE_PM "dev_knx_pm"
 #define KNX_STORAGE_SA "dev_knx_sa"
 #define KNX_STORAGE_DA "dev_knx_da"
@@ -304,6 +305,7 @@ oc_core_dev_ia_put_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
+  bool error = false;
 
   /* check if the accept header is CBOR-format */
   if (request->accept != APPLICATION_CBOR) {
@@ -317,27 +319,50 @@ oc_core_dev_ia_put_handler(oc_request_t *request,
   while (rep != NULL) {
     if (rep->type == OC_REP_INT) {
       if (rep->iname == 1) {
-        PRINT("  oc_core_dev_ia_put_handler received : %d\n",
+        PRINT("  oc_core_dev_ia_put_handler received 1 ia (old): %d\n",
               (int)rep->value.integer);
         oc_core_set_device_ia(device_index, (int)rep->value.integer);
         int temp = (int)rep->value.integer;
-
         oc_storage_write(KNX_STORAGE_IA, (uint8_t *)&temp, sizeof(temp));
-        oc_send_cbor_response(request, OC_STATUS_CHANGED);
-
-        // do the run time installation
-        if (oc_is_device_in_runtime(device_index)) {
-          oc_register_group_multicasts();
-          oc_init_datapoints_at_initialization();
-        }
-
-        return;
+        error = false;
+      } else if (rep->iname == 12) {
+        PRINT("  oc_core_dev_ia_put_handler received 12 (ia) : %d\n",
+              (int)rep->value.integer);
+        oc_core_set_device_ia(device_index, (int)rep->value.integer);
+        int temp = (int)rep->value.integer;
+        oc_storage_write(KNX_STORAGE_IA, (uint8_t *)&temp, sizeof(temp));
+        error = false;
+      } else if (rep->iname == 25) {
+        PRINT("  oc_core_dev_ia_put_handler received 25 (fid): %d\n",
+              (int)rep->value.integer);
+        oc_core_set_device_fid(device_index, (int)rep->value.integer);
+        int temp = (int)rep->value.integer;
+        oc_storage_write(KNX_STORAGE_FID, (uint8_t *)&temp, sizeof(temp));
+        error = false;
+      } else if (rep->iname == 26) {
+        PRINT("  oc_core_dev_ia_put_handler received 26 (iid): %d\n",
+              (int)rep->value.integer);
+        oc_core_set_device_iid(device_index, (int)rep->value.integer);
+        int temp = (int)rep->value.integer;
+        oc_storage_write(KNX_STORAGE_IID, (uint8_t *)&temp, sizeof(temp));
+        error = false;
       }
     }
     rep = rep->next;
   }
 
-  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+  if (error) {
+    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+  } else {
+
+    // do the run time installation
+    if (oc_is_device_in_runtime(device_index)) {
+      oc_register_group_multicasts();
+      oc_init_datapoints_at_initialization();
+    }
+
+    oc_send_cbor_response(request, OC_STATUS_CHANGED);
+  }
 }
 
 void
