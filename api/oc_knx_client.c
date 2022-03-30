@@ -14,6 +14,10 @@
  // limitations under the License.
  */
 
+// TEMPORARY
+// just for IDE, correct value comes from cmake
+#define OC_SPAKE
+
 #include "oc_api.h"
 #include "api/oc_knx_client.h"
 #include "api/oc_knx_fp.h"
@@ -101,6 +105,13 @@ finish_spake_handshake(oc_client_response_t *data)
 
   update_tokens(shared_key, shared_key_len);
 
+  // free up the memory used by the handshake
+  mbedtls_mpi_free(&w0);
+  mbedtls_mpi_free(&w1);
+  mbedtls_mpi_free(&privA);
+  mbedtls_ecp_point_free(&pA);
+  mbedtls_ecp_point_free(&pubA);
+
   if (m_spake_cb) {
     // PRINT("CALLING CALLBACK------->\n");
     m_spake_cb(0, shared_key, shared_key_len);
@@ -156,6 +167,8 @@ do_credential_verification(oc_client_response_t *data)
                                  &len_pA, pA_bytes, 63);
   oc_spake_calc_cB(Ka_Ke, local_cB, pA_bytes);
 
+  mbedtls_ecp_group_free(&grp);
+
   oc_init_post("/.well-known/knx/spake", data->endpoint, NULL,
                &finish_spake_handshake, HIGH_QOS, NULL);
   oc_rep_begin_root_object();
@@ -209,9 +222,6 @@ do_credential_exchange(oc_client_response_t *data)
     rep = rep->next;
   }
 
-  // TODO WARNING: init without free leaks memory every time it is called,
-  // but for the test client this is not important
-  // use mbedtls_mpi_free(mbedtls_mpi * X);
   mbedtls_mpi_init(&w0);
   mbedtls_mpi_init(&w1);
   mbedtls_mpi_init(&privA);
@@ -238,6 +248,7 @@ do_credential_exchange(oc_client_response_t *data)
 #endif /* OC_SPAKE */
 
 int
+// TODO add oscore id to API too
 oc_initiate_spake(oc_endpoint_t *endpoint, char *password)
 {
   int return_value = -1;
@@ -254,6 +265,7 @@ oc_initiate_spake(oc_endpoint_t *endpoint, char *password)
     rnd[32]; // not actually used by the server, so just send some gibberish
   oc_rep_begin_root_object();
   oc_rep_i_set_byte_string(root, 15, rnd, 32);
+  // TODO add oscore id here
   oc_rep_end_root_object();
 
   strncpy((char *)&g_spake_ctx.spake_password, password, MAX_PASSWORD_LEN);
@@ -633,7 +645,7 @@ oc_do_s_mode_with_scope(int scope, char *resource_url, char *rp)
     oc_print_cflags(cflags);
 
     // With a read command to a Group Object, the device send this Group
-    // Object’s value.
+    // Object's value.
     if (send_flag_w || send_flag_r || send_flag_rp) {
       PRINT("    handling: index %d\n", index);
       for (int j = 0; j < ga_len; j++) {
