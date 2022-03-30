@@ -143,15 +143,15 @@ def do_install_device(my_stack, sn, ia, iid, got_content, rec_content, pub_conte
     print ("response:",response)
     my_stack.purge_response(response)
 
-    content = { 1: int(ia)}
+    content = { 12: int(ia), 26:int(iid)}
     print("set IA :", content)
     response = my_stack.issue_cbor_put(sn,"/dev/ia",content)
     print ("response:",response)
     my_stack.purge_response(response)
-    content = { 1: int(iid) }
-    response =  my_stack.issue_cbor_put(sn,"/dev/iid",content)
-    print ("response:",response)
-    my_stack.purge_response(response)
+    #content = { 1: int(iid) }
+    #response =  my_stack.issue_cbor_put(sn,"/dev/iid",content)
+    #print ("response:",response)
+    #my_stack.purge_response(response)
     # content = { 2: "startLoading"}
     content = { 2: 1}
     print("lsm :", content)
