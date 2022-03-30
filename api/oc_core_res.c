@@ -344,7 +344,6 @@ oc_core_set_device_fid(size_t device_index, uint32_t fid)
   return 0;
 }
 
-
 oc_device_info_t *
 oc_core_add_device(const char *name, const char *version, const char *base,
                    const char *serialnumber,

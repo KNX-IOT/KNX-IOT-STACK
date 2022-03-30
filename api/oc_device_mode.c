@@ -22,11 +22,9 @@
 #include <stdio.h>
 #include <string.h>
 
-
 bool
 oc_is_device_mode_in_programming(size_t device_index)
 {
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   return device->pm;
 }
-

@@ -259,7 +259,7 @@ oc_core_dev_ia_get_handler(oc_request_t *request,
     oc_rep_i_set_int(root, 12, (int64_t)device->ia);
     oc_rep_i_set_int(root, 26, (int64_t)device->iid);
     if (device->fid > 0) {
-     // only frame it when it is set...
+      // only frame it when it is set...
       oc_rep_i_set_int(root, 25, (int64_t)device->fid);
     }
     oc_rep_end_root_object();

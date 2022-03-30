@@ -1135,7 +1135,7 @@ oc_tls_populate_ssl_config(mbedtls_ssl_config *conf, size_t device, int role,
     return -1;
   }
 
-  //oc_uuid_t *device_id = oc_core_get_device_id(device);
+  // oc_uuid_t *device_id = oc_core_get_device_id(device);
   oc_uuid_t *device_id = NULL;
 #ifdef OC_CLIENT
   if (role == MBEDTLS_SSL_IS_CLIENT && use_pin_obt_psk_identity) {

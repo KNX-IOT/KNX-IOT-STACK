@@ -28,7 +28,6 @@
 extern "C" {
 #endif
 
-
 /**
  * @brief checks if the device is in programming mode
  *
@@ -37,8 +36,6 @@ extern "C" {
  * @return false = not in programming mode
  */
 bool oc_is_device_mode_in_programming(size_t device_index);
-
-
 
 #ifdef __cplusplus
 }

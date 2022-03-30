@@ -66,9 +66,10 @@ typedef struct oc_knx_version_info_t
 /**
  * @brief device information
  *
- * This structure contains 
+ * This structure contains
  */
-typedef struct oc_device_info_t {
+typedef struct oc_device_info_t
+{
   oc_string_t serialnumber;  /**< knx serial number */
   oc_knx_version_info_t hwv; /**< knx hardware version */
   oc_knx_version_info_t fwv; /**< fwv firmware version number */
@@ -222,7 +223,6 @@ int oc_core_set_device_fid(size_t device_index, uint32_t fid);
  */
 size_t oc_core_get_num_devices(void);
 
-
 /**
  * @brief retrieve the device info from the device index
  *
@@ -332,7 +332,6 @@ bool oc_filter_resource_by_if(oc_resource_t *resource, oc_request_t *request);
  * @return int 0 = success
  */
 int oc_frame_interfaces_mask_in_response(oc_interface_mask_t iface_mask);
-
 
 #ifdef __cplusplus
 }
