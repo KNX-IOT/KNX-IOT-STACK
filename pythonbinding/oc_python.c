@@ -838,7 +838,7 @@ ets_discover_devices_with_query(int scope, const char *query)
 // -----------------------------------------------------------------------------
 
 void
-ets_initiate_spake(char *sn, char *password)
+ets_initiate_spake(char *sn, char *password, char *oscore_id)
 {
   int ret = -1;
   device_handle_t *device = py_getdevice_from_sn(sn);
@@ -847,7 +847,7 @@ ets_initiate_spake(char *sn, char *password)
   if (oc_string_len(device->ep.serial_number) == 0) {
     oc_new_string(&device->ep.serial_number, sn, strlen(sn));
   }
-  ret = oc_initiate_spake(&device->ep, password);
+  ret = oc_initiate_spake(&device->ep, password, oscore_id);
   PRINT("  [C]py_initiate_spake: [%d]-- done\n", ret);
   if (ret == -1) {
     // failure, so unblock python

@@ -42,9 +42,10 @@ bool oc_set_spake_response_cb(oc_spake_cb_t my_func);
  *
  * @param endpoint the endpoint of the device to be used
  * @param password the spake password to be used
+ * @param oscore_id optional OSCORE id for the handshake. Set to NULL if unused
  * @return int success full start up of the handshake
  */
-int oc_initiate_spake(oc_endpoint_t *endpoint, char *password, oc_string_t oscore_id);
+int oc_initiate_spake(oc_endpoint_t *endpoint, char *password, char* oscore_id);
 
 typedef void (*oc_s_mode_response_cb_t)(char *url, oc_rep_t *rep,
                                         oc_rep_t *rep_value);
