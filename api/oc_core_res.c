@@ -63,7 +63,6 @@ oc_core_init(void)
 static void
 oc_core_free_device_info_properties(oc_device_info_t *oc_device_info_item)
 {
-
   if (oc_device_info_item) {
     // KNX
     oc_free_string(&(oc_device_info_item->serialnumber));
@@ -127,7 +126,6 @@ oc_core_encode_interfaces_mask(CborEncoder *parent,
   }
   if (iface_mask & OC_IF_G) {
     oc_rep_add_text_string(if, "if.g.s");
-    // TODO note: this must be extended with a number...
   }
   if (iface_mask & OC_IF_C) {
     oc_rep_add_text_string(if, "if.c");
@@ -178,7 +176,6 @@ oc_frame_interfaces_mask_in_response(oc_interface_mask_t iface_mask)
   }
   if (iface_mask & OC_IF_G) {
     oc_rep_encode_raw((uint8_t *)"if.g.s", 5);
-    // TODO note: this must be extended with a number...
     total_size += 5;
   }
   if (iface_mask & OC_IF_C) {
@@ -233,7 +230,7 @@ oc_core_get_num_devices(void)
 int
 oc_core_set_device_fwv(size_t device_index, int major, int minor, int minor2)
 {
-  if (device_index >= (int)oc_number_of_devices()) {
+  if (device_index >= (int)oc_core_get_num_devices()) {
     PRINT("device_index %d to large\n", (int)device_index);
     return -1;
   }
@@ -246,7 +243,7 @@ oc_core_set_device_fwv(size_t device_index, int major, int minor, int minor2)
 int
 oc_core_set_device_hwv(size_t device_index, int major, int minor, int minor2)
 {
-  if (device_index >= (int)oc_number_of_devices()) {
+  if (device_index >= (int)oc_core_get_num_devices()) {
     PRINT("device_index %d to large\n", (int)device_index);
     return -1;
   }
@@ -260,7 +257,7 @@ oc_core_set_device_hwv(size_t device_index, int major, int minor, int minor2)
 int
 oc_core_set_device_ia(size_t device_index, int ia)
 {
-  if (device_index >= (int)oc_number_of_devices()) {
+  if (device_index >= (int)oc_core_get_num_devices()) {
     PRINT("device_index %d to large\n", (int)device_index);
     return -1;
   }
@@ -271,7 +268,7 @@ oc_core_set_device_ia(size_t device_index, int ia)
 int
 oc_core_set_device_hwt(size_t device_index, const char *hardwaretype)
 {
-  if (device_index >= (int)oc_number_of_devices()) {
+  if (device_index >= (int)oc_core_get_num_devices()) {
     PRINT("device_index %d to large\n", (int)device_index);
     return -1;
   }
@@ -286,7 +283,7 @@ oc_core_set_device_hwt(size_t device_index, const char *hardwaretype)
 int
 oc_core_set_device_pm(size_t device_index, bool pm)
 {
-  if (device_index >= (int)oc_number_of_devices()) {
+  if (device_index >= (int)oc_core_get_num_devices()) {
     PRINT("  device_index %d to large\n", (int)device_index);
     return -1;
   }
@@ -299,7 +296,7 @@ oc_core_set_device_pm(size_t device_index, bool pm)
 int
 oc_core_set_device_model(size_t device_index, const char *model)
 {
-  if (device_index >= (int)oc_number_of_devices()) {
+  if (device_index >= (int)oc_core_get_num_devices()) {
     PRINT("  device_index %d to large\n", (int)device_index);
     return -1;
   }
@@ -312,7 +309,7 @@ oc_core_set_device_model(size_t device_index, const char *model)
 int
 oc_core_set_device_hostname(size_t device_index, const char *hostname)
 {
-  if (device_index >= (int)oc_number_of_devices()) {
+  if (device_index >= (int)oc_core_get_num_devices()) {
     PRINT("  device_index %d to large\n", (int)device_index);
     return -1;
   }
@@ -326,7 +323,7 @@ oc_core_set_device_hostname(size_t device_index, const char *hostname)
 int
 oc_core_set_device_iid(size_t device_index, uint32_t iid)
 {
-  if (device_index >= (int)oc_number_of_devices()) {
+  if (device_index >= (int)oc_core_get_num_devices()) {
     PRINT("  device_index %d to large\n", (int)device_index);
     return -1;
   }
@@ -586,10 +583,4 @@ oc_filter_resource_by_if(oc_resource_t *resource, oc_request_t *request)
     }
   } while (more_query_params);
   return match;
-}
-
-size_t
-oc_number_of_devices()
-{
-  return (size_t)device_count;
 }

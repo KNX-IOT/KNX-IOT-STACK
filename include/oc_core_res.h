@@ -74,14 +74,14 @@ typedef struct oc_device_info_t {
   oc_knx_version_info_t fwv; /**< fwv firmware version number */
   oc_string_t hwt;           /**< knx hardware type */
   oc_string_t model;         /**< knx model */
-  uint32_t ia;               /**< knx ia Device individual address */
-  uint32_t fid;              /**< knx fabric id */
-  uint32_t iid;              /**< knx iid (installation id) */
-  oc_string_t hostname;      /**< knx host name */
-  bool pm;                   /**< knx programming mode */
   uint32_t sa;               /**< sub address */
   uint32_t da;               /**< device address */
+  oc_string_t hostname;      /**< knx host name */
+  uint32_t fid;              /**< knx fabric id */
+  uint32_t ia;               /**< knx ia Device individual address */
+  uint32_t iid;              /**< knx iid (installation id) */
   uint32_t port;             /**< coap port number */
+  bool pm;                   /**< knx programming mode */
   oc_lsm_state_t lsm_s;      /**< knx lsm states */
   oc_core_add_device_cb_t add_device_cb; /**< callback when device is changed */
   void *data;                            /**< user data */
@@ -213,13 +213,6 @@ int oc_core_set_device_iid(size_t device_index, uint32_t iid);
  */
 size_t oc_core_get_num_devices(void);
 
-/**
- * @brief retrieve the id (uuid) of the device
- *
- * @param device the device index
- * @return oc_uuid_t* the device id
- */
-oc_uuid_t *oc_core_get_device_id(size_t device);
 
 /**
  * @brief retrieve the device info from the device index
@@ -331,12 +324,6 @@ bool oc_filter_resource_by_if(oc_resource_t *resource, oc_request_t *request);
  */
 int oc_frame_interfaces_mask_in_response(oc_interface_mask_t iface_mask);
 
-/**
- * @brief return the number of registered devices
- *
- * @return size_t The number of registered devices
- */
-size_t oc_number_of_devices();
 
 #ifdef __cplusplus
 }
