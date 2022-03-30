@@ -67,13 +67,7 @@ typedef struct oc_knx_version_info_t
  * @brief device information
  *
  */
-typedef struct oc_device_info_t
-{
-  oc_uuid_t di;              /**< device identifier */
-  oc_uuid_t piid;            /**< Permanent Immutable ID */
-  oc_string_t name;          /**< name of the device */
-  oc_string_t icv;           /**< specification version */
-  oc_string_t dmv;           /**< data model version */
+typedef struct oc_device_info_t {
   oc_string_t serialnumber;  /**< knx serial number */
   oc_knx_version_info_t hwv; /**< knx hardware version */
   oc_knx_version_info_t fwv; /**< fwv firmware version number */
@@ -81,7 +75,7 @@ typedef struct oc_device_info_t
   oc_string_t model;         /**< knx model */
   uint32_t ia;               /**< knx ia Device individual address */
   oc_string_t hostname;      /**< knx host name */
-  uint32_t iid;              /**< knx idd (installation id) */
+  uint32_t iid;              /**< knx iid (installation id) */
   bool pm;                   /**< knx programming mode */
   uint32_t sa;               /**< sub address */
   uint32_t da;               /**< device address */

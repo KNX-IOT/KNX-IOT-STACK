@@ -65,9 +65,6 @@ oc_core_free_device_info_properties(oc_device_info_t *oc_device_info_item)
 {
 
   if (oc_device_info_item) {
-    oc_free_string(&(oc_device_info_item->name));
-    oc_free_string(&(oc_device_info_item->icv));
-    oc_free_string(&(oc_device_info_item->dmv));
     // KNX
     oc_free_string(&(oc_device_info_item->serialnumber));
     oc_free_string(&(oc_device_info_item->hwt));
@@ -372,16 +369,8 @@ oc_core_add_device(const char *name, const char *version, const char *base,
 
 #endif /* OC_DYNAMIC_ALLOCATION */
 
-  oc_gen_uuid(&oc_device_info[device_count].di);
-
   /* Construct device resource */
   // int properties = OC_DISCOVERABLE;
-
-  oc_gen_uuid(&oc_device_info[device_count].piid);
-
-  oc_new_string(&oc_device_info[device_count].name, name, strlen(name));
-  oc_new_string(&oc_device_info[device_count].icv, version, strlen(version));
-  oc_new_string(&oc_device_info[device_count].dmv, base, strlen(base));
   oc_new_string(&oc_device_info[device_count].serialnumber, serialnumber,
                 strlen(serialnumber));
   oc_device_info[device_count].add_device_cb = add_device_cb;
@@ -470,15 +459,6 @@ oc_core_populate_resource(int core_resource, size_t device_index,
   r->put_handler.cb = put;
   r->post_handler.cb = post;
   r->delete_handler.cb = delete;
-}
-
-oc_uuid_t *
-oc_core_get_device_id(size_t device)
-{
-  if (device >= device_count) {
-    return NULL;
-  }
-  return &oc_device_info[device].di;
 }
 
 oc_device_info_t *
