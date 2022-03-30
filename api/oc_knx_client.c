@@ -262,8 +262,7 @@ oc_initiate_spake(oc_endpoint_t *endpoint, char *password, char *oscore_id)
   uint8_t
     rnd[32]; // not actually used by the server, so just send some gibberish
   oc_rep_begin_root_object();
-  if(oscore_id)
-  {
+  if (oscore_id) {
     oc_rep_i_set_byte_string(root, 0, oscore_id, strlen(oscore_id));
   }
   oc_rep_i_set_byte_string(root, 15, rnd, 32);
