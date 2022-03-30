@@ -5,9 +5,10 @@
 #include <errno.h>
 
 static pid_t avahi_pid = 0;
+static char advertised_subtype[200];
 
 int
-knx_publish_service(char *serial_no, char* iid, char* ia)
+knx_publish_service(char *serial_no, char *iid, char *ia)
 {
   if (avahi_pid != 0) {
     // A previously published service advertisment is still running
@@ -21,13 +22,40 @@ knx_publish_service(char *serial_no, char* iid, char* ia)
   if (avahi_pid == 0) {
     // we are in the child thread - execute Avahi
     int error;
-    error = execlp("avahi-publish-service", "avahi-publish-service",
-                   "--subtype=_ia0._sub._knx._udp", // subtype present for
-                   // uncomissioned devices???
-                   serial_no,   // service name = serial number
-                   "_knx._udp", // service type
-                   "5683",      // port
-                   (char *)NULL);
+    if (!iid || !ia) {
+      // No Installation ID or Individual Address - we are in Programming mode
+
+      // Set up the subtype for the serial number
+      // --subtype=_01CAFE1234._sub._knx._udp
+      char *format_string = "--subtype=_%s._sub._knx._udp";
+      snprintf(advertised_subtype, sizeof(advertised_subtype), format_string,
+               serial_no);
+
+      error =
+        execlp("avahi-publish-service", "avahi-publish-service",
+               "--subtype=_ia0._sub._knx._udp", // for uncommissioned devices
+               advertised_subtype,
+               serial_no,   // service name = serial number
+               "_knx._udp", // service type
+               "5683",      // port
+               (char *)NULL);
+    } else {
+      // We have already been commissioned
+
+      // Set up the subtype for IID and IA
+      // --subtype=_ia3333-CA._sub._knx._udp
+
+      char *format_string = "--subtype=_ia%s-%s._sub._knx._udp";
+      snprintf(advertised_subtype, sizeof(advertised_subtype), format_string,
+               iid, ia);
+
+      error = execlp("avahi-publish-service", "avahi-publish-service",
+                     advertised_subtype,
+                     serial_no,   // service name = serial number
+                     "_knx._udp", // service type
+                     "5683",      // port
+                     (char *)NULL);
+    }
 
     if (error == -1) {
       OC_ERR("Failed to execute avahi-publish-service: %s", strerror(errno));

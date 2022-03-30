@@ -12,6 +12,6 @@
  * commissioned yet (in programming mode)
  * @return int 0 on success, -1 on error.
  */
-int knx_publish_service(char *serial_no, char* iid, char* ia);
+int knx_publish_service(char *serial_no, char *iid, char *ia);
 
 #endif // DNS_SD_H
