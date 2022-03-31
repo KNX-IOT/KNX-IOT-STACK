@@ -278,8 +278,9 @@ kisCS_EXPORT void ets_cbor_delete(char *sn, char *uri, char *query, char *r_id);
  *
  * @param sn the serial number of the device
  * @param password the password of the device
+ * @param oscore_id the oscore id for the spake handshake
  */
-kisCS_EXPORT void ets_initiate_spake(char *sn, char *password);
+kisCS_EXPORT void ets_initiate_spake(char *sn, char *password, char *oscore_id);
 
 /**
  * @brief sends an s-mode message
