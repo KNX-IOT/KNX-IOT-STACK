@@ -5,7 +5,8 @@
 #include <errno.h>
 
 static pid_t avahi_pid = 0;
-static char advertised_subtype[200];
+static char serial_no_subtype[200];
+static char installation_subtype[200];
 
 int
 knx_publish_service(char *serial_no, char *iid, char *ia)
@@ -21,20 +22,20 @@ knx_publish_service(char *serial_no, char *iid, char *ia)
 
   if (avahi_pid == 0) {
     // we are in the child thread - execute Avahi
+    // Set up the subtype for the serial number
+    // --subtype=_01CAFE1234._sub._knx._udp
+    char *serial_format_string = "--subtype=_%s._sub._knx._udp";
+    snprintf(serial_no_subtype, sizeof(serial_no_subtype), serial_format_string,
+              serial_no);
+
     int error;
     if (!iid || !ia) {
       // No Installation ID or Individual Address - we are in Programming mode
 
-      // Set up the subtype for the serial number
-      // --subtype=_01CAFE1234._sub._knx._udp
-      char *format_string = "--subtype=_%s._sub._knx._udp";
-      snprintf(advertised_subtype, sizeof(advertised_subtype), format_string,
-               serial_no);
-
       error =
         execlp("avahi-publish-service", "avahi-publish-service",
                "--subtype=_ia0._sub._knx._udp", // for uncommissioned devices
-               advertised_subtype,
+               serial_no_subtype,
                serial_no,   // service name = serial number
                "_knx._udp", // service type
                "5683",      // port
@@ -46,11 +47,11 @@ knx_publish_service(char *serial_no, char *iid, char *ia)
       // --subtype=_ia3333-CA._sub._knx._udp
 
       char *format_string = "--subtype=_ia%s-%s._sub._knx._udp";
-      snprintf(advertised_subtype, sizeof(advertised_subtype), format_string,
+      snprintf(installation_subtype, sizeof(serial_no_subtype), format_string,
                iid, ia);
 
       error = execlp("avahi-publish-service", "avahi-publish-service",
-                     advertised_subtype,
+                     serial_no_subtype,
                      serial_no,   // service name = serial number
                      "_knx._udp", // service type
                      "5683",      // port
