@@ -125,7 +125,7 @@ set(COAP_INCLUDE_DIRS
 
 add_library(kis-common INTERFACE)
 
-if(OC_OSCORE_ENABLEDx)
+if(OC_OSCORE_ENABLED)
    target_compile_definitions(mbedcrypto PUBLIC OC_OSCORE)
    target_compile_definitions(kis-common INTERFACE OC_OSCORE)
    target_compile_definitions(kis-common INTERFACE OC_SPAKE)
