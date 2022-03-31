@@ -69,6 +69,7 @@ set(API_SOURCES
     ${PROJECT_SOURCE_DIR}/api/oc_knx_fb.c
     ${PROJECT_SOURCE_DIR}/api/oc_knx_fp.c
     ${PROJECT_SOURCE_DIR}/api/oc_knx_gm.c
+    ${PROJECT_SOURCE_DIR}/api/oc_knx_p.c
     ${PROJECT_SOURCE_DIR}/api/oc_knx_sec.c
     ${PROJECT_SOURCE_DIR}/api/oc_knx_swu.c
     ${PROJECT_SOURCE_DIR}/api/c-timestamp/timestamp_compare.c
@@ -99,9 +100,6 @@ set(CORE_SOURCES
     ${PROJECT_SOURCE_DIR}/util/oc_process.c
     ${PROJECT_SOURCE_DIR}/util/oc_timer.c
     # Security
-    #${PROJECT_SOURCE_DIR}/security/oc_certs.c
-    #${PROJECT_SOURCE_DIR}/security/oc_cred.c
-    #${PROJECT_SOURCE_DIR}/security/oc_keypair.c
     ${PROJECT_SOURCE_DIR}/security/oc_oscore_context.c
     ${PROJECT_SOURCE_DIR}/security/oc_oscore_crypto.c
     ${PROJECT_SOURCE_DIR}/security/oc_oscore_engine.c
@@ -127,7 +125,7 @@ set(COAP_INCLUDE_DIRS
 
 add_library(kis-common INTERFACE)
 
-if(OC_OSCORE_ENABLED)
+if(OC_OSCORE_ENABLEDx)
    target_compile_definitions(mbedcrypto PUBLIC OC_OSCORE)
    target_compile_definitions(kis-common INTERFACE OC_OSCORE)
    target_compile_definitions(kis-common INTERFACE OC_SPAKE)

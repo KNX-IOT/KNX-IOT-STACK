@@ -637,6 +637,32 @@ def do_sequence_f(my_stack):
     my_stack.purge_response(response)
 
 
+def do_sequence_p(my_stack):
+    sn = my_stack.device_array[0].sn
+    print("========/p=========")
+    response =  my_stack.issue_linkformat_get(sn, "/p")
+    print ("response:", response)
+    lf = knx_stack.LinkFormat(response.payload)
+    print(" lines:", lf.get_nr_lines())
+    for line in lf.get_lines():
+        print(line)
+    for line in lf.get_lines():
+        print(" -------------------------")
+        print(" url :", lf.get_url(line))
+        print(" ct  :", lf.get_ct(line))
+        print(" rt  :", lf.get_rt(line))
+        if lf.get_ct(line) == "40" :
+            response2 =  my_stack.issue_linkformat_get(sn, lf.get_url(line))
+            lf2 = knx_stack.LinkFormat(response2.payload)
+            print ("response2:",response2)
+            for line2 in lf2.get_lines():
+                print("    -------------------------",lf.get_url(line) )
+                print("    url :", lf2.get_url(line2))
+                print("    ct  :", lf2.get_ct(line2))
+                print("    rt  :", lf2.get_rt(line2))
+            my_stack.purge_response(response2)
+    my_stack.purge_response(response)
+
 def do_auth_at(my_stack):
     sn = my_stack.device_array[0].sn
     print("========/auth/at=========")
@@ -862,6 +888,10 @@ def do_dev(my_stack):
     if my_stack.get_nr_devices() > 0:
         do_sequence(my_stack)
 
+def do_p(my_stack):
+    if my_stack.get_nr_devices() > 0:
+        do_sequence_p(my_stack)
+
 def do_discover(my_stack, serial_number, scope = 2):
     time.sleep(1)
     query = "ep=urn:knx:sn."+str(serial_number)
@@ -917,11 +947,14 @@ if __name__ == '__main__':  # pragma: no cover
     signal.signal(signal.SIGINT, the_stack.sig_handler)
     try:
         do_discover(the_stack, args.serialnumber, args.scope)
-        test_discover(the_stack)
+        # test_discover(the_stack)
+        #do_p(the_stack)
+        # exit
         if args.all:
             do_all(the_stack)
         elif args.dev:
-            do_dev(the_stack)
+            do_p(the_stack)
+            # do_dev(the_stack)
         elif args.discovery:
             do_discovery(the_stack)
         elif args.security:

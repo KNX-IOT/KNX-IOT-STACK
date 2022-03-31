@@ -319,7 +319,7 @@ oc_core_find_next_group_object_table_url(char *url, int cur_index)
   return -1;
 }
 
-static bool
+bool
 oc_belongs_href_to_resource(oc_string_t href, size_t device_index)
 {
 
