@@ -26,6 +26,8 @@
 #include <stdio.h>
 #include "oc_rep.h" // should not be needed
 
+#include "port/dns-sd.h"
+
 #ifdef OC_SPAKE
 #include "security/oc_spake2plus.h"
 #endif
@@ -444,6 +446,8 @@ oc_core_knx_lsm_post_handler(oc_request_t *request,
     if (oc_is_device_in_runtime(device_index)) {
       oc_register_group_multicasts();
       oc_init_datapoints_at_initialization();
+      oc_device_info_t *device = oc_core_get_device_info(device_index);
+      knx_publish_service(oc_string(device->serialnumber), device->iid, device->ia);
     }
 
     return;
