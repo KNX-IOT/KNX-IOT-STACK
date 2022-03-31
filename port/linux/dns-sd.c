@@ -3,13 +3,16 @@
 #include <stdio.h>
 #include <oc_log.h>
 #include <errno.h>
+#include <stdint.h>
+
+#include "dns-sd.h"
 
 static pid_t avahi_pid = 0;
 static char serial_no_subtype[200];
 static char installation_subtype[200];
 
 int
-knx_publish_service(char *serial_no, char *iid, char *ia)
+knx_publish_service(char *serial_no, uint32_t iid, uint32_t ia)
 {
   if (avahi_pid != 0) {
     // A previously published service advertisment is still running
@@ -46,7 +49,7 @@ knx_publish_service(char *serial_no, char *iid, char *ia)
       // Set up the subtype for IID and IA
       // --subtype=_ia3333-CA._sub._knx._udp
 
-      char *format_string = "--subtype=_ia%s-%s._sub._knx._udp";
+      char *format_string = "--subtype=_ia%X-%X._sub._knx._udp";
       snprintf(installation_subtype, sizeof(serial_no_subtype), format_string,
                iid, ia);
 
