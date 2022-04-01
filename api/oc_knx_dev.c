@@ -997,7 +997,7 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
 
   } else if (reset_mode == 7) {
     /*
-    With erase code �7� (�Factory Reset to default without IA�),
+      With erase code 7 (Factory Reset to default without IA),
       all configuration data SHALL be reset to ex -factory default state
       except addressing information( IA, Device IP Address) and
       security configuration data(credentials)
