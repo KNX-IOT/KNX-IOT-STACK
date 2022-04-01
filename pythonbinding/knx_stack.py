@@ -904,13 +904,13 @@ class KNXIOTStack():
         print("Discovered DEVICE ARRAY {}".format(self.device_array))
         return self.device_array
 
-    def initiate_spake(self, sn, password):
-        print("initiate spake: ", sn, password)
+    def initiate_spake(self, sn, password, contextid):
+        print("initiate spake: ", sn, password, contextid)
         # application
         spake_event.clear()
         self.discovery_data = None
-        self.lib.ets_initiate_spake.argtypes = [ String, String ]
-        self.lib.ets_initiate_spake(sn, password)
+        self.lib.ets_initiate_spake.argtypes = [ String, String, String ]
+        self.lib.ets_initiate_spake(sn, password, contextid)
         #time.sleep(self.timout)
         spake_event.wait(self.timout)
         print ("initate_spake data: ")
