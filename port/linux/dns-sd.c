@@ -55,6 +55,7 @@ knx_publish_service(char *serial_no, uint32_t iid, uint32_t ia)
 
       error = execlp("avahi-publish-service", "avahi-publish-service",
                      serial_no_subtype,
+                     installation_subtype,
                      serial_no,   // service name = serial number
                      "_knx._udp", // service type
                      "5683",      // port
