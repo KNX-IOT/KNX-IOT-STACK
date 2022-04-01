@@ -602,17 +602,36 @@ oc_do_s_mode_read(size_t group_address)
   }
 }
 
+// note: this function does not check the transmit flag
+// the caller of this function needs to check if the flag is set.
 void
 oc_do_s_mode_with_scope(int scope, char *resource_url, char *rp)
 {
   int value_size;
+  bool error = true;
+
+  // do the checks
+  if (strcmp(rp, "w") == 0) {
+    error = false;
+  } else if (strcmp(rp, "r") == 0) {
+    error = false;
+  } else if (strcmp(rp, "rp") == 0) {
+    error = false;
+  }
+  if (error) {
+    OC_ERR("oc_do_s_mode_with_scope : rp value incorrect %s", rp);
+    return;
+  }
+
   if (resource_url == NULL) {
+    OC_ERR("oc_do_s_mode: resource url is NULL");
     return;
   }
 
   uint8_t *buffer = malloc(100);
   if (!buffer) {
-    OC_WRN("oc_do_s_mode: out of memory allocating buffer");
+    OC_ERR("oc_do_s_mode: out of memory allocating buffer");
+    return;
   } //! buffer
 
   value_size = oc_s_mode_get_resource_value(resource_url, rp, buffer, 100);
@@ -631,20 +650,6 @@ oc_do_s_mode_with_scope(int scope, char *resource_url, char *rp)
   int iid = device->iid;
   int group_address = -1;
 
-  bool send_flag_w = false;
-  bool send_flag_r = false;
-  bool send_flag_rp = false;
-
-  if (strcmp(rp, "w") == 0) {
-    send_flag_w = true;
-  }
-  if (strcmp(rp, "r") == 0) {
-    send_flag_r = true;
-  }
-  if (strcmp(rp, "rp") == 0) {
-    send_flag_rp = true;
-  }
-
   // loop over all group addresses and issue the s-mode command
   int index = oc_core_find_group_object_table_url(resource_url);
   while (index != -1) {
@@ -656,7 +661,6 @@ oc_do_s_mode_with_scope(int scope, char *resource_url, char *rp)
 
     // With a read command to a Group Object, the device send this Group
     // Object's value.
-    if (send_flag_w || send_flag_r || send_flag_rp) {
       PRINT("    handling: index %d\n", index);
       for (int j = 0; j < ga_len; j++) {
         group_address = oc_core_find_group_object_table_group_entry(index, j);
@@ -682,7 +686,6 @@ oc_do_s_mode_with_scope(int scope, char *resource_url, char *rp)
           }
         }
       }
-    }
     index = oc_core_find_next_group_object_table_url(resource_url, index);
   }
 }
