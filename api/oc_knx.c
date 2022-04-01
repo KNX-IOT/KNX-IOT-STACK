@@ -661,8 +661,8 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
   bool st_read = false;
   // handle the request
   // loop over the group addresses of the /fp/r
-  PRINT(" .knx : sia: %d ga: %d st: %s\n", g_received_notification.sia, 
-    g_received_notification.ga, oc_string(g_received_notification.st));
+  PRINT(" .knx : sia: %d ga: %d st: %s\n", g_received_notification.sia,
+        g_received_notification.ga, oc_string(g_received_notification.st));
   if (strcmp(oc_string(g_received_notification.st), "w") == 0) {
     // case_1 :
     // Received from bus: -st w, any ga ==> @receiver:
@@ -703,7 +703,8 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
       // check if the data is allowed to write or update
       oc_cflag_mask_t cflags = oc_core_group_object_table_cflag_entries(index);
       if (((cflags & OC_CFLAG_WRITE) > 0) && (st_write)) {
-        PRINT(" (case1) W-WRITE: index %d handled due to flags %d\n", index, cflags);
+        PRINT(" (case1) W-WRITE: index %d handled due to flags %d\n", index,
+              cflags);
         // CASE 1:
         // Received from bus: -st w, any ga
         // @receiver : cflags = w->overwrite object value
@@ -720,14 +721,16 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
         }
       }
       if (((cflags & OC_CFLAG_UPDATE) > 0) && (st_rep)) {
-        PRINT(" (case2) RP-UPDATE: index %d handled due to flags %d\n", index, cflags);
+        PRINT(" (case2) RP-UPDATE: index %d handled due to flags %d\n", index,
+              cflags);
         // Case 2)
         // Received from bus: -st rp , any ga
         // @receiver : cflags = u->overwrite object value
         if (my_resource->post_handler.cb) {
           my_resource->post_handler.cb(request, iface_mask, data);
           if ((cflags & OC_CFLAG_TRANSMISSION) > 0) {
-            PRINT("   (case3) (RP-UPDATE) sending WRITE due to TRANSMIT flag \n");
+            PRINT(
+              "   (case3) (RP-UPDATE) sending WRITE due to TRANSMIT flag \n");
             // Case 3) part 2
             // @sender : updated object value + cflags = t
             // Sent : -st w, sending association(1st assigned ga)
@@ -737,7 +740,8 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
         }
       }
       if (((cflags & OC_CFLAG_READ) > 0) && (st_read)) {
-        PRINT(" (case4) (R-READ) index %d handled due to flags %d\n", index, cflags);
+        PRINT(" (case4) (R-READ) index %d handled due to flags %d\n", index,
+              cflags);
         // Case 4)
         // @sender: cflags = r
         // Received from bus: -st r
@@ -762,7 +766,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
     return;
   }
 
-  //PRINT(" .knx : Unicast - sending response\n");
+  // PRINT(" .knx : Unicast - sending response\n");
   // send the response
   oc_send_cbor_response(request, OC_STATUS_OK);
 }
