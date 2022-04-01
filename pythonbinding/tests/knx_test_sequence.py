@@ -645,21 +645,15 @@ def do_sequence_p(my_stack):
     lf = knx_stack.LinkFormat(response.payload)
     print(" lines:", lf.get_nr_lines())
     for line in lf.get_lines():
-        print(line)
-    for line in lf.get_lines():
         print(" -------------------------")
+        print("",line)
         print(" url :", lf.get_url(line))
         print(" ct  :", lf.get_ct(line))
         print(" rt  :", lf.get_rt(line))
-        if lf.get_ct(line) == "40" :
-            response2 =  my_stack.issue_linkformat_get(sn, lf.get_url(line))
-            lf2 = knx_stack.LinkFormat(response2.payload)
-            print ("response2:",response2)
-            for line2 in lf2.get_lines():
-                print("    -------------------------",lf.get_url(line) )
-                print("    url :", lf2.get_url(line2))
-                print("    ct  :", lf2.get_ct(line2))
-                print("    rt  :", lf2.get_rt(line2))
+        if lf.get_ct(line) == "60" :
+            response2 =  my_stack.issue_cbor_get(sn, lf.get_url(line))
+            print ("  response2:",response2)
+            safe_print(response2)
             my_stack.purge_response(response2)
     my_stack.purge_response(response)
 
