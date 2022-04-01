@@ -264,7 +264,7 @@ oc_core_fb_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 void
 oc_create_fb_resource(int resource_idx, size_t device)
 {
-  OC_DBG("oc_create_dev_dev_resource\n");
+  OC_DBG("oc_create_fb_resource\n");
   // note that this resource is listed in /.well-known/core so it should have
   // the full rt with urn:knx prefix
   oc_core_populate_resource(resource_idx, device, "/f", OC_IF_LI,
