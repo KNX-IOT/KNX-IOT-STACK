@@ -602,17 +602,36 @@ oc_do_s_mode_read(size_t group_address)
   }
 }
 
+// note: this function does not check the transmit flag
+// the caller of this function needs to check if the flag is set.
 void
 oc_do_s_mode_with_scope(int scope, char *resource_url, char *rp)
 {
   int value_size;
+  bool error = true;
+
+  // do the checks
+  if (strcmp(rp, "w") == 0) {
+    error = false;
+  } else if (strcmp(rp, "r") == 0) {
+    error = false;
+  } else if (strcmp(rp, "rp") == 0) {
+    error = false;
+  }
+  if (error) {
+    OC_ERR("oc_do_s_mode_with_scope : rp value incorrect %s", rp);
+    return;
+  }
+
   if (resource_url == NULL) {
+    OC_ERR("oc_do_s_mode: resource url is NULL");
     return;
   }
 
   uint8_t *buffer = malloc(100);
   if (!buffer) {
-    OC_WRN("oc_do_s_mode: out of memory allocating buffer");
+    OC_ERR("oc_do_s_mode: out of memory allocating buffer");
+    return;
   } //! buffer
 
   value_size = oc_s_mode_get_resource_value(resource_url, rp, buffer, 100);
@@ -631,20 +650,6 @@ oc_do_s_mode_with_scope(int scope, char *resource_url, char *rp)
   int iid = device->iid;
   int group_address = -1;
 
-  bool send_flag_w = false;
-  bool send_flag_r = false;
-  bool send_flag_rp = false;
-
-  if (strcmp(rp, "w") == 0) {
-    send_flag_w = true;
-  }
-  if (strcmp(rp, "r") == 0) {
-    send_flag_r = true;
-  }
-  if (strcmp(rp, "rp") == 0) {
-    send_flag_rp = true;
-  }
-
   // loop over all group addresses and issue the s-mode command
   int index = oc_core_find_group_object_table_url(resource_url);
   while (index != -1) {
@@ -656,29 +661,27 @@ oc_do_s_mode_with_scope(int scope, char *resource_url, char *rp)
 
     // With a read command to a Group Object, the device send this Group
     // Object's value.
-    if (send_flag_w || send_flag_r || send_flag_rp) {
-      PRINT("    handling: index %d\n", index);
-      for (int j = 0; j < ga_len; j++) {
-        group_address = oc_core_find_group_object_table_group_entry(index, j);
-        PRINT("      ga : %d\n", group_address);
-        if (j == 0) {
-          // issue the s-mode command, but only for the first ga entry
-          oc_issue_s_mode(scope, sia_value, group_address, iid, rp, buffer,
-                          value_size);
-        }
-        // the recipient table contains the list of destinations that will
-        // receive data. loop over the full recipient table and send a message
-        // if the group is there
-        for (int j = 0; j < oc_core_get_recipient_table_size(); j++) {
-          bool found =
-            oc_core_check_recipient_index_on_group_address(j, group_address);
-          if (found) {
-            char *url = oc_core_get_recipient_index_url_or_path(j);
-            if (url) {
-              PRINT(" broker send: %s\n", url);
-              int ia = oc_core_get_recipient_ia(j);
-              oc_knx_client_do_broker_request(resource_url, ia, url, rp);
-            }
+    PRINT("    handling: index %d\n", index);
+    for (int j = 0; j < ga_len; j++) {
+      group_address = oc_core_find_group_object_table_group_entry(index, j);
+      PRINT("      ga : %d\n", group_address);
+      if (j == 0) {
+        // issue the s-mode command, but only for the first ga entry
+        oc_issue_s_mode(scope, sia_value, group_address, iid, rp, buffer,
+                        value_size);
+      }
+      // the recipient table contains the list of destinations that will
+      // receive data. loop over the full recipient table and send a message
+      // if the group is there
+      for (int j = 0; j < oc_core_get_recipient_table_size(); j++) {
+        bool found =
+          oc_core_check_recipient_index_on_group_address(j, group_address);
+        if (found) {
+          char *url = oc_core_get_recipient_index_url_or_path(j);
+          if (url) {
+            PRINT(" broker send: %s\n", url);
+            int ia = oc_core_get_recipient_ia(j);
+            oc_knx_client_do_broker_request(resource_url, ia, url, rp);
           }
         }
       }

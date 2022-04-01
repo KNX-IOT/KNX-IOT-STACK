@@ -154,7 +154,7 @@ void oc_do_s_mode_read(size_t group_address);
  * for the recipient table all entries are used to send the unicast
  * communication.
  *
- * Note: function does not check the flags on the resources
+ * Note: function does not check the flags on the resource
  *
  * @param scope the multi-cast scope
  * @param resource_url URI of the resource (e.g. implemented on the device that
