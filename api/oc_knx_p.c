@@ -24,10 +24,9 @@
 
 // -----------------------------------------------------------------------------
 
-
 bool
 oc_add_data_points_to_response(oc_request_t *request, size_t device_index,
-                                   size_t *response_length, int matches)
+                               size_t *response_length, int matches)
 {
   (void)request;
   int length = 0;
@@ -39,7 +38,7 @@ oc_add_data_points_to_response(oc_request_t *request, size_t device_index,
       continue;
     }
     oc_add_resource_to_wk(resource, request, device_index, response_length,
-                               matches);
+                          matches);
     matches++;
   }
 
@@ -55,7 +54,7 @@ oc_add_data_points_to_response(oc_request_t *request, size_t device_index,
  */
 static void
 oc_core_p_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
-                       void *data)
+                      void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -74,7 +73,7 @@ oc_core_p_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   size_t device_index = request->resource->device;
 
   bool added = oc_add_data_points_to_response(request, device_index,
-                                                  &response_length, matches);
+                                              &response_length, matches);
 
   if (added) {
     oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
@@ -85,13 +84,12 @@ oc_core_p_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   PRINT("oc_core_p_get_handler - end\n");
 }
 
-
 /*
  * return list of function blocks
  */
 static void
 oc_core_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
-                      void *data)
+                       void *data)
 {
   (void)data;
   oc_rep_t *rep = NULL;
@@ -134,7 +132,7 @@ oc_core_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
     return;
   }
-  
+
   oc_string_t *myurl;
   oc_rep_t *value;
   rep = request->request_payload;
@@ -178,7 +176,7 @@ oc_core_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
           new_request.uri_path_len = 4;
 
           oc_resource_t *my_resource = oc_ri_get_app_resource_by_uri(
-              oc_string(*myurl), oc_string_len(*myurl), device_index);
+            oc_string(*myurl), oc_string_len(*myurl), device_index);
           if (my_resource) {
             // this should not be the request..
             if (my_resource->post_handler.cb) {
