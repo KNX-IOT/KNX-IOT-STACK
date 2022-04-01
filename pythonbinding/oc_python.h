@@ -376,7 +376,7 @@ kisCS_EXPORT int ets_start(char *serial_number);
 /**
  * @brief stop the ETS server
  *  e.g. free up the allocated resources when the ETS server has been started
- * wiht ets_start()
+ * with ets_start()
  * @see ets_start
  * @see ets_poll
  * @return 0 == success

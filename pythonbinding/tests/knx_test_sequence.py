@@ -644,6 +644,7 @@ def do_sequence_p(my_stack):
     print ("response:", response)
     lf = knx_stack.LinkFormat(response.payload)
     print(" lines:", lf.get_nr_lines())
+    content = []
     for line in lf.get_lines():
         print(" -------------------------")
         print("",line)
@@ -651,11 +652,16 @@ def do_sequence_p(my_stack):
         print(" ct  :", lf.get_ct(line))
         print(" rt  :", lf.get_rt(line))
         if lf.get_ct(line) == "60" :
-            response2 =  my_stack.issue_cbor_get(sn, lf.get_url(line))
+            url = lf.get_url(line)
+            response2 =  my_stack.issue_cbor_get(sn, url)
             print ("  response2:",response2)
             safe_print(response2)
             my_stack.purge_response(response2)
+            content.append( { 11 : my_stack.url_local_path(url), 1: False})
+    print(content)
+    response3 = my_stack.issue_cbor_post(sn,"/p", content)
     my_stack.purge_response(response)
+    my_stack.purge_response(response3)
 
 def do_auth_at(my_stack):
     sn = my_stack.device_array[0].sn

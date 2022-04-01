@@ -94,7 +94,6 @@ oc_core_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
                       void *data)
 {
   (void)data;
-  (void)iface_mask;
   oc_rep_t *rep = NULL;
   bool error = false;
 
@@ -117,7 +116,7 @@ oc_core_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
         // href == 11
         if ((entry->iname == 11) && (entry->type == OC_REP_STRING)) {
 
-          if (oc_belongs_href_to_resource(rep->value.string, device_index) ==
+          if (oc_belongs_href_to_resource(entry->value.string, device_index) ==
               false) {
             error = true;
             OC_ERR("href '%.*s' does not belong to device",
@@ -138,7 +137,7 @@ oc_core_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   
   oc_string_t *myurl;
   oc_rep_t *value;
-
+  rep = request->request_payload;
   while (rep != NULL) {
     if (rep->type == OC_REP_OBJECT) {
       oc_rep_t *entry = rep->value.object;
@@ -157,15 +156,35 @@ oc_core_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
           oc_request_t new_request;
           memcpy(&new_request, request, sizeof(request));
           new_request.request_payload = value;
+          new_request.response = NULL;
+
+          oc_response_buffer_t response_buffer;
+          oc_response_t response_obj;
+
+          /* Postpone allocating response_state right after calling
+           * oc_parse_rep()
+           *  in order to reducing peak memory in OC_BLOCK_WISE &
+           * OC_DYNAMIC_ALLOCATION
+           */
+          response_buffer.code = 0;
+          response_buffer.response_length = 0;
+          response_buffer.content_format = 0;
+          response_buffer.max_age = 0;
+
+          response_obj.separate_response = NULL;
+          response_obj.response_buffer = &response_buffer;
+          new_request.response = &response_obj;
+          new_request.uri_path = ".knx";
+          new_request.uri_path_len = 4;
 
           oc_resource_t *my_resource = oc_ri_get_app_resource_by_uri(
               oc_string(*myurl), oc_string_len(*myurl), device_index);
-          if (my_resource == NULL) {
-            return;
+          if (my_resource) {
+            // this should not be the request..
+            if (my_resource->post_handler.cb) {
+              my_resource->post_handler.cb(&new_request, iface_mask, NULL);
+            }
           }
-          // this should not be the request..
-          my_resource->post_handler.cb(&new_request, iface_mask, NULL);
-        
         }
         entry = entry->next;
       }
