@@ -447,7 +447,8 @@ oc_core_knx_lsm_post_handler(oc_request_t *request,
       oc_register_group_multicasts();
       oc_init_datapoints_at_initialization();
       oc_device_info_t *device = oc_core_get_device_info(device_index);
-      knx_publish_service(oc_string(device->serialnumber), device->iid, device->ia);
+      knx_publish_service(oc_string(device->serialnumber), device->iid,
+                          device->ia);
     }
 
     return;

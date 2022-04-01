@@ -29,7 +29,7 @@ knx_publish_service(char *serial_no, uint32_t iid, uint32_t ia)
     // --subtype=_01CAFE1234._sub._knx._udp
     char *serial_format_string = "--subtype=_%s._sub._knx._udp";
     snprintf(serial_no_subtype, sizeof(serial_no_subtype), serial_format_string,
-              serial_no);
+             serial_no);
 
     int error;
     if (!iid || !ia) {
@@ -54,8 +54,7 @@ knx_publish_service(char *serial_no, uint32_t iid, uint32_t ia)
                iid, ia);
 
       error = execlp("avahi-publish-service", "avahi-publish-service",
-                     serial_no_subtype,
-                     installation_subtype,
+                     serial_no_subtype, installation_subtype,
                      serial_no,   // service name = serial number
                      "_knx._udp", // service type
                      "5683",      // port
