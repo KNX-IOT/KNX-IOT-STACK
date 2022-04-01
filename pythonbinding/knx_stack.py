@@ -551,18 +551,18 @@ class CoAPResponse():
 
     def get_payload_string(self):
         if self.payload_type == "json":
-            json = self.get_payload_dict()
-            my_string = json["1"]
+            my_json = self.get_payload_dict()
+            my_string = my_json["1"]
             return my_string
         return self.payload
 
     def get_payload_boolean(self, tag=1):
         if self.payload_type == "json":
             my_string = self.get_payload()
-            json = self.get_payload_dict()
+            my_json = self.get_payload_dict()
             my_string = ""
             try:
-                my_string = json[str(tag)]
+                my_string = my_json[str(tag)]
             except:
                 pass
             if my_string == "true":
@@ -574,10 +574,10 @@ class CoAPResponse():
 
     def get_payload_int(self, tag=1):
         if self.payload_type == "json":
-            json = self.get_payload_dict()
+            my_json = self.get_payload_dict()
             my_string = ""
             try:
-                my_string = json[str(tag)]
+                my_string = my_json[str(tag)]
             except:
                 pass
             print("get_payload_int:", int(my_string))
@@ -652,7 +652,7 @@ class KNXIOTStack():
             discover_event.set()
 
     def gatewayCB(self, payload_size, payload):
-        print("gateway event: Payload:{}".format(payload))
+        print("gateway event: size:{} Payload:{}".format(payload_size, payload))
 
     def clientCB(self, cb_sn, cb_status, cb_format, cb_id, cb_url, cb_payload_size, cb_payload):
         """ ********************************
@@ -779,6 +779,7 @@ class KNXIOTStack():
         self.device_array = []
         self.response_array = []
         self.discovery_data = None
+        self.threadid = None
         self.spake = {}
         print (self.lib)
         print ("...")
@@ -814,19 +815,17 @@ class KNXIOTStack():
     def get_r_id(self):
         self.counter = self.counter + 1
         return str(self.counter)
-    
+
     def url_local_path(self, url):
         if url.startswith("coap"):
             # coap://[fe80::6513:3050:71a7:5b98]:63196/p/1
             url2 = url[10:]
-            print("url_local_path in:", url)
-            print("url_local_path url2", url2)
             index = url2.find("/")
             if index > 0 :
                 print("url_local_path : ", index, url2[index:])
                 return url2[index:]
             else:
-               return url
+                return url
         else:
             return url
 
