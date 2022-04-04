@@ -243,8 +243,7 @@ register_resources(void)
   PRINT("Data point 61 (DPT_Switch) \n");
   PRINT("Register Resource with local path \"/p/1\"\n");
 
-  oc_resource_t *res_pushbutton =
-    oc_new_resource("push button", "p/1", 2, 0);
+  oc_resource_t *res_pushbutton = oc_new_resource("push button", "p/1", 2, 0);
   oc_resource_bind_resource_type(res_pushbutton, "urn:knx:dpa.421.61");
   oc_resource_bind_resource_type(res_pushbutton, "DPT_Switch");
   oc_resource_bind_content_type(res_pushbutton, APPLICATION_CBOR);
