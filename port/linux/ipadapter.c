@@ -957,7 +957,7 @@ network_event_thread(void *data)
         break;
       }
 
-      message->endpoint.device = dev->device;
+      message->endpoint.device_index = dev->device;
 
       if (oc_udp_receive_message(dev, &setfds, message) ==
           ADAPTER_STATUS_RECEIVE) {
@@ -1103,7 +1103,7 @@ oc_send_buffer(oc_message_t *message)
   }
   int send_sock = -1;
 
-  ip_context_t *dev = get_ip_context_for_device(message->endpoint.device);
+  ip_context_t *dev = get_ip_context_for_device(message->endpoint.device_index);
 
   if (!dev) {
     return -1;
@@ -1158,7 +1158,7 @@ oc_send_discovery_request(oc_message_t *message)
          sizeof(message->endpoint.addr_local));
   message->endpoint.interface_index = 0;
 
-  ip_context_t *dev = get_ip_context_for_device(message->endpoint.device);
+  ip_context_t *dev = get_ip_context_for_device(message->endpoint.device_index);
 
 #define IN6_IS_ADDR_MC_REALM_LOCAL(addr)                                       \
   IN6_IS_ADDR_MULTICAST(addr) && ((((const uint8_t *)(addr))[1] & 0x0f) == 0x03)
@@ -1886,7 +1886,7 @@ ip_context_rfds_fd_copy(ip_context_t *dev)
 void
 oc_connectivity_subscribe_mcast_ipv6(oc_endpoint_t *address)
 {
-  ip_context_t *dev = get_ip_context_for_device(address->device);
+  ip_context_t *dev = get_ip_context_for_device(address->device_index);
 
   if (dev == NULL) {
     OC_ERR(" dev is NULL");
