@@ -583,19 +583,18 @@ oc_interface_mask_t oc_ri_get_interface_mask(char *iface, size_t if_len);
  */
 bool oc_ri_is_app_resource_valid(oc_resource_t *resource);
 
-
 /**
  * @brief create a new request from the old request
  * is used internally only for redirection of:
  * - .knx
  * - p
- * 
+ *
  * @param new_request the original request
  * @param request the new request
  * @param response_buffer the dummy response buffer for the new request
  * @param response_obj the dummy response object
- * @return true 
- * @return false 
+ * @return true
+ * @return false
  */
 bool oc_ri_new_request_from_request(oc_request_t new_request,
                                     oc_request_t request,

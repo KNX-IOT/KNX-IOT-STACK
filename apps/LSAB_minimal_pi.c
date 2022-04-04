@@ -309,8 +309,8 @@ post_dpa_417_61(oc_request_t *request, oc_interface_mask_t interfaces,
   // handle the different requests
   if (oc_is_redirected_request(request)) {
     PRINT(" S-MODE or /P\n");
-  } 
- 
+  }
+
   rep = request->request_payload;
   char buffer[200];
   memset(buffer, 200, 1);
