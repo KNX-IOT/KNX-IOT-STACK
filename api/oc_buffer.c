@@ -69,6 +69,8 @@ allocate_message(struct oc_memb *pool)
     message->next = 0;
     message->ref_count = 1;
     message->endpoint.interface_index = -1;
+    message->endpoint.device_index = 0;
+    message->endpoint.group_id = 0;
 //#ifdef OC_SECURITY
 #ifdef OC_OSCORE
     message->encrypted = 0;
@@ -225,12 +227,6 @@ OC_PROCESS_THREAD(message_buffer_handler, ev, data)
       oc_message_t *message = (oc_message_t *)data;
 
 #ifdef OC_CLIENT
-      if (message->endpoint.flags & DISCOVERY) {
-        OC_DBG("Outbound network event: multicast request");
-        oc_send_discovery_request(message);
-        oc_message_unref(message);
-      }
-//#if defined(OC_SECURITY) && defined(OC_OSCORE)
 #ifdef OC_OSCORE
       else if ((message->endpoint.flags & OSCORE) &&
                (message->endpoint.flags & MULTICAST)) {
@@ -238,9 +234,14 @@ OC_PROCESS_THREAD(message_buffer_handler, ev, data)
           "Outbound secure multicast request: forwarding to OSCORE\n");
         oc_process_post(&oc_oscore_handler,
                         oc_events[OUTBOUND_GROUP_OSCORE_EVENT], data);
+      } else 
+#endif /* OC_SECURITY && OC_OSCORE */     
+
+      if (message->endpoint.flags & DISCOVERY) {
+        OC_DBG_OSCORE("Outbound network event: multicast request");
+        oc_send_discovery_request(message);
+        oc_message_unref(message);
       }
-#endif /* OC_SECURITY && OC_OSCORE */
-      else
 #endif /* OC_CLIENT */
 //#ifdef OC_SECURITY
 #ifdef OC_OSCORE

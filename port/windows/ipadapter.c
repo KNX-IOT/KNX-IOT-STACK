@@ -785,7 +785,7 @@ network_event_thread(void *data)
           break;
         }
 
-        message->endpoint.device = dev->device;
+        message->endpoint.device_index = dev->device;
 
         if (i == SERVER6) {
           int count = recv_msg(dev->server_sock, message->data, OC_PDU_SIZE,
@@ -1117,7 +1117,7 @@ oc_send_buffer(oc_message_t *message)
   }
   SOCKET send_sock = INVALID_SOCKET;
 
-  ip_context_t *dev = get_ip_context_for_device(message->endpoint.device);
+  ip_context_t *dev = get_ip_context_for_device(message->endpoint.device_index);
 #ifdef OC_TCP
   if (message->endpoint.flags & TCP) {
     return oc_tcp_send_buffer(dev, message, &receiver);
@@ -1160,7 +1160,7 @@ oc_send_discovery_request(oc_message_t *message)
   ifaddr_t *ifaddr_list = get_network_addresses();
   ifaddr_t *ifaddr;
 
-  ip_context_t *dev = get_ip_context_for_device(message->endpoint.device);
+  ip_context_t *dev = get_ip_context_for_device(message->endpoint.device_index);
 
   for (ifaddr = ifaddr_list; ifaddr != NULL; ifaddr = ifaddr->next) {
     if (message->endpoint.flags & IPV6 && ifaddr->addr.ss_family == AF_INET6) {
@@ -1756,7 +1756,7 @@ oc_dns_lookup(const char *domain, oc_string_t *addr, enum transport_flags flags)
 void
 oc_connectivity_subscribe_mcast_ipv6(oc_endpoint_t *address)
 {
-  ip_context_t *dev = get_ip_context_for_device(address->device);
+  ip_context_t *dev = get_ip_context_for_device(address->device_index);
 
   if (dev == NULL) {
     OC_ERR(" dev is NULL");

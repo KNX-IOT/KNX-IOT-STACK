@@ -286,11 +286,11 @@ coap_receive(oc_message_t *msg)
         } else {
 #ifdef OC_REQUEST_HISTORY
           if (oc_coap_check_if_duplicate(message->mid,
-                                         (uint8_t)msg->endpoint.device)) {
+                                         (uint8_t)msg->endpoint.device_index)) {
             return 0;
           }
           history[idx] = message->mid;
-          history_dev[idx] = (uint8_t)msg->endpoint.device;
+          history_dev[idx] = (uint8_t)msg->endpoint.device_index;
           idx = (idx + 1) % OC_REQUEST_HISTORY_SIZE;
 #endif /* OC_REQUEST_HISTORY */
           // TODO
@@ -331,7 +331,7 @@ coap_receive(oc_message_t *msg)
           }
 
           if (!request_buffer && block1_num == 0) {
-            if (oc_drop_command(msg->endpoint.device) &&
+            if (oc_drop_command(msg->endpoint.device_index) &&
                 message->code >= COAP_GET && message->code <= COAP_DELETE) {
               OC_WRN("cannot process new request during closing TLS sessions");
               goto init_reset_message;
@@ -446,7 +446,7 @@ coap_receive(oc_message_t *msg)
                   message->uri_query, message->uri_query_len,
                   OC_BLOCKWISE_SERVER);
                 if (!request_buffer) {
-                  if (oc_drop_command(msg->endpoint.device) &&
+                  if (oc_drop_command(msg->endpoint.device_index) &&
                       message->code >= COAP_GET &&
                       message->code <= COAP_DELETE) {
                     OC_WRN("cannot process new request during closing TLS "
@@ -479,7 +479,7 @@ coap_receive(oc_message_t *msg)
           goto init_reset_message;
         } else {
           OC_DBG("no block options; processing regular request");
-          if (oc_drop_command(msg->endpoint.device) &&
+          if (oc_drop_command(msg->endpoint.device_index) &&
               message->code >= COAP_GET && message->code <= COAP_DELETE) {
             OC_WRN("cannot process new request during closing TLS sessions");
             goto init_reset_message;
