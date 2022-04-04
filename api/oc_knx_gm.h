@@ -48,7 +48,9 @@ void oc_create_knx_gm_resources(size_t device_index);
  * e.g. to be used to create a KNX-IOT to CLASSIC gateway
  */
 typedef void (*oc_gateway_s_mode_cb_t)(
-  size_t device_index, oc_group_object_notification_t *s_mode_message,
+  size_t device_index, 
+  char* sender_ip_address,
+  oc_group_object_notification_t *s_mode_message,
   void *data);
 
 /**

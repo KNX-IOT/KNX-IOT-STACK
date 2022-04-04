@@ -231,13 +231,13 @@ ets_install_spakeCB(spakeCB spakeCB)
 }
 
 void
-internal_gw_cb(size_t device_index,
+internal_gw_cb(size_t device_index, char* sender_ip_address,
                oc_group_object_notification_t *s_mode_message, void *data)
 {
   (void)data;
   char buffer[300];
 
-  PRINT("[c]internal_gw_cb %d\n", (int)device_index);
+  PRINT("[c]internal_gw_cb %d from %s\n", (int)device_index, sender_ip_address);
   PRINT("   ga  = %d\n", s_mode_message->ga);
   PRINT("   sia = %d\n", s_mode_message->sia);
   PRINT("   st  = %s\n", oc_string(s_mode_message->st));
@@ -245,7 +245,7 @@ internal_gw_cb(size_t device_index,
 
   oc_s_mode_notification_to_json(buffer, 300, *s_mode_message);
   if (my_CBFunctions.gatewayFCB) {
-    my_CBFunctions.gatewayFCB(300, buffer);
+    my_CBFunctions.gatewayFCB(sender_ip_address, 300, buffer);
   }
 }
 

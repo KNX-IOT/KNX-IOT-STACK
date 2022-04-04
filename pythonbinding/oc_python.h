@@ -93,10 +93,11 @@ typedef void (*resourceCB)(char *anchor, char *uri, char *types,
 /**
  * @brief The gateway callback function type
  *
+ * @param sender_ip_address the sender address
  * @param payload_size the size of the payload in bytes
  * @param payload the ascii payload json
  */
-typedef void (*gatewayCB)(int payload_size, char *payload);
+typedef void (*gatewayCB)(char* sender_ip_address, int payload_size, char *payload);
 
 /**
  * @brief the client callback function
