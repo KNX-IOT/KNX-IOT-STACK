@@ -141,12 +141,12 @@ oc_add_s_mode_response_cb(char *url, oc_rep_t *rep, oc_rep_t *rep_value)
 }
 
 void
-oc_gateway_s_mode_cb(size_t device_index,
+oc_gateway_s_mode_cb(size_t device_index, char *sender_ip_address,
                      oc_group_object_notification_t *s_mode_message, void *data)
 {
   (void)data;
 
-  PRINT("oc_gateway_s_mode_cb %d\n", (int)device_index);
+  PRINT("testserver_all: oc_gateway_s_mode_cb %s\n", sender_ip_address);
   PRINT("   ga  = %d\n", s_mode_message->ga);
   PRINT("   sia = %d\n", s_mode_message->sia);
   PRINT("   st  = %s\n", oc_string(s_mode_message->st));
@@ -816,6 +816,9 @@ issue_requests_s_mode_delayed(void *data)
   oc_device_info_t *device = oc_core_get_device_info(0);
   device->ia = 5;
   device->iid = 16;
+
+  PRINT(" issue_requests_s_mode_delayed : ia = %d\n", device->ia);
+  PRINT(" issue_requests_s_mode_delayed : iid = %d\n", device->iid);
 
   PRINT(" issue_requests_s_mode_delayed : config data\n");
   int ga_values[5] = { 1, 255, 256, 1024, 1024 * 256 };
