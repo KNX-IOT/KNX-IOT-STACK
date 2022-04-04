@@ -172,7 +172,7 @@ oc_core_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
           response_obj.separate_response = NULL;
           response_obj.response_buffer = &response_buffer;
           new_request.response = &response_obj;
-          new_request.uri_path = ".knx";
+          new_request.uri_path = "/p";
           new_request.uri_path_len = 4;
 
           oc_resource_t *my_resource = oc_ri_get_app_resource_by_uri(
