@@ -652,7 +652,8 @@ class KNXIOTStack():
             discover_event.set()
 
     def gatewayCB(self, sender_ip_address, payload_size, payload):
-        print("gateway event: sender:: {}, size:{} Payload:{}".format(sender_ip_address, payload_size, payload))
+        print("gateway event: sender:: {}, size:{} Payload:{}".
+            format(sender_ip_address, payload_size, payload))
 
     def clientCB(self, cb_sn, cb_status, cb_format, cb_id, cb_url, cb_payload_size, cb_payload):
         """ ********************************
@@ -1049,7 +1050,7 @@ class KNXIOTStack():
         except:
             traceback.print_exc()
         print(" issue_s_mode - done")
-        
+
     def listen_s_mode(self, scope, ga_max, iid) :
         print(" listen_s_mode: scope:{} ga_max:{} iid:{} ".
                format(scope, ga_max, iid))
