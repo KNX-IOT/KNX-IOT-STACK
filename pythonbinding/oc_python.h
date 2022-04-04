@@ -97,7 +97,8 @@ typedef void (*resourceCB)(char *anchor, char *uri, char *types,
  * @param payload_size the size of the payload in bytes
  * @param payload the ascii payload json
  */
-typedef void (*gatewayCB)(char* sender_ip_address, int payload_size, char *payload);
+typedef void (*gatewayCB)(char *sender_ip_address, int payload_size,
+                          char *payload);
 
 /**
  * @brief the client callback function
@@ -298,21 +299,20 @@ kisCS_EXPORT void ets_issue_requests_s_mode(int scope, int sia, int ga, int iid,
                                             char *st, int value_type,
                                             char *value);
 
-
 /**
  * @brief configure the stack to listen to group addresses.
  * the group addresses for s-mode commands are defined per:
  * - scope (2 local, 5 site local)
  * - ga_max, starting from group address 1.
  * - iid, installation id
- * 
+ *
  * @param scope the multicast scope
- * @param ga_max the group address maximum, e.g. all values between 1 and ga_max will be registered
+ * @param ga_max the group address maximum, e.g. all values between 1 and ga_max
+ * will be registered
  * @param iid the installation identifier
- * @return kisCS_EXPORT 
+ * @return kisCS_EXPORT
  */
 kisCS_EXPORT void ets_listen_s_mode(int scope, int ga_max, int iid);
-
 
 /**
  * @brief discover KNX devices on the network

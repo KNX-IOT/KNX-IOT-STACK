@@ -585,7 +585,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
   oc_reset_g_received_notification();
 
   // get sender ip address
-  SNPRINTFipaddr(ip_address, 100-1, *request->origin);
+  SNPRINTFipaddr(ip_address, 100 - 1, *request->origin);
 
   /* loop over the request document to parse all the data */
   rep = request->request_payload;
@@ -621,13 +621,12 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
                           oc_string_len(object->value.string));
           }
           if (object->iname == 1) {
-              oc_free_string(&g_received_notification.value);
-              oc_new_string(&g_received_notification.value,
-                            oc_string(object->value.string),
-                            oc_string_len(object->value.string));
+            oc_free_string(&g_received_notification.value);
+            oc_new_string(&g_received_notification.value,
+                          oc_string(object->value.string),
+                          oc_string_len(object->value.string));
           }
-        }
-        break;
+        } break;
 
         case OC_REP_INT: {
 #ifdef TAGS_AS_STRINGS
@@ -652,8 +651,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
             oc_free_string(&g_received_notification.value);
             char buf[20];
             snprintf(buf, 20 - 1, "%d", object->value.integer);
-            oc_new_string(&g_received_notification.value, buf,
-                          strlen(buf));
+            oc_new_string(&g_received_notification.value, buf, strlen(buf));
           }
         } break;
         case OC_REP_BOOL: {
@@ -663,7 +661,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
               oc_new_string(&g_received_notification.value, "true",
                             strlen("true"));
             } else {
-              oc_new_string(&g_received_notification.value,"false",
+              oc_new_string(&g_received_notification.value, "false",
                             strlen("false"));
             }
           }
@@ -696,7 +694,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
   oc_gateway_t *my_gw = oc_get_gateway_cb();
   if (my_gw != NULL && my_gw->cb) {
     // call the gateway function
-    my_gw->cb(device_index, ip_address, & g_received_notification, my_gw->data);
+    my_gw->cb(device_index, ip_address, &g_received_notification, my_gw->data);
   }
 
   bool st_write = false;
@@ -704,9 +702,9 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
   bool st_read = false;
   // handle the request
   // loop over the group addresses of the /fp/r
-  PRINT(" .knx : origin:%s sia: %d ga: %d st: %s\n",
-        ip_address, g_received_notification.sia,
-        g_received_notification.ga, oc_string(g_received_notification.st));
+  PRINT(" .knx : origin:%s sia: %d ga: %d st: %s\n", ip_address,
+        g_received_notification.sia, g_received_notification.ga,
+        oc_string(g_received_notification.st));
   if (strcmp(oc_string(g_received_notification.st), "w") == 0) {
     // case_1 :
     // Received from bus: -st w, any ga ==> @receiver:

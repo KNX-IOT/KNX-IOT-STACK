@@ -231,7 +231,7 @@ ets_install_spakeCB(spakeCB spakeCB)
 }
 
 void
-internal_gw_cb(size_t device_index, char* sender_ip_address,
+internal_gw_cb(size_t device_index, char *sender_ip_address,
                oc_group_object_notification_t *s_mode_message, void *data)
 {
   (void)data;
@@ -930,7 +930,6 @@ ets_issue_requests_s_mode(int scope, int sia, int ga, int iid, char *st,
     }
   }
 }
-
 
 // -----------------------------------------------------------------------------
 
