@@ -19,6 +19,7 @@
 #include "api/oc_knx_fp.h"
 #include "api/oc_knx_sec.h"
 #include "api/oc_main.h"
+#include "port/dns-sd.h"
 
 #include "oc_core_res.h"
 #include "oc_discovery.h"
@@ -456,6 +457,9 @@ oc_core_dev_iid_put_handler(oc_request_t *request,
         if (oc_is_device_in_runtime(device_index)) {
           oc_register_group_multicasts();
           oc_init_datapoints_at_initialization();
+          oc_device_info_t *device = oc_core_get_device_info(device_index);
+          knx_publish_service(oc_string(device->serialnumber), device->iid,
+                              device->ia);
         }
         return;
       }
@@ -958,7 +962,7 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
     return;
   }
   if (reset_mode == 2) {
-    /* With erase code ‘2’ (“Factory Reset to default state”),
+    /* With erase code ï¿½2ï¿½ (ï¿½Factory Reset to default stateï¿½),
      all addressing information and security configuration data SHALL be reset
      to default ex-factory state. */
     // writing the empty values
@@ -990,7 +994,7 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
 
   } else if (reset_mode == 7) {
     /*
-    With erase code ‘7’ (“Factory Reset to default without IA”),
+      With erase code 7 (Factory Reset to default without IA),
       all configuration data SHALL be reset to ex -factory default state
       except addressing information( IA, Device IP Address) and
       security configuration data(credentials)
