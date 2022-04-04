@@ -299,6 +299,18 @@ kisCS_EXPORT void ets_issue_requests_s_mode(int scope, int sia, int ga, int iid,
                                             char *value);
 
 
+/**
+ * @brief configure the stack to listen to group addresses.
+ * the group addresses for s-mode commands are defined per:
+ * - scope (2 local, 5 site local)
+ * - ga_max, starting from group address 1.
+ * - iid, installation id
+ * 
+ * @param scope the multicast scope
+ * @param ga_max the group address maximum, e.g. all values between 1 and ga_max will be registered
+ * @param iid the installation identifier
+ * @return kisCS_EXPORT 
+ */
 kisCS_EXPORT void ets_listen_s_mode(int scope, int ga_max, int iid);
 
 
