@@ -354,7 +354,7 @@ oc_parse_endpoint_string(oc_string_t *endpoint_str, oc_endpoint_t *endpoint,
     return -1;
 
   const char *address = NULL;
-  endpoint->device_index = 0;
+  endpoint->device = 0;
   endpoint->flags = 0;
   size_t len = oc_string_len(*endpoint_str);
 #ifdef OC_TCP
@@ -589,7 +589,7 @@ oc_endpoint_compare(const oc_endpoint_t *ep1, const oc_endpoint_t *ep2)
 
   if ((ep1->flags & ~(MULTICAST | ACCEPTED)) !=
         (ep2->flags & ~(MULTICAST | ACCEPTED)) ||
-      ep1->device_index != ep2->device_index) {
+      ep1->device != ep2->device) {
     return -1;
   }
   if (ep1->flags & IPV6) {
@@ -644,7 +644,7 @@ oc_endpoint_set_local_address(oc_endpoint_t *ep, int interface_index)
   if (!ep) {
     return;
   }
-  oc_endpoint_t *e = oc_connectivity_get_endpoints(ep->device_index);
+  oc_endpoint_t *e = oc_connectivity_get_endpoints(ep->device);
   enum transport_flags conn = (ep->flags & IPV6) ? IPV6 : IPV4;
   while (e) {
     if ((e->flags & conn) && e->interface_index == interface_index) {

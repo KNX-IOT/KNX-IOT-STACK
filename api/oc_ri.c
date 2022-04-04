@@ -1058,7 +1058,7 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
     int i;
     int len_resource;
     for (i = 0; i < OC_NUM_CORE_RESOURCES_PER_DEVICE; i++) {
-      resource = oc_core_get_resource_by_index(i, endpoint->device_index);
+      resource = oc_core_get_resource_by_index(i, endpoint->device);
       if (oc_string_len(resource->uri) == (uri_path_len + 1) &&
           strncmp((const char *)oc_string(resource->uri) + 1, uri_path,
                   uri_path_len) == 0) {
@@ -1085,7 +1085,7 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
    */
   if (!cur_resource && !bad_request) {
     request_obj.resource = cur_resource = oc_ri_get_app_resource_by_uri(
-      uri_path, uri_path_len, endpoint->device_index);
+      uri_path, uri_path_len, endpoint->device);
   }
 #endif /* OC_SERVER */
 

@@ -1,5 +1,6 @@
 /*
 // Copyright (c) 2016 Intel Corporation
+// Copyright (c) 2022 Cascoda Ltd.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,13 +24,6 @@
 #ifdef OC_DYNAMIC_ALLOCATION
 #include <stdlib.h>
 #endif /* OC_DYNAMIC_ALLOCATION */
-
-//#ifdef OC_SECURITY
-//#include "security/oc_tls.h"
-//#ifdef OC_OSCORE
-//#include "security/oc_oscore.h"
-//#endif /* OC_OSCORE */
-//#endif /* OC_SECURITY */
 
 #ifdef OC_OSCORE
 #include "security/oc_tls.h"
@@ -69,12 +63,11 @@ allocate_message(struct oc_memb *pool)
     message->next = 0;
     message->ref_count = 1;
     message->endpoint.interface_index = -1;
-    message->endpoint.device_index = 0;
+    message->endpoint.device = 0;
     message->endpoint.group_id = 0;
-//#ifdef OC_SECURITY
 #ifdef OC_OSCORE
     message->encrypted = 0;
-#endif /* OC_SECURITY */
+#endif /* OC_OSCORE */
 #if !defined(OC_DYNAMIC_ALLOCATION) || defined(OC_INOUT_BUFFER_SIZE)
     OC_DBG("buffer: Allocated TX/RX buffer; num free: %d",
            oc_memb_numfree(pool));
@@ -184,13 +177,11 @@ OC_PROCESS_THREAD(message_buffer_handler, ev, data)
     OC_PROCESS_YIELD();
 
     if (ev == oc_events[INBOUND_NETWORK_EVENT]) {
-//#ifdef OC_SECURITY
 #ifdef OC_OSCORE
       if (((oc_message_t *)data)->encrypted == 1) {
         OC_DBG_OSCORE("Inbound network event: encrypted request");
         oc_process_post(&oc_tls_handler, oc_events[UDP_TO_TLS_EVENT], data);
       } else {
-#ifdef OC_OSCORE
         if (((oc_message_t *)data)->endpoint.flags & MULTICAST) {
           OC_DBG_OSCORE("Inbound network event: multicast request");
           oc_process_post(&oc_oscore_handler, oc_events[INBOUND_OSCORE_EVENT],
@@ -209,11 +200,11 @@ OC_PROCESS_THREAD(message_buffer_handler, ev, data)
         OC_DBG("Inbound network event: decrypted request");
         oc_process_post(&coap_engine, oc_events[INBOUND_RI_EVENT], data);
 #endif /* OC_OSCORE */
-      }
-#else  /* OC_SECURITY */
+      //}
+//#else  /* OC_SECURITY */
       OC_DBG("Inbound network event: decrypted request");
       oc_process_post(&coap_engine, oc_events[INBOUND_RI_EVENT], data);
-#endif /* !OC_SECURITY */
+//#endif /* !OC_SECURITY */
 #ifdef OC_OSCORE
     } else if (ev == oc_events[OUTBOUND_NETWORK_EVENT_ENCRYPTED]) {
       OC_DBG_OSCORE("Outbound network event: send encrypted message");
@@ -225,8 +216,7 @@ OC_PROCESS_THREAD(message_buffer_handler, ev, data)
        //#ifdef OC_OSCORE
     } else if (ev == oc_events[OUTBOUND_NETWORK_EVENT]) {
       oc_message_t *message = (oc_message_t *)data;
-
-#ifdef OC_CLIENT
+//#ifdef OC_CLIENT
 #ifdef OC_OSCORE
       else if ((message->endpoint.flags & OSCORE) &&
                (message->endpoint.flags & MULTICAST)) {
@@ -235,15 +225,14 @@ OC_PROCESS_THREAD(message_buffer_handler, ev, data)
         oc_process_post(&oc_oscore_handler,
                         oc_events[OUTBOUND_GROUP_OSCORE_EVENT], data);
       } else 
-#endif /* OC_SECURITY && OC_OSCORE */     
+#endif /* OC_OSCORE */     
 
       if (message->endpoint.flags & DISCOVERY) {
         OC_DBG_OSCORE("Outbound network event: multicast request");
         oc_send_discovery_request(message);
         oc_message_unref(message);
       }
-#endif /* OC_CLIENT */
-//#ifdef OC_SECURITY
+//#endif /* OC_CLIENT */
 #ifdef OC_OSCORE
         if (message->endpoint.flags & OSCORE) {
 #ifdef OC_OSCORE
@@ -273,8 +262,7 @@ OC_PROCESS_THREAD(message_buffer_handler, ev, data)
         oc_message_unref(message);
       }
     }
-//#ifdef OC_SECURITY
-#ifdef OC_OSCORE
+#ifdef OC_SECURITY
     else if (ev == oc_events[TLS_CLOSE_ALL_SESSIONS]) {
       OC_DBG("Signaling to close all TLS sessions from this device");
       oc_process_post(&oc_tls_handler, oc_events[TLS_CLOSE_ALL_SESSIONS], data);

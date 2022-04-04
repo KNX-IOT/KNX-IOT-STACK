@@ -72,7 +72,7 @@ enum transport_flags {
 typedef struct oc_endpoint_t
 {
   struct oc_endpoint_t *next; /**< pointer to the next structure */
-  size_t device_index;        /**< device index */
+  size_t device;        /**< device index */
   enum transport_flags flags; /**< the transport flags */
   oc_string_t serial_number;  /**< serial number of the device to talk to */
   union dev_addr {
@@ -94,6 +94,8 @@ typedef struct oc_endpoint_t
                                             .address = { __VA_ARGS__ } } }
 #define oc_make_ipv6_endpoint(__name__, __flags__, __port__, ...)              \
   oc_endpoint_t __name__ = { .flags = __flags__,                               \
+                             .device = 0,                                      \
+                             .group_id = 0,                                    \
                              .addr.ipv6 = { .port = __port__,                  \
                                             .address = { __VA_ARGS__ } } }
 
