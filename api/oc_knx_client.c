@@ -363,15 +363,18 @@ oc_knx_client_do_broker_request(char *resource_url, int ia, char *destination,
 // ----------------------------------------------------------------------------
 
 bool
-oc_is_s_mode_request(oc_request_t *request)
+oc_is_redirected_request(oc_request_t *request)
 {
   if (request == NULL) {
     return false;
   }
 
-  PRINT("  oc_is_s_mode_request %.*s\n", (int)request->uri_path_len,
+  PRINT("  oc_is_redirected_request %.*s\n", (int)request->uri_path_len,
         request->uri_path);
   if (strncmp(".knx", request->uri_path, request->uri_path_len) == 0) {
+    return true;
+  }
+  if (strncmp("/p", request->uri_path, request->uri_path_len) == 0) {
     return true;
   }
   return false;

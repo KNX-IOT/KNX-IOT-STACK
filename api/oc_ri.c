@@ -300,6 +300,29 @@ oc_get_interface_in_mask_in_string_array(oc_interface_mask_t iface_mask,
   return total_masks;
 }
 
+bool
+oc_ri_new_request_from_request(oc_request_t new_request, oc_request_t request,
+                               oc_response_buffer_t response_buffer,
+                               oc_response_t response_obj)
+{
+  memcpy(&new_request, &request, sizeof(request));
+  new_request.response = NULL;
+
+  /* Postpone allocating response_state right after calling
+   * oc_parse_rep()
+   *  in order to reducing peak memory in OC_BLOCK_WISE &
+   * OC_DYNAMIC_ALLOCATION
+   */
+  response_buffer.code = 0;
+  response_buffer.response_length = 0;
+  response_buffer.content_format = 0;
+  response_buffer.max_age = 0;
+
+  response_obj.separate_response = NULL;
+  response_obj.response_buffer = &response_buffer;
+  new_request.response = &response_obj;
+}
+
 #ifdef OC_SERVER
 oc_resource_t *
 oc_ri_get_app_resources(void)

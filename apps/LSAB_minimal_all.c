@@ -227,15 +227,10 @@ post_dpa_417_61(oc_request_t *request, oc_interface_mask_t interfaces,
 
   oc_rep_t *rep = NULL;
   // handle the different requests
-  if (oc_is_s_mode_request(request)) {
-    PRINT(" S-MODE\n");
-    // retrieve the value of the s-mode payload
-    rep = oc_s_mode_get_value(request);
-  } else {
-    // the regular payload
-    rep = request->request_payload;
+  if (oc_is_redirected_request(request)) {
+    PRINT(" S-MODE or /P\n");
   }
-
+  rep = request->request_payload;
   while (rep != NULL) {
     if (rep->type == OC_REP_BOOL) {
       if (rep->iname == 1) {
