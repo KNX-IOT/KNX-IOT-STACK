@@ -931,6 +931,18 @@ ets_issue_requests_s_mode(int scope, int sia, int ga, int iid, char *st,
   }
 }
 
+
+// -----------------------------------------------------------------------------
+
+void
+ets_listen_s_mode(int scope, int ga_max, int iid)
+{
+
+  for (int i = 1; i < ga_max; i++) {
+    subscribe_group_to_multicast(i, iid, scope);
+  }
+}
+
 // -----------------------------------------------------------------------------
 
 /**

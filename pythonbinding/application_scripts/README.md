@@ -45,6 +45,16 @@ script to issue an s-mode command
 python s-mode.py 
 ```
 
+### sniffer-s-mode.py
+
+script to listen to s-mode commands
+
+- has option to set iid and max group number
+
+```bash
+python sniffer-s-mode.py 
+```
+
 ### programming_mode.py
 
 script to issue set a specific device (via serial_number) in programming mode

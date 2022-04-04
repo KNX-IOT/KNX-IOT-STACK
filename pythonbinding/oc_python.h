@@ -298,6 +298,10 @@ kisCS_EXPORT void ets_issue_requests_s_mode(int scope, int sia, int ga, int iid,
                                             char *st, int value_type,
                                             char *value);
 
+
+kisCS_EXPORT void ets_listen_s_mode(int scope, int ga_max, int iid);
+
+
 /**
  * @brief discover KNX devices on the network
  *  e.g. issues a request with query param: rt=urn:knx:dpa.*

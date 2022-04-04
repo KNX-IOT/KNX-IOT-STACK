@@ -451,7 +451,7 @@ RESOURCE_CALLBACK = CFUNCTYPE(None, c_char_p, c_char_p, c_char_p, c_char_p)
 CLIENT_CALLBACK = CFUNCTYPE(None, c_char_p, c_int, c_char_p, c_char_p, c_char_p, c_int, c_char_p)
 DISCOVERY_CALLBACK = CFUNCTYPE(None, c_int, c_char_p)
 SPAKE_CALLBACK = CFUNCTYPE(None, c_char_p, c_int, c_char_p, c_int)
-GATEWAY_CALLBACK = CFUNCTYPE(None, c_int, c_char_p)
+GATEWAY_CALLBACK = CFUNCTYPE(None, c_char_p, c_int, c_char_p)
 
 #----------LinkFormat parsing ---------------
 
@@ -651,8 +651,8 @@ class KNXIOTStack():
             self.device_array.append(dev)
             discover_event.set()
 
-    def gatewayCB(self, payload_size, payload):
-        print("gateway event: size:{} Payload:{}".format(payload_size, payload))
+    def gatewayCB(self, sender_ip_address, payload_size, payload):
+        print("gateway event: sender:: {}, size:{} Payload:{}".format(sender_ip_address, payload_size, payload))
 
     def clientCB(self, cb_sn, cb_status, cb_format, cb_id, cb_url, cb_payload_size, cb_payload):
         """ ********************************
@@ -1046,6 +1046,17 @@ class KNXIOTStack():
                        c_int, c_int, c_int, String, c_int, String]
             self.lib.ets_issue_requests_s_mode(int(scope), int(sia), int(ga), int(iid),
                                               str(st), int(value_type), str(value))
+        except:
+            traceback.print_exc()
+        print(" issue_s_mode - done")
+        
+    def listen_s_mode(self, scope, ga_max, iid) :
+        print(" listen_s_mode: scope:{} ga_max:{} iid:{} ".
+               format(scope, ga_max, iid))
+        try:
+            self.lib.ets_listen_s_mode.argtypes = [c_int,
+                       c_int, c_int]
+            self.lib.ets_listen_s_mode(int(scope), int(ga_max), int(iid))
         except:
             traceback.print_exc()
         print(" issue_s_mode - done")

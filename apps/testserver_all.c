@@ -817,6 +817,10 @@ issue_requests_s_mode_delayed(void *data)
   device->ia = 5;
   device->iid = 16;
 
+  PRINT(" issue_requests_s_mode_delayed : ia = %d\n", device->ia);
+  PRINT(" issue_requests_s_mode_delayed : iid = %d\n", device->iid);
+
+
   PRINT(" issue_requests_s_mode_delayed : config data\n");
   int ga_values[5] = { 1, 255, 256, 1024, 1024 * 256 };
   oc_string_t href;

@@ -53,26 +53,6 @@ sys.path.append(parentdir)
 
 import knx_stack
 
-def test_discover(my_stack):
-    time.sleep(1)
-    my_stack.discover_devices()
-    if my_stack.get_nr_devices() > 0:
-        print ("SN :", my_stack.device_array[0].sn)
-
-def get_sn(my_stack):
-    print("Get SN :")
-    sn = my_stack.device_array[0].sn
-    response = my_stack.issue_cbor_get(sn, "/dev/sn")
-    print ("response:",response)
-    my_stack.purge_response(response)
-
-def do_reset(my_stack):
-    sn = my_stack.device_array[0].sn
-    content = {2: "reset"}
-    response =  my_stack.issue_cbor_post(sn,"/a/sen",content)
-    print ("response:",response)
-    my_stack.purge_response(response)
-
 #
 #
 # {sia: 5678, es: {st: write, ga: 1, value: 100 }}
@@ -82,43 +62,23 @@ if __name__ == '__main__':  # pragma: no cover
 
     parser = argparse.ArgumentParser()
     # input (files etc.)
-    parser.add_argument("-scope", "--scope", default=2,
-                    help="scope of the multicast request (defaul =2 : same machine)", nargs='?',
-                    const="", required=False)
-    parser.add_argument("-sia", "--sia", default=2,
-                    help="sending internal address (default ia=2)", nargs='?',
-                    const="", required=False)
+
     parser.add_argument("-iid", "--iid", default=5,
-                    help="sending installation identifier (default iid=5)", nargs='?',
+                    help="receiving installation identifier (default iid=5)", nargs='?',
                     const="", required=False)
-    parser.add_argument("-st", "--st", default="w",
-                    help="send target ,e.g w,r,rp", nargs='?',
-                    const="", required=False)
-    parser.add_argument("-ga", "--ga", default=1,
-                    help="group address (default = 1)", nargs='?', const="",
+    parser.add_argument("-ga_max", "--ga_max", default=20,
+                    help="group address range(default [1,20]", nargs='?', const="",
                     required=False)
-    parser.add_argument("-valuetype", "--valuetype", default=0,
-                    help="0=boolean, 1=integer, 2=float (default boolean)", nargs='?',
-                    const="", required=False)
-    parser.add_argument("-value", "--value", default=True,
-                    help="value of the valuetype (default True)", nargs='?',
-                    const="true", required=False)
     parser.add_argument("-wait", "--wait",
                     help="wait after issuing s-mode command", nargs='?',
-                    default=2, const=1, required=False)
+                    default=200000, const=1, required=False)
     # (args) supports batch scripts providing arguments
     print(sys.argv)
     args = parser.parse_args()
 
-    print("scope      :" + str(args.scope))
-    print("sia        :" + str(args.sia))
-    print("st         :" + str(args.st))
-    print("ga         :" + str(args.ga))
     print("iid        :" + str(args.iid))
-    print("valuetype  :" + str(args.valuetype))
-    print("value      :" + str(args.value))
+    print("ga range   :" + str(args.ga_max))
     print("wait [sec] :" + str(args.wait))
-
     the_stack = knx_stack.KNXIOTStack()
     the_stack.start_thread()
 
@@ -126,8 +86,8 @@ if __name__ == '__main__':  # pragma: no cover
     time.sleep(2)
 
     try:
-        the_stack.issue_s_mode(args.scope, args.sia, args.ga, args.iid,
-           str(args.st), args.valuetype, str(args.value))
+        the_stack.listen_s_mode(2, args.ga_max, args.iid)
+        the_stack.listen_s_mode(5, args.ga_max, args.iid)
     except:
         traceback.print_exc()
 
