@@ -533,10 +533,10 @@ oc_oscore_send_message(oc_message_t *msg)
   oc_message_t *message = msg;
   oc_oscore_context_t *oscore_ctx = NULL;
   oscore_ctx = oc_oscore_find_context_by_serial_number(
-    message->endpoint.device_index, message->endpoint.serial_number);
+    message->endpoint.device, message->endpoint.serial_number);
   if (oscore_ctx == NULL) {
     oscore_ctx = oc_oscore_find_context_by_group_id(
-      message->endpoint.device_index, message->endpoint.group_id);
+      message->endpoint.device, message->endpoint.group_id);
   }
 
   if (oscore_ctx) {
