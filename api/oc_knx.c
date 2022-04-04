@@ -689,6 +689,19 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
     return;
   }
 
+  // create the dummy request
+  oc_request_t new_request;
+  memset(&new_request, 0, sizeof(oc_request_t));
+  oc_response_buffer_t response_buffer;
+  memset(&response_buffer, 0, sizeof(oc_response_buffer_t));
+  oc_response_t response_obj;
+  memset(&response_obj, 0, sizeof(oc_response_t));
+  oc_ri_new_request_from_request(new_request, *request, response_buffer,
+                                 response_obj);
+  new_request.request_payload = oc_s_mode_get_value(request);
+  new_request.uri_path = ".knx";
+  new_request.uri_path_len = 4;
+
   while (index != -1) {
     oc_string_t myurl = oc_core_find_group_object_table_url_from_index(index);
     PRINT(" .knx : url  %s\n", oc_string(myurl));
@@ -709,7 +722,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
         // Received from bus: -st w, any ga
         // @receiver : cflags = w->overwrite object value
         if (my_resource->post_handler.cb) {
-          my_resource->post_handler.cb(request, iface_mask, data);
+          my_resource->post_handler.cb(&new_request, iface_mask, data);
           if ((cflags & OC_CFLAG_TRANSMISSION) > 0) {
             // Case 3) part 1
             // @sender : updated object value + cflags = t
@@ -727,7 +740,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
         // Received from bus: -st rp , any ga
         // @receiver : cflags = u->overwrite object value
         if (my_resource->post_handler.cb) {
-          my_resource->post_handler.cb(request, iface_mask, data);
+          my_resource->post_handler.cb(&new_request, iface_mask, data);
           if ((cflags & OC_CFLAG_TRANSMISSION) > 0) {
             PRINT(
               "   (case3) (RP-UPDATE) sending WRITE due to TRANSMIT flag \n");

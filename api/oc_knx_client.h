@@ -82,14 +82,14 @@ bool oc_set_s_mode_response_cb(oc_s_mode_response_cb_t my_func);
 oc_s_mode_response_cb_t oc_get_s_mode_response_cb();
 
 /**
- * @brief checks if the request is a redirected request from .knx
- * all messages to .knx are s-mode messages with an encapsulating payload
+ * @brief checks if the request is a redirected request from /.knx or /p
+ * when that happend, extra information can be in the CBOR object
  *
  * @param request the request to be checked
  * @return true
  * @return false
  */
-bool oc_is_s_mode_request(oc_request_t *request);
+bool oc_is_redirected_request(oc_request_t *request);
 
 /**
   @defgroup doc_module_tag_s_mode_client s-mode client

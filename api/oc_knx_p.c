@@ -152,26 +152,16 @@ oc_core_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
         if (value && myurl) {
           // do the post..
           oc_request_t new_request;
-          memcpy(&new_request, request, sizeof(request));
-          new_request.request_payload = value;
-          new_request.response = NULL;
-
+          memset(&new_request, 0, sizeof(oc_request_t));
           oc_response_buffer_t response_buffer;
+          memset(&response_buffer, 0, sizeof(oc_response_buffer_t));
           oc_response_t response_obj;
+          memset(&response_obj, 0, sizeof(oc_response_t));
+          oc_ri_new_request_from_request(
+            new_request, *request,
+            response_buffer, response_obj);
 
-          /* Postpone allocating response_state right after calling
-           * oc_parse_rep()
-           *  in order to reducing peak memory in OC_BLOCK_WISE &
-           * OC_DYNAMIC_ALLOCATION
-           */
-          response_buffer.code = 0;
-          response_buffer.response_length = 0;
-          response_buffer.content_format = 0;
-          response_buffer.max_age = 0;
-
-          response_obj.separate_response = NULL;
-          response_obj.response_buffer = &response_buffer;
-          new_request.response = &response_obj;
+          new_request.request_payload = value;
           new_request.uri_path = "/p";
           new_request.uri_path_len = 4;
 

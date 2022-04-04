@@ -583,6 +583,13 @@ oc_interface_mask_t oc_ri_get_interface_mask(char *iface, size_t if_len);
  */
 bool oc_ri_is_app_resource_valid(oc_resource_t *resource);
 
+
+
+bool oc_ri_new_request_from_request(oc_request_t new_request,
+                                    oc_request_t request,
+                                    oc_response_buffer_t response_buffer,
+                                    oc_response_t response_obj);
+
 #ifdef __cplusplus
 }
 #endif
