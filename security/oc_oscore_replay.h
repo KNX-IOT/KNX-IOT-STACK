@@ -1,0 +1,2 @@
+
+#define OC_MAX_RX_SEQUENCE_NUMBERS 30
