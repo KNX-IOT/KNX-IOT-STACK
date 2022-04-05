@@ -763,10 +763,9 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
         // CASE 1:
         // Received from bus: -st w, any ga
         // @receiver : cflags = w->overwrite object value
-
+        // to be discussed:
         // get value, since the w only should be send if the value is updated
         // (e.g. different)
-
         if (my_resource->post_handler.cb) {
           my_resource->post_handler.cb(&new_request, iface_mask, data);
           if ((cflags & OC_CFLAG_TRANSMISSION) > 0) {
@@ -805,10 +804,10 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
         // @sender: cflags = r
         // Received from bus: -st r
         // Sent: -st rp, sending association (1st assigned ga)
-        // oc_do_s_mode(oc_string(myurl), "rp");
+        // specifically: do not check the transmission flag
         PRINT("   (case3) (RP-UPDATE) sending RP due to READ flag \n");
-        oc_do_s_mode_with_scope(2, oc_string(myurl), "rp");
-        oc_do_s_mode_with_scope(5, oc_string(myurl), "rp");
+        oc_do_s_mode_with_scope_no_check(2, oc_string(myurl), "rp");
+        oc_do_s_mode_with_scope_no_check(5, oc_string(myurl), "rp");
       }
     }
     // get the next index in the table to get the url from.

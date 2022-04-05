@@ -585,13 +585,6 @@ oc_s_mode_get_resource_value(char *resource_url, char *rp, uint8_t *buf,
 }
 
 void
-oc_do_s_mode(char *resource_url, char *rp)
-{
-  int scope = 2;
-  oc_do_s_mode_with_scope(scope, resource_url, rp);
-}
-
-void
 oc_do_s_mode_read(size_t group_address)
 {
   size_t device_index = 0;
@@ -611,7 +604,8 @@ oc_do_s_mode_read(size_t group_address)
 // note: this function does not check the transmit flag
 // the caller of this function needs to check if the flag is set.
 void
-oc_do_s_mode_with_scope(int scope, char *resource_url, char *rp)
+oc_do_s_mode_with_scope_and_check(int scope, char *resource_url, char *rp,
+                                  bool check)
 {
   int value_size;
   bool error = true;
@@ -625,18 +619,18 @@ oc_do_s_mode_with_scope(int scope, char *resource_url, char *rp)
     error = false;
   }
   if (error) {
-    OC_ERR("oc_do_s_mode_with_scope : rp value incorrect %s", rp);
+    OC_ERR("oc_do_s_mode_with_scope_internal : rp value incorrect %s", rp);
     return;
   }
 
   if (resource_url == NULL) {
-    OC_ERR("oc_do_s_mode: resource url is NULL");
+    OC_ERR("oc_do_s_mode_with_scope_internal: resource url is NULL");
     return;
   }
 
   uint8_t *buffer = malloc(100);
   if (!buffer) {
-    OC_ERR("oc_do_s_mode: out of memory allocating buffer");
+    OC_ERR("oc_do_s_mode_with_scope_internal: out of memory allocating buffer");
     return;
   } //! buffer
 
@@ -645,7 +639,8 @@ oc_do_s_mode_with_scope(int scope, char *resource_url, char *rp)
   oc_resource_t *my_resource =
     oc_ri_get_app_resource_by_uri(resource_url, strlen(resource_url), 0);
   if (my_resource == NULL) {
-    PRINT(" oc_do_s_mode : error no URL found %s\n", resource_url);
+    PRINT(" oc_do_s_mode_with_scope_internal : error no URL found %s\n",
+          resource_url);
     return;
   }
 
@@ -665,36 +660,64 @@ oc_do_s_mode_with_scope(int scope, char *resource_url, char *rp)
     PRINT(" index %d rp = %s cflags %d flags=", index, rp, cflags);
     oc_print_cflags(cflags);
 
-    // With a read command to a Group Object, the device send this Group
-    // Object's value.
-    PRINT("    handling: index %d\n", index);
-    for (int j = 0; j < ga_len; j++) {
-      group_address = oc_core_find_group_object_table_group_entry(index, j);
-      PRINT("      ga : %d\n", group_address);
-      if (j == 0) {
-        // issue the s-mode command, but only for the first ga entry
-        oc_issue_s_mode(scope, sia_value, group_address, iid, rp, buffer,
-                        value_size);
-      }
-      // the recipient table contains the list of destinations that will
-      // receive data. loop over the full recipient table and send a message
-      // if the group is there
-      for (int j = 0; j < oc_core_get_recipient_table_size(); j++) {
-        bool found =
-          oc_core_check_recipient_index_on_group_address(j, group_address);
-        if (found) {
-          char *url = oc_core_get_recipient_index_url_or_path(j);
-          if (url) {
-            PRINT(" broker send: %s\n", url);
-            int ia = oc_core_get_recipient_ia(j);
-            oc_knx_client_do_broker_request(resource_url, ia, url, rp);
+    bool do_send = (cflags & OC_CFLAG_TRANSMISSION) > 0;
+    if (check == false) {
+      PRINT("    not checking flags.. always send\n");
+      do_send = true;
+    }
+
+    if (do_send) {
+      // o
+      PRINT(" index %d rp = %s cflags %d flags=", index, rp, cflags);
+      oc_print_cflags(cflags);
+
+      // With a read command to a Group Object, the device send this Group
+      // Object's value.
+      PRINT("    handling: index %d\n", index);
+      for (int j = 0; j < ga_len; j++) {
+        group_address = oc_core_find_group_object_table_group_entry(index, j);
+        PRINT("      ga : %d\n", group_address);
+        if (j == 0) {
+          // issue the s-mode command, but only for the first ga entry
+          oc_issue_s_mode(scope, sia_value, group_address, iid, rp, buffer,
+                          value_size);
+        }
+        // the recipient table contains the list of destinations that will
+        // receive data. loop over the full recipient table and send a message
+        // if the group is there
+        for (int j = 0; j < oc_core_get_recipient_table_size(); j++) {
+          bool found =
+            oc_core_check_recipient_index_on_group_address(j, group_address);
+          if (found) {
+            char *url = oc_core_get_recipient_index_url_or_path(j);
+            if (url) {
+              PRINT(" broker send: %s\n", url);
+              int ia = oc_core_get_recipient_ia(j);
+              oc_knx_client_do_broker_request(resource_url, ia, url, rp);
+            }
           }
         }
       }
-    }
+    } /* cflag */
     index = oc_core_find_next_group_object_table_url(resource_url, index);
   }
 }
+// note: this function does not check the transmit flag
+// the caller of this function needs to check if the flag is set.
+void
+oc_do_s_mode_with_scope_no_check(int scope, char *resource_url, char *rp)
+{
+  oc_do_s_mode_with_scope_and_check(scope, resource_url, rp, false);
+}
+
+// note: this function does check the transmit flag
+void
+oc_do_s_mode_with_scope(int scope, char *resource_url, char *rp)
+{
+  oc_do_s_mode_with_scope_and_check(scope, resource_url, rp, true);
+}
+
+// ----------------------------------------------------------------------------
 
 bool
 oc_set_spake_response_cb(oc_spake_cb_t my_func)
