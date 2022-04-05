@@ -1083,8 +1083,8 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
   /* Check against list of declared application resources.
    */
   if (!cur_resource && !bad_request) {
-    request_obj.resource = cur_resource = oc_ri_get_app_resource_by_uri(
-      uri_path, uri_path_len, endpoint->device);
+    request_obj.resource = cur_resource =
+      oc_ri_get_app_resource_by_uri(uri_path, uri_path_len, endpoint->device);
   }
 #endif /* OC_SERVER */
 

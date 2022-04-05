@@ -133,8 +133,7 @@ oc_oscore_find_context_by_serial_number(size_t device,
 }
 
 oc_oscore_context_t *
-oc_oscore_find_context_by_group_id(size_t device,
-                                   int group_id)
+oc_oscore_find_context_by_group_id(size_t device, int group_id)
 {
   (void)device;
 

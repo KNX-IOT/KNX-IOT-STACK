@@ -764,8 +764,8 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
         // Received from bus: -st w, any ga
         // @receiver : cflags = w->overwrite object value
 
-
-        // get value, since the w only should be send if the value is updated (e.g. different)
+        // get value, since the w only should be send if the value is updated
+        // (e.g. different)
 
         if (my_resource->post_handler.cb) {
           my_resource->post_handler.cb(&new_request, iface_mask, data);

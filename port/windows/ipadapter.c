@@ -728,7 +728,7 @@ network_event_thread(void *data)
   events_list[events_list_size] = server6_event;
   events_list_size++;
 #if defined(OC_SECURITY)
-//#if defined(OC_OSCORE)
+  //#if defined(OC_OSCORE)
   DWORD SECURE6 = events_list_size;
   events_list[events_list_size] = secure6_event;
   events_list_size++;
@@ -1150,8 +1150,8 @@ oc_send_buffer(oc_message_t *message)
   }
 #else  /* OC_IPV4 */
   {
-    //if (dev) {
-      send_sock = dev->server_sock;
+    // if (dev) {
+    send_sock = dev->server_sock;
     //}
   }
 #endif /* !OC_IPV4 */

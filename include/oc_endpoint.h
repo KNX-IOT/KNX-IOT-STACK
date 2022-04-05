@@ -72,7 +72,7 @@ enum transport_flags {
 typedef struct oc_endpoint_t
 {
   struct oc_endpoint_t *next; /**< pointer to the next structure */
-  size_t device;        /**< device index */
+  size_t device;              /**< device index */
   enum transport_flags flags; /**< the transport flags */
   oc_string_t serial_number;  /**< serial number of the device to talk to */
   union dev_addr {
@@ -81,7 +81,7 @@ typedef struct oc_endpoint_t
   } addr, addr_local;
   int interface_index; /**< interface index */
   uint8_t priority;    /**< priority */
-  int group_id; /**< group_id identifier */
+  int group_id;        /**< group_id identifier */
 #ifdef OC_OSCORE
   uint8_t piv[OSCORE_PIV_LEN]; /**< oscore partial iv */
   uint8_t piv_len;             /**< oscore partial iv length */
