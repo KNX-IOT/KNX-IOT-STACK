@@ -190,8 +190,9 @@ OC_PROCESS_THREAD(message_buffer_handler, ev, data)
           msg->endpoint.flags += OSCORE;
           oc_process_post(&oc_oscore_handler, oc_events[INBOUND_OSCORE_EVENT],
                           data);
-        } else {
+        } else
 #endif /* OC_OSCORE*/
+        {
           OC_DBG_OSCORE("Inbound network event: decrypted request");
           oc_process_post(&coap_engine, oc_events[INBOUND_RI_EVENT], data);
         }
