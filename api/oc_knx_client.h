@@ -149,7 +149,6 @@ void oc_do_s_mode_read(size_t group_address);
  */
 void oc_do_s_mode_with_scope(int scope, char *resource_url, char *rp);
 
-
 /**
  * @brief sends (transmits) an s-mode message
  * the value comes from the GET of the resource indicated by the resource_url

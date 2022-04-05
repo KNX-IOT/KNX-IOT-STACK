@@ -601,11 +601,11 @@ oc_do_s_mode_read(size_t group_address)
   }
 }
 
-
 // note: this function does not check the transmit flag
 // the caller of this function needs to check if the flag is set.
 void
-oc_do_s_mode_with_scope_and_check(int scope, char *resource_url, char *rp, bool check)
+oc_do_s_mode_with_scope_and_check(int scope, char *resource_url, char *rp,
+                                  bool check)
 {
   int value_size;
   bool error = true;
@@ -639,7 +639,8 @@ oc_do_s_mode_with_scope_and_check(int scope, char *resource_url, char *rp, bool 
   oc_resource_t *my_resource =
     oc_ri_get_app_resource_by_uri(resource_url, strlen(resource_url), 0);
   if (my_resource == NULL) {
-    PRINT(" oc_do_s_mode_with_scope_internal : error no URL found %s\n", resource_url);
+    PRINT(" oc_do_s_mode_with_scope_internal : error no URL found %s\n",
+          resource_url);
     return;
   }
 
@@ -655,9 +656,9 @@ oc_do_s_mode_with_scope_and_check(int scope, char *resource_url, char *rp, bool 
   while (index != -1) {
     int ga_len = oc_core_find_group_object_table_number_group_entries(index);
     oc_cflag_mask_t cflags = oc_core_group_object_table_cflag_entries(index);
-    
+
     PRINT(" index %d rp = %s cflags %d flags=", index, rp, cflags);
-       oc_print_cflags(cflags);
+    oc_print_cflags(cflags);
 
     bool do_send = (cflags & OC_CFLAG_TRANSMISSION) > 0;
     if (check == false) {
