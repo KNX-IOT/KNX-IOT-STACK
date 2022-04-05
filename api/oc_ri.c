@@ -527,13 +527,12 @@ start_processes(void)
   oc_process_start(&coap_engine, NULL);
   oc_process_start(&message_buffer_handler, NULL);
 
-// TODO
-//#ifdef OC_SECURITY
-#ifdef OC_OSCORE
-  oc_process_start(&oc_tls_handler, NULL);
 #ifdef OC_OSCORE
   oc_process_start(&oc_oscore_handler, NULL);
 #endif /* OC_OSCORE */
+
+#ifdef OC_SECURITY
+  oc_process_start(&oc_tls_handler, NULL);
 #endif /* OC_SECURITY */
 
   oc_process_start(&oc_network_events, NULL);
@@ -552,11 +551,11 @@ stop_processes(void)
   oc_process_exit(&oc_etimer_process);
   oc_process_exit(&timed_callback_events);
   oc_process_exit(&coap_engine);
-
-#ifdef OC_SECURITY
 #ifdef OC_OSCORE
   oc_process_exit(&oc_oscore_handler);
 #endif /* OC_OSCORE */
+
+#ifdef OC_SECURITY
   oc_process_exit(&oc_tls_handler);
 #endif /* OC_SECURITY */
 #ifdef OC_OSCORE

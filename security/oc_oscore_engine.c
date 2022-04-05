@@ -109,7 +109,7 @@ oc_oscore_recv_message(oc_message_t *message)
    */
 
   if (oscore_is_oscore_message(message) >= 0) {
-    OC_DBG_OSCORE("#################################");
+    OC_DBG_OSCORE("#################################: found OSCORE header");
     oc_oscore_context_t *oscore_ctx = NULL;
     // message->endpoint.flags |= SECURED;
     message->endpoint.flags += OSCORE;
@@ -357,7 +357,7 @@ oc_oscore_send_multicast_message(oc_message_t *message)
    */
   uint64_t group_id = 0;
 
-  // group_id = message->data.
+  group_id = message->endpoint.group_id;
 
   oc_oscore_context_t *oscore_ctx = oc_oscore_find_group_context(group_id);
 
@@ -531,13 +531,18 @@ oc_oscore_send_message(oc_message_t *msg)
    * Dispatch oc_message_t to the TLS layer
    */
   oc_message_t *message = msg;
-  oc_oscore_context_t *oscore_ctx = oc_oscore_find_context_by_serial_number(
+  oc_oscore_context_t *oscore_ctx = NULL;
+  oscore_ctx = oc_oscore_find_context_by_serial_number(
     message->endpoint.device, message->endpoint.serial_number);
+  if (oscore_ctx == NULL) {
+    oscore_ctx = oc_oscore_find_context_by_group_id(message->endpoint.device,
+                                                    message->endpoint.group_id);
+  }
 
   if (oscore_ctx) {
     OC_DBG_OSCORE("#################################");
-    OC_DBG_OSCORE(
-      "found OSCORE context corresponding to the peer serial number");
+    OC_DBG_OSCORE("found OSCORE context corresponding to the peer serial "
+                  "number or group_id");
     /* Is this is an inadvertent response to a secure multi cast message */
     if (msg->endpoint.flags & MULTICAST) {
       OC_DBG_OSCORE(

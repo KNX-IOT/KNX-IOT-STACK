@@ -693,7 +693,7 @@ network_event_thread(void *data)
   dev->event_server_handle = server6_event;
 
 //#ifdef OC_SECURITY
-#ifdef OC_OSCORE
+#ifdef OC_SECURITY
   WSAEVENT secure6_event = WSACreateEvent();
   OC_WSAEVENTSELECT(dev->secure_sock, secure6_event, FD_READ);
 #endif /* OC_SECURITY */
@@ -727,8 +727,8 @@ network_event_thread(void *data)
   DWORD SERVER6 = events_list_size;
   events_list[events_list_size] = server6_event;
   events_list_size++;
-//#if defined(OC_SECURITY)
-#if defined(OC_OSCORE)
+#if defined(OC_SECURITY)
+  //#if defined(OC_OSCORE)
   DWORD SECURE6 = events_list_size;
   events_list[events_list_size] = secure6_event;
   events_list_size++;
@@ -838,7 +838,7 @@ network_event_thread(void *data)
 #endif /* OC_IPV4 */
 
 //#ifdef OC_SECURITY
-#ifdef OC_OSCORE
+#ifdef OC_SECURITY /* receiving from a secure socket */
         if (i == SECURE6) {
           int count = recv_msg(dev->secure_sock, message->data, OC_PDU_SIZE,
                                &message->endpoint, false);
@@ -1118,6 +1118,10 @@ oc_send_buffer(oc_message_t *message)
   SOCKET send_sock = INVALID_SOCKET;
 
   ip_context_t *dev = get_ip_context_for_device(message->endpoint.device);
+  if (dev == NULL) {
+    OC_ERR("NO IP context for device");
+    return -1;
+  }
 #ifdef OC_TCP
   if (message->endpoint.flags & TCP) {
     return oc_tcp_send_buffer(dev, message, &receiver);
@@ -1125,7 +1129,7 @@ oc_send_buffer(oc_message_t *message)
 #endif /* OC_TCP */
 
 //#ifdef OC_SECURITY
-#ifdef OC_OSCORE
+#ifdef OC_SECURITY /*  not using secured socket to send*/
   if (message->endpoint.flags & SECURED) {
 #ifdef OC_IPV4
     if (message->endpoint.flags & IPV4) {
@@ -1146,7 +1150,9 @@ oc_send_buffer(oc_message_t *message)
   }
 #else  /* OC_IPV4 */
   {
+    // if (dev) {
     send_sock = dev->server_sock;
+    //}
   }
 #endif /* !OC_IPV4 */
 

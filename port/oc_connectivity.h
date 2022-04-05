@@ -120,10 +120,7 @@ struct oc_message_s
 #ifdef OC_TCP
   size_t read_offset;
 #endif /* OC_TCP */
-//#ifdef OC_SECURITY
-#ifdef OC_OSCORE
   uint8_t encrypted;
-#endif /* OC_SECURITY */
 };
 
 /**

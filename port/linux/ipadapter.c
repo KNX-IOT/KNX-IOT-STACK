@@ -744,7 +744,7 @@ recv_msg(int sock, uint8_t *recv_buf, int recv_buf_size,
   for (cmsg = CMSG_FIRSTHDR(&msg); cmsg != 0; cmsg = CMSG_NXTHDR(&msg, cmsg)) {
     if (cmsg->cmsg_level == IPPROTO_IPV6 && cmsg->cmsg_type == IPV6_PKTINFO) {
       if (msg.msg_namelen != sizeof(struct sockaddr_in6)) {
-        OC_ERR("anciliary data contains invalid source address");
+        OC_ERR("ancillary data contains invalid source address");
         return -1;
       }
       /* Set source address of packet in endpoint structure */
@@ -774,7 +774,7 @@ recv_msg(int sock, uint8_t *recv_buf, int recv_buf_size,
 #ifdef OC_IPV4
     else if (cmsg->cmsg_level == SOL_IP && cmsg->cmsg_type == IP_PKTINFO) {
       if (msg.msg_namelen != sizeof(struct sockaddr_in)) {
-        OC_ERR("anciliary data contains invalid source address");
+        OC_ERR("ancillary data contains invalid source address");
         return -1;
       }
       struct in_pktinfo *pktinfo = (struct in_pktinfo *)CMSG_DATA(cmsg);
@@ -869,8 +869,7 @@ oc_udp_receive_message(ip_context_t *dev, fd_set *fds, oc_message_t *message)
   }
 #endif /* OC_IPV4 */
 
-//#ifdef OC_SECURITY
-#ifdef OC_OSCORE
+#ifdef OC_SECURITY
   if (FD_ISSET(dev->secure_sock, fds)) {
     int count = recv_msg(dev->secure_sock, message->data, OC_PDU_SIZE,
                          &message->endpoint, false);
@@ -1116,7 +1115,7 @@ oc_send_buffer(oc_message_t *message)
 #endif /* OC_TCP */
 
 //#ifdef OC_SECURITY
-#ifdef OC_OSCORE
+#ifdef OC_SECURITY
   if (message->endpoint.flags & SECURED) {
 #ifdef OC_IPV4
     if (message->endpoint.flags & IPV4) {
@@ -1144,7 +1143,6 @@ oc_send_buffer(oc_message_t *message)
   return send_msg(send_sock, &receiver, message);
 }
 
-#ifdef OC_CLIENT
 void
 oc_send_discovery_request(oc_message_t *message)
 {
@@ -1218,7 +1216,6 @@ done:
 #undef IN6_IS_ADDR_MC_REALM_LOCAL
   freeifaddrs(ifs);
 }
-#endif /* OC_CLIENT */
 
 #ifdef OC_NETWORK_MONITOR
 int

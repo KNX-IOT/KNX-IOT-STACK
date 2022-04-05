@@ -35,17 +35,18 @@
 
 typedef struct broker_s_mode_userdata_t
 {
-  int ia;          //!< internal address of the destination
-  char path[20];   //< the path on the device designated with ia
-  int ga;          //!< group address to use
-  char rp_type[3]; //!< mode to send the message "w"  = 1  "r" = 2  "rp" = 3
-  char resource_url[20]; //< the url to pull the data from.
+  int ia;          /**< internal address of the destination */
+  char path[20];   /**< the path on the device designated with ia */
+  int ga;          /**< group address to use */
+  char rp_type[3]; /**< mode to send the message "w"  = 1  "r" = 2  "rp" = 3 */
+  char resource_url[20]; /**< the url to pull the data from. */
 } broker_s_mode_userdata_t;
 
 typedef struct oc_spake_context_t
 {
   char spake_password[MAX_PASSWORD_LEN]; /**< spake password */
   oc_string_t serial_number;             /**< the serial number of the device */
+  char oscore_id[MAX_PASSWORD_LEN];      /**< the oscore_id for the device */
 } oc_spake_context_t;
 
 // ----------------------------------------------------------------------------
@@ -115,7 +116,7 @@ finish_spake_handshake(oc_client_response_t *data)
 
   if (m_spake_cb) {
     // PRINT("CALLING CALLBACK------->\n");
-    m_spake_cb(0, shared_key, shared_key_len);
+    m_spake_cb(0, "", shared_key, shared_key_len);
   }
 }
 
@@ -227,7 +228,8 @@ do_credential_exchange(oc_client_response_t *data)
     }
     // OSCORE context
     if (rep->type == OC_REP_BYTE_STRING && rep->iname == 0) {
-      // TODO do something with rep->value.string
+      strncpy((char *)&g_spake_ctx.oscore_id, oc_string(rep->value.string),
+              MAX_PASSWORD_LEN);
     }
     rep = rep->next;
   }
@@ -274,6 +276,7 @@ oc_initiate_spake(oc_endpoint_t *endpoint, char *password, char *oscore_id)
   oc_rep_begin_root_object();
   if (oscore_id) {
     oc_rep_i_set_byte_string(root, 0, oscore_id, strlen(oscore_id));
+    strncpy((char *)&g_spake_ctx.oscore_id, oscore_id, MAX_PASSWORD_LEN);
   }
   oc_rep_i_set_byte_string(root, 15, rnd, 32);
   oc_rep_end_root_object();

@@ -123,8 +123,24 @@ oc_oscore_find_context_by_serial_number(size_t device,
 
   oc_oscore_context_t *ctx = (oc_oscore_context_t *)oc_list_head(contexts);
   while (ctx != NULL) {
-    oc_string_t ctx_serial_number = ctx->destination_serial_number;
+    oc_string_t ctx_serial_number = ctx->serial_number;
     if (oc_string_cmp(serial_number, ctx_serial_number) == 0) {
+      return ctx;
+    }
+    ctx = ctx->next;
+  }
+  return ctx;
+}
+
+oc_oscore_context_t *
+oc_oscore_find_context_by_group_id(size_t device, int group_id)
+{
+  (void)device;
+
+  oc_oscore_context_t *ctx = (oc_oscore_context_t *)oc_list_head(contexts);
+  while (ctx != NULL) {
+    int ctx_group_id = ctx->group_id;
+    if (group_id == ctx_group_id) {
       return ctx;
     }
     ctx = ctx->next;

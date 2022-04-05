@@ -1,6 +1,6 @@
 /*
 // Copyright (c) 2016 Intel Corporation
-// Copyright (c) 2021 Cascoda Ltd
+// Copyright (c) 2021-2022 Cascoda Ltd
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -135,8 +135,7 @@ coap_send_empty_response(coap_message_type_t type, uint16_t mid,
   }
 }
 
-//#ifdef OC_SECURITY
-#ifdef OC_OSCORE
+#ifdef OC_SECURITY
 static oc_event_callback_retval_t
 close_all_tls_sessions(void *data)
 {
@@ -145,7 +144,7 @@ close_all_tls_sessions(void *data)
   oc_set_drop_commands(device, false);
   return OC_EVENT_DONE;
 }
-#endif /* OC_OSCORE */
+#endif /* OC_SECURITY */
 
 /*---------------------------------------------------------------------------*/
 /*- Internal API ------------------------------------------------------------*/
@@ -159,9 +158,9 @@ coap_receive(oc_message_t *msg)
   OC_LOGipaddr(msg->endpoint);
   OC_LOGbytes(msg->data, msg->length);
 
-  // PRINT("CoAP Engine: received datalen=%u from ", (unsigned int)msg->length);
-  // PRINTipaddr(msg->endpoint);
-  // PRINT("\n");
+  PRINT("CoAP Engine: received datalen=%u from ", (unsigned int)msg->length);
+  PRINTipaddr(msg->endpoint);
+  PRINT("\n");
 
   /* static declaration reduces stack peaks and program code size */
   static coap_packet_t
@@ -888,8 +887,8 @@ send_message:
     }
   }
 
-//#ifdef OC_SECURITY
-#ifdef OC_OSCORE
+#ifdef OC_SECURITY
+  //#ifdef OC_OSCORE
   if (coap_status_code == CLOSE_ALL_TLS_SESSIONS) {
     oc_set_drop_commands(msg->endpoint.device, true);
     oc_set_delayed_callback((void *)msg->endpoint.device,
