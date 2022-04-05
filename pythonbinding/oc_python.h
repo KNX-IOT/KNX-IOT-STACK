@@ -114,7 +114,7 @@ typedef void (*gatewayCB)(char *sender_ip_address, int payload_size,
  * @see ets_cbor_post
  * @see ets_cbor_put
  * @see ets_cbor_delete
- *      
+ *
  * @param sn the serial number of the device
  * @param status The state of the device
  * @param r_format the return format
