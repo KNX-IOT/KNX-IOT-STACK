@@ -28,8 +28,8 @@
 #ifdef OC_OSCORE
 #include "security/oc_tls.h"
 #include "security/oc_oscore.h"
-#include "messaging/coap/oscore.h"
 #endif /* OC_OSCORE */
+#include "messaging/coap/oscore.h"
 
 #include "oc_buffer.h"
 #include "oc_config.h"
@@ -217,11 +217,6 @@ OC_PROCESS_THREAD(message_buffer_handler, ev, data)
         OC_DBG_OSCORE("Outbound network event: multicast request");
         oc_send_discovery_request(message);
         oc_message_unref(message);
-      }
-        if (message->endpoint.flags & OSCORE) {
-        OC_DBG("Outbound unicast network event: forwarding to OSCORE");
-        oc_process_post(&oc_oscore_handler, oc_events[OUTBOUND_OSCORE_EVENT],
-                        data);
       } else
 #ifdef OC_SECURITY
         OC_DBG("Outbound network event: forwarding to TLS");
