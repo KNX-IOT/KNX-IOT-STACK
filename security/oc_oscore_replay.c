@@ -1,9 +1,6 @@
 #include "oc_endpoint.h"
-
 #include "oc_oscore_replay.h"
 
-// temporary
-#define OC_OSCORE
 #ifdef OC_OSCORE
 
 static struct {
