@@ -183,15 +183,15 @@ OC_PROCESS_THREAD(message_buffer_handler, ev, data)
         oc_process_post(&oc_tls_handler, oc_events[UDP_TO_TLS_EVENT], data);
       } else {
 #endif /* OC_SECURITY*/
+#ifdef OC_OSCORE
         if (oscore_is_oscore_message((oc_message_t *)data)) {
           OC_DBG_OSCORE("Inbound network event: oscore request ==> decrypt");
-#ifdef OC_OSCORE
           oc_message_t *msg = (oc_message_t *)data;
           msg->endpoint.flags += OSCORE;
           oc_process_post(&oc_oscore_handler, oc_events[INBOUND_OSCORE_EVENT],
                           data);
-#endif /* OC_OSCORE*/
         } else {
+#endif /* OC_OSCORE*/
           OC_DBG_OSCORE("Inbound network event: decrypted request");
           oc_process_post(&coap_engine, oc_events[INBOUND_RI_EVENT], data);
         }
@@ -211,7 +211,12 @@ OC_PROCESS_THREAD(message_buffer_handler, ev, data)
           "Outbound secure multicast request: forwarding to OSCORE\n");
         oc_process_post(&oc_oscore_handler,
                         oc_events[OUTBOUND_GROUP_OSCORE_EVENT], data);
-      } else 
+      } else if (message->endpoint.flags & OSCORE) {
+        OC_DBG_OSCORE(
+          "Outbound secure unicast request: forwarding to OSCORE\n");
+        oc_process_post(&oc_oscore_handler,
+                        oc_events[OUTBOUND_GROUP_OSCORE_EVENT], data);
+      } else
 #endif /* OC_OSCORE */     
       if (message->endpoint.flags & DISCOVERY) {
         OC_DBG_OSCORE("Outbound network event: multicast request");
