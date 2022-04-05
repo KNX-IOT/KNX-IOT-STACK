@@ -116,22 +116,6 @@ oc_rep_t *oc_s_mode_get_value(oc_request_t *request);
 /** @} */ // end of doc_module_tag_s_mode_server
 
 /**
- * @brief sends an s-mode message
- * the value comes from the GET of the resource indicated by the resource_url
- * The uri the multicast address with group id and installation id incorporated
- * the path is ".knx"
- * the sia (sender individual address) is taken from the device
- * the ga is coming from the group address table that is listing the resource
- * url (path) if more than one entry in the group object table, then all group
- * address are used to send the POST request too.
- *
- * @param resource_url URI of the resource (e.g. implemented on the device that
- * is calling this function)
- * @param rp the "st" value to send e.g. "w" | "rp" | "r"
- */
-void oc_do_s_mode(char *resource_url, char *rp);
-
-/**
  * @brief sends out an s-mode read request.
  * The read request has no data value
  *
@@ -154,7 +138,8 @@ void oc_do_s_mode_read(size_t group_address);
  * for the recipient table all entries are used to send the unicast
  * communication.
  *
- * Note: function does not check the flags on the resource
+ * Note: function does check the T flag on the resource
+ *       if the T flag is not set, then the message is NOT send.
  *
  * @param scope the multi-cast scope
  * @param resource_url URI of the resource (e.g. implemented on the device that

@@ -200,7 +200,8 @@ bool g_bool_value = false;
 static void
 issue_requests_s_mode(void)
 {
-  oc_do_s_mode("p/1", "w");
+  oc_do_s_mode_with_scope(2, "p/1", "w");
+  oc_do_s_mode_with_scope(5, "p/1", "w");
 }
 
 PyObject *pModule;
