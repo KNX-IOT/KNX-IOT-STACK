@@ -28,6 +28,7 @@
 #ifdef OC_OSCORE
 #include "security/oc_tls.h"
 #include "security/oc_oscore.h"
+#include "messaging/coap/oscore.h"
 #endif /* OC_OSCORE */
 
 #include "oc_buffer.h"

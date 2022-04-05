@@ -315,20 +315,20 @@ inform_discovery_python(int payload_size, const char *payload)
 
 /**
  * function to call the callback for discovery to python.
- * CFUNCTYPE(None, c_int, c_char_p, c_int)
+ * CFUNCTYPE(None, c_int,  c_char_p, c_char_p, c_int)
  */
 void
-inform_spake_python(char *sn, int state, char *key, int key_size)
+inform_spake_python(char *sn, int state, char* oscore_id, char *key, int key_size)
 {
-  PRINT("[C]inform_spake_python %p %s %d %d key=[", my_CBFunctions.spakeFCB, sn,
-        state, key_size);
+  PRINT("[C]inform_spake_python %p sn:%s state:%d oscore_id:%skey_size:%d key=[", my_CBFunctions.spakeFCB, sn,
+        state, oscore_id, key_size);
   for (int i = 0; i < key_size; i++) {
     PRINT("%02x", (unsigned char)key[i]);
   }
   PRINT("]\n");
 
   if (my_CBFunctions.spakeFCB != NULL) {
-    my_CBFunctions.spakeFCB(sn, state, key, key_size);
+    my_CBFunctions.spakeFCB(sn, state, oscore_id, key, key_size);
   }
 }
 
@@ -852,14 +852,15 @@ ets_initiate_spake(char *sn, char *password, char *oscore_id)
   PRINT("  [C]py_initiate_spake: [%d]-- done\n", ret);
   if (ret == -1) {
     // failure, so unblock python
-    inform_spake_python(sn, ret, "", 0);
+    inform_spake_python(sn, ret, "", "", 0);
   }
 }
 
 void
 spake_callback(int error, uint8_t *secret, int secret_size)
 {
-  inform_spake_python("", error, secret, secret_size);
+  char *oscore_id = "";
+  inform_spake_python("", error, oscore_id, secret, secret_size);
 }
 
 // -----------------------------------------------------------------------------

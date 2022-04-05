@@ -66,8 +66,10 @@ from python.
  * @param state The state of the device
  * @param secret the negotiated master secret
  * @param secret_size the negotiated master secret size
+ * @param oscore_id the oscore id (from the input of the initiator)
  */
-typedef void (*spakeCB)(char *sn, int state, char *secret, int secret_size);
+typedef void (*spakeCB)(char *sn, int state, char *secret, int secret_size,
+                        char *oscore_id);
 
 /**
  * @brief The changed callback function type
