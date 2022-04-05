@@ -864,6 +864,11 @@ issue_requests_s_mode_delayed(void *data)
   oc_register_group_multicasts();
 
   PRINT("  issue_requests_s_mode: issue\n");
+
+  PRINT("  issue_requests_s_mode: issue\n");
+  oc_do_s_mode_with_scope(2, "/p/b", "w");
+  oc_do_s_mode_with_scope(5, "/p/b", "w");
+
   oc_do_s_mode_with_scope(2, "/p/c", "w");
   oc_do_s_mode_with_scope(5, "/p/c", "w");
 

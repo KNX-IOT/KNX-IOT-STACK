@@ -605,7 +605,7 @@ oc_do_s_mode_read(size_t group_address)
 // note: this function does not check the transmit flag
 // the caller of this function needs to check if the flag is set.
 void
-oc_do_s_mode_with_scope_internal(int scope, char *resource_url, char *rp, bool check)
+oc_do_s_mode_with_scope_and_check(int scope, char *resource_url, char *rp, bool check)
 {
   int value_size;
   bool error = true;
@@ -619,18 +619,18 @@ oc_do_s_mode_with_scope_internal(int scope, char *resource_url, char *rp, bool c
     error = false;
   }
   if (error) {
-    OC_ERR("oc_do_s_mode_with_scope : rp value incorrect %s", rp);
+    OC_ERR("oc_do_s_mode_with_scope_internal : rp value incorrect %s", rp);
     return;
   }
 
   if (resource_url == NULL) {
-    OC_ERR("oc_do_s_mode: resource url is NULL");
+    OC_ERR("oc_do_s_mode_with_scope_internal: resource url is NULL");
     return;
   }
 
   uint8_t *buffer = malloc(100);
   if (!buffer) {
-    OC_ERR("oc_do_s_mode: out of memory allocating buffer");
+    OC_ERR("oc_do_s_mode_with_scope_internal: out of memory allocating buffer");
     return;
   } //! buffer
 
@@ -639,7 +639,7 @@ oc_do_s_mode_with_scope_internal(int scope, char *resource_url, char *rp, bool c
   oc_resource_t *my_resource =
     oc_ri_get_app_resource_by_uri(resource_url, strlen(resource_url), 0);
   if (my_resource == NULL) {
-    PRINT(" oc_do_s_mode : error no URL found %s\n", resource_url);
+    PRINT(" oc_do_s_mode_with_scope_internal : error no URL found %s\n", resource_url);
     return;
   }
 
@@ -659,7 +659,7 @@ oc_do_s_mode_with_scope_internal(int scope, char *resource_url, char *rp, bool c
     PRINT(" index %d rp = %s cflags %d flags=", index, rp, cflags);
        oc_print_cflags(cflags);
 
-    bool do_send = (cflags & OC_CFLAG_READ) > 0;
+    bool do_send = (cflags & OC_CFLAG_TRANSMISSION) > 0;
     if (check == false) {
       PRINT("    not checking flags.. always send\n");
       do_send = true;
@@ -706,14 +706,14 @@ oc_do_s_mode_with_scope_internal(int scope, char *resource_url, char *rp, bool c
 void
 oc_do_s_mode_with_scope_no_check(int scope, char *resource_url, char *rp)
 {
-  oc_do_s_mode_with_scope_internal(scope, resource_url, rp, false);
+  oc_do_s_mode_with_scope_and_check(scope, resource_url, rp, false);
 }
 
 // note: this function does check the transmit flag
 void
 oc_do_s_mode_with_scope(int scope, char *resource_url, char *rp)
 {
-  oc_do_s_mode_with_scope_internal(scope, resource_url, rp, true);
+  oc_do_s_mode_with_scope_and_check(scope, resource_url, rp, true);
 }
 
 // ----------------------------------------------------------------------------
