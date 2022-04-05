@@ -535,14 +535,14 @@ oc_oscore_send_message(oc_message_t *msg)
   oscore_ctx = oc_oscore_find_context_by_serial_number(
     message->endpoint.device, message->endpoint.serial_number);
   if (oscore_ctx == NULL) {
-    oscore_ctx = oc_oscore_find_context_by_group_id(
-      message->endpoint.device, message->endpoint.group_id);
+    oscore_ctx = oc_oscore_find_context_by_group_id(message->endpoint.device,
+                                                    message->endpoint.group_id);
   }
 
   if (oscore_ctx) {
     OC_DBG_OSCORE("#################################");
-    OC_DBG_OSCORE(
-      "found OSCORE context corresponding to the peer serial number or group_id");
+    OC_DBG_OSCORE("found OSCORE context corresponding to the peer serial "
+                  "number or group_id");
     /* Is this is an inadvertent response to a secure multi cast message */
     if (msg->endpoint.flags & MULTICAST) {
       OC_DBG_OSCORE(

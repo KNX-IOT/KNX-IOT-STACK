@@ -318,10 +318,12 @@ inform_discovery_python(int payload_size, const char *payload)
  * CFUNCTYPE(None, c_int,  c_char_p, c_char_p, c_int)
  */
 void
-inform_spake_python(char *sn, int state, char* oscore_id, char *key, int key_size)
+inform_spake_python(char *sn, int state, char *oscore_id, char *key,
+                    int key_size)
 {
-  PRINT("[C]inform_spake_python %p sn:%s state:%d oscore_id:%skey_size:%d key=[", my_CBFunctions.spakeFCB, sn,
-        state, oscore_id, key_size);
+  PRINT(
+    "[C]inform_spake_python %p sn:%s state:%d oscore_id:%skey_size:%d key=[",
+    my_CBFunctions.spakeFCB, sn, state, oscore_id, key_size);
   for (int i = 0; i < key_size; i++) {
     PRINT("%02x", (unsigned char)key[i]);
   }

@@ -888,7 +888,7 @@ send_message:
   }
 
 #ifdef OC_SECURITY
-//#ifdef OC_OSCORE
+  //#ifdef OC_OSCORE
   if (coap_status_code == CLOSE_ALL_TLS_SESSIONS) {
     oc_set_drop_commands(msg->endpoint.device, true);
     oc_set_delayed_callback((void *)msg->endpoint.device,

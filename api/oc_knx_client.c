@@ -116,7 +116,7 @@ finish_spake_handshake(oc_client_response_t *data)
 
   if (m_spake_cb) {
     // PRINT("CALLING CALLBACK------->\n");
-    m_spake_cb(0 ,"" , shared_key, shared_key_len);
+    m_spake_cb(0, "", shared_key, shared_key_len);
   }
 }
 
