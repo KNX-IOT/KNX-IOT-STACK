@@ -1,5 +1,5 @@
 /*
-// Copyright (c) 2021 Cascoda Ltd
+// Copyright (c) 2021-2022 Cascoda Ltd
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ extern "C" {
 
 /**
 @defgroup doc_module_tag_dll DLL
-Group of exported functions, so that these functions can be used with a dll or
+Group of exported functions, so that these functions can be used with a DLL or
 shared object.
 
 # request data
@@ -60,13 +60,13 @@ from python.
 */
 
 /**
- * @brief the spake callback function type
+ * @brief The spake callback function type
  *
  * @param sn the serial number of the device
  * @param state The state of the device
  * @param secret the negotiated master secret
  * @param secret_size the negotiated master secret size
- * @param oscore_id the oscore id (from the input of the initiator)
+ * @param oscore_id the OSCORE id (from the input of the initiator)
  */
 typedef void (*spakeCB)(char *sn, int state, char *secret, int secret_size,
                         char *oscore_id);
@@ -81,7 +81,7 @@ typedef void (*changedCB)(char *uuid, char *state, char *event);
  * @brief The discovery callback function type
  *
  * @param payload_size the size of the payload in bytes
- * @param payload the ascii payload e.g. link-formatted data
+ * @param payload the ASCII payload e.g. link-formatted data
  */
 typedef void (*discoveryCB)(int payload_size, char *payload);
 
@@ -97,13 +97,13 @@ typedef void (*resourceCB)(char *anchor, char *uri, char *types,
  *
  * @param sender_ip_address the sender address
  * @param payload_size the size of the payload in bytes
- * @param payload the ascii payload json
+ * @param payload the ASCII payload as JSON
  */
 typedef void (*gatewayCB)(char *sender_ip_address, int payload_size,
                           char *payload);
 
 /**
- * @brief the client callback function
+ * @brief The client callback function
  * When one of the CoAP methods is called for interacting with an KNX device
  * this callback is being called with the expected results.
  *
@@ -114,40 +114,41 @@ typedef void (*gatewayCB)(char *sender_ip_address, int payload_size,
  * @see ets_cbor_post
  * @see ets_cbor_put
  * @see ets_cbor_delete
+ *
  * @param sn the serial number of the device
  * @param status The state of the device
  * @param r_format the return format
  * @param r_id the r_id (string), e.g. info that has been set on the call
  * @param url the called url
  * @param payload_size the size of the payload in bytes
- * @param payload the ascii payload e.g. link-formatted data
+ * @param payload the ASCII payload e.g. the core link formatted data
  */
 typedef void (*clientCB)(char *sn, int status, char *r_format, char *r_id,
                          char *url, int payload_size, char *payload);
 
 /**
- * @brief returns the application max data size, e.g. data size for each call
+ * @brief Returns the application max data size, e.g. data size for each call
  *
  * @return max data size
  */
 kisCS_EXPORT long ets_get_max_app_data_size(void);
 
 /**
- * @brief sets the maximum data size, e.g. the data size for each call
+ * @brief Sets the maximum data size, e.g. the data size for each call
  *
  * @param data_size the data size
  */
 kisCS_EXPORT void ets_set_max_app_data_size(int data_size);
 
 /**
- * @brief install the changed callback
+ * @brief Install the changed callback
  *
  * @param changedCB the changed callback
  */
 kisCS_EXPORT void ets_install_changedCB(changedCB changedCB);
 
 /**
- * @brief install the resource callback (not yet used)
+ * @brief Install the resource callback (not yet used)
  *
  * @param resourceCB the resource callback
  */
@@ -282,7 +283,7 @@ kisCS_EXPORT void ets_cbor_delete(char *sn, char *uri, char *query, char *r_id);
  *
  * @param sn the serial number of the device
  * @param password the password of the device
- * @param oscore_id the oscore id for the spake handshake
+ * @param oscore_id the OSCORE id for the spake handshake
  */
 kisCS_EXPORT void ets_initiate_spake(char *sn, char *password, char *oscore_id);
 
@@ -372,7 +373,7 @@ kisCS_EXPORT void ets_exit(int signal);
 
 /**
  * @brief start the ETS server
- * The initialisation of the KNX server code
+ * The initialization of the KNX server code
  * This function should by followed by a loop that calls ets_poll()
  * The clean up can be done when the polling is finished by calling ets_stop()
  * Example:
