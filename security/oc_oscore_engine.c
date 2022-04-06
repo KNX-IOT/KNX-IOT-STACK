@@ -538,6 +538,9 @@ oc_oscore_send_message(oc_message_t *msg)
     oscore_ctx = oc_oscore_find_context_by_group_id(message->endpoint.device,
                                                     message->endpoint.group_id);
   }
+  if(oscore_ctx == NULL) {
+    OC_DBG_OSCORE("oc_oscore_send_message: No OSCORE context found. ERROR");
+  }
 
   if (oscore_ctx) {
     OC_DBG_OSCORE("#################################");
@@ -843,7 +846,11 @@ OC_PROCESS_THREAD(oc_oscore_handler, ev, data)
     else if (ev == oc_events[OUTBOUND_GROUP_OSCORE_EVENT]) {
       OC_DBG_OSCORE("Outbound OSCORE event: protecting multicast message");
       oc_oscore_send_multicast_message(data);
-    }
+    } 
+    //else if (ev == oc_events[OUTBOUND_OSCORE_EVENT]) {
+    //  OC_DBG_OSCORE("Outbound OSCORE event: protecting unicast message");
+    //  oc_oscore_send_multicast_message(data);
+    //}
 #endif /* OC_CLIENT */
   }
 

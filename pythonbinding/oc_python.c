@@ -68,8 +68,8 @@ static CONDITION_VARIABLE cv;
 static CRITICAL_SECTION cs;
 
 /* OS specific definition for lock/unlock */
-#define py_mutex_lock(m) EnterCriticalSection(&m)
-#define py_mutex_unlock(m) LeaveCriticalSection(&m)
+#define ets_mutex_lock(m) EnterCriticalSection(&m)
+#define ets_mutex_unlock(m) LeaveCriticalSection(&m)
 
 #elif defined(__linux__)
 static pthread_t event_thread;
@@ -78,8 +78,8 @@ static pthread_mutex_t mutex;
 static pthread_cond_t cv;
 
 /* OS specific definition for lock/unlock */
-#define py_mutex_lock(m) pthread_mutex_lock(&m)
-#define py_mutex_unlock(m) pthread_mutex_unlock(&m)
+#define ets_mutex_lock(m) pthread_mutex_lock(&m)
+#define ets_mutex_unlock(m) pthread_mutex_unlock(&m)
 
 static struct timespec ts;
 #endif
@@ -341,7 +341,7 @@ inform_spake_python(char *sn, int state, char *oscore_id, char *key,
  *
  */
 device_handle_t *
-py_getdevice_from_sn(char *sn)
+ets_getdevice_from_sn(char *sn)
 {
   device_handle_t *device = NULL;
   device = (device_handle_t *)oc_list_head(discovered_devices);
@@ -467,23 +467,23 @@ general_get_cb(oc_client_response_t *data)
   }
   if (my_data) {
     if (data->content_format == APPLICATION_LINK_FORMAT) {
-      py_mutex_lock(app_sync_lock);
+      ets_mutex_lock(app_sync_lock);
       memset(buffer, 0, buffer_size);
       memcpy(&buffer, (char *)data->_payload, (int)data->_payload_len);
 
       inform_client_python((char *)my_data->sn, status, "link_format",
                            (char *)my_data->r_id, (char *)my_data->url,
                            (int)data->_payload_len, buffer);
-      py_mutex_unlock(app_sync_lock);
+      ets_mutex_unlock(app_sync_lock);
     } else if (data->content_format == APPLICATION_CBOR) {
-      py_mutex_lock(app_sync_lock);
+      ets_mutex_lock(app_sync_lock);
       memset(buffer, 0, buffer_size);
       int json_size =
         py_oc_rep_to_json(data->payload, (char *)&buffer, buffer_size, false);
       inform_client_python((char *)my_data->sn, status, "json",
                            (char *)my_data->r_id, (char *)my_data->url,
                            (int)json_size, (char *)buffer);
-      py_mutex_unlock(app_sync_lock);
+      ets_mutex_unlock(app_sync_lock);
     } else {
       PRINT(" [C]informing python with error \n");
       inform_client_python((char *)my_data->sn, status, "error",
@@ -501,7 +501,12 @@ void
 ets_cbor_get(char *sn, char *uri, char *query, char *cbdata)
 {
   int ret = -1;
-  device_handle_t *device = py_getdevice_from_sn(sn);
+  device_handle_t *target_device = ets_getdevice_from_sn(sn);
+
+  if (target_device == NULL) {
+    OC_ERR(" no device found for %s", sn);
+    return;
+  }
 
   user_struct_t *new_cbdata;
   new_cbdata = (user_struct_t *)malloc(sizeof(user_struct_t));
@@ -511,13 +516,21 @@ ets_cbor_get(char *sn, char *uri, char *query, char *cbdata)
     strcpy(new_cbdata->sn, sn);
   }
 
-  PRINT("  [C]py_cbor_get: [%s], [%s] [%s] [%s]\n", sn, uri, query, cbdata);
+  PRINT("  [C]ets_cbor_get: [%s], [%s] [%s] [%s]\n", sn, uri, query, cbdata);
 #ifdef OC_OSCORE
-  device->ep.flags += OSCORE;
+
+  
+  if ((target_device->ep.flags & OSCORE) == 0) {
+    target_device->ep.flags += OSCORE;
+  }
+
   PRINT("  [C] enable OSCORE encryption\n");
+  PRINTipaddr_flags(target_device->ep);
+  PRINTipaddr(target_device->ep);
+  PRINT("\n");
 #endif
 
-  ret = oc_do_get_ex(uri, &device->ep, query, general_get_cb, HIGH_QOS,
+  ret = oc_do_get_ex(uri, &target_device->ep, query, general_get_cb, HIGH_QOS,
                      APPLICATION_CBOR, APPLICATION_CBOR, new_cbdata);
   if (ret >= 0) {
     PRINT("  [C]Successfully issued GET request\n");
@@ -530,7 +543,11 @@ void
 ets_cbor_get_unsecured(char *sn, char *uri, char *query, char *cbdata)
 {
   int ret = -1;
-  device_handle_t *device = py_getdevice_from_sn(sn);
+  device_handle_t *device = ets_getdevice_from_sn(sn);
+
+  if ((device->ep.flags & OSCORE) > 0) {
+    device->ep.flags -= OSCORE;
+  }
 
   user_struct_t *new_cbdata;
   new_cbdata = (user_struct_t *)malloc(sizeof(user_struct_t));
@@ -540,7 +557,7 @@ ets_cbor_get_unsecured(char *sn, char *uri, char *query, char *cbdata)
     strcpy(new_cbdata->sn, sn);
   }
 
-  PRINT("  [C]py_cbor_get_unsecured: [%s], [%s] [%s] [%s]\n", sn, uri, query,
+  PRINT("  [C]ets_cbor_get_unsecured: [%s], [%s] [%s] [%s]\n", sn, uri, query,
         cbdata);
 
   ret = oc_do_get_ex(uri, &device->ep, query, general_get_cb, HIGH_QOS,
@@ -557,12 +574,12 @@ ets_linkformat_get(char *sn, char *uri, char *query, char *cbdata)
 {
   int ret = -1;
   oc_endpoint_t ep;
-  device_handle_t *device = py_getdevice_from_sn(sn);
+  device_handle_t *device = ets_getdevice_from_sn(sn);
 
-  PRINT("  [C]py_linkformat_get: [%s], [%s] [%s] [%s]\n", sn, uri, query,
+  PRINT("  [C]ets_linkformat_get: [%s], [%s] [%s] [%s]\n", sn, uri, query,
         cbdata);
 #ifdef OC_OSCORE
-  device->ep.flags += OSCORE;
+  device->ep.flags &= OSCORE;
   PRINT("  [C] enable OSCORE encryption\n");
 #endif
 
@@ -592,10 +609,14 @@ ets_linkformat_get_unsecured(char *sn, char *uri, char *query, char *cbdata)
 {
   int ret = -1;
   oc_endpoint_t ep;
-  device_handle_t *device = py_getdevice_from_sn(sn);
+  device_handle_t *device = ets_getdevice_from_sn(sn);
 
-  PRINT("  [C]py_linkformat_get_unsecured: [%s], [%s] [%s] [%s]\n", sn, uri,
+  PRINT("  [C]ets_linkformat_get_unsecured: [%s], [%s] [%s] [%s]\n", sn, uri,
         query, cbdata);
+
+  if ((device->ep.flags & OSCORE) > 0) {
+    device->ep.flags -= OSCORE;
+  }
 
   user_struct_t *new_cbdata;
   new_cbdata = (user_struct_t *)malloc(sizeof(user_struct_t));
@@ -624,12 +645,12 @@ void
 ets_cbor_post(char *sn, char *uri, char *query, char *id, int size, char *data)
 {
   int ret = -1;
-  device_handle_t *device = py_getdevice_from_sn(sn);
+  device_handle_t *device = ets_getdevice_from_sn(sn);
 
-  PRINT("  [C]py_cbor_post: [%s], [%s] [%s] [%s] %d\n", sn, uri, id, query,
+  PRINT("  [C]ets_cbor_post: [%s], [%s] [%s] [%s] %d\n", sn, uri, id, query,
         size);
 #ifdef OC_OSCORE
-  device->ep.flags += OSCORE;
+  device->ep.flags &= OSCORE;
   PRINT("  [C] enable OSCORE encryption\n");
 #endif
 
@@ -660,13 +681,15 @@ void
 ets_cbor_put(char *sn, char *uri, char *query, char *id, int size, char *data)
 {
   int ret = -1;
-  device_handle_t *device = py_getdevice_from_sn(sn);
+  device_handle_t *device = ets_getdevice_from_sn(sn);
 
-  PRINT("  [C]py_cbor_put: [%s], [%s] [%s] [%s] %d\n", sn, uri, id, query,
+  PRINT("  [C]ets_cbor_put: [%s], [%s] [%s] [%s] %d\n", sn, uri, id, query,
         size);
 #ifdef OC_OSCORE
-  device->ep.flags += OSCORE;
+  device->ep.flags &= OSCORE;
   PRINT("  [C] enable OSCORE encryption\n");
+  PRINTipaddr_flags(device->ep);
+  PRINT("\n");
 #endif
 
   user_struct_t *new_cbdata;
@@ -696,9 +719,9 @@ void
 ets_cbor_delete(char *sn, char *uri, char *query, char *id)
 {
   int ret = -1;
-  device_handle_t *device = py_getdevice_from_sn(sn);
+  device_handle_t *device = ets_getdevice_from_sn(sn);
 
-  PRINT("  [C]py_cbor_delete: [%s], [%s] [%s] [%s]\n", sn, uri, id, query);
+  PRINT("  [C]ets_cbor_delete: [%s], [%s] [%s] [%s]\n", sn, uri, id, query);
 #ifdef OC_OSCORE
   device->ep.flags += OSCORE;
   PRINT("  [C] enable OSCORE encryption\n");
@@ -823,18 +846,18 @@ discovery_cb(const char *payload, int len, oc_endpoint_t *endpoint,
 void
 ets_discover_devices(int scope)
 {
-  py_mutex_lock(app_sync_lock);
+  ets_mutex_lock(app_sync_lock);
   oc_do_wk_discovery_all("rt=urn:knx:dpa.*", scope, discovery_cb, NULL);
-  py_mutex_unlock(app_sync_lock);
+  ets_mutex_unlock(app_sync_lock);
   signal_event_loop();
 }
 
 void
 ets_discover_devices_with_query(int scope, const char *query)
 {
-  py_mutex_lock(app_sync_lock);
+  ets_mutex_lock(app_sync_lock);
   oc_do_wk_discovery_all(query, scope, discovery_cb, NULL);
-  py_mutex_unlock(app_sync_lock);
+  ets_mutex_unlock(app_sync_lock);
   signal_event_loop();
 }
 
@@ -844,14 +867,14 @@ void
 ets_initiate_spake(char *sn, char *password, char *oscore_id)
 {
   int ret = -1;
-  device_handle_t *device = py_getdevice_from_sn(sn);
+  device_handle_t *device = ets_getdevice_from_sn(sn);
 
-  PRINT("  [C]py_initiate_spake: [%s] [%s]\n", sn, password);
+  PRINT("  [C]ets_initiate_spake: [%s] [%s]\n", sn, password);
   if (oc_string_len(device->ep.serial_number) == 0) {
     oc_new_string(&device->ep.serial_number, sn, strlen(sn));
   }
   ret = oc_initiate_spake(&device->ep, password, oscore_id);
-  PRINT("  [C]py_initiate_spake: [%d]-- done\n", ret);
+  PRINT("  [C]ets_initiate_spake: [%d]-- done\n", ret);
   if (ret == -1) {
     // failure, so unblock python
     inform_spake_python(sn, ret, "", "", 0);
@@ -872,7 +895,7 @@ void
 ets_issue_requests_s_mode(int scope, int sia, int ga, int iid, char *st,
                           int value_type, char *value)
 {
-  PRINT(" [C] py_issue_requests_s_mode\n");
+  PRINT(" [C] ets_issue_requests_s_mode\n");
 
   oc_endpoint_t mcast;
   memset(&mcast, 0, sizeof(mcast));
@@ -985,21 +1008,21 @@ ets_get_nr_devices(void)
 void
 ets_reset_device(char *sn)
 {
-  device_handle_t *device = py_getdevice_from_sn(sn);
+  device_handle_t *device = ets_getdevice_from_sn(sn);
 
   if (device == NULL) {
     PRINT("[C]ERROR: Invalid uuid\n");
     return;
   }
 
-  // py_mutex_lock(app_sync_lock);
+  // ets_mutex_lock(app_sync_lock);
   // int ret = oc_obt_device_hard_reset(&device->uuid, reset_device_cb, device);
   // if (ret >= 0) {
   //  PRINT("[C]\nSuccessfully issued request to perform hard RESET\n");
   //} else {
   //  PRINT("[C]\nERROR issuing request to perform hard RESET\n");
   // }
-  // py_mutex_unlock(app_sync_lock);
+  // ets_mutex_unlock(app_sync_lock);
 }
 
 // -----------------------------------------------------------------------------
@@ -1066,9 +1089,9 @@ ets_poll(void)
   next_event = oc_main_poll();
   signal_event_loop();
 
-  // py_mutex_lock(app_sync_lock);
+  // ets_mutex_lock(app_sync_lock);
   // next_event = oc_main_poll();
-  // py_mutex_unlock(app_sync_lock);
+  // ets_mutex_unlock(app_sync_lock);
 
   // PRINT("blah");
   // PRINT("    ---> %d", next_event);
@@ -1088,9 +1111,9 @@ signal_event_loop(void)
 #if defined(_WIN32)
   WakeConditionVariable(&cv);
 #elif defined(__linux__)
-  py_mutex_lock(mutex);
+  ets_mutex_lock(mutex);
   pthread_cond_signal(&cv);
-  py_mutex_unlock(mutex);
+  ets_mutex_unlock(mutex);
 #endif
 }
 
@@ -1116,9 +1139,9 @@ func_event_thread(LPVOID lpParam)
 {
   oc_clock_time_t next_event;
   while (quit != 1) {
-    py_mutex_lock(app_sync_lock);
+    ets_mutex_lock(app_sync_lock);
     next_event = oc_main_poll();
-    py_mutex_unlock(app_sync_lock);
+    ets_mutex_unlock(app_sync_lock);
 
     if (next_event == 0) {
       SleepConditionVariableCS(&cv, &cs, INFINITE);
@@ -1141,11 +1164,11 @@ func_event_thread(void *data)
   (void)data;
   oc_clock_time_t next_event;
   while (quit != 1) {
-    py_mutex_lock(app_sync_lock);
+    ets_mutex_lock(app_sync_lock);
     next_event = oc_main_poll();
-    py_mutex_unlock(app_sync_lock);
+    ets_mutex_unlock(app_sync_lock);
 
-    py_mutex_lock(mutex);
+    ets_mutex_lock(mutex);
     if (next_event == 0) {
       pthread_cond_wait(&cv, &mutex);
     } else {
@@ -1153,7 +1176,7 @@ func_event_thread(void *data)
       ts.tv_nsec = (next_event % OC_CLOCK_SECOND) * 1.e09 / OC_CLOCK_SECOND;
       pthread_cond_timedwait(&cv, &mutex, &ts);
     }
-    py_mutex_unlock(mutex);
+    ets_mutex_unlock(mutex);
   }
   oc_main_shutdown();
   return NULL;

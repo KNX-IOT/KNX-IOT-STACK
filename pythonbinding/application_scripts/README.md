@@ -35,6 +35,8 @@ script to list the device, issuing:
 python list_devices.py -h
 ```
 
+Note: this application works without security, e.g. only uses unsecured KNX IoT Point API mechanims.
+
 ### s-mode.py
 
 script to issue an s-mode command
