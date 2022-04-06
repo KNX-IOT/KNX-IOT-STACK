@@ -4,6 +4,9 @@
 #ifdef OC_OSCORE
 #define OC_MAX_RX_SEQUENCE_NUMBERS 30
 
+
+int oc_oscore_replay_init_table();
+
 /**
  * @brief Add an endpoint to the table of sequence numbers.
  *
