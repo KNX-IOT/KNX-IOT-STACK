@@ -8,9 +8,7 @@ static struct
   oc_endpoint_t endpoint;
   uint16_t sequence_number;
   bool in_use;
-} sn_table[OC_MAX_RX_SEQUENCE_NUMBERS];
-
-//= {};
+} sn_table[OC_MAX_RX_SEQUENCE_NUMBERS] = { 0 };
 
 int oc_oscore_replay_init_table()
 {
