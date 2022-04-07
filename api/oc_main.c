@@ -326,6 +326,13 @@ oc_main_init(const oc_handler_t *handler)
   oc_init_datapoints_at_initialization();
 #endif
 
+  // note - only advertising for the first device
+  // if multiple devices per KNX instance are desired,
+  // the implementation of this service must change
+  oc_device_info_t *device = oc_core_get_device_info(0);
+  knx_publish_service(oc_string(device->serialnumber), device->iid,
+                      device->ia);
+
   return 0;
 
 err:
@@ -334,13 +341,6 @@ err:
   free(drop_commands);
   drop_commands = NULL;
 #endif
-
-  // note - only advertising for the first device
-  // if multiple devices per KNX instance are desired,
-  // the implementation of this service must change
-  oc_device_info_t *device = oc_core_get_device_info(0);
-  knx_publish_service(oc_string(device->serialnumber), device->iid,
-                      device->ia);
   return ret;
 }
 
