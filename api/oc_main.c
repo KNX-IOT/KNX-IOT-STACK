@@ -22,6 +22,7 @@
 #include "port/oc_assert.h"
 #include "port/oc_clock.h"
 #include "port/oc_connectivity.h"
+#include "port/dns-sd.h"
 
 #include "util/oc_etimer.h"
 #include "util/oc_process.h"
@@ -333,6 +334,13 @@ err:
   free(drop_commands);
   drop_commands = NULL;
 #endif
+
+  // note - only advertising for the first device
+  // if multiple devices per KNX instance are desired,
+  // the implementation of this service must change
+  oc_device_info_t *device = oc_core_get_device_info(0);
+  knx_publish_service(oc_string(device->serialnumber), device->iid,
+                      device->ia);
   return ret;
 }
 
