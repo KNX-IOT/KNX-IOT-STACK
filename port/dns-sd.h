@@ -1,6 +1,8 @@
 #ifndef DNS_SD_H
 #define DNS_SD_H
 
+#include <stdint.h>
+
 /**
  * @brief Publish the KNX mDNS service in order to enable DNS-SD discovery.
  *

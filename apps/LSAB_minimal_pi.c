@@ -75,7 +75,6 @@
 #include "oc_api.h"
 #include "oc_core_res.h"
 #include "port/oc_clock.h"
-#include "port/dns-sd.h"
 
 #include <signal.h>
 
@@ -524,7 +523,6 @@ main(void)
 
   oc_device_info_t *device = oc_core_get_device_info(0);
   PRINT("serial number: %s", oc_string(device->serialnumber));
-  knx_publish_service(oc_string(device->serialnumber), 0, 0);
 
   oc_endpoint_t *my_ep = oc_connectivity_get_endpoints(0);
   if (my_ep != NULL) {

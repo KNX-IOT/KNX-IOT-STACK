@@ -10,11 +10,6 @@ static struct
   bool in_use;
 } sn_table[OC_MAX_RX_SEQUENCE_NUMBERS] = { 0 };
 
-int oc_oscore_replay_init_table()
-{
-  memset(&sn_table, 0, sizeof(sn_table));
-}
-
 int
 oc_oscore_replay_add_endpoint(const oc_endpoint_t *endpoint)
 {
