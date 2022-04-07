@@ -211,13 +211,13 @@ oc_process_init(void)
 
   lastevent = OC_PROCESS_EVENT_MAX;
 
-  nevents = fevent = 0;
+  //nevents = fevent = 0;
 #if OC_PROCESS_CONF_STATS
   process_maxevents = 0;
 #endif /* OC_PROCESS_CONF_STATS */
 
-  oc_process_current = NULL;
-  oc_process_list = NULL;
+  //oc_process_current = NULL;
+  //oc_process_list = NULL;
 }
 /*---------------------------------------------------------------------------*/
 /*
