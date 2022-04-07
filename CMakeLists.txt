@@ -9,10 +9,11 @@ add_compile_definitions(OC_DYNAMIC_ALLOCATION)
 # Do not build anything except for the library
 option(ENABLE_PROGRAMS "Build mbed TLS programs." OFF)
 option(ENABLE_TESTING "Build mbed TLS tests." OFF)
+option(BUILD_TESTING "Build KNX tests" OFF)
 
 #set(OC_SECURITY_ENABLED ON CACHE BOOL "Enable security")
 
-set(OC_OSCORE_ENABLED ON CACHE BOOL "Enable oscore")
+set(OC_OSCORE_ENABLED OFF CACHE BOOL "Enable oscore")
 set(OC_PKI_ENABLED OFF CACHE BOOL "Enable PKI security")
 set(OC_DEBUG_ENABLED OFF CACHE BOOL "Enable debug messages")
 set(CLANG_TIDY_ENABLED OFF CACHE BOOL "Enable clang-tidy analysis during compilation.")
@@ -73,6 +74,7 @@ set(API_SOURCES
     ${PROJECT_SOURCE_DIR}/api/oc_knx_fb.c
     ${PROJECT_SOURCE_DIR}/api/oc_knx_fp.c
     ${PROJECT_SOURCE_DIR}/api/oc_knx_gm.c
+    ${PROJECT_SOURCE_DIR}/api/oc_knx_p.c
     ${PROJECT_SOURCE_DIR}/api/oc_knx_sec.c
     ${PROJECT_SOURCE_DIR}/api/oc_knx_swu.c
     ${PROJECT_SOURCE_DIR}/api/c-timestamp/timestamp_compare.c
@@ -103,12 +105,10 @@ set(CORE_SOURCES
     ${PROJECT_SOURCE_DIR}/util/oc_process.c
     ${PROJECT_SOURCE_DIR}/util/oc_timer.c
     # Security
-    ${PROJECT_SOURCE_DIR}/security/oc_certs.c
-    ${PROJECT_SOURCE_DIR}/security/oc_cred.c
-    ${PROJECT_SOURCE_DIR}/security/oc_keypair.c
     ${PROJECT_SOURCE_DIR}/security/oc_oscore_context.c
     ${PROJECT_SOURCE_DIR}/security/oc_oscore_crypto.c
     ${PROJECT_SOURCE_DIR}/security/oc_oscore_engine.c
+    ${PROJECT_SOURCE_DIR}/security/oc_oscore_replay.c
     ${PROJECT_SOURCE_DIR}/security/oc_spake2plus.c
     ${PROJECT_SOURCE_DIR}/security/oc_tls.c
 
@@ -202,12 +202,15 @@ if(WIN32 OR UNIX)
     target_include_directories(kisCS PRIVATE ${PROJECT_BINARY_DIR} ${KNX_INCLUDE_DIRS})
 endif()
 
-# do not treat warnings as errors on Windows
 if(MSVC)
-    target_compile_options(mbedtls PRIVATE /W1 /WX-)
-    target_compile_options(mbedx509 PRIVATE /W1 /WX-)
-    target_compile_options(mbedcrypto PRIVATE /W1 /WX-)
-    target_compile_options(kis-common INTERFACE /W1 /WX-)
+    # do not treat warnings as errors on Windows
+    add_compile_options(/W1 /WX-)
+elseif(NOT BUILD_TESTING)
+    # enable warnings as errors on GCC-based toolchains
+
+    # do not do this for the testing tree as there are warnings
+    # within gtest
+    add_compile_options(-Werror)
 endif()
 
 # copy Python binding files to build directory
@@ -246,7 +249,9 @@ if(BUILD_TESTING AND UNIX)
     add_subdirectory(api/unittest)
     add_subdirectory(port/unittest)
     add_subdirectory(messaging/coap/unittest)
+if(OC_OSCORE_ENABLED)
     add_subdirectory(security/unittest)
+endif()
 endif()
 
 # https://stackoverflow.com/questions/37957583/how-to-use-gcov-with-cmake

@@ -13,6 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 */
+/**
+  @file
+*/
 
 #ifndef OC_KNX_SEC_INTERNAL_H
 #define OC_KNX_SEC_INTERNAL_H
@@ -33,13 +36,27 @@ typedef enum {
   OC_PROFILE_COAP_OSCORE  /**< "coap_oscore" */
 } oc_at_profile_t;
 
+/**
+ * @brief string to accesst token profile
+ *
+ * @param str input string
+ * @return oc_at_profile_t the token profile
+ */
 oc_at_profile_t oc_string_to_at_profile(oc_string_t str);
+
+/**
+ * @brief access token profile to string
+ *
+ * @param at_profile the access token profile
+ * @return char* the string denoting the at accss token profile
+ */
 char *oc_at_profile_to_string(oc_at_profile_t at_profile);
 
 /**
  * @brief Access Token (at) Information
- *
- * example of (json) payload for a unicast message:
+ * payload for a unicast message
+ * Example(JSON):
+ * ```
  *{
  * "id": "OC5BLLhkAG ...",
  * "profile": "coap_oscore",
@@ -51,8 +68,9 @@ char *oc_at_profile_to_string(oc_at_profile_t at_profile);
  * "id": "<kid>",
  * "ms": "f9af8s.6bd94e6f"
  * }}}
- *
+ * ```
  * second example of (json) payload for a group address:
+ * ```
  *{
  * "id": "OC5BLLhkAG ...",
  * "profile": "coap_oscore",
@@ -63,7 +81,7 @@ char *oc_at_profile_to_string(oc_at_profile_t at_profile);
  * "id": "<kid>",
  * "ms": "f9af8s.6bd94e6f"
  * }}}
- *
+ * ```
  * scope : "coap_oscore" [OSCORE] or "coap_dtls"
  *
  *  | name      | CBOR key | CBOR type  | mandatory  |
@@ -89,16 +107,18 @@ char *oc_at_profile_to_string(oc_at_profile_t at_profile);
  * | ms | 2    | byte string  | OSCORE Master Secret value (shall be PSK) | - |
  * | hkdf | 3    | text string / integer | HKDF value | HKDF SHA-256  |
  * | alg | 4  | text string / integer | AEAD Algorithm | AES-CCM-16-64-128 (10)|
- * | salt | 5 | byte string | Master Salt | Default SHALL be an empty byte
- *string | | contextId | 6    | byte string | OSCORE ID Context value | omit  |
+ * | salt | 5 | byte string | Master Salt | Default empty byte string |
+ * | contextId | 6    | byte string | OSCORE ID Context value | omit  |
  *
+ * Example payload:
+ * ```
  * {
  *   "alg" : "AES-CCM-16-64-128",
  *   "id" : b64'AQ=='
  *   "ms" : b64'+a+Dg2jjU+eIiOFCa9lObw'
  * }
- *
- *     Note: maps are not stored.
+ * ```
+ * Note: maps are not stored.
  */
 typedef struct oc_auth_at_t
 {
@@ -188,6 +208,15 @@ void oc_create_knx_sec_resources(size_t device);
  */
 void oc_init_oscore(size_t device_index);
 
+/**
+ * @brief function to check if the at_interface is listed in the resource
+ * interfaces
+ *
+ * @param at_interface interface to be checked
+ * @param resource_interface list of interfaces.
+ * @return true at_interface listed in resource_interface list
+ * @return false at_interface not listed in resource_interface list
+ */
 bool oc_knx_contains_interface(oc_interface_mask_t at_interface,
                                oc_interface_mask_t resource_interface);
 

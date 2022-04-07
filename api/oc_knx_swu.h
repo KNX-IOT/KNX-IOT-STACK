@@ -1,5 +1,5 @@
 /*
-// Copyright (c) 2021 Cascoda Ltd
+// Copyright (c) 2021-2022 Cascoda Ltd
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,6 +12,9 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+*/
+/**
+  @file
 */
 
 #ifndef OC_KNX_SWU_INTERNAL_H
@@ -39,19 +42,19 @@ typedef enum {
  */
 typedef enum {
   OC_SWU_RESULT_INIT =
-    0, /**< 0: Initial value. Once the updating process is initiated (Download
+    0, /**< 0 Initial value. Once the updating process is initiated (Download
           /Update), this Resource MUST be reset to Initial value. */
-  OC_SWU_RESULT_SUCCESS,   /**< 1: Software updated successfully.*/
-  OC_SWU_RESULT_ERR_FLASH, /**< 2: Not enough flash memory for the new software
+  OC_SWU_RESULT_SUCCESS,   /**< 1 Software updated successfully.*/
+  OC_SWU_RESULT_ERR_FLASH, /**< 2 Not enough flash memory for the new software
                               package.*/
-  OC_SWU_RESULT_ERR_RAM,   /**< 3: Out of RAM during downloading process*/
-  OC_SWU_RESULT_ERR_CONN,  /**< 4: Connection lost during downloading process.*/
-  OC_SWU_RESULT_ERR_ICF,   /**< 5: Integrity check failure for new downloaded
+  OC_SWU_RESULT_ERR_RAM,   /**< 3 Out of RAM during downloading process*/
+  OC_SWU_RESULT_ERR_CONN,  /**< 4 Connection lost during downloading process.*/
+  OC_SWU_RESULT_ERR_ICF,   /**< 5 Integrity check failure for new downloaded
                               package.*/
-  OC_SWU_RESULT_ERR_UPT,   /**< 6: Unsupported package type.*/
-  OC_SWU_RESULT_ERR_URL,   /**< 7: Invalid URL.*/
-  OC_SWU_RESULT_ERR_SUF,   /**< 8: Software update failed.*/
-  OC_SWU_RESULT_ERR_UP,    /**< 9: Unsupported protocol..*/
+  OC_SWU_RESULT_ERR_UPT,   /**< 6 Unsupported package type.*/
+  OC_SWU_RESULT_ERR_URL,   /**< 7 Invalid URL.*/
+  OC_SWU_RESULT_ERR_SUF,   /**< 8 Software update failed.*/
+  OC_SWU_RESULT_ERR_UP,    /**< 9 Unsupported protocol. */
 } oc_swu_result_t;
 
 /**

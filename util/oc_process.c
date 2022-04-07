@@ -106,7 +106,7 @@ oc_process_start(struct oc_process *p, oc_process_data_t data)
   if (q == p) {
     return;
   }
-  /* Put on the procs list.*/
+  /* Put on the process list.*/
   p->next = oc_process_list;
   oc_process_list = p;
   p->state = OC_PROCESS_STATE_RUNNING;

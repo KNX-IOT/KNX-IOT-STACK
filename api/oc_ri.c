@@ -300,6 +300,29 @@ oc_get_interface_in_mask_in_string_array(oc_interface_mask_t iface_mask,
   return total_masks;
 }
 
+bool
+oc_ri_new_request_from_request(oc_request_t new_request, oc_request_t request,
+                               oc_response_buffer_t response_buffer,
+                               oc_response_t response_obj)
+{
+  memcpy(&new_request, &request, sizeof(request));
+  new_request.response = NULL;
+
+  /* Postpone allocating response_state right after calling
+   * oc_parse_rep()
+   *  in order to reducing peak memory in OC_BLOCK_WISE &
+   * OC_DYNAMIC_ALLOCATION
+   */
+  response_buffer.code = 0;
+  response_buffer.response_length = 0;
+  response_buffer.content_format = 0;
+  response_buffer.max_age = 0;
+
+  response_obj.separate_response = NULL;
+  response_obj.response_buffer = &response_buffer;
+  new_request.response = &response_obj;
+}
+
 #ifdef OC_SERVER
 oc_resource_t *
 oc_ri_get_app_resources(void)
@@ -504,13 +527,12 @@ start_processes(void)
   oc_process_start(&coap_engine, NULL);
   oc_process_start(&message_buffer_handler, NULL);
 
-// TODO
-//#ifdef OC_SECURITY
-#ifdef OC_OSCORE
-  oc_process_start(&oc_tls_handler, NULL);
 #ifdef OC_OSCORE
   oc_process_start(&oc_oscore_handler, NULL);
 #endif /* OC_OSCORE */
+
+#ifdef OC_SECURITY
+  oc_process_start(&oc_tls_handler, NULL);
 #endif /* OC_SECURITY */
 
   oc_process_start(&oc_network_events, NULL);
@@ -529,11 +551,11 @@ stop_processes(void)
   oc_process_exit(&oc_etimer_process);
   oc_process_exit(&timed_callback_events);
   oc_process_exit(&coap_engine);
-
-#ifdef OC_SECURITY
 #ifdef OC_OSCORE
   oc_process_exit(&oc_oscore_handler);
 #endif /* OC_OSCORE */
+
+#ifdef OC_SECURITY
   oc_process_exit(&oc_tls_handler);
 #endif /* OC_SECURITY */
 #ifdef OC_OSCORE
@@ -751,18 +773,6 @@ oc_observe_notification_delayed(void *data)
   return OC_EVENT_DONE;
 }
 #endif
-
-//#ifdef OC_SERVER
-// static oc_event_callback_retval_t
-// oc_observe_notification_resource_defaults_delayed(void *data)
-//{
-//  oc_resource_defaults_data_t *resource_defaults_data =
-//    (oc_resource_defaults_data_t *)data;
-//  notify_resource_defaults_observer(resource_defaults_data->resource,
-//                                    resource_defaults_data->iface_mask, NULL);
-//  return OC_EVENT_DONE;
-//}
-//#endif
 
 #ifdef OC_SERVER
 static oc_event_callback_retval_t
@@ -1333,20 +1343,8 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
      */
     if (cur_resource && (method == OC_PUT || method == OC_POST) &&
         response_buffer.code < oc_status_code(OC_STATUS_BAD_REQUEST)) {
-      // if ((iface_mask == OC_IF_STARTUP) ||
-      //    (iface_mask == OC_IF_STARTUP_REVERT)) {
-      //  oc_resource_defaults_data_t *resource_defaults_data =
-      //    oc_ri_alloc_resource_defaults();
-      //  resource_defaults_data->resource = cur_resource;
-      //  resource_defaults_data->iface_mask = iface_mask;
-      //  oc_ri_add_timed_event_callback_ticks(
-      //    resource_defaults_data,
-      //    &oc_observe_notification_resource_defaults_delayed, 0);
-      //} else
-      //{
       oc_ri_add_timed_event_callback_ticks(cur_resource,
                                            &oc_observe_notification_delayed, 0);
-      //}
     }
 
 #endif /* OC_SERVER */

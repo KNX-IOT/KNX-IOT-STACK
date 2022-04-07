@@ -1,5 +1,5 @@
 /*
-// Copyright (c) 2021 Cascoda Ltd
+// Copyright (c) 2021-2022 Cascoda Ltd
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 */
-
+/**
+  @file
+*/
 #ifndef OC_KNX_FP_INTERNAL_H
 #define OC_KNX_FP_INTERNAL_H
 
@@ -43,12 +45,30 @@ typedef enum {
     1 << 7, /**< 128 false = Group Object value is not updated.*/
 } oc_cflag_mask_t;
 
+/**
+ * @brief print the cflags to standard output
+ * cflags in ASCII e.g. "w" "r" "i" "t" "u" without quotes
+ *
+ * @param cflags the cflags
+ */
 void oc_print_cflags(oc_cflag_mask_t cflags);
 
 /**
- * @brief Group Object Table Resource (/fp/g)
+ * @brief adds the cflags a preallocated buffer
+
+ * cflags in ASCII e.g. "w" "r" "i" "t" "u" without quotes
+ * if the flag does not exist, then a "." will be added instead
  *
- * the will be an array of objects (as json):
+ * @param buffer the string buffer to add the cflags too
+ * @param cflags The cflags
+ */
+void oc_cflags_as_string(char *buffer, oc_cflag_mask_t cflags);
+
+/**
+ * @brief Group Object Table Resource (/fp/g)
+ * The payload is an array of objects.
+ * Example (JSON):
+ * ```
  * [
  *    {
  *        "id": "1",
@@ -63,6 +83,7 @@ void oc_print_cflags(oc_cflag_mask_t cflags);
  *        "cflag":["t"]  // note this is an integer
  *     }
  * ]
+ * ```
  *
  * cflag translation
  * | string | bit     |  value |
@@ -87,13 +108,14 @@ void oc_print_cflags(oc_cflag_mask_t cflags);
  * There are function to find
  * - empty index in the array
  * - find the index with a specific id
- * - delete an index, e.g. free the array entry of data
+ * - delete an index, e.g. delete the array entry of data (persistent)
  * - make the entry persistent
+ * - free the data
  */
 typedef struct oc_group_object_table_t
 {
   int id;                 /**< contents of id*/
-  oc_string_t href;       /**<  contents of href*/
+  oc_string_t href;       /**< contents of href*/
   oc_cflag_mask_t cflags; /**< contents of cflags as bitmap*/
   int ga_len;             /**< length of the array of ga identifiers*/
   int *ga;                /**< array of integers*/
@@ -106,7 +128,8 @@ typedef struct oc_group_object_table_t
  * the only difference is the confirmable/not confirmable flag.
  * There will be 2 arrays of the structure to store the /fp/r or /fp/p data
  *
- * array of objects (as json)
+ * Example (JSON): array of objects
+ * ```
  * [
  *    {
  *        "id": "1",
@@ -120,6 +143,7 @@ typedef struct oc_group_object_table_t
  *        "ga": [2305, 2306, 2307, 2308]
  *     }
  * ]
+ * ```
  *
  * Key translation
  * | Json Key | Integer Value |
@@ -136,8 +160,9 @@ typedef struct oc_group_object_table_t
  * There are function to find:
  * - empty index in the array
  * - find the index with a specific id
- * - delete an index, e.g. free the array entry of data
+ * - delete an index, e.g. delete the array entry of data
  * - make the entry persistent
+ * - free up the allocated data
  */
 typedef struct oc_group_rp_table_t
 {
@@ -150,12 +175,50 @@ typedef struct oc_group_rp_table_t
   int ga_len;       /**< length of the array of ga identifiers*/
 } oc_group_rp_table_t;
 
+/**
+ * @brief set an entry in the group object table
+ *
+ * @param index the index where to add the entry
+ * @param entry the group object entry
+ * @return int 0 == success
+ */
 int oc_core_set_group_object_table(int index, oc_group_object_table_t entry);
+
+/**
+ * @brief retrieve the group object table total size,
+ * e.g. the number of entries that can be stored
+ *
+ * @return int the total number of entries
+ */
+int oc_core_get_group_object_table_total_size();
+
+/**
+ * @brief retrieve the group object table entry
+ *
+ * @param index the index in the group object table
+ * @return oc_group_object_table_t* pointer to the entry
+ */
+oc_group_object_table_t *oc_core_get_group_object_table_entry(int index);
+
+/**
+ * @brief register the group entries in the Group Object table
+ * as multi cast receive addresses
+ *
+ * function to be called when the device is (re)started in run-time mode
+ */
+void oc_register_group_multicasts();
+
+/**
+ * @brief initializes the data points at initialisation
+ * e.g. sends out an read s-mode message when the I flag is set.
+ *
+ */
+void oc_init_datapoints_at_initialization();
 
 /**
  * @brief find index belonging to the id
  *
- * @param the identifier of the entry
+ * @param id the identifier of the entry
  * @return int the index in the table or -1
  */
 int oc_core_find_index_in_group_object_table_from_id(int id);
@@ -181,17 +244,17 @@ int oc_core_find_next_group_object_table_index(int group_address,
 /**
  * @brief find (first) index in the group address table via url
  *
- * @param url the url to find
- * @return int the index in the table or -1
+ * @param url The url to find
+ * @return int The index in the table or -1
  */
 int oc_core_find_group_object_table_url(char *url);
 
 /**
  * @brief find next index in the group address table via url
  *
- * @param  url the url to find
- * @param cur_index  the current index to start from.
- * @return int the index in the table or -1
+ * @param  url The url to find
+ * @param cur_index  The current index to start from.
+ * @return int The index in the table or -1
  */
 int oc_core_find_next_group_object_table_url(char *url, int cur_index);
 
@@ -313,11 +376,11 @@ int oc_core_get_recipient_table_size();
 /**
  * @brief add points to the well-known core discovery response
  *  when the request has query option
- * .well-known/core?d=urn:knx:g.s.[group-address].
+ * .well-known/core?d=urn:knx:g.s.[group-address]
  * @param request The request
  * @param device_index The device index
  * @param group_address the parsed group address from the query option
- * @param response_length the response lenght
+ * @param response_length the response length
  * @param matches if there are matches
  * @return true
  * @return false
@@ -329,11 +392,44 @@ bool oc_add_points_in_group_object_table_to_response(oc_request_t *request,
                                                      int matches);
 
 /**
+ * @brief checks if the href (url) belongs to the device
+ *
+ * @param href the url to be checked if it belongs to the device
+ * @param device_index The device index
+
+ * @return true
+ * @return false
+ */
+bool oc_belongs_href_to_resource(oc_string_t href, size_t device_index);
+
+/**
  * @brief Creation of the KNX feature point resources.
  *
- * @param device index of the device to which the resource are to be created
+ * @param device_index index of the device to which the resource are to be
+ * created
  */
-void oc_create_knx_fp_resources(size_t device);
+void oc_create_knx_fp_resources(size_t device_index);
+
+/**
+ * @brief free the fp resources
+ * e.g. frees up all allocated memory.
+ *
+ * @param device_index index of the device to which the resource are to be
+ * freed.
+ */
+void oc_free_knx_fp_resources(size_t device_index);
+
+/**
+ * @brief create the group multi cast address
+ *
+ * @param in the endpoint to adapt
+ * @param group_nr the group number
+ * @param iid the installation id
+ * @param scope the address scope
+ * @return oc_endpoint_t the modified endpoint
+ */
+oc_endpoint_t oc_create_multicast_group_address(oc_endpoint_t in, int group_nr,
+                                                int iid, int scope);
 
 #ifdef __cplusplus
 }

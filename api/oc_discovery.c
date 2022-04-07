@@ -104,7 +104,7 @@ oc_add_resource_to_wk(oc_resource_t *resource, oc_request_t *request,
           *response_length += length;
         }
 
-        length = oc_rep_add_line_size_to_buffer(t, size);
+        length = oc_rep_add_line_size_to_buffer(t, (int)size);
         *response_length += length;
       }
     }
@@ -252,15 +252,24 @@ oc_wkcore_discovery_handler(oc_request_t *request,
     if (lsm != LSM_S_LOADED) {
       /* handle bad request..
       note below layer ignores this message if it is a multi cast request */
+      PRINT(" not loaded!");
       request->response->response_buffer->code =
         oc_status_code(OC_STATUS_BAD_REQUEST);
       return;
     }
     // create the response
-    oc_add_points_in_group_object_table_to_response(
+    bool added = oc_add_points_in_group_object_table_to_response(
       request, device_index, group_address, &response_length, matches);
-    request->response->response_buffer->response_length = response_length;
-    request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
+    if (added) {
+      request->response->response_buffer->content_format =
+        APPLICATION_LINK_FORMAT;
+      request->response->response_buffer->response_length = response_length;
+      request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
+    } else {
+      request->response->response_buffer->code =
+        oc_status_code(OC_STATUS_BAD_REQUEST);
+    }
+
     return;
   }
 
@@ -283,7 +292,11 @@ oc_wkcore_discovery_handler(oc_request_t *request,
     int if_ia_i = atoi(if_ia_s);
     if (if_ia_i == device->ia) {
       /* return the ll entry: </dev/ia>;rt="dpt.value2Ucount";ct=50 */
-      int size =
+      int size = oc_rep_add_line_to_buffer("</dev/sa>;rt=\"dpa.0.57\";ct=50,");
+      response_length = response_length + size;
+      size = oc_rep_add_line_to_buffer("</dev/dp>;rt=\"dpa.0.58\";ct=50,");
+      response_length = response_length + size;
+      size =
         oc_rep_add_line_to_buffer("</dev/ia>;rt=\"dpt.value2Ucount\";ct=50");
       response_length = response_length + size;
 
@@ -296,7 +309,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
       return;
     } else {
       /* should ignore this request*/
-      PRINT(" oc_wkcore_discovery_handler IA HANDLING: IGNORE\n");
+      // PRINT(" oc_wkcore_discovery_handler IA HANDLING: IGNORE\n");
       request->response->response_buffer->code = OC_IGNORE;
       return;
     }

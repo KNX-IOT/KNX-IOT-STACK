@@ -13,6 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 */
+/**
+  @file
+*/
 
 #ifndef OC_KNX_INTERNAL_H
 #define OC_KNX_INTERNAL_H
@@ -27,11 +30,14 @@ extern "C" {
 /**
  * @brief Pase Resource Object
  *
+ * Example Json:
+ * ```
  *  { "rnd": x}
  *  { "pa": x}
  *  { "pb": x}
  *  { "ca": x}
  *  { "pbkdf2" : { "salt" : "xxxx", "it" : 5}}}
+ * ```
  *
  * Key translation
  * | Json Key | Integer Value |  type       |
@@ -49,6 +55,7 @@ extern "C" {
  */
 typedef struct oc_pase_t
 {
+  oc_string_t id;   /**< oscore id */
   oc_string_t salt; /**< salt */
   oc_string_t pa;   /**< pa */
   oc_string_t pb;   /**< pb */
@@ -59,13 +66,15 @@ typedef struct oc_pase_t
 } oc_pase_t;
 
 /**
- * @brief Group Object Notification
+ * @brief Group Object Notification (s-mode messages)
  * Can be used for receiving messages or sending messages.
  *
  *  generic structures:
+ * ```
  *  { 5: { 6: "st value" , 7: "ga value", 1: "value" } }
  *
  *  { 4: "sia", 5: { 6: "st", 7: "ga", 1: "value" } }
+ * ```
  *
  * Key translation
  * | Json Key | Integer Value | type   |
@@ -108,18 +117,23 @@ typedef enum {
   LSM_E_UNLOAD = 4        /**< (4) cmd unload: state will be UNLOADED */
 } oc_lsm_event_t;
 
-/**
- * @brief retrieve the current lsm state
- *
- * @param device index of the device to which the resource is to be created
- * @return the lsm state
- */
-oc_lsm_state_t oc_knx_lsm_state(size_t device);
+bool gob_notification_to_json(char *buffer, int buffer_size,
+                              oc_group_object_notification_t notification);
 
 /**
  * @brief retrieve the current lsm state
  *
- * @param device index of the device to which the resource is to be created
+ * @param device_index index of the device to which the resource is to be
+ * created
+ * @return the lsm state
+ */
+oc_lsm_state_t oc_knx_lsm_state(size_t device_index);
+
+/**
+ * @brief retrieve the current lsm state
+ *
+ * @param device_index index of the device to which the resource is to be
+ * created
  * @param new_state the new lsm_state
  * @return 0 == success
  */
@@ -141,21 +155,38 @@ const char *oc_core_get_lsm_event_as_string(oc_lsm_event_t lsm_e);
  */
 const char *oc_core_get_lsm_state_as_string(oc_lsm_state_t lsm_s);
 
+bool oc_s_mode_notification_to_json(
+  char *buffer, size_t buffer_size,
+  oc_group_object_notification_t notification);
+
+/**
+ * @brief checks if the device is in "run-time" mode
+ * run-time is:
+ * - ia initialized (e.g. larger than 0)
+ * - iid initialized (e.g. larger than 0)
+ * - load state machine (lsm) == loaded
+ *
+ * @param device_index The device index.
+ * @return true in runtime
+ * @return false not in run time
+ */
+bool oc_is_device_in_runtime(size_t device_index);
+
+/**
+ * @brief sets the idevid
+ *
+ * @param idevid the idevid certificate
+ * @param length the length of the certificate
+ */
+void oc_knx_set_idevid(const char *idevid, int length);
+
 /**
  * @brief sets the ldevid
  *
  * @param ldevid the ldevid certificate
  * @param len the length of the certificate
  */
-void oc_knx_set_idevid(const char *idevid, int len);
-
-/**
- * @brief sets the idevid
- *
- * @param idevid the idevid certificate
- * @param len the length of the certificate
- */
-void oc_knx_set_ldevid(char *idevid, int len);
+void oc_knx_set_ldevid(char *ldevid, int len);
 
 /**
  * @brief sets the fingerprint value (of the loaded materials)

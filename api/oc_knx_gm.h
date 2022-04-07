@@ -13,11 +13,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 */
-
+/**
+  @file
+*/
 #ifndef OC_KNX_GM_INTERNAL_H
 #define OC_KNX_GM_INTERNAL_H
 
 #include <stddef.h>
+#include "oc_knx.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,13 +29,17 @@ extern "C" {
 /**
  * @brief Creation of the gm resources
  *
- * @param device index of the device to which the resource are to be created
+ * @param device_index index of the device to which the resource are to be
+ * created
  */
-void oc_create_knx_gm_resources(size_t device);
+void oc_create_knx_gm_resources(size_t device_index);
 
 /**
-  @defgroup doc_module_tag_gateway gateway
+  @defgroup doc_module_tag_gateway Gateway
   Optional group of KNX-IOT to Classic gateway functions.
+
+  Currently implemented: register a generic call back to route all s-mode
+  messages
   @{
 */
 
@@ -40,7 +47,9 @@ void oc_create_knx_gm_resources(size_t device);
  * Callback invoked for all s-mode communication
  * e.g. to be used to create a KNX-IOT to CLASSIC gateway
  */
-typedef void (*oc_gateway_s_mode_cb_t)(size_t device, void *data);
+typedef void (*oc_gateway_s_mode_cb_t)(
+  size_t device_index, char *sender_ip_address,
+  oc_group_object_notification_t *s_mode_message, void *data);
 
 /**
  * @brief The gateway info

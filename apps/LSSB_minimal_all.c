@@ -15,6 +15,7 @@
  limitations under the License.
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 */
+
 #ifndef DOXYGEN
 // Force doxygen to document static inline
 #define STATIC static
@@ -25,8 +26,7 @@
  *  Example code for Function Block LSSB
  *  Implements only data point 61: switch on/off
  *  This implementation is a sensor, e.g. transmits data
- */
-/**
+ *
  * ## Application Design
  *
  * support functions:
@@ -69,6 +69,7 @@
 #include "oc_api.h"
 #include "oc_core_res.h"
 #include "port/oc_clock.h"
+#include "port/dns-sd.h"
 #include <signal.h>
 // test purpose only
 #include "api/oc_knx_dev.h"
@@ -161,9 +162,6 @@ app_init(void)
   /* set the hardware type*/
   oc_core_set_device_hwt(0, "Pi");
 
-  /* set the programming mode */
-  oc_core_set_device_pm(0, true);
-
   /* set the model */
   oc_core_set_device_model(0, "my model");
 
@@ -195,7 +193,7 @@ get_dpa_421_61(oc_request_t *request, oc_interface_mask_t interfaces,
      returns to this function here. alternative is to have a callback from the
      hardware that sets the global variables.
   */
-  bool error_state = false; /**< the error state, the generated code */
+  bool error_state = false; /* the error state, the generated code */
   int oc_status_code = OC_STATUS_OK;
 
   PRINT("-- Begin get_dpa_421_61: interface %d\n", interfaces);
@@ -206,7 +204,11 @@ get_dpa_421_61(oc_request_t *request, oc_interface_mask_t interfaces,
   }
 
   CborError error;
-  error = cbor_encode_boolean(&g_encoder, g_mystate);
+  oc_rep_begin_root_object();
+  oc_rep_i_set_boolean(root, 1, g_mystate);
+  oc_rep_end_root_object();
+  error = g_err;
+
   if (error) {
     oc_status_code = true;
   }
@@ -241,8 +243,7 @@ register_resources(void)
   PRINT("Data point 61 (DPT_Switch) \n");
   PRINT("Register Resource with local path \"/p/1\"\n");
 
-  oc_resource_t *res_pushbutton =
-    oc_new_resource("push button", "p/push", 2, 0);
+  oc_resource_t *res_pushbutton = oc_new_resource("push button", "p/1", 2, 0);
   oc_resource_bind_resource_type(res_pushbutton, "urn:knx:dpa.421.61");
   oc_resource_bind_resource_type(res_pushbutton, "DPT_Switch");
   oc_resource_bind_content_type(res_pushbutton, APPLICATION_CBOR);
@@ -264,7 +265,7 @@ register_resources(void)
 /**
  * @brief initiate preset for device
  * current implementation: device reset as command line argument
- * @param device the device identifier of the list of devices
+ * @param device_index the device identifier of the list of devices
  * @param data the supplied data.
  */
 void
@@ -282,7 +283,8 @@ factory_presets_cb(size_t device_index, void *data)
 /**
  * @brief application reset
  *
- * @param device the device identifier of the list of devices
+ * @param device_index the device identifier of the list of devices
+ * @param reset_value the knx reset value
  * @param data the supplied data.
  */
 void
@@ -296,7 +298,7 @@ reset_cb(size_t device_index, int reset_value, void *data)
 /**
  * @brief restart the device (application depended)
  *
- * @param device the device identifier of the list of devices
+ * @param device_index the device identifier of the list of devices
  * @param data the supplied data.
  */
 void
@@ -312,7 +314,7 @@ restart_cb(size_t device_index, void *data)
 /**
  * @brief set the host name on the device (application depended)
  *
- * @param device the device identifier of the list of devices
+ * @param device_index the device identifier of the list of devices
  * @param host_name the host name to be set on the device
  * @param data the supplied data.
  */
@@ -370,7 +372,8 @@ issue_requests_s_mode(void)
 {
   PRINT("issue_requests_s_mode: TEST TEST \n\n");
 
-  oc_do_s_mode("/p/1", "w");
+  oc_do_s_mode_with_scope(2, "p/1", "w");
+  oc_do_s_mode_with_scope(5, "p/1", "w");
 }
 
 #ifndef NO_MAIN
@@ -531,8 +534,9 @@ main(int argc, char *argv[])
 #endif /* OC_OSCORE */
 
   oc_device_info_t *device = oc_core_get_device_info(0);
-  PRINT("serial number: %s", oc_string(device->serialnumber));
-  oc_device_mode_display(0);
+  PRINT("serial number: %s\n", oc_string(device->serialnumber));
+  knx_publish_service(oc_string(device->serialnumber), 0, 0);
+
   oc_endpoint_t *my_ep = oc_connectivity_get_endpoints(0);
   if (my_ep != NULL) {
     PRINTipaddr(*my_ep);

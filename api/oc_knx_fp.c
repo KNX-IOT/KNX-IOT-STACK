@@ -170,14 +170,34 @@ oc_core_set_group_object_table(int index, oc_group_object_table_t entry)
   g_got[index].ga_len = entry.ga_len;
   int *new_array = (int *)malloc(entry.ga_len * sizeof(int));
 
-  for (int i = 0; i < entry.ga_len; i++) {
-    new_array[i] = entry.ga[i];
+  if (new_array != NULL) {
+    for (int i = 0; i < entry.ga_len; i++) {
+      new_array[i] = entry.ga[i];
+    }
+    if (g_got[index].ga != 0) {
+      free(g_got[index].ga);
+    }
+    g_got[index].ga = new_array;
   }
-  if (g_got[index].ga != 0) {
-    free(g_got[index].ga);
-  }
-  g_got[index].ga = new_array;
   return 0;
+}
+
+int
+oc_core_get_group_object_table_total_size()
+{
+  return GOT_MAX_ENTRIES;
+}
+
+oc_group_object_table_t *
+oc_core_get_group_object_table_entry(int index)
+{
+  if (index < 0) {
+    return NULL;
+  }
+  if (index >= GOT_MAX_ENTRIES) {
+    return NULL;
+  }
+  return &g_got[index];
 }
 
 int
@@ -299,7 +319,7 @@ oc_core_find_next_group_object_table_url(char *url, int cur_index)
   return -1;
 }
 
-static bool
+bool
 oc_belongs_href_to_resource(oc_string_t href, size_t device_index)
 {
 
@@ -309,7 +329,7 @@ oc_belongs_href_to_resource(oc_string_t href, size_t device_index)
         !(resource->properties & OC_DISCOVERABLE)) {
       continue;
     }
-    if (oc_string_cmp(href, resource->uri) == 0) {
+    if (oc_url_cmp(href, resource->uri) == 0) {
       return true;
     }
   }
@@ -390,7 +410,7 @@ oc_fp_p_check_and_save(int index, size_t device_index, bool status_ok)
   }
   if (oc_belongs_href_to_resource(g_got[index].href, device_index) == false) {
     do_save = false;
-    OC_ERR("  index %d href does not belong to device '%s'", index,
+    OC_ERR("  index %d href '%s' does not belong to device\n", index,
            oc_string(g_got[index].href));
   }
 
@@ -1335,7 +1355,7 @@ oc_core_get_recipient_index_url_or_path(int index)
 
     } else {
       // do .knx
-      PRINT("      oc_core_get_recipient_index_url_or_patho (default) %s\n",
+      PRINT("      oc_core_get_recipient_index_url_or_path (default) %s\n",
             ".knx");
       return ".knx";
     }
@@ -1354,6 +1374,37 @@ oc_core_get_recipient_index_url_or_path(int index)
 //#endif /* OC_RECIPIENT_TABLE */
 
 // -----------------------------------------------------------------------------
+
+void
+oc_cflags_as_string(char *buffer, oc_cflag_mask_t cflags)
+{
+
+  if (cflags & OC_CFLAG_READ) {
+    strcat(buffer, "r");
+  } else {
+    strcat(buffer, ".");
+  }
+  if (cflags & OC_CFLAG_WRITE) {
+    strcat(buffer, "w");
+  } else {
+    strcat(buffer, ".");
+  }
+  if (cflags & OC_CFLAG_INIT) {
+    strcat(buffer, "i");
+  } else {
+    strcat(buffer, ".");
+  }
+  if (cflags & OC_CFLAG_TRANSMISSION) {
+    strcat(buffer, "t");
+  } else {
+    strcat(buffer, ".");
+  }
+  if (cflags & OC_CFLAG_UPDATE) {
+    strcat(buffer, "u");
+  } else {
+    strcat(buffer, ".");
+  }
+}
 
 void
 oc_print_cflags(oc_cflag_mask_t cflags)
@@ -1481,9 +1532,8 @@ oc_load_group_object_table_entry(int entry)
             int64_t *arr = oc_int_array(rep->value.array);
             int array_size = (int)oc_int_array_size(rep->value.array);
             int *new_array = (int *)malloc(array_size * sizeof(int));
-            // int*  new_array;
-            // oc_new_int_array(&new_array, array_size);
 
+            // TODO check  if new array is not NULL
             for (int i = 0; i < array_size; i++) {
               new_array[i] = arr[i];
             }
@@ -1517,16 +1567,22 @@ oc_load_group_object_table()
 }
 
 void
-oc_delete_group_object_table_entry(int entry)
+oc_free_group_object_table_entry(int entry)
 {
   g_got[entry].id = -1;
   oc_free_string(&g_got[entry].href);
-  oc_new_string(&g_got[entry].href, "", 0);
+  // oc_new_string(&g_got[entry].href, "", 0);
   free(g_got[entry].ga);
   g_got[entry].ga = NULL;
   // oc_free_int_array(g_got[value].ga);
   g_got[entry].ga_len = 0;
   g_got[entry].cflags = 0;
+}
+
+void
+oc_delete_group_object_table_entry(int entry)
+{
+  oc_free_group_object_table_entry(entry);
 }
 
 void
@@ -1537,6 +1593,15 @@ oc_delete_group_object_table()
     oc_delete_group_object_table_entry(i);
     oc_print_group_object_table_entry(i);
     oc_dump_group_object_table_entry(i);
+  }
+}
+
+void
+oc_free_group_object_table()
+{
+  PRINT("Free Group Object Table\n");
+  for (int i = 0; i < GOT_MAX_ENTRIES; i++) {
+    oc_free_group_object_table_entry(i);
   }
 }
 
@@ -1719,24 +1784,27 @@ oc_load_rp_object_table()
 }
 
 static void
-oc_delete_group_rp_table_entry(int entry, char *Store,
-                               oc_group_rp_table_t *rp_table, int max_size)
+oc_free_group_rp_table_entry(int entry, char *Store,
+                             oc_group_rp_table_t *rp_table, int max_size)
 {
   (void)max_size;
   (void)Store;
   rp_table[entry].id = -1;
   rp_table[entry].ia = -1;
-  // oc_free_string(&rp_table[entry].ia);
-  // oc_new_string(&rp_table[entry].ia, "", 0);
   oc_free_string(&rp_table[entry].path);
-  oc_new_string(&rp_table[entry].path, "", 0);
   oc_free_string(&rp_table[entry].url);
-  oc_new_string(&rp_table[entry].url, "", 0);
   free(rp_table[entry].ga);
   rp_table[entry].ga = NULL;
 
   rp_table[entry].ga_len = 0;
   // rp_table[entry].cflags = 0;
+}
+
+static void
+oc_delete_group_rp_table_entry(int entry, char *Store,
+                               oc_group_rp_table_t *rp_table, int max_size)
+{
+  oc_free_group_rp_table_entry(entry, Store, rp_table, max_size);
 }
 
 void
@@ -1755,6 +1823,22 @@ oc_delete_group_rp_table()
     oc_delete_group_rp_table_entry(i, GPT_STORE, g_gpt, GPT_MAX_ENTRIES);
     oc_print_group_rp_table_entry(i, GPT_STORE, g_gpt, GPT_MAX_ENTRIES);
     oc_dump_group_rp_table_entry(i, GPT_STORE, g_gpt, GPT_MAX_ENTRIES);
+  }
+#endif /*  OC_PUBLISHER_TABLE */
+}
+void
+oc_free_group_rp_table()
+{
+
+  PRINT("FreeGroup Recipient Table from Persistent storage\n");
+  for (int i = 0; i < GRT_MAX_ENTRIES; i++) {
+    oc_free_group_rp_table_entry(i, GRT_STORE, g_grt, GRT_MAX_ENTRIES);
+  }
+
+#ifdef OC_PUBLISHER_TABLE
+  PRINT("Deleting Group Publisher Table from Persistent storage\n");
+  for (int i = 0; i < GPT_MAX_ENTRIES; i++) {
+    oc_free_group_rp_table_entry(i, GPT_STORE, g_gpt, GPT_MAX_ENTRIES);
   }
 #endif /*  OC_PUBLISHER_TABLE */
 }
@@ -1836,6 +1920,15 @@ oc_create_knx_fp_resources(size_t device_index)
   oc_init_tables();
   oc_load_group_object_table();
   oc_load_rp_object_table();
+
+  // oc_register_group_multicasts();
+}
+
+void
+oc_free_knx_fp_resources(size_t device_index)
+{
+  oc_free_group_rp_table();
+  oc_free_group_object_table();
 }
 
 // -----------------------------------------------------------------------------
@@ -1863,6 +1956,7 @@ oc_add_points_in_group_object_table_to_response(oc_request_t *request,
   (void)response_length;
   (void)matches;
   // int length = 0;
+  bool return_value = false;
 
   PRINT("oc_add_points_in_group_object_table_to_response %d\n", group_address);
 
@@ -1871,14 +1965,129 @@ oc_add_points_in_group_object_table_to_response(oc_request_t *request,
     if (g_got[index].ga_len > 0) {
       if (is_in_array(group_address, g_got[index].ga, g_got[index].ga_len)) {
         // add the resource
-        PRINT("oc_add_points_in_group_object_table_to_response %s\n",
-              oc_string(g_got[index].href));
+        // note, not checked if the resource is already there...
+        PRINT("oc_add_points_in_group_object_table_to_response [%d] %s\n",
+              index, oc_string(g_got[index].href));
         oc_add_resource_to_wk(oc_ri_get_app_resource_by_uri(
                                 oc_string(g_got[index].href),
                                 oc_string_len(g_got[index].href), device_index),
                               request, device_index, response_length, matches);
+        return_value = true;
       }
     }
   }
-  return false;
+  return return_value;
+}
+
+oc_endpoint_t
+oc_create_multicast_group_address(oc_endpoint_t in, int group_nr, int iid,
+                                  int scope)
+{
+  // create the multicast address from group and scope
+  // FF35::30: <ULA-routing-prefix>::<group id>
+  //    | 5 == scope
+  //   | 3 == multicast
+
+  // group number to the various bytes
+  uint8_t byte_1 = (uint8_t)group_nr;
+  uint8_t byte_2 = (uint8_t)(group_nr >> 8);
+  uint8_t byte_3 = (uint8_t)(group_nr >> 16);
+  uint8_t byte_4 = (uint8_t)(group_nr >> 24);
+
+  // iid as  ula prefix to various bytes
+  uint8_t ula_1 = (uint8_t)iid;
+  uint8_t ula_2 = (uint8_t)(iid >> 8);
+  uint8_t ula_3 = (uint8_t)(iid >> 16);
+  uint8_t ula_4 = (uint8_t)(iid >> 24);
+
+  int my_transport_flags = 0;
+  my_transport_flags += IPV6;
+  my_transport_flags += MULTICAST;
+  my_transport_flags += DISCOVERY;
+#ifdef OC_OSCORE
+  my_transport_flags += OSCORE;
+#endif
+
+  oc_make_ipv6_endpoint(group_mcast, my_transport_flags, 5683, 0xff,
+                        0x30 + scope, ula_4, ula_3, ula_2, ula_1, 0, 0, 0, 0, 0,
+                        0, byte_4, byte_3, byte_2, byte_1);
+  PRINT("  oc_create_multicast_group_address S=%d U=%d G=%d B4=%d B3=%d B2=%d "
+        "B1=%d\n",
+        scope, iid, group_nr, byte_4, byte_3, byte_2, byte_1);
+  PRINT("  ");
+  PRINTipaddr(group_mcast);
+  PRINT("\n");
+  memcpy(&in, &group_mcast, sizeof(oc_endpoint_t));
+
+  return in;
+}
+
+void
+subscribe_group_to_multicast(int group_nr, int iid, int scope)
+{
+  // FF35::30: <ULA-routing-prefix>::<group id>
+  //
+  // create the multi cast address from group and scope
+  oc_endpoint_t group_mcast;
+  memset(&group_mcast, 0, sizeof(group_mcast));
+
+  group_mcast =
+    oc_create_multicast_group_address(group_mcast, group_nr, iid, scope);
+
+  // subscribe
+  oc_connectivity_subscribe_mcast_ipv6(&group_mcast);
+}
+
+void
+oc_register_group_multicasts()
+{
+  // installation id will be used as ULA prefix
+  oc_device_info_t *device = oc_core_get_device_info(0);
+  uint32_t installation_id = device->iid;
+
+  PRINT("oc_register_group_multicasts\n");
+
+  int index;
+  for (index = 0; index < GOT_MAX_ENTRIES; index++) {
+    int nr_entries = g_got[index].ga_len;
+
+    oc_cflag_mask_t cflags = g_got[index].cflags;
+    // check if the group address is used for receiving.
+    // e.g. WRITE or UPDATE
+    if (((cflags & OC_CFLAG_WRITE) > 0) || ((cflags & OC_CFLAG_UPDATE) > 0) ||
+        ((cflags & OC_CFLAG_READ) > 0)) {
+
+      for (int i = 0; i < nr_entries; i++) {
+        PRINT(" oc_register_group_multicasts index=%d i=%d group: %d  cflags=",
+              index, i, g_got[index].ga[i]);
+        oc_print_cflags(cflags);
+        subscribe_group_to_multicast(g_got[index].ga[i], installation_id, 2);
+        subscribe_group_to_multicast(g_got[index].ga[i], installation_id, 5);
+      }
+    }
+  }
+}
+
+void
+oc_init_datapoints_at_initialization()
+{
+  int index;
+  PRINT("oc_init_datapoints_at_initialization\n");
+
+  for (index = 0; index < GOT_MAX_ENTRIES; index++) {
+    int nr_entries = g_got[index].ga_len;
+
+    if (nr_entries > 0) {
+      oc_cflag_mask_t cflags = g_got[index].cflags;
+      if ((cflags & OC_CFLAG_INIT) > 0) {
+        // Case 5)
+        // @sender : cflags = i After device restart(power up)
+        // Sent : -st r, sending association(1st assigned ga)
+        PRINT("oc_init_datapoints_at_initialization: index: %d issue read on "
+              "group address %d\n",
+              index, g_got[index].ga[0]);
+        oc_do_s_mode_read(g_got[index].ga[0]);
+      }
+    }
+  }
 }

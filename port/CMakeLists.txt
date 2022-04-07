@@ -12,6 +12,7 @@ if(UNIX OR WIN32)
     add_library(kis-port
         ${PORT_DIR}/abort.c
         ${PORT_DIR}/clock.c
+        ${PORT_DIR}/dns-sd.c
         ${PORT_DIR}/ipadapter.c
         ${PORT_DIR}/random.c
         ${PORT_DIR}/storage.c

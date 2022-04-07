@@ -819,7 +819,7 @@ def do_spake(my_stack, password):
     if my_stack.get_nr_devices() > 0:
         sn = my_stack.device_array[0].sn
         print("========spake=========", sn, password)
-        my_stack.initate_spake(sn, password)
+        my_stack.initiate_spake(sn, password)
 
 if __name__ == '__main__':  # pragma: no cover
 

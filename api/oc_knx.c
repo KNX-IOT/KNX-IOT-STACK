@@ -1,5 +1,5 @@
 /*
- // Copyright (c) 2021 Cascoda Ltd
+ // Copyright (c) 2021-2022 Cascoda Ltd
  //
  // Licensed under the Apache License, Version 2.0 (the "License");
  // you may not use this file except in compliance with the License.
@@ -15,15 +15,18 @@
  */
 
 #include "oc_api.h"
-#include "oc_knx.h"
-#include "oc_knx_fp.h"
-#include "oc_knx_dev.h"
-#include "oc_knx_client.h"
-#include "oc_knx_sec.h"
 #include "oc_core_res.h"
+#include "oc_knx.h"
+#include "oc_knx_client.h"
+#include "oc_knx_dev.h"
+#include "oc_knx_fp.h"
+#include "oc_knx_gm.h"
+#include "oc_knx_sec.h"
 #include "oc_main.h"
 #include <stdio.h>
 #include "oc_rep.h" // should not be needed
+
+#include "port/dns-sd.h"
 
 #ifdef OC_SPAKE
 #include "security/oc_spake2plus.h"
@@ -50,6 +53,7 @@ oc_string_t g_ldevid;
 // ----------------------------------------------------------------------------
 
 enum SpakeKeys {
+  SPAKE_ID = 0,
   SPAKE_SALT = 5,
   SPAKE_PA_SHARE_P = 10,
   SPAKE_PB_SHARE_V = 11,
@@ -184,7 +188,7 @@ oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     case OC_REP_INT: {
       if (rep->iname == 1) {
         {
-          value = rep->value.integer;
+          value = (int)rep->value.integer;
         }
       }
     } break;
@@ -205,7 +209,7 @@ oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   }
 
   PRINT("  cmd   : %d\n", cmd);
-  PRINT("  value : %d\n", value);
+  PRINT("  value : %d\n", (int)value);
 
   bool error = true;
   size_t device_index = request->resource->device;
@@ -419,7 +423,7 @@ oc_core_knx_lsm_post_handler(oc_request_t *request,
   while (rep != NULL) {
     if (rep->type == OC_REP_INT) {
       if (rep->iname == 2) {
-        event = rep->value.integer;
+        event = (int)rep->value.integer;
         changed = true;
         break;
       }
@@ -438,6 +442,15 @@ oc_core_knx_lsm_post_handler(oc_request_t *request,
     oc_rep_i_set_int(root, 3, (int)oc_knx_lsm_state(device_index));
     oc_rep_end_root_object();
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
+
+    if (oc_is_device_in_runtime(device_index)) {
+      oc_register_group_multicasts();
+      oc_init_datapoints_at_initialization();
+      oc_device_info_t *device = oc_core_get_device_info(device_index);
+      knx_publish_service(oc_string(device->serialnumber), device->iid,
+                          device->ia);
+    }
+
     return;
   }
 
@@ -505,6 +518,25 @@ oc_core_knx_knx_get_handler(oc_request_t *request,
   PRINT("oc_core_knx_knx_get_handler - done\n");
 }
 
+// ----------------------------------------------------------------------------
+
+bool
+oc_s_mode_notification_to_json(char *buffer, size_t buffer_size,
+                               oc_group_object_notification_t notification)
+{
+  // { 5: { 6: <st>, 7: <ga>, 1: <value> } }
+  // { "s": { "st": <st>,  "ga": <ga>, "value": <value> } }
+  int size = snprintf(
+    buffer, buffer_size,
+    "{ \"sia\": %d \"s\":{ \"st\": \"%s\" , \"ga\":%d, \"value\": %s }  }",
+    notification.sia, oc_string(notification.st), notification.ga,
+    oc_string(notification.value));
+  if (size > buffer_size) {
+    return false;
+  }
+  return true;
+}
+
 void
 oc_reset_g_received_notification()
 {
@@ -527,6 +559,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
   (void)iface_mask;
   oc_rep_t *rep = NULL;
   oc_rep_t *rep_value = NULL;
+  char ip_address[100];
 
   PRINT("KNX KNX Post Handler");
   char buffer[200];
@@ -551,6 +584,9 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
   }
   oc_reset_g_received_notification();
 
+  // get sender ip address
+  SNPRINTFipaddr(ip_address, 100 - 1, *request->origin);
+
   /* loop over the request document to parse all the data */
   rep = request->request_payload;
   while (rep != NULL) {
@@ -558,7 +594,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
     case OC_REP_INT: {
       // sia
       if (rep->iname == 4) {
-        g_received_notification.sia = rep->value.integer;
+        g_received_notification.sia = (int)rep->value.integer;
       }
     } break;
     case OC_REP_OBJECT: {
@@ -584,26 +620,58 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
                           oc_string(object->value.string),
                           oc_string_len(object->value.string));
           }
+          if (object->iname == 1) {
+            oc_free_string(&g_received_notification.value);
+            oc_new_string(&g_received_notification.value,
+                          oc_string(object->value.string),
+                          oc_string_len(object->value.string));
+          }
         } break;
 
         case OC_REP_INT: {
 #ifdef TAGS_AS_STRINGS
           if (oc_string_len(object->name) == 3 &&
               memcmp(oc_string(object->name), "sia", 3) == 0) {
-            g_received_notification.sia = object->value.integer;
+            g_received_notification.sia = (int)object->value.integer;
           }
           if (oc_string_len(object->name) == 2 &&
               memcmp(oc_string(object->name), "ga", 2) == 0) {
-            g_received_notification.ga = object->value.integer;
+            g_received_notification.ga = (int)object->value.integer;
           }
 #endif
           // sia
           if (object->iname == 4) {
-            g_received_notification.sia = object->value.integer;
+            g_received_notification.sia = (int)object->value.integer;
           }
           // ga
           if (object->iname == 7) {
-            g_received_notification.ga = object->value.integer;
+            g_received_notification.ga = (int)object->value.integer;
+          }
+          if (object->iname == 1) {
+            oc_free_string(&g_received_notification.value);
+            char buf[20];
+            snprintf(buf, 20 - 1, "%d", object->value.integer);
+            oc_new_string(&g_received_notification.value, buf, strlen(buf));
+          }
+        } break;
+        case OC_REP_BOOL: {
+          if (object->iname == 1) {
+            oc_free_string(&g_received_notification.value);
+            if (object->value.boolean) {
+              oc_new_string(&g_received_notification.value, "true",
+                            strlen("true"));
+            } else {
+              oc_new_string(&g_received_notification.value, "false",
+                            strlen("false"));
+            }
+          }
+        } break;
+        case OC_REP_DOUBLE: {
+          if (object->iname == 1) {
+            oc_free_string(&g_received_notification.value);
+            char buf[20];
+            snprintf(buf, 20 - 1, "%f", object->value.double_p);
+            oc_new_string(&g_received_notification.value, buf, strlen(buf));
           }
         } break;
         case OC_REP_NIL:
@@ -622,22 +690,37 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
     rep = rep->next;
   }
 
-  bool do_write = false;
-  bool do_read = false;
-  bool do_response = false;
+  // gateway functionality: call back for all s-mode calls
+  oc_gateway_t *my_gw = oc_get_gateway_cb();
+  if (my_gw != NULL && my_gw->cb) {
+    // call the gateway function
+    my_gw->cb(device_index, ip_address, &g_received_notification, my_gw->data);
+  }
+
+  bool st_write = false;
+  bool st_rep = false;
+  bool st_read = false;
   // handle the request
   // loop over the group addresses of the /fp/r
-  PRINT(" .knx : sia   %d\n", g_received_notification.sia);
-  PRINT(" .knx : ga    %d\n", g_received_notification.ga);
-  PRINT(" .knx : st    %s\n", oc_string(g_received_notification.st));
+  PRINT(" .knx : origin:%s sia: %d ga: %d st: %s\n", ip_address,
+        g_received_notification.sia, g_received_notification.ga,
+        oc_string(g_received_notification.st));
   if (strcmp(oc_string(g_received_notification.st), "w") == 0) {
-    do_write = true;
+    // case_1 :
+    // Received from bus: -st w, any ga ==> @receiver:
+    // cflags = w -> overwrite object value
+    st_write = true;
+  } else if (strcmp(oc_string(g_received_notification.st), "rp") == 0) {
+    // Case 2)
+    // Received from bus: -st rp, any ga
+    //@receiver: cflags = u -> overwrite object value
+    st_rep = true;
   } else if (strcmp(oc_string(g_received_notification.st), "r") == 0) {
-    do_read = true;
-  } else {
-    do_response = true;
-    PRINT(" .knx : st : no reading/writing: ignoring request\n");
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    // Case 4)
+    // @sender: cflags = r
+    // Received from bus: -st r
+    // Sent: -st rp, sending association (1st assigned ga)
+    st_read = true;
   }
 
   int index = oc_core_find_group_object_table_index(g_received_notification.ga);
@@ -648,6 +731,19 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
     return;
   }
 
+  // create the dummy request
+  oc_request_t new_request;
+  memset(&new_request, 0, sizeof(oc_request_t));
+  oc_response_buffer_t response_buffer;
+  memset(&response_buffer, 0, sizeof(oc_response_buffer_t));
+  oc_response_t response_obj;
+  memset(&response_obj, 0, sizeof(oc_response_t));
+  oc_ri_new_request_from_request(new_request, *request, response_buffer,
+                                 response_obj);
+  new_request.request_payload = oc_s_mode_get_value(request);
+  new_request.uri_path = ".knx";
+  new_request.uri_path_len = 4;
+
   while (index != -1) {
     oc_string_t myurl = oc_core_find_group_object_table_url_from_index(index);
     PRINT(" .knx : url  %s\n", oc_string(myurl));
@@ -655,33 +751,63 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
       // get the resource to do the fake post on
       oc_resource_t *my_resource = oc_ri_get_app_resource_by_uri(
         oc_string(myurl), oc_string_len(myurl), device_index);
+      if (my_resource == NULL) {
+        return;
+      }
 
       // check if the data is allowed to write or update
       oc_cflag_mask_t cflags = oc_core_group_object_table_cflag_entries(index);
-      if ((cflags & OC_CFLAG_WRITE) || (cflags & OC_CFLAG_UPDATE)) {
-        PRINT(" skipping index %d due to flags %d", index, cflags);
-        break;
-      }
-
-      if (my_resource != NULL) {
-        if (do_write) {
-          // write the value to the resource
-          my_resource->post_handler.cb(request, iface_mask, data);
-        }
-        if (do_read) {
-          // do the actual read from the resource and
-          // send the reply
-          oc_do_s_mode(oc_string(my_resource->uri), "rp");
-        }
-        if (do_response) {
-          // send the response to the callback
-          oc_s_mode_response_cb_t m_s_mode_cb = oc_get_s_mode_response_cb();
-          if (m_s_mode_cb) {
-            rep = request->request_payload;
-            rep_value = oc_s_mode_get_value(request);
-            m_s_mode_cb(oc_string(my_resource->uri), rep, rep_value);
+      if (((cflags & OC_CFLAG_WRITE) > 0) && (st_write)) {
+        PRINT(" (case1) W-WRITE: index %d handled due to flags %d\n", index,
+              cflags);
+        // CASE 1:
+        // Received from bus: -st w, any ga
+        // @receiver : cflags = w->overwrite object value
+        // to be discussed:
+        // get value, since the w only should be send if the value is updated
+        // (e.g. different)
+        if (my_resource->post_handler.cb) {
+          my_resource->post_handler.cb(&new_request, iface_mask, data);
+          if ((cflags & OC_CFLAG_TRANSMISSION) > 0) {
+            // Case 3) part 1
+            // @sender : updated object value + cflags = t
+            // Sent : -st w, sending association(1st assigned ga)
+            PRINT("  (case3) (W-WRITE) sending WRITE due to TRANSMIT flag \n");
+            oc_do_s_mode_with_scope(2, oc_string(myurl), "w");
+            oc_do_s_mode_with_scope(5, oc_string(myurl), "w");
           }
         }
+      }
+      if (((cflags & OC_CFLAG_UPDATE) > 0) && (st_rep)) {
+        PRINT(" (case2) RP-UPDATE: index %d handled due to flags %d\n", index,
+              cflags);
+        // Case 2)
+        // Received from bus: -st rp , any ga
+        // @receiver : cflags = u->overwrite object value
+        if (my_resource->post_handler.cb) {
+          my_resource->post_handler.cb(&new_request, iface_mask, data);
+          if ((cflags & OC_CFLAG_TRANSMISSION) > 0) {
+            PRINT(
+              "   (case3) (RP-UPDATE) sending WRITE due to TRANSMIT flag \n");
+            // Case 3) part 2
+            // @sender : updated object value + cflags = t
+            // Sent : -st w, sending association(1st assigned ga)
+            oc_do_s_mode_with_scope(2, oc_string(myurl), "w");
+            oc_do_s_mode_with_scope(5, oc_string(myurl), "w");
+          }
+        }
+      }
+      if (((cflags & OC_CFLAG_READ) > 0) && (st_read)) {
+        PRINT(" (case4) (R-READ) index %d handled due to flags %d\n", index,
+              cflags);
+        // Case 4)
+        // @sender: cflags = r
+        // Received from bus: -st r
+        // Sent: -st rp, sending association (1st assigned ga)
+        // specifically: do not check the transmission flag
+        PRINT("   (case3) (RP-UPDATE) sending RP due to READ flag \n");
+        oc_do_s_mode_with_scope_no_check(2, oc_string(myurl), "rp");
+        oc_do_s_mode_with_scope_no_check(5, oc_string(myurl), "rp");
       }
     }
     // get the next index in the table to get the url from.
@@ -693,12 +819,12 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
 
   // don't send anything back on a multi cast message
   if (request->origin && (request->origin->flags & MULTICAST)) {
-    PRINT(" .knx : Multicast - not sending response\n");
+    // PRINT(" .knx : Multicast - not sending response\n");
     oc_send_cbor_response(request, OC_IGNORE);
     return;
   }
 
-  PRINT(" .knx : Unicast - sending response\n");
+  // PRINT(" .knx : Unicast - sending response\n");
   // send the response
   oc_send_cbor_response(request, OC_STATUS_OK);
 }
@@ -707,7 +833,7 @@ void
 oc_create_knx_knx_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_knx_resource\n");
-  // "/a/lsm"
+
   oc_core_populate_resource(resource_idx, device, "/.knx", OC_IF_LI | OC_IF_G,
                             APPLICATION_CBOR, OC_DISCOVERABLE,
                             oc_core_knx_knx_get_handler, 0,
@@ -730,7 +856,10 @@ oc_core_knx_fingerprint_get_handler(oc_request_t *request,
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
-  cbor_encode_uint(&g_encoder, g_fingerprint);
+  // cbor_encode_uint(&g_encoder, g_fingerprint);
+  oc_rep_begin_root_object();
+  oc_rep_i_set_int(root, 1, g_fingerprint);
+  oc_rep_end_root_object();
 
   PRINT("oc_core_knx_fingerprint_get_handler - done\n");
   oc_send_cbor_response(request, OC_STATUS_OK);
@@ -761,7 +890,10 @@ oc_core_knx_osn_get_handler(oc_request_t *request,
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
-  cbor_encode_uint(&g_encoder, g_osn);
+  // cbor_encode_uint(&g_encoder, g_osn);
+  oc_rep_begin_root_object();
+  oc_rep_i_set_int(root, 1, g_osn);
+  oc_rep_end_root_object();
 
   PRINT("oc_core_knx_osn_get_handler - done\n");
   oc_send_cbor_response(request, OC_STATUS_OK);
@@ -973,6 +1105,14 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
   }
   rep = request->request_payload;
+
+  if (valid_request == SPAKE_RND) {
+    // set the default id, in preparation for the response
+    // this gets overwritten if the ID is present in the
+    // request payload handled below
+    oc_free_string(&g_pase.id);
+    oc_new_string(&g_pase.id, "responderkey", strlen("responderkey"));
+  }
   // handle input
   while (rep != NULL) {
     switch (rep->type) {
@@ -992,6 +1132,12 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
         oc_new_string(&g_pase.rnd, oc_string(rep->value.string),
                       oc_byte_string_len(rep->value.string));
       }
+      if (rep->iname == SPAKE_ID) {
+        // if the ID is present, overwrite the default
+        oc_free_string(&g_pase.id);
+        oc_new_string(&g_pase.id, oc_string(rep->value.string),
+                      oc_byte_string_len(rep->value.string));
+      }
     } break;
     default:
       break;
@@ -1007,6 +1153,9 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     oc_spake_parameter_exchange(&g_pase.rnd, &g_pase.salt, &g_pase.it);
 #endif /* OC_SPAKE */
     oc_rep_begin_root_object();
+    // id (0)
+    oc_rep_i_set_byte_string(root, SPAKE_ID, oc_cast(g_pase.id, uint8_t),
+                             oc_byte_string_len(g_pase.id));
     // rnd (15)
     oc_rep_i_set_byte_string(root, SPAKE_RND, oc_cast(g_pase.rnd, uint8_t),
                              oc_byte_string_len(g_pase.rnd));
@@ -1297,4 +1446,23 @@ oc_create_knx_resources(size_t device_index)
   oc_create_knx_idevid_resource(OC_KNX_IDEVID, device_index);
   oc_create_knx_spake_resource(OC_KNX_SPAKE, device_index);
   oc_create_knx_resource(OC_KNX, device_index);
+}
+
+// ----------------------------------------------------------------------------
+
+bool
+oc_is_device_in_runtime(size_t device_index)
+{
+  oc_device_info_t *device = oc_core_get_device_info(device_index);
+  if (device->ia <= 0) {
+    return false;
+  }
+  if (device->iid <= 0) {
+    return false;
+  }
+  if (device->lsm_s != LSM_S_LOADED) {
+    return false;
+  }
+
+  return true;
 }

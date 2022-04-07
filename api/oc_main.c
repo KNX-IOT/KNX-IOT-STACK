@@ -1,5 +1,6 @@
 /*
 // Copyright (c) 2016 Intel Corporation
+// Copyright (c) 2022 Cascoda Ltd
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,13 +31,7 @@
 #include "oc_signal_event_loop.h"
 
 #include "oc_knx_dev.h"
-
-//#ifdef OC_SECURITY
-//#include "security/oc_cred_internal.h"
-//#ifdef OC_PKI
-//#include "security/oc_keypair.h"
-//#endif /* OC_PKI */
-//#endif /* OC_SECURITY */
+#include "oc_knx_fp.h"
 
 #ifdef OC_OSCORE
 #include "security/oc_tls.h"
@@ -283,10 +278,6 @@ oc_main_init(const oc_handler_t *handler)
   }
 #endif /* OC_SECURITY */
 
-  //#ifdef OC_SECURITY
-  //  oc_sec_create_svr();
-  //#endif
-
   for (size_t device = 0; device < oc_core_get_num_devices(); device++) {
     oc_knx_device_storage_read(device);
     oc_knx_load_state(device);
@@ -305,8 +296,9 @@ oc_main_init(const oc_handler_t *handler)
 #endif
 
 #ifdef OC_SERVER
-  if (app_callbacks->register_resources)
+  if (app_callbacks->register_resources) {
     app_callbacks->register_resources();
+  }
 #endif
 
   OC_DBG("oc_main: stack initialized");
@@ -318,9 +310,19 @@ oc_main_init(const oc_handler_t *handler)
     presets->cb(0, presets->data);
   }
 
+#ifdef OC_SERVER
+  // listen to the group addresses multi-casts
+  // that are registered in the group object table
+  oc_register_group_multicasts();
+#endif
+
 #ifdef OC_CLIENT
-  if (app_callbacks->requests_entry)
+  if (app_callbacks->requests_entry) {
     app_callbacks->requests_entry();
+  }
+  // do initialization of the data points according the I flag in
+  // in the group object table
+  oc_init_datapoints_at_initialization();
 #endif
 
   return 0;
@@ -354,12 +356,6 @@ oc_main_shutdown(void)
 
   oc_ri_shutdown();
 
-//#ifdef OC_SECURITY
-//  oc_tls_shutdown();
-//#ifdef OC_PKI
-//  oc_free_ecdsa_keypairs();
-//#endif /* OC_PKI */
-//#endif /* OC_SECURITY */
 #ifdef OC_OSCORE
   oc_tls_shutdown();
 #endif

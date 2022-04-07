@@ -88,9 +88,11 @@ oc_send_response(oc_request_t *request, oc_status_t response_code)
 void
 oc_send_cbor_response(oc_request_t *request, oc_status_t response_code)
 {
-  request->response->response_buffer->content_format = APPLICATION_CBOR;
-  request->response->response_buffer->response_length = response_length();
-  request->response->response_buffer->code = oc_status_code(response_code);
+  if (request && request->response && request->response->response_buffer) {
+    request->response->response_buffer->content_format = APPLICATION_CBOR;
+    request->response->response_buffer->response_length = response_length();
+    request->response->response_buffer->code = oc_status_code(response_code);
+  }
 }
 
 void
@@ -394,20 +396,6 @@ oc_resource_set_request_handler(oc_resource_t *resource, oc_method_t method,
     handler->user_data = user_data;
   }
 }
-
-#ifdef OC_OSCORE
-void
-oc_resource_set_secure_mcast(oc_resource_t *resource, bool supported)
-{
-  if (resource) {
-    if (supported) {
-      resource->properties |= OC_SECURE_MCAST;
-    } else {
-      resource->properties &= ~OC_SECURE_MCAST;
-    }
-  }
-}
-#endif /* OC_OSCORE */
 
 bool
 oc_add_resource(oc_resource_t *resource)

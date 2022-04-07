@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #############################
 #
-#    copyright 2021 Cascoda Ltd.
+#    copyright 2021-2022 Cascoda Ltd.
 #    Redistribution and use in source and binary forms, with or without modification,
 #    are permitted provided that the following conditions are met:
 #    1.  Redistributions of source code must retain the above copyright notice,
@@ -53,56 +53,44 @@ sys.path.append(parentdir)
 
 import knx_stack
 
-def do_discover(my_stack, serial_number, scope = 2):
-    time.sleep(1)
-    query = "ep=urn:knx:sn."+str(serial_number)
-    my_stack.discover_devices_with_query( query, int(scope))
-    if my_stack.get_nr_devices() > 0:
-        print ("SN :", my_stack.device_array[0].sn)
-
-def get_sn(my_stack):
-    print("Get SN :")
-    sn = my_stack.device_array[0].sn
-    response = my_stack.issue_cbor_get(sn, "/dev/sn")
-    print ("response:",response)
-    my_stack.purge_response(response)
-
-def do_reset(my_stack, reset_value):
-    if my_stack.get_nr_devices() > 0:
-        sn = my_stack.device_array[0].sn
-        # { cmd : "reset", "value": 2}
-        content = {2: "reset", 1: reset_value }
-        response =  my_stack.issue_cbor_post(sn,"/.well-known/knx",content)
-        print ("response:",response)
-        my_stack.purge_response(response)
-
+#
+#
+# {sia: 5678, es: {st: write, ga: 1, value: 100 }}
+#
+#
 if __name__ == '__main__':  # pragma: no cover
-    parser = argparse.ArgumentParser()
 
+    parser = argparse.ArgumentParser()
     # input (files etc.)
-    parser.add_argument("-sn", "--serialnumber",
-                    help="serial number of the device", nargs='?',
-                    const=1, required=True)
-    parser.add_argument("-scope", "--scope",
-                    help="scope of the multicast request [2,5] 2:linklocal",
-                    nargs='?', default=2, const=1, required=False)
-    parser.add_argument("-rs", "--resetvalue",
-                    help="reset value [2,7], 2: factory default, 7: table info",
-                    nargs='?', default=2, const=1, required=False)
+
+    parser.add_argument("-iid", "--iid", default=5,
+                    help="receiving installation identifier (default iid=5)", nargs='?',
+                    const="", required=False)
+    parser.add_argument("-ga_max", "--ga_max", default=20,
+                    help="group address range(default [1,20]", nargs='?', const="",
+                    required=False)
+    parser.add_argument("-wait", "--wait",
+                    help="wait after issuing s-mode command", nargs='?',
+                    default=200000, const=1, required=False)
     # (args) supports batch scripts providing arguments
     print(sys.argv)
     args = parser.parse_args()
-    print("scope         :" + str(args.scope))
-    print("serial number :" + str(args.serialnumber))
-    print("reset value   :" + str(args.resetvalue))
+
+    print("iid        :" + str(args.iid))
+    print("ga range   :" + str(args.ga_max))
+    print("wait [sec] :" + str(args.wait))
     the_stack = knx_stack.KNXIOTStack()
     the_stack.start_thread()
+
     signal.signal(signal.SIGINT, the_stack.sig_handler)
+    time.sleep(2)
+
     try:
-        do_discover(the_stack, args.serialnumber, args.scope)
-        do_reset(the_stack, args.resetvalue)
+        the_stack.listen_s_mode(2, args.ga_max, args.iid)
+        the_stack.listen_s_mode(5, args.ga_max, args.iid)
     except:
         traceback.print_exc()
-    time.sleep(2)
+
+    time.sleep(int(args.wait))
     the_stack.quit()
     sys.exit()

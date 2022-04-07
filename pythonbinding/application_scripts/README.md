@@ -10,17 +10,6 @@ Most of the application needs the serial number of the device so that the applic
 
 ## application scripts
 
-
-### list_devices.py
-
-script to list all the devices, issuing:
-
-- discovery with query : rt=urn:knx:dpa.*
-
-```bash
-python list_devices.py -h
-```
-
 ### reset_device.py
 
 script to reset the device, issuing:
@@ -32,15 +21,46 @@ script to reset the device, issuing:
 python reset_device.py -h
 ```
 
+### list_devices.py
 
-### list_device_with_ia.py
+script to list the device, issuing:
 
-script to list the device with internal address, issuing:
-
-- discovery with query : if=urn:knx:ia.[ia]
+- discovery of device with internal address using query : if=urn:knx:ia.[ia]
+- discovery of device in programming mode using query : if=urn:knx:if.pm
+- discovery of device with a serial_number using query : ep=urn:knx:sn.[serial_number]
+- discovery of device using a group_address using query : d=urn:knx:g.s.[group_address]
+- discovery with query : rt=urn:knx:dpa.*
 
 ```bash
-python list_device_with_ia.py -h
+python list_devices.py -h
+```
+
+### s-mode.py
+
+script to issue an s-mode command
+
+- has option to set the various values in the command.
+
+```bash
+python s-mode.py 
+```
+
+### sniffer-s-mode.py
+
+script to listen to s-mode commands
+
+- has option to set iid and max group number
+
+```bash
+python sniffer-s-mode.py 
+```
+
+### programming_mode.py
+
+script to issue set a specific device (via serial_number) in programming mode
+
+```bash
+python programming_mode.py 
 ```
 
 ### install_config.py
@@ -49,12 +69,12 @@ script to configuring a device, issuing:
 
 - discovery a device with sn
 - putting the device in programming mode to set:
-   - internal address (ia)
-   - installation id (iid)
+  - internal address (ia)
+  - installation id (iid)
 - putting the device in loading state
-   - configure Group Object Table
-   - configure Recipient Table
-   - configure Publisher Table
+  - configure Group Object Table
+  - configure Recipient Table
+  - configure Publisher Table
 
 ```bash
 python install_config.py -h
@@ -72,6 +92,7 @@ python install_config.py -sn 000003 -ia 1 -file LSAB_config.json
 
 The configuration file is a json formatted file.
 config data:
+
 - installation id: key = "iid"
 - group object table: Key = "groupobject"
 - recipient table: Key = "recipient"
@@ -92,6 +113,7 @@ The group object table contains the json keys for an Group Object Table entry.
 ```
 
 ##### publisher table
+
 The group object table contains the json keys for an Publisher entry.
 note that this table contains the info of the sending side.
 Note that the ia (and path) needs to be defined or the url.
@@ -113,6 +135,7 @@ if ia is defined and path is not there, the path will have the default value ".k
 ```
 
 ##### recipient table
+
 The group object table contains the json keys for an Publisher entry.
 note that this table contains the info of the receiving side.
 Note that the ia (and path) needs to be defined or the url.
@@ -127,32 +150,5 @@ if ia is defined and path is not there, the path will have the default value ".k
  *        "id": "2","url": "coap://<IP multicast, unicast address or fqdn>/<path>", 
  * "ga": [2305, 2306, 2307, 2308]
  *     }] 
-```
-
-### s-mode.py
-
-script to issue an s-mode command
-
-- works on multicast all coap nodes
-- has option to set the various values in the command.
-
-```bash
-python s-mode.py 
-```
-
-### install_demo.py
-
-convieniance script to install the LSAB + LSSB demo.
- 
-the script to does an predefined installation
-
-- works for LSAB & LSSB devices
-- works only for devices with serial numbers:
-  - 000001 (LSAB)
-  - 000002 (LSSB)
-  - 000003 (LSAB)
-  - 000004 (LSSB)
-```bash
-python install_devices.py
 ```
 

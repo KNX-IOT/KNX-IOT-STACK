@@ -120,10 +120,7 @@ struct oc_message_s
 #ifdef OC_TCP
   size_t read_offset;
 #endif /* OC_TCP */
-//#ifdef OC_SECURITY
-#ifdef OC_OSCORE
   uint8_t encrypted;
-#endif /* OC_SECURITY */
 };
 
 /**
@@ -210,11 +207,11 @@ void handle_session_event_callback(const oc_endpoint_t *endpoint,
 /**
  * @brief Subscribe to a multicast address
  *
- * @param device ID of device to subscribe
- * @param address 16-byte array containing multicast address
+ * @param address endpoint describing the address to subscribe to.
+ * The device & addr.ipv6.address members must be set for the
+ * function call to be valid.
  */
-void oc_connectivity_subscribe_mcast_ipv6(size_t device,
-                                          const uint8_t *address);
+void oc_connectivity_subscribe_mcast_ipv6(oc_endpoint_t *address);
 
 #ifdef OC_TCP
 /**

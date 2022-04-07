@@ -77,7 +77,7 @@ void oc_message_unref(oc_message_t *message);
 /**
  * @brief receive (CoAP) message
  *
- * @param message the received messsage
+ * @param message the received message
  */
 void oc_recv_message(oc_message_t *message);
 

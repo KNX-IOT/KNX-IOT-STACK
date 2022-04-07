@@ -14,37 +14,26 @@
 // limitations under the License.
 */
 /**
- * @file
- * Device status
- *
+  @file
+*/
+#ifndef OC_KNX_P_INTERNAL_H
+#define OC_KNX_P_INTERNAL_H
 
- */
-#ifndef OC_DEVICE_MODE_H
-#define OC_DEVICE_MODE_H
-
-#include <stdint.h>
+#include <stddef.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef enum oc_device_mode_t {
-
-  OC_PROGRAMMING_MODE = 0, ///< device is in programming mode
-  OC_NORMAL_OPERATION      ///< device is in normal operation
-} oc_device_mode_t;
-
 /**
- * @brief checks if the device is in programming mode
- *
- * @param device_index the device index
- * @return true in programming mode
- * @return false not in programming mode
+ *@brief Creation of the KNX /p resource.
+ * - /p
+ *@param device index of the device to which the resource is to be created
  */
-bool is_device_in_programming_mode(int device_index);
+void oc_create_knx_p_resources(size_t device);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* OC_DEVICE_MODE_H */
+#endif /* OC_KNX_FB_INTERNAL_H */

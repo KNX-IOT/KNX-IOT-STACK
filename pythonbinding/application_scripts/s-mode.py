@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #############################
 #
-#    copyright 2021 Cascoda Ltd.
+#    copyright 2021-2022 Cascoda Ltd.
 #    Redistribution and use in source and binary forms, with or without modification,
 #    are permitted provided that the following conditions are met:
 #    1.  Redistributions of source code must retain the above copyright notice,
@@ -83,24 +83,29 @@ if __name__ == '__main__':  # pragma: no cover
     parser = argparse.ArgumentParser()
     # input (files etc.)
     parser.add_argument("-scope", "--scope", default=2,
-                    help="scope of the multicast request", nargs='?',
+                    help="scope of the multicast request (defaul =2 : same machine)", nargs='?',
                     const="", required=False)
     parser.add_argument("-sia", "--sia", default=2,
-                    help="sending internal address", nargs='?',
+                    help="sending internal address (default ia=2)", nargs='?',
+                    const="", required=False)
+    parser.add_argument("-iid", "--iid", default=5,
+                    help="sending installation identifier (default iid=5)", nargs='?',
                     const="", required=False)
     parser.add_argument("-st", "--st", default="w",
                     help="send target ,e.g w,r,rp", nargs='?',
                     const="", required=False)
     parser.add_argument("-ga", "--ga", default=1,
-                    help="group address", nargs='?', const="",
+                    help="group address (default = 1)", nargs='?', const="",
                     required=False)
-    parser.add_argument("-valuetype", "--valuetype", default=1,
-                    help="1=boolean, 2=int, 3=float", nargs='?',
+    parser.add_argument("-valuetype", "--valuetype", default=0,
+                    help="0=boolean, 1=integer, 2=float (default boolean)", nargs='?',
                     const="", required=False)
     parser.add_argument("-value", "--value", default=True,
-                    help="value of the valuetype ", nargs='?',
-                    const="", required=False)
-
+                    help="value of the valuetype (default True)", nargs='?',
+                    const="true", required=False)
+    parser.add_argument("-wait", "--wait",
+                    help="wait after issuing s-mode command", nargs='?',
+                    default=2, const=1, required=False)
     # (args) supports batch scripts providing arguments
     print(sys.argv)
     args = parser.parse_args()
@@ -109,20 +114,23 @@ if __name__ == '__main__':  # pragma: no cover
     print("sia        :" + str(args.sia))
     print("st         :" + str(args.st))
     print("ga         :" + str(args.ga))
+    print("iid        :" + str(args.iid))
     print("valuetype  :" + str(args.valuetype))
     print("value      :" + str(args.value))
+    print("wait [sec] :" + str(args.wait))
 
     the_stack = knx_stack.KNXIOTStack()
+    the_stack.start_thread()
 
     signal.signal(signal.SIGINT, the_stack.sig_handler)
     time.sleep(2)
 
     try:
-        the_stack.issue_s_mode(args.scope, args.sia, args.ga,
+        the_stack.issue_s_mode(args.scope, args.sia, args.ga, args.iid,
            str(args.st), args.valuetype, str(args.value))
     except:
         traceback.print_exc()
 
-    time.sleep(2)
+    time.sleep(int(args.wait))
     the_stack.quit()
     sys.exit()

@@ -18,6 +18,8 @@
 #include "oc_api.h"
 #include "oc_core_res.h"
 #include "port/oc_clock.h"
+#include "api/oc_knx_fp.h"
+#include "api/oc_knx_gm.h"
 
 #if defined(_WIN32)
 #include <windows.h>
@@ -37,16 +39,21 @@
 #define MAX_NUM_RESOURCES (100)
 #define MAX_NUM_RT (50)
 #define MAX_URI_LENGTH (30)
+#define MAX_SERIAL_NUM_LENGTH (20)
 
 /* Structure in app to track currently discovered owned/unowned devices */
 
+char g_serial_number[MAX_SERIAL_NUM_LENGTH]; /**< the serial number to be set on
+                                                the stack */
+
 typedef struct device_handle_t
 {
-  struct device_handle_t *next;
-  char device_serial_number[10];
-  char device_name[64];
-  char ip_address[100];
-  oc_endpoint_t ep;
+  struct device_handle_t *next;                     /**< next in the list */
+  char device_serial_number[MAX_SERIAL_NUM_LENGTH]; /**< serial number of the
+                                                       device*/
+  char device_name[64]; /**< the device name (not used) */
+  char ip_address[100]; /**< the ip address (ipv6 as string) */
+  oc_endpoint_t ep;     /**< the endpoint to talk to the device */
 } device_handle_t;
 
 /* Pool of device handles */
@@ -78,17 +85,25 @@ static struct timespec ts;
 #endif
 static int quit = 0;
 
+// -----------------------------------------------------------------------------
+// forward declarations
+
+static void signal_event_loop(void);
+
+// -----------------------------------------------------------------------------
+
 /**
  * structure with the callbacks
  *
  */
 typedef struct py_cb_struct
 {
-  changedCB changedFCB;
-  resourceCB resourceFCB;
-  clientCB clientFCB;
-  discoveryCB discoveryFCB;
-  spakeCB spakeFCB;
+  volatile changedCB changedFCB;
+  volatile resourceCB resourceFCB;
+  volatile clientCB clientFCB;
+  volatile discoveryCB discoveryFCB;
+  volatile spakeCB spakeFCB;
+  volatile gatewayCB gatewayFCB;
 } py_cb_struct_t;
 
 /**
@@ -162,24 +177,24 @@ print_rep(oc_rep_t *rep, bool pretty_print)
 // -----------------------------------------------------------------------------
 
 /**
- * function to install callbacks, called from python
+ * function to install callbacks
  *
  */
 void
-py_install_changedCB(changedCB changedCB)
+ets_install_changedCB(changedCB changedCB)
 {
-  PRINT("[C]install_changedCB\n");
+  PRINT("[C]install_changedCB %p\n", changedCB);
   my_CBFunctions.changedFCB = changedCB;
 }
 
 /**
- * function to install resource callbacks, called from python
+ * function to install resource callbacks
  *
  */
 void
-py_install_resourceCB(resourceCB resourceCB)
+ets_install_resourceCB(resourceCB resourceCB)
 {
-  PRINT("[C]install_resourceCB\n");
+  PRINT("[C]install_resourceCB: %p\n", resourceCB);
   my_CBFunctions.resourceFCB = resourceCB;
 }
 /**
@@ -187,9 +202,9 @@ py_install_resourceCB(resourceCB resourceCB)
  *
  */
 void
-py_install_clientCB(clientCB clientCB)
+ets_install_clientCB(clientCB clientCB)
 {
-  PRINT("[C]install_clientCB\n");
+  PRINT("[C]install_clientCB: %p\n", clientCB);
   my_CBFunctions.clientFCB = clientCB;
 }
 
@@ -198,9 +213,9 @@ py_install_clientCB(clientCB clientCB)
  *
  */
 void
-py_install_discoveryCB(discoveryCB discoveryCB)
+ets_install_discoveryCB(discoveryCB discoveryCB)
 {
-  PRINT("[C]installdiscoveryCB\n");
+  PRINT("[C]install_discoveryCB: %p\n", discoveryCB);
   my_CBFunctions.discoveryFCB = discoveryCB;
 }
 
@@ -209,10 +224,40 @@ py_install_discoveryCB(discoveryCB discoveryCB)
  *
  */
 void
-py_install_spakeCB(spakeCB spakeCB)
+ets_install_spakeCB(spakeCB spakeCB)
 {
-  PRINT("[C]installspakeCB\n");
+  PRINT("[C]install_spakeCB: %p\n", spakeCB);
   my_CBFunctions.spakeFCB = spakeCB;
+}
+
+void
+internal_gw_cb(size_t device_index, char *sender_ip_address,
+               oc_group_object_notification_t *s_mode_message, void *data)
+{
+  (void)data;
+  char buffer[300];
+
+  PRINT("[c]internal_gw_cb %d from %s\n", (int)device_index, sender_ip_address);
+  PRINT("   ga  = %d\n", s_mode_message->ga);
+  PRINT("   sia = %d\n", s_mode_message->sia);
+  PRINT("   st  = %s\n", oc_string(s_mode_message->st));
+  PRINT("   val = %s\n", oc_string(s_mode_message->value));
+
+  oc_s_mode_notification_to_json(buffer, 300, *s_mode_message);
+  if (my_CBFunctions.gatewayFCB) {
+    my_CBFunctions.gatewayFCB(sender_ip_address, 300, buffer);
+  }
+}
+
+void
+ets_install_gatewayCB(gatewayCB gatewayCB)
+{
+  PRINT("[C]install_gatewayCB: %p\n", gatewayCB);
+  // set the python callback, e.g. do the conversion from s-mode message to json
+  my_CBFunctions.gatewayFCB = gatewayCB;
+
+  // set the gateway callback on the stack
+  oc_set_gateway_cb(internal_gw_cb, NULL);
 }
 
 /**
@@ -222,8 +267,9 @@ py_install_spakeCB(spakeCB spakeCB)
 void
 inform_python(const char *uuid, const char *state, const char *event)
 {
-  // PRINT("[C]inform_python %p\n",my_CBFunctions.changedFCB);
+  PRINT("[C]inform_python %p\n", my_CBFunctions.changedFCB);
   if (my_CBFunctions.changedFCB != NULL) {
+    PRINT("[C]inform_python CB %p\n", my_CBFunctions.changedFCB);
     my_CBFunctions.changedFCB((char *)uuid, (char *)state, (char *)event);
   }
 }
@@ -269,20 +315,22 @@ inform_discovery_python(int payload_size, const char *payload)
 
 /**
  * function to call the callback for discovery to python.
- * CFUNCTYPE(None, c_int, c_char_p, c_int)
+ * CFUNCTYPE(None, c_int,  c_char_p, c_char_p, c_int)
  */
 void
-inform_spake_python(char *sn, int state, char *key, int key_size)
+inform_spake_python(char *sn, int state, char *oscore_id, char *key,
+                    int key_size)
 {
-  PRINT("[C]inform_spake_python %p %s %d %d key=[", my_CBFunctions.spakeFCB, sn,
-        state, key_size);
+  PRINT(
+    "[C]inform_spake_python %p sn:%s state:%d oscore_id:%skey_size:%d key=[",
+    my_CBFunctions.spakeFCB, sn, state, oscore_id, key_size);
   for (int i = 0; i < key_size; i++) {
     PRINT("%02x", (unsigned char)key[i]);
   }
   PRINT("]\n");
 
   if (my_CBFunctions.spakeFCB != NULL) {
-    my_CBFunctions.spakeFCB(sn, state, key, key_size);
+    my_CBFunctions.spakeFCB(sn, state, oscore_id, key, key_size);
   }
 }
 
@@ -319,92 +367,22 @@ app_init(void)
 {
   int ret = oc_init_platform("Cascoda", NULL, NULL);
 
-  ret |= oc_add_device("py-client", "1.0.0", "//", "012349", NULL, NULL);
+  if (strlen(g_serial_number) > 0) {
+    ret |=
+      oc_add_device("py-client", "1.0.0", "//", g_serial_number, NULL, NULL);
+
+  } else {
+
+    ret |= oc_add_device("py-client", "1.0.0", "//", "012349", NULL, NULL);
+  }
+
+  /* set the programming mode */
+  oc_core_set_device_pm(0, false);
 
   return ret;
 }
 
-/**
- * event loop (window/linux) used for the python initiated thread.
- *
- */
-static void
-signal_event_loop(void)
-{
-#if defined(_WIN32)
-  WakeConditionVariable(&cv);
-#elif defined(__linux__)
-  py_mutex_lock(mutex);
-  pthread_cond_signal(&cv);
-  py_mutex_unlock(mutex);
-#endif
-}
-
-/**
- * function to quit the event loop
- *
- */
-void
-py_exit(int signal)
-{
-  (void)signal;
-  quit = 1;
-  signal_event_loop();
-}
-
-/**
- * the event thread (windows or Linux)
- *
- */
-#if defined(_WIN32)
-DWORD WINAPI
-func_event_thread(LPVOID lpParam)
-{
-  oc_clock_time_t next_event;
-  while (quit != 1) {
-    py_mutex_lock(app_sync_lock);
-    next_event = oc_main_poll();
-    py_mutex_unlock(app_sync_lock);
-
-    if (next_event == 0) {
-      SleepConditionVariableCS(&cv, &cs, INFINITE);
-    } else {
-      oc_clock_time_t now = oc_clock_time();
-      if (now < next_event) {
-        SleepConditionVariableCS(
-          &cv, &cs, (DWORD)((next_event - now) * 1000 / OC_CLOCK_SECOND));
-      }
-    }
-  }
-
-  oc_main_shutdown();
-  return TRUE;
-}
-#elif defined(__linux__)
-static void *
-func_event_thread(void *data)
-{
-  (void)data;
-  oc_clock_time_t next_event;
-  while (quit != 1) {
-    py_mutex_lock(app_sync_lock);
-    next_event = oc_main_poll();
-    py_mutex_unlock(app_sync_lock);
-
-    py_mutex_lock(mutex);
-    if (next_event == 0) {
-      pthread_cond_wait(&cv, &mutex);
-    } else {
-      ts.tv_sec = (next_event / OC_CLOCK_SECOND);
-      ts.tv_nsec = (next_event % OC_CLOCK_SECOND) * 1.e09 / OC_CLOCK_SECOND;
-      pthread_cond_timedwait(&cv, &mutex, &ts);
-    }
-    py_mutex_unlock(mutex);
-  }
-  oc_main_shutdown();
-  return NULL;
-}
-#endif
+// -----------------------------------------------------------------------------
 
 /* Application utility functions */
 static device_handle_t *
@@ -434,6 +412,7 @@ add_device_to_list(char *sn, const char *device_name, char *ip_address,
       return false;
     }
     strcpy(device->device_serial_number, sn);
+    PRINT("[C] add_device_to_list adding device %s\n", sn);
     oc_list_add(list, device);
   }
   if (ip_address) {
@@ -519,7 +498,7 @@ general_get_cb(oc_client_response_t *data)
 }
 
 void
-py_cbor_get(char *sn, char *uri, char *query, char *cbdata)
+ets_cbor_get(char *sn, char *uri, char *query, char *cbdata)
 {
   int ret = -1;
   device_handle_t *device = py_getdevice_from_sn(sn);
@@ -548,7 +527,7 @@ py_cbor_get(char *sn, char *uri, char *query, char *cbdata)
 }
 
 void
-py_cbor_get_unsecured(char *sn, char *uri, char *query, char *cbdata)
+ets_cbor_get_unsecured(char *sn, char *uri, char *query, char *cbdata)
 {
   int ret = -1;
   device_handle_t *device = py_getdevice_from_sn(sn);
@@ -574,7 +553,7 @@ py_cbor_get_unsecured(char *sn, char *uri, char *query, char *cbdata)
 }
 
 void
-py_linkformat_get(char *sn, char *uri, char *query, char *cbdata)
+ets_linkformat_get(char *sn, char *uri, char *query, char *cbdata)
 {
   int ret = -1;
   oc_endpoint_t ep;
@@ -609,7 +588,7 @@ py_linkformat_get(char *sn, char *uri, char *query, char *cbdata)
 }
 
 void
-py_linkformat_get_unsecured(char *sn, char *uri, char *query, char *cbdata)
+ets_linkformat_get_unsecured(char *sn, char *uri, char *query, char *cbdata)
 {
   int ret = -1;
   oc_endpoint_t ep;
@@ -642,7 +621,7 @@ py_linkformat_get_unsecured(char *sn, char *uri, char *query, char *cbdata)
 // -----------------------------------------------------------------------------
 
 void
-py_cbor_post(char *sn, char *uri, char *query, char *id, int size, char *data)
+ets_cbor_post(char *sn, char *uri, char *query, char *id, int size, char *data)
 {
   int ret = -1;
   device_handle_t *device = py_getdevice_from_sn(sn);
@@ -678,7 +657,7 @@ py_cbor_post(char *sn, char *uri, char *query, char *id, int size, char *data)
 // -----------------------------------------------------------------------------
 
 void
-py_cbor_put(char *sn, char *uri, char *query, char *id, int size, char *data)
+ets_cbor_put(char *sn, char *uri, char *query, char *id, int size, char *data)
 {
   int ret = -1;
   device_handle_t *device = py_getdevice_from_sn(sn);
@@ -714,7 +693,7 @@ py_cbor_put(char *sn, char *uri, char *query, char *id, int size, char *data)
 // -----------------------------------------------------------------------------
 
 void
-py_cbor_delete(char *sn, char *uri, char *query, char *id)
+ets_cbor_delete(char *sn, char *uri, char *query, char *id)
 {
   int ret = -1;
   device_handle_t *device = py_getdevice_from_sn(sn);
@@ -750,14 +729,20 @@ response_get_sn(oc_client_response_t *data)
         (int)data->_payload_len, data->_payload);
   oc_rep_t *rep = data->payload;
   oc_string_t my_address;
+  char *my_sn = NULL;
 
   oc_endpoint_to_string(data->endpoint, &my_address);
 
-  if ((rep != NULL) && (rep->type == OC_REP_STRING)) {
-    char *my_sn = oc_string(rep->value.string);
-    PRINT("[C]  get_sn received %s (address) :%s\n", my_sn,
-          oc_string(my_address));
+  while (rep != NULL) {
+    if ((rep->iname = 1) && (rep->type == OC_REP_STRING)) {
+      my_sn = oc_string(rep->value.string);
+      PRINT("[C]  get_sn received %s (address) :%s\n", my_sn,
+            oc_string(my_address));
+    }
+    rep = rep->next;
+  }
 
+  if (my_sn) {
     add_device_to_list(my_sn, NULL, oc_string(my_address), data->endpoint,
                        discovered_devices);
     inform_python(my_sn, oc_string(my_address), "discovered");
@@ -782,48 +767,73 @@ discovery_cb(const char *payload, int len, oc_endpoint_t *endpoint,
   PRINT("[C]DISCOVERY: %.*s\n", len, payload);
   int nr_entries = oc_lf_number_of_entries(payload, len);
   PRINT("[C] entries %d\n", nr_entries);
+  int found = 0;
 
   for (int i = 0; i < nr_entries; i++) {
 
     oc_lf_get_entry_uri(payload, len, i, &uri, &uri_len);
     PRINT("[C] DISCOVERY URL %.*s\n", uri_len, uri);
     // oc_string_to_endpoint()
-    oc_lf_get_entry_param(payload, len, i, "rt", &param, &param_len);
-    PRINT("[C] DISCOVERY RT %.*s\n", param_len, param);
-    oc_lf_get_entry_param(payload, len, i, "if", &param, &param_len);
-    PRINT("[C] DISCOVERY IF %.*s\n", param_len, param);
-    oc_lf_get_entry_param(payload, len, i, "ct", &param, &param_len);
-    PRINT("[C] DISCOVERY CT %.*s\n", param_len, param);
+    found = oc_lf_get_entry_param(payload, len, i, "rt", &param, &param_len);
+    if (found) {
+      PRINT("    RT %.*s\n", param_len, param);
+    }
+    found = oc_lf_get_entry_param(payload, len, i, "if", &param, &param_len);
+    if (found) {
+      PRINT("    IF %.*s\n", param_len, param);
+    }
+    found = oc_lf_get_entry_param(payload, len, i, "ct", &param, &param_len);
+    if (found) {
+      PRINT("    CT %.*s\n", param_len, param);
+    }
+    found = oc_lf_get_entry_param(payload, len, i, "ep", &param, &param_len);
+    if (found) {
+      PRINT("    EP %.*s\n", param_len, param);
+      char sn[30];
+      memset(sn, 0, 30);
+      PRINT("    PARAM %.*s \n", param_len, param);
+      // ep = urn:knx:sn.0004000
+      oc_string_t my_address;
+      oc_endpoint_to_string(endpoint, &my_address);
+      PRINT("    address: %s\n", oc_string(my_address));
+      if (param_len > 11) {
+
+        strncpy(sn, &param[11], param_len - 11);
+        PRINT("    SN: %s\n", sn);
+        add_device_to_list(sn, NULL, oc_string(my_address), endpoint,
+                           discovered_devices);
+        inform_python(sn, oc_string(my_address), "discovered");
+      }
+    }
   }
 
   inform_discovery_python(len, payload);
 
-  PRINT("[C] issue get on /dev/sn\n");
-  oc_endpoint_print(endpoint);
+  // PRINT("[C] issue get on /dev/sn\n");
+  // oc_endpoint_print(endpoint);
 
-  oc_do_get_ex("/dev/sn", endpoint, NULL, response_get_sn, HIGH_QOS,
-               APPLICATION_CBOR, APPLICATION_CBOR, endpoint);
+  // oc_do_get_ex("/dev/sn", endpoint, NULL, response_get_sn, HIGH_QOS,
+  //             APPLICATION_CBOR, APPLICATION_CBOR, endpoint);
 
   PRINT("[C] DISCOVERY- END\n");
-  return OC_CONTINUE_DISCOVERY;
+  // return OC_CONTINUE_DISCOVERY;
+  return OC_STOP_DISCOVERY;
 }
 
 void
-py_discover_devices(int scope)
+ets_discover_devices(int scope)
 {
   py_mutex_lock(app_sync_lock);
   oc_do_wk_discovery_all("rt=urn:knx:dpa.*", scope, discovery_cb, NULL);
-
   py_mutex_unlock(app_sync_lock);
   signal_event_loop();
 }
 
 void
-py_discover_devices_with_query(int scope, const char *query)
+ets_discover_devices_with_query(int scope, const char *query)
 {
   py_mutex_lock(app_sync_lock);
   oc_do_wk_discovery_all(query, scope, discovery_cb, NULL);
-
   py_mutex_unlock(app_sync_lock);
   signal_event_loop();
 }
@@ -831,40 +841,42 @@ py_discover_devices_with_query(int scope, const char *query)
 // -----------------------------------------------------------------------------
 
 void
-py_initate_spake(char *sn, char *password)
+ets_initiate_spake(char *sn, char *password, char *oscore_id)
 {
   int ret = -1;
   device_handle_t *device = py_getdevice_from_sn(sn);
 
-  PRINT("  [C]py_initate_spake: [%s] [%s]\n", sn, password);
+  PRINT("  [C]py_initiate_spake: [%s] [%s]\n", sn, password);
   if (oc_string_len(device->ep.serial_number) == 0) {
     oc_new_string(&device->ep.serial_number, sn, strlen(sn));
   }
-  ret = oc_initiate_spake(&device->ep, password);
-  PRINT("  [C]py_initate_spake: [%d]-- done\n", ret);
+  ret = oc_initiate_spake(&device->ep, password, oscore_id);
+  PRINT("  [C]py_initiate_spake: [%d]-- done\n", ret);
   if (ret == -1) {
     // failure, so unblock python
-    inform_spake_python(sn, ret, "", 0);
+    inform_spake_python(sn, ret, "", "", 0);
   }
 }
 
 void
 spake_callback(int error, uint8_t *secret, int secret_size)
 {
-  inform_spake_python("", error, secret, secret_size);
+  char *oscore_id = "";
+  inform_spake_python("", error, oscore_id, secret, secret_size);
 }
 
 // -----------------------------------------------------------------------------
 
 /* send a multicast s-mode message */
 void
-py_issue_requests_s_mode(int scope, int sia, int ga, char *st, int value_type,
-                         char *value)
+ets_issue_requests_s_mode(int scope, int sia, int ga, int iid, char *st,
+                          int value_type, char *value)
 {
   PRINT(" [C] py_issue_requests_s_mode\n");
 
-  oc_make_ipv6_endpoint(mcast, IPV6 | DISCOVERY | MULTICAST, 5683, 0xff, scope,
-                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0xfd);
+  oc_endpoint_t mcast;
+  memset(&mcast, 0, sizeof(mcast));
+  mcast = oc_create_multicast_group_address(mcast, ga, iid, scope);
 
   if (oc_init_post("/.knx", &mcast, NULL, NULL, LOW_QOS, NULL)) {
     /*
@@ -899,14 +911,23 @@ py_issue_requests_s_mode(int scope, int sia, int ga, char *st, int value_type,
     }
     if (value_type == 2) {
       // float
-      int float_value = atof(value);
+      double float_value = atof(value);
       oc_rep_i_set_double(value, 1, (double)float_value);
     }
     cbor_encoder_close_container_checked(&root_map, &value_map);
     oc_rep_end_root_object();
 
+    PRINT("S-MODE Payload Size: %d\n", oc_rep_get_encoded_payload_size());
+    OC_LOGbytes_OSCORE(oc_rep_get_encoder_buf(),
+                       oc_rep_get_encoded_payload_size());
+
+#ifndef OC_OSCORE
     if (oc_do_post_ex(APPLICATION_CBOR, APPLICATION_CBOR)) {
       PRINT("  Sent POST request\n");
+#else
+    if (oc_do_multicast_update()) {
+      PRINT("  Sent oc_do_multicast_update update\n");
+#endif
     } else {
       PRINT("  Could not send POST request\n");
     }
@@ -915,53 +936,23 @@ py_issue_requests_s_mode(int scope, int sia, int ga, char *st, int value_type,
 
 // -----------------------------------------------------------------------------
 
-/**
- * function to retrieve the device name of the owned/unowned device
- *
- */
-char *
-get_device_name(int index)
+void
+ets_listen_s_mode(int scope, int ga_max, int iid)
 {
-  device_handle_t *device = NULL;
 
-  device = (device_handle_t *)oc_list_head(discovered_devices);
-  int i = 0;
-  while (device != NULL) {
-    if (index == i) {
-      return device->device_name;
-    }
-    i++;
-    device = device->next;
+  for (int i = 1; i < ga_max; i++) {
+    subscribe_group_to_multicast(i, iid, scope);
   }
-  return " empty ";
 }
 
-/**
- * function to retrieve the device name belonging to the sn
- *
- */
-char *
-get_device_name_from_sn(char *uuid)
-{
-  device_handle_t *device = NULL;
-  device = (device_handle_t *)oc_list_head(discovered_devices);
-  int i = 0;
-  while (device != NULL) {
-    if (strcmp(device->device_serial_number, uuid) == 0) {
-      return device->device_name;
-    }
-    i++;
-    device = device->next;
-  }
-  return " empty ";
-}
+// -----------------------------------------------------------------------------
 
 /**
- * function to retrieve the sn of the discovered device
+ * function to retrieve the serial number of the discovered device
  *
  */
 char *
-py_get_sn(int index)
+ets_get_sn(int index)
 {
   device_handle_t *device = NULL;
   device = (device_handle_t *)oc_list_head(discovered_devices);
@@ -978,11 +969,11 @@ py_get_sn(int index)
 }
 
 /**
- * function to retrieve the number of discovered device
+ * function to retrieve the amount of discovered devices
  *
  */
 int
-py_get_nr_devices(void)
+ets_get_nr_devices(void)
 {
   return (oc_list_length(discovered_devices));
 }
@@ -992,7 +983,7 @@ py_get_nr_devices(void)
  *
  */
 void
-py_reset_device(char *sn)
+ets_reset_device(char *sn)
 {
   device_handle_t *device = py_getdevice_from_sn(sn);
 
@@ -1011,30 +1002,166 @@ py_reset_device(char *sn)
   // py_mutex_unlock(app_sync_lock);
 }
 
-// void
-// display_device_uuid()
-//{
-//  char buffer[OC_UUID_LEN];
-//  oc_uuid_to_str(oc_core_get_device_id(0), buffer, sizeof(buffer));
-
-//  PRINT("[C] Started device with ID: %s\n", buffer);
-//}
-
-// char *
-// py_get_obt_uuid()
-//{
-//  char buffer[OC_UUID_LEN];
-//  oc_uuid_to_str(oc_core_get_device_id(0), buffer, sizeof(buffer));
-
-//  char *uuid = malloc(sizeof(char) * OC_UUID_LEN);
-//  strncpy(uuid, buffer, OC_UUID_LEN);
-//  return uuid;
-//}
-
 // -----------------------------------------------------------------------------
 
 int
-py_main(void)
+ets_start(char *serial_number)
+{
+
+  strncpy(g_serial_number, serial_number, MAX_SERIAL_NUM_LENGTH);
+  memset(&my_CBFunctions, 0, sizeof(my_CBFunctions));
+
+  static const oc_handler_t handler = { .init = app_init,
+                                        .signal_event_loop = signal_event_loop,
+#ifdef OC_SERVER
+                                        .register_resources = NULL,
+#endif
+#ifdef OC_CLIENT
+                                        .requests_entry = NULL
+#endif
+  };
+
+#ifdef OC_STORAGE
+  oc_storage_config("./ets_creds");
+#endif /* OC_STORAGE */
+       // oc_set_factory_presets_cb(factory_presets_cb, NULL);
+  oc_set_max_app_data_size(16384);
+
+  oc_set_spake_response_cb(spake_callback);
+
+  int init = oc_main_init(&handler);
+
+#if defined(_WIN32)
+  InitializeCriticalSection(&cs);
+  InitializeConditionVariable(&cv);
+  InitializeCriticalSection(&app_sync_lock);
+#elif defined(__linux__)
+  struct sigaction sa;
+  sigfillset(&sa.sa_mask);
+  sa.sa_flags = 0;
+  sa.sa_handler = ets_exit;
+  sigaction(SIGINT, &sa, NULL);
+#endif
+
+  return init;
+}
+
+int
+ets_stop(void)
+{
+
+  /* Free all device_handle_t objects allocated by this application */
+  device_handle_t *device = (device_handle_t *)oc_list_pop(discovered_devices);
+  while (device) {
+    oc_memb_free(&device_handles, device);
+    device = (device_handle_t *)oc_list_pop(discovered_devices);
+  }
+  return 0;
+}
+
+int
+ets_poll(void)
+{
+  oc_clock_time_t next_event;
+  next_event = oc_main_poll();
+  signal_event_loop();
+
+  // py_mutex_lock(app_sync_lock);
+  // next_event = oc_main_poll();
+  // py_mutex_unlock(app_sync_lock);
+
+  // PRINT("blah");
+  // PRINT("    ---> %d", next_event);
+
+  return 0;
+}
+
+// -----------------------------------------------------------------------------
+
+/**
+ * event loop (window/linux) used for the python initiated thread.
+ *
+ */
+static void
+signal_event_loop(void)
+{
+#if defined(_WIN32)
+  WakeConditionVariable(&cv);
+#elif defined(__linux__)
+  py_mutex_lock(mutex);
+  pthread_cond_signal(&cv);
+  py_mutex_unlock(mutex);
+#endif
+}
+
+/**
+ * function to quit the event loop
+ *
+ */
+void
+ets_exit(int signal)
+{
+  (void)signal;
+  quit = 1;
+  signal_event_loop();
+}
+
+/**
+ * the event thread (windows or Linux)
+ *
+ */
+#if defined(_WIN32)
+DWORD WINAPI
+func_event_thread(LPVOID lpParam)
+{
+  oc_clock_time_t next_event;
+  while (quit != 1) {
+    py_mutex_lock(app_sync_lock);
+    next_event = oc_main_poll();
+    py_mutex_unlock(app_sync_lock);
+
+    if (next_event == 0) {
+      SleepConditionVariableCS(&cv, &cs, INFINITE);
+    } else {
+      oc_clock_time_t now = oc_clock_time();
+      if (now < next_event) {
+        SleepConditionVariableCS(
+          &cv, &cs, (DWORD)((next_event - now) * 1000 / OC_CLOCK_SECOND));
+      }
+    }
+  }
+
+  oc_main_shutdown();
+  return TRUE;
+}
+#elif defined(__linux__)
+static void *
+func_event_thread(void *data)
+{
+  (void)data;
+  oc_clock_time_t next_event;
+  while (quit != 1) {
+    py_mutex_lock(app_sync_lock);
+    next_event = oc_main_poll();
+    py_mutex_unlock(app_sync_lock);
+
+    py_mutex_lock(mutex);
+    if (next_event == 0) {
+      pthread_cond_wait(&cv, &mutex);
+    } else {
+      ts.tv_sec = (next_event / OC_CLOCK_SECOND);
+      ts.tv_nsec = (next_event % OC_CLOCK_SECOND) * 1.e09 / OC_CLOCK_SECOND;
+      pthread_cond_timedwait(&cv, &mutex, &ts);
+    }
+    py_mutex_unlock(mutex);
+  }
+  oc_main_shutdown();
+  return NULL;
+}
+#endif
+
+int
+ets_main(void)
 {
 #if defined(_WIN32)
   InitializeCriticalSection(&cs);
@@ -1044,7 +1171,7 @@ py_main(void)
   struct sigaction sa;
   sigfillset(&sa.sa_mask);
   sa.sa_flags = 0;
-  sa.sa_handler = py_exit;
+  sa.sa_handler = ets_exit;
   sigaction(SIGINT, &sa, NULL);
 #endif
 
@@ -1062,6 +1189,8 @@ py_main(void)
 
   int init;
 
+  strncpy(g_serial_number, "01234", MAX_SERIAL_NUM_LENGTH);
+
   static const oc_handler_t handler = { .init = app_init,
                                         .signal_event_loop = signal_event_loop,
 #ifdef OC_SERVER
@@ -1073,7 +1202,7 @@ py_main(void)
   };
 
 #ifdef OC_STORAGE
-  oc_storage_config("./onboarding_tool_creds");
+  oc_storage_config("./ets_creds");
 #endif /* OC_STORAGE */
        // oc_set_factory_presets_cb(factory_presets_cb, NULL);
   oc_set_max_app_data_size(16384);
@@ -1125,13 +1254,13 @@ py_main(void)
 // -----------------------------------------------------------------------------
 
 long
-py_get_max_app_data_size(void)
+ets_get_max_app_data_size(void)
 {
   return oc_get_max_app_data_size();
 }
 
 void
-py_set_max_app_data_size(int data_size)
+ets_set_max_app_data_size(int data_size)
 {
   oc_set_max_app_data_size((size_t)data_size);
 }

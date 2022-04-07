@@ -15,15 +15,15 @@
 Introduction
 ------------
 
-KNX-IOT stack is an open-source, reference implementation of the KNX standards for the Internet of Things (IoT). 
-Specifically, the stack realizes all the functionalities of the KNX-IOT specification.
+KNX IoT Point API stack is an open-source, reference implementation of the KNX IoT standard for the Internet of Things (IoT). 
+Specifically, the stack realizes all the functionalities of the KNX IoT Point API specification.
 
 .. image:: ./images/knxstack-v1.png
    :scale: 100%
    :alt: Architecture
    :align: center
 
-The responsibilities between the stack and an actual KNX-IOT device implementation is depicted in the following diagram:
+The responsibilities between the stack and an actual KNX IoT Point API device implementation is depicted in the following diagram:
 
 .. image:: ./images/application.png
    :scale: 100%
@@ -33,22 +33,25 @@ The responsibilities between the stack and an actual KNX-IOT device implementati
 
 Please review the following resources for more details:
 
-TODO: link to spec??
 
-The project was created to bring together the open-source community to accelerate the development of the framework and services required to connect the growing number of IoT devices. 
-The  project offers device vendors and application developers royalty-free access  under the `Apache 2.0 license <https://github.com/KNX-IOT/KNX-IOT-STACK/blob/main/LICENSE.md>`_.
+The project was created to bring together the open-source community to accelerate the development of the KNX IoT Point API devices and services required to connect the growing number of IoT devices. 
+The project offers device vendors and application developers royalty-free access  under the `Apache 2.0 license <https://github.com/KNX-IOT/KNX-IOT-STACK/blob/main/LICENSE.md>`_.
 
 Stack features
 -----------------------
 
-- **OS agnostic:** The  device stack and modules work cross-platform (pure C code) and execute in an event-driven style. The stack interacts with lower level OS/hardware platform-specific functionality through a set of abstract interfaces. This decoupling of standards related functionality from platform adaptation code promotes ease of long-term maintenance and evolution of the stack through successive releases.
+- **OS agnostic:** The KNX IoT Point API device stack and modules work cross-platform (pure C code) and execute in an event-driven style. 
+The stack interacts with lower level OS/hardware platform-specific functionality through a set of abstract interfaces. 
+This decoupling of standards related functionality from platform adaptation code promotes ease of long-term maintenance and evolution of the stack through successive releases.
 
 .. image:: ./images/porting.png
    :scale: 100%
    :alt: PortingLayer
    :align: center
 
-- **Porting layer:** The platform abstraction is a set of generically defined interfaces which elicit a specific contract from implementations. The stack utilizes these interfaces to interact with the underlying OS/platform. The simplicity and boundedness of these interface definitions allow them to be rapidly implemented on any chosen OS/target. Such an implementation constitutes a "port".
+- **Porting layer:** The platform abstraction is a set of generically defined interfaces which elicit a specific contract from implementations. 
+The stack utilizes these interfaces to interact with the underlying OS/platform. 
+The simplicity and boundedness of these interface definitions allow them to be rapidly implemented on any chosen OS/target. Such an implementation constitutes a "port".
 
 
 Project directory structure
@@ -57,20 +60,18 @@ Project directory structure
 api/*
   contains the implementations of client/server APIs, the resource model,
   utility and helper functions to encode/decode
-  to/from data model, module for encoding and interpreting type 4
-  UUIDs, base64 strings, endpoints, and handlers for the discovery, platform
-  and device resources.
+  to/from data points (function blocks), module for encoding and interpreting endpoints, and handlers for the discovery, device
+  and application resources.
 
 messaging/coap/*
   contains a tailored CoAP implementation.
 
 security/*
-  contains resource handlers that implement the security model.
+  contains resource handlers that implement the security model, using OSCORE.
 
 utils/*
   contains a few primitive building blocks used internally by the core
   framework.
-
 
 deps/*
   contains external project dependencies.
@@ -80,9 +81,6 @@ deps/tinycbor/*
 
 deps/mbedtls/*
   contains the mbedTLS sources.
-
-patches/*
-  contains patches for deps/mbedTLS and need to be applied once.
 
 include/*
   contains all common headers.
@@ -104,9 +102,21 @@ port/\*.h
 
 port/<OS>/*
   contains adaptations for each OS.
+  Platforms:
+  
+  - Linux
+    storage folder is created by the make system
+  - Windows
+    storage folder is automatic created by the make system.
+    as extra also the stack creates the storage folder.
+    This allows copying of the executables to other folders without having to know which folder to create.
 
 apps/*
-  contains sample  applications.
+  contains sample applications.
+
+python_bindings
+  contains a binding to python (and other languages that can use a dll)
+  specific api for creating a client that can talk to the KNX IoT Point API devices.
 
 
 Build instructions

@@ -68,10 +68,12 @@
 #include "oc_api.h"
 #include "oc_core_res.h"
 #include "api/oc_knx_fp.h"
+#include "api/oc_knx_gm.h"
 #ifdef OC_SPAKE
 #include "security/oc_spake2plus.h"
 #endif
 #include "port/oc_clock.h"
+#include "port/dns-sd.h"
 #include <signal.h>
 
 // test purpose only
@@ -138,6 +140,19 @@ oc_add_s_mode_response_cb(char *url, oc_rep_t *rep, oc_rep_t *rep_value)
   PRINT("oc_add_s_mode_response_cb %s\n", url);
 }
 
+void
+oc_gateway_s_mode_cb(size_t device_index, char *sender_ip_address,
+                     oc_group_object_notification_t *s_mode_message, void *data)
+{
+  (void)data;
+
+  PRINT("testserver_all: oc_gateway_s_mode_cb %s\n", sender_ip_address);
+  PRINT("   ga  = %d\n", s_mode_message->ga);
+  PRINT("   sia = %d\n", s_mode_message->sia);
+  PRINT("   st  = %s\n", oc_string(s_mode_message->st));
+  PRINT("   val = %s\n", oc_string(s_mode_message->value));
+}
+
 /**
  * function to set up the device.
  *
@@ -185,6 +200,9 @@ app_init(void)
   /* set the client callback, for testing purposes only */
   oc_set_s_mode_response_cb(oc_add_s_mode_response_cb);
 
+  /* set the gateway call back for receiving all s-mode messages */
+  oc_set_gateway_cb(oc_gateway_s_mode_cb, NULL);
+
   return ret;
 }
 
@@ -217,7 +235,11 @@ get_dpa_352_51(oc_request_t *request, oc_interface_mask_t interfaces,
   }
 
   CborError error;
-  error = cbor_encode_boolean(&g_encoder, g_352_51_state);
+  // error = cbor_encode_boolean(&g_encoder, g_352_51_state);
+  oc_rep_begin_root_object();
+  oc_rep_i_set_boolean(root, 1, g_352_51_state);
+  oc_rep_end_root_object();
+  error = g_err;
   if (error) {
     oc_status_code = true;
   }
@@ -262,6 +284,11 @@ get_dpa_352_51_1(oc_request_t *request, oc_interface_mask_t interfaces,
 
   CborError error;
   error = cbor_encode_boolean(&g_encoder, g_352_51_1_state);
+  oc_rep_begin_root_object();
+  oc_rep_i_set_boolean(root, 1, g_352_51_1_state);
+  oc_rep_end_root_object();
+  error = g_err;
+
   if (error) {
     oc_status_code = true;
   }
@@ -304,7 +331,11 @@ get_dpa_352_52(oc_request_t *request, oc_interface_mask_t interfaces,
   }
 
   CborError error;
-  error = cbor_encode_boolean(&g_encoder, g_352_52_state);
+  // error = cbor_encode_boolean(&g_encoder, g_352_52_state);
+  oc_rep_begin_root_object();
+  oc_rep_i_set_boolean(root, 1, g_352_52_state);
+  oc_rep_end_root_object();
+  error = g_err;
   if (error) {
     oc_status_code = true;
   }
@@ -347,7 +378,11 @@ get_dpa_353_52(oc_request_t *request, oc_interface_mask_t interfaces,
     return;
   }
 
-  error = cbor_encode_boolean(&g_encoder, g_352_52_state);
+  // error = cbor_encode_boolean(&g_encoder, g_352_52_state);
+  oc_rep_begin_root_object();
+  oc_rep_i_set_boolean(root, 1, g_352_52_state);
+  oc_rep_end_root_object();
+  error = g_err;
   if (error) {
     oc_status_code = true;
   }
@@ -383,32 +418,26 @@ post_dpa_352_51(oc_request_t *request, oc_interface_mask_t interfaces,
   PRINT("-- Begin post_dpa_352_51:\n");
   oc_rep_t *rep = NULL;
   // handle the different requests
-  if (oc_is_s_mode_request(request)) {
-    PRINT(" S-MODE\n");
-    // retrieve the value of the s-mode payload
-    rep = oc_s_mode_get_value(request);
-  } else {
-    // the regular payload
-    rep = request->request_payload;
+  if (oc_is_redirected_request(request)) {
+    PRINT("  S-MODE or /P\n");
   }
-
+  rep = request->request_payload;
   // handle the type of payload correctly.
-  if ((rep != NULL) && (rep->type == OC_REP_BOOL)) {
-    PRINT("  post_dpa_352_51 received : %d\n", rep->value.boolean);
-    g_352_51_state = rep->value.boolean;
-    oc_send_cbor_response(request, OC_STATUS_CHANGED);
-    PRINT("-- End post_dpa_352_51\n");
-    return;
+  while (rep != NULL) {
+    if (rep->type == OC_REP_BOOL) {
+      if (rep->iname == 1) {
+        PRINT("  post_dpa_352_51 received : %d\n", rep->value.boolean);
+        g_352_51_state = rep->value.boolean;
+        oc_send_cbor_response(request, OC_STATUS_CHANGED);
+        PRINT("-- End post_dpa_352_51\n");
+        return;
+      }
+    }
+    rep = rep->next;
   }
 
-  /* if the input is ok, then process the input document and assign the global
-   * variables */
-  if (error_state == false) {
-    oc_send_cbor_response(request, OC_STATUS_OK);
-  } else {
-    PRINT("  Returning Error \n");
-    oc_send_response(request, OC_STATUS_BAD_REQUEST);
-  }
+  PRINT("  Returning Error \n");
+  oc_send_response(request, OC_STATUS_BAD_REQUEST);
   PRINT("-- End post_dpa_352_51\n");
 }
 
@@ -436,32 +465,27 @@ post_dpa_352_51_1(oc_request_t *request, oc_interface_mask_t interfaces,
 
   oc_rep_t *rep = NULL;
   // handle the different requests
-  if (oc_is_s_mode_request(request)) {
-    PRINT(" S-MODE\n");
-    // retrieve the value of the s-mode payload
-    rep = oc_s_mode_get_value(request);
-  } else {
-    // the regular payload
-    rep = request->request_payload;
+  if (oc_is_redirected_request(request)) {
+    PRINT("  S-MODE or /P\n");
   }
+  rep = request->request_payload;
 
   // handle the type of payload correctly.
-  if ((rep != NULL) && (rep->type == OC_REP_BOOL)) {
-    PRINT("  post_dpa_352_51_1 received : %d\n", rep->value.boolean);
-    g_352_51_1_state = rep->value.boolean;
-    oc_send_cbor_response(request, OC_STATUS_CHANGED);
-    PRINT("-- End post_dpa_352_51_1\n");
-    return;
+  while (rep != NULL) {
+    if (rep->type == OC_REP_BOOL) {
+      if (rep->iname == 1) {
+        PRINT("  post_dpa_352_51_1 received : %d\n", rep->value.boolean);
+        g_352_51_1_state = rep->value.boolean;
+        oc_send_cbor_response(request, OC_STATUS_CHANGED);
+        PRINT("-- End post_dpa_352_51_1\n");
+        return;
+      }
+    }
+    rep = rep->next;
   }
 
-  /* if the input is ok, then process the input document and assign the global
-   * variables */
-  if (error_state == false) {
-    oc_send_cbor_response(request, OC_STATUS_OK);
-  } else {
-    PRINT("  Returning Error \n");
-    oc_send_response(request, OC_STATUS_BAD_REQUEST);
-  }
+  PRINT("  Returning Error \n");
+  oc_send_response(request, OC_STATUS_BAD_REQUEST);
   PRINT("-- End post_dpa_352_51_1\n");
 }
 
@@ -488,22 +512,29 @@ post_dpa_352_52(oc_request_t *request, oc_interface_mask_t interfaces,
 
   oc_rep_t *rep = NULL;
   // handle the different requests
-  if (oc_is_s_mode_request(request)) {
-    PRINT(" S-MODE\n");
-    // retrieve the value of the s-mode payload
-    rep = oc_s_mode_get_value(request);
-  } else {
-    // the regular payload
-    rep = request->request_payload;
+  if (oc_is_redirected_request(request)) {
+    PRINT("  S-MODE or /P\n");
   }
+  rep = request->request_payload;
+
   /* loop over the request document to check if all inputs are ok */
-  if ((rep != NULL) && (rep->type == OC_REP_BOOL)) {
-    PRINT("  post_dpa_352_52 received : %d\n", rep->value.boolean);
-    g_352_52_state = rep->value.boolean;
-    oc_send_cbor_response(request, OC_STATUS_CHANGED);
-    PRINT("-- End post_dpa_352_52\n");
-    return;
+  while (rep != NULL) {
+    if (rep->type == OC_REP_BOOL) {
+      if (rep->iname == 1) {
+        PRINT("  post_dpa_352_52 received : %d\n", rep->value.boolean);
+        g_352_52_state = rep->value.boolean;
+        oc_send_cbor_response(request, OC_STATUS_CHANGED);
+        PRINT("-- End post_dpa_352_52\n");
+        return;
+      }
+    }
+    rep = rep->next;
   }
+
+  /* if the input is ok, then process the input document and assign the global
+   * variables */
+  PRINT("  Returning Error \n");
+  oc_send_response(request, OC_STATUS_BAD_REQUEST);
   PRINT("-- End post_dpa_352_52\n");
 }
 
@@ -529,18 +560,21 @@ post_dpa_353_52(oc_request_t *request, oc_interface_mask_t interfaces,
   oc_rep_t *rep = NULL;
   PRINT("-- Begin post_dpa_353_52:\n");
 
-  if (oc_is_s_mode_request(request)) {
-    PRINT(" S-MODE\n");
-    rep = oc_s_mode_get_value(request);
-  } else {
-    rep = request->request_payload;
+  if (oc_is_redirected_request(request)) {
+    PRINT("  S-MODE or /P\n");
   }
-  if ((rep != NULL) && (rep->type == OC_REP_BOOL)) {
-    PRINT("  post_dpa_353_52 received : %d\n", rep->value.boolean);
-    g_353_52_state = rep->value.boolean;
-    oc_send_cbor_response(request, OC_STATUS_CHANGED);
-    PRINT("-- End post_dpa_353_52\n");
-    return;
+  rep = request->request_payload;
+  while (rep != NULL) {
+    if (rep->type == OC_REP_BOOL) {
+      if (rep->iname == 1) {
+        PRINT("  post_dpa_353_52 received : %d\n", rep->value.boolean);
+        g_353_52_state = rep->value.boolean;
+        oc_send_cbor_response(request, OC_STATUS_CHANGED);
+        PRINT("-- End post_dpa_353_52\n");
+        return;
+      }
+    }
+    rep = rep->next;
   }
   oc_send_response(request, OC_STATUS_BAD_REQUEST);
   PRINT("-- End post_dpa_353_52\n");
@@ -618,8 +652,7 @@ register_resources(void)
   oc_resource_t *res_353 = oc_new_resource("myname_c", "p/c", 1, 0);
   oc_resource_bind_resource_type(res_353, "urn:knx:dpa.353.52");
   oc_resource_bind_content_type(res_353, APPLICATION_CBOR);
-  oc_resource_bind_resource_interface(res_353,
-                                      OC_IF_S | OC_IF_A); /* if.s && if.a */
+  oc_resource_bind_resource_interface(res_353, OC_IF_S); /* if.s  */
   oc_resource_set_discoverable(res_353, true);
   /* periodic observable
      to be used when one wants to send an event per time slice
@@ -638,29 +671,32 @@ register_resources(void)
 /**
  * initiate preset for device
  *
- * @param device the device identifier of the list of devices
+ * @param device_index the device identifier of the list of devices
  * @param data the supplied data.
  */
 void
-factory_presets_cb(size_t device, void *data)
+factory_presets_cb(size_t device_index, void *data)
 {
-  (void)device;
+  (void)device_index;
   (void)data;
 
   if (g_reset) {
     PRINT("resetting device\n");
     oc_knx_device_storage_reset(0, 2);
   }
+
+  oc_core_set_device_ia(device_index, 5);
+  oc_core_set_device_iid(device_index, 7);
 }
 
 /**
  * application reset
  *
- * @param device the device identifier of the list of devices
+ * @param device_index the device identifier of the list of devices
  * @param data the supplied data.
  */
 void
-reset_cb(size_t device, int reset_value, void *data)
+reset_cb(size_t device_index, int reset_value, void *data)
 {
   (void)data;
 
@@ -670,11 +706,11 @@ reset_cb(size_t device, int reset_value, void *data)
 /**
  * restart the device (application depended)
  *
- * @param device the device identifier of the list of devices
+ * @param device_index the device identifier of the list of devices
  * @param data the supplied data.
  */
 void
-restart_cb(size_t device, void *data)
+restart_cb(size_t device_index, void *data)
 {
   (void)data;
 
@@ -685,12 +721,12 @@ restart_cb(size_t device, void *data)
 /**
  * set the host name on the device (application depended)
  *
- * @param device the device identifier of the list of devices
+ * @param device_index the device identifier of the list of devices
  * @param host_name the host name to be set on the device
  * @param data the supplied data.
  */
 void
-hostname_cb(size_t device, oc_string_t host_name, void *data)
+hostname_cb(size_t device_index, oc_string_t host_name, void *data)
 {
   (void)data;
 
@@ -776,8 +812,16 @@ issue_requests_s_mode_delayed(void *data)
 {
   (void)data;
 
-  PRINT(" issue_requests_s_mode_delayed\n");
-  int ga_values[2] = { 2 };
+  // setting the test data
+  oc_device_info_t *device = oc_core_get_device_info(0);
+  device->ia = 5;
+  device->iid = 16;
+
+  PRINT(" issue_requests_s_mode_delayed : ia = %d\n", device->ia);
+  PRINT(" issue_requests_s_mode_delayed : iid = %d\n", device->iid);
+
+  PRINT(" issue_requests_s_mode_delayed : config data\n");
+  int ga_values[5] = { 1, 255, 256, 1024, 1024 * 256 };
   oc_string_t href;
   oc_new_string(&href, "/p/c", strlen("/p/c"));
 
@@ -791,9 +835,45 @@ issue_requests_s_mode_delayed(void *data)
   oc_core_set_group_object_table(0, entry);
   oc_print_group_object_table_entry(0);
 
-  PRINT(" issue_requests_s_mode: issue\n");
+  oc_group_object_table_t entry2;
+  entry2.cflags = OC_CFLAG_TRANSMISSION;
+  entry2.id = 5;
+  entry2.href = href;
+  entry2.ga_len = 1;
+  entry2.ga = (int *)&ga_values;
+
+  oc_core_set_group_object_table(1, entry2);
+  PRINT("\n");
+  oc_print_group_object_table_entry(1);
+
+  oc_group_object_table_t entry3;
+  entry3.cflags = OC_CFLAG_INIT;
+  entry3.id = 5;
+  entry3.href = href;
+  entry3.ga_len = 1;
+  entry3.ga = (int *)&ga_values;
+
+  oc_core_set_group_object_table(2, entry3);
+  PRINT("\n");
+  oc_print_group_object_table_entry(2);
+
+  // set loaded
+  device->lsm_s = LSM_S_LOADED;
+
+  // testing, since the data is already reset...
+  oc_register_group_multicasts();
+
+  PRINT("  issue_requests_s_mode: issue\n");
+
+  PRINT("  issue_requests_s_mode: issue\n");
+  oc_do_s_mode_with_scope(2, "/p/b", "w");
+  oc_do_s_mode_with_scope(5, "/p/b", "w");
+
   oc_do_s_mode_with_scope(2, "/p/c", "w");
   oc_do_s_mode_with_scope(5, "/p/c", "w");
+
+  // test invoking read on initialization.
+  oc_init_datapoints_at_initialization();
 
   return OC_EVENT_DONE;
 }
@@ -838,7 +918,8 @@ main(int argc, char *argv[])
 {
   int init;
 
-  bool do_send_s_mode = false;
+  bool do_send_s_mode = true;
+  g_reset = true;
 
   oc_clock_time_t next_event;
 
@@ -920,7 +1001,7 @@ main(int argc, char *argv[])
   };
 #ifdef OC_CLIENT
   if (do_send_s_mode) {
-    //  handler.requests_entry = issue_requests_s_mode;
+    handler.requests_entry = issue_requests_s_mode;
   }
 #endif
 
@@ -942,7 +1023,7 @@ main(int argc, char *argv[])
 
   oc_device_info_t *device = oc_core_get_device_info(0);
   PRINT("serial number: %s\n", oc_string(device->serialnumber));
-  oc_device_mode_display(0);
+  knx_publish_service(oc_string(device->serialnumber), 0, 0);
 
   oc_endpoint_t *my_ep = oc_connectivity_get_endpoints(0);
   if (my_ep != NULL) {

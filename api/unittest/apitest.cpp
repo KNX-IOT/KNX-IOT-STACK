@@ -87,3 +87,45 @@ TEST(KNXSEC, contains_interfaces)
   EXPECT_FALSE(oc_knx_contains_interface(
     (oc_interface_mask_t)OC_IF_M, (oc_interface_mask_t)(OC_IF_I | OC_IF_G)));
 }
+
+TEST(HELPER_cmp, oc_string_cmp)
+{
+  oc_string_t compare1;
+  oc_new_string(&compare1, "abcd", 4);
+
+  oc_string_t compare2;
+  oc_new_string(&compare2, "abdcd", 4);
+
+  int value = oc_string_cmp(compare1, compare1);
+  EXPECT_EQ(0, value);
+  value = oc_string_cmp(compare1, compare2);
+  EXPECT_NE(0, value);
+
+  oc_free_string(&compare1);
+  oc_free_string(&compare2);
+}
+
+TEST(HELPER_cmp, oc_url_cmp)
+{
+  oc_string_t compare1;
+  oc_new_string(&compare1, "/abcd", 5);
+
+  oc_string_t compare2;
+  oc_new_string(&compare2, "abcd", 4);
+
+  oc_string_t compare3;
+  oc_new_string(&compare3, "abddc", 4);
+
+  int value = oc_url_cmp(compare1, compare1);
+  EXPECT_EQ(0, value);
+  value = oc_url_cmp(compare1, compare2);
+  EXPECT_EQ(0, value);
+  value = oc_url_cmp(compare1, compare3);
+  EXPECT_NE(0, value);
+  value = oc_url_cmp(compare2, compare3);
+  EXPECT_NE(0, value);
+
+  oc_free_string(&compare1);
+  oc_free_string(&compare2);
+  oc_free_string(&compare3);
+}

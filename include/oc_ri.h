@@ -238,6 +238,9 @@ typedef enum {
   OC_DEV_IID,               /**< KNX installation ID */
   OC_DEV_PM,                /**< Programming Mode */
   OC_DEV_IPV6,              /**< IPV6 */
+  OC_DEV_SA,                /**< /dev/sa subnet address */
+  OC_DEV_DA,                /**< /dev/da device address */
+  OC_DEV_PORT,              /**< /dev/port the coap port number */
   OC_DEV,                   /**< core link */
   OC_KNX_SPAKE,             /**< spake */
   OC_KNX_IDEVID,            /**< IDevID */
@@ -579,6 +582,24 @@ oc_interface_mask_t oc_ri_get_interface_mask(char *iface, size_t if_len);
  * @return false not valid
  */
 bool oc_ri_is_app_resource_valid(oc_resource_t *resource);
+
+/**
+ * @brief create a new request from the old request
+ * is used internally only for redirection of:
+ * - .knx
+ * - p
+ *
+ * @param new_request the original request
+ * @param request the new request
+ * @param response_buffer the dummy response buffer for the new request
+ * @param response_obj the dummy response object
+ * @return true
+ * @return false
+ */
+bool oc_ri_new_request_from_request(oc_request_t new_request,
+                                    oc_request_t request,
+                                    oc_response_buffer_t response_buffer,
+                                    oc_response_t response_obj);
 
 #ifdef __cplusplus
 }

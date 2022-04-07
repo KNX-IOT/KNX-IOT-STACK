@@ -74,13 +74,14 @@ typedef struct oc_endpoint_t
   struct oc_endpoint_t *next; /**< pointer to the next structure */
   size_t device;              /**< device index */
   enum transport_flags flags; /**< the transport flags */
-  oc_string_t serial_number;  /**< serial number */
+  oc_string_t serial_number;  /**< serial number of the device to talk to */
   union dev_addr {
     oc_ipv6_addr_t ipv6; /**< ipv6 address */
     oc_ipv4_addr_t ipv4; /**< ipv4 address */
   } addr, addr_local;
   int interface_index; /**< interface index */
   uint8_t priority;    /**< priority */
+  int group_id;        /**< group_id identifier */
 #ifdef OC_OSCORE
   uint8_t piv[OSCORE_PIV_LEN]; /**< oscore partial iv */
   uint8_t piv_len;             /**< oscore partial iv length */
@@ -93,6 +94,8 @@ typedef struct oc_endpoint_t
                                             .address = { __VA_ARGS__ } } }
 #define oc_make_ipv6_endpoint(__name__, __flags__, __port__, ...)              \
   oc_endpoint_t __name__ = { .flags = __flags__,                               \
+                             .device = 0,                                      \
+                             .group_id = 0,                                    \
                              .addr.ipv6 = { .port = __port__,                  \
                                             .address = { __VA_ARGS__ } } }
 

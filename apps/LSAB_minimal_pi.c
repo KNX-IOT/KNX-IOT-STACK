@@ -1,6 +1,6 @@
 /*
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
- Copyright (c) 2021 Cascoda Ltd
+ Copyright (c) 2021-2022 Cascoda Ltd
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -75,6 +75,8 @@
 #include "oc_api.h"
 #include "oc_core_res.h"
 #include "port/oc_clock.h"
+#include "port/dns-sd.h"
+
 #include <signal.h>
 
 #include <Python.h>
@@ -221,9 +223,6 @@ app_init(void)
   /* set the hardware type*/
   oc_core_set_device_hwt(0, "Pi");
 
-  /* set the programming mode */
-  oc_core_set_device_pm(0, true);
-
   /* set the model */
   oc_core_set_device_model(0, "Cascoda Actuator");
 
@@ -267,7 +266,11 @@ get_dpa_417_61(oc_request_t *request, oc_interface_mask_t interfaces,
   }
 
   CborError error;
-  error = cbor_encode_boolean(&g_encoder, g_mystate);
+  oc_rep_begin_root_object();
+  oc_rep_i_set_boolean(root, 1, g_mystate);
+  oc_rep_end_root_object();
+  error = g_err;
+
   if (error) {
     oc_status_code = true;
   }
@@ -304,27 +307,28 @@ post_dpa_417_61(oc_request_t *request, oc_interface_mask_t interfaces,
 
   oc_rep_t *rep = NULL;
   // handle the different requests
-  if (oc_is_s_mode_request(request)) {
-    PRINT(" S-MODE\n");
-    // retrieve the value of the s-mode payload
-    rep = oc_s_mode_get_value(request);
-  } else {
-    // the regular payload
-    rep = request->request_payload;
+  if (oc_is_redirected_request(request)) {
+    PRINT(" S-MODE or /P\n");
   }
+
+  rep = request->request_payload;
   char buffer[200];
   memset(buffer, 200, 1);
   oc_rep_to_json(rep, (char *)&buffer, 200, true);
   PRINT("%s", buffer);
 
-  // handle the type of payload correctly.
-  if ((rep != NULL) && (rep->type == OC_REP_BOOL)) {
-    PRINT("  post_dpa_417_61 received : %d\n", rep->value.boolean);
-    g_mystate = rep->value.boolean;
-    set_backlight(g_mystate);
-    oc_send_cbor_response(request, OC_STATUS_CHANGED);
-    PRINT("-- End post_dpa_417_61\n");
-    return;
+  while (rep != NULL) {
+    if (rep->type == OC_REP_BOOL) {
+      if (rep->iname == 1) {
+        PRINT("  post_dpa_417_61 received : %d\n", rep->value.boolean);
+        g_mystate = rep->value.boolean;
+        set_backlight(g_mystate);
+        oc_send_cbor_response(request, OC_STATUS_CHANGED);
+        PRINT("-- End post_dpa_417_61\n");
+        return;
+      }
+    }
+    rep = rep->next;
   }
 
   oc_send_response(request, OC_STATUS_BAD_REQUEST);
@@ -520,7 +524,8 @@ main(void)
 
   oc_device_info_t *device = oc_core_get_device_info(0);
   PRINT("serial number: %s", oc_string(device->serialnumber));
-  oc_device_mode_display(0);
+  knx_publish_service(oc_string(device->serialnumber), 0, 0);
+
   oc_endpoint_t *my_ep = oc_connectivity_get_endpoints(0);
   if (my_ep != NULL) {
     PRINTipaddr(*my_ep);

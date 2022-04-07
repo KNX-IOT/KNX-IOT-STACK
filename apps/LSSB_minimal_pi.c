@@ -70,6 +70,7 @@
 #include "oc_api.h"
 #include "oc_core_res.h"
 #include "port/oc_clock.h"
+#include "port/dns-sd.h"
 #include <signal.h>
 
 #include <Python.h>
@@ -135,9 +136,6 @@ app_init(void)
   /* set the hardware type*/
   oc_core_set_device_hwt(0, "Pi");
 
-  /* set the programming mode */
-  oc_core_set_device_pm(0, true);
-
   /* set the model */
   oc_core_set_device_model(0, "my model");
 
@@ -178,7 +176,10 @@ get_dpa_421_61(oc_request_t *request, oc_interface_mask_t interfaces,
   }
 
   CborError error;
-  error = cbor_encode_boolean(&g_encoder, g_mystate);
+  oc_rep_begin_root_object();
+  oc_rep_i_set_boolean(root, 1, g_mystate);
+  oc_rep_end_root_object();
+  error = g_err;
   if (error) {
     oc_status_code = true;
   }
@@ -195,60 +196,12 @@ get_dpa_421_61(oc_request_t *request, oc_interface_mask_t interfaces,
 oc_group_object_notification_t g_send_notification;
 bool g_bool_value = false;
 
-oc_event_callback_retval_t post_callback(void *data);
-
 /* send a multicast s-mode message */
 static void
 issue_requests_s_mode(void)
 {
-  oc_do_s_mode("p/1", "w");
-  // post_callback(NULL);
-}
-
-oc_event_callback_retval_t
-post_callback(void *data)
-{
-  int scope = 5;
-  PRINT(" issue_requests_s_mode\n");
-
-  oc_make_ipv6_endpoint(mcast, IPV6 | DISCOVERY | MULTICAST, 5683, 0xff, scope,
-                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0xfd);
-
-  if (oc_init_post("/.knx", &mcast, NULL, NULL, LOW_QOS, NULL)) {
-
-    g_send_notification.ga = 1;
-    /*
-    { 5: { 6: <st>, 7: <ga>, 1: <value> } }
-    */
-    CborEncoder value_map;
-
-    oc_rep_begin_root_object();
-    oc_rep_i_set_key(&root_map, 5);
-    cbor_encoder_create_map(&root_map, &value_map, CborIndefiniteLength);
-
-    oc_rep_i_set_int(value, 4, g_send_notification.sia);
-    // ga
-    oc_rep_i_set_int(value, 7, g_send_notification.ga);
-    // st M Service type code(write = w, read = r, response = rp) Enum : w, r,
-    // rp
-    // oc_rep_i_set_text_string(value, 6, oc_string(g_send_notification.st));
-    oc_rep_i_set_text_string(value, 6, "w");
-    // boolean
-    oc_rep_i_set_boolean(value, 1, g_mystate);
-    cbor_encoder_close_container_checked(&root_map, &value_map);
-
-    oc_rep_end_root_object();
-
-    PRINT("Encoded Payload Size: %d\n", oc_rep_get_encoded_payload_size());
-
-    if (oc_do_post_ex(APPLICATION_CBOR, APPLICATION_CBOR)) {
-      PRINT("  Sent PUT request\n");
-    } else {
-      PRINT("  Could not send POST request\n");
-    }
-  }
-
-  return OC_EVENT_DONE;
+  oc_do_s_mode_with_scope(2, "p/1", "w");
+  oc_do_s_mode_with_scope(5, "p/1", "w");
 }
 
 PyObject *pModule;
@@ -591,14 +544,6 @@ main(void)
   PyRun_SimpleString("simpleclient.init()");
 
 #ifdef OC_SECURITY
-  /* print out the current DI of the device */
-  char uuid[37] = { 0 };
-  oc_uuid_to_str(oc_core_get_device_id(0), uuid, OC_UUID_LEN);
-  PRINT(" DI: '%s'\n", uuid);
-  oc_add_ownership_status_cb(oc_ownership_status_cb, NULL);
-#endif /* OC_SECURITY */
-
-#ifdef OC_SECURITY
   PRINT("Security - Enabled\n");
 #else
   PRINT("Security - Disabled\n");
@@ -606,6 +551,7 @@ main(void)
 
   oc_device_info_t *device = oc_core_get_device_info(0);
   PRINT("serial number: %s", oc_string(device->serialnumber));
+  knx_publish_service(oc_string(device->serialnumber), 0, 0);
 
   PRINT("Server \"%s\" running, waiting on incoming "
         "connections.\n",

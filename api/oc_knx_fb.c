@@ -195,7 +195,7 @@ oc_add_function_blocks_to_response(oc_request_t *request, size_t device_index,
     length = oc_rep_add_line_to_buffer("</f/");
     *response_length += length;
     if (g_int_array[1][i] > 0) {
-      snprintf(number, 23, "%3d_%2d", g_int_array[0][i], g_int_array[1][i]);
+      snprintf(number, 23, "%03d_%02d", g_int_array[0][i], g_int_array[1][i]);
     } else {
       snprintf(number, 5, "%d", g_int_array[0][i]);
     }
@@ -264,7 +264,7 @@ oc_core_fb_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 void
 oc_create_fb_resource(int resource_idx, size_t device)
 {
-  OC_DBG("oc_create_dev_dev_resource\n");
+  OC_DBG("oc_create_fb_resource\n");
   // note that this resource is listed in /.well-known/core so it should have
   // the full rt with urn:knx prefix
   oc_core_populate_resource(resource_idx, device, "/f", OC_IF_LI,

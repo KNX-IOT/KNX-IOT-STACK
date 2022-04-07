@@ -25,8 +25,7 @@
  *  Example code for Function Block LSAB
  *  Implements only data point 61: switch on/off
  *  This implementation is a actuator, e.g. receives data
- */
-/**
+ *
  * ## Application Design
  *
  * support functions:
@@ -70,6 +69,7 @@
 #include "oc_api.h"
 #include "oc_core_res.h"
 #include "port/oc_clock.h"
+#include "port/dns-sd.h"
 #include <signal.h>
 // test purpose only
 #include "api/oc_knx_dev.h"
@@ -146,9 +146,6 @@ app_init(void)
   /* set the hardware type*/
   oc_core_set_device_hwt(0, "Pi");
 
-  /* set the programming mode */
-  oc_core_set_device_pm(0, true);
-
   /* set the model */
   oc_core_set_device_model(0, "Cascoda Actuator");
 
@@ -178,7 +175,7 @@ get_dpa_417_61(oc_request_t *request, oc_interface_mask_t interfaces,
      returns to this function here. alternative is to have a callback from the
      hardware that sets the global variables.
   */
-  bool error_state = false; /**< the error state, the generated code */
+  bool error_state = false; /* the error state, the generated code */
   int oc_status_code = OC_STATUS_OK;
 
   PRINT("-- Begin get_dpa_417_61: interface %d\n", interfaces);
@@ -189,7 +186,11 @@ get_dpa_417_61(oc_request_t *request, oc_interface_mask_t interfaces,
   }
 
   CborError error;
-  error = cbor_encode_boolean(&g_encoder, g_mystate);
+  oc_rep_begin_root_object();
+  oc_rep_i_set_boolean(root, 1, g_mystate);
+  oc_rep_end_root_object();
+  error = g_err;
+
   if (error) {
     oc_status_code = true;
   }
@@ -226,22 +227,21 @@ post_dpa_417_61(oc_request_t *request, oc_interface_mask_t interfaces,
 
   oc_rep_t *rep = NULL;
   // handle the different requests
-  if (oc_is_s_mode_request(request)) {
-    PRINT(" S-MODE\n");
-    // retrieve the value of the s-mode payload
-    rep = oc_s_mode_get_value(request);
-  } else {
-    // the regular payload
-    rep = request->request_payload;
+  if (oc_is_redirected_request(request)) {
+    PRINT(" S-MODE or /P\n");
   }
-
-  // handle the type of payload correctly.
-  if ((rep != NULL) && (rep->type == OC_REP_BOOL)) {
-    PRINT("  post_dpa_417_61 received : %d\n", rep->value.boolean);
-    g_mystate = rep->value.boolean;
-    oc_send_cbor_response(request, OC_STATUS_CHANGED);
-    PRINT("-- End post_dpa_417_61\n");
-    return;
+  rep = request->request_payload;
+  while (rep != NULL) {
+    if (rep->type == OC_REP_BOOL) {
+      if (rep->iname == 1) {
+        PRINT("  post_dpa_417_61 received : %d\n", rep->value.boolean);
+        g_mystate = rep->value.boolean;
+        oc_send_cbor_response(request, OC_STATUS_CHANGED);
+        PRINT("-- End post_dpa_417_61\n");
+        return;
+      }
+    }
+    rep = rep->next;
   }
 
   oc_send_response(request, OC_STATUS_BAD_REQUEST);
@@ -312,7 +312,8 @@ factory_presets_cb(size_t device, void *data)
 /**
  * @brief application reset
  *
- * @param device the device identifier of the list of devices
+ * @param device_index the device identifier of the list of devices
+ * @param reset_value the knx reset value
  * @param data the supplied data.
  */
 void
@@ -541,7 +542,8 @@ main(int argc, char *argv[])
 
   oc_device_info_t *device = oc_core_get_device_info(0);
   PRINT("serial number: %s", oc_string(device->serialnumber));
-  oc_device_mode_display(0);
+  knx_publish_service(oc_string(device->serialnumber), 0, 0);
+
   oc_endpoint_t *my_ep = oc_connectivity_get_endpoints(0);
   if (my_ep != NULL) {
     PRINTipaddr(*my_ep);

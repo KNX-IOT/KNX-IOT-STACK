@@ -192,74 +192,10 @@ discovery(const char *payload, int len, oc_endpoint_t *endpoint,
   }
 
   // do parameter exchange
-  oc_initiate_spake(endpoint, "LETTUCE");
+  oc_initiate_spake(endpoint, "LETTUCE", NULL);
 
   PRINT(" DISCOVERY- END\n");
   return OC_STOP_DISCOVERY;
-}
-
-oc_group_object_notification_t g_send_notification;
-bool g_bool_value = false;
-int g_int_value = 1;
-float g_float_value = 1.0;
-
-// 0 == boolean
-// 1 == int
-// 2 == float
-int g_value_type = 0;
-
-/* send a multicast s-mode message */
-static void
-issue_requests_s_mode(void)
-{
-  int scope = 5;
-  PRINT(" issue_requests_s_mode\n");
-
-  oc_make_ipv6_endpoint(mcast, IPV6 | DISCOVERY | MULTICAST, 5683, 0xff, scope,
-                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0xfd);
-
-  if (oc_init_post("/.knx", &mcast, NULL, NULL, LOW_QOS, NULL)) {
-
-    /*
-    { 4: sia, 5: { 6: <st>, 7: <ga>, 1: <value> } }
-    */
-
-    oc_rep_begin_root_object();
-
-    oc_rep_i_set_int(root, 4, g_send_notification.sia);
-
-    oc_rep_i_set_key(&root_map, 5);
-    CborEncoder value_map;
-    cbor_encoder_create_map(&root_map, &value_map, CborIndefiniteLength);
-    // ga
-    oc_rep_i_set_int(value, 7, g_send_notification.ga);
-    // st M Service type code(write = w, read = r, response = rp) Enum : w, r,
-    // rp
-    // oc_rep_i_set_text_string(value, 6, oc_string(g_send_notification.st));
-    oc_rep_i_set_text_string(value, 6, "w");
-    if (g_value_type == 0) {
-      // boolean
-      oc_rep_i_set_boolean(value, 1, g_bool_value);
-    }
-    if (g_value_type == 1) {
-      // integer
-      oc_rep_i_set_int(value, 1, (int)g_int_value);
-    }
-    if (g_value_type == 2) {
-      // float
-      oc_rep_i_set_double(value, 1, (double)g_float_value);
-    }
-
-    cbor_encoder_close_container_checked(&root_map, &value_map);
-
-    oc_rep_end_root_object();
-
-    if (oc_do_post_ex(APPLICATION_CBOR, APPLICATION_CBOR)) {
-      PRINT("  Sent POST request\n");
-    } else {
-      PRINT("  Could not send POST request\n");
-    }
-  }
 }
 
 /* do normal discovery */
@@ -310,9 +246,9 @@ handle_signal(int signal)
 }
 
 void
-my_spake_cb(int error, uint8_t *secret, int secret_size)
+my_spake_cb(int error, char *oscore_id, uint8_t *secret, int secret_size)
 {
-  PRINT("my_spake_cb: SPAKE2+ Handshake Finished!\n");
+  PRINT("my_spake_cb: SPAKE2+ Handshake Finished! %s\n", oscore_id);
   PRINT("my_spake_cb: code: %d\n", error);
   PRINT("my_spake_cb: Shared Secret: ");
   for (int i = 0; i < secret_size; i++) {
@@ -328,13 +264,6 @@ print_usage()
   PRINT("none : issue discovery request and perform a GET on /dev/pm and do an "
         "PUT /dev/pm\n");
   PRINT("-help : this message\n");
-  PRINT("s-mode <group address> <type> <value>\n");
-  PRINT("  <group address> : integer\n");
-  PRINT("  <sender address> : integer\n");
-  PRINT("  <type> : boolean | int | double\n");
-  PRINT("  <value> : boolean : true | false\n");
-  PRINT("            int : integer e.g. 1 \n");
-  PRINT("            double : double value e.g. 3.14 \n");
   exit(0);
 }
 
@@ -348,55 +277,8 @@ main(int argc, char *argv[])
     printf("argv[%d] = %s\n", i, argv[i]);
   }
   if (argc > 1) {
-    PRINT("s-mode: %s\n", argv[1]);
-    if (strcmp(argv[1], "s-mode") == 0) {
-      do_send_s_mode = true;
-    }
     if (strcmp(argv[1], "-help") == 0) {
       print_usage();
-    }
-  }
-  if (argc > 2) {
-    g_send_notification.ga = atoi(argv[2]);
-    PRINT(" group address : %s [%d]\n", argv[2], g_send_notification.ga);
-  }
-
-  if (argc > 3) {
-    g_send_notification.sia = atoi(argv[3]);
-    PRINT(" sender internal address (sia) : %s [%d]\n", argv[3],
-          g_send_notification.sia);
-  }
-
-  if (argc > 4) {
-    if (strcmp(argv[4], "boolean") == 0) {
-      g_value_type = 0;
-    }
-    if (strcmp(argv[4], "int") == 0) {
-      g_value_type = 1;
-    }
-    if (strcmp(argv[4], "double") == 0) {
-      g_value_type = 2;
-    }
-    PRINT(" value type : %s [%d]\n", argv[4], g_value_type);
-  }
-  if (argc > 5) {
-    PRINT(" value type : %s\n", argv[5]);
-    if (g_value_type == 0) {
-      g_bool_value = false;
-      if (strcmp(argv[5], "true") == 0) {
-        g_bool_value = true;
-        PRINT(" value type : %s [%d]\n", argv[5], g_bool_value);
-      }
-    }
-    if (g_value_type == 1) {
-      // integer
-      g_int_value = atoi(argv[5]);
-      PRINT(" value type : %s [%d]\n", argv[5], g_int_value);
-    }
-    if (g_value_type == 2) {
-      // double
-      g_float_value = atof(argv[5]);
-      PRINT(" value type : %s [%f]\n", argv[5], g_float_value);
     }
   }
 
@@ -423,11 +305,6 @@ main(int argc, char *argv[])
   static oc_handler_t handler = { .init = app_init,
                                   .signal_event_loop = signal_event_loop,
                                   .requests_entry = issue_requests };
-
-  if (do_send_s_mode) {
-
-    handler.requests_entry = issue_requests_s_mode;
-  }
 
   oc_clock_time_t next_event;
 

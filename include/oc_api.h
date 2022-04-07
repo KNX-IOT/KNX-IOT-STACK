@@ -1,6 +1,6 @@
 /*
 // Copyright (c) 2016-2019 Intel Corporation
-// Copyright (c) 2021 Cascoda Ltd
+// Copyright (c) 2021-2022 Cascoda Ltd
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,10 +21,64 @@
 */
 
 /**
-  \mainpage API
+  \mainpage KNX_IOT Point API Stack
 
   The file \link oc_api.h \endlink is the main entry for all
   server and client related stack functions.
+
+  An KNX IOT Point API device contains:
+
+  - initialization functionality
+  - \ref doc_module_tag_server_side Server exposing data points
+  - \ref doc_module_tag_client_state Client sending s-mode commands
+
+  The Stack implements functionality like:
+
+  - the CoAP client and server
+  - OSCORE security
+  - .well-known/core discovery
+  - Table implementation:
+    - Group object table
+    - Credential table (e.g. auth/at entries)
+    - Recipient table
+    - functionality to handle the s-mode objects & transmission flags.
+
+
+  Therefore an KNX_IOT application exist of:
+
+  - Code for each specific data points (handling GET/POST)
+  - own code to talk to hardware
+  - Device specific (functional specific) callbacks
+     - reset \ref oc_reset_t
+     - restart \ref oc_restart_t
+     - software update
+     - setting host name  \ref oc_hostname_t
+  - main loop
+
+  Examples of functional devices :
+  - LSAB_minimal_all.c an example that implements Functional Block LSAB
+  - LSSB_minimal_all.c an example that implements Functional Block LSSB
+
+  ## handling of transmission flags
+
+  - Case 1 (write data):
+    - Received from bus: -st w, any ga
+    - receiver does: c flags = w -> overwrite object value
+  - Case 2 (update data):
+    - Received from bus: -st rp, any ga
+    - receiver does: c flags = u -> overwrite object value
+  - Case 3 (inform change):
+    - sender: updated object value + cflags = t
+    - Sent: -st w, sending association (1st assigned ga)
+      Note: this will be done when Case 1 & Case 2 have updated a value.
+  - Case 4 (request & respond):
+    - sender: c flags = r
+    - Received from bus: -st r
+    - Sent: -st rp, sending association (1st assigned ga)
+  - Case 5 (update at start up):
+    - sender: c flags = i
+    - After device restart (power up)
+    - Sent: -st r, sending association (1st assigned ga)
 */
 
 #ifndef OC_API_H
@@ -46,6 +100,10 @@
 extern "C" {
 #endif
 
+/**
+ * @brief maximum URL length (as specified by KNX)
+ *
+ */
 #define OC_MAX_URL_LENGTH (30)
 
 /**
@@ -124,7 +182,6 @@ typedef struct
    * @see oc_resource_set_discoverable
    * @see oc_resource_set_observable
    * @see oc_resource_set_periodic_observable
-   * @see oc_resource_set_properties_cbs
    * @see oc_resource_set_request_handler
    * @see oc_add_resource
    */
@@ -449,7 +506,28 @@ int oc_init_platform(const char *mfg_name,
 /* Server side */
 /**
   @defgroup doc_module_tag_server_side Server side
-  Optional group of server support functions.
+  Group of server support functions.
+
+  # standardized data points
+
+  The standardized functions are implemented.
+  The following groups are implemented:
+  - / dev / x
+  - / .well-known / core
+  - / fp / x
+  - / fb / x
+
+  all functions generate the core-link or CBOR formatted responses.
+
+  # application specific data points
+
+  Applications have to define the functions (GET and PUT) for the application
+  level data points. Applications have to define for each instance these
+  functions. The functions are registered with the device and will be called
+  when the other devices are interacting with it.
+
+  see for more details the examples.
+
   @{
 */
 /**
@@ -546,14 +624,6 @@ void oc_resource_bind_resource_type(oc_resource_t *resource, const char *type);
  */
 void oc_resource_bind_content_type(oc_resource_t *resource,
                                    oc_content_format_t content_type);
-
-/**
- * @defgroup doc_module_tag_collections Collection Support
- * Optional group of functions to support compliant collections.
- * @{
- */
-
-/** @} */ // end of doc_module_tag_collections
 
 /**
  * Expose unsecured coap:// endpoints (in addition to secured coaps://
@@ -666,14 +736,6 @@ void oc_resource_set_properties_cbs(oc_resource_t *resource,
                                     void *get_props_user_data,
                                     oc_set_properties_cb_t set_properties,
                                     void *set_props_user_data);
-
-/**
- * @brief sets the support of the secure multicast feature
- *
- * @param resource the resource
- * @param supported true: supported
- */
-void oc_resource_set_secure_mcast(oc_resource_t *resource, bool supported);
 
 /**
  * @brief set a resource to a specific function block instance
@@ -1079,7 +1141,29 @@ int oc_notify_observers(oc_resource_t *resource);
 
 /**
   @defgroup doc_module_tag_client_state Client side
-  Client side support functions
+  Client side support functions.
+
+  This module contains functions to communicate to a KNX server for an Client.
+
+  ## multicast
+
+  The multicast communication is for:
+  - Discovery
+
+  The multicast Discovery is issued is on CoAP .well-known/core
+  The s-mode communication is performed at the (specific) group addresses.
+
+
+  ## unicast communication
+
+  The following functions can be used to communicate on CoAP level e.g. issuing:
+  - GET
+  - PUT
+  - POST
+  - DELETE
+  functions.
+  The functions are secured with OSCORE.
+
   @{
 */
 #include "oc_client_state.h"
@@ -1422,7 +1506,6 @@ void oc_stop_multicast(oc_client_response_t *response);
  * @return true
  * @return false
  */
-// bool oc_init_multicast_update(const char *uri, const char *query);
 bool oc_init_multicast_update(oc_endpoint_t *mcast, const char *uri,
                               const char *query);
 
@@ -1473,6 +1556,10 @@ bool oc_send_ping(bool custody, oc_endpoint_t *endpoint,
 /**  */
 /**
   @defgroup doc_module_tag_common_operations Common operations
+
+  This section contains common operations that can be used to schedule
+  callbacks.
+
   @{
 */
 

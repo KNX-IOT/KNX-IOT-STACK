@@ -21,7 +21,7 @@
 #define OC_CORE_RES_H
 
 #include "oc_ri.h"
-#include "oc_device_mode.h"
+#include "oc_programming_mode.h"
 #include "oc_knx.h"
 #include <stdint.h>
 
@@ -60,32 +60,30 @@ typedef struct oc_knx_version_info_t
 {
   int major; /**< major version number */
   int minor; /**< minor version number */
-  int third; /**< third version number */
+  int patch; /**< patch version number */
 } oc_knx_version_info_t;
 
 /**
  * @brief device information
  *
+ * This structure contains
  */
 typedef struct oc_device_info_t
 {
-  oc_uuid_t di;              /**< device identifier */
-  oc_uuid_t piid;            /**< Permanent Immutable ID */
-  oc_string_t name;          /**< name of the device */
-  oc_string_t icv;           /**< specification version */
-  oc_string_t dmv;           /**< data model version */
   oc_string_t serialnumber;  /**< knx serial number */
   oc_knx_version_info_t hwv; /**< knx hardware version */
   oc_knx_version_info_t fwv; /**< fwv firmware version number */
   oc_string_t hwt;           /**< knx hardware type */
   oc_string_t model;         /**< knx model */
-  uint32_t ia;               /**< knx ia Device individual address */
+  uint32_t sa;               /**< sub address */
+  uint32_t da;               /**< device address */
   oc_string_t hostname;      /**< knx host name */
-  uint32_t iid;              /**< knx idd (installation id) */
+  uint32_t fid;              /**< knx fabric id */
+  uint32_t ia;               /**< knx ia Device individual address */
+  uint32_t iid;              /**< knx iid (installation id) */
+  uint32_t port;             /**< coap port number */
   bool pm;                   /**< knx programming mode */
   oc_lsm_state_t lsm_s;      /**< knx lsm states */
-  oc_device_mode_t
-    device_mode; /**< device mode (programming, normal operation) */
   oc_core_add_device_cb_t add_device_cb; /**< callback when device is changed */
   void *data;                            /**< user data */
 } oc_device_info_t;
@@ -120,13 +118,14 @@ oc_platform_info_t *oc_core_init_platform(const char *mfg_name,
  * @param name the name of the device
  * @param version the version of the KNX spec
  * @param base the base url
- * @param serialnumber the serial number of the device
+ * @param serial_number the serial number of the device
  * @param add_device_cb device callback
  * @param data the supplied user data
  * @return oc_device_info_t* the device structure
  */
 oc_device_info_t *oc_core_add_device(const char *name, const char *version,
-                                     const char *base, const char *serialnumber,
+                                     const char *base,
+                                     const char *serial_number,
                                      oc_core_add_device_cb_t add_device_cb,
                                      void *data);
 
@@ -136,10 +135,11 @@ oc_device_info_t *oc_core_add_device(const char *name, const char *version,
  * @param device_index the device index
  * @param major the xxx number of xxx.yyy.zzz
  * @param minor the yyy number of xxx.yyy.zz
- * @param minor2 the zzz number of xxx.yyy.zzz
+ * @param patch the zzz number of xxx.yyy.zzz
  * @return int error status, 0 = OK
  */
-int oc_core_set_device_fwv(int device_index, int major, int minor, int minor2);
+int oc_core_set_device_fwv(size_t device_index, int major, int minor,
+                           int patch);
 
 /**
  * @brief sets the hardware version number
@@ -147,10 +147,11 @@ int oc_core_set_device_fwv(int device_index, int major, int minor, int minor2);
  * @param device_index the device index
  * @param major the xxx number of xxx.yyy.zzz
  * @param minor the yyy number of xxx.yyy.zz
- * @param minor2 the zzz number of xxx.yyy.zzz
+ * @param patch the zzz number of xxx.yyy.zzz
  * @return int  error status, 0 = OK
  */
-int oc_core_set_device_hwv(int device_index, int major, int minor, int minor2);
+int oc_core_set_device_hwv(size_t device_index, int major, int minor,
+                           int patch);
 
 /**
  * @brief sets the internal address
@@ -159,16 +160,16 @@ int oc_core_set_device_hwv(int device_index, int major, int minor, int minor2);
  * @param ia the internal address
  * @return int error status, 0 = OK
  */
-int oc_core_set_device_ia(int device_index, int ia);
+int oc_core_set_device_ia(size_t device_index, int ia);
 
 /**
  * @brief sets the hardware type (string)
  *
  * @param device_index the device index
- * @param hardwaretype the hardware type
+ * @param hardware_type the hardware type
  * @return int error status, 0 = OK
  */
-int oc_core_set_device_hwt(int device_index, const char *hardwaretype);
+int oc_core_set_device_hwt(size_t device_index, const char *hardware_type);
 
 /**
  * @brief sets the programming mode (boolean)
@@ -177,7 +178,7 @@ int oc_core_set_device_hwt(int device_index, const char *hardwaretype);
  * @param pm the programming mode
  * @return int error status, 0 = OK
  */
-int oc_core_set_device_pm(int device_index, bool pm);
+int oc_core_set_device_pm(size_t device_index, bool pm);
 
 /**
  * @brief sets the model (string)
@@ -186,25 +187,34 @@ int oc_core_set_device_pm(int device_index, bool pm);
  * @param model the device model
  * @return int error status, 0 = OK
  */
-int oc_core_set_device_model(int device_index, const char *model);
+int oc_core_set_device_model(size_t device_index, const char *model);
 
 /**
  * @brief sets the host name (string)
  *
  * @param device_index the device index
- * @param hostname the host name
+ * @param host_name the host name
  * @return int error status, 0 = OK
  */
-int oc_core_set_device_hostname(int device_index, const char *hostname);
+int oc_core_set_device_hostname(size_t device_index, const char *host_name);
 
 /**
- * @brief sets the iid (unsigned int)
+ * @brief sets the installation identifier (iid) (unsigned int)
  *
  * @param device_index the device index
  * @param iid the KNX installation id
  * @return int error status, 0 = OK
  */
-int oc_core_set_device_iid(int device_index, uint32_t iid);
+int oc_core_set_device_iid(size_t device_index, uint32_t iid);
+
+/**
+ * @brief sets the fabric identifier (fid) (unsigned int)
+ *
+ * @param device_index the device index
+ * @param fid the fabric id
+ * @return int error status, 0 = OK
+ */
+int oc_core_set_device_fid(size_t device_index, uint32_t fid);
 
 /**
  * @brief retrieve the amount of devices
@@ -212,14 +222,6 @@ int oc_core_set_device_iid(int device_index, uint32_t iid);
  * @return size_t the amount of devices
  */
 size_t oc_core_get_num_devices(void);
-
-/**
- * @brief retrieve the id (uuid) of the device
- *
- * @param device the device index
- * @return oc_uuid_t* the device id
- */
-oc_uuid_t *oc_core_get_device_id(size_t device);
 
 /**
  * @brief retrieve the device info from the device index
@@ -330,43 +332,6 @@ bool oc_filter_resource_by_if(oc_resource_t *resource, oc_request_t *request);
  * @return int 0 = success
  */
 int oc_frame_interfaces_mask_in_response(oc_interface_mask_t iface_mask);
-
-/**
- * @brief determine if a resource is a Device Configuration Resource
- *
- * @param resource the resource
- * @param device the device index to which the resource belongs too
- * @return true is DCR resource
- * @return false is not DCR resource
- */
-bool oc_core_is_DCR(oc_resource_t *resource, size_t device);
-
-/**
- * @brief determine if a resource is Security Vertical Resource
- *
- * @param resource the resource
- * @param device the device index to which the resource belongs too
- * @return true is SRV resource
- * @return false is not SVR resource
- */
-bool oc_core_is_SVR(oc_resource_t *resource, size_t device);
-
-/**
- * @brief determine if a resource is a vertical resource
- *
- * @param resource the resource
- * @param device the device index to which the resource belongs too
- * @return true : is vertical resource
- * @return false : is not a vertical resource
- */
-bool oc_core_is_vertical_resource(oc_resource_t *resource, size_t device);
-
-/**
- * @brief return the number of registered devices
- *
- * @return size_t The number of registered devices
- */
-size_t oc_number_of_devices();
 
 #ifdef __cplusplus
 }

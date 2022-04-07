@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #############################
 #
-#    copyright 2021 Cascoda Ltd.
+#    copyright 2021-2022 Cascoda Ltd.
 #    Redistribution and use in source and binary forms, with or without modification,
 #    are permitted provided that the following conditions are met:
 #    1.  Redistributions of source code must retain the above copyright notice,
@@ -23,6 +23,7 @@
 #    EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #############################
+
 # pylint: disable=C0103
 # pylint: disable=C0114
 # pylint: disable=C0115
@@ -52,55 +53,76 @@ sys.path.append(parentdir)
 
 import knx_stack
 
-def do_discover(my_stack, internal_address, scope = 2):
+def safe_print(response):
+    if response is not None:
+        response.print_payload()
+    else:
+        print("no response")
+
+def do_discover(my_stack, serial_number, scope = 2):
     time.sleep(1)
-    query = "if=urn:knx:ia."+str(internal_address)
+    query = "ep=urn:knx:sn."+str(serial_number)
     my_stack.discover_devices_with_query( query, int(scope))
     if my_stack.get_nr_devices() > 0:
         print ("SN :", my_stack.device_array[0].sn)
 
-def get_sn(my_stack):
+def do_programming_mode(my_stack, pm_value):
     print("Get SN :")
     sn = my_stack.device_array[0].sn
-    response = my_stack.issue_cbor_get(sn, "/dev/sn")
-    print ("response:",response)
+    response = my_stack.issue_cbor_get(sn, "/dev/pm")
+    print ("current value response:",response)
+    my_stack.purge_response(response)
+    pm_val = False
+    if pm_value is True:
+        pm_val = True
+    content = { 1 : pm_val}
+    print("set PM :", content)
+    response =  my_stack.issue_cbor_put(sn,"/dev/pm",content)
+    safe_print(response)
     my_stack.purge_response(response)
 
-def do_reset(my_stack):
-    if my_stack.get_nr_devices() > 0:
-        sn = my_stack.device_array[0].sn
-        content = {2: "reset"}
-        response =  my_stack.issue_cbor_post(sn,"/a/sen",content)
-        print ("response:",response)
-        my_stack.purge_response(response)
-
+#
 if __name__ == '__main__':  # pragma: no cover
 
     parser = argparse.ArgumentParser()
-
     # input (files etc.)
-    parser.add_argument("-ia", "--internal_address",
-                    help="internal address of the device", nargs='?',
+    parser.add_argument("-scope", "--scope", default=2,
+                    help="scope of the multicast request (defaul =2 : same machine)", nargs='?',
+                    const="", required=False)
+    parser.add_argument("-sn", "--serial_number",
+                    help="serial number", nargs='?',
                     const=1, required=True)
-    parser.add_argument("-scope", "--scope",
-                    help="scope of the multicast request [2,5]", nargs='?',
+    parser.add_argument("-pm", "--programming_mode", default="True",
+                    help="set the programming mode (default True) e.g. -pm False", nargs='?',
+                    const="true", required=False)
+    parser.add_argument("-wait", "--wait",
+                    help="wait after issuing the command", nargs='?',
                     default=2, const=1, required=False)
     # (args) supports batch scripts providing arguments
     print(sys.argv)
     args = parser.parse_args()
 
     print("scope            :" + str(args.scope))
-    print("internal address :" + str(args.internal_address))
+    print("serial_number    :" + str(args.serial_number))
+    print("programming_mode :" + str(args.programming_mode))
+    print("wait [sec] :" + str(args.wait))
+
+    value = False
+    if  str(args.programming_mode) == "True":
+        value = True
 
     the_stack = knx_stack.KNXIOTStack()
+    the_stack.start_thread()
     signal.signal(signal.SIGINT, the_stack.sig_handler)
+    time.sleep(2)
 
     try:
-        do_discover(the_stack, args.internal_address, args.scope)
-        do_reset(the_stack)
+        do_discover(the_stack, args.serial_number, args.scope)
+        time.sleep(1)
+        do_programming_mode(the_stack, value)
     except:
         traceback.print_exc()
 
-    time.sleep(2)
+    time.sleep(int(args.wait))
     the_stack.quit()
     sys.exit()
