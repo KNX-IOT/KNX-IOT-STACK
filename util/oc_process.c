@@ -216,8 +216,11 @@ oc_process_init(void)
   process_maxevents = 0;
 #endif /* OC_PROCESS_CONF_STATS */
 
+/*
+  // should already be null
   oc_process_current = NULL;
   oc_process_list = NULL;
+  */
 }
 /*---------------------------------------------------------------------------*/
 /*
