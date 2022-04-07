@@ -922,23 +922,23 @@ oc_at_entry_print(size_t device_index, int index)
 
       PRINT("  at index: %d\n", index);
       PRINT("    id (0)        : %s\n", oc_string(g_at_entries[index].id));
-      PRINT("    interfaces : %d\n", g_at_entries[index].scope);
+      PRINT("    interfaces    : %d\n", g_at_entries[index].scope);
       PRINT("    profile (38)  : %d (%s)\n", g_at_entries[index].profile,
             oc_at_profile_to_string(g_at_entries[index].profile));
+      if (oc_string_len(g_at_entries[index].kid) > 0) {
+        PRINT("    kid           : %s\n", oc_string(g_at_entries[index].kid));
+      }
       if (g_at_entries[index].profile == OC_PROFILE_COAP_DTLS) {
         if (oc_string_len(g_at_entries[index].sub) > 0) {
           PRINT("    sub    : %s\n", oc_string(g_at_entries[index].sub));
         }
-        if (oc_string_len(g_at_entries[index].kid) > 0) {
-          PRINT("    kid    : %s\n", oc_string(g_at_entries[index].kid));
-        }
       }
       if (g_at_entries[index].profile == OC_PROFILE_COAP_OSCORE) {
         if (oc_string_len(g_at_entries[index].osc_id) > 0) {
-          PRINT("    osc:id     : %s\n", oc_string(g_at_entries[index].osc_id));
+          PRINT("    osc:id        : %s\n", oc_string(g_at_entries[index].osc_id));
         }
         if (oc_string_len(g_at_entries[index].osc_ms) > 0) {
-          PRINT("    osc:ms     : ");
+          PRINT("    osc:ms        : ");
           int length = oc_string_len(g_at_entries[index].osc_ms);
           char *ms = oc_string(g_at_entries[index].osc_ms);
           for (int i = 0; i < length; i++) {
@@ -947,11 +947,11 @@ oc_at_entry_print(size_t device_index, int index)
           PRINT("\n");
         }
         if (oc_string_len(g_at_entries[index].osc_alg) > 0) {
-          PRINT("    osc:alg    : %s\n",
+          PRINT("    osc:alg       : %s\n",
                 oc_string(g_at_entries[index].osc_alg));
         }
         if (oc_string_len(g_at_entries[index].osc_contextid) > 0) {
-          PRINT("    osc:contextid     : %s\n",
+          PRINT("    osc:contextid : %s\n",
                 oc_string(g_at_entries[index].osc_contextid));
         }
       }
@@ -1239,6 +1239,7 @@ oc_oscore_set_auth(char* serial_number, char* context_id, uint8_t *shared_key, i
   // create the token & store in at tables at position 0
   // note there should be no entries.. if there is an entry then overwrite
   // it..
+  PRINT("oc_oscore_set_auth sn:%s ci:%s\n", serial_number, context_id);
   oc_auth_at_t os_token;
   memset(&os_token, 0, sizeof(os_token));
   oc_new_string(&os_token.id, "spake", strlen("spake"));
@@ -1247,8 +1248,9 @@ oc_oscore_set_auth(char* serial_number, char* context_id, uint8_t *shared_key, i
   os_token.scope = OC_IF_SEC | OC_IF_D | OC_IF_P;
   oc_new_string(&os_token.osc_ms, (char *)shared_key, shared_key_size);
   oc_new_string(&os_token.osc_id, context_id, strlen(context_id));
+  oc_new_string(&os_token.osc_contextid, context_id, strlen(context_id));
   oc_new_string(&os_token.sub, "", strlen(""));
-  oc_new_string(&os_token.kid, "", strlen(""));
+  oc_new_string(&os_token.kid, "serial_number", strlen("serial_number"));
   oc_core_set_at_table((size_t)0, 0, os_token);
 
   // add the oscore context...
@@ -1304,19 +1306,19 @@ oc_init_oscore(size_t device_index)
       oc_at_entry_print(device_index, i);
 
       oc_oscore_context_t *ctx =
-        oc_oscore_add_context(device_index, "sender", "reci", oc_knx_get_osn(),
+        oc_oscore_add_context(device_index, "sender", "receiver", oc_knx_get_osn(),
                               "desc", oc_string(g_at_entries[i].osc_ms),
-                              oc_string(g_at_entries[i].kid), false);
+                              oc_string(g_at_entries[i].osc_contextid), false);
       if (ctx == NULL) {
         PRINT("   fail...\n ");
       }
 
-      ctx = oc_oscore_add_context(
-        device_index, "reci", "sender", oc_knx_get_osn(), "desc",
-        oc_string(g_at_entries[i].osc_ms), "token2", false);
-      if (ctx == NULL) {
-        PRINT("   fail...\n ");
-      }
+      //ctx = oc_oscore_add_context(
+      //  device_index, "reci", "sender", oc_knx_get_osn(), "desc",
+      //  oc_string(g_at_entries[i].osc_ms), "token2", false);
+      //if (ctx == NULL) {
+      //  PRINT("   fail...\n ");
+      //}
     }
   }
 #endif
@@ -1468,9 +1470,18 @@ method_allowed(oc_method_t method, oc_resource_t *resource,
   if (oc_is_resource_secure(method, resource) == false) {
     return true;
   }
-
+  PRINT("method allowed flags:");
+  PRINTipaddr_flags(*endpoint);
 #ifdef OC_OSCORE
   if ((endpoint->flags & OSCORE) == 0) {
+    // not an oscore protected message, but oscore is enabled
+    // so the is call is unprotected and should not go ahead
+    OC_DBG_OSCORE("unprotected message, access denied for: %s [%s]",
+                  get_method_name(method), oc_string(resource->uri));
+    return false;
+  }
+
+  if ((endpoint->flags & OSCORE_DECRYPTED) == 0) {
     // not an oscore protected message, but oscore is enabled
     // so the is call is unprotected and should not go ahead
     OC_DBG_OSCORE("unprotected message, access denied for: %s [%s]",
