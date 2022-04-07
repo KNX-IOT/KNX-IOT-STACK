@@ -14,36 +14,18 @@ knx_publish_service(char *serial_no, uint32_t iid, uint32_t ia)
   (void)iid;
   (void)ia;
 
-  if (process_handle != 0)
-  {
+  if (process_handle != 0) {
     TerminateProcess(process_handle, 0);
   }
 
-  if (iid == 0 || ia == 0)
-  {
+  if (iid == 0 || ia == 0) {
     sprintf(subtypes, "_knx._udp,_%s,_ia0", serial_no);
-    process_handle = _spawnlp(_P_NOWAIT, "dns-sd",
-      "dns-sd",
-      "-R", 
-      serial_no,
-      subtypes,
-      "local", 
-      "5683", 
-      NULL
-    );
-  }
-  else
-  {
+    process_handle = _spawnlp(_P_NOWAIT, "dns-sd", "dns-sd", "-R", serial_no,
+                              subtypes, "local", "5683", NULL);
+  } else {
     sprintf(subtypes, "_knx._udp,_%s,_ia%X-%X", serial_no, iid, ia);
-    process_handle = _spawnlp(_P_NOWAIT, "dns-sd",
-      "dns-sd",
-      "-R", 
-      serial_no,
-      subtypes,
-      "local", 
-      "5683", 
-      NULL
-    );
+    process_handle = _spawnlp(_P_NOWAIT, "dns-sd", "dns-sd", "-R", serial_no,
+                              subtypes, "local", "5683", NULL);
   }
   return 0;
 }
