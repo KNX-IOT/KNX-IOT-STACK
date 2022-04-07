@@ -1234,7 +1234,7 @@ oc_delete_at_table(size_t device_index)
 // ----------------------------------------------------------------------------
 
 void
-oc_oscore_set_auth(uint8_t *shared_key, int shared_key_size)
+oc_oscore_set_auth(char* serial_number, char* context_id, uint8_t *shared_key, int shared_key_size)
 {
   // create the token & store in at tables at position 0
   // note there should be no entries.. if there is an entry then overwrite
@@ -1246,9 +1246,9 @@ oc_oscore_set_auth(uint8_t *shared_key, int shared_key_size)
   os_token.profile = OC_PROFILE_COAP_OSCORE;
   os_token.scope = OC_IF_SEC | OC_IF_D | OC_IF_P;
   oc_new_string(&os_token.osc_ms, (char *)shared_key, shared_key_size);
-  oc_new_string(&os_token.osc_id, "responderkey", strlen("responderkey"));
-  oc_new_string(&os_token.sub, "", strlen("spake2+"));
-  oc_new_string(&os_token.kid, "+", strlen("spake2+"));
+  oc_new_string(&os_token.osc_id, context_id, strlen(context_id));
+  oc_new_string(&os_token.sub, "", strlen(""));
+  oc_new_string(&os_token.kid, "", strlen(""));
   oc_core_set_at_table((size_t)0, 0, os_token);
 
   // add the oscore context...

@@ -311,7 +311,15 @@ oc_oscore_recv_message(oc_message_t *message)
     OC_DBG_OSCORE("### serializing CoAP message ###");
     /* Serialize fully decrypted CoAP packet to message->data buffer */
     message->length = coap_serialize_message((void *)coap_pkt, message->data);
+    
+    OC_DBG_OSCORE("### setting OSCORE and OSCORE_DECRYPTED ###");
 
+    /* set the oscore encryption and decryption flags*/
+    message->endpoint.flags = message->endpoint.flags | OSCORE_DECRYPTED;
+    message->endpoint.flags = message->endpoint.flags | OSCORE;
+    message->endpoint.flags = message->endpoint.flags | IPV6;
+
+    PRINTipaddr_flags(message->endpoint);
     OC_DBG_OSCORE(
       "### serialized decrypted CoAP message to dispatch to the CoAP "
       "layer ###");
@@ -545,7 +553,7 @@ oc_oscore_send_message(oc_message_t *msg)
   if (oscore_ctx) {
     OC_DBG_OSCORE("#################################");
     OC_DBG_OSCORE("found OSCORE context corresponding to the peer serial "
-                  "number or group_id");
+                  "number or group_id  id=%s", oscore_ctx->token_id);
     /* Is this is an inadvertent response to a secure multi cast message */
     if (msg->endpoint.flags & MULTICAST) {
       OC_DBG_OSCORE(

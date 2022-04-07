@@ -54,15 +54,13 @@ oc_oscore_find_context_by_kid(oc_oscore_context_t *ctx, size_t device,
     ctx = (oc_oscore_context_t *)oc_list_head(contexts);
   }
 
-  PRINT("oc_oscore_find_context_by_kid : %d\n  Kid:", (int)device);
+  PRINT("oc_oscore_find_context_by_kid : %d\n  kidlen: %d Kid:", (int)device, kid_len);
   OC_LOGbytes_OSCORE(kid, kid_len);
 
   while (ctx != NULL) {
-
-    PRINT("  ---> : =%s=\n  recvid:", (char *)(ctx->token_id));
-    OC_LOGbytes_OSCORE(ctx->recvid, ctx->recvid_len);
-
-    if (kid_len == ctx->recvid_len && memcmp(kid, ctx->recvid, kid_len) == 0) {
+    PRINT("  ---> : =%s=\n  tokenid :", (char *)(ctx->token_id));
+    if (kid_len == ctx->recvid_len &&
+        memcmp(kid, ctx->recvid, kid_len) == 0) {
       PRINT("  FOUND\n");
       return ctx;
     }
@@ -177,15 +175,18 @@ oc_oscore_add_context(size_t device, const char *senderid,
   ctx->device = device;
   ctx->ssn = ssn;
 
-  PRINT("  device  %d\n", (int)device);
-  PRINT("  ssn     %d\n", (int)ssn);
+  PRINT("  device    %d\n", (int)device);
+  PRINT("  sender    %s\n", senderid);
+  PRINT("  recipient %s\n", recipientid);
+  PRINT("  desc      %s\n", desc);
+  PRINT("  token_id  %s\n", token_id);
+  PRINT("  ssn       %d\n", (int)ssn);
   PRINT("  ms      ");
   int length = strlen(mastersecret);
   for (int i = 0; i < length; i++) {
     PRINT("%02x", (unsigned char)mastersecret[i]);
   }
   PRINT("\n");
-  PRINT("  desc    %s\n", desc);
 
   /* To prevent SSN reuse, bump to higher value that could've been previously
    * used, accounting for any failed writes to nonvolatile storage.

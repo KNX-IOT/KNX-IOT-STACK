@@ -1260,7 +1260,10 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     size_t shared_key_len = 16;
 
     // set thet /auth/at entry with the calculated shared key.
-    oc_oscore_set_auth(shared_key, shared_key_len);
+
+    oc_oscore_set_auth(oc_string(g_pase.id), oc_string(g_pase.id), shared_key,
+                       shared_key_len);
+
 
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
     // handshake completed successfully - clear state

@@ -155,7 +155,11 @@ stringFromResponse(int code)
                              "__NUM_STATUS_CODES__",
                              "IGNORE",
                              "PING_TIMEOUT" };
-  return strings[code];
+  if (code < 21) {
+    return strings[code];
+  } else {
+    return " unknown error";
+  }
 }
 
 /**
@@ -322,10 +326,10 @@ inform_spake_python(char *sn, int state, char *oscore_id, char *key,
                     int key_size)
 {
   PRINT(
-    "[C]inform_spake_python %p sn:%s state:%d oscore_id:%skey_size:%d key=[",
+    "[C]inform_spake_python %p sn:%s state:%d oscore_id:%s key_size:%d key=[",
     my_CBFunctions.spakeFCB, sn, state, oscore_id, key_size);
   for (int i = 0; i < key_size; i++) {
-    PRINT("%02x", (unsigned char)key[i]);
+  //  PRINT("%02x", (unsigned char)key[i]);
   }
   PRINT("]\n");
 
@@ -518,11 +522,8 @@ ets_cbor_get(char *sn, char *uri, char *query, char *cbdata)
 
   PRINT("  [C]ets_cbor_get: [%s], [%s] [%s] [%s]\n", sn, uri, query, cbdata);
 #ifdef OC_OSCORE
-
-  
-  if ((target_device->ep.flags & OSCORE) == 0) {
-    target_device->ep.flags += OSCORE;
-  }
+  /* set OSCORE flag*/
+  target_device->ep.flags |= OSCORE;
 
   PRINT("  [C] enable OSCORE encryption\n");
   PRINTipaddr_flags(target_device->ep);
@@ -545,9 +546,9 @@ ets_cbor_get_unsecured(char *sn, char *uri, char *query, char *cbdata)
   int ret = -1;
   device_handle_t *device = ets_getdevice_from_sn(sn);
 
-  if ((device->ep.flags & OSCORE) > 0) {
-    device->ep.flags -= OSCORE;
-  }
+  /* remove OSCORE flag*/
+  device->ep.flags &= OSCORE;
+  PRINTipaddr_flags(device->ep);
 
   user_struct_t *new_cbdata;
   new_cbdata = (user_struct_t *)malloc(sizeof(user_struct_t));
@@ -579,8 +580,13 @@ ets_linkformat_get(char *sn, char *uri, char *query, char *cbdata)
   PRINT("  [C]ets_linkformat_get: [%s], [%s] [%s] [%s]\n", sn, uri, query,
         cbdata);
 #ifdef OC_OSCORE
-  device->ep.flags &= OSCORE;
+  //device->ep.flags &= OSCORE;
   PRINT("  [C] enable OSCORE encryption\n");
+
+  
+  device->ep.flags != OSCORE;
+  PRINTipaddr_flags(device->ep);
+
 #endif
 
   user_struct_t *new_cbdata;
@@ -614,9 +620,12 @@ ets_linkformat_get_unsecured(char *sn, char *uri, char *query, char *cbdata)
   PRINT("  [C]ets_linkformat_get_unsecured: [%s], [%s] [%s] [%s]\n", sn, uri,
         query, cbdata);
 
-  if ((device->ep.flags & OSCORE) > 0) {
-    device->ep.flags -= OSCORE;
-  }
+  /* remove OSCORE flag */
+  //device->ep.flags = device->ep.flags & OSCORE;
+
+  device->ep.flags &= OSCORE;
+  PRINTipaddr_flags(device->ep);
+
 
   user_struct_t *new_cbdata;
   new_cbdata = (user_struct_t *)malloc(sizeof(user_struct_t));
@@ -650,7 +659,8 @@ ets_cbor_post(char *sn, char *uri, char *query, char *id, int size, char *data)
   PRINT("  [C]ets_cbor_post: [%s], [%s] [%s] [%s] %d\n", sn, uri, id, query,
         size);
 #ifdef OC_OSCORE
-  device->ep.flags &= OSCORE;
+  device->ep.flags |= OSCORE;
+  PRINTipaddr_flags(device->ep);
   PRINT("  [C] enable OSCORE encryption\n");
 #endif
 
@@ -686,7 +696,7 @@ ets_cbor_put(char *sn, char *uri, char *query, char *id, int size, char *data)
   PRINT("  [C]ets_cbor_put: [%s], [%s] [%s] [%s] %d\n", sn, uri, id, query,
         size);
 #ifdef OC_OSCORE
-  device->ep.flags &= OSCORE;
+  device->ep.flags |= OSCORE;
   PRINT("  [C] enable OSCORE encryption\n");
   PRINTipaddr_flags(device->ep);
   PRINT("\n");
@@ -723,7 +733,8 @@ ets_cbor_delete(char *sn, char *uri, char *query, char *id)
 
   PRINT("  [C]ets_cbor_delete: [%s], [%s] [%s] [%s]\n", sn, uri, id, query);
 #ifdef OC_OSCORE
-  device->ep.flags += OSCORE;
+  device->ep.flags |= OSCORE;
+  PRINTipaddr_flags(device->ep);
   PRINT("  [C] enable OSCORE encryption\n");
 #endif
 
@@ -869,23 +880,38 @@ ets_initiate_spake(char *sn, char *password, char *oscore_id)
   int ret = -1;
   device_handle_t *device = ets_getdevice_from_sn(sn);
 
+  /* remove OSCORE flag */
+  device->ep.flags = IPV6;
+  PRINT("  [C] disable OSCORE encryption\n");
+  PRINTipaddr_flags(device->ep);
+
+
   PRINT("  [C]ets_initiate_spake: [%s] [%s]\n", sn, password);
-  if (oc_string_len(device->ep.serial_number) == 0) {
-    oc_new_string(&device->ep.serial_number, sn, strlen(sn));
+  if (oc_string_len(device->ep.serial_number) > 0) {
+    oc_free_string(&device->ep.serial_number);
   }
+  // always set the serial number
+  oc_new_string(&device->ep.serial_number, sn, strlen(sn));
+  
   ret = oc_initiate_spake(&device->ep, password, oscore_id);
   PRINT("  [C]ets_initiate_spake: [%d]-- done\n", ret);
   if (ret == -1) {
     // failure, so unblock python
-    inform_spake_python(sn, ret, "", "", 0);
+    inform_spake_python(sn, ret, oscore_id, "", 0);
   }
 }
 
+
+//inform_spake_python(char *sn, int state, char *oscore_id, char *key,
+//                    int key_size)
+
+//typedef void (*oc_spake_cb_t)(int error, char *oscore_id, uint8_t *secret,
+//                              int secret_size);
+
 void
-spake_callback(int error, uint8_t *secret, int secret_size)
+spake_callback(int error, char* sn, char* oscore_id, uint8_t *secret, int secret_size)
 {
-  char *oscore_id = "";
-  inform_spake_python("", error, oscore_id, secret, secret_size);
+  inform_spake_python(sn, error, oscore_id, secret, secret_size);
 }
 
 // -----------------------------------------------------------------------------
@@ -968,7 +994,13 @@ ets_listen_s_mode(int scope, int ga_max, int iid)
   }
 }
 
+char *ets_error_to_string(int error_code)
+{
+   return stringFromResponse(error_code);
+}
+
 // -----------------------------------------------------------------------------
+
 
 /**
  * function to retrieve the serial number of the discovered device
@@ -1026,6 +1058,14 @@ ets_reset_device(char *sn)
 }
 
 // -----------------------------------------------------------------------------
+
+void
+ets_reset_ets()
+{
+  PRINT("[C] ets_reset_ets: resetting device\n");
+  oc_knx_device_storage_reset(0, 2);
+}
+
 
 int
 ets_start(char *serial_number)
