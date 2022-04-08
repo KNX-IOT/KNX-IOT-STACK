@@ -3,6 +3,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <process.h>
 #include <string.h>
+#include <Windows.h>
 
 intptr_t process_handle = 0;
 char subtypes[200];
@@ -15,7 +16,7 @@ knx_publish_service(char *serial_no, uint32_t iid, uint32_t ia)
   (void)ia;
 
   if (process_handle != 0) {
-    TerminateProcess(process_handle, 0);
+    TerminateProcess((HANDLE) process_handle, 0);
   }
 
   if (iid == 0 || ia == 0) {
