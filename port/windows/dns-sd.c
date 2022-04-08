@@ -15,7 +15,8 @@ knx_publish_service(char *serial_no, uint32_t iid, uint32_t ia)
   (void)ia;
 
   if (process_handle != 0) {
-    TerminateProcess(process_handle, 0);
+    // TODO: this needs to be fixed for win32...
+    // TerminateProcess(process_handle, 0);
   }
 
   if (iid == 0 || ia == 0) {
