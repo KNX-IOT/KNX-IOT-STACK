@@ -101,6 +101,32 @@ extern "C" {
     }                                                                          \
   } while (0)
 
+#define PRINTipaddr_flags(endpoint)                                            \
+  do {                                                                         \
+    if ((endpoint).flags & SECURED) {                                          \
+      PRINT(" Secured ");                                                      \
+    };                                                                         \
+    if ((endpoint).flags & MULTICAST) {                                        \
+      PRINT(" MULTICAST ");                                                    \
+    };                                                                         \
+    if ((endpoint).flags & TCP) {                                              \
+      PRINT(" TCP ");                                                          \
+    };                                                                         \
+    if ((endpoint).flags & IPV4) {                                             \
+      PRINT(" IPV4 ");                                                         \
+    };                                                                         \
+    if ((endpoint).flags & IPV6) {                                             \
+      PRINT(" IPV6 ");                                                         \
+    };                                                                         \
+    if ((endpoint).flags & OSCORE) {                                           \
+      PRINT(" OSCORE ");                                                       \
+    };                                                                         \
+    if ((endpoint).flags & ACCEPTED) {                                         \
+      PRINT(" ACCEPTED ");                                                     \
+    };                                                                         \
+    PRINT(" \n");                                                              \
+  } while (0)
+
 #define PRINTipaddr_local(endpoint)                                            \
   do {                                                                         \
     const char *scheme = "coap";                                               \
