@@ -533,7 +533,7 @@ class CoAPResponse():
         self.payload = payload
 
     def __str__(self):
-        return "Payload Sn:{} r_id:{}".format(self.sn ,self.r_id)
+        return "Payload Sn:{} status:{} r_id:{}".format(self.sn , self.status, self.r_id)
 
     def get_sn(self):
         return self.sn
