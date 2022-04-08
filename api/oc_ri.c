@@ -83,7 +83,24 @@ extern int strncasecmp(const char *s1, const char *s2, size_t n);
 
 static unsigned int oc_coap_status_codes[__NUM_OC_STATUS_CODES__];
 
-oc_process_event_t oc_events[__NUM_OC_EVENT_TYPES__];
+oc_process_event_t oc_events[__NUM_OC_EVENT_TYPES__] =
+{
+  OC_PROCESS_EVENT_MAX,
+  OC_PROCESS_EVENT_MAX + 1,
+  OC_PROCESS_EVENT_MAX + 2,
+  OC_PROCESS_EVENT_MAX + 3,
+  OC_PROCESS_EVENT_MAX + 4,
+  OC_PROCESS_EVENT_MAX + 5,
+  OC_PROCESS_EVENT_MAX + 6,
+  OC_PROCESS_EVENT_MAX + 7,
+  OC_PROCESS_EVENT_MAX + 8,
+  OC_PROCESS_EVENT_MAX + 9,
+  OC_PROCESS_EVENT_MAX + 10,
+  OC_PROCESS_EVENT_MAX + 11,
+  OC_PROCESS_EVENT_MAX + 12,
+  OC_PROCESS_EVENT_MAX + 13,
+  OC_PROCESS_EVENT_MAX + 14,
+};
 
 static void
 set_mpro_status_codes(void)
@@ -509,19 +526,9 @@ oc_ri_query_exists(const char *query, size_t query_len, const char *key)
   return found;
 }
 
-void
-allocate_events(void)
-{
-  int i = 0;
-  for (i = 0; i < __NUM_OC_EVENT_TYPES__; i++) {
-    oc_events[i] = oc_process_alloc_event();
-  }
-}
-
 static void
 start_processes(void)
 {
-  allocate_events();
   oc_process_start(&oc_etimer_process, NULL);
   oc_process_start(&timed_callback_events, NULL);
   oc_process_start(&coap_engine, NULL);

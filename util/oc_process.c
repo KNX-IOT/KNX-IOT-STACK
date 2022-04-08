@@ -47,8 +47,6 @@
 struct oc_process *oc_process_list = NULL;
 struct oc_process *oc_process_current = NULL;
 
-static oc_process_event_t lastevent;
-
 /*
  * Structure used for keeping the queue of active events.
  */
@@ -85,13 +83,6 @@ static volatile unsigned char poll_requested;
 static void call_process(struct oc_process *p, oc_process_event_t ev,
                          oc_process_data_t data);
 
-/*---------------------------------------------------------------------------*/
-oc_process_event_t
-oc_process_alloc_event(void)
-{
-  return lastevent++;
-}
-/*---------------------------------------------------------------------------*/
 void
 oc_process_start(struct oc_process *p, oc_process_data_t data)
 {
@@ -209,15 +200,7 @@ oc_process_init(void)
   }
 #endif /* OC_DYNAMIC_ALLOCATION */
 
-  lastevent = OC_PROCESS_EVENT_MAX;
-
-  //nevents = fevent = 0;
-#if OC_PROCESS_CONF_STATS
-  process_maxevents = 0;
-#endif /* OC_PROCESS_CONF_STATS */
-
-  //oc_process_current = NULL;
-  //oc_process_list = NULL;
+  return;
 }
 /*---------------------------------------------------------------------------*/
 /*
