@@ -68,8 +68,8 @@ static CONDITION_VARIABLE cv;
 static CRITICAL_SECTION cs;
 
 /* OS specific definition for lock/unlock */
-#define py_mutex_lock(m) EnterCriticalSection(&m)
-#define py_mutex_unlock(m) LeaveCriticalSection(&m)
+#define ets_mutex_lock(m) EnterCriticalSection(&m)
+#define ets_mutex_unlock(m) LeaveCriticalSection(&m)
 
 #elif defined(__linux__)
 static pthread_t event_thread;
@@ -78,8 +78,8 @@ static pthread_mutex_t mutex;
 static pthread_cond_t cv;
 
 /* OS specific definition for lock/unlock */
-#define py_mutex_lock(m) pthread_mutex_lock(&m)
-#define py_mutex_unlock(m) pthread_mutex_unlock(&m)
+#define ets_mutex_lock(m) pthread_mutex_lock(&m)
+#define ets_mutex_unlock(m) pthread_mutex_unlock(&m)
 
 static struct timespec ts;
 #endif
@@ -467,23 +467,23 @@ general_get_cb(oc_client_response_t *data)
   }
   if (my_data) {
     if (data->content_format == APPLICATION_LINK_FORMAT) {
-      py_mutex_lock(app_sync_lock);
+      ets_mutex_lock(app_sync_lock);
       memset(buffer, 0, buffer_size);
       memcpy(&buffer, (char *)data->_payload, (int)data->_payload_len);
 
       inform_client_python((char *)my_data->sn, status, "link_format",
                            (char *)my_data->r_id, (char *)my_data->url,
                            (int)data->_payload_len, buffer);
-      py_mutex_unlock(app_sync_lock);
+      ets_mutex_unlock(app_sync_lock);
     } else if (data->content_format == APPLICATION_CBOR) {
-      py_mutex_lock(app_sync_lock);
+      ets_mutex_lock(app_sync_lock);
       memset(buffer, 0, buffer_size);
       int json_size =
         py_oc_rep_to_json(data->payload, (char *)&buffer, buffer_size, false);
       inform_client_python((char *)my_data->sn, status, "json",
                            (char *)my_data->r_id, (char *)my_data->url,
                            (int)json_size, (char *)buffer);
-      py_mutex_unlock(app_sync_lock);
+      ets_mutex_unlock(app_sync_lock);
     } else {
       PRINT(" [C]informing python with error \n");
       inform_client_python((char *)my_data->sn, status, "error",
@@ -823,18 +823,18 @@ discovery_cb(const char *payload, int len, oc_endpoint_t *endpoint,
 void
 ets_discover_devices(int scope)
 {
-  py_mutex_lock(app_sync_lock);
+  ets_mutex_lock(app_sync_lock);
   oc_do_wk_discovery_all("rt=urn:knx:dpa.*", scope, discovery_cb, NULL);
-  py_mutex_unlock(app_sync_lock);
+  ets_mutex_unlock(app_sync_lock);
   signal_event_loop();
 }
 
 void
 ets_discover_devices_with_query(int scope, const char *query)
 {
-  py_mutex_lock(app_sync_lock);
+  ets_mutex_lock(app_sync_lock);
   oc_do_wk_discovery_all(query, scope, discovery_cb, NULL);
-  py_mutex_unlock(app_sync_lock);
+  ets_mutex_unlock(app_sync_lock);
   signal_event_loop();
 }
 
@@ -992,14 +992,14 @@ ets_reset_device(char *sn)
     return;
   }
 
-  // py_mutex_lock(app_sync_lock);
+  // ets_mutex_lock(app_sync_lock);
   // int ret = oc_obt_device_hard_reset(&device->uuid, reset_device_cb, device);
   // if (ret >= 0) {
   //  PRINT("[C]\nSuccessfully issued request to perform hard RESET\n");
   //} else {
   //  PRINT("[C]\nERROR issuing request to perform hard RESET\n");
   // }
-  // py_mutex_unlock(app_sync_lock);
+  // ets_mutex_unlock(app_sync_lock);
 }
 
 // -----------------------------------------------------------------------------
@@ -1066,9 +1066,9 @@ ets_poll(void)
   next_event = oc_main_poll();
   signal_event_loop();
 
-  // py_mutex_lock(app_sync_lock);
+  // ets_mutex_lock(app_sync_lock);
   // next_event = oc_main_poll();
-  // py_mutex_unlock(app_sync_lock);
+  // ets_mutex_unlock(app_sync_lock);
 
   // PRINT("blah");
   // PRINT("    ---> %d", next_event);
@@ -1088,9 +1088,9 @@ signal_event_loop(void)
 #if defined(_WIN32)
   WakeConditionVariable(&cv);
 #elif defined(__linux__)
-  py_mutex_lock(mutex);
+  ets_mutex_lock(mutex);
   pthread_cond_signal(&cv);
-  py_mutex_unlock(mutex);
+  ets_mutex_unlock(mutex);
 #endif
 }
 
@@ -1116,9 +1116,9 @@ func_event_thread(LPVOID lpParam)
 {
   oc_clock_time_t next_event;
   while (quit != 1) {
-    py_mutex_lock(app_sync_lock);
+    ets_mutex_lock(app_sync_lock);
     next_event = oc_main_poll();
-    py_mutex_unlock(app_sync_lock);
+    ets_mutex_unlock(app_sync_lock);
 
     if (next_event == 0) {
       SleepConditionVariableCS(&cv, &cs, INFINITE);
@@ -1141,11 +1141,11 @@ func_event_thread(void *data)
   (void)data;
   oc_clock_time_t next_event;
   while (quit != 1) {
-    py_mutex_lock(app_sync_lock);
+    ets_mutex_lock(app_sync_lock);
     next_event = oc_main_poll();
-    py_mutex_unlock(app_sync_lock);
+    ets_mutex_unlock(app_sync_lock);
 
-    py_mutex_lock(mutex);
+    ets_mutex_lock(mutex);
     if (next_event == 0) {
       pthread_cond_wait(&cv, &mutex);
     } else {
@@ -1153,7 +1153,7 @@ func_event_thread(void *data)
       ts.tv_nsec = (next_event % OC_CLOCK_SECOND) * 1.e09 / OC_CLOCK_SECOND;
       pthread_cond_timedwait(&cv, &mutex, &ts);
     }
-    py_mutex_unlock(mutex);
+    ets_mutex_unlock(mutex);
   }
   oc_main_shutdown();
   return NULL;
