@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 3.10)
 project(knx-iot-stack)
 
-if(CMAKE_COMPILER_IS_GNUCC)
+if(CMAKE_COMPILER_IS_GNUCC AND UNIX)
     add_compile_options(-fPIC)
 endif()
 add_compile_definitions(OC_DYNAMIC_ALLOCATION)
