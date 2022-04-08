@@ -16,7 +16,7 @@ knx_publish_service(char *serial_no, uint32_t iid, uint32_t ia)
   (void)ia;
 
   if (process_handle != 0) {
-    TerminateProcess((HANDLE) process_handle, 0);
+    TerminateProcess((HANDLE)process_handle, 0);
   }
 
   if (iid == 0 || ia == 0) {
