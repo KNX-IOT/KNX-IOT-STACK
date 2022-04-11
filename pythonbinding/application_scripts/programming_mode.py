@@ -69,7 +69,7 @@ def do_discover(my_stack, serial_number, scope = 2):
 def do_programming_mode(my_stack, pm_value):
     print("Get SN :")
     if my_stack.get_nr_devices() == 0:
-      return -1
+        return -1
     sn = my_stack.device_array[0].sn
     response = my_stack.issue_cbor_get(sn, "/dev/pm")
     print ("current value response:",response)
