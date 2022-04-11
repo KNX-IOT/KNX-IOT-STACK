@@ -317,8 +317,19 @@ kisCS_EXPORT void ets_issue_requests_s_mode(int scope, int sia, int ga, int iid,
  */
 kisCS_EXPORT void ets_listen_s_mode(int scope, int ga_max, int iid);
 
+/**
+ * @brief reset the this client
+ * 
+ * @return kisCS_EXPORT 
+ */
 kisCS_EXPORT void ets_reset_ets();
 
+/**
+ * @brief error to string
+ * 
+ * @param error_code the stack error code returned by a callback.
+ * @return string : error code as a human readable string
+ */
 kisCS_EXPORT char *ets_error_to_string(int error_code);
 
 /**
