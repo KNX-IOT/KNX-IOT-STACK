@@ -119,8 +119,8 @@ finish_spake_handshake(oc_client_response_t *data)
 
   if (m_spake_cb) {
     PRINT("CALLING CALLBACK- (CLIENT)------>\n");
-    m_spake_cb(0, oc_string(g_spake_ctx.serial_number),
-               g_spake_ctx.oscore_id, shared_key, shared_key_len);
+    m_spake_cb(0, oc_string(g_spake_ctx.serial_number), g_spake_ctx.oscore_id,
+               shared_key, shared_key_len);
   }
 }
 
@@ -287,7 +287,7 @@ oc_initiate_spake(oc_endpoint_t *endpoint, char *password, char *oscore_id)
 
   strncpy((char *)&g_spake_ctx.spake_password, password, MAX_PASSWORD_LEN);
   oc_string_copy(&g_spake_ctx.serial_number, endpoint->serial_number);
-  
+
   if (oc_do_post_ex(APPLICATION_CBOR, APPLICATION_CBOR)) {
     return_value = 0;
   }

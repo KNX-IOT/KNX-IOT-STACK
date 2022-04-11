@@ -132,7 +132,7 @@ oc_oscore_find_context_by_serial_number(size_t device,
 
   oc_oscore_context_t *ctx = (oc_oscore_context_t *)oc_list_head(contexts);
   while (ctx != NULL) {
-    char* ctx_serial_number = ctx->token_id;
+    char *ctx_serial_number = ctx->token_id;
     if (strncmp(oc_string(serial_number), ctx_serial_number, 16) == 0) {
       PRINT("  FOUND\n");
       return ctx;

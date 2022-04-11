@@ -321,7 +321,8 @@ oc_conv_hex_string_to_byte_array(const char *hex_str, size_t hex_str_len,
   return 0;
 }
 
-int oc_string_copy(oc_string_t* string1, oc_string_t string2)
+int
+oc_string_copy(oc_string_t *string1, oc_string_t string2)
 {
   oc_free_string(string1);
   oc_new_string(string1, oc_string(string2), oc_string_len(string2));
@@ -329,13 +330,12 @@ int oc_string_copy(oc_string_t* string1, oc_string_t string2)
 }
 
 int
-oc_string_copy_from_char(oc_string_t* string1, char* string2)
+oc_string_copy_from_char(oc_string_t *string1, char *string2)
 {
   oc_free_string(string1);
   oc_new_string(string1, string2, strlen(string2));
   return 0;
 }
-
 
 int
 oc_string_cmp(oc_string_t string1, oc_string_t string2)

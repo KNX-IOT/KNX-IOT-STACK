@@ -33,8 +33,9 @@ typedef struct oc_oscore_context_t
   struct oc_oscore_context_t
     *next; /**< pointer to the next, NULL if there is not any */
   /* Provisioned parameters */
-  uint64_t group_id;         /**<  the group id as OSCORE contextid */
-  uint8_t token_id[OSCORE_IDCTX_LEN];   /**< Note: the serial number of the device */
+  uint64_t group_id; /**<  the group id as OSCORE contextid */
+  uint8_t
+    token_id[OSCORE_IDCTX_LEN]; /**< Note: the serial number of the device */
   uint8_t master_secret[OSCORE_IDCTX_LEN];
   size_t device;
   uint8_t sendid[OSCORE_CTXID_LEN];
