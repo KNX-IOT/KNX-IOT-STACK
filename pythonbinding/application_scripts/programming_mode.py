@@ -76,7 +76,8 @@ def do_programming_mode(my_stack, pm_value):
     if response is None:
         return 1
     if response.status != 0:
-        print("ERROR {} {}".format(response.status, my_stack.get_error_string_from_code(response.status)))
+        print("ERROR {} {}".format(response.status,
+            my_stack.get_error_string_from_code(response.status)))
         return 2
     my_stack.purge_response(response)
     pm_val = False
@@ -93,7 +94,6 @@ def self_reset(my_stack):
     """
     reset myself
     """
-    print("===> self reset");
     my_stack.reset_myself()
 
 def do_spake(my_stack, password):
