@@ -19,6 +19,7 @@ pythonbinding/cmake_install.cmake
 pythonbinding/CMakeCache.txt
 pythonbinding/DartConfiguration.tcl
 pythonbinding/CTestTestfile.cmake
+pythonbinding/application_scripts/ets*
 
 
 # dependend subprojects

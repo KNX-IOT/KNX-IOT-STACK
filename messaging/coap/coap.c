@@ -1191,7 +1191,7 @@ coap_send_message(oc_message_t *message)
   }
 #endif /* OC_TCP */
 
-  OC_DBG("-sending OCF message (%u)-", (unsigned int)message->length);
+  OC_DBG("-sending message (%u)-", (unsigned int)message->length);
 
   oc_send_message(message);
 }

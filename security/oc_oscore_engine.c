@@ -538,6 +538,9 @@ oc_oscore_send_message(oc_message_t *msg)
     oscore_ctx = oc_oscore_find_context_by_group_id(message->endpoint.device,
                                                     message->endpoint.group_id);
   }
+  if (oscore_ctx == NULL) {
+    OC_DBG_OSCORE("oc_oscore_send_message: No OSCORE context found. ERROR");
+  }
 
   if (oscore_ctx) {
     OC_DBG_OSCORE("#################################");
