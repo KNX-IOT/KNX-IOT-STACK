@@ -998,7 +998,7 @@ verify_certificate(void *opq, mbedtls_x509_crt *crt, int depth, uint32_t *flags)
      * Find a trusted root that matches the peer's root and store it
      * as context accompanying the identity certificate. This is queried
      * after validating the end-entity certificate to authorize the
-     * the peer per the OCF Specification. */
+     * the peer per the Specification. */
     oc_x509_crt_t *id_cert = get_identity_cert_for_session(&peer->ssl_conf);
     oc_sec_pstat_t *ps = oc_sec_get_pstat(peer->endpoint.device);
     if (oc_certs_validate_non_end_entity_cert(crt, true, ps->s == OC_DOS_RFOTM,

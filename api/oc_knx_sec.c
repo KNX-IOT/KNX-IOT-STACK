@@ -525,7 +525,7 @@ oc_core_auth_at_post_handler(oc_request_t *request,
               int64_t *new_array =
                 (int64_t *)malloc(array_size * sizeof(uint64_t));
               if (new_array) {
-                for (int i = 0; i < array_size; i++) {
+                for (size_t i = 0; i < array_size; i++) {
                   new_array[i] = array[i];
                 }
                 g_at_entries[index].ga = new_array;
@@ -1190,7 +1190,7 @@ oc_core_set_at_table(size_t device_index, int index, oc_auth_at_t entry)
       int64_t *new_array = (int64_t *)malloc(array_size * sizeof(uint64_t));
 
       if (new_array) {
-        for (int i = 0; i < array_size; i++) {
+        for (size_t i = 0; i < array_size; i++) {
           new_array[i] = entry.ga[i];
         }
         g_at_entries[index].ga = new_array;
@@ -1202,7 +1202,7 @@ oc_core_set_at_table(size_t device_index, int index, oc_auth_at_t entry)
     oc_at_dump_entry(device_index, index);
   }
   if (index == 0) {
-    // set the oscore stuff
+    // set the OSCORE stuff
   }
 
   return 0;
@@ -1244,7 +1244,7 @@ oc_oscore_set_auth(char *serial_number, char *context_id, uint8_t *shared_key,
 
   oc_auth_at_t os_token;
   memset(&os_token, 0, sizeof(os_token));
-  oc_new_string(&os_token.id, "spake", strlen("spake"));
+  oc_new_string(&os_token.id, "context_id", strlen("context_id"));
   os_token.ga_len = 0;
   os_token.profile = OC_PROFILE_COAP_OSCORE;
   os_token.scope = OC_IF_SEC | OC_IF_D | OC_IF_P;

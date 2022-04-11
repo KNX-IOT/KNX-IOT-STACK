@@ -185,9 +185,12 @@ OC_PROCESS_THREAD(message_buffer_handler, ev, data)
 #endif /* OC_SECURITY*/
 #ifdef OC_OSCORE
         if (oscore_is_oscore_message((oc_message_t *)data) == 0) {
-          OC_DBG_OSCORE("Inbound network event: oscore request ==> decrypt");
+          OC_DBG_OSCORE("Inbound network event: OSCORE request ==> decrypt");
           oc_message_t *msg = (oc_message_t *)data;
-          msg->endpoint.flags += OSCORE;
+          // OSCORE detected
+          msg->endpoint.flags = msg->endpoint.flags | OSCORE;
+          // not yet decrypted
+          msg->endpoint.flags = msg->endpoint.flags & OSCORE_DECRYPTED;
           oc_process_post(&oc_oscore_handler, oc_events[INBOUND_OSCORE_EVENT],
                           data);
         } else
@@ -211,16 +214,23 @@ OC_PROCESS_THREAD(message_buffer_handler, ev, data)
         oc_message_t *message = (oc_message_t *)data;
 #ifdef OC_OSCORE
         if ((message->endpoint.flags & OSCORE) &&
-            (message->endpoint.flags & MULTICAST)) {
+            (message->endpoint.flags & MULTICAST) &&
+            ((message->endpoint.flags & OSCORE_DECRYPTED) == 0)) {
           OC_DBG_OSCORE(
             "Outbound secure multicast request: forwarding to OSCORE\n");
           oc_process_post(&oc_oscore_handler,
                           oc_events[OUTBOUND_GROUP_OSCORE_EVENT], data);
-        } else if (message->endpoint.flags & OSCORE) {
+        } else if ((message->endpoint.flags & OSCORE) &&
+                   ((message->endpoint.flags & OSCORE_DECRYPTED) == 0)) {
           OC_DBG_OSCORE(
             "Outbound secure unicast request: forwarding to OSCORE\n");
-          oc_process_post(&oc_oscore_handler,
-                          oc_events[OUTBOUND_GROUP_OSCORE_EVENT], data);
+          oc_process_post(&oc_oscore_handler, oc_events[OUTBOUND_OSCORE_EVENT],
+                          data);
+        } else if ((message->endpoint.flags & OSCORE) &&
+                   (message->endpoint.flags & OSCORE_DECRYPTED)) {
+          OC_DBG_OSCORE("Outbound (encrypted) secure unicast request \n");
+          oc_send_buffer(message);
+          oc_message_unref(message);
         } else
 #endif /* OC_OSCORE */
           if (message->endpoint.flags & DISCOVERY) {
@@ -241,6 +251,13 @@ OC_PROCESS_THREAD(message_buffer_handler, ev, data)
       }
       else
 #endif /* OC_SECURITY */
+        if (ev == oc_events[OUTBOUND_NETWORK_EVENT_ENCRYPTED])
+      {
+        // OC_DBG("Outbound network event: encrypted unicast message");
+        // oc_send_buffer(message);
+        // oc_message_unref(message);
+      }
+      else
       {
         OC_DBG("Outbound network event: unicast message");
         oc_send_buffer(message);

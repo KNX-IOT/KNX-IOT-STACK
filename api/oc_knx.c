@@ -531,7 +531,7 @@ oc_s_mode_notification_to_json(char *buffer, size_t buffer_size,
     "{ \"sia\": %d \"s\":{ \"st\": \"%s\" , \"ga\":%d, \"value\": %s }  }",
     notification.sia, oc_string(notification.st), notification.ga,
     oc_string(notification.value));
-  if (size > buffer_size) {
+  if ((int)size > buffer_size) {
     return false;
   }
   return true;

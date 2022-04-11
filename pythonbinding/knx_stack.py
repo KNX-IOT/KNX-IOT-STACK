@@ -754,8 +754,11 @@ class KNXIOTStack():
         Client spake/state
         **********************************"""
         print("spakeCB", cb_sn, cb_state, cb_secret_size) #, hex(cb_secret))
-        new_secret = cb_secret[:cb_secret_size]
-        self.spake = { "state": cb_state, "sec_size": cb_secret_size, "secret" : new_secret}
+        try:
+            new_secret = cb_secret[:cb_secret_size]
+        except:
+            new_secret = cb_secret
+        self.spake = { " state": cb_state, " sec_size": cb_secret_size, " secret" : new_secret}
         secret_in_hex = binascii.hexlify(new_secret)
         print ("spakeCB: secret (in hex)",secret_in_hex)
         spake_event.set()
@@ -914,7 +917,7 @@ class KNXIOTStack():
         self.lib.ets_initiate_spake(sn, password, contextid)
         #time.sleep(self.timout)
         spake_event.wait(self.timout)
-        print ("initate_spake data: ")
+        #print ("initiate_spake data: ")
         return self.spake
         #return self.discovery_data
 

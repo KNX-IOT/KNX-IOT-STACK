@@ -322,6 +322,22 @@ oc_conv_hex_string_to_byte_array(const char *hex_str, size_t hex_str_len,
 }
 
 int
+oc_string_copy(oc_string_t *string1, oc_string_t string2)
+{
+  oc_free_string(string1);
+  oc_new_string(string1, oc_string(string2), oc_string_len(string2));
+  return 0;
+}
+
+int
+oc_string_copy_from_char(oc_string_t *string1, char *string2)
+{
+  oc_free_string(string1);
+  oc_new_string(string1, string2, strlen(string2));
+  return 0;
+}
+
+int
 oc_string_cmp(oc_string_t string1, oc_string_t string2)
 {
   if (oc_string_len(string1) != oc_string_len(string2)) {
@@ -358,7 +374,7 @@ oc_uri_contains_wildcard(const char *uri)
   if (uri == NULL)
     return false;
 
-  int len = strlen(uri);
+  size_t len = strlen(uri);
   if (uri[len - 1] == '*') {
     return true;
   }
@@ -422,8 +438,8 @@ oc_uri_get_wildcard_value_as_string(const char *uri_resource, size_t uri_len,
   if (uri_resource[uri_len - 1] == '*') {
     if ((invoked_len + 1) >= uri_len) {
       *value = &uri_invoked[uri_len - 2];
-      int len = invoked_len - uri_len + 2;
-      return len;
+      size_t len = invoked_len - uri_len + 2;
+      return (int)len;
     }
   }
 
