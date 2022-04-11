@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 3.10)
 project(knx-iot-stack)
 
-if(CMAKE_COMPILER_IS_GNUCC)
+if(CMAKE_COMPILER_IS_GNUCC AND UNIX)
     add_compile_options(-fPIC)
 endif()
 add_compile_definitions(OC_DYNAMIC_ALLOCATION)
@@ -18,29 +18,34 @@ set(OC_PKI_ENABLED OFF CACHE BOOL "Enable PKI security")
 set(OC_DEBUG_ENABLED OFF CACHE BOOL "Enable debug messages")
 set(CLANG_TIDY_ENABLED OFF CACHE BOOL "Enable clang-tidy analysis during compilation.")
 
+set(KNX_BUILTIN_MBEDTLS ON CACHE BOOL "Use builtin mbedTLS, as opposed to external lib from different project")
+set(KNX_BUILTIN_TINYCBOR ON CACHE BOOL "Use builtin TinyCBOR, as opposed to external lib from different project")
+
 include(tools/clang-tidy.cmake)
 
-# If an mbedtls platform layer is defined, add it to the mbedtls list of libs
-if(TARGET mbedtls-plat)
-    set(libs ${libs} mbedtls-plat)
-endif()
+if(KNX_BUILTIN_MBEDTLS)
+    # If an mbedtls platform layer is defined, add it to the mbedtls list of libs
+    if(TARGET mbedtls-plat)
+        set(libs ${libs} mbedtls-plat)
+    endif()
 
-add_subdirectory(${PROJECT_SOURCE_DIR}/deps/mbedtls)
+    add_subdirectory(${PROJECT_SOURCE_DIR}/deps/mbedtls)
 
-target_include_directories(mbedcrypto PUBLIC
-    ${PROJECT_SOURCE_DIR}
-    ${PROJECT_SOURCE_DIR}/include
-    ${PROJECT_SOURCE_DIR}/deps/mbedtls/include
-    ${PROJECT_SOURCE_DIR}/security
-)
+    target_include_directories(mbedcrypto PUBLIC
+        ${PROJECT_SOURCE_DIR}
+        ${PROJECT_SOURCE_DIR}/include
+        ${PROJECT_SOURCE_DIR}/deps/mbedtls/include
+        ${PROJECT_SOURCE_DIR}/security
+    )
 
-target_compile_definitions(mbedcrypto
-    PUBLIC
-    MBEDTLS_CONFIG_FILE=\"knx_mbedtls_config.h\"
-)
+    target_compile_definitions(mbedcrypto
+        PUBLIC
+        MBEDTLS_CONFIG_FILE=\"knx_mbedtls_config.h\"
+    )
 
-if(TARGET mbedcrypto-plat)
-	target_link_libraries(mbedcrypto mbedcrypto-plat)
+    if(TARGET mbedcrypto-plat)
+        target_link_libraries(mbedcrypto mbedcrypto-plat)
+    endif()
 endif()
 
 
@@ -127,26 +132,18 @@ set(COAP_INCLUDE_DIRS
 add_library(kis-common INTERFACE)
 
 if(OC_OSCORE_ENABLED)
-   target_compile_definitions(mbedcrypto PUBLIC OC_OSCORE)
    target_compile_definitions(kis-common INTERFACE OC_OSCORE)
    target_compile_definitions(kis-common INTERFACE OC_SPAKE)
 endif()
 
-if(OC_PKI_ENABLED)
-    target_compile_definitions(mbedcrypto PUBLIC OC_PKI)
-endif()
-
 if(OC_DEBUG_ENABLED)
     target_compile_definitions(kis-common INTERFACE OC_DEBUG)
-    target_compile_definitions(mbedcrypto PUBLIC OC_DEBUG)
 endif()
-
 
 # Client and server versions
 set(KNX_INCLUDE_DIRS 
     ${PROJECT_SOURCE_DIR}/
     ${PROJECT_SOURCE_DIR}/include
-    ${PROJECT_SOURCE_DIR}/deps/tinycbor/src
     ${PROJECT_SOURCE_DIR}/security
     ${API_INCLUDE_DIRS}
     ${COAP_INCLUDE_DIRS}
@@ -167,31 +164,33 @@ target_link_libraries(kisClientServer PUBLIC
 )
 target_include_directories(kisClientServer PUBLIC ${KNX_INCLUDE_DIRS})
 
-include (GenerateExportHeader)
+if(WIN32 OR UNIX)
+    include (GenerateExportHeader)
 
-add_library(kisCS SHARED 
-    ${PROJECT_SOURCE_DIR}/pythonbinding/oc_python.c
-    ${API_SOURCES}
-    ${COAP_SOURCES}
-    ${CORE_SOURCES}
-)
-GENERATE_EXPORT_HEADER( kisCS
-             BASE_NAME kisCS
-             EXPORT_MACRO_NAME kisCS_EXPORT
-             EXPORT_FILE_NAME kisCS_Export.h
-             STATIC_DEFINE kisCS_BUILT_AS_STATIC
-)
+    add_library(kisCS SHARED 
+        ${PROJECT_SOURCE_DIR}/pythonbinding/oc_python.c
+        ${API_SOURCES}
+        ${COAP_SOURCES}
+        ${CORE_SOURCES}
+    )
+    GENERATE_EXPORT_HEADER( kisCS
+                BASE_NAME kisCS
+                EXPORT_MACRO_NAME kisCS_EXPORT
+                EXPORT_FILE_NAME kisCS_Export.h
+                STATIC_DEFINE kisCS_BUILT_AS_STATIC
+    )
 
-target_compile_definitions(kisCS PUBLIC OC_SERVER OC_CLIENT)
-target_link_libraries(kisCS PUBLIC
-    kis-common
-    mbedtls
-    tinycbor-master
-    kis-port
-)
-target_link_libraries(kisCS PUBLIC kis-common)
+    target_compile_definitions(kisCS PUBLIC OC_SERVER OC_CLIENT)
+    target_link_libraries(kisCS PUBLIC
+        kis-common
+        mbedtls
+        tinycbor-master
+        kis-port
+    )
+    target_link_libraries(kisCS PUBLIC kis-common)
 
-target_include_directories(kisCS PRIVATE ${PROJECT_BINARY_DIR} ${KNX_INCLUDE_DIRS})
+    target_include_directories(kisCS PRIVATE ${PROJECT_BINARY_DIR} ${KNX_INCLUDE_DIRS})
+endif()
 
 if(MSVC)
     # do not treat warnings as errors on Windows
