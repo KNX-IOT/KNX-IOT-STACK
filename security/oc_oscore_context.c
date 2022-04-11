@@ -150,7 +150,7 @@ oc_oscore_find_context_by_group_id(size_t device, int group_id)
 
   oc_oscore_context_t *ctx = (oc_oscore_context_t *)oc_list_head(contexts);
   while (ctx != NULL) {
-    int ctx_group_id = ctx->group_id;
+    int ctx_group_id = (int) ctx->group_id;
     if (group_id == ctx_group_id) {
       return ctx;
     }
@@ -158,6 +158,19 @@ oc_oscore_find_context_by_group_id(size_t device, int group_id)
   }
   return ctx;
 }
+
+void
+oc_oscore_free_all_contexts()
+{
+  oc_oscore_context_t *ctx = (oc_oscore_context_t *)oc_list_head(contexts);
+  while (ctx != NULL) {
+    oc_oscore_context_t *next = ctx->next;
+    oc_oscore_free_context(ctx);
+    ctx = next;
+  }
+  oc_list_init(contexts);
+}
+
 
 void
 oc_oscore_free_context(oc_oscore_context_t *ctx)
