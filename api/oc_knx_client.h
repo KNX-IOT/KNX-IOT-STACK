@@ -26,6 +26,7 @@ extern "C" {
 #endif
 
 typedef void (*oc_spake_cb_t)(int error, char *serial_number, char *oscore_id,
+                              uint8_t* secret,
                               uint8_t secret_size);
 
 /**
