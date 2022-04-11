@@ -806,8 +806,6 @@ oscore_send_dispatch:
   }
   message->endpoint.flags |= OSCORE_ENCRYPTED;
 
-
-
 #ifdef OC_CLIENT
   /* Dispatch oc_message_t to the message buffer layer */
   OC_DBG_OSCORE("Outbound network event: OUTBOUND_NETWORK_EVENT_ENCRYPTED");
