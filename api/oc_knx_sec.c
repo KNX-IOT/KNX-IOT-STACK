@@ -338,8 +338,8 @@ find_empty_at_index()
 static int
 find_index_from_at(oc_string_t *at)
 {
-  int len;
-  int len_at = oc_string_len(*at);
+  size_t len;
+  size_t len_at = oc_string_len(*at);
   for (int i = 0; i < G_AT_MAX_ENTRIES; i++) {
     len = oc_string_len(g_at_entries[i].id);
     if (len > 0 && len == len_at &&
@@ -1234,11 +1234,14 @@ oc_delete_at_table(size_t device_index)
 // ----------------------------------------------------------------------------
 
 void
-oc_oscore_set_auth(uint8_t *shared_key, int shared_key_size)
+oc_oscore_set_auth(char *serial_number, char *context_id, uint8_t *shared_key,
+                   int shared_key_size)
 {
   // create the token & store in at tables at position 0
   // note there should be no entries.. if there is an entry then overwrite
   // it..
+  PRINT("oc_oscore_set_auth sn:%s ci:%s\n", serial_number, context_id);
+
   oc_auth_at_t os_token;
   memset(&os_token, 0, sizeof(os_token));
   oc_new_string(&os_token.id, "spake", strlen("spake"));
@@ -1246,9 +1249,12 @@ oc_oscore_set_auth(uint8_t *shared_key, int shared_key_size)
   os_token.profile = OC_PROFILE_COAP_OSCORE;
   os_token.scope = OC_IF_SEC | OC_IF_D | OC_IF_P;
   oc_new_string(&os_token.osc_ms, (char *)shared_key, shared_key_size);
-  oc_new_string(&os_token.osc_id, "responderkey", strlen("responderkey"));
-  oc_new_string(&os_token.sub, "", strlen("spake2+"));
-  oc_new_string(&os_token.kid, "+", strlen("spake2+"));
+  // TODO this is the default, when no context_id is supplied
+  // oc_new_string(&os_token.osc_id, "responderkey", strlen("responderkey"));
+  oc_new_string(&os_token.osc_id, context_id, strlen(context_id));
+  oc_new_string(&os_token.osc_contextid, context_id, strlen(context_id));
+  oc_new_string(&os_token.sub, "", strlen(""));
+  oc_new_string(&os_token.kid, "serial_number", strlen("serial_number"));
   oc_core_set_at_table((size_t)0, 0, os_token);
 
   // add the oscore context...
@@ -1303,20 +1309,21 @@ oc_init_oscore(size_t device_index)
     if (oc_string_len(g_at_entries[i].id) > 0) {
       oc_at_entry_print(device_index, i);
 
-      oc_oscore_context_t *ctx =
-        oc_oscore_add_context(device_index, "sender", "reci", oc_knx_get_osn(),
-                              "desc", oc_string(g_at_entries[i].osc_ms),
-                              oc_string(g_at_entries[i].kid), false);
+      // one context: for sending and receiving.
+      oc_oscore_context_t *ctx = oc_oscore_add_context(
+        device_index, "sender", "receiver", oc_knx_get_osn(), "desc",
+        oc_string(g_at_entries[i].osc_ms),
+        oc_string(g_at_entries[i].osc_contextid), false);
       if (ctx == NULL) {
         PRINT("   fail...\n ");
       }
 
-      ctx = oc_oscore_add_context(
-        device_index, "reci", "sender", oc_knx_get_osn(), "desc",
-        oc_string(g_at_entries[i].osc_ms), "token2", false);
-      if (ctx == NULL) {
-        PRINT("   fail...\n ");
-      }
+      // ctx = oc_oscore_add_context(
+      //  device_index, "reci", "sender", oc_knx_get_osn(), "desc",
+      //  oc_string(g_at_entries[i].osc_ms), "token2", false);
+      // if (ctx == NULL) {
+      //  PRINT("   fail...\n ");
+      //}
     }
   }
 #endif
@@ -1468,12 +1475,19 @@ method_allowed(oc_method_t method, oc_resource_t *resource,
   if (oc_is_resource_secure(method, resource) == false) {
     return true;
   }
-
+  PRINT("method allowed flags:");
+  PRINTipaddr_flags(*endpoint);
 #ifdef OC_OSCORE
   if ((endpoint->flags & OSCORE) == 0) {
-    // not an oscore protected message, but oscore is enabled
+    // not an OSCORE protected message, but OSCORE is enabled
     // so the is call is unprotected and should not go ahead
     OC_DBG_OSCORE("unprotected message, access denied for: %s [%s]",
+                  get_method_name(method), oc_string(resource->uri));
+    return false;
+  }
+  if ((endpoint->flags & OSCORE_DECRYPTED) == 0) {
+    // not an decrypted message
+    OC_DBG_OSCORE("not a decrypted message, access denied for: %s [%s]",
                   get_method_name(method), oc_string(resource->uri));
     return false;
   }

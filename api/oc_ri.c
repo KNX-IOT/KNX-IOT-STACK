@@ -962,7 +962,7 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
   request_obj._payload = NULL;
   request_obj._payload_len = 0;
 
-  /* Initialize OCF interface selector. */
+  /* Initialize interface selector. */
   oc_interface_mask_t iface_query = 0, iface_mask = 0;
 
   /* Obtain request uri from the CoAP packet. */

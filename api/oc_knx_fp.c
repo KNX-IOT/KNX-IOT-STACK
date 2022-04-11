@@ -112,13 +112,13 @@ table_find_id_from_rep(oc_rep_t *object)
 #ifdef TAGS_AS_STRINGS
       if ((oc_string_len(object->name) == 2 &&
            memcmp(oc_string(object->name), "id", 2) == 0)) {
-        id = object->value.integer;
+        id = (int)object->value.integer;
         PRINT("  table_find_id_from_rep id=%d \n", id);
         return id;
       }
 #endif
       if (oc_string_len(object->name) == 0 && object->iname == 0) {
-        id = object->value.integer;
+        id = (int)object->value.integer;
         PRINT(" table_find_id_from_rep id=%d \n", id);
         return id;
       }
@@ -489,7 +489,7 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
         case OC_REP_INT: {
           if (oc_string_len(object->name) == 0 && object->iname == 0) {
             // id (0)
-            g_got[index].id = object->value.integer;
+            g_got[index].id = (int)object->value.integer;
           }
           if (oc_string_len(object->name) == 0 && object->iname == 8) {
             // cflags (8)
@@ -521,7 +521,7 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
             int *new_array = (int *)malloc(array_size * sizeof(int));
 
             for (int i = 0; i < array_size; i++) {
-              new_array[i] = arr[i];
+              new_array[i] = (int)arr[i];
             }
             if (g_got[index].ga != 0) {
               free(g_got[index].ga);
@@ -1102,7 +1102,7 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 
         case OC_REP_INT: {
           if (object->iname == 12) {
-            g_grt[index].ia = object->value.integer;
+            g_grt[index].ia = (int)object->value.integer;
           }
         } break;
 
@@ -1142,7 +1142,7 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
             int *new_array = (int *)malloc(array_size * sizeof(int));
 
             for (int i = 0; i < array_size; i++) {
-              new_array[i] = arr[i];
+              new_array[i] = (int)arr[i];
             }
             if (g_grt[index].ga != 0) {
               free(g_grt[index].ga);
@@ -1158,7 +1158,7 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
             int *new_array = (int *)malloc(array_size * sizeof(int));
 
             for (int i = 0; i < array_size; i++) {
-              new_array[i] = arr[i];
+              new_array[i] = (int)arr[i];
             }
             if (g_grt[index].ga != 0) {
               free(g_grt[index].ga);
@@ -1535,7 +1535,7 @@ oc_load_group_object_table_entry(int entry)
 
             // TODO check  if new array is not NULL
             for (int i = 0; i < array_size; i++) {
-              new_array[i] = arr[i];
+              new_array[i] = (int)arr[i];
             }
             if (g_got[entry].ga != 0) {
               free(g_got[entry].ga);
@@ -1742,7 +1742,7 @@ oc_load_group_rp_table_entry(int entry, char *Store,
             int *new_array = (int *)malloc(array_size * sizeof(int));
             if (new_array != 0) {
               for (int i = 0; i < array_size; i++) {
-                new_array[i] = arr[i];
+                new_array[i] = (int)arr[i];
               }
             }
             if (rp_table[entry].ga != 0) {

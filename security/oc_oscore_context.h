@@ -76,6 +76,9 @@ oc_oscore_context_t *oc_oscore_add_context(size_t device, const char *senderid,
 oc_oscore_context_t *oc_oscore_find_context_by_serial_number(
   size_t device, oc_string_t serial_number);
 
+oc_oscore_context_t *oc_oscore_find_context_by_group_id(size_t device,
+                                                        int group_id);
+
 oc_oscore_context_t *oc_oscore_find_context_by_kid(oc_oscore_context_t *ctx,
                                                    size_t device, uint8_t *kid,
                                                    uint8_t kid_len);

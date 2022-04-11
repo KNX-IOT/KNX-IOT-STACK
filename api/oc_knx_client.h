@@ -25,8 +25,8 @@
 extern "C" {
 #endif
 
-typedef void (*oc_spake_cb_t)(int error, char *oscore_id, uint8_t *secret,
-                              int secret_size);
+typedef void (*oc_spake_cb_t)(int error, char *serial_number, char *oscore_id,
+                              uint8_t *secret, int secret_size);
 
 /**
  * @brief set the spake response callback
@@ -58,7 +58,7 @@ typedef void (*oc_s_mode_response_cb_t)(char *url, oc_rep_t *rep,
   This module contains the receiving side of the s-mode functionality.
   The received s-mode messages are routed to the appropriate POST methods of the
   data point. However since not all data is in the s-mode message the POST
-  method needs to retrieve the data from the s-mode messsage differently than
+  method needs to retrieve the data from the s-mode message differently than
   for an normal CoAP post message (the message payload is constructed
   differently).
 
@@ -84,7 +84,7 @@ oc_s_mode_response_cb_t oc_get_s_mode_response_cb();
 
 /**
  * @brief checks if the request is a redirected request from /.knx or /p
- * when that happend, extra information can be in the CBOR object
+ * when that happened, extra information can be in the CBOR object
  *
  * @param request the request to be checked
  * @return true

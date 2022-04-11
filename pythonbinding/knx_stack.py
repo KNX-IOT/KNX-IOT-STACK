@@ -1088,6 +1088,17 @@ class KNXIOTStack():
         else:
             return ""
 
+    def reset_myself(self):
+        self.lib.ets_reset_ets.argtypes = []
+        #self.lib.ets_reset_ets.restype = String
+        return self.lib.ets_reset_ets()
+
+    def get_error_string_from_code(self, error_code):
+        self.lib.ets_error_to_string.argtypes = [c_int]
+        self.lib.ets_error_to_string.restype = String
+        return self.lib.ets_error_to_string(error_code)
+
+
 if __name__ == "__main__":
     my_stack = KNXIOTStack()
     my_stack.start_thread()

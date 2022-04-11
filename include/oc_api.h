@@ -896,7 +896,7 @@ int oc_query_value_exists(oc_request_t *request, const char *key);
 
 /**
  * Called after the response to a GET, PUT, POST or DELETE call has been
- * prepared completed
+ * prepared completed, will respond with CBOR.
  *
  * The function oc_send_response is called at the end of a
  * oc_request_callback_t to inform the caller about the status of the requested
