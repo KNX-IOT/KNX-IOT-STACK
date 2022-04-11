@@ -215,13 +215,13 @@ OC_PROCESS_THREAD(message_buffer_handler, ev, data)
 #ifdef OC_OSCORE
         if ((message->endpoint.flags & OSCORE) &&
             (message->endpoint.flags & MULTICAST) &&
-            ((message->endpoint.flags & OSCORE_DECRYPTED) == 0)) {
+            ((message->endpoint.flags & OSCORE_ENCRYPTED) == 0)) {
           OC_DBG_OSCORE(
             "Outbound secure multicast request: forwarding to OSCORE\n");
           oc_process_post(&oc_oscore_handler,
                           oc_events[OUTBOUND_GROUP_OSCORE_EVENT], data);
         } else if ((message->endpoint.flags & OSCORE) &&
-                   ((message->endpoint.flags & OSCORE_DECRYPTED) == 0)) {
+                   ((message->endpoint.flags & OSCORE_ENCRYPTED) == 0)) {
           OC_DBG_OSCORE(
             "Outbound secure unicast request: forwarding to OSCORE\n");
           oc_process_post(&oc_oscore_handler, oc_events[OUTBOUND_OSCORE_EVENT],

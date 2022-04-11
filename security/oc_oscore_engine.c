@@ -804,6 +804,9 @@ oscore_send_dispatch:
   OC_DBG_OSCORE("#################################");
   if (!oc_tls_connected(&message->endpoint)) {
   }
+  message->endpoint.flags |= OSCORE_ENCRYPTED;
+
+
 
 #ifdef OC_CLIENT
   /* Dispatch oc_message_t to the message buffer layer */

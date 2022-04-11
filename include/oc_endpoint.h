@@ -64,6 +64,7 @@ enum transport_flags {
   MULTICAST = 1 << 6,        /**< multicast enabled */
   ACCEPTED = 1 << 7,         /**< accepted */
   OSCORE_DECRYPTED = 1 << 8, /**< OSCORE decrypted message */
+  OSCORE_ENCRYPTED = 1 << 9, /**< OSCORE encrypted message */
 };
 
 /**
