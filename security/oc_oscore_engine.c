@@ -536,7 +536,7 @@ oc_oscore_send_message(oc_message_t *msg)
    *    Reflect the Observe option (if present in the CoAP packet)
    *    Set the Outer code for the OSCORE packet (POST/FETCH:2.04/2.05)
    *    Serialize OSCORE message to oc_message_t
-   * Dispatch oc_message_t to the TLS layer
+   * Dispatch oc_message_t to the (TLS or) network layer
    */
   oc_message_t *message = msg;
   oc_oscore_context_t *oscore_ctx = NULL;

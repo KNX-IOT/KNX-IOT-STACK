@@ -46,6 +46,7 @@ oc_oscore_find_group_context(uint64_t group_id)
   return ctx;
 }
 
+// checking against receiver...
 oc_oscore_context_t *
 oc_oscore_find_context_by_kid(oc_oscore_context_t *ctx, size_t device,
                               uint8_t *kid, uint8_t kid_len)
@@ -54,7 +55,8 @@ oc_oscore_find_context_by_kid(oc_oscore_context_t *ctx, size_t device,
     ctx = (oc_oscore_context_t *)oc_list_head(contexts);
   }
 
-  PRINT("oc_oscore_find_context_by_kid : %d\n  Kid:", (int)device);
+  PRINT("oc_oscore_find_context_by_kid : %d\n  kidlen: %d Kid:", (int)device,
+        kid_len);
   OC_LOGbytes_OSCORE(kid, kid_len);
 
   while (ctx != NULL) {
@@ -120,15 +122,24 @@ oc_oscore_find_context_by_serial_number(size_t device,
                                         oc_string_t serial_number)
 {
   (void)device;
+  PRINT("oc_oscore_find_context_by_serial_number %s\n",
+        oc_string(serial_number));
+
+  if (oc_string_len(serial_number) == 0) {
+    PRINT("  SERIAL number NULL\n");
+    return NULL;
+  }
 
   oc_oscore_context_t *ctx = (oc_oscore_context_t *)oc_list_head(contexts);
   while (ctx != NULL) {
-    oc_string_t ctx_serial_number = ctx->serial_number;
-    if (oc_string_cmp(serial_number, ctx_serial_number) == 0) {
+    char* ctx_serial_number = ctx->token_id;
+    if (strncmp(oc_string(serial_number), ctx_serial_number, 16) == 0) {
+      PRINT("  FOUND\n");
       return ctx;
     }
     ctx = ctx->next;
   }
+  PRINT("  NOT FOUND\n");
   return ctx;
 }
 
@@ -177,8 +188,12 @@ oc_oscore_add_context(size_t device, const char *senderid,
   ctx->device = device;
   ctx->ssn = ssn;
 
-  PRINT("  device  %d\n", (int)device);
-  PRINT("  ssn     %d\n", (int)ssn);
+  PRINT("  device    %d\n", (int)device);
+  PRINT("  sender    %s\n", senderid);
+  PRINT("  recipient %s\n", recipientid);
+  PRINT("  desc      %s\n", desc);
+  PRINT("  token_id  %s\n", token_id);
+  PRINT("  ssn       %d\n", (int)ssn);
   PRINT("  ms      ");
   int length = strlen(mastersecret);
   for (int i = 0; i < length; i++) {
