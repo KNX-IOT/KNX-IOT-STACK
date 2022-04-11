@@ -132,23 +132,13 @@ set(COAP_INCLUDE_DIRS
 add_library(kis-common INTERFACE)
 
 if(OC_OSCORE_ENABLED)
-   # TODO - IS THIS OKAY TO COMPILE OUT NOW THAT THE PATCHES ARE GONE?
-   # target_compile_definitions(mbedcrypto PUBLIC OC_OSCORE)
    target_compile_definitions(kis-common INTERFACE OC_OSCORE)
    target_compile_definitions(kis-common INTERFACE OC_SPAKE)
 endif()
 
-if(OC_PKI_ENABLED)
-    # TODO - IS THIS OKAY TO COMPILE OUT NOW THAT THE PATCHES ARE GONE?
-    #target_compile_definitions(mbedcrypto PUBLIC OC_PKI)
-endif()
-
 if(OC_DEBUG_ENABLED)
     target_compile_definitions(kis-common INTERFACE OC_DEBUG)
-    # TODO - IS THIS OKAY TO COMPILE OUT NOW THAT THE PATCHES ARE GONE?
-    #target_compile_definitions(mbedcrypto PUBLIC OC_DEBUG)
 endif()
-
 
 # Client and server versions
 set(KNX_INCLUDE_DIRS 
