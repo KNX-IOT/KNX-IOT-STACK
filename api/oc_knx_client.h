@@ -25,8 +25,8 @@
 extern "C" {
 #endif
 
-typedef void (*oc_spake_cb_t)(int error, char *oscore_id, uint8_t *secret,
-                              int secret_size);
+typedef void (*oc_spake_cb_t)(int error, char *serial_number, char *oscore_id,
+                              uint8_t secret_size);
 
 /**
  * @brief set the spake response callback

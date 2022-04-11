@@ -1259,8 +1259,11 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     uint8_t *shared_key = spake_data.Ka_Ke + 16;
     size_t shared_key_len = 16;
 
-    // set thet /auth/at entry with the calculated shared key.
-    oc_oscore_set_auth(shared_key, shared_key_len);
+    // set thet /auth/at entry with the calculated shared key
+    size_t device_index = request->resource->device;
+    oc_device_info_t *device = oc_core_get_device_info(device_index);
+    oc_oscore_set_auth(oc_string(device->serialnumber), oc_string(g_pase.id),
+                       shared_key, shared_key_len);
 
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
     // handshake completed successfully - clear state

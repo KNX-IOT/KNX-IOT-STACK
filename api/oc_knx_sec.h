@@ -156,12 +156,14 @@ int oc_core_set_at_table(size_t device_index, int index, oc_auth_at_t entry);
 
 /**
  * @brief set shared (SPAKE) key
- * TBD if this remains
- *
+ *      
+ * @param serial_number the serial_number of the device that has been hand shaked with (e.g. client side)
+ * @param context_id the context_id delivered during the handshake
  * @param shared_key the master key after SPAKE2 handshake
  * @param shared_key_size the key size
  */
-void oc_oscore_set_auth(uint8_t *shared_key, int shared_key_size);
+void oc_oscore_set_auth(char *serial_number, char *context_id,
+                        uint8_t *shared_key, int shared_key_size);
 
 /**
  * @brief delete the /auth/at table
