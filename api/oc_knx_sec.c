@@ -1229,6 +1229,9 @@ oc_delete_at_table(size_t device_index)
     oc_at_entry_print(device_index, i);
     oc_at_dump_entry(device_index, i);
   }
+#ifdef OC_OSCORE
+  oc_oscore_free_all_contexts();
+#endif
 }
 
 // ----------------------------------------------------------------------------

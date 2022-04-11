@@ -66,6 +66,8 @@ int oc_oscore_context_derive_param(const uint8_t *id, uint8_t id_len,
 
 void oc_oscore_free_context(oc_oscore_context_t *ctx);
 
+void oc_oscore_free_all_contexts();
+
 oc_oscore_context_t *oc_oscore_add_context(size_t device, const char *senderid,
                                            const char *recipientid,
                                            uint64_t ssn, const char *desc,
