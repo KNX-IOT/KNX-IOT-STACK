@@ -1244,7 +1244,7 @@ oc_oscore_set_auth(char *serial_number, char *context_id, uint8_t *shared_key,
 
   oc_auth_at_t os_token;
   memset(&os_token, 0, sizeof(os_token));
-  oc_new_string(&os_token.id, "spake", strlen("spake"));
+  oc_new_string(&os_token.id, "context_id", strlen("context_id"));
   os_token.ga_len = 0;
   os_token.profile = OC_PROFILE_COAP_OSCORE;
   os_token.scope = OC_IF_SEC | OC_IF_D | OC_IF_P;

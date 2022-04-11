@@ -78,6 +78,8 @@ static int oc_s_mode_get_resource_value(char *resource_url, char *rp,
 static void
 update_tokens(uint8_t *secret, int secret_size)
 {
+  PRINT("update_tokens \n");
+
   oc_oscore_set_auth(oc_string(g_spake_ctx.serial_number),
                      g_spake_ctx.oscore_id, secret, secret_size);
 }
@@ -116,8 +118,8 @@ finish_spake_handshake(oc_client_response_t *data)
   mbedtls_ecp_point_free(&pubA);
 
   if (m_spake_cb) {
-    // PRINT("CALLING CALLBACK------->\n");
-    m_spake_cb(0, oc_string(data->endpoint->serial_number),
+    PRINT("CALLING CALLBACK- (CLIENT)------>\n");
+    m_spake_cb(0, oc_string(g_spake_ctx.serial_number),
                g_spake_ctx.oscore_id, shared_key, shared_key_len);
   }
 }
@@ -284,7 +286,8 @@ oc_initiate_spake(oc_endpoint_t *endpoint, char *password, char *oscore_id)
   oc_rep_end_root_object();
 
   strncpy((char *)&g_spake_ctx.spake_password, password, MAX_PASSWORD_LEN);
-
+  oc_string_copy(&g_spake_ctx.serial_number, endpoint->serial_number);
+  
   if (oc_do_post_ex(APPLICATION_CBOR, APPLICATION_CBOR)) {
     return_value = 0;
   }
