@@ -124,6 +124,9 @@ extern "C" {
     if ((endpoint).flags & ACCEPTED) {                                         \
       PRINT(" ACCEPTED ");                                                     \
     };                                                                         \
+    if ((endpoint).flags & OSCORE_DECRYPTED) {                                 \
+      PRINT(" OSCORE_DECRYPTED ");                                             \
+    };                                                                         \
     PRINT(" \n");                                                              \
   } while (0)
 

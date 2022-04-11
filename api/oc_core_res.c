@@ -38,6 +38,7 @@
 static oc_resource_t *core_resources = NULL;
 static oc_device_info_t *oc_device_info = NULL;
 #else  /* OC_DYNAMIC_ALLOCATION */
+// TODO fix this for static allocation, this is not used at the moment..
 static oc_resource_t core_resources[1 + OCF_D * OC_MAX_NUM_DEVICES];
 static oc_device_info_t oc_device_info[OC_MAX_NUM_DEVICES];
 #endif /* !OC_DYNAMIC_ALLOCATION */

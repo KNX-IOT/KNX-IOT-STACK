@@ -80,7 +80,7 @@ response_length(void)
 void
 oc_send_response(oc_request_t *request, oc_status_t response_code)
 {
-  request->response->response_buffer->content_format = APPLICATION_VND_OCF_CBOR;
+  request->response->response_buffer->content_format = APPLICATION_CBOR;
   request->response->response_buffer->response_length = response_length();
   request->response->response_buffer->code = oc_status_code(response_code);
 }
