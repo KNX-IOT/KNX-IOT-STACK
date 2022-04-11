@@ -42,7 +42,6 @@
 #define MAX_URI_LENGTH (30)
 #define MAX_SERIAL_NUM_LENGTH (20)
 
-
 char g_serial_number[MAX_SERIAL_NUM_LENGTH]; /**< the serial number to be set on
                                                 the stack */
 
@@ -334,7 +333,7 @@ inform_spake_python(char *sn, int state, char *oscore_id, char *key,
   PRINT("]\n");
 
   if (my_CBFunctions.spakeFCB != NULL) {
-    my_CBFunctions.spakeFCB(sn, state, oscore_id,(uint8_t *) key, key_size);
+    my_CBFunctions.spakeFCB(sn, state, oscore_id, (uint8_t *)key, key_size);
   }
 }
 
@@ -850,7 +849,7 @@ ets_initiate_spake(char *sn, char *password, char *oscore_id)
   int ret = -1;
   device_handle_t *device = ets_getdevice_from_sn(sn);
 
-    /* remove OSCORE flag */
+  /* remove OSCORE flag */
   device->ep.flags = IPV6;
   PRINT("  [C] disable OSCORE encryption\n");
   PRINTipaddr_flags(device->ep);
@@ -955,7 +954,6 @@ ets_listen_s_mode(int scope, int ga_max, int iid)
 }
 
 // -----------------------------------------------------------------------------
-
 
 char *
 ets_error_to_string(int error_code)

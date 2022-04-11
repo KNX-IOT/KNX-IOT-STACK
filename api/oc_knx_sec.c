@@ -1250,7 +1250,7 @@ oc_oscore_set_auth(char *serial_number, char *context_id, uint8_t *shared_key,
   os_token.scope = OC_IF_SEC | OC_IF_D | OC_IF_P;
   oc_new_string(&os_token.osc_ms, (char *)shared_key, shared_key_size);
   // TODO this is the default, when no context_id is supplied
-  //oc_new_string(&os_token.osc_id, "responderkey", strlen("responderkey"));
+  // oc_new_string(&os_token.osc_id, "responderkey", strlen("responderkey"));
   oc_new_string(&os_token.osc_id, context_id, strlen(context_id));
   oc_new_string(&os_token.osc_contextid, context_id, strlen(context_id));
   oc_new_string(&os_token.sub, "", strlen(""));
@@ -1310,18 +1310,18 @@ oc_init_oscore(size_t device_index)
       oc_at_entry_print(device_index, i);
 
       // one context: for sending and receiving.
-      oc_oscore_context_t *ctx =
-        oc_oscore_add_context(device_index, "sender", "receiver", oc_knx_get_osn(),
-                              "desc", oc_string(g_at_entries[i].osc_ms),
+      oc_oscore_context_t *ctx = oc_oscore_add_context(
+        device_index, "sender", "receiver", oc_knx_get_osn(), "desc",
+        oc_string(g_at_entries[i].osc_ms),
         oc_string(g_at_entries[i].osc_contextid), false);
       if (ctx == NULL) {
         PRINT("   fail...\n ");
       }
 
-      //ctx = oc_oscore_add_context(
+      // ctx = oc_oscore_add_context(
       //  device_index, "reci", "sender", oc_knx_get_osn(), "desc",
       //  oc_string(g_at_entries[i].osc_ms), "token2", false);
-      //if (ctx == NULL) {
+      // if (ctx == NULL) {
       //  PRINT("   fail...\n ");
       //}
     }
