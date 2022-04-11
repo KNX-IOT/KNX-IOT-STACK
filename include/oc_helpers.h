@@ -388,6 +388,12 @@ int oc_uri_get_wildcard_value_as_string(const char *uri_resource,
                                         size_t uri_len, const char *uri_invoked,
                                         size_t invoked_len, const char **value);
 
+
+
+int oc_string_copy_from_char(oc_string_t *string1, char* string2);
+
+int oc_string_copy(oc_string_t* string1, oc_string_t string2);
+
 /**
  * @brief oc_string compare
  *
