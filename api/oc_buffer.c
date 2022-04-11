@@ -185,9 +185,12 @@ OC_PROCESS_THREAD(message_buffer_handler, ev, data)
 #endif /* OC_SECURITY*/
 #ifdef OC_OSCORE
         if (oscore_is_oscore_message((oc_message_t *)data) == 0) {
-          OC_DBG_OSCORE("Inbound network event: oscore request ==> decrypt");
+          OC_DBG_OSCORE("Inbound network event: OSCORE request ==> decrypt");
           oc_message_t *msg = (oc_message_t *)data;
-          msg->endpoint.flags += OSCORE;
+          // OSCORE detected
+          msg->endpoint.flags = msg->endpoint.flags | OSCORE;
+          // not yet decrypted
+          msg->endpoint.flags = msg->endpoint.flags & OSCORE_DECRYPTED;
           oc_process_post(&oc_oscore_handler, oc_events[INBOUND_OSCORE_EVENT],
                           data);
         } else
