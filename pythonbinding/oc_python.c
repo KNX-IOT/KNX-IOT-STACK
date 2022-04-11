@@ -325,7 +325,7 @@ inform_spake_python(char *sn, int state, char *oscore_id, char *key,
                     int key_size)
 {
   PRINT(
-    "[C]inform_spake_python %p sn:%s state:%d oscore_id:%skey_size:%d key=[",
+    "[C]inform_spake_python %p sn:%s state:%d oscore_id:%s key_size:%d key=[",
     my_CBFunctions.spakeFCB, sn, state, oscore_id, key_size);
   for (int i = 0; i < key_size; i++) {
     PRINT("%02x", (unsigned char)key[i]);
@@ -333,7 +333,7 @@ inform_spake_python(char *sn, int state, char *oscore_id, char *key,
   PRINT("]\n");
 
   if (my_CBFunctions.spakeFCB != NULL) {
-    my_CBFunctions.spakeFCB(sn, state, oscore_id, (uint8_t *)key, key_size);
+    my_CBFunctions.spakeFCB(sn, sn , state, oscore_id, (uint8_t *)key, key_size);
   }
 }
 
@@ -518,6 +518,8 @@ ets_cbor_get(char *sn, char *uri, char *query, char *cbdata)
 #ifdef OC_OSCORE
   device->ep.flags += OSCORE;
   PRINT("  [C] enable OSCORE encryption\n");
+  oc_string_copy_from_char(&device->ep.serial_number, sn);
+  PRINT("  [C] ep serial %s\n", oc_string(device->ep.serial_number));
 #endif
 
   ret = oc_do_get_ex(uri, &device->ep, query, general_get_cb, HIGH_QOS,
@@ -572,6 +574,7 @@ ets_linkformat_get(char *sn, char *uri, char *query, char *cbdata)
   PRINT(" [C] enable OSCORE encryption\n");
   device->ep.flags != OSCORE;
   PRINTipaddr_flags(device->ep);
+  oc_string_copy_from_char(&device->ep.serial_number, sn);
 #endif
 
   user_struct_t *new_cbdata;
@@ -642,6 +645,7 @@ ets_cbor_post(char *sn, char *uri, char *query, char *id, int size, char *data)
   device->ep.flags |= OSCORE;
   PRINT("  [C] enable OSCORE encryption\n");
   PRINTipaddr_flags(device->ep);
+  oc_string_copy_from_char(&device->ep.serial_number, sn);
 #endif
 
   user_struct_t *new_cbdata;
@@ -679,6 +683,7 @@ ets_cbor_put(char *sn, char *uri, char *query, char *id, int size, char *data)
   device->ep.flags |= OSCORE;
   PRINT("  [C] enable OSCORE encryption\n");
   PRINTipaddr_flags(device->ep);
+  oc_string_copy_from_char(&device->ep.serial_number, sn);
 #endif
 
   user_struct_t *new_cbdata;
@@ -715,6 +720,7 @@ ets_cbor_delete(char *sn, char *uri, char *query, char *id)
   device->ep.flags |= OSCORE;
   PRINT("  [C] enable OSCORE encryption\n");
   PRINTipaddr_flags(device->ep);
+  oc_string_copy_from_char(&device->ep.serial_number, sn);
 #endif
 
   user_struct_t *new_cbdata;
