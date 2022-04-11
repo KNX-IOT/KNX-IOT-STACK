@@ -338,8 +338,8 @@ find_empty_at_index()
 static int
 find_index_from_at(oc_string_t *at)
 {
-  int len;
-  int len_at = oc_string_len(*at);
+  size_t len;
+  size_t len_at = oc_string_len(*at);
   for (int i = 0; i < G_AT_MAX_ENTRIES; i++) {
     len = oc_string_len(g_at_entries[i].id);
     if (len > 0 && len == len_at &&
