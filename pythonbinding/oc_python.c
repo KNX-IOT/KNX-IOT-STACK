@@ -20,6 +20,7 @@
 #include "port/oc_clock.h"
 #include "api/oc_knx_fp.h"
 #include "api/oc_knx_gm.h"
+#include "port/oc_connectivity.h"
 
 #if defined(_WIN32)
 #include <windows.h>
@@ -330,7 +331,7 @@ inform_spake_python(char *sn, int state, char *oscore_id, char *key,
   PRINT("]\n");
 
   if (my_CBFunctions.spakeFCB != NULL) {
-    my_CBFunctions.spakeFCB(sn, state, oscore_id, key, key_size);
+    my_CBFunctions.spakeFCB(sn, state, oscore_id,(uint8_t *) key, key_size);
   }
 }
 
