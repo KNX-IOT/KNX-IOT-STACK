@@ -956,6 +956,13 @@ ets_listen_s_mode(int scope, int ga_max, int iid)
 
 // -----------------------------------------------------------------------------
 
+
+char *
+ets_error_to_string(int error_code)
+{
+  return stringFromResponse(error_code);
+}
+
 /**
  * function to retrieve the serial number of the discovered device
  *
@@ -1012,6 +1019,12 @@ ets_reset_device(char *sn)
 }
 
 // -----------------------------------------------------------------------------
+void
+ets_reset_ets()
+{
+  PRINT("[C] ets_reset_ets: resetting device\n");
+  oc_knx_device_storage_reset(0, 2);
+}
 
 int
 ets_start(char *serial_number)
