@@ -245,8 +245,7 @@ handle_signal(int signal)
   quit = 1;
 }
 
-//  my_spake_cb(int error, char *oscore_id, uint8_t *secret,
-//            int secret_size) void
+void
 my_spake_cb(int error, char *sn, char *oscore_id, uint8_t *secret,
                int secret_size)
 {
