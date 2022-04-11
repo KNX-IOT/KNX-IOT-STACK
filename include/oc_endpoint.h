@@ -55,14 +55,15 @@ typedef struct
  * these flags are used to determine what to do on communication level
  */
 enum transport_flags {
-  DISCOVERY = 1 << 0, /**< used for discovery */
-  SECURED = 1 << 1,   /**< secure communication */
-  IPV4 = 1 << 2,      /**< ipv4 communication */
-  IPV6 = 1 << 3,      /**< ipv6 communication */
-  TCP = 1 << 4,       /**< tcp communication */
-  OSCORE = 1 << 5,    /**< OSCORE communication */
-  MULTICAST = 1 << 6, /**< multicast enabled */
-  ACCEPTED = 1 << 7   /**< accepted */
+  DISCOVERY = 1 << 0,        /**< used for discovery */
+  SECURED = 1 << 1,          /**< secure communication */
+  IPV4 = 1 << 2,             /**< ipv4 communication */
+  IPV6 = 1 << 3,             /**< ipv6 communication */
+  TCP = 1 << 4,              /**< tcp communication */
+  OSCORE = 1 << 5,           /**< OSCORE communication */
+  MULTICAST = 1 << 6,        /**< multicast enabled */
+  ACCEPTED = 1 << 7,         /**< accepted */
+  OSCORE_DECRYPTED = 1 << 8, /**< OSCORE decrypted message */
 };
 
 /**
@@ -83,8 +84,8 @@ typedef struct oc_endpoint_t
   uint8_t priority;    /**< priority */
   int group_id;        /**< group_id identifier */
 #ifdef OC_OSCORE
-  uint8_t piv[OSCORE_PIV_LEN]; /**< oscore partial iv */
-  uint8_t piv_len;             /**< oscore partial iv length */
+  uint8_t piv[OSCORE_PIV_LEN]; /**< OSCORE partial iv */
+  uint8_t piv_len;             /**< OSCORE partial iv length */
 #endif                         /* OC_OSCORE */
 } oc_endpoint_t;
 
