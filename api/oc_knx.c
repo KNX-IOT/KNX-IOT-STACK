@@ -650,7 +650,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
           if (object->iname == 1) {
             oc_free_string(&g_received_notification.value);
             char buf[20];
-            snprintf(buf, 20 - 1, "%d", object->value.integer);
+            snprintf(buf, 20 - 1, "%d", (int)object->value.integer);
             oc_new_string(&g_received_notification.value, buf, strlen(buf));
           }
         } break;

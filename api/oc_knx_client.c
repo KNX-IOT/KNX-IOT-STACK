@@ -78,7 +78,8 @@ static int oc_s_mode_get_resource_value(char *resource_url, char *rp,
 static void
 update_tokens(uint8_t *secret, int secret_size)
 {
-  oc_oscore_set_auth(secret, secret_size);
+  oc_oscore_set_auth(oc_string(g_spake_ctx.serial_number),
+                     g_spake_ctx.oscore_id, secret, secret_size);
 }
 
 static void
