@@ -71,6 +71,10 @@ def do_programming_mode(my_stack, pm_value):
     sn = my_stack.device_array[0].sn
     response = my_stack.issue_cbor_get(sn, "/dev/pm")
     print ("current value response:",response)
+    if response is None:
+        return 1
+    if response.status != 0:
+        return 2
     my_stack.purge_response(response)
     pm_val = False
     if pm_value is True:
@@ -80,6 +84,18 @@ def do_programming_mode(my_stack, pm_value):
     response =  my_stack.issue_cbor_put(sn,"/dev/pm",content)
     safe_print(response)
     my_stack.purge_response(response)
+    return 0
+
+
+def do_spake(my_stack, password):
+    """
+    do spake handshake
+    """
+    if my_stack.get_nr_devices() > 0:
+        sn = my_stack.device_array[0].sn
+        print("========spake=========", sn)
+        my_stack.initiate_spake(sn, password, sn)
+
 
 #
 if __name__ == '__main__':  # pragma: no cover
@@ -95,6 +111,9 @@ if __name__ == '__main__':  # pragma: no cover
     parser.add_argument("-pm", "--programming_mode", default="True",
                     help="set the programming mode (default True) e.g. -pm False", nargs='?',
                     const="true", required=False)
+    parser.add_argument("-password", "--password", default="LETTUCE",
+                    help="password default:LETTUCE", nargs='?',
+                    const="true", required=False)
     parser.add_argument("-wait", "--wait",
                     help="wait after issuing the command", nargs='?',
                     default=2, const=1, required=False)
@@ -105,7 +124,8 @@ if __name__ == '__main__':  # pragma: no cover
     print("scope            :" + str(args.scope))
     print("serial_number    :" + str(args.serial_number))
     print("programming_mode :" + str(args.programming_mode))
-    print("wait [sec] :" + str(args.wait))
+    print("password        :" + str(args.password))
+    print("wait [sec]      :" + str(args.wait))
 
     value = False
     if  str(args.programming_mode) == "True":
@@ -119,7 +139,10 @@ if __name__ == '__main__':  # pragma: no cover
     try:
         do_discover(the_stack, args.serial_number, args.scope)
         time.sleep(1)
-        do_programming_mode(the_stack, value)
+        ret = do_programming_mode(the_stack, value)
+        if ret > 0:
+            do_spake(the_stack, str(args.password))
+            ret = do_programming_mode(the_stack, value)
     except:
         traceback.print_exc()
 

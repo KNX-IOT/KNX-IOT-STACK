@@ -546,6 +546,10 @@ ets_cbor_get_unsecured(char *sn, char *uri, char *query, char *cbdata)
   PRINT("  [C]ets_cbor_get_unsecured: [%s], [%s] [%s] [%s]\n", sn, uri, query,
         cbdata);
 
+  /* remove OSCORE flag*/
+  device->ep.flags &= OSCORE;
+  PRINTipaddr_flags(device->ep);
+
   ret = oc_do_get_ex(uri, &device->ep, query, general_get_cb, HIGH_QOS,
                      APPLICATION_CBOR, APPLICATION_CBOR, new_cbdata);
   if (ret >= 0) {
@@ -565,8 +569,9 @@ ets_linkformat_get(char *sn, char *uri, char *query, char *cbdata)
   PRINT("  [C]ets_linkformat_get: [%s], [%s] [%s] [%s]\n", sn, uri, query,
         cbdata);
 #ifdef OC_OSCORE
-  device->ep.flags += OSCORE;
-  PRINT("  [C] enable OSCORE encryption\n");
+  PRINT(" [C] enable OSCORE encryption\n");
+  device->ep.flags != OSCORE;
+  PRINTipaddr_flags(device->ep);
 #endif
 
   user_struct_t *new_cbdata;
@@ -599,6 +604,8 @@ ets_linkformat_get_unsecured(char *sn, char *uri, char *query, char *cbdata)
 
   PRINT("  [C]ets_linkformat_get_unsecured: [%s], [%s] [%s] [%s]\n", sn, uri,
         query, cbdata);
+  device->ep.flags &= OSCORE;
+  PRINTipaddr_flags(device->ep);
 
   user_struct_t *new_cbdata;
   new_cbdata = (user_struct_t *)malloc(sizeof(user_struct_t));
@@ -615,7 +622,7 @@ ets_linkformat_get_unsecured(char *sn, char *uri, char *query, char *cbdata)
                        new_cbdata);
   }
   if (ret >= 0) {
-    PRINT("  [C]Successfully issued GET request\n");
+    PRINT("  [C]Successfully issued unsecured GET request (linkformat)\n");
   } else {
     PRINT("  [C]ERROR issuing GET request\n");
   }
@@ -632,8 +639,9 @@ ets_cbor_post(char *sn, char *uri, char *query, char *id, int size, char *data)
   PRINT("  [C]ets_cbor_post: [%s], [%s] [%s] [%s] %d\n", sn, uri, id, query,
         size);
 #ifdef OC_OSCORE
-  device->ep.flags += OSCORE;
+  device->ep.flags |= OSCORE;
   PRINT("  [C] enable OSCORE encryption\n");
+  PRINTipaddr_flags(device->ep);
 #endif
 
   user_struct_t *new_cbdata;
@@ -668,8 +676,9 @@ ets_cbor_put(char *sn, char *uri, char *query, char *id, int size, char *data)
   PRINT("  [C]ets_cbor_put: [%s], [%s] [%s] [%s] %d\n", sn, uri, id, query,
         size);
 #ifdef OC_OSCORE
-  device->ep.flags += OSCORE;
+  device->ep.flags |= OSCORE;
   PRINT("  [C] enable OSCORE encryption\n");
+  PRINTipaddr_flags(device->ep);
 #endif
 
   user_struct_t *new_cbdata;
@@ -703,8 +712,9 @@ ets_cbor_delete(char *sn, char *uri, char *query, char *id)
 
   PRINT("  [C]ets_cbor_delete: [%s], [%s] [%s] [%s]\n", sn, uri, id, query);
 #ifdef OC_OSCORE
-  device->ep.flags += OSCORE;
+  device->ep.flags |= OSCORE;
   PRINT("  [C] enable OSCORE encryption\n");
+  PRINTipaddr_flags(device->ep);
 #endif
 
   user_struct_t *new_cbdata;
