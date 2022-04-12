@@ -105,8 +105,6 @@ def do_spake(my_stack, password):
         print("========spake=========", sn)
         my_stack.initiate_spake(sn, password, sn)
 
-
-#
 if __name__ == '__main__':  # pragma: no cover
 
     parser = argparse.ArgumentParser()

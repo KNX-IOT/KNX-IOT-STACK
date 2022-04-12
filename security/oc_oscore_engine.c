@@ -149,6 +149,13 @@ oc_oscore_recv_message(oc_message_t *message)
       oscore_ctx =
         oc_oscore_find_context_by_kid(oscore_ctx, message->endpoint.device,
                                       oscore_pkt->kid, oscore_pkt->kid_len);
+      if (oscore_ctx != NULL) {
+        // copy the serial number as return token, so that the reply can find
+        // the context again.
+        OC_DBG_OSCORE("--- setting endpoint serial number with found token");
+        oc_string_copy_from_char(&message->endpoint.serial_number,
+                                 (char *)oscore_ctx->token_id);
+      }
     } else {
       /* If message is response */
       if (oscore_pkt->code > OC_FETCH) {
@@ -571,13 +578,6 @@ oc_oscore_send_message(oc_message_t *msg)
     message->length = msg->length;
     memcpy(message->data, msg->data, msg->length);
     memcpy(&message->endpoint, &msg->endpoint, sizeof(oc_endpoint_t));
-
-    // PRINT(" oc_oscore_send_message: msg lenght: %d\n", message->length);
-    // PRINT(" oc_oscore_send_message: data[0]: %d\n", message->data[0]);
-    // PRINT(" oc_oscore_send_message: input endpoint flags:\n");
-    // PRINTipaddr_flags(msg->endpoint);
-    // PRINT(" oc_oscore_send_message: copied endpoint flags:\n");
-    // PRINTipaddr_flags(message->endpoint);
 
     bool msg_valid = false;
     if (msg->ref_count > 1) {

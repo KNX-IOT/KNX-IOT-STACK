@@ -882,8 +882,8 @@ oc_endpoint_t g_endpoint;
 void
 response_get_pm(oc_client_response_t *data)
 {
-  PRINT("response_get_pm: content format format:%d  code:%d\n",
-        data->content_format, data->code);
+  PRINT("response_get_pm: content format :%d  code:%d\n", data->content_format,
+        data->code);
 }
 
 void
@@ -967,10 +967,12 @@ void
 print_usage()
 {
   PRINT("Usage:\n");
-  PRINT("none : starts the application as server (e.g. no client "
+  PRINT("none : starts the application as server (e.g. no client interaction) "
         "functionality)\n ");
   PRINT("-help : this message\n");
   PRINT("s-mode : does an event (to itself)\n");
+  PRINT("oscore : spake2hand shake (to itself) & issue secure request to "
+        "/dev/pm \n");
   PRINT("reset  : does an full reset of the device\n");
   exit(0);
 }
@@ -991,7 +993,7 @@ main(int argc, char *argv[])
   int init;
 
   bool do_send_s_mode = false;
-  bool do_send_oscore = true; /// false;  /// true for debugging
+  bool do_send_oscore = false;
   g_reset = true;
 
   oc_clock_time_t next_event;
