@@ -152,7 +152,8 @@ if __name__ == '__main__':  # pragma: no cover
             time.sleep(1)
         do_discover(the_stack, args.serial_number, args.scope)
         time.sleep(1)
-        ret = do_programming_mode(the_stack, value)
+        ret = 1
+        #ret = do_programming_mode(the_stack, value)
         if ret > 0:
             do_spake(the_stack, str(args.password))
             ret = do_programming_mode(the_stack, value)
