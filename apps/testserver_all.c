@@ -950,17 +950,13 @@ discovery_cb(const char *payload, int len, oc_endpoint_t *endpoint,
  * fires only once
  * @param data the callback data
  */
-oc_event_callback_retval_t
+void
 issue_requests_call_delayed(void *data)
 {
   (void)data;
 
 
    oc_do_wk_discovery_all("ep=urn:knx:sn.000005", 2, discovery_cb, NULL);
-
-#ifdef OC_OSCORE
-
-#endif
 
   return OC_EVENT_DONE;
 }
@@ -1007,7 +1003,8 @@ main(int argc, char *argv[])
 {
   int init;
 
-  bool do_send_s_mode = true;
+  bool do_send_s_mode = false;
+  bool do_send_oscore = true;  /// false;  /// true for debugging
   g_reset = true;
 
   oc_clock_time_t next_event;
@@ -1020,6 +1017,10 @@ main(int argc, char *argv[])
     if (strcmp(argv[1], "s-mode") == 0) {
       do_send_s_mode = true;
       PRINT(" smode: %d\n", do_send_s_mode);
+    }
+    if (strcmp(argv[1], "oscore") == 0) {
+      do_send_oscore = true;
+      PRINT(" oscore: %d\n", do_send_oscore);
     }
     if (strcmp(argv[1], "reset") == 0) {
       PRINT(" internal reset\n");
@@ -1090,7 +1091,12 @@ main(int argc, char *argv[])
   };
 #ifdef OC_CLIENT
   if (do_send_s_mode) {
-    //   handler.requests_entry = issue_requests_s_mode;
+    handler.requests_entry = issue_requests_s_mode;
+  }
+#endif
+
+#ifdef OC_CLIENT
+  if (do_send_oscore) {
     handler.requests_entry = issue_requests_call_delayed;
   }
 #endif
