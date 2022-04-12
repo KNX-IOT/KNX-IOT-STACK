@@ -882,8 +882,8 @@ oc_endpoint_t g_endpoint;
 void
 response_get_pm(oc_client_response_t *data)
 {
-  PRINT("response_get_pm: content format :%d  code:%d\n",
-        data->content_format, data->code);
+  PRINT("response_get_pm: content format :%d  code:%d\n", data->content_format,
+        data->code);
 }
 
 void
@@ -971,7 +971,8 @@ print_usage()
         "functionality)\n ");
   PRINT("-help : this message\n");
   PRINT("s-mode : does an event (to itself)\n");
-  PRINT("oscore : spake2hand shake (to itself) & issue secure request to /dev/pm \n");
+  PRINT("oscore : spake2hand shake (to itself) & issue secure request to "
+        "/dev/pm \n");
   PRINT("reset  : does an full reset of the device\n");
   exit(0);
 }

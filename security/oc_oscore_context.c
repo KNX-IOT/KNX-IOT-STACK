@@ -80,7 +80,7 @@ oc_oscore_find_context_by_token_mid(size_t device, uint8_t *token,
                                     uint8_t *request_piv_len, bool tcp)
 {
   (void)device;
-  char* serial_number = NULL;
+  char *serial_number = NULL;
 #ifdef OC_CLIENT
   /* Search for client cb by token */
   oc_client_cb_t *cb = oc_ri_find_client_cb_by_token(token, token_len);
@@ -111,22 +111,23 @@ oc_oscore_find_context_by_token_mid(size_t device, uint8_t *token,
   oc_oscore_context_t *ctx = (oc_oscore_context_t *)oc_list_head(contexts);
 
   if (serial_number == NULL) {
-    OC_ERR("***could not find matching OSCORE context: serial number is NULL***");
+    OC_ERR(
+      "***could not find matching OSCORE context: serial number is NULL***");
     return NULL;
   }
 
-   while (ctx != NULL) {
-  //  oc_sec_cred_t *cred = (oc_sec_cred_t *)ctx->cred;
-  //  if (memcmp(cred->subjectuuid.id, uuid->id, 16) == 0 &&
-  //      ctx->device == device) {
-  //    return ctx;
-  //   }
-     char *ctx_serial_number = ctx->token_id;
-     if (strncmp(serial_number, ctx_serial_number, 16) == 0) {
-       PRINT("  FOUND\n");
-       return ctx;
-     }
-     ctx = ctx->next;
+  while (ctx != NULL) {
+    //  oc_sec_cred_t *cred = (oc_sec_cred_t *)ctx->cred;
+    //  if (memcmp(cred->subjectuuid.id, uuid->id, 16) == 0 &&
+    //      ctx->device == device) {
+    //    return ctx;
+    //   }
+    char *ctx_serial_number = ctx->token_id;
+    if (strncmp(serial_number, ctx_serial_number, 16) == 0) {
+      PRINT("  FOUND\n");
+      return ctx;
+    }
+    ctx = ctx->next;
   }
   return ctx;
 }
@@ -246,7 +247,7 @@ oc_oscore_add_context(size_t device, const char *senderid,
       goto add_oscore_context_error;
     }
 
-    ctx->sendid_len = (uint8_t) id_len;
+    ctx->sendid_len = (uint8_t)id_len;
   }
   PRINT("SendID:");
   OC_LOGbytes_OSCORE(ctx->sendid, ctx->sendid_len);

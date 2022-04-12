@@ -551,7 +551,7 @@ ets_cbor_get_unsecured(char *sn, char *uri, char *query, char *cbdata)
 
   /* remove OSCORE flag*/
   device->ep.flags = IPV6;
-  //device->ep.flags &= OSCORE;
+  // device->ep.flags &= OSCORE;
   PRINTipaddr_flags(device->ep);
 
   ret = oc_do_get_ex(uri, &device->ep, query, general_get_cb, HIGH_QOS,
@@ -612,7 +612,7 @@ ets_linkformat_get_unsecured(char *sn, char *uri, char *query, char *cbdata)
   PRINT("  [C]ets_linkformat_get_unsecured: [%s], [%s] [%s] [%s]\n", sn, uri,
         query, cbdata);
   device->ep.flags = IPV6;
-  //device->ep.flags &= OSCORE;
+  // device->ep.flags &= OSCORE;
   PRINTipaddr_flags(device->ep);
 
   user_struct_t *new_cbdata;
@@ -913,7 +913,7 @@ ets_issue_requests_s_mode(int scope, int sia, int ga, int iid, char *st,
   memset(&mcast, 0, sizeof(mcast));
   mcast = oc_create_multicast_group_address(mcast, ga, iid, scope);
 
-  #ifdef OC_OSCORE
+#ifdef OC_OSCORE
   mcast.flags |= OSCORE;
   PRINT("  [C] enable OSCORE encryption\n");
   PRINTipaddr_flags(mcast);
