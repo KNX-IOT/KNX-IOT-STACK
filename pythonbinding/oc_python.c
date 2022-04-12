@@ -516,6 +516,7 @@ ets_cbor_get(char *sn, char *uri, char *query, char *cbdata)
 
   PRINT("  [C]ets_cbor_get: [%s], [%s] [%s] [%s]\n", sn, uri, query, cbdata);
 #ifdef OC_OSCORE
+  device->ep.flags = IPV6;
   device->ep.flags += OSCORE;
   PRINT("  [C] enable OSCORE encryption\n");
   oc_string_copy_from_char(&device->ep.serial_number, sn);
@@ -549,7 +550,8 @@ ets_cbor_get_unsecured(char *sn, char *uri, char *query, char *cbdata)
         cbdata);
 
   /* remove OSCORE flag*/
-  device->ep.flags &= OSCORE;
+  device->ep.flags = IPV6;
+  //device->ep.flags &= OSCORE;
   PRINTipaddr_flags(device->ep);
 
   ret = oc_do_get_ex(uri, &device->ep, query, general_get_cb, HIGH_QOS,
@@ -572,6 +574,8 @@ ets_linkformat_get(char *sn, char *uri, char *query, char *cbdata)
         cbdata);
 #ifdef OC_OSCORE
   PRINT(" [C] enable OSCORE encryption\n");
+
+  device->ep.flags = IPV6;
   device->ep.flags != OSCORE;
   PRINTipaddr_flags(device->ep);
   oc_string_copy_from_char(&device->ep.serial_number, sn);
@@ -607,7 +611,8 @@ ets_linkformat_get_unsecured(char *sn, char *uri, char *query, char *cbdata)
 
   PRINT("  [C]ets_linkformat_get_unsecured: [%s], [%s] [%s] [%s]\n", sn, uri,
         query, cbdata);
-  device->ep.flags &= OSCORE;
+  device->ep.flags = IPV6;
+  //device->ep.flags &= OSCORE;
   PRINTipaddr_flags(device->ep);
 
   user_struct_t *new_cbdata;
@@ -642,6 +647,8 @@ ets_cbor_post(char *sn, char *uri, char *query, char *id, int size, char *data)
   PRINT("  [C]ets_cbor_post: [%s], [%s] [%s] [%s] %d\n", sn, uri, id, query,
         size);
 #ifdef OC_OSCORE
+
+  device->ep.flags = IPV6;
   device->ep.flags |= OSCORE;
   PRINT("  [C] enable OSCORE encryption\n");
   PRINTipaddr_flags(device->ep);
@@ -680,6 +687,8 @@ ets_cbor_put(char *sn, char *uri, char *query, char *id, int size, char *data)
   PRINT("  [C]ets_cbor_put: [%s], [%s] [%s] [%s] %d\n", sn, uri, id, query,
         size);
 #ifdef OC_OSCORE
+
+  device->ep.flags = IPV6;
   device->ep.flags |= OSCORE;
   PRINT("  [C] enable OSCORE encryption\n");
   PRINTipaddr_flags(device->ep);
@@ -717,6 +726,8 @@ ets_cbor_delete(char *sn, char *uri, char *query, char *id)
 
   PRINT("  [C]ets_cbor_delete: [%s], [%s] [%s] [%s]\n", sn, uri, id, query);
 #ifdef OC_OSCORE
+
+  device->ep.flags = IPV6;
   device->ep.flags |= OSCORE;
   PRINT("  [C] enable OSCORE encryption\n");
   PRINTipaddr_flags(device->ep);
@@ -901,6 +912,13 @@ ets_issue_requests_s_mode(int scope, int sia, int ga, int iid, char *st,
   oc_endpoint_t mcast;
   memset(&mcast, 0, sizeof(mcast));
   mcast = oc_create_multicast_group_address(mcast, ga, iid, scope);
+
+  #ifdef OC_OSCORE
+  mcast.flags |= OSCORE;
+  PRINT("  [C] enable OSCORE encryption\n");
+  PRINTipaddr_flags(mcast);
+#endif
+  mcast.group_id = ga;
 
   if (oc_init_post("/.knx", &mcast, NULL, NULL, LOW_QOS, NULL)) {
     /*
