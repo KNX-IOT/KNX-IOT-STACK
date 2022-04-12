@@ -946,21 +946,14 @@ discovery_cb(const char *payload, int len, oc_endpoint_t *endpoint,
 }
 
 /**
- * send a unicast secure message
- * fires only once
- * @param data the callback data
+ * discovers myself
  */
 void
-issue_requests_call_delayed(void *data)
+issue_requests_oscore(void)
 {
-  (void)data;
-
-
+  // first step is discover myself..
    oc_do_wk_discovery_all("ep=urn:knx:sn.000005", 2, discovery_cb, NULL);
-
-  return OC_EVENT_DONE;
 }
-
 
 
 /**
@@ -1097,7 +1090,7 @@ main(int argc, char *argv[])
 
 #ifdef OC_CLIENT
   if (do_send_oscore) {
-    handler.requests_entry = issue_requests_call_delayed;
+    handler.requests_entry = issue_requests_oscore;
   }
 #endif
 
