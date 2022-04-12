@@ -395,7 +395,7 @@ int oc_uri_get_wildcard_value_as_string(const char *uri_resource,
  * @param string2 the char* to copy from
  * @return int 0 == success
  */
-int oc_string_copy_from_char(oc_string_t *string1, char *string2);
+int oc_string_copy_from_char(oc_string_t *string1, const char *string2);
 
 /**
  * @brief copy oc_string
