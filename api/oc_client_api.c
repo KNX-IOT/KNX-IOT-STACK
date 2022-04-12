@@ -363,17 +363,18 @@ oc_do_delete_ex(const char *uri, oc_endpoint_t *endpoint, const char *query,
 }
 
 bool
-oc_do_get_ex_secured(const char *uri, oc_endpoint_t *endpoint, const char *query, const char* token,
-             oc_response_handler_t handler, oc_qos_t qos,
-             oc_content_format_t content, oc_content_format_t accept,
-             void *user_data)
+oc_do_get_ex_secured(const char *uri, oc_endpoint_t *endpoint,
+                     const char *query, const char *token,
+                     oc_response_handler_t handler, oc_qos_t qos,
+                     oc_content_format_t content, oc_content_format_t accept,
+                     void *user_data)
 {
   oc_client_handler_t client_handler;
   client_handler.response = handler;
 
   endpoint->flags += OSCORE;
   PRINT("  enable OSCORE encryption\n");
-    oc_string_copy_from_char(&endpoint->serial_number, token);
+  oc_string_copy_from_char(&endpoint->serial_number, token);
   PRINT("  ep serial %s\n", oc_string(endpoint->serial_number));
 
   oc_client_cb_t *cb = oc_ri_alloc_client_cb(uri, endpoint, OC_GET, query,
@@ -390,7 +391,6 @@ oc_do_get_ex_secured(const char *uri, oc_endpoint_t *endpoint, const char *query
 
   return status;
 }
-
 
 bool
 oc_do_get_ex(const char *uri, oc_endpoint_t *endpoint, const char *query,
