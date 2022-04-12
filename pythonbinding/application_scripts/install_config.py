@@ -62,7 +62,7 @@ def safe_print(response):
         response.print_payload()
     else:
         print("no response")
-        
+
 def do_discover(my_stack, serial_number, scope = 2):
     time.sleep(1)
     query = "ep=urn:knx:sn."+str(serial_number)
