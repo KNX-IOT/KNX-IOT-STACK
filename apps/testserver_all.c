@@ -877,6 +877,107 @@ issue_requests_s_mode_delayed(void *data)
   return OC_EVENT_DONE;
 }
 
+oc_endpoint_t g_endpoint;
+
+void
+response_get_pm(oc_client_response_t *data)
+{
+  PRINT("[C]response_get_pm: content format %d  %.*s\n", data->content_format,
+        (int)data->_payload_len, data->_payload);
+  oc_rep_t *rep = data->payload;
+  oc_string_t my_address;
+  char *my_sn = NULL;
+
+  oc_endpoint_to_string(data->endpoint, &my_address);
+
+  oc_free_string(&my_address);
+}
+
+
+void
+spake_cb(int error, char *sn, char *oscore_id, uint8_t *secret,
+                       int secret_size)
+{
+
+#ifdef OC_OSCORE
+  g_endpoint.flags += OSCORE;
+  PRINT("  [C] enable OSCORE encryption\n");
+  oc_string_copy_from_char(&g_endpoint.serial_number, sn);
+  PRINT("  [C] ep serial %s\n", oc_string(g_endpoint.serial_number));
+#endif
+
+  //oc_do_get_ex("/dev/pm", &g_endpoint, NULL, &response_get_pm, HIGH_QOS,
+  //             APPLICATION_CBOR, APPLICATION_CBOR, NULL);
+
+  PRINT("spake CB\n");
+  oc_do_get_ex("/dev/pm", &g_endpoint, NULL, response_get_pm, HIGH_QOS,
+               APPLICATION_CBOR, APPLICATION_CBOR, NULL);
+}
+
+
+static oc_discovery_flags_t
+discovery_cb(const char *payload, int len, oc_endpoint_t *endpoint,
+             void *user_data)
+{
+  //(void)anchor;
+  (void)user_data;
+  (void)endpoint;
+  const char *uri;
+  int uri_len;
+  const char *param;
+  int param_len;
+  char *my_serialnum = "000005";
+
+  PRINT("[C]DISCOVERY: %.*s\n", len, payload);
+  int nr_entries = oc_lf_number_of_entries(payload, len);
+  PRINT("[C] entries %d\n", nr_entries);
+  int found = 0;
+
+  PRINT("[C] issue get on /dev/pm\n");
+  oc_endpoint_print(endpoint);
+
+
+    /* remove OSCORE flag */
+  endpoint->flags = IPV6;
+  PRINT("  [C] disable OSCORE encryption\n");
+  PRINTipaddr_flags(*endpoint);
+
+  if (oc_string_len(endpoint->serial_number) == 0) {
+    oc_new_string(&endpoint->serial_number, my_serialnum,
+                  strlen(my_serialnum));
+  }
+  
+  g_endpoint = *endpoint;
+  
+  oc_set_spake_response_cb(spake_cb);
+  oc_initiate_spake(endpoint, "LETTUCE", my_serialnum);
+
+  PRINT("[C] DISCOVERY- END\n");
+  return OC_STOP_DISCOVERY;
+}
+
+/**
+ * send a unicast secure message
+ * fires only once
+ * @param data the callback data
+ */
+oc_event_callback_retval_t
+issue_requests_call_delayed(void *data)
+{
+  (void)data;
+
+
+   oc_do_wk_discovery_all("ep=urn:knx:sn.000005", 2, discovery_cb, NULL);
+
+#ifdef OC_OSCORE
+
+#endif
+
+  return OC_EVENT_DONE;
+}
+
+
+
 /**
  * set a multicast s-mode message as delayed callback
  */
@@ -1001,6 +1102,7 @@ main(int argc, char *argv[])
 #ifdef OC_CLIENT
   if (do_send_s_mode) {
     //   handler.requests_entry = issue_requests_s_mode;
+    handler.requests_entry = issue_requests_call_delayed;
   }
 #endif
 

@@ -546,7 +546,7 @@ oc_oscore_send_message(oc_message_t *msg)
                                                     message->endpoint.group_id);
   }
   if (oscore_ctx == NULL) {
-    OC_DBG_OSCORE("oc_oscore_send_message: No OSCORE context found. ERROR");
+    OC_ERR("oc_oscore_send_message: No OSCORE context found. ERROR");
   }
 
   if (oscore_ctx) {
@@ -571,6 +571,13 @@ oc_oscore_send_message(oc_message_t *msg)
     message->length = msg->length;
     memcpy(message->data, msg->data, msg->length);
     memcpy(&message->endpoint, &msg->endpoint, sizeof(oc_endpoint_t));
+
+    PRINT(" oc_oscore_send_message: msg lenght: %d\n", message->length);
+    PRINT(" oc_oscore_send_message: data[0]: %d\n", message->data[0]);
+    PRINT(" oc_oscore_send_message: input endpoint flags:\n");
+    PRINTipaddr_flags(msg->endpoint);
+    PRINT(" oc_oscore_send_message: copied endpoint flags:\n");
+    PRINTipaddr_flags(message->endpoint);
 
     bool msg_valid = false;
     if (msg->ref_count > 1) {
@@ -612,12 +619,7 @@ oc_oscore_send_message(oc_message_t *msg)
         coap_pkt->code == CSM_7_01
 #endif /* OC_TCP */
     ) {
-      // oc_sec_pstat_t *pstat = oc_sec_get_pstat(message->endpoint.device);
-      // if (pstat->s != OC_DOS_RFNOP) {
-      //   OC_ERR("### device not in RFNOP; stop further processing ###");
-      //   goto oscore_send_error;
-      // }
-
+ 
       OC_DBG_OSCORE("### protecting outgoing request ###");
       /* Request */
       /* Use context->SSN as Partial IV */
