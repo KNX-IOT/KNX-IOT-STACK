@@ -126,6 +126,18 @@ coap_send_transaction(coap_transaction_t *t)
   OC_LOGbytes(t->message->data, t->message->length);
   bool confirmable = false;
 
+  if (t == NULL) {
+    OC_ERR("transaction == NULL");
+  }
+  if (t->message == NULL) {
+    OC_ERR("message in transaction == NULL");
+  }
+  if (t->message->data == NULL) {
+    OC_ERR("data in message in transaction == NULL");
+  }
+
+  PRINT(" coap_send_transaction  xxxxx %d\n", t->message->data[0]);
+
   confirmable =
     (COAP_TYPE_CON == ((COAP_HEADER_TYPE_MASK & t->message->data[0]) >>
                        COAP_HEADER_TYPE_POSITION))

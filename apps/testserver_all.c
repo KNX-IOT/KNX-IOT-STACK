@@ -877,6 +877,79 @@ issue_requests_s_mode_delayed(void *data)
   return OC_EVENT_DONE;
 }
 
+oc_endpoint_t g_endpoint;
+
+void
+response_get_pm(oc_client_response_t *data)
+{
+  PRINT("response_get_pm: content format format:%d  code:%d\n",
+        data->content_format, data->code);
+}
+
+void
+spake_cb(int error, char *sn, char *oscore_id, uint8_t *secret, int secret_size)
+{
+  PRINT("spake CB: invoke PM with encryption!!!!!\n");
+#ifdef OC_OSCORE
+  g_endpoint.flags += OSCORE;
+  PRINT("  spake_cb: enable OSCORE encryption\n");
+  oc_string_copy_from_char(&g_endpoint.serial_number, sn);
+  PRINT("  spake_cb: ep serial %s\n", oc_string(g_endpoint.serial_number));
+#endif
+  PRINT("spake CB\n");
+  oc_do_get_ex("/dev/pm", &g_endpoint, NULL, response_get_pm, HIGH_QOS,
+               APPLICATION_CBOR, APPLICATION_CBOR, NULL);
+}
+
+static oc_discovery_flags_t
+discovery_cb(const char *payload, int len, oc_endpoint_t *endpoint,
+             void *user_data)
+{
+  //(void)anchor;
+  (void)user_data;
+  (void)endpoint;
+  const char *uri;
+  int uri_len;
+  const char *param;
+  int param_len;
+  char *my_serialnum = "000005";
+
+  PRINT("[C]DISCOVERY: %.*s\n", len, payload);
+  int nr_entries = oc_lf_number_of_entries(payload, len);
+  PRINT("[C] entries %d\n", nr_entries);
+  int found = 0;
+
+  PRINT("[C] issue get on /dev/pm\n");
+  oc_endpoint_print(endpoint);
+
+  /* remove OSCORE flag */
+  endpoint->flags = IPV6;
+  PRINT("  [C] disable OSCORE encryption\n");
+  PRINTipaddr_flags(*endpoint);
+
+  if (oc_string_len(endpoint->serial_number) == 0) {
+    oc_new_string(&endpoint->serial_number, my_serialnum, strlen(my_serialnum));
+  }
+
+  g_endpoint = *endpoint;
+
+  oc_set_spake_response_cb(spake_cb);
+  oc_initiate_spake(endpoint, "LETTUCE", my_serialnum);
+
+  PRINT("[C] DISCOVERY- END\n");
+  return OC_STOP_DISCOVERY;
+}
+
+/**
+ * discovers myself
+ */
+void
+issue_requests_oscore(void)
+{
+  // first step is discover myself..
+  oc_do_wk_discovery_all("ep=urn:knx:sn.000005", 2, discovery_cb, NULL);
+}
+
 /**
  * set a multicast s-mode message as delayed callback
  */
@@ -917,7 +990,8 @@ main(int argc, char *argv[])
 {
   int init;
 
-  bool do_send_s_mode = true;
+  bool do_send_s_mode = false;
+  bool do_send_oscore = true; /// false;  /// true for debugging
   g_reset = true;
 
   oc_clock_time_t next_event;
@@ -930,6 +1004,10 @@ main(int argc, char *argv[])
     if (strcmp(argv[1], "s-mode") == 0) {
       do_send_s_mode = true;
       PRINT(" smode: %d\n", do_send_s_mode);
+    }
+    if (strcmp(argv[1], "oscore") == 0) {
+      do_send_oscore = true;
+      PRINT(" oscore: %d\n", do_send_oscore);
     }
     if (strcmp(argv[1], "reset") == 0) {
       PRINT(" internal reset\n");
@@ -1000,7 +1078,13 @@ main(int argc, char *argv[])
   };
 #ifdef OC_CLIENT
   if (do_send_s_mode) {
-    //   handler.requests_entry = issue_requests_s_mode;
+    handler.requests_entry = issue_requests_s_mode;
+  }
+#endif
+
+#ifdef OC_CLIENT
+  if (do_send_oscore) {
+    handler.requests_entry = issue_requests_oscore;
   }
 #endif
 

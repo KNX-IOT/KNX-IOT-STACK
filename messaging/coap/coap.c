@@ -1061,7 +1061,7 @@ coap_oscore_serialize_message(void *packet, uint8_t *buffer, bool inner,
   coap_pkt->buffer = buffer;
   coap_pkt->version = 1;
 
-  /* coap header option serialize first to know total length about options */
+  /* CoAP header option serialize first to know total length about options */
   option_length_calculation =
     coap_serialize_options(coap_pkt, NULL, inner, outer, oscore);
   header_length_calculation += option_length_calculation;
@@ -1116,7 +1116,7 @@ coap_oscore_serialize_message(void *packet, uint8_t *buffer, bool inner,
     }
   }
 
-  /* empty packet, dont need to do more stuff */
+  /* empty packet, don't need to do more stuff */
   if (outer && !coap_pkt->code) {
     OC_DBG("Done serializing empty message at %p-", coap_pkt->buffer);
     return token_location;
