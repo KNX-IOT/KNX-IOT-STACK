@@ -882,15 +882,8 @@ oc_endpoint_t g_endpoint;
 void
 response_get_pm(oc_client_response_t *data)
 {
-  PRINT("[C]response_get_pm: content format %d  %.*s\n", data->content_format,
-        (int)data->_payload_len, data->_payload);
-  oc_rep_t *rep = data->payload;
-  oc_string_t my_address;
-  char *my_sn = NULL;
-
-  oc_endpoint_to_string(data->endpoint, &my_address);
-
-  oc_free_string(&my_address);
+  PRINT("response_get_pm: content format format:%d  code:%d\n", data->content_format,
+       data->code); 
 }
 
 
@@ -898,17 +891,13 @@ void
 spake_cb(int error, char *sn, char *oscore_id, uint8_t *secret,
                        int secret_size)
 {
-
+  PRINT("spake CB: invoke PM with encryption!!!!!\n");
 #ifdef OC_OSCORE
   g_endpoint.flags += OSCORE;
-  PRINT("  [C] enable OSCORE encryption\n");
+  PRINT("  spake_cb: enable OSCORE encryption\n");
   oc_string_copy_from_char(&g_endpoint.serial_number, sn);
-  PRINT("  [C] ep serial %s\n", oc_string(g_endpoint.serial_number));
+  PRINT("  spake_cb: ep serial %s\n", oc_string(g_endpoint.serial_number));
 #endif
-
-  //oc_do_get_ex("/dev/pm", &g_endpoint, NULL, &response_get_pm, HIGH_QOS,
-  //             APPLICATION_CBOR, APPLICATION_CBOR, NULL);
-
   PRINT("spake CB\n");
   oc_do_get_ex("/dev/pm", &g_endpoint, NULL, response_get_pm, HIGH_QOS,
                APPLICATION_CBOR, APPLICATION_CBOR, NULL);
