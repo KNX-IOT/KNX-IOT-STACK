@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #############################
 #
-#    copyright 2021 Cascoda Ltd.
+#    copyright 2021-2022 Cascoda Ltd.
 #    Redistribution and use in source and binary forms, with or without modification,
 #    are permitted provided that the following conditions are met:
 #    1.  Redistributions of source code must retain the above copyright notice,
@@ -56,6 +56,12 @@ sys.path.append(parentdir)
 
 #from knx_stack import KNXIOTStack
 import knx_stack
+
+def safe_print(response):
+    if response is not None:
+        response.print_payload()
+    else:
+        print("no response")
 
 def do_discover(my_stack, serial_number, scope = 2):
     time.sleep(1)
@@ -132,49 +138,64 @@ def convert_json_tag2integer(table):
         new_data.append(new_item)
     return new_data
 
+def do_load_state(my_stack):
+    print("do_load_state :")
+    if my_stack.get_nr_devices() == 0:
+        return -1
+    sn = my_stack.device_array[0].sn
+    response =  my_stack.issue_cbor_get(sn,"/a/lsm")
+    safe_print(response)
+    if response is None:
+        return 1
+    if response.status != 0:
+        print("ERROR {} {}".format(response.status,
+            my_stack.get_error_string_from_code(response.status)))
+        return 2
+    return 0
+
+def do_reset(my_stack, sn):
+    content = { 2: "reset"}
+    print("reset :", content)
+    response =  my_stack.issue_cbor_post(sn,"/.well-known/knx",content)
+    safe_print(response)
+    my_stack.purge_response(response)
 
 def do_install_device(my_stack, sn, ia, iid, got_content, rec_content, pub_content):
     # sensor, e.g sending
     print ("--------------------")
     print ("Installing SN: ", sn)
-    content = { 2: "reset"}
-    print("reset :", content)
-    response =  my_stack.issue_cbor_post(sn,"/.well-known/knx",content)
-    print ("response:",response)
-    my_stack.purge_response(response)
-
     content = { 12: int(ia), 26:int(iid)}
     print("set IA :", content)
     response = my_stack.issue_cbor_put(sn,"/dev/ia",content)
-    print ("response:",response)
+    safe_print(response)
     my_stack.purge_response(response)
 
     # content = { 2: "startLoading"}
     content = { 2: 1}
     print("lsm :", content)
     response =  my_stack.issue_cbor_post(sn,"/a/lsm",content)
-    print ("response:",response)
+    safe_print(response)
     my_stack.purge_response(response)
     response =  my_stack.issue_cbor_get(sn,"/a/lsm")
-    print ("response:",response)
+    safe_print(response)
     my_stack.purge_response(response)
     content = got_content
     response =  my_stack.issue_cbor_post(sn,"/fp/g",content)
-    print ("response:",response)
+    safe_print(response)
     my_stack.purge_response(response)
 
     response =  my_stack.issue_linkformat_get(sn,"/fp/g")
-    print ("response:",response)
+    safe_print(response)
     my_stack.purge_response(response)
 
     if rec_content is not None:
         content = rec_content
         response =  my_stack.issue_cbor_post(sn,"/fp/r",content)
-        print ("response:",response)
+        safe_print(response)
         my_stack.purge_response(response)
 
         response =  my_stack.issue_linkformat_get(sn,"/fp/r")
-        print ("response:",response)
+        safe_print(response)
         my_stack.purge_response(response)
     else:
         print ("no recipient table")
@@ -182,11 +203,11 @@ def do_install_device(my_stack, sn, ia, iid, got_content, rec_content, pub_conte
     if pub_content is not None:
         content = pub_content
         response =  my_stack.issue_cbor_post(sn,"/fp/p",content)
-        print ("response:",response)
+        safe_print(response)
         my_stack.purge_response(response)
 
         response =  my_stack.issue_linkformat_get(sn,"/fp/p")
-        print ("response:",response)
+        safe_print(response)
         my_stack.purge_response(response)
     else:
         print ("no publisher table")
@@ -194,11 +215,11 @@ def do_install_device(my_stack, sn, ia, iid, got_content, rec_content, pub_conte
     content = { 2: 2}
     print("lsm :", content)
     response =  my_stack.issue_cbor_post(sn,"/a/lsm",content)
-    print ("response:",response)
+    safe_print(response)
     my_stack.purge_response(response)
 
     response =  my_stack.issue_cbor_get(sn,"/a/lsm")
-    print ("response:",response)
+    safe_print(response)
     my_stack.purge_response(response)
 
 
@@ -207,29 +228,41 @@ def do_install(my_stack, internal_address, filename):
         print("device not found!")
         return
     sn = my_stack.device_array[0].sn
-
     json_data = load_json_file(filename)
     if json_data is None:
         return
-
     sn = my_stack.device_array[0].sn
     print (" SN : ", sn)
     iid = json_data["iid"] # "5"
     ia = internal_address
-
     got_content = json_data["groupobject"]
     got_num = convert_json_tag2integer(got_content)
-
     rep_num = None
     if "recipient" in json_data:
         rep_content = json_data["recipient"]
         rep_num = convert_json_tag2integer(rep_content)
-
     pub_num = None
     if "publisher" in json_data:
         pub_content = json_data["publisher"]
         pub_num = convert_json_tag2integer(pub_content)
     do_install_device(my_stack, sn, ia, iid, got_num, rep_num, pub_num )
+
+def self_reset(my_stack):
+    """
+    reset myself
+    """
+    my_stack.reset_myself()
+
+def do_spake(my_stack, password):
+    """
+    do spake handshake
+    """
+    if my_stack.get_nr_devices() > 0:
+        sn = my_stack.device_array[0].sn
+        print("========spake=========", sn)
+        print("password : ", password)
+        my_stack.initiate_spake(sn, password, sn)
+
 
 if __name__ == '__main__':  # pragma: no cover
     parser = argparse.ArgumentParser()
@@ -247,17 +280,30 @@ if __name__ == '__main__':  # pragma: no cover
     parser.add_argument("-ia", "--internal_address",
                     help="internal address of the device", nargs='?',
                     const=1, required=True)
+    parser.add_argument("-password", "--password", default="LETTUCE",
+                    help="password default:LETTUCE", nargs='?',
+                    const="true", required=False)
+    parser.add_argument("-reset", "--reset",default=False,
+                    help="reset myself", nargs='?',
+                    const="true", required=False)
     print(sys.argv)
     args = parser.parse_args()
     print("scope            :" + str(args.scope))
     print("serial number    :" + str(args.serialnumber))
     print("internal address :" + str(args.internal_address))
     print("filename         :" + str(args.file))
+    print("password         :" + str(args.password))
+    print("reset myself     :" + str(args.reset))
     the_stack = knx_stack.KNXIOTStack()
     the_stack.start_thread()
     signal.signal(signal.SIGINT, the_stack.sig_handler)
     try:
         do_discover(the_stack, args.serialnumber, args.scope)
+        time.sleep(1)
+        error = 1
+        #error = do_load_state(the_stack)
+        if error > 0:
+            do_spake(the_stack, str(args.password))
         do_install(the_stack, args.internal_address, args.file)
     except:
         traceback.print_exc()
