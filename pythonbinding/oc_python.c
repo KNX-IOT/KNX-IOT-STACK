@@ -114,6 +114,7 @@ typedef struct user_struct_t
   char url[200];
   char sn[200];
   char r_id[200];
+  oc_endpoint_t ep;
 } user_struct_t;
 
 /**
@@ -505,30 +506,32 @@ ets_cbor_get(char *sn, char *uri, char *query, char *cbdata)
 {
   int ret = -1;
   device_handle_t *device = ets_getdevice_from_sn(sn);
+  
+  PRINT("  [C]ets_cbor_get: [%s], [%s] [%s] [%s]\n", sn, uri, query, cbdata);
 
-  user_struct_t *new_cbdata;
+  user_struct_t *new_cbdata = NULL;
   new_cbdata = (user_struct_t *)malloc(sizeof(user_struct_t));
   if (new_cbdata != NULL) {
     strcpy(new_cbdata->r_id, cbdata);
     strcpy(new_cbdata->url, uri);
     strcpy(new_cbdata->sn, sn);
-  }
+    oc_endpoint_copy(&new_cbdata->ep, &device->ep);
 
-  PRINT("  [C]ets_cbor_get: [%s], [%s] [%s] [%s]\n", sn, uri, query, cbdata);
 #ifdef OC_OSCORE
-  device->ep.flags = IPV6;
-  device->ep.flags += OSCORE;
-  PRINT("  [C] enable OSCORE encryption\n");
-  oc_string_copy_from_char(&device->ep.serial_number, sn);
-  PRINT("  [C] ep serial %s\n", oc_string(device->ep.serial_number));
+    new_cbdata->ep.flags = IPV6;
+    new_cbdata->ep.flags += OSCORE;
+    PRINT("  [C] enable OSCORE encryption\n");
+    oc_string_copy_from_char(&new_cbdata->ep.serial_number, sn);
+    PRINT("  [C] ep serial %s\n", oc_string(new_cbdata->ep.serial_number));
 #endif
 
-  ret = oc_do_get_ex(uri, &device->ep, query, general_get_cb, HIGH_QOS,
-                     APPLICATION_CBOR, APPLICATION_CBOR, new_cbdata);
-  if (ret >= 0) {
-    PRINT("  [C]Successfully issued GET request\n");
-  } else {
-    PRINT("  [C]ERROR issuing GET request\n");
+    ret = oc_do_get_ex(uri, &new_cbdata->ep, query, general_get_cb, HIGH_QOS,
+                       APPLICATION_CBOR, APPLICATION_CBOR, new_cbdata);
+    if (ret >= 0) {
+      PRINT("  [C]Successfully issued GET request\n");
+    } else {
+      PRINT("  [C]ERROR issuing GET request\n");
+    }
   }
 }
 
@@ -537,6 +540,8 @@ ets_cbor_get_unsecured(char *sn, char *uri, char *query, char *cbdata)
 {
   int ret = -1;
   device_handle_t *device = ets_getdevice_from_sn(sn);
+  PRINT("  [C]ets_cbor_get_unsecured: [%s], [%s] [%s] [%s]\n", sn, uri, query,
+        cbdata);
 
   user_struct_t *new_cbdata;
   new_cbdata = (user_struct_t *)malloc(sizeof(user_struct_t));
@@ -544,22 +549,20 @@ ets_cbor_get_unsecured(char *sn, char *uri, char *query, char *cbdata)
     strcpy(new_cbdata->r_id, cbdata);
     strcpy(new_cbdata->url, uri);
     strcpy(new_cbdata->sn, sn);
-  }
+    oc_endpoint_copy(&new_cbdata->ep, &device->ep);
 
-  PRINT("  [C]ets_cbor_get_unsecured: [%s], [%s] [%s] [%s]\n", sn, uri, query,
-        cbdata);
+    /* remove OSCORE flag*/
+    new_cbdata->ep.flags = IPV6;
+    // device->ep.flags &= OSCORE;
+    PRINTipaddr_flags(new_cbdata->ep);
 
-  /* remove OSCORE flag*/
-  device->ep.flags = IPV6;
-  // device->ep.flags &= OSCORE;
-  PRINTipaddr_flags(device->ep);
-
-  ret = oc_do_get_ex(uri, &device->ep, query, general_get_cb, HIGH_QOS,
-                     APPLICATION_CBOR, APPLICATION_CBOR, new_cbdata);
-  if (ret >= 0) {
-    PRINT("  [C]Successfully issued GET request\n");
-  } else {
-    PRINT("  [C]ERROR issuing GET request\n");
+    ret = oc_do_get_ex(uri, &new_cbdata->ep, query, general_get_cb, HIGH_QOS,
+                       APPLICATION_CBOR, APPLICATION_CBOR, new_cbdata);
+    if (ret >= 0) {
+      PRINT("  [C]Successfully issued GET request\n");
+    } else {
+      PRINT("  [C]ERROR issuing GET request\n");
+    }
   }
 }
 
@@ -572,14 +575,6 @@ ets_linkformat_get(char *sn, char *uri, char *query, char *cbdata)
 
   PRINT("  [C]ets_linkformat_get: [%s], [%s] [%s] [%s]\n", sn, uri, query,
         cbdata);
-#ifdef OC_OSCORE
-  PRINT(" [C] enable OSCORE encryption\n");
-
-  device->ep.flags = IPV6;
-  device->ep.flags != OSCORE;
-  PRINTipaddr_flags(device->ep);
-  oc_string_copy_from_char(&device->ep.serial_number, sn);
-#endif
 
   user_struct_t *new_cbdata;
   new_cbdata = (user_struct_t *)malloc(sizeof(user_struct_t));
@@ -587,18 +582,28 @@ ets_linkformat_get(char *sn, char *uri, char *query, char *cbdata)
     strcpy(new_cbdata->r_id, cbdata);
     strcpy(new_cbdata->url, uri);
     strcpy(new_cbdata->sn, sn);
-  }
+    oc_endpoint_copy(&new_cbdata->ep, &device->ep);
 
-  oc_endpoint_print(&device->ep);
-  if (&ep != NULL) {
-    ret = oc_do_get_ex(uri, &device->ep, query, general_get_cb, HIGH_QOS,
-                       APPLICATION_LINK_FORMAT, APPLICATION_LINK_FORMAT,
-                       new_cbdata);
-  }
-  if (ret >= 0) {
-    PRINT("  [C]Successfully issued GET request\n");
-  } else {
-    PRINT("  [C]ERROR issuing GET request\n");
+#ifdef OC_OSCORE
+    PRINT(" [C] enable OSCORE encryption\n");
+
+    new_cbdata->ep.flags = IPV6;
+    new_cbdata->ep.flags != OSCORE;
+    PRINTipaddr_flags(device->ep);
+    oc_string_copy_from_char(&new_cbdata->ep.serial_number, sn);
+#endif
+
+    oc_endpoint_print(&device->ep);
+    if (&ep != NULL) {
+      ret = oc_do_get_ex(uri, &new_cbdata->ep, query, general_get_cb, HIGH_QOS,
+                         APPLICATION_LINK_FORMAT, APPLICATION_LINK_FORMAT,
+                         new_cbdata);
+    }
+    if (ret >= 0) {
+      PRINT("  [C]Successfully issued GET request\n");
+    } else {
+      PRINT("  [C]ERROR issuing GET request\n");
+    }
   }
 }
 
@@ -611,28 +616,29 @@ ets_linkformat_get_unsecured(char *sn, char *uri, char *query, char *cbdata)
 
   PRINT("  [C]ets_linkformat_get_unsecured: [%s], [%s] [%s] [%s]\n", sn, uri,
         query, cbdata);
-  device->ep.flags = IPV6;
-  // device->ep.flags &= OSCORE;
-  PRINTipaddr_flags(device->ep);
-
   user_struct_t *new_cbdata;
   new_cbdata = (user_struct_t *)malloc(sizeof(user_struct_t));
   if (new_cbdata != NULL) {
     strcpy(new_cbdata->r_id, cbdata);
     strcpy(new_cbdata->url, uri);
     strcpy(new_cbdata->sn, sn);
-  }
+    oc_endpoint_copy(&new_cbdata->ep, &device->ep);
 
-  oc_endpoint_print(&device->ep);
-  if (&ep != NULL) {
-    ret = oc_do_get_ex(uri, &device->ep, query, general_get_cb, HIGH_QOS,
-                       APPLICATION_LINK_FORMAT, APPLICATION_LINK_FORMAT,
-                       new_cbdata);
-  }
-  if (ret >= 0) {
-    PRINT("  [C]Successfully issued unsecured GET request (linkformat)\n");
-  } else {
-    PRINT("  [C]ERROR issuing GET request\n");
+    new_cbdata->ep.flags = IPV6;
+    // device->ep.flags &= OSCORE;
+    PRINTipaddr_flags(new_cbdata->ep);
+
+    oc_endpoint_print(&new_cbdata->ep);
+    if (&ep != NULL) {
+      ret = oc_do_get_ex(uri, &new_cbdata->ep, query, general_get_cb, HIGH_QOS,
+                         APPLICATION_LINK_FORMAT, APPLICATION_LINK_FORMAT,
+                         new_cbdata);
+    }
+    if (ret >= 0) {
+      PRINT("  [C]Successfully issued unsecured GET request (linkformat)\n");
+    } else {
+      PRINT("  [C]ERROR issuing GET request\n");
+    }
   }
 }
 
@@ -646,14 +652,6 @@ ets_cbor_post(char *sn, char *uri, char *query, char *id, int size, char *data)
 
   PRINT("  [C]ets_cbor_post: [%s], [%s] [%s] [%s] %d\n", sn, uri, id, query,
         size);
-#ifdef OC_OSCORE
-
-  device->ep.flags = IPV6;
-  device->ep.flags |= OSCORE;
-  PRINT("  [C] enable OSCORE encryption\n");
-  PRINTipaddr_flags(device->ep);
-  oc_string_copy_from_char(&device->ep.serial_number, sn);
-#endif
 
   user_struct_t *new_cbdata;
   new_cbdata = (user_struct_t *)malloc(sizeof(user_struct_t));
@@ -661,17 +659,26 @@ ets_cbor_post(char *sn, char *uri, char *query, char *id, int size, char *data)
     strcpy(new_cbdata->r_id, id);
     strcpy(new_cbdata->url, uri);
     strcpy(new_cbdata->sn, sn);
-  }
+    oc_endpoint_copy(&new_cbdata->ep, &device->ep);
 
-  if (oc_init_post(uri, &device->ep, NULL, general_get_cb, HIGH_QOS,
-                   new_cbdata)) {
-    // encode the request data..it should already be cbor
-    oc_rep_encode_raw(data, (size_t)size);
+#ifdef OC_OSCORE
+    new_cbdata->ep.flags = IPV6;
+    new_cbdata->ep.flags |= OSCORE;
+    PRINT("  [C] enable OSCORE encryption\n");
+    PRINTipaddr_flags(device->ep);
+    oc_string_copy_from_char(&new_cbdata->ep.serial_number, sn);
+#endif
 
-    if (oc_do_post_ex(APPLICATION_CBOR, APPLICATION_CBOR)) {
-      PRINT("  [C]Sent POST request\n");
-    } else {
-      PRINT("  [C]Could not send POST request\n");
+    if (oc_init_post(uri, &new_cbdata->ep, NULL, general_get_cb, HIGH_QOS,
+                     new_cbdata)) {
+      // encode the request data..it should already be cbor
+      oc_rep_encode_raw(data, (size_t)size);
+
+      if (oc_do_post_ex(APPLICATION_CBOR, APPLICATION_CBOR)) {
+        PRINT("  [C]Sent POST request\n");
+      } else {
+        PRINT("  [C]Could not send POST request\n");
+      }
     }
   }
 }
@@ -686,14 +693,6 @@ ets_cbor_put(char *sn, char *uri, char *query, char *id, int size, char *data)
 
   PRINT("  [C]ets_cbor_put: [%s], [%s] [%s] [%s] %d\n", sn, uri, id, query,
         size);
-#ifdef OC_OSCORE
-
-  device->ep.flags = IPV6;
-  device->ep.flags |= OSCORE;
-  PRINT("  [C] enable OSCORE encryption\n");
-  PRINTipaddr_flags(device->ep);
-  oc_string_copy_from_char(&device->ep.serial_number, sn);
-#endif
 
   user_struct_t *new_cbdata;
   new_cbdata = (user_struct_t *)malloc(sizeof(user_struct_t));
@@ -701,17 +700,26 @@ ets_cbor_put(char *sn, char *uri, char *query, char *id, int size, char *data)
     strcpy(new_cbdata->r_id, id);
     strcpy(new_cbdata->url, uri);
     strcpy(new_cbdata->sn, sn);
-  }
+    oc_endpoint_copy(&new_cbdata->ep, &device->ep);
 
-  if (oc_init_put(uri, &device->ep, NULL, general_get_cb, HIGH_QOS,
-                  (char *)new_cbdata)) {
-    // encode the request data..it should already be cbor
-    oc_rep_encode_raw(data, (size_t)size);
+#ifdef OC_OSCORE
+    new_cbdata->ep.flags = IPV6;
+    new_cbdata->ep.flags |= OSCORE;
+    PRINT("  [C] enable OSCORE encryption\n");
+    PRINTipaddr_flags(device->ep);
+    oc_string_copy_from_char(&new_cbdata->ep.serial_number, sn);
+#endif
 
-    if (oc_do_put_ex(APPLICATION_CBOR, APPLICATION_CBOR)) {
-      PRINT("  [C]Sent PUT request\n");
-    } else {
-      PRINT("  [C]Could not send PUT request\n");
+    if (oc_init_put(uri, &new_cbdata->ep, NULL, general_get_cb, HIGH_QOS,
+                    (char *)new_cbdata)) {
+      // encode the request data..it should already be cbor
+      oc_rep_encode_raw(data, (size_t)size);
+
+      if (oc_do_put_ex(APPLICATION_CBOR, APPLICATION_CBOR)) {
+        PRINT("  [C]Sent PUT request\n");
+      } else {
+        PRINT("  [C]Could not send PUT request\n");
+      }
     }
   }
 }
@@ -725,14 +733,6 @@ ets_cbor_delete(char *sn, char *uri, char *query, char *id)
   device_handle_t *device = ets_getdevice_from_sn(sn);
 
   PRINT("  [C]ets_cbor_delete: [%s], [%s] [%s] [%s]\n", sn, uri, id, query);
-#ifdef OC_OSCORE
-
-  device->ep.flags = IPV6;
-  device->ep.flags |= OSCORE;
-  PRINT("  [C] enable OSCORE encryption\n");
-  PRINTipaddr_flags(device->ep);
-  oc_string_copy_from_char(&device->ep.serial_number, sn);
-#endif
 
   user_struct_t *new_cbdata;
   new_cbdata = (user_struct_t *)malloc(sizeof(user_struct_t));
@@ -740,13 +740,22 @@ ets_cbor_delete(char *sn, char *uri, char *query, char *id)
     strcpy(new_cbdata->r_id, id);
     strcpy(new_cbdata->url, uri);
     strcpy(new_cbdata->sn, sn);
-  }
+    oc_endpoint_copy(&new_cbdata->ep, &device->ep);
 
-  if (oc_do_delete(uri, &device->ep, query, general_get_cb, HIGH_QOS,
-                   new_cbdata)) {
-    PRINT("  [C]Sent DELETE request\n");
-  } else {
-    PRINT("  [C]Could not send DELETE request\n");
+#ifdef OC_OSCORE
+    new_cbdata->ep.flags = IPV6;
+    new_cbdata->ep.flags |= OSCORE;
+    PRINT("  [C] enable OSCORE encryption\n");
+    PRINTipaddr_flags(new_cbdata->ep);
+    oc_string_copy_from_char(&new_cbdata->ep.serial_number, sn);
+#endif
+
+    if (oc_do_delete(uri, &new_cbdata->ep, query, general_get_cb, HIGH_QOS,
+                     new_cbdata)) {
+      PRINT("  [C]Sent DELETE request\n");
+    } else {
+      PRINT("  [C]Could not send DELETE request\n");
+    }
   }
 }
 
