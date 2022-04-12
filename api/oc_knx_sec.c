@@ -935,7 +935,8 @@ oc_at_entry_print(size_t device_index, int index)
       }
       if (g_at_entries[index].profile == OC_PROFILE_COAP_OSCORE) {
         if (oc_string_len(g_at_entries[index].osc_id) > 0) {
-          PRINT("    osc:id        : %s\n", oc_string(g_at_entries[index].osc_id));
+          PRINT("    osc:id        : %s\n",
+                oc_string(g_at_entries[index].osc_id));
         }
         if (oc_string_len(g_at_entries[index].osc_ms) > 0) {
           PRINT("    osc:ms        : ");
@@ -1257,7 +1258,7 @@ oc_oscore_set_auth(char *serial_number, char *context_id, uint8_t *shared_key,
   oc_new_string(&os_token.osc_id, context_id, strlen(context_id));
   oc_new_string(&os_token.osc_contextid, context_id, strlen(context_id));
   oc_new_string(&os_token.sub, "", strlen(""));
-  //oc_new_string(&os_token.kid, "serial_number", strlen("serial_number"));
+  // oc_new_string(&os_token.kid, "serial_number", strlen("serial_number"));
   oc_core_set_at_table((size_t)0, 0, os_token);
 
   // add the oscore context...
