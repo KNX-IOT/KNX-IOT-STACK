@@ -57,6 +57,12 @@ sys.path.append(parentdir)
 #from knx_stack import KNXIOTStack
 import knx_stack
 
+def safe_print(response):
+    if response is not None:
+        response.print_payload()
+    else:
+        print("no response")
+        
 def do_discover(my_stack, serial_number, scope = 2):
     time.sleep(1)
     query = "ep=urn:knx:sn."+str(serial_number)
@@ -138,19 +144,20 @@ def do_load_state(my_stack):
         return -1
     sn = my_stack.device_array[0].sn
     response =  my_stack.issue_cbor_get(sn,"/a/lsm")
-    print ("current value response:",response)
+    safe_print(response)
     if response is None:
         return 1
     if response.status != 0:
         print("ERROR {} {}".format(response.status,
             my_stack.get_error_string_from_code(response.status)))
         return 2
+    return 0
 
 def do_reset(my_stack, sn):
     content = { 2: "reset"}
     print("reset :", content)
     response =  my_stack.issue_cbor_post(sn,"/.well-known/knx",content)
-    print ("response:",response)
+    safe_print(response)
     my_stack.purge_response(response)
 
 def do_install_device(my_stack, sn, ia, iid, got_content, rec_content, pub_content):
@@ -160,35 +167,35 @@ def do_install_device(my_stack, sn, ia, iid, got_content, rec_content, pub_conte
     content = { 12: int(ia), 26:int(iid)}
     print("set IA :", content)
     response = my_stack.issue_cbor_put(sn,"/dev/ia",content)
-    print ("response:",response)
+    safe_print(response)
     my_stack.purge_response(response)
 
     # content = { 2: "startLoading"}
     content = { 2: 1}
     print("lsm :", content)
     response =  my_stack.issue_cbor_post(sn,"/a/lsm",content)
-    print ("response:",response)
+    safe_print(response)
     my_stack.purge_response(response)
     response =  my_stack.issue_cbor_get(sn,"/a/lsm")
-    print ("response:",response)
+    safe_print(response)
     my_stack.purge_response(response)
     content = got_content
     response =  my_stack.issue_cbor_post(sn,"/fp/g",content)
-    print ("response:",response)
+    safe_print(response)
     my_stack.purge_response(response)
 
     response =  my_stack.issue_linkformat_get(sn,"/fp/g")
-    print ("response:",response)
+    safe_print(response)
     my_stack.purge_response(response)
 
     if rec_content is not None:
         content = rec_content
         response =  my_stack.issue_cbor_post(sn,"/fp/r",content)
-        print ("response:",response)
+        safe_print(response)
         my_stack.purge_response(response)
 
         response =  my_stack.issue_linkformat_get(sn,"/fp/r")
-        print ("response:",response)
+        safe_print(response)
         my_stack.purge_response(response)
     else:
         print ("no recipient table")
@@ -196,11 +203,11 @@ def do_install_device(my_stack, sn, ia, iid, got_content, rec_content, pub_conte
     if pub_content is not None:
         content = pub_content
         response =  my_stack.issue_cbor_post(sn,"/fp/p",content)
-        print ("response:",response)
+        safe_print(response)
         my_stack.purge_response(response)
 
         response =  my_stack.issue_linkformat_get(sn,"/fp/p")
-        print ("response:",response)
+        safe_print(response)
         my_stack.purge_response(response)
     else:
         print ("no publisher table")
@@ -208,11 +215,11 @@ def do_install_device(my_stack, sn, ia, iid, got_content, rec_content, pub_conte
     content = { 2: 2}
     print("lsm :", content)
     response =  my_stack.issue_cbor_post(sn,"/a/lsm",content)
-    print ("response:",response)
+    safe_print(response)
     my_stack.purge_response(response)
 
     response =  my_stack.issue_cbor_get(sn,"/a/lsm")
-    print ("response:",response)
+    safe_print(response)
     my_stack.purge_response(response)
 
 

@@ -152,3 +152,10 @@ if ia is defined and path is not there, the path will have the default value ".k
  *     }] 
 ```
 
+##### example files
+
+test_server_config.json
+
+Example file for the test_server_all program
+
+
