@@ -882,14 +882,12 @@ oc_endpoint_t g_endpoint;
 void
 response_get_pm(oc_client_response_t *data)
 {
-  PRINT("response_get_pm: content format format:%d  code:%d\n", data->content_format,
-       data->code); 
+  PRINT("response_get_pm: content format format:%d  code:%d\n",
+        data->content_format, data->code);
 }
 
-
 void
-spake_cb(int error, char *sn, char *oscore_id, uint8_t *secret,
-                       int secret_size)
+spake_cb(int error, char *sn, char *oscore_id, uint8_t *secret, int secret_size)
 {
   PRINT("spake CB: invoke PM with encryption!!!!!\n");
 #ifdef OC_OSCORE
@@ -902,7 +900,6 @@ spake_cb(int error, char *sn, char *oscore_id, uint8_t *secret,
   oc_do_get_ex("/dev/pm", &g_endpoint, NULL, response_get_pm, HIGH_QOS,
                APPLICATION_CBOR, APPLICATION_CBOR, NULL);
 }
-
 
 static oc_discovery_flags_t
 discovery_cb(const char *payload, int len, oc_endpoint_t *endpoint,
@@ -925,19 +922,17 @@ discovery_cb(const char *payload, int len, oc_endpoint_t *endpoint,
   PRINT("[C] issue get on /dev/pm\n");
   oc_endpoint_print(endpoint);
 
-
-    /* remove OSCORE flag */
+  /* remove OSCORE flag */
   endpoint->flags = IPV6;
   PRINT("  [C] disable OSCORE encryption\n");
   PRINTipaddr_flags(*endpoint);
 
   if (oc_string_len(endpoint->serial_number) == 0) {
-    oc_new_string(&endpoint->serial_number, my_serialnum,
-                  strlen(my_serialnum));
+    oc_new_string(&endpoint->serial_number, my_serialnum, strlen(my_serialnum));
   }
-  
+
   g_endpoint = *endpoint;
-  
+
   oc_set_spake_response_cb(spake_cb);
   oc_initiate_spake(endpoint, "LETTUCE", my_serialnum);
 
@@ -952,9 +947,8 @@ void
 issue_requests_oscore(void)
 {
   // first step is discover myself..
-   oc_do_wk_discovery_all("ep=urn:knx:sn.000005", 2, discovery_cb, NULL);
+  oc_do_wk_discovery_all("ep=urn:knx:sn.000005", 2, discovery_cb, NULL);
 }
-
 
 /**
  * set a multicast s-mode message as delayed callback
@@ -997,7 +991,7 @@ main(int argc, char *argv[])
   int init;
 
   bool do_send_s_mode = false;
-  bool do_send_oscore = true;  /// false;  /// true for debugging
+  bool do_send_oscore = true; /// false;  /// true for debugging
   g_reset = true;
 
   oc_clock_time_t next_event;

@@ -180,14 +180,14 @@ OC_PROCESS_THREAD(message_buffer_handler, ev, data)
 
 #ifdef OC_OSCORE
       if (oscore_is_oscore_message((oc_message_t *)data) == 0) {
-          OC_DBG_OSCORE("Inbound network event: oscore request");
-          oc_process_post(&oc_oscore_handler, oc_events[INBOUND_OSCORE_EVENT],
-                          data);
-      } else 
+        OC_DBG_OSCORE("Inbound network event: oscore request");
+        oc_process_post(&oc_oscore_handler, oc_events[INBOUND_OSCORE_EVENT],
+                        data);
+      } else
 #endif /* OC_OSCORE */
       {
-         OC_DBG_OSCORE("Inbound network event: decrypted request");
-         oc_process_post(&coap_engine, oc_events[INBOUND_RI_EVENT], data);
+        OC_DBG_OSCORE("Inbound network event: decrypted request");
+        oc_process_post(&coap_engine, oc_events[INBOUND_RI_EVENT], data);
       }
 
     } else if (ev == oc_events[OUTBOUND_NETWORK_EVENT]) {
@@ -199,13 +199,13 @@ OC_PROCESS_THREAD(message_buffer_handler, ev, data)
         oc_message_unref(message);
       } else
 #if OC_OSCORE
-      if ((message->endpoint.flags & MULTICAST) &&
-               (message->endpoint.flags & OSCORE)) {
+        if ((message->endpoint.flags & MULTICAST) &&
+            (message->endpoint.flags & OSCORE)) {
         OC_DBG_OSCORE(
           "Outbound secure multicast request: forwarding to OSCORE");
         oc_process_post(&oc_oscore_handler,
                         oc_events[OUTBOUND_GROUP_OSCORE_EVENT], data);
-      } else if ( message->endpoint.flags & OSCORE) {
+      } else if (message->endpoint.flags & OSCORE) {
         OC_DBG_OSCORE("Outbound network event: forwarding to OSCORE");
         oc_process_post(&oc_oscore_handler, oc_events[OUTBOUND_OSCORE_EVENT],
                         data);
@@ -223,8 +223,6 @@ OC_PROCESS_THREAD(message_buffer_handler, ev, data)
       oc_send_buffer(message);
       oc_message_unref(message);
     }
-
-
   }
   OC_PROCESS_END();
 }

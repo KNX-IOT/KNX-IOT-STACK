@@ -134,8 +134,8 @@ coap_send_transaction(coap_transaction_t *t)
   }
   if (t->message->data == NULL) {
     OC_ERR("data in message in transaction == NULL");
-  } 
-  
+  }
+
   PRINT(" coap_send_transaction  xxxxx %d\n", t->message->data[0]);
 
   confirmable =

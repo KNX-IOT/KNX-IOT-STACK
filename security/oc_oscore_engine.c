@@ -572,12 +572,12 @@ oc_oscore_send_message(oc_message_t *msg)
     memcpy(message->data, msg->data, msg->length);
     memcpy(&message->endpoint, &msg->endpoint, sizeof(oc_endpoint_t));
 
-    //PRINT(" oc_oscore_send_message: msg lenght: %d\n", message->length);
-    //PRINT(" oc_oscore_send_message: data[0]: %d\n", message->data[0]);
-    //PRINT(" oc_oscore_send_message: input endpoint flags:\n");
-    //PRINTipaddr_flags(msg->endpoint);
-    //PRINT(" oc_oscore_send_message: copied endpoint flags:\n");
-    //PRINTipaddr_flags(message->endpoint);
+    // PRINT(" oc_oscore_send_message: msg lenght: %d\n", message->length);
+    // PRINT(" oc_oscore_send_message: data[0]: %d\n", message->data[0]);
+    // PRINT(" oc_oscore_send_message: input endpoint flags:\n");
+    // PRINTipaddr_flags(msg->endpoint);
+    // PRINT(" oc_oscore_send_message: copied endpoint flags:\n");
+    // PRINTipaddr_flags(message->endpoint);
 
     bool msg_valid = false;
     if (msg->ref_count > 1) {
@@ -619,7 +619,7 @@ oc_oscore_send_message(oc_message_t *msg)
         coap_pkt->code == CSM_7_01
 #endif /* OC_TCP */
     ) {
- 
+
       OC_DBG_OSCORE("### protecting outgoing request ###");
       /* Request */
       /* Use context->SSN as Partial IV */
