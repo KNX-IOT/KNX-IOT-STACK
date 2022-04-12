@@ -1305,7 +1305,8 @@ oc_init_oscore(size_t device_index)
   (void)device_index;
 #else /* OC_OSCORE */
   int i;
-  PRINT("oc_init_oscore adding oscore context, using context id for sender & receiver\n");
+  PRINT("oc_init_oscore adding oscore context, using context id for sender & "
+        "receiver\n");
 
   for (i = 0; i < G_AT_MAX_ENTRIES; i++) {
 
@@ -1314,10 +1315,8 @@ oc_init_oscore(size_t device_index)
 
       // one context: for sending and receiving.
       oc_oscore_context_t *ctx = oc_oscore_add_context(
-        device_index,
-        oc_string(g_at_entries[i].osc_contextid),
-        oc_string(g_at_entries[i].osc_contextid),
-        oc_knx_get_osn(), "desc",
+        device_index, oc_string(g_at_entries[i].osc_contextid),
+        oc_string(g_at_entries[i].osc_contextid), oc_knx_get_osn(), "desc",
         oc_string(g_at_entries[i].osc_ms),
         oc_string(g_at_entries[i].osc_contextid), false);
       if (ctx == NULL) {
