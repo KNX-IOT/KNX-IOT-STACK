@@ -24,7 +24,7 @@
 void
 oscore_send_error(void *packet, uint8_t code, oc_endpoint_t *endpoint)
 {
-  //if (endpoint->flags & OSCORE) {
+  // if (endpoint->flags & OSCORE) {
   //  return;
   //}
 

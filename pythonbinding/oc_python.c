@@ -506,7 +506,7 @@ ets_cbor_get(char *sn, char *uri, char *query, char *cbdata)
 {
   int ret = -1;
   device_handle_t *device = ets_getdevice_from_sn(sn);
-  
+
   PRINT("  [C]ets_cbor_get: [%s], [%s] [%s] [%s]\n", sn, uri, query, cbdata);
 
   user_struct_t *new_cbdata = NULL;
