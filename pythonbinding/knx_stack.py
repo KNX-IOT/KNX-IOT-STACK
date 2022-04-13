@@ -612,11 +612,6 @@ class CoAPResponse():
 
 #----------The Stack ---------------
 class KNXIOTStack():
-    """ ********************************
-    Call back handles general task like device
-    discovery.
-    needs to be before _init_
-    **********************************"""
 
     def convertcbor2json(self, payload, payload_len):
         print (type(payload))
@@ -636,6 +631,11 @@ class KNXIOTStack():
             print ("===+++===")
         return ""
 
+    """ ********************************
+    Call back handles general task like device
+    discovery.
+    needs to be before _init_
+    **********************************"""
     def changedCB(self, sn, cb_state, cb_event):
         print("Changed event: Device: {}, State:{} Event:{}".format(sn, cb_state, cb_event))
         name = ""
