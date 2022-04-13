@@ -156,6 +156,7 @@ if __name__ == '__main__':  # pragma: no cover
         #ret = do_programming_mode(the_stack, value)
         if ret > 0:
             do_spake(the_stack, str(args.password))
+            time.sleep(5)
             ret = do_programming_mode(the_stack, value)
     except:
         traceback.print_exc()

@@ -315,7 +315,7 @@ oc_oscore_add_context(size_t device, const char *senderid,
     goto add_oscore_context_error;
   }
   PRINT("IV:");
-  // OC_LOGbytes_OSCORE(ctx->commoniv, OSCORE_KEY_LEN);
+  OC_LOGbytes_OSCORE(ctx->commoniv, OSCORE_COMMON_IV_LEN);
   OC_DBG_OSCORE("### derived Common IV ###");
 
   oc_list_add(contexts, ctx);

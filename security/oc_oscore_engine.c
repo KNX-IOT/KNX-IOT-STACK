@@ -34,6 +34,11 @@
 
 OC_PROCESS(oc_oscore_handler, "OSCORE Process");
 
+static increment_ssn_in_context(oc_oscore_context_t *ctx)
+{
+  // ctx->ssn++;
+}
+
 static oc_event_callback_retval_t
 dump_cred(void *data)
 {
@@ -212,7 +217,7 @@ oc_oscore_recv_message(oc_message_t *message)
                               &AAD_len);
         OC_DBG_OSCORE(
           "---composed AAD using received Partial IV and Recipient ID");
-        OC_LOGbytes(AAD, AAD_len);
+        OC_LOGbytes_OSCORE(AAD, AAD_len);
       }
 
       /* Copy received piv into oc_message_t->endpoint */
@@ -220,7 +225,7 @@ oc_oscore_recv_message(oc_message_t *message)
       message->endpoint.piv_len = oscore_pkt->piv_len;
 
       OC_DBG_OSCORE("---got Partial IV from incoming message");
-      OC_LOGbytes(message->endpoint.piv, message->endpoint.piv_len);
+      OC_LOGbytes_OSCORE(message->endpoint.piv, message->endpoint.piv_len);
 
       /* Compute nonce using received piv and context->recvid */
       oc_oscore_AEAD_nonce(oscore_ctx->recvid, oscore_ctx->recvid_len,
@@ -229,13 +234,13 @@ oc_oscore_recv_message(oc_message_t *message)
 
       OC_DBG_OSCORE(
         "---computed AEAD nonce using received Partial IV and Recipient ID");
-      OC_LOGbytes(nonce, OSCORE_AEAD_NONCE_LEN);
+      OC_LOGbytes_OSCORE(nonce, OSCORE_AEAD_NONCE_LEN);
     }
 
     /* If message is response */
     if (oscore_pkt->code > OC_FETCH) {
       OC_DBG_OSCORE("---got request_piv from client callback");
-      OC_LOGbytes(request_piv, request_piv_len);
+      OC_LOGbytes_OSCORE(request_piv, request_piv_len);
 
       /* If oc_message_t->endpoint.piv_len == 0 */
       if (message->endpoint.piv_len == 0) {
@@ -250,7 +255,7 @@ oc_oscore_recv_message(oc_message_t *message)
                              nonce, OSCORE_AEAD_NONCE_LEN);
 
         OC_DBG_OSCORE("---use AEAD nonce from request");
-        OC_LOGbytes(nonce, OSCORE_AEAD_NONCE_LEN);
+        OC_LOGbytes_OSCORE(nonce, OSCORE_AEAD_NONCE_LEN);
       }
 
       /* Compose AAD using request_piv and context->sendid */
@@ -258,17 +263,24 @@ oc_oscore_recv_message(oc_message_t *message)
                             request_piv, request_piv_len, AAD, &AAD_len);
 
       OC_DBG_OSCORE("---composed AAD using request_piv and Sender ID");
-      OC_LOGbytes(AAD, AAD_len);
+      OC_LOGbytes_OSCORE(AAD, AAD_len);
     }
 
     OC_DBG_OSCORE("### decrypting OSCORE payload ###");
 
     /* Verify and decrypt OSCORE payload */
+    uint8_t *output = (uint8_t *)malloc(oscore_pkt->payload_len);
 
+    // int ret = oc_oscore_decrypt(oscore_pkt->payload, oscore_pkt->payload_len,
+    //                            OSCORE_AEAD_TAG_LEN, key, OSCORE_KEY_LEN,
+    //                            nonce, OSCORE_AEAD_NONCE_LEN, AAD, AAD_len,
+    //                            oscore_pkt->payload);
     int ret = oc_oscore_decrypt(oscore_pkt->payload, oscore_pkt->payload_len,
                                 OSCORE_AEAD_TAG_LEN, key, OSCORE_KEY_LEN, nonce,
-                                OSCORE_AEAD_NONCE_LEN, AAD, AAD_len,
-                                oscore_pkt->payload);
+                                OSCORE_AEAD_NONCE_LEN, AAD, AAD_len, output);
+
+    memcpy(oscore_pkt->payload, output, oscore_pkt->payload_len);
+    free(output);
 
     if (ret != 0) {
       OC_ERR("***error decrypting/verifying response : (%d)***", ret);
@@ -406,7 +418,8 @@ oc_oscore_send_multicast_message(oc_message_t *message)
     OC_DBG_OSCORE("---using SSN as Partial IV: %lu", oscore_ctx->ssn);
     OC_LOGbytes_OSCORE(piv, piv_len);
     /* Increment SSN */
-    oscore_ctx->ssn++;
+    // oscore_ctx->ssn++;
+    increment_ssn_in_context(oscore_ctx);
     // store it so that it can be retrieved by the clients
     oc_knx_set_osn(oscore_ctx->ssn);
 
@@ -624,10 +637,12 @@ oc_oscore_send_message(oc_message_t *msg)
       /* Request */
       /* Use context->SSN as Partial IV */
       oscore_store_piv(oscore_ctx->ssn, piv, &piv_len);
+      // oscore_store_piv(0, piv, &piv_len);
       OC_DBG_OSCORE("---using SSN as Partial IV: %lu", oscore_ctx->ssn);
-      OC_LOGbytes(piv, piv_len);
+      OC_LOGbytes_OSCORE(piv, piv_len);
       /* Increment SSN */
-      oscore_ctx->ssn++;
+      increment_ssn_in_context(oscore_ctx);
+      // oscore_ctx->ssn++;
 
 #ifdef OC_CLIENT
       if (coap_pkt->code >= OC_GET && coap_pkt->code <= OC_DELETE) {
@@ -655,14 +670,17 @@ oc_oscore_send_message(oc_message_t *msg)
                            piv_len, oscore_ctx->commoniv, nonce,
                            OSCORE_AEAD_NONCE_LEN);
 
-      OC_DBG("---computed AEAD nonce using Partial IV (SSN) and Sender ID");
-      OC_LOGbytes(nonce, OSCORE_AEAD_NONCE_LEN);
+      OC_DBG_OSCORE(
+        "---computed AEAD nonce using Partial IV (SSN) and Sender ID");
+      OC_LOGbytes_OSCORE(nonce, OSCORE_AEAD_NONCE_LEN);
+      OC_DBG_OSCORE("---");
 
       /* Compose AAD using partial IV and context->sendid */
       oc_oscore_compose_AAD(oscore_ctx->sendid, oscore_ctx->sendid_len, piv,
                             piv_len, AAD, &AAD_len);
-      OC_DBG("---composed AAD using Partial IV (SSN) and Sender ID");
-      OC_LOGbytes(AAD, AAD_len);
+      OC_DBG_OSCORE("---composed AAD using Partial IV (SSN) and Sender ID");
+      OC_LOGbytes_OSCORE(AAD, AAD_len);
+      OC_DBG_OSCORE("---");
 
       /* Copy partial IV into incoming oc_message_t (*msg), if valid */
       if (msg_valid) {
@@ -680,29 +698,32 @@ oc_oscore_send_message(oc_message_t *msg)
       /* Per specification, all responses must include a new Partial IV */
       /* Use context->SSN as partial IV */
       oscore_store_piv(oscore_ctx->ssn, piv, &piv_len);
-      OC_DBG("---using SSN as Partial IV: %lu", oscore_ctx->ssn);
-      OC_LOGbytes(piv, piv_len);
+      OC_DBG_OSCORE("---using SSN as Partial IV: %lu", oscore_ctx->ssn);
+      OC_LOGbytes_OSCORE(piv, piv_len);
+      OC_DBG_OSCORE("---");
 
       /* Increment SSN */
-      oscore_ctx->ssn++;
+      // oscore_ctx->ssn++;
+      increment_ssn_in_context(oscore_ctx);
 
       /* Compute nonce using partial IV and context->sendid */
       oc_oscore_AEAD_nonce(oscore_ctx->sendid, oscore_ctx->sendid_len, piv,
                            piv_len, oscore_ctx->commoniv, nonce,
                            OSCORE_AEAD_NONCE_LEN);
 
-      OC_DBG("---computed AEAD nonce using new Partial IV (SSN) and Sender ID");
-      OC_LOGbytes(nonce, OSCORE_AEAD_NONCE_LEN);
+      OC_DBG_OSCORE(
+        "---computed AEAD nonce using new Partial IV (SSN) and Sender ID");
+      OC_LOGbytes_OSCORE(nonce, OSCORE_AEAD_NONCE_LEN);
 
-      OC_DBG("---request_piv");
-      OC_LOGbytes(message->endpoint.piv, message->endpoint.piv_len);
+      OC_DBG_OSCORE("---request_piv");
+      OC_LOGbytes_OSCORE(message->endpoint.piv, message->endpoint.piv_len);
 
       /* Compose AAD using request_piv and context->recvid */
       oc_oscore_compose_AAD(oscore_ctx->recvid, oscore_ctx->recvid_len,
                             message->endpoint.piv, message->endpoint.piv_len,
                             AAD, &AAD_len);
-      OC_DBG("---composed AAD using request_piv and Recipient ID");
-      OC_LOGbytes(AAD, AAD_len);
+      OC_DBG_OSCORE("---composed AAD using request_piv and Recipient ID");
+      OC_LOGbytes_OSCORE(AAD, AAD_len);
 
       /* Copy partial IV into incoming oc_message_t (*msg), if valid */
       if (msg_valid) {

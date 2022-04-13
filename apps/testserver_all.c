@@ -994,6 +994,7 @@ main(int argc, char *argv[])
 
   bool do_send_s_mode = false;
   bool do_send_oscore = false;
+  true; //  false;
   g_reset = true;
 
   oc_clock_time_t next_event;
