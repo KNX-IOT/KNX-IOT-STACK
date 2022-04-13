@@ -1209,6 +1209,30 @@ oc_core_set_at_table(size_t device_index, int index, oc_auth_at_t entry)
   return 0;
 }
 
+int
+oc_core_find_at_entry_with_context_id(size_t device_index, char *context_id)
+{
+  for (int i = 0; i < G_AT_MAX_ENTRIES; i++) {
+    if ((oc_string_len(g_at_entries[i].id) > 0) &&
+        (strncmp(oc_string(g_at_entries[i].id), context_id,
+                 strlen(context_id)) == 0)) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+int
+oc_core_find_at_entry_empty_slot(size_t device_index)
+{
+  for (int i = 0; i < G_AT_MAX_ENTRIES; i++) {
+    if (oc_string_len(g_at_entries[i].id) == 0) {
+      return i;
+    }
+  }
+  return -1;
+}
+
 void
 oc_load_at_table(size_t device_index)
 {
@@ -1248,7 +1272,7 @@ oc_oscore_set_auth(char *serial_number, char *context_id, uint8_t *shared_key,
 
   oc_auth_at_t os_token;
   memset(&os_token, 0, sizeof(os_token));
-  oc_new_string(&os_token.id, "context_id", strlen("context_id"));
+  oc_new_string(&os_token.id, context_id, strlen(context_id));
   os_token.ga_len = 0;
   os_token.profile = OC_PROFILE_COAP_OSCORE;
   os_token.scope = OC_IF_SEC | OC_IF_D | OC_IF_P;
@@ -1258,11 +1282,18 @@ oc_oscore_set_auth(char *serial_number, char *context_id, uint8_t *shared_key,
   oc_new_string(&os_token.osc_id, context_id, strlen(context_id));
   oc_new_string(&os_token.osc_contextid, context_id, strlen(context_id));
   oc_new_string(&os_token.sub, "", strlen(""));
-  // oc_new_string(&os_token.kid, "serial_number", strlen("serial_number"));
-  oc_core_set_at_table((size_t)0, 0, os_token);
 
-  // add the oscore context...
-  oc_init_oscore(0);
+  int index = oc_core_find_at_entry_with_context_id(0, context_id);
+  if (index == -1) {
+    index = oc_core_find_at_entry_empty_slot(0);
+  }
+  if (index == -1) {
+    OC_ERR("no space left in auth/at");
+  } else {
+    oc_core_set_at_table((size_t)0, 0, os_token);
+    // add the oscore context...
+    oc_init_oscore(0);
+  }
 }
 
 // ----------------------------------------------------------------------------

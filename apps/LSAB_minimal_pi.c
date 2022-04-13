@@ -95,6 +95,9 @@ static pthread_cond_t cv;
 static struct timespec ts;
 #endif /* NO_MAIN */
 #endif
+#ifdef OC_SPAKE
+#include "security/oc_spake2plus.h"
+#endif
 
 #include <stdio.h> /* defines FILENAME_MAX */
 
@@ -225,6 +228,11 @@ app_init(void)
   /* set the model */
   oc_core_set_device_model(0, "Cascoda Actuator");
 
+#ifdef OC_SPAKE
+#define PASSWORD "LETTUCE"
+  oc_spake_set_password(PASSWORD);
+  PRINT(" SPAKE password %s\n", PASSWORD);
+#endif
   return ret;
 }
 

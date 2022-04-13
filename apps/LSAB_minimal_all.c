@@ -72,7 +72,9 @@
 #include <signal.h>
 // test purpose only
 #include "api/oc_knx_dev.h"
-
+#ifdef OC_SPAKE
+#include "security/oc_spake2plus.h"
+#endif
 #ifdef INCLUDE_EXTERNAL
 /* import external definitions from header file*/
 /* this file should be externally supplied */
@@ -147,6 +149,12 @@ app_init(void)
 
   /* set the model */
   oc_core_set_device_model(0, "Cascoda Actuator");
+
+#ifdef OC_SPAKE
+#define PASSWORD "LETTUCE"
+  oc_spake_set_password(PASSWORD);
+  PRINT(" SPAKE password %s\n", PASSWORD);
+#endif
 
   return ret;
 }

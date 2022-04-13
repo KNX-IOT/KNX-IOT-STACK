@@ -81,7 +81,9 @@
 #endif
 
 #include <stdio.h> /* defines FILENAME_MAX */
-
+#ifdef OC_SPAKE
+#include "security/oc_spake2plus.h"
+#endif
 #define MY_NAME "Sensor (LSSB) 421.61" /**< The name of the application */
 
 #ifdef WIN32
@@ -138,6 +140,11 @@ app_init(void)
   /* set the model */
   oc_core_set_device_model(0, "my model");
 
+#ifdef OC_SPAKE
+#define PASSWORD "LETTUCE"
+  oc_spake_set_password(PASSWORD);
+  PRINT(" SPAKE password %s\n", PASSWORD);
+#endif
   return ret;
 }
 
