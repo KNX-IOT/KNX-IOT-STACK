@@ -631,12 +631,12 @@ class KNXIOTStack():
             print ("===+++===")
         return ""
 
-    """ ********************************
-    Call back handles general task like device
-    discovery.
-    needs to be before _init_
-    **********************************"""
     def changedCB(self, sn, cb_state, cb_event):
+        """ ********************************
+        Call back handles general task like device
+        discovery.
+        needs to be before _init_
+        **********************************"""
         print("Changed event: Device: {}, State:{} Event:{}".format(sn, cb_state, cb_event))
         name = ""
         if sn is not None:
