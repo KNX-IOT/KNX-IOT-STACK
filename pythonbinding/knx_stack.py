@@ -660,7 +660,9 @@ class KNXIOTStack():
         Call back handles client command callbacks.
         Client discovery/state
         **********************************"""
+        print("Acquiring Client Mutex...")
         client_mutex.acquire()
+        print("Acquired!")
         sn=""
         c_format=""
         r_id = ""
@@ -696,7 +698,9 @@ class KNXIOTStack():
         resp  = CoAPResponse(sn, cb_status, c_format, r_id, url, cb_payload_size, payload)
         self.response_array.append(resp)
         client_event.set()
+        print("Releasing Client Mutex...")
         client_mutex.release()
+        print("Released!")
 
     def resourceCB(self, anchor, uri, _rtypes, myjson):
         """ ********************************
