@@ -117,7 +117,7 @@ void oc_etimer_reset(struct oc_etimer *et);
  * \param interval The interval before the timer expires.
  *
  *             This function very similar to oc_etimer_reset. Opposed to
- *             oc_etimer_reset it is possible to change the timout.
+ *             oc_etimer_reset it is possible to change the timeout.
  *             This allows accurate, non-periodic timers without drift.
  *
  * \sa oc_etimer_reset()
