@@ -34,10 +34,10 @@
 
 OC_PROCESS(oc_oscore_handler, "OSCORE Process");
 
-static increment_ssn_in_context(oc_oscore_context_t *ctx) {
+static increment_ssn_in_context(oc_oscore_context_t *ctx)
+{
   // ctx->ssn++;
 }
-
 
 static oc_event_callback_retval_t
 dump_cred(void *data)
@@ -252,7 +252,7 @@ oc_oscore_recv_message(oc_message_t *message)
         /* Compute nonce using request_piv and context->sendid */
         oc_oscore_AEAD_nonce(oscore_ctx->sendid, oscore_ctx->sendid_len,
                              request_piv, request_piv_len, oscore_ctx->commoniv,
-                            nonce, OSCORE_AEAD_NONCE_LEN);
+                             nonce, OSCORE_AEAD_NONCE_LEN);
 
         OC_DBG_OSCORE("---use AEAD nonce from request");
         OC_LOGbytes_OSCORE(nonce, OSCORE_AEAD_NONCE_LEN);
@@ -270,11 +270,10 @@ oc_oscore_recv_message(oc_message_t *message)
 
     /* Verify and decrypt OSCORE payload */
     uint8_t *output = (uint8_t *)malloc(oscore_pkt->payload_len);
-    
 
-    //int ret = oc_oscore_decrypt(oscore_pkt->payload, oscore_pkt->payload_len,
-    //                            OSCORE_AEAD_TAG_LEN, key, OSCORE_KEY_LEN, nonce,
-    //                            OSCORE_AEAD_NONCE_LEN, AAD, AAD_len,
+    // int ret = oc_oscore_decrypt(oscore_pkt->payload, oscore_pkt->payload_len,
+    //                            OSCORE_AEAD_TAG_LEN, key, OSCORE_KEY_LEN,
+    //                            nonce, OSCORE_AEAD_NONCE_LEN, AAD, AAD_len,
     //                            oscore_pkt->payload);
     int ret = oc_oscore_decrypt(oscore_pkt->payload, oscore_pkt->payload_len,
                                 OSCORE_AEAD_TAG_LEN, key, OSCORE_KEY_LEN, nonce,
@@ -419,7 +418,7 @@ oc_oscore_send_multicast_message(oc_message_t *message)
     OC_DBG_OSCORE("---using SSN as Partial IV: %lu", oscore_ctx->ssn);
     OC_LOGbytes_OSCORE(piv, piv_len);
     /* Increment SSN */
-    //oscore_ctx->ssn++;
+    // oscore_ctx->ssn++;
     increment_ssn_in_context(oscore_ctx);
     // store it so that it can be retrieved by the clients
     oc_knx_set_osn(oscore_ctx->ssn);
@@ -638,12 +637,12 @@ oc_oscore_send_message(oc_message_t *msg)
       /* Request */
       /* Use context->SSN as Partial IV */
       oscore_store_piv(oscore_ctx->ssn, piv, &piv_len);
-      //oscore_store_piv(0, piv, &piv_len);
+      // oscore_store_piv(0, piv, &piv_len);
       OC_DBG_OSCORE("---using SSN as Partial IV: %lu", oscore_ctx->ssn);
       OC_LOGbytes_OSCORE(piv, piv_len);
       /* Increment SSN */
       increment_ssn_in_context(oscore_ctx);
-      //oscore_ctx->ssn++;
+      // oscore_ctx->ssn++;
 
 #ifdef OC_CLIENT
       if (coap_pkt->code >= OC_GET && coap_pkt->code <= OC_DELETE) {
@@ -704,7 +703,7 @@ oc_oscore_send_message(oc_message_t *msg)
       OC_DBG_OSCORE("---");
 
       /* Increment SSN */
-      //oscore_ctx->ssn++;
+      // oscore_ctx->ssn++;
       increment_ssn_in_context(oscore_ctx);
 
       /* Compute nonce using partial IV and context->sendid */

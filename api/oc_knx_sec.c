@@ -1315,7 +1315,7 @@ oc_init_oscore(size_t device_index)
       oc_at_entry_print(device_index, i);
 
       uint64_t ssn = 0;
-      //ssn = oc_knx_get_osn();
+      // ssn = oc_knx_get_osn();
 
       // one context: for sending and receiving.
       oc_oscore_context_t *ctx = oc_oscore_add_context(
