@@ -154,11 +154,15 @@ typedef struct oc_auth_at_t
  */
 int oc_core_set_at_table(size_t device_index, int index, oc_auth_at_t entry);
 
+int oc_core_find_at_entry_with_context_id(size_t device_index, char* context_id);
+
+int oc_core_find_at_entry_empty_slot(size_t device_index);
+
 /**
  * @brief set shared (SPAKE) key
  *
- * @param serial_number the serial_number of the device that has been hand
- * shaked with (e.g. client side)
+ * @param serial_number the serial_number of the device that has been negotiated
+ * with spake2plus with (e.g. client side)
  * @param context_id the context_id delivered during the handshake
  * @param shared_key the master key after SPAKE2 handshake
  * @param shared_key_size the key size
