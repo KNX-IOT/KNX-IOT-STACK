@@ -217,7 +217,7 @@ oc_oscore_recv_message(oc_message_t *message)
                               &AAD_len);
         OC_DBG_OSCORE(
           "---composed AAD using received Partial IV and Recipient ID");
-        OC_LOGbytes(AAD, AAD_len);
+        OC_LOGbytes_OSCORE(AAD, AAD_len);
       }
 
       /* Copy received piv into oc_message_t->endpoint */
@@ -240,7 +240,7 @@ oc_oscore_recv_message(oc_message_t *message)
     /* If message is response */
     if (oscore_pkt->code > OC_FETCH) {
       OC_DBG_OSCORE("---got request_piv from client callback");
-      OC_LOGbytes(request_piv, request_piv_len);
+      OC_LOGbytes_OSCORE(request_piv, request_piv_len);
 
       /* If oc_message_t->endpoint.piv_len == 0 */
       if (message->endpoint.piv_len == 0) {
@@ -252,10 +252,10 @@ oc_oscore_recv_message(oc_message_t *message)
         /* Compute nonce using request_piv and context->sendid */
         oc_oscore_AEAD_nonce(oscore_ctx->sendid, oscore_ctx->sendid_len,
                              request_piv, request_piv_len, oscore_ctx->commoniv,
-                             nonce, OSCORE_AEAD_NONCE_LEN);
+                            nonce, OSCORE_AEAD_NONCE_LEN);
 
         OC_DBG_OSCORE("---use AEAD nonce from request");
-        OC_LOGbytes(nonce, OSCORE_AEAD_NONCE_LEN);
+        OC_LOGbytes_OSCORE(nonce, OSCORE_AEAD_NONCE_LEN);
       }
 
       /* Compose AAD using request_piv and context->sendid */
@@ -263,17 +263,25 @@ oc_oscore_recv_message(oc_message_t *message)
                             request_piv, request_piv_len, AAD, &AAD_len);
 
       OC_DBG_OSCORE("---composed AAD using request_piv and Sender ID");
-      OC_LOGbytes(AAD, AAD_len);
+      OC_LOGbytes_OSCORE(AAD, AAD_len);
     }
 
     OC_DBG_OSCORE("### decrypting OSCORE payload ###");
 
     /* Verify and decrypt OSCORE payload */
+    uint8_t *output = (uint8_t *)malloc(oscore_pkt->payload_len);
+    
 
+    //int ret = oc_oscore_decrypt(oscore_pkt->payload, oscore_pkt->payload_len,
+    //                            OSCORE_AEAD_TAG_LEN, key, OSCORE_KEY_LEN, nonce,
+    //                            OSCORE_AEAD_NONCE_LEN, AAD, AAD_len,
+    //                            oscore_pkt->payload);
     int ret = oc_oscore_decrypt(oscore_pkt->payload, oscore_pkt->payload_len,
                                 OSCORE_AEAD_TAG_LEN, key, OSCORE_KEY_LEN, nonce,
-                                OSCORE_AEAD_NONCE_LEN, AAD, AAD_len,
-                                oscore_pkt->payload);
+                                OSCORE_AEAD_NONCE_LEN, AAD, AAD_len, output);
+
+    memcpy(oscore_pkt->payload, output, oscore_pkt->payload_len);
+    free(output);
 
     if (ret != 0) {
       OC_ERR("***error decrypting/verifying response : (%d)***", ret);
