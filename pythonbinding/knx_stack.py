@@ -78,7 +78,6 @@ discover_data_event = threading.Event()
 spake_event = threading.Event()
 client_event = threading.Event()
 client_mutex = threading.Lock()
-resource_mutex = threading.Lock()
 
 ten_spaces = "          "
 
@@ -660,9 +659,7 @@ class KNXIOTStack():
         Call back handles client command callbacks.
         Client discovery/state
         **********************************"""
-        print("Acquiring Client Mutex...")
         client_mutex.acquire()
-        print("Acquired!")
         sn=""
         c_format=""
         r_id = ""
@@ -698,9 +695,7 @@ class KNXIOTStack():
         resp  = CoAPResponse(sn, cb_status, c_format, r_id, url, cb_payload_size, payload)
         self.response_array.append(resp)
         client_event.set()
-        print("Releasing Client Mutex...")
         client_mutex.release()
-        print("Released!")
 
     def resourceCB(self, anchor, uri, _rtypes, myjson):
         """ ********************************
@@ -769,7 +764,6 @@ class KNXIOTStack():
 
     def __init__(self, debug=True):
         print ("loading ...")
-        resource_mutex.acquire()
         if sys.platform == 'linux':
             libname = "libkisCS.so"
         else:
