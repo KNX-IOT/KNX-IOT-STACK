@@ -1209,13 +1209,13 @@ oc_core_set_at_table(size_t device_index, int index, oc_auth_at_t entry)
   return 0;
 }
 
-
 int
 oc_core_find_at_entry_with_context_id(size_t device_index, char *context_id)
 {
   for (int i = 0; i < G_AT_MAX_ENTRIES; i++) {
-    if ((oc_string_len(g_at_entries[i].id) > 0) && 
-        (strncmp(oc_string(g_at_entries[i].id), context_id, strlen(context_id)) == 0)) {
+    if ((oc_string_len(g_at_entries[i].id) > 0) &&
+        (strncmp(oc_string(g_at_entries[i].id), context_id,
+                 strlen(context_id)) == 0)) {
       return i;
     }
   }

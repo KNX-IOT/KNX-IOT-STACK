@@ -156,17 +156,18 @@ int oc_core_set_at_table(size_t device_index, int index, oc_auth_at_t entry);
 
 /**
  * @brief find the entry with context_id as id
- * 
+ *
  * @param device_index The device index
  * @param context_id the context id to search for
  * @return int -1 : no entry with that name
  * @return int >=0 : entry found
  */
-int oc_core_find_at_entry_with_context_id(size_t device_index, char* context_id);
+int oc_core_find_at_entry_with_context_id(size_t device_index,
+                                          char *context_id);
 
 /**
  * @brief find empty slot
- * 
+ *
  * @param device_index The device index
  * @return int -1 : no space left
  * @return int >=0 : index to place entry
