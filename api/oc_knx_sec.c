@@ -1314,10 +1314,13 @@ oc_init_oscore(size_t device_index)
     if (oc_string_len(g_at_entries[i].id) > 0) {
       oc_at_entry_print(device_index, i);
 
+      uint64_t ssn = 0;
+      //ssn = oc_knx_get_osn();
+
       // one context: for sending and receiving.
       oc_oscore_context_t *ctx = oc_oscore_add_context(
         device_index, oc_string(g_at_entries[i].osc_contextid),
-        oc_string(g_at_entries[i].osc_contextid), oc_knx_get_osn(), "desc",
+        oc_string(g_at_entries[i].osc_contextid), ssn, "desc",
         oc_string(g_at_entries[i].osc_ms),
         oc_string(g_at_entries[i].osc_contextid), false);
       if (ctx == NULL) {
