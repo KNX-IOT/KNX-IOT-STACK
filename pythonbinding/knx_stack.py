@@ -773,7 +773,7 @@ class KNXIOTStack():
         print ("loading :", libname)
         libdir = os.path.dirname(__file__)
         print ("at :", libdir)
-        self.timout = 3
+        self.timeout = 3
         self.m_stop = False
         self.lib=ctl.load_library(libname, libdir)
         # python list of copied unowned devices on the local network
@@ -879,11 +879,11 @@ class KNXIOTStack():
             self.lib.ets_discover_devices(scope)
         except:
             traceback.print_exc()
-        time.sleep(self.timout)
+        time.sleep(self.timeout)
         # python callback application
         print("[P] discovery- done")
         self.lib.ets_get_nr_devices()
-        discover_event.wait(self.timout)
+        discover_event.wait(self.timeout)
         print("Discovered DEVICE ARRAY {}".format(self.device_array))
         return self.device_array
 
@@ -893,11 +893,11 @@ class KNXIOTStack():
         discover_event.clear()
         self.lib.ets_discover_devices_with_query.argtypes = [c_int, String ]
         self.lib.ets_discover_devices_with_query(scope, query)
-        #time.sleep(self.timout)
+        #time.sleep(self.timeout)
         # python callback application
         print("[P] discovery- done")
         #self.lib.ets_get_nr_devices()
-        discover_event.wait(self.timout)
+        discover_event.wait(self.timeout)
         print("Found devices {}".format(self.get_nr_devices))
         print("Discovered DEVICE ARRAY {}".format(self.device_array))
         if self.get_nr_devices() > 0:
@@ -915,8 +915,8 @@ class KNXIOTStack():
         self.discovery_data = None
         self.lib.ets_initiate_spake.argtypes = [ String, String, String ]
         self.lib.ets_initiate_spake(sn, password, contextid)
-        #time.sleep(self.timout)
-        spake_event.wait(self.timout)
+        #time.sleep(self.timeout)
+        spake_event.wait(self.timeout)
         #print ("initiate_spake data: ")
         return self.spake
         #return self.discovery_data
@@ -959,10 +959,10 @@ class KNXIOTStack():
         self.lib.ets_cbor_get.argtypes = [String, String, String, String]
         client_event.clear()
         self.lib.ets_cbor_get(sn, self.url_local_path(uri), query, r_id)
-        client_event.wait(self.timout)
+        client_event.wait(self.timeout)
         my_response =  self.find_response(r_id)
         if my_response is None :
-            client_event.wait(self.timout)
+            client_event.wait(self.timeout)
         return self.find_response(r_id)
 
     def issue_cbor_get_unsecured(self, sn, uri, query=None) :
@@ -971,10 +971,10 @@ class KNXIOTStack():
         self.lib.ets_cbor_get_unsecured.argtypes = [String, String, String, String]
         client_event.clear()
         self.lib.ets_cbor_get_unsecured(sn, self.url_local_path(uri), query, r_id)
-        client_event.wait(self.timout)
+        client_event.wait(self.timeout)
         my_response =  self.find_response(r_id)
         if my_response is None :
-            client_event.wait(self.timout)
+            client_event.wait(self.timeout)
         return self.find_response(r_id)
 
     def issue_linkformat_get(self, sn, uri, query=None) :
@@ -983,7 +983,7 @@ class KNXIOTStack():
         self.lib.ets_linkformat_get.argtypes = [String, String, String, String]
         client_event.clear()
         self.lib.ets_linkformat_get(sn, self.url_local_path(uri), query, r_id)
-        client_event.wait(self.timout)
+        client_event.wait(self.timeout)
         return self.find_response(r_id)
 
     def issue_linkformat_get_unsecured(self, sn, uri, query=None) :
@@ -992,7 +992,7 @@ class KNXIOTStack():
         self.lib.ets_linkformat_get_unsecured.argtypes = [String, String, String, String]
         client_event.clear()
         self.lib.ets_linkformat_get_unsecured(sn, self.url_local_path(uri), query, r_id)
-        client_event.wait(self.timout)
+        client_event.wait(self.timeout)
         return self.find_response(r_id)
 
     def issue_cbor_post(self, sn, uri, my_content, query=None) :
@@ -1009,7 +1009,7 @@ class KNXIOTStack():
         except:
             pass
         # print(" issue_cbor_post - done")
-        client_event.wait(self.timout)
+        client_event.wait(self.timeout)
         return self.find_response(r_id)
 
     def issue_cbor_put(self, sn, uri, my_content, query=None) :
@@ -1026,7 +1026,7 @@ class KNXIOTStack():
         except:
             pass
         print(" issue_cbor_put - done")
-        client_event.wait(self.timout)
+        client_event.wait(self.timeout)
         return self.find_response(r_id)
 
     def issue_cbor_delete(self, sn, uri, query=None) :
@@ -1039,7 +1039,7 @@ class KNXIOTStack():
         except:
             pass
         print(" issue_cbor_delete - done")
-        client_event.wait(self.timout)
+        client_event.wait(self.timeout)
         return self.find_response(r_id)
 
     def issue_s_mode(self, scope, sia, ga, iid, st, value_type, value) :
