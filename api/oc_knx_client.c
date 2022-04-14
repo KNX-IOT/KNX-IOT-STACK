@@ -312,6 +312,7 @@ discovery_ia_cb(const char *payload, int len, oc_endpoint_t *endpoint,
     return OC_STOP_DISCOVERY;
   }
 
+  // todo: where is the free?
   uint8_t *buffer = malloc(100);
   if (!buffer) {
     OC_WRN("discovery_ia_cb: out of memory allocating buffer");
@@ -521,6 +522,7 @@ oc_s_mode_get_resource_value(char *resource_url, char *rp, uint8_t *buf,
     return 0;
   }
 
+  // todo: where is the free??
   uint8_t *buffer = malloc(100);
   if (!buffer) {
     OC_WRN("oc_do_s_mode: out of memory allocating buffer");
@@ -622,6 +624,7 @@ oc_do_s_mode_with_scope_and_check(int scope, char *resource_url, char *rp,
     return;
   }
 
+  // todo: where is the free?
   uint8_t *buffer = malloc(100);
   if (!buffer) {
     OC_ERR("oc_do_s_mode_with_scope_internal: out of memory allocating buffer");
