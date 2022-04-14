@@ -1400,3 +1400,19 @@ py_oc_rep_to_json(oc_rep_t *rep, char *buf, size_t buf_size, bool pretty_print)
 
   return total_char_printed;
 }
+
+/**
+ * function to print the returned cbor as JSON
+ *
+ */
+void
+oc_print_rep_as_json(oc_rep_t *rep, bool pretty_print)
+{
+  char *json;
+  size_t json_size;
+  json_size = oc_rep_to_json(rep, NULL, 0, pretty_print);
+  json = (char *)malloc(json_size + 1);
+  oc_rep_to_json(rep, json, json_size + 1, pretty_print);
+  PRINT("%s\n", json);
+  free(json);
+}

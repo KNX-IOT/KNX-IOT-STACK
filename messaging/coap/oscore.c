@@ -283,7 +283,7 @@ coap_parse_oscore_option(void *packet, uint8_t *current_option,
   /* Check if 'k' flag bit is set */
   if (coap_pkt->oscore_flags & OSCORE_FLAGS_KID_BITMASK) {
     /* Remaining bytes in option: kid */
-    coap_pkt->kid_len = option_length;
+    coap_pkt->kid_len = (uint8_t)option_length;
     memcpy(coap_pkt->kid, current_option, option_length);
 
     OC_DBG_OSCORE("\tkid:");
@@ -391,7 +391,7 @@ oscore_parse_inner_message(uint8_t *data, size_t data_len, void *packet)
 
   /* Parse inner options */
   coap_status_t ret = coap_oscore_parse_options(
-    packet, data, data_len, current_option, true, false, true);
+    packet, data, (uint32_t)data_len, current_option, true, false, true);
   if (COAP_NO_ERROR != ret) {
     OC_DBG_OSCORE("coap_oscore_parse_options failed! %d", ret);
     return ret;
@@ -542,8 +542,9 @@ oscore_parse_outer_message(oc_message_t *msg, void *packet)
   current_option += coap_pkt->token_len;
 
   /* Parse outer options */
-  coap_status_t ret = coap_oscore_parse_options(
-    packet, msg->data, msg->length, current_option, false, true, true);
+  coap_status_t ret =
+    coap_oscore_parse_options(packet, msg->data, (uint32_t)msg->length,
+                              current_option, false, true, true);
   if (COAP_NO_ERROR != ret) {
     OC_DBG_OSCORE("coap_oscore_parse_options failed! %d", ret);
     return ret;

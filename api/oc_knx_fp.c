@@ -160,6 +160,10 @@ find_empty_slot_in_group_object_table(int id)
 int
 oc_core_set_group_object_table(int index, oc_group_object_table_t entry)
 {
+  if (index >= oc_core_get_group_object_table_total_size()) {
+    OC_ERR("index to large index:%d %d", index,
+           oc_core_get_group_object_table_total_size());
+  }
   g_got[index].cflags = entry.cflags;
   g_got[index].id = entry.id;
 
@@ -527,6 +531,9 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
               free(g_got[index].ga);
             }
             g_got[index].ga_len = array_size;
+            if (g_got[index].ga) {
+              free(g_got[index].ga);
+            }
             g_got[index].ga = new_array;
           }
         } break;
@@ -1532,17 +1539,17 @@ oc_load_group_object_table_entry(int entry)
             int64_t *arr = oc_int_array(rep->value.array);
             int array_size = (int)oc_int_array_size(rep->value.array);
             int *new_array = (int *)malloc(array_size * sizeof(int));
-
-            // TODO check  if new array is not NULL
-            for (int i = 0; i < array_size; i++) {
-              new_array[i] = (int)arr[i];
+            if (new_array) {
+              for (int i = 0; i < array_size; i++) {
+                new_array[i] = (int)arr[i];
+              }
+              if (g_got[entry].ga != 0) {
+                free(g_got[entry].ga);
+              }
+              PRINT("  ga size %d\n", array_size);
+              g_got[entry].ga_len = array_size;
+              g_got[entry].ga = new_array;
             }
-            if (g_got[entry].ga != 0) {
-              free(g_got[entry].ga);
-            }
-            PRINT("  ga size %d\n", array_size);
-            g_got[entry].ga_len = array_size;
-            g_got[entry].ga = new_array;
           }
           break;
         default:
@@ -1750,6 +1757,9 @@ oc_load_group_rp_table_entry(int entry, char *Store,
             }
             PRINT("  ga size %d\n", array_size);
             rp_table[entry].ga_len = array_size;
+            if (rp_table[entry].ga) {
+              free(rp_table[entry].ga);
+            }
             rp_table[entry].ga = new_array;
           }
           break;
@@ -1795,9 +1805,7 @@ oc_free_group_rp_table_entry(int entry, char *Store,
   oc_free_string(&rp_table[entry].url);
   free(rp_table[entry].ga);
   rp_table[entry].ga = NULL;
-
   rp_table[entry].ga_len = 0;
-  // rp_table[entry].cflags = 0;
 }
 
 static void
@@ -1830,7 +1838,7 @@ void
 oc_free_group_rp_table()
 {
 
-  PRINT("FreeGroup Recipient Table from Persistent storage\n");
+  PRINT("Free Group Recipient Table from Persistent storage\n");
   for (int i = 0; i < GRT_MAX_ENTRIES; i++) {
     oc_free_group_rp_table_entry(i, GRT_STORE, g_grt, GRT_MAX_ENTRIES);
   }

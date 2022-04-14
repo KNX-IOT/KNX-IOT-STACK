@@ -122,6 +122,7 @@ bool g_352_52_state = false;   /**< state variable for dp 352.52 instance 0 */
 bool g_353_52_state = false;   /**< state variable for dp 353.52 instance 0 */
 volatile int quit = 0;         /**< stop variable, used by handle_signal */
 bool g_reset = false;
+int call_counter = 0;
 
 /**
  * @brief callback for the smode response
@@ -882,8 +883,14 @@ oc_endpoint_t g_endpoint;
 void
 response_get_pm(oc_client_response_t *data)
 {
-  PRINT("response_get_pm: content format :%d  code:%d\n", data->content_format,
-        data->code);
+  PRINT("=============> response_get_pm (%d): content format :%d  code:%d\n",
+        call_counter, data->content_format, data->code);
+  oc_print_rep_as_json(data->payload, true);
+
+  call_counter++;
+
+  oc_do_get_ex("/dev/pm", &g_endpoint, NULL, response_get_pm, HIGH_QOS,
+               APPLICATION_CBOR, APPLICATION_CBOR, NULL);
 }
 
 void
@@ -993,7 +1000,8 @@ main(int argc, char *argv[])
   int init;
 
   bool do_send_s_mode = false;
-  bool do_send_oscore = false;
+  bool do_send_oscore = true;
+  // false;
   true; //  false;
   g_reset = true;
 

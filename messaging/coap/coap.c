@@ -1460,7 +1460,7 @@ coap_get_header_proxy_uri(void *packet, const char **uri)
     return 0;
   }
   *uri = coap_pkt->proxy_uri;
-  return coap_pkt->proxy_uri_len;
+  return (int)coap_pkt->proxy_uri_len;
 }
 int
 coap_set_header_proxy_uri(void *packet, const char *uri)
@@ -1471,7 +1471,7 @@ coap_set_header_proxy_uri(void *packet, const char *uri)
   coap_pkt->proxy_uri_len = strlen(uri);
 
   SET_OPTION(coap_pkt, COAP_OPTION_PROXY_URI);
-  return coap_pkt->proxy_uri_len;
+  return (int)coap_pkt->proxy_uri_len;
 }
 /*---------------------------------------------------------------------------*/
 #if 0

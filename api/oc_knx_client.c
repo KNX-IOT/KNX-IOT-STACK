@@ -78,7 +78,7 @@ static int oc_s_mode_get_resource_value(char *resource_url, char *rp,
 static void
 update_tokens(uint8_t *secret, int secret_size)
 {
-  PRINT("update_tokens \n");
+  PRINT("update_tokens: \n");
 
   oc_oscore_set_auth(oc_string(g_spake_ctx.serial_number),
                      g_spake_ctx.oscore_id, secret, secret_size);
@@ -96,17 +96,10 @@ finish_spake_handshake(oc_client_response_t *data)
     mbedtls_ecp_point_free(&pubA);
     return;
   }
-  // OC_DBG_SPAKE("SPAKE2+ Handshake Finished!\n");
-  // OC_DBG_SPAKE("  code: %d\n", data->code);
-  // OC_DBG_SPAKE("Shared Secret: ");
-  // for (int i = 0; i < 16; i++) {
-  //  PRINT("%02x", Ka_Ke[i + 16]);
-  //}
-  // OC_DBG_SPAKE("\n");
 
   // shared_key is 16-byte array - NOT NULL TERMINATED
   uint8_t *shared_key = Ka_Ke + 16;
-  size_t shared_key_len = 16;
+  int shared_key_len = 16;
 
   update_tokens(shared_key, shared_key_len);
 
@@ -118,7 +111,6 @@ finish_spake_handshake(oc_client_response_t *data)
   mbedtls_ecp_point_free(&pubA);
 
   if (m_spake_cb) {
-    PRINT("CALLING CALLBACK- (CLIENT)------>\n");
     m_spake_cb(0, oc_string(g_spake_ctx.serial_number), g_spake_ctx.oscore_id,
                shared_key, shared_key_len);
   }
@@ -140,10 +132,7 @@ do_credential_verification(oc_client_response_t *data)
     return;
   }
 
-  char buffer[200];
-  memset(buffer, 200, 1);
-  oc_rep_to_json(data->payload, (char *)&buffer, 200, true);
-  OC_DBG_SPAKE("%s", buffer);
+  oc_print_rep_as_json(data->payload, true);
 
   uint8_t *pB_bytes, *cB_bytes;
   oc_rep_t *rep = data->payload;
@@ -323,6 +312,7 @@ discovery_ia_cb(const char *payload, int len, oc_endpoint_t *endpoint,
     return OC_STOP_DISCOVERY;
   }
 
+  // todo: where is the free?
   uint8_t *buffer = malloc(100);
   if (!buffer) {
     OC_WRN("discovery_ia_cb: out of memory allocating buffer");
@@ -532,6 +522,7 @@ oc_s_mode_get_resource_value(char *resource_url, char *rp, uint8_t *buf,
     return 0;
   }
 
+  // todo: where is the free??
   uint8_t *buffer = malloc(100);
   if (!buffer) {
     OC_WRN("oc_do_s_mode: out of memory allocating buffer");
@@ -569,7 +560,7 @@ oc_s_mode_get_resource_value(char *resource_url, char *rp, uint8_t *buf,
   request.uri_path = resource_url;
   request.uri_path_len = strlen(resource_url);
 
-  oc_rep_new(response_buffer.buffer, response_buffer.buffer_size);
+  oc_rep_new(response_buffer.buffer, (int)response_buffer.buffer_size);
 
   // get the value...oc_request_t request_obj;
   oc_interface_mask_t iface_mask = OC_IF_NONE;
@@ -601,8 +592,8 @@ oc_do_s_mode_read(size_t group_address)
         sia_value, iid);
 
   if (group_address > 0) {
-    oc_issue_s_mode(2, sia_value, group_address, iid, "r", 0, 0);
-    oc_issue_s_mode(5, sia_value, group_address, iid, "r", 0, 0);
+    oc_issue_s_mode(2, sia_value, (int)group_address, iid, "r", 0, 0);
+    oc_issue_s_mode(5, sia_value, (int)group_address, iid, "r", 0, 0);
   }
 }
 
@@ -633,6 +624,7 @@ oc_do_s_mode_with_scope_and_check(int scope, char *resource_url, char *rp,
     return;
   }
 
+  // todo: where is the free?
   uint8_t *buffer = malloc(100);
   if (!buffer) {
     OC_ERR("oc_do_s_mode_with_scope_internal: out of memory allocating buffer");

@@ -20,6 +20,7 @@
 #include "port/oc_clock.h"
 #include "api/oc_knx_fp.h"
 #include "api/oc_knx_gm.h"
+#include "api/oc_knx_dev.h"
 #include "port/oc_connectivity.h"
 
 #if defined(_WIN32)
@@ -160,22 +161,6 @@ stringFromResponse(int code)
   } else {
     return " unknown error";
   }
-}
-
-/**
- * function to print the returned cbor as JSON
- *
- */
-void
-print_rep(oc_rep_t *rep, bool pretty_print)
-{
-  char *json;
-  size_t json_size;
-  json_size = oc_rep_to_json(rep, NULL, 0, pretty_print);
-  json = (char *)malloc(json_size + 1);
-  oc_rep_to_json(rep, json, json_size + 1, pretty_print);
-  printf("%s\n", json);
-  free(json);
 }
 
 // -----------------------------------------------------------------------------
@@ -334,7 +319,10 @@ inform_spake_python(char *sn, int state, char *oscore_id, char *key,
   PRINT("]\n");
 
   if (my_CBFunctions.spakeFCB != NULL) {
-    my_CBFunctions.spakeFCB(sn, state, oscore_id, key, key_size);
+    // typedef void (*spakeCB)(char *sn, int state, char *secret, int
+    // secret_size,
+    //                        char *oscore_id);
+    my_CBFunctions.spakeFCB(sn, state, key, key_size, oscore_id);
   }
 }
 
@@ -416,16 +404,15 @@ add_device_to_list(char *sn, const char *device_name, char *ip_address,
       return false;
     }
     strcpy(device->device_serial_number, sn);
-    PRINT("[C] add_device_to_list adding device %s\n", sn);
+    PRINT("[C] add_device_to_list adding device sn:%s name:%s\n", sn,
+          device_name);
     oc_list_add(list, device);
   }
   if (ip_address) {
     strcpy(device->ip_address, ip_address);
   }
   if (ep) {
-    // strcpy(device->ip_address, ip_address);
     oc_endpoint_copy(&device->ep, ep);
-    // oc_endpoint_list_copy(&device->ep, ep);
   }
 
   if (device_name) {
@@ -442,11 +429,13 @@ add_device_to_list(char *sn, const char *device_name, char *ip_address,
 void
 empty_device_list(oc_list_t list)
 {
+  ets_mutex_lock(app_sync_lock);
   device_handle_t *device = (device_handle_t *)oc_list_pop(list);
   while (device != NULL) {
     oc_memb_free(&device_handles, device);
     device = (device_handle_t *)oc_list_pop(list);
   }
+  ets_mutex_unlock(app_sync_lock);
 }
 /* End of app utility functions */
 
@@ -482,7 +471,7 @@ general_get_cb(oc_client_response_t *data)
     } else if (data->content_format == APPLICATION_CBOR) {
       ets_mutex_lock(app_sync_lock);
       memset(buffer, 0, buffer_size);
-      int json_size =
+      size_t json_size =
         py_oc_rep_to_json(data->payload, (char *)&buffer, buffer_size, false);
       inform_client_python((char *)my_data->sn, status, "json",
                            (char *)my_data->r_id, (char *)my_data->url,
@@ -507,10 +496,17 @@ ets_cbor_get(char *sn, char *uri, char *query, char *cbdata)
   int ret = -1;
   device_handle_t *device = ets_getdevice_from_sn(sn);
 
+  if (device == NULL) {
+    OC_ERR("device not found: %s", sn);
+    return;
+  }
+
   PRINT("  [C]ets_cbor_get: [%s], [%s] [%s] [%s]\n", sn, uri, query, cbdata);
 
   user_struct_t *new_cbdata = NULL;
   new_cbdata = (user_struct_t *)malloc(sizeof(user_struct_t));
+
+  ets_mutex_lock(app_sync_lock);
   if (new_cbdata != NULL) {
     strcpy(new_cbdata->r_id, cbdata);
     strcpy(new_cbdata->url, uri);
@@ -519,11 +515,13 @@ ets_cbor_get(char *sn, char *uri, char *query, char *cbdata)
 
 #ifdef OC_OSCORE
     new_cbdata->ep.flags = IPV6;
-    new_cbdata->ep.flags += OSCORE;
+    new_cbdata->ep.flags |= OSCORE;
     PRINT("  [C] enable OSCORE encryption\n");
     oc_string_copy_from_char(&new_cbdata->ep.serial_number, sn);
-    PRINT("  [C] ep serial %s\n", oc_string(new_cbdata->ep.serial_number));
 #endif
+    PRINTipaddr_flags(new_cbdata->ep);
+    PRINTipaddr(new_cbdata->ep);
+    PRINT("\n");
 
     ret = oc_do_get_ex(uri, &new_cbdata->ep, query, general_get_cb, HIGH_QOS,
                        APPLICATION_CBOR, APPLICATION_CBOR, new_cbdata);
@@ -533,6 +531,8 @@ ets_cbor_get(char *sn, char *uri, char *query, char *cbdata)
       PRINT("  [C]ERROR issuing GET request\n");
     }
   }
+
+  ets_mutex_unlock(app_sync_lock);
 }
 
 void
@@ -542,10 +542,15 @@ ets_cbor_get_unsecured(char *sn, char *uri, char *query, char *cbdata)
   device_handle_t *device = ets_getdevice_from_sn(sn);
   PRINT("  [C]ets_cbor_get_unsecured: [%s], [%s] [%s] [%s]\n", sn, uri, query,
         cbdata);
+  if (device == NULL) {
+    OC_ERR("device not found: %s", sn);
+    return;
+  }
 
   user_struct_t *new_cbdata;
   new_cbdata = (user_struct_t *)malloc(sizeof(user_struct_t));
   if (new_cbdata != NULL) {
+    /* initialize the callback data */
     strcpy(new_cbdata->r_id, cbdata);
     strcpy(new_cbdata->url, uri);
     strcpy(new_cbdata->sn, sn);
@@ -553,8 +558,10 @@ ets_cbor_get_unsecured(char *sn, char *uri, char *query, char *cbdata)
 
     /* remove OSCORE flag*/
     new_cbdata->ep.flags = IPV6;
-    // device->ep.flags &= OSCORE;
+    PRINT("  [C] no encryption\n");
     PRINTipaddr_flags(new_cbdata->ep);
+    PRINTipaddr(new_cbdata->ep);
+    PRINT("\n");
 
     ret = oc_do_get_ex(uri, &new_cbdata->ep, query, general_get_cb, HIGH_QOS,
                        APPLICATION_CBOR, APPLICATION_CBOR, new_cbdata);
@@ -572,6 +579,10 @@ ets_linkformat_get(char *sn, char *uri, char *query, char *cbdata)
   int ret = -1;
   oc_endpoint_t ep;
   device_handle_t *device = ets_getdevice_from_sn(sn);
+  if (device == NULL) {
+    OC_ERR("device not found: %s", sn);
+    return;
+  }
 
   PRINT("  [C]ets_linkformat_get: [%s], [%s] [%s] [%s]\n", sn, uri, query,
         cbdata);
@@ -585,13 +596,14 @@ ets_linkformat_get(char *sn, char *uri, char *query, char *cbdata)
     oc_endpoint_copy(&new_cbdata->ep, &device->ep);
 
 #ifdef OC_OSCORE
-    PRINT(" [C] enable OSCORE encryption\n");
-
     new_cbdata->ep.flags = IPV6;
-    new_cbdata->ep.flags != OSCORE;
-    PRINTipaddr_flags(device->ep);
+    new_cbdata->ep.flags |= OSCORE;
+    PRINT("  [C] enable OSCORE encryption: Flags :");
     oc_string_copy_from_char(&new_cbdata->ep.serial_number, sn);
 #endif
+    PRINTipaddr_flags(new_cbdata->ep);
+    PRINTipaddr(new_cbdata->ep);
+    PRINT("\n");
 
     oc_endpoint_print(&device->ep);
     if (&ep != NULL) {
@@ -616,6 +628,11 @@ ets_linkformat_get_unsecured(char *sn, char *uri, char *query, char *cbdata)
 
   PRINT("  [C]ets_linkformat_get_unsecured: [%s], [%s] [%s] [%s]\n", sn, uri,
         query, cbdata);
+  if (device == NULL) {
+    OC_ERR("device not found: %s", sn);
+    return;
+  }
+
   user_struct_t *new_cbdata;
   new_cbdata = (user_struct_t *)malloc(sizeof(user_struct_t));
   if (new_cbdata != NULL) {
@@ -625,8 +642,10 @@ ets_linkformat_get_unsecured(char *sn, char *uri, char *query, char *cbdata)
     oc_endpoint_copy(&new_cbdata->ep, &device->ep);
 
     new_cbdata->ep.flags = IPV6;
-    // device->ep.flags &= OSCORE;
+    PRINT("  [C] no encryption: Flags :");
     PRINTipaddr_flags(new_cbdata->ep);
+    PRINTipaddr(new_cbdata->ep);
+    PRINT("\n");
 
     oc_endpoint_print(&new_cbdata->ep);
     if (&ep != NULL) {
@@ -652,6 +671,10 @@ ets_cbor_post(char *sn, char *uri, char *query, char *id, int size, char *data)
 
   PRINT("  [C]ets_cbor_post: [%s], [%s] [%s] [%s] %d\n", sn, uri, id, query,
         size);
+  if (device == NULL) {
+    OC_ERR("device not found: %s", sn);
+    return;
+  }
 
   user_struct_t *new_cbdata;
   new_cbdata = (user_struct_t *)malloc(sizeof(user_struct_t));
@@ -664,10 +687,12 @@ ets_cbor_post(char *sn, char *uri, char *query, char *id, int size, char *data)
 #ifdef OC_OSCORE
     new_cbdata->ep.flags = IPV6;
     new_cbdata->ep.flags |= OSCORE;
-    PRINT("  [C] enable OSCORE encryption\n");
-    PRINTipaddr_flags(device->ep);
+    PRINT("  [C] enable OSCORE encryption: Flags :");
     oc_string_copy_from_char(&new_cbdata->ep.serial_number, sn);
 #endif
+    PRINTipaddr_flags(new_cbdata->ep);
+    PRINTipaddr(new_cbdata->ep);
+    PRINT("\n");
 
     if (oc_init_post(uri, &new_cbdata->ep, NULL, general_get_cb, HIGH_QOS,
                      new_cbdata)) {
@@ -693,6 +718,10 @@ ets_cbor_put(char *sn, char *uri, char *query, char *id, int size, char *data)
 
   PRINT("  [C]ets_cbor_put: [%s], [%s] [%s] [%s] %d\n", sn, uri, id, query,
         size);
+  if (device == NULL) {
+    OC_ERR("device not found: %s", sn);
+    return;
+  }
 
   user_struct_t *new_cbdata;
   new_cbdata = (user_struct_t *)malloc(sizeof(user_struct_t));
@@ -705,10 +734,14 @@ ets_cbor_put(char *sn, char *uri, char *query, char *id, int size, char *data)
 #ifdef OC_OSCORE
     new_cbdata->ep.flags = IPV6;
     new_cbdata->ep.flags |= OSCORE;
-    PRINT("  [C] enable OSCORE encryption\n");
-    PRINTipaddr_flags(device->ep);
+    PRINT("  [C] enable OSCORE encryption: Flags :");
     oc_string_copy_from_char(&new_cbdata->ep.serial_number, sn);
 #endif
+    // PRINTipaddr_flags(new_cbdata->ep);
+    PRINT("  [C] 1 :");
+    PRINTipaddr(new_cbdata->ep);
+    PRINT("\n");
+    PRINT("  [C] 2 :");
 
     if (oc_init_put(uri, &new_cbdata->ep, NULL, general_get_cb, HIGH_QOS,
                     (char *)new_cbdata)) {
@@ -733,7 +766,10 @@ ets_cbor_delete(char *sn, char *uri, char *query, char *id)
   device_handle_t *device = ets_getdevice_from_sn(sn);
 
   PRINT("  [C]ets_cbor_delete: [%s], [%s] [%s] [%s]\n", sn, uri, id, query);
-
+  if (device == NULL) {
+    OC_ERR("device not found: %s", sn);
+    return;
+  }
   user_struct_t *new_cbdata;
   new_cbdata = (user_struct_t *)malloc(sizeof(user_struct_t));
   if (new_cbdata != NULL) {
@@ -745,10 +781,11 @@ ets_cbor_delete(char *sn, char *uri, char *query, char *id)
 #ifdef OC_OSCORE
     new_cbdata->ep.flags = IPV6;
     new_cbdata->ep.flags |= OSCORE;
-    PRINT("  [C] enable OSCORE encryption\n");
-    PRINTipaddr_flags(new_cbdata->ep);
+    PRINT("  [C] enable OSCORE encryption: Flags :");
     oc_string_copy_from_char(&new_cbdata->ep.serial_number, sn);
 #endif
+    PRINTipaddr_flags(new_cbdata->ep);
+    PRINTipaddr(new_cbdata->ep);
 
     if (oc_do_delete(uri, &new_cbdata->ep, query, general_get_cb, HIGH_QOS,
                      new_cbdata)) {
@@ -782,8 +819,11 @@ response_get_sn(oc_client_response_t *data)
   }
 
   if (my_sn) {
+
+    ets_mutex_lock(app_sync_lock);
     add_device_to_list(my_sn, NULL, oc_string(my_address), data->endpoint,
                        discovered_devices);
+    ets_mutex_unlock(app_sync_lock);
     inform_python(my_sn, oc_string(my_address), "discovered");
   }
   oc_free_string(&my_address);
@@ -839,8 +879,12 @@ discovery_cb(const char *payload, int len, oc_endpoint_t *endpoint,
 
         strncpy(sn, &param[11], param_len - 11);
         PRINT("    SN: %s\n", sn);
+
+        ets_mutex_lock(app_sync_lock);
         add_device_to_list(sn, NULL, oc_string(my_address), endpoint,
                            discovered_devices);
+        ets_mutex_unlock(app_sync_lock);
+
         inform_python(sn, oc_string(my_address), "discovered");
       }
     }
@@ -1179,10 +1223,10 @@ func_event_thread(LPVOID lpParam)
 {
   oc_clock_time_t next_event;
   while (quit != 1) {
-    ets_mutex_lock(app_sync_lock);
+    // ets_mutex_lock(app_sync_lock);
     next_event = oc_main_poll();
-    ets_mutex_unlock(app_sync_lock);
-
+    // ets_mutex_unlock(app_sync_lock);
+    // ets_mutex_lock(app_sync_lock);
     if (next_event == 0) {
       SleepConditionVariableCS(&cv, &cs, INFINITE);
     } else {
@@ -1192,6 +1236,7 @@ func_event_thread(LPVOID lpParam)
           &cv, &cs, (DWORD)((next_event - now) * 1000 / OC_CLOCK_SECOND));
       }
     }
+    // ets_mutex_unlock(app_sync_lock);
   }
 
   oc_main_shutdown();

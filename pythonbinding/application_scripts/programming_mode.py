@@ -67,10 +67,11 @@ def do_discover(my_stack, serial_number, scope = 2):
         print ("SN :", my_stack.device_array[0].sn)
 
 def do_programming_mode(my_stack, pm_value):
-    print("Get SN :")
+    print("do_programming_mode")
     if my_stack.get_nr_devices() == 0:
         return -1
     sn = my_stack.device_array[0].sn
+    print("  using sn:", sn)
     response = my_stack.issue_cbor_get(sn, "/dev/pm")
     print ("current value response:",response)
     if response is None:
@@ -162,5 +163,7 @@ if __name__ == '__main__':  # pragma: no cover
         traceback.print_exc()
 
     time.sleep(int(args.wait))
+    print("quit.....after 1 sec")
+    time.sleep(1)
     the_stack.quit()
     sys.exit()
