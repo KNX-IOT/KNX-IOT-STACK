@@ -132,10 +132,7 @@ do_credential_verification(oc_client_response_t *data)
     return;
   }
 
-  char buffer[200];
-  memset(buffer, 200, 1);
-  oc_rep_to_json(data->payload, (char *)&buffer, 200, true);
-  OC_DBG_SPAKE("%s", buffer);
+  oc_print_rep_as_json(data->payload, true);
 
   uint8_t *pB_bytes, *cB_bytes;
   oc_rep_t *rep = data->payload;

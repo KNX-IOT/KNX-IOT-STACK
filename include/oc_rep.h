@@ -2115,6 +2115,16 @@ bool oc_rep_i_get_object_array(oc_rep_t *rep, int key, oc_rep_t **value);
 size_t oc_rep_to_json(oc_rep_t *rep, char *buf, size_t buf_size,
                       bool pretty_print);
 
+/**
+ * @brief prints the response tree as JSON to the output
+ * pretty_print: true: nicely formatted JSON on multiple lines
+ *               false: JSON formatted on a single line
+ * 
+ * @param rep the response tree
+ * @param pretty_print true: nicely formatted json
+ */
+void oc_print_rep_as_json(oc_rep_t *rep, bool pretty_print);
+
 size_t py_oc_rep_to_json(oc_rep_t *rep, char *buf, size_t buf_size,
                          bool pretty_print);
 
