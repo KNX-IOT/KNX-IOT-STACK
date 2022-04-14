@@ -502,7 +502,7 @@ oc_send_separate_response(oc_separate_response_t *handle,
 
           memcpy(response_state->buffer, response_buffer.buffer,
                  response_buffer.response_length);
-          response_state->payload_size = response_buffer.response_length;
+          response_state->payload_size = (uint32_t)response_buffer.response_length;
 
           uint32_t payload_size = 0;
           const void *payload = oc_blockwise_dispatch_block(

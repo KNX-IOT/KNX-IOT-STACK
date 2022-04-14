@@ -20,6 +20,7 @@
 #include "port/oc_clock.h"
 #include "api/oc_knx_fp.h"
 #include "api/oc_knx_gm.h"
+#include "api/oc_knx_dev.h"
 #include "port/oc_connectivity.h"
 
 #if defined(_WIN32)
@@ -468,7 +469,7 @@ general_get_cb(oc_client_response_t *data)
     } else if (data->content_format == APPLICATION_CBOR) {
       ets_mutex_lock(app_sync_lock);
       memset(buffer, 0, buffer_size);
-      int json_size =
+      size_t json_size =
         py_oc_rep_to_json(data->payload, (char *)&buffer, buffer_size, false);
       inform_client_python((char *)my_data->sn, status, "json",
                            (char *)my_data->r_id, (char *)my_data->url,

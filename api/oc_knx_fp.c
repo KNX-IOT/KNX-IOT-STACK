@@ -160,6 +160,10 @@ find_empty_slot_in_group_object_table(int id)
 int
 oc_core_set_group_object_table(int index, oc_group_object_table_t entry)
 {
+  if (index >= oc_core_get_group_object_table_total_size()) {
+    OC_ERR("index to large index:%d %d", index,
+           oc_core_get_group_object_table_total_size());
+  }
   g_got[index].cflags = entry.cflags;
   g_got[index].id = entry.id;
 

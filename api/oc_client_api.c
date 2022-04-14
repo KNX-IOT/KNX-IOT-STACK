@@ -831,7 +831,7 @@ oc_lf_get_entry_param(const char *payload, int payload_len, int entry,
 
   // <coap://[fe80::8d4c:632a:c5e7:ae09]:60054/p/a>;rt="urn:knx:dpa.352.51";if=if.a;ct=60
   //
-  int param_len = strlen(param);
+  int param_len = (int)strlen(param);
   for (i = 0; i < line_len - param_len - 1; i++) {
     if (line[i] == ';') {
       if (strncmp(&line[i + 1], param, param_len) == 0) {

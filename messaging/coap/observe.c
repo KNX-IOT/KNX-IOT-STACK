@@ -367,7 +367,7 @@ coap_notify_observers(oc_resource_t *resource,
       request.resource = resource;
       request.response = &response;
       request.request_payload = NULL;
-      oc_rep_new(response_buffer.buffer, response_buffer.buffer_size);
+      oc_rep_new(response_buffer.buffer, (int)response_buffer.buffer_size);
       {
         // resource->get_handler.cb(&request, resource->default_interface,
         //                         resource->get_handler.user_data);
@@ -482,7 +482,7 @@ coap_notify_observers(oc_resource_t *resource,
               }
               memcpy(response_state->buffer, response_buf->buffer,
                      response_buf->response_length);
-              response_state->payload_size = response_buf->response_length;
+              response_state->payload_size = (uint32_t)response_buf->response_length;
               uint32_t payload_size = 0;
               const void *payload = oc_blockwise_dispatch_block(
                 response_state, 0, obs->block2_size, &payload_size);
@@ -592,7 +592,7 @@ notify_resource_defaults_observer(oc_resource_t *resource,
   request.resource = resource;
   request.response = &response;
   request.request_payload = NULL;
-  oc_rep_new(response_buffer.buffer, response_buffer.buffer_size);
+  oc_rep_new(response_buffer.buffer, (int)response_buffer.buffer_size);
   resource->get_handler.cb(&request, iface_mask,
                            resource->get_handler.user_data);
   response_buf = &response_buffer;
@@ -687,7 +687,7 @@ notify_resource_defaults_observer(oc_resource_t *resource,
           }
           memcpy(response_state->buffer, response_buf->buffer,
                  response_buf->response_length);
-          response_state->payload_size = response_buf->response_length;
+          response_state->payload_size = (uint32_t)response_buf->response_length;
           uint32_t payload_size = 0;
           const void *payload = oc_blockwise_dispatch_block(
             response_state, 0, obs->block2_size, &payload_size);

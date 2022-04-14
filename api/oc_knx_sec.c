@@ -355,7 +355,7 @@ find_index_from_at_string(const char *at, int len_at)
 {
   int len;
   for (int i = 0; i < G_AT_MAX_ENTRIES; i++) {
-    len = oc_string_len(g_at_entries[i].id);
+    len = (int)oc_string_len(g_at_entries[i].id);
     if (len > 0 && len == len_at &&
         (strncmp(at, oc_string(g_at_entries[i].id), len) == 0)) {
       return i;
@@ -521,7 +521,7 @@ oc_core_auth_at_post_handler(oc_request_t *request,
                 }
                 g_at_entries[index].ga = NULL;
               }
-              g_at_entries[index].ga_len = array_size;
+              g_at_entries[index].ga_len = (int)array_size;
               int64_t *new_array =
                 (int64_t *)malloc(array_size * sizeof(uint64_t));
               if (new_array) {
@@ -940,7 +940,7 @@ oc_at_entry_print(size_t device_index, int index)
         }
         if (oc_string_len(g_at_entries[index].osc_ms) > 0) {
           PRINT("    osc:ms        : ");
-          int length = oc_string_len(g_at_entries[index].osc_ms);
+          int length = (int)oc_string_len(g_at_entries[index].osc_ms);
           char *ms = oc_string(g_at_entries[index].osc_ms);
           for (int i = 0; i < length; i++) {
             PRINT("%02x", (unsigned char)ms[i]);
@@ -1187,7 +1187,7 @@ oc_core_set_at_table(size_t device_index, int index, oc_auth_at_t entry)
         }
         // free(&g_at_entries[index].ga);
       }
-      g_at_entries[index].ga_len = array_size;
+      g_at_entries[index].ga_len = (int)array_size;
       int64_t *new_array = (int64_t *)malloc(array_size * sizeof(uint64_t));
 
       if (new_array) {
