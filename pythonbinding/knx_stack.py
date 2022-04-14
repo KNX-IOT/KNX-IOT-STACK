@@ -78,7 +78,6 @@ discover_data_event = threading.Event()
 spake_event = threading.Event()
 client_event = threading.Event()
 client_mutex = threading.Lock()
-resource_mutex = threading.Lock()
 
 ten_spaces = "          "
 
@@ -765,7 +764,6 @@ class KNXIOTStack():
 
     def __init__(self, debug=True):
         print ("loading ...")
-        resource_mutex.acquire()
         if sys.platform == 'linux':
             libname = "libkisCS.so"
         else:

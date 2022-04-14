@@ -1204,9 +1204,7 @@ func_event_thread(void *data)
   (void)data;
   oc_clock_time_t next_event;
   while (quit != 1) {
-    ets_mutex_lock(app_sync_lock);
     next_event = oc_main_poll();
-    ets_mutex_unlock(app_sync_lock);
 
     ets_mutex_lock(mutex);
     if (next_event == 0) {
@@ -1236,6 +1234,10 @@ ets_main(void)
   sa.sa_flags = 0;
   sa.sa_handler = ets_exit;
   sigaction(SIGINT, &sa, NULL);
+
+  pthread_mutex_init(&app_sync_lock, NULL);
+  pthread_mutex_init(&mutex, NULL);
+  pthread_cond_init(&cv, NULL);
 #endif
 
 #ifdef OC_SERVER
