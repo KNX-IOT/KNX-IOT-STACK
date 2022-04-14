@@ -482,7 +482,8 @@ coap_notify_observers(oc_resource_t *resource,
               }
               memcpy(response_state->buffer, response_buf->buffer,
                      response_buf->response_length);
-              response_state->payload_size = (uint32_t)response_buf->response_length;
+              response_state->payload_size =
+                (uint32_t)response_buf->response_length;
               uint32_t payload_size = 0;
               const void *payload = oc_blockwise_dispatch_block(
                 response_state, 0, obs->block2_size, &payload_size);
@@ -687,7 +688,8 @@ notify_resource_defaults_observer(oc_resource_t *resource,
           }
           memcpy(response_state->buffer, response_buf->buffer,
                  response_buf->response_length);
-          response_state->payload_size = (uint32_t)response_buf->response_length;
+          response_state->payload_size =
+            (uint32_t)response_buf->response_length;
           uint32_t payload_size = 0;
           const void *payload = oc_blockwise_dispatch_block(
             response_state, 0, obs->block2_size, &payload_size);

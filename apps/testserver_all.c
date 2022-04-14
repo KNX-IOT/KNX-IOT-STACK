@@ -884,9 +884,7 @@ void
 response_get_pm(oc_client_response_t *data)
 {
   PRINT("=============> response_get_pm (%d): content format :%d  code:%d\n",
-        call_counter,
-        data->content_format,
-        data->code);
+        call_counter, data->content_format, data->code);
   oc_print_rep_as_json(data->payload, true);
 
   call_counter++;
@@ -1003,7 +1001,7 @@ main(int argc, char *argv[])
 
   bool do_send_s_mode = false;
   bool do_send_oscore = true;
-  //false;
+  // false;
   true; //  false;
   g_reset = true;
 

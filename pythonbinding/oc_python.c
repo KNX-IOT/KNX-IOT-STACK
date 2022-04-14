@@ -319,7 +319,8 @@ inform_spake_python(char *sn, int state, char *oscore_id, char *key,
   PRINT("]\n");
 
   if (my_CBFunctions.spakeFCB != NULL) {
-    //typedef void (*spakeCB)(char *sn, int state, char *secret, int secret_size,
+    // typedef void (*spakeCB)(char *sn, int state, char *secret, int
+    // secret_size,
     //                        char *oscore_id);
     my_CBFunctions.spakeFCB(sn, state, key, key_size, oscore_id);
   }
@@ -403,7 +404,8 @@ add_device_to_list(char *sn, const char *device_name, char *ip_address,
       return false;
     }
     strcpy(device->device_serial_number, sn);
-    PRINT("[C] add_device_to_list adding device sn:%s name:%s\n", sn, device_name);
+    PRINT("[C] add_device_to_list adding device sn:%s name:%s\n", sn,
+          device_name);
     oc_list_add(list, device);
   }
   if (ip_address) {
@@ -735,7 +737,7 @@ ets_cbor_put(char *sn, char *uri, char *query, char *id, int size, char *data)
     PRINT("  [C] enable OSCORE encryption: Flags :");
     oc_string_copy_from_char(&new_cbdata->ep.serial_number, sn);
 #endif
-    //PRINTipaddr_flags(new_cbdata->ep);
+    // PRINTipaddr_flags(new_cbdata->ep);
     PRINT("  [C] 1 :");
     PRINTipaddr(new_cbdata->ep);
     PRINT("\n");
@@ -1221,10 +1223,10 @@ func_event_thread(LPVOID lpParam)
 {
   oc_clock_time_t next_event;
   while (quit != 1) {
-    //ets_mutex_lock(app_sync_lock);
+    // ets_mutex_lock(app_sync_lock);
     next_event = oc_main_poll();
-    //ets_mutex_unlock(app_sync_lock);
-    //ets_mutex_lock(app_sync_lock);
+    // ets_mutex_unlock(app_sync_lock);
+    // ets_mutex_lock(app_sync_lock);
     if (next_event == 0) {
       SleepConditionVariableCS(&cv, &cs, INFINITE);
     } else {
@@ -1234,7 +1236,7 @@ func_event_thread(LPVOID lpParam)
           &cv, &cs, (DWORD)((next_event - now) * 1000 / OC_CLOCK_SECOND));
       }
     }
-    //ets_mutex_unlock(app_sync_lock);
+    // ets_mutex_unlock(app_sync_lock);
   }
 
   oc_main_shutdown();

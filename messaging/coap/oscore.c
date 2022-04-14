@@ -542,8 +542,9 @@ oscore_parse_outer_message(oc_message_t *msg, void *packet)
   current_option += coap_pkt->token_len;
 
   /* Parse outer options */
-  coap_status_t ret = coap_oscore_parse_options(
-    packet, msg->data, (uint32_t)msg->length, current_option, false, true, true);
+  coap_status_t ret =
+    coap_oscore_parse_options(packet, msg->data, (uint32_t)msg->length,
+                              current_option, false, true, true);
   if (COAP_NO_ERROR != ret) {
     OC_DBG_OSCORE("coap_oscore_parse_options failed! %d", ret);
     return ret;
