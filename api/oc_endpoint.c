@@ -58,13 +58,10 @@ oc_free_endpoint(oc_endpoint_t *endpoint)
 }
 
 void
-oc_endpoint_set_serial_number(oc_endpoint_t *endpoint,
-                              oc_string_t serial_number)
+oc_endpoint_set_serial_number(oc_endpoint_t *endpoint, char *serial_number)
 {
   if (endpoint) {
-    oc_free_string(&endpoint->serial_number);
-    oc_new_string(&endpoint->serial_number, oc_string(serial_number),
-                  oc_string_len(serial_number));
+    strncpy(&endpoint->serial_number, serial_number, SERIAL_NUM_SIZE);
   }
 }
 

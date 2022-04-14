@@ -374,8 +374,8 @@ oc_do_get_ex_secured(const char *uri, oc_endpoint_t *endpoint,
 
   endpoint->flags += OSCORE;
   PRINT("  enable OSCORE encryption\n");
-  oc_string_copy_from_char(&endpoint->serial_number, token);
-  PRINT("  ep serial %s\n", oc_string(endpoint->serial_number));
+  oc_endpoint_set_serial_number(endpoint, token);
+  PRINT("  ep serial %s\n", endpoint->serial_number);
 
   oc_client_cb_t *cb = oc_ri_alloc_client_cb(uri, endpoint, OC_GET, query,
                                              client_handler, qos, user_data);

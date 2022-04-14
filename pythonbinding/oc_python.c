@@ -517,7 +517,7 @@ ets_cbor_get(char *sn, char *uri, char *query, char *cbdata)
     new_cbdata->ep.flags = IPV6;
     new_cbdata->ep.flags |= OSCORE;
     PRINT("  [C] enable OSCORE encryption\n");
-    oc_string_copy_from_char(&new_cbdata->ep.serial_number, sn);
+    oc_endpoint_set_serial_number(&new_cbdata->ep, sn);
 #endif
     PRINTipaddr_flags(new_cbdata->ep);
     PRINTipaddr(new_cbdata->ep);
@@ -599,7 +599,7 @@ ets_linkformat_get(char *sn, char *uri, char *query, char *cbdata)
     new_cbdata->ep.flags = IPV6;
     new_cbdata->ep.flags |= OSCORE;
     PRINT("  [C] enable OSCORE encryption: Flags :");
-    oc_string_copy_from_char(&new_cbdata->ep.serial_number, sn);
+    oc_endpoint_set_serial_number(&new_cbdata->ep, sn);
 #endif
     PRINTipaddr_flags(new_cbdata->ep);
     PRINTipaddr(new_cbdata->ep);
@@ -688,7 +688,7 @@ ets_cbor_post(char *sn, char *uri, char *query, char *id, int size, char *data)
     new_cbdata->ep.flags = IPV6;
     new_cbdata->ep.flags |= OSCORE;
     PRINT("  [C] enable OSCORE encryption: Flags :");
-    oc_string_copy_from_char(&new_cbdata->ep.serial_number, sn);
+    oc_endpoint_set_serial_number(&new_cbdata->ep, sn);
 #endif
     PRINTipaddr_flags(new_cbdata->ep);
     PRINTipaddr(new_cbdata->ep);
@@ -735,7 +735,7 @@ ets_cbor_put(char *sn, char *uri, char *query, char *id, int size, char *data)
     new_cbdata->ep.flags = IPV6;
     new_cbdata->ep.flags |= OSCORE;
     PRINT("  [C] enable OSCORE encryption: Flags :");
-    oc_string_copy_from_char(&new_cbdata->ep.serial_number, sn);
+    oc_endpoint_set_serial_number(&new_cbdata->ep, sn);
 #endif
     // PRINTipaddr_flags(new_cbdata->ep);
     PRINT("  [C] 1 :");
@@ -782,7 +782,7 @@ ets_cbor_delete(char *sn, char *uri, char *query, char *id)
     new_cbdata->ep.flags = IPV6;
     new_cbdata->ep.flags |= OSCORE;
     PRINT("  [C] enable OSCORE encryption: Flags :");
-    oc_string_copy_from_char(&new_cbdata->ep.serial_number, sn);
+    oc_endpoint_set_serial_number(&new_cbdata->ep, sn);
 #endif
     PRINTipaddr_flags(new_cbdata->ep);
     PRINTipaddr(new_cbdata->ep);
@@ -935,9 +935,9 @@ ets_initiate_spake(char *sn, char *password, char *oscore_id)
   PRINTipaddr_flags(device->ep);
 
   PRINT("  [C]ets_initiate_spake: [%s] [%s]\n", sn, password);
-  if (oc_string_len(device->ep.serial_number) == 0) {
-    oc_new_string(&device->ep.serial_number, sn, strlen(sn));
-  }
+
+  oc_endpoint_set_serial_number(&device->ep, sn);
+
   ret = oc_initiate_spake(&device->ep, password, oscore_id);
   PRINT("  [C]ets_initiate_spake: [%d]-- done\n", ret);
   if (ret == -1) {

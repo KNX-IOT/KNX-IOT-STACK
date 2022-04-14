@@ -88,7 +88,7 @@ oc_oscore_find_context_by_token_mid(size_t device, uint8_t *token,
   if (cb) {
     *request_piv = cb->piv;
     *request_piv_len = cb->piv_len;
-    serial_number = oc_string(cb->endpoint.serial_number);
+    serial_number = cb->endpoint.serial_number;
   } else {
 #endif /* OC_CLIENT */
     /* Search transactions by token and mid */
@@ -104,7 +104,7 @@ oc_oscore_find_context_by_token_mid(size_t device, uint8_t *token,
     }
     *request_piv = t->message->endpoint.piv;
     *request_piv_len = t->message->endpoint.piv_len;
-    serial_number = oc_string(t->message->endpoint.serial_number);
+    serial_number = t->message->endpoint.serial_number;
 #ifdef OC_CLIENT
   }
 #endif /* OC_CLIENT */
@@ -133,22 +133,20 @@ oc_oscore_find_context_by_token_mid(size_t device, uint8_t *token,
 }
 
 oc_oscore_context_t *
-oc_oscore_find_context_by_serial_number(size_t device,
-                                        oc_string_t serial_number)
+oc_oscore_find_context_by_serial_number(size_t device, char *serial_number)
 {
   (void)device;
-  PRINT("oc_oscore_find_context_by_serial_number %s\n",
-        oc_string(serial_number));
 
-  if (oc_string_len(serial_number) == 0) {
-    PRINT("  SERIAL number NULL\n");
+  if (strlen(serial_number) == 0) {
+    OC_ERR("SERIAL number NULL\n");
     return NULL;
   }
+  PRINT("oc_oscore_find_context_by_serial_number '%s'\n", serial_number);
 
   oc_oscore_context_t *ctx = (oc_oscore_context_t *)oc_list_head(contexts);
   while (ctx != NULL) {
     char *ctx_serial_number = ctx->token_id;
-    if (strncmp(oc_string(serial_number), ctx_serial_number, 16) == 0) {
+    if (strncmp(serial_number, ctx_serial_number, 16) == 0) {
       PRINT("  FOUND\n");
       return ctx;
     }

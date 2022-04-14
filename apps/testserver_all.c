@@ -898,10 +898,14 @@ spake_cb(int error, char *sn, char *oscore_id, uint8_t *secret, int secret_size)
 {
   PRINT("spake CB: invoke PM with encryption!!!!!\n");
 #ifdef OC_OSCORE
+  g_endpoint.flags = IPV6;
   g_endpoint.flags += OSCORE;
   PRINT("  spake_cb: enable OSCORE encryption\n");
-  oc_string_copy_from_char(&g_endpoint.serial_number, sn);
-  PRINT("  spake_cb: ep serial %s\n", oc_string(g_endpoint.serial_number));
+
+  // oc_endpoint_copy(&g_endpoint, endpoint);
+  oc_endpoint_set_serial_number(&g_endpoint, sn);
+
+  PRINT("  spake_cb: ep serial %s\n", g_endpoint.serial_number);
 #endif
   PRINT("spake CB\n");
   oc_do_get_ex("/dev/pm", &g_endpoint, NULL, response_get_pm, HIGH_QOS,
@@ -926,19 +930,18 @@ discovery_cb(const char *payload, int len, oc_endpoint_t *endpoint,
   PRINT("[C] entries %d\n", nr_entries);
   int found = 0;
 
-  PRINT("[C] issue get on /dev/pm\n");
+  // PRINT("[C] issue get on /dev/pm\n");
   oc_endpoint_print(endpoint);
 
   /* remove OSCORE flag */
   endpoint->flags = IPV6;
   PRINT("  [C] disable OSCORE encryption\n");
   PRINTipaddr_flags(*endpoint);
+  PRINTipaddr(*endpoint);
+  oc_endpoint_set_serial_number(endpoint, my_serialnum);
 
-  if (oc_string_len(endpoint->serial_number) == 0) {
-    oc_new_string(&endpoint->serial_number, my_serialnum, strlen(my_serialnum));
-  }
-
-  g_endpoint = *endpoint;
+  // copy the endpoint so that we know it in the spake2plus callback
+  oc_endpoint_copy(&g_endpoint, endpoint);
 
   oc_set_spake_response_cb(spake_cb);
   oc_initiate_spake(endpoint, "LETTUCE", my_serialnum);

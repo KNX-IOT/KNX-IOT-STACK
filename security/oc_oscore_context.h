@@ -76,7 +76,7 @@ oc_oscore_context_t *oc_oscore_add_context(size_t device, const char *senderid,
                                            bool from_storagw);
 
 oc_oscore_context_t *oc_oscore_find_context_by_serial_number(
-  size_t device, oc_string_t serial_number);
+  size_t device, char *serial_number);
 
 oc_oscore_context_t *oc_oscore_find_context_by_group_id(size_t device,
                                                         int group_id);

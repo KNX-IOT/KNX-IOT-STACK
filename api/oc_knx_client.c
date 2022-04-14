@@ -275,7 +275,7 @@ oc_initiate_spake(oc_endpoint_t *endpoint, char *password, char *oscore_id)
   oc_rep_end_root_object();
 
   strncpy((char *)&g_spake_ctx.spake_password, password, MAX_PASSWORD_LEN);
-  oc_string_copy(&g_spake_ctx.serial_number, endpoint->serial_number);
+  oc_string_copy_from_char(&g_spake_ctx.serial_number, endpoint->serial_number);
 
   if (oc_do_post_ex(APPLICATION_CBOR, APPLICATION_CBOR)) {
     return_value = 0;
