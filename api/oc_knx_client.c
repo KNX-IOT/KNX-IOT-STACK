@@ -101,7 +101,7 @@ finish_spake_handshake(oc_client_response_t *data)
   uint8_t *shared_key = Ka_Ke + 16;
   int shared_key_len = 16;
 
-  update_tokens(shared_key, (shared_key_len);
+  update_tokens(shared_key, shared_key_len);
 
   // free up the memory used by the handshake
   mbedtls_mpi_free(&w0);
