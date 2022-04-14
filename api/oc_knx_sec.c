@@ -1290,7 +1290,7 @@ oc_oscore_set_auth(char *serial_number, char *context_id, uint8_t *shared_key,
   if (index == -1) {
     OC_ERR("no space left in auth/at");
   } else {
-    oc_core_set_at_table((size_t)0, 0, os_token);
+    oc_core_set_at_table((size_t)0, index, os_token);
     // add the oscore context...
     oc_init_oscore(0);
   }
@@ -1337,9 +1337,13 @@ oc_init_oscore(size_t device_index)
   (void)device_index;
 #else /* OC_OSCORE */
   int i;
-  PRINT("oc_init_oscore adding oscore context, using context id for sender & "
-        "receiver\n");
+  PRINT("oc_init_oscore deleting old contexts!!\n");
 
+  // deleting all contexts!!
+  oc_oscore_free_all_contexts();
+
+  PRINT("oc_init_oscore adding OSCORE context, using context id for sender & "
+        "receiver\n");
   for (i = 0; i < G_AT_MAX_ENTRIES; i++) {
 
     if (oc_string_len(g_at_entries[i].id) > 0) {
