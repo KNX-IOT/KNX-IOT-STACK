@@ -334,7 +334,9 @@ inform_spake_python(char *sn, int state, char *oscore_id, char *key,
   PRINT("]\n");
 
   if (my_CBFunctions.spakeFCB != NULL) {
-    my_CBFunctions.spakeFCB(sn, state, oscore_id, key, key_size);
+    //typedef void (*spakeCB)(char *sn, int state, char *secret, int secret_size,
+    //                        char *oscore_id);
+    my_CBFunctions.spakeFCB(sn, state, key, key_size, oscore_id);
   }
 }
 
@@ -519,11 +521,12 @@ ets_cbor_get(char *sn, char *uri, char *query, char *cbdata)
 
 #ifdef OC_OSCORE
     new_cbdata->ep.flags = IPV6;
-    new_cbdata->ep.flags += OSCORE;
+    new_cbdata->ep.flags |= OSCORE;
     PRINT("  [C] enable OSCORE encryption\n");
     oc_string_copy_from_char(&new_cbdata->ep.serial_number, sn);
-    PRINT("  [C] ep serial %s\n", oc_string(new_cbdata->ep.serial_number));
 #endif
+    PRINTipaddr_flags(new_cbdata->ep);
+    PRINTipaddr(new_cbdata->ep);
 
     ret = oc_do_get_ex(uri, &new_cbdata->ep, query, general_get_cb, HIGH_QOS,
                        APPLICATION_CBOR, APPLICATION_CBOR, new_cbdata);
@@ -546,6 +549,7 @@ ets_cbor_get_unsecured(char *sn, char *uri, char *query, char *cbdata)
   user_struct_t *new_cbdata;
   new_cbdata = (user_struct_t *)malloc(sizeof(user_struct_t));
   if (new_cbdata != NULL) {
+    /* initialize the callback data */
     strcpy(new_cbdata->r_id, cbdata);
     strcpy(new_cbdata->url, uri);
     strcpy(new_cbdata->sn, sn);
@@ -553,8 +557,9 @@ ets_cbor_get_unsecured(char *sn, char *uri, char *query, char *cbdata)
 
     /* remove OSCORE flag*/
     new_cbdata->ep.flags = IPV6;
-    // device->ep.flags &= OSCORE;
+    PRINT("  [C] no encryption\n");
     PRINTipaddr_flags(new_cbdata->ep);
+    PRINTipaddr(new_cbdata->ep);
 
     ret = oc_do_get_ex(uri, &new_cbdata->ep, query, general_get_cb, HIGH_QOS,
                        APPLICATION_CBOR, APPLICATION_CBOR, new_cbdata);
@@ -585,13 +590,13 @@ ets_linkformat_get(char *sn, char *uri, char *query, char *cbdata)
     oc_endpoint_copy(&new_cbdata->ep, &device->ep);
 
 #ifdef OC_OSCORE
-    PRINT(" [C] enable OSCORE encryption\n");
-
     new_cbdata->ep.flags = IPV6;
-    new_cbdata->ep.flags != OSCORE;
-    PRINTipaddr_flags(device->ep);
+    new_cbdata->ep.flags |= OSCORE;
+    PRINT("  [C] enable OSCORE encryption: Flags :");
     oc_string_copy_from_char(&new_cbdata->ep.serial_number, sn);
 #endif
+    PRINTipaddr_flags(new_cbdata->ep);
+    PRINTipaddr(new_cbdata->ep);
 
     oc_endpoint_print(&device->ep);
     if (&ep != NULL) {
@@ -625,8 +630,9 @@ ets_linkformat_get_unsecured(char *sn, char *uri, char *query, char *cbdata)
     oc_endpoint_copy(&new_cbdata->ep, &device->ep);
 
     new_cbdata->ep.flags = IPV6;
-    // device->ep.flags &= OSCORE;
+    PRINT("  [C] no encryption: Flags :");
     PRINTipaddr_flags(new_cbdata->ep);
+    PRINTipaddr(new_cbdata->ep);
 
     oc_endpoint_print(&new_cbdata->ep);
     if (&ep != NULL) {
@@ -664,10 +670,11 @@ ets_cbor_post(char *sn, char *uri, char *query, char *id, int size, char *data)
 #ifdef OC_OSCORE
     new_cbdata->ep.flags = IPV6;
     new_cbdata->ep.flags |= OSCORE;
-    PRINT("  [C] enable OSCORE encryption\n");
-    PRINTipaddr_flags(device->ep);
+    PRINT("  [C] enable OSCORE encryption: Flags :");
     oc_string_copy_from_char(&new_cbdata->ep.serial_number, sn);
 #endif
+    PRINTipaddr_flags(new_cbdata->ep);
+    PRINTipaddr(new_cbdata->ep);
 
     if (oc_init_post(uri, &new_cbdata->ep, NULL, general_get_cb, HIGH_QOS,
                      new_cbdata)) {
@@ -705,10 +712,11 @@ ets_cbor_put(char *sn, char *uri, char *query, char *id, int size, char *data)
 #ifdef OC_OSCORE
     new_cbdata->ep.flags = IPV6;
     new_cbdata->ep.flags |= OSCORE;
-    PRINT("  [C] enable OSCORE encryption\n");
-    PRINTipaddr_flags(device->ep);
+    PRINT("  [C] enable OSCORE encryption: Flags :");
     oc_string_copy_from_char(&new_cbdata->ep.serial_number, sn);
 #endif
+    PRINTipaddr_flags(new_cbdata->ep);
+    PRINTipaddr(new_cbdata->ep);
 
     if (oc_init_put(uri, &new_cbdata->ep, NULL, general_get_cb, HIGH_QOS,
                     (char *)new_cbdata)) {
@@ -745,10 +753,11 @@ ets_cbor_delete(char *sn, char *uri, char *query, char *id)
 #ifdef OC_OSCORE
     new_cbdata->ep.flags = IPV6;
     new_cbdata->ep.flags |= OSCORE;
-    PRINT("  [C] enable OSCORE encryption\n");
-    PRINTipaddr_flags(new_cbdata->ep);
+    PRINT("  [C] enable OSCORE encryption: Flags :");
     oc_string_copy_from_char(&new_cbdata->ep.serial_number, sn);
 #endif
+    PRINTipaddr_flags(new_cbdata->ep);
+    PRINTipaddr(new_cbdata->ep);
 
     if (oc_do_delete(uri, &new_cbdata->ep, query, general_get_cb, HIGH_QOS,
                      new_cbdata)) {

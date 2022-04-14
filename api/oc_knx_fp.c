@@ -1830,7 +1830,7 @@ void
 oc_free_group_rp_table()
 {
 
-  PRINT("FreeGroup Recipient Table from Persistent storage\n");
+  PRINT("Free Group Recipient Table from Persistent storage\n");
   for (int i = 0; i < GRT_MAX_ENTRIES; i++) {
     oc_free_group_rp_table_entry(i, GRT_STORE, g_grt, GRT_MAX_ENTRIES);
   }

@@ -78,7 +78,7 @@ static int oc_s_mode_get_resource_value(char *resource_url, char *rp,
 static void
 update_tokens(uint8_t *secret, int secret_size)
 {
-  PRINT("update_tokens \n");
+  PRINT("update_tokens: \n");
 
   oc_oscore_set_auth(oc_string(g_spake_ctx.serial_number),
                      g_spake_ctx.oscore_id, secret, secret_size);
@@ -96,13 +96,6 @@ finish_spake_handshake(oc_client_response_t *data)
     mbedtls_ecp_point_free(&pubA);
     return;
   }
-  // OC_DBG_SPAKE("SPAKE2+ Handshake Finished!\n");
-  // OC_DBG_SPAKE("  code: %d\n", data->code);
-  // OC_DBG_SPAKE("Shared Secret: ");
-  // for (int i = 0; i < 16; i++) {
-  //  PRINT("%02x", Ka_Ke[i + 16]);
-  //}
-  // OC_DBG_SPAKE("\n");
 
   // shared_key is 16-byte array - NOT NULL TERMINATED
   uint8_t *shared_key = Ka_Ke + 16;
@@ -118,7 +111,6 @@ finish_spake_handshake(oc_client_response_t *data)
   mbedtls_ecp_point_free(&pubA);
 
   if (m_spake_cb) {
-    PRINT("CALLING CALLBACK- (CLIENT)------>\n");
     m_spake_cb(0, oc_string(g_spake_ctx.serial_number), g_spake_ctx.oscore_id,
                shared_key, shared_key_len);
   }
