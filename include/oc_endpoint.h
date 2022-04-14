@@ -74,11 +74,11 @@ enum transport_flags {
  */
 typedef struct oc_endpoint_t
 {
-  struct oc_endpoint_t *next; /**< pointer to the next structure */
-  size_t device;              /**< device index */
-  enum transport_flags flags; /**< the transport flags */
-  char serial_number[SERIAL_NUM_SIZE+1]; /**< serial number of the device to talk
-                                          to */
+  struct oc_endpoint_t *next;              /**< pointer to the next structure */
+  size_t device;                           /**< device index */
+  enum transport_flags flags;              /**< the transport flags */
+  char serial_number[SERIAL_NUM_SIZE + 1]; /**< serial number of the device to
+                                            talk to */
   union dev_addr {
     oc_ipv6_addr_t ipv6; /**< ipv6 address */
     oc_ipv4_addr_t ipv4; /**< ipv4 address */
@@ -124,7 +124,7 @@ void oc_free_endpoint(oc_endpoint_t *endpoint);
  * @param serial_number the device serial number
  */
 void oc_endpoint_set_serial_number(oc_endpoint_t *endpoint,
-                                   char* serial_number);
+                                   char *serial_number);
 
 /**
  * @brief convert the endpoint to a human readable string (e.g.

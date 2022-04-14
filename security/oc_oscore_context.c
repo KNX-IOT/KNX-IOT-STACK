@@ -133,8 +133,7 @@ oc_oscore_find_context_by_token_mid(size_t device, uint8_t *token,
 }
 
 oc_oscore_context_t *
-oc_oscore_find_context_by_serial_number(size_t device,
-                                        char* serial_number)
+oc_oscore_find_context_by_serial_number(size_t device, char *serial_number)
 {
   (void)device;
 

@@ -902,7 +902,7 @@ spake_cb(int error, char *sn, char *oscore_id, uint8_t *secret, int secret_size)
   g_endpoint.flags += OSCORE;
   PRINT("  spake_cb: enable OSCORE encryption\n");
 
-   // oc_endpoint_copy(&g_endpoint, endpoint);
+  // oc_endpoint_copy(&g_endpoint, endpoint);
   oc_endpoint_set_serial_number(&g_endpoint, sn);
 
   PRINT("  spake_cb: ep serial %s\n", g_endpoint.serial_number);
@@ -930,7 +930,7 @@ discovery_cb(const char *payload, int len, oc_endpoint_t *endpoint,
   PRINT("[C] entries %d\n", nr_entries);
   int found = 0;
 
-  //PRINT("[C] issue get on /dev/pm\n");
+  // PRINT("[C] issue get on /dev/pm\n");
   oc_endpoint_print(endpoint);
 
   /* remove OSCORE flag */
