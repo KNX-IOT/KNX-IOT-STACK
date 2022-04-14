@@ -148,6 +148,8 @@ oc_oscore_find_context_by_serial_number(size_t device, char *serial_number)
     char *ctx_serial_number = ctx->token_id;
     if (strncmp(serial_number, ctx_serial_number, 16) == 0) {
       PRINT("  FOUND\n");
+      OC_DBG_OSCORE("    Common IV:");
+      OC_LOGbytes_OSCORE(ctx->commoniv, OSCORE_COMMON_IV_LEN);
       return ctx;
     }
     ctx = ctx->next;
