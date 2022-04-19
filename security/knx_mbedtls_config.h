@@ -113,6 +113,7 @@
 #define MBEDTLS_SSL_EXTENDED_MASTER_SECRET
 #define MBEDTLS_SSL_ALL_ALERT_MESSAGES
 #define MBEDTLS_PKCS5_C
+
 #ifdef OC_PKI
 #define MBEDTLS_ECDSA_C
 #define MBEDTLS_KEY_EXCHANGE_ECDHE_ECDSA_ENABLED
@@ -148,10 +149,8 @@
 //
 #endif /* OC_PKI */
 
-#ifdef OC_DEBUG
 #define MBEDTLS_ERROR_C
 #define MBEDTLS_DEBUG_C
-#endif /* OC_DEBUG */
 
 #include "mbedtls/check_config.h"
 
