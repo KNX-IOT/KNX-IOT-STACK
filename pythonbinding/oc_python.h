@@ -211,8 +211,8 @@ kisCS_EXPORT void ets_cbor_get(char *sn, char *uri, char *query, char *r_id);
  * callback
  */
 kisCS_EXPORT void ets_cbor_get_with_context_id(char *sn, char *context_id,
-                                              char *uri,
-                                  char *query, char *cbdata);
+                                              char *uri, char *query,
+                                               char *r_id);
 
 /**
  * @brief issue a GET request with expected content type CBOR (unsecured)
@@ -255,8 +255,8 @@ kisCS_EXPORT void ets_linkformat_get(char *sn, char *uri, char *query,
  * callback
  */
 kisCS_EXPORT void ets_linkformat_get_with_context_id(char *sn, char *context_id,
-                                                    char *uri,
-                                        char *query, char *cbdata);
+                                                    char *uri, char *query,
+                                                     char *r_id);
 
   /*
  * @brief issue a GET request with expected content type LINK-FORMAT unsecured
@@ -304,7 +304,8 @@ kisCS_EXPORT void ets_cbor_post(char *sn, char *uri, char *query, char *r_id,
  */
 kisCS_EXPORT void ets_cbor_post_with_context_id(char *sn, char *context_id,
                                                 char *uri, char *query,
-                                                char *id, int size, char *data);
+                                                char *r_id, int size,
+                                                char *data);
 
 /**
  * @brief issue a PUT request, content type CBOR
@@ -337,8 +338,8 @@ kisCS_EXPORT void ets_cbor_put(char *sn, char *uri, char *query, char *r_id,
  * @param data the request data (in cbor)
  */
 void
-ets_cbor_put_with_context_id(char *sn, char *context_id, char *uri, char *query,
-                             char *id, int size, char *data);
+ets_cbor_put_with_context_id(char *sn, char *context_id, char *uri, char *query, char *r_id, int size,
+                                  char *data);
 
 
 /**
