@@ -187,6 +187,7 @@ do_credential_exchange(oc_client_response_t *data)
     OC_DBG_SPAKE("Error in Parameter Response!!! %d\n", data->code);
     return;
   }
+  oc_print_rep_as_json(data->payload, true);
 
   char buffer[300];
   memset(buffer, 300, 1);

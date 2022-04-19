@@ -1081,6 +1081,9 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
 #endif /* OC_SPAKE */
 
   oc_rep_t *rep = request->request_payload;
+
+  oc_print_rep_as_json(rep, true);
+
   int valid_request = 0;
   // check input
   // note: no check if there are multiple byte strings in the request payload
@@ -1215,7 +1218,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     oc_free_string(&g_pase.pb);
     oc_alloc_string(&g_pase.pb, kPubKeySize);
     oc_free_string(&g_pase.cb);
-    oc_alloc_string(&g_pase.cb, kPubKeySize);
+    oc_alloc_string(&g_pase.cb, 32);
 
     if (oc_spake_encode_pubkey(&pB, oc_cast(g_pase.pb, uint8_t))) {
       mbedtls_ecp_point_free(&pB);
