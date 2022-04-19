@@ -459,6 +459,9 @@ oc_core_auth_at_post_handler(oc_request_t *request,
   }
   size_t device_index = request->resource->device;
 
+  /* debugging info */
+  oc_print_rep_as_json(request->request_payload, true);
+
   rep = request->request_payload;
   while (rep != NULL) {
     if (rep->type == OC_REP_OBJECT) {

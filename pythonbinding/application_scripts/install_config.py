@@ -138,6 +138,76 @@ def convert_json_tag2integer(table):
         new_data.append(new_item)
     return new_data
 
+def convert_json_auth_tag2integer(auth):
+    # auth
+    # id (0)
+    # cnf 8 (map)
+    # osc 4 (map)
+    # kid 2
+    # nbf 5
+    # sub 2
+    # aud 3
+    # scope 9 map
+    # profile 
+    # cnf:osc:id 8:4:0
+    # cnf:osc:version 8:4:1
+    # cnf:osc:ms 8:4:2
+    # cnf:osc:hkdf (not used) 8:4:3
+    # cnf:osc:alg 8:4:4
+    # cnf:osc:salt 8:4:5
+    # cnf:osc:contextId 8:4:6
+    
+    new_data = []
+    for item in auth:
+        #print ("input : " ,item)
+        new_item = {}
+        if "id" in item:
+            new_item[0] = item["id"]
+        if "scope" in item:
+            new_item[9] = item["scope"]
+        if "sub" in item:
+            new_item[2] = item["sub"]
+        if "aud" in item:
+            new_item[3] = item["aud"]
+        if "profile" in item:
+            new_item[38] = item["profile"]
+        if "cnf" in item:
+            # do the stuff below item
+            #new_item[4] = {}
+            if "osc" in item["cnf"]:
+                if "id" in item["cnf"]["osc"]:
+                    new_item[8] = {}
+                    new_item[8][4] = {}
+                    new_item[8][4][0] = item["cnf"]["osc"]["id"]
+                if "ms" in item["cnf"]["osc"]:
+                    if new_item[8] is None:
+                        new_item[8] = {}
+                    if new_item[8][4] is None:
+                        new_item[8][4] = {}
+                    new_item[8][4][2] = item["cnf"]["osc"]["ms"]
+                if "alg" in item["cnf"]["osc"]:
+                    if new_item[8] is None:
+                        new_item[8] = {}
+                    if new_item[8][4] is None:
+                        new_item[8][4] = {}
+                    new_item[8][4][4] = item["cnf"]["osc"]["alg"]
+                if "salt" in item["cnf"]["osc"]:
+                    if new_item[8] is None:
+                        new_item[8] = {}
+                    if new_item[8][4] is None:
+                        new_item[8][4] = {}
+                    new_item[8][4][5] = item["cnf"]["osc"]["salt"]
+                if "contextId" in item["cnf"]["osc"]:
+                    if new_item[8] is None:
+                        new_item[8] = {}
+                    if new_item[8][4] is None:
+                        new_item[8][4] = {}
+                    new_item[8][4][6] = item["cnf"]["osc"]["contextId"]
+        new_data.append(new_item)
+    print (new_data)
+    return new_data
+
+
 def do_load_state(my_stack):
     print("do_load_state :")
     if my_stack.get_nr_devices() == 0:
@@ -160,7 +230,7 @@ def do_reset(my_stack, sn):
     safe_print(response)
     my_stack.purge_response(response)
 
-def do_install_device(my_stack, sn, ia, iid, got_content, rec_content, pub_content):
+def do_install_device(my_stack, sn, ia, iid, got_content, rec_content, pub_content, auth_content):
     # sensor, e.g sending
     print ("--------------------")
     print ("Installing SN: ", sn)
@@ -187,20 +257,19 @@ def do_install_device(my_stack, sn, ia, iid, got_content, rec_content, pub_conte
     response =  my_stack.issue_linkformat_get(sn,"/fp/g")
     safe_print(response)
     my_stack.purge_response(response)
-
     if rec_content is not None:
+        print("===receiver===")
         content = rec_content
         response =  my_stack.issue_cbor_post(sn,"/fp/r",content)
         safe_print(response)
         my_stack.purge_response(response)
-
         response =  my_stack.issue_linkformat_get(sn,"/fp/r")
         safe_print(response)
         my_stack.purge_response(response)
     else:
         print ("no recipient table")
-
     if pub_content is not None:
+        print("===publisher===")
         content = pub_content
         response =  my_stack.issue_cbor_post(sn,"/fp/p",content)
         safe_print(response)
@@ -211,27 +280,53 @@ def do_install_device(my_stack, sn, ia, iid, got_content, rec_content, pub_conte
         my_stack.purge_response(response)
     else:
         print ("no publisher table")
+    if auth_content is not None:
+        content = auth_content
+        print("===auth===")
+        print(content)
+        response =  my_stack.issue_cbor_post(sn,"/auth/at",content)
+        safe_print(response)
+        my_stack.purge_response(response)
+        response =  my_stack.issue_linkformat_get(sn,"/auth/at")
+        safe_print(response)
+        my_stack.purge_response(response)
+    else:
+        print ("no auth table")
     # content = { 2: "loadComplete"}
     content = { 2: 2}
     print("lsm :", content)
     response =  my_stack.issue_cbor_post(sn,"/a/lsm",content)
     safe_print(response)
     my_stack.purge_response(response)
-
     response =  my_stack.issue_cbor_get(sn,"/a/lsm")
     safe_print(response)
     my_stack.purge_response(response)
 
 
+def do_auth(my_stack, sn, auth_content):
+    if auth_content is not None:
+        content = auth_content
+        print("auth")
+        print(content)
+        response =  my_stack.issue_cbor_post(sn,"/auth/at",content)
+        safe_print(response)
+        my_stack.purge_response(response)
+        response =  my_stack.issue_linkformat_get(sn,"/auth/at")
+        safe_print(response)
+        my_stack.purge_response(response)
+    else:
+        print ("no auth table")
+
 def do_install(my_stack, internal_address, filename):
+    sn = None
     if my_stack.get_nr_devices() == 0:
         print("device not found!")
-        return
-    sn = my_stack.device_array[0].sn
+        #return
+    else:
+        sn = my_stack.device_array[0].sn
     json_data = load_json_file(filename)
     if json_data is None:
         return
-    sn = my_stack.device_array[0].sn
     print (" SN : ", sn)
     iid = json_data["iid"] # "5"
     ia = internal_address
@@ -240,12 +335,18 @@ def do_install(my_stack, internal_address, filename):
     rep_num = None
     if "recipient" in json_data:
         rep_content = json_data["recipient"]
-        rep_num = convert_json_tag2integer(rep_content)
+        #rep_num = convert_json_tag2integer(rep_content)
     pub_num = None
     if "publisher" in json_data:
         pub_content = json_data["publisher"]
-        pub_num = convert_json_tag2integer(pub_content)
-    do_install_device(my_stack, sn, ia, iid, got_num, rep_num, pub_num )
+        #pub_num = convert_json_tag2integer(pub_content)
+    auth_num = None
+    if "auth" in json_data:
+        auth_content = json_data["auth"]
+        print (auth_content)
+        auth_num = convert_json_auth_tag2integer(auth_content)
+        #do_auth(my_stack, sn, auth_num)
+    do_install_device(my_stack, sn, ia, iid, got_num, rep_num, pub_num, auth_num )
 
 def self_reset(my_stack):
     """

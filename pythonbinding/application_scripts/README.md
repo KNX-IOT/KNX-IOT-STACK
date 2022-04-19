@@ -97,6 +97,7 @@ config data:
 - group object table: Key = "groupobject"
 - recipient table: Key = "recipient"
 - publisher table: Key = "publisher"
+- access token table: Key = "auth"
 
 The content of the tables are the items in an array.
 The items have the json keys (e.g. "id" instead of 0)
@@ -104,26 +105,41 @@ The application converts the json data in to data with integer keys and then con
 
 ##### group object table
 
-The group object table contains the json keys for an Group Object Table entry.
+The group object table contains the array of json objects for an Group Object Table entry.
+
+- id (0): identifier in the group object table
+- href (11) : the href of the point api url
+- ga (7): the array of group addresses
+- cflags (8) : the communication flags (as strings)
+  the cflags array will be converted into the bit flags.
 
 ```bash
+{
+....
 "groupobject" : [ 
     { "id": 1, "href": "p/push", "ga" :[1], "cflag" : ["w"] },
     { "id": 1, "href": "p/push", "ga" :[1], "cflag" : ["r"] }] 
+....
 ```
 
 ##### publisher table
 
-The group object table contains the json keys for an Publisher entry.
+The group object table contains the array of json objects for an Publisher entry.
 note that this table contains the info of the sending side.
 Note that the ia (and path) needs to be defined or the url.
 if ia is defined and path is not there, the path will have the default value ".knx".
 
+- id (0): identifier in the group object table
+- ia (12) : internal address
+- ga (7): the array of group addresses
+
 ```bash
+{
+....
 "publisher" : [ 
       {
          "id": "1",
-          ia": 5,
+         "ia": 5,
          "ga":[2305, 2401],
          "path": ".knx",
      },
@@ -132,24 +148,72 @@ if ia is defined and path is not there, the path will have the default value ".k
          "url": "coap://<IP multicast, unicast address or fqdn>/<path>",
          "ga": [2305, 2306, 2307, 2308]
       }] 
+....
+}
 ```
 
 ##### recipient table
 
-The group object table contains the json keys for an Publisher entry.
+The group object table contains the array of json objects for an Publisher entry.
 note that this table contains the info of the receiving side.
 Note that the ia (and path) needs to be defined or the url.
 if ia is defined and path is not there, the path will have the default value ".knx".
 
 ```bash
+....
+{
 "recipient" : [ 
- *    {
- *       "id": "1", ia": 5, "ga":[2305, 2401], "path": ".knx",
- *    },
- *    {
- *        "id": "2","url": "coap://<IP multicast, unicast address or fqdn>/<path>", 
- * "ga": [2305, 2306, 2307, 2308]
- *     }] 
+    {
+        "id": "1", ia": 5, "ga":[2305, 2401], "path": ".knx",
+    },
+    {
+        "id": "2","url": "coap://<IP multicast, unicast address or fqdn>/<path>", 
+        "ga": [2305, 2306, 2307, 2308]
+      }] 
+....
+}
+```
+
+##### access token table
+
+The access token table contains the array of json objects for an auth/at entry.
+
+- id (0): identifier of the entry
+- profile (38): oscore (2) 
+- scope (9) : either list of integers for group scope or list of access (if) scopes
+- the oscore information is in 2 layers: cnf & osc as json objects
+- cnf(8):osc(4):id(0) : the oscore identifier
+- cnf(8):osc(4):ms(2) : the master secret (32 bytes)
+- cnf(8):osc(4):contextId(6) : the OSCORE context id
+
+```bash
+{
+....
+"auth" : [ 
+  {
+     "id": "id1", 
+     "aud": "xx", 
+     "profile": 2, 
+     "scope": [ 1, 2 , 3 ], 
+     "cnf": {"osc" : { "id": "osc_1",  "ms" : "ms_1" }}
+  },
+  {
+      "id": "id2", 
+      "aud": "yyy", 
+      "profile": 2,
+      "scope": [ 4], 
+      "cnf": {"osc" : { "id": "osc_2", "ms" : "ms_2" }}
+  },
+  {
+      "id": "id3", 
+      "aud": "yyy", 
+      "profile": 2,
+      "scope": [ if.sec], 
+      "cnf": {"osc" : { "id": "osc_3", "ms" : "ms_2" }}
+  }
+  ] 
+....
+}
 ```
 
 ##### example files
@@ -157,5 +221,3 @@ if ia is defined and path is not there, the path will have the default value ".k
 test_server_config.json
 
 Example file for the test_server_all program
-
-
