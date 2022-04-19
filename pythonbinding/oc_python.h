@@ -185,7 +185,7 @@ kisCS_EXPORT void ets_install_spakeCB(spakeCB spakeCB);
 kisCS_EXPORT void ets_install_gatewayCB(gatewayCB gatewayCB);
 
 /**
- * @brief issue a GET request 
+ * @brief issue a GET request
  *  - with expected content type CBOR
  *
  * @see clientCB
@@ -211,7 +211,7 @@ kisCS_EXPORT void ets_cbor_get(char *sn, char *uri, char *query, char *r_id);
  * callback
  */
 kisCS_EXPORT void ets_cbor_get_with_context_id(char *sn, char *context_id,
-                                              char *uri, char *query,
+                                               char *uri, char *query,
                                                char *r_id);
 
 /**
@@ -228,7 +228,7 @@ kisCS_EXPORT void ets_cbor_get_unsecured(char *sn, char *uri, char *query,
                                          char *r_id);
 
 /**
- * @brief issue a GET request 
+ * @brief issue a GET request
  *  - with expected content type LINK-FORMAT
  *
  * @see clientCB
@@ -255,10 +255,10 @@ kisCS_EXPORT void ets_linkformat_get(char *sn, char *uri, char *query,
  * callback
  */
 kisCS_EXPORT void ets_linkformat_get_with_context_id(char *sn, char *context_id,
-                                                    char *uri, char *query,
+                                                     char *uri, char *query,
                                                      char *r_id);
 
-  /*
+/*
  * @brief issue a GET request with expected content type LINK-FORMAT unsecured
  *
  * @see clientCB
@@ -337,10 +337,9 @@ kisCS_EXPORT void ets_cbor_put(char *sn, char *uri, char *query, char *r_id,
  * @param size the size of the data
  * @param data the request data (in cbor)
  */
-void
-ets_cbor_put_with_context_id(char *sn, char *context_id, char *uri, char *query, char *r_id, int size,
+void ets_cbor_put_with_context_id(char *sn, char *context_id, char *uri,
+                                  char *query, char *r_id, int size,
                                   char *data);
-
 
 /**
  * @brief issue a DELETE request, content type CBOR
@@ -367,7 +366,9 @@ kisCS_EXPORT void ets_cbor_delete(char *sn, char *uri, char *query, char *r_id);
  * @param r_id the r_id (string), e.g. info that will be returned by the
  * callback
  */
-kisCS_EXPORT void ets_cbor_delete_with_context_id(char *sn, char* context_id, char *uri, char *query, char *r_id);
+kisCS_EXPORT void ets_cbor_delete_with_context_id(char *sn, char *context_id,
+                                                  char *uri, char *query,
+                                                  char *r_id);
 
 /**
  * @brief initiate the spake handshake
