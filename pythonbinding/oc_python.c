@@ -490,8 +490,15 @@ general_get_cb(oc_client_response_t *data)
   }
 }
 
+
 void
 ets_cbor_get(char *sn, char *uri, char *query, char *cbdata)
+{
+  ets_cbor_get_with_context_id(sn, sn, uri, query, cbdata);
+}
+
+void
+ets_cbor_get_with_context_id(char *sn, char* context_id, char *uri, char *query, char *cbdata)
 {
   int ret = -1;
   device_handle_t *device = ets_getdevice_from_sn(sn);
@@ -501,7 +508,7 @@ ets_cbor_get(char *sn, char *uri, char *query, char *cbdata)
     return;
   }
 
-  PRINT("  [C]ets_cbor_get: [%s], [%s] [%s] [%s]\n", sn, uri, query, cbdata);
+  PRINT("  [C]ets_cbor_get_with_context_id: sn:%s ctx:%s, [%s] [%s] [%s]\n", sn, context_id, uri, query, cbdata);
 
   user_struct_t *new_cbdata = NULL;
   new_cbdata = (user_struct_t *)malloc(sizeof(user_struct_t));
@@ -576,6 +583,12 @@ ets_cbor_get_unsecured(char *sn, char *uri, char *query, char *cbdata)
 void
 ets_linkformat_get(char *sn, char *uri, char *query, char *cbdata)
 {
+  ets_linkformat_get_with_context_id(sn, sn, uri, query, cbdata);
+}
+
+void
+ets_linkformat_get_with_context_id(char *sn, char* context_id, char *uri, char *query, char *cbdata)
+{
   int ret = -1;
   oc_endpoint_t ep;
   device_handle_t *device = ets_getdevice_from_sn(sn);
@@ -584,7 +597,7 @@ ets_linkformat_get(char *sn, char *uri, char *query, char *cbdata)
     return;
   }
 
-  PRINT("  [C]ets_linkformat_get: [%s], [%s] [%s] [%s]\n", sn, uri, query,
+  PRINT("  [C]ets_linkformat_get_with_context_id: sn:%s ctx:%s, [%s] [%s] [%s]\n", sn, context_id,uri, query,
         cbdata);
 
   user_struct_t *new_cbdata;
@@ -666,10 +679,18 @@ ets_linkformat_get_unsecured(char *sn, char *uri, char *query, char *cbdata)
 void
 ets_cbor_post(char *sn, char *uri, char *query, char *id, int size, char *data)
 {
+  ets_cbor_post_with_context_id(sn, sn, uri, query, id, size, data);
+}
+
+void
+ets_cbor_post_with_context_id(char *sn, char *context_id, char *uri,
+                              char *query, char *id,
+              int size, char *data)
+{
   int ret = -1;
   device_handle_t *device = ets_getdevice_from_sn(sn);
 
-  PRINT("  [C]ets_cbor_post: [%s], [%s] [%s] [%s] %d\n", sn, uri, id, query,
+  PRINT("  [C]ets_cbor_post_with_context_id: sn%s ctx:%s, [%s] [%s] [%s] %d\n", sn, context_id, uri, id, query,
         size);
   if (device == NULL) {
     OC_ERR("device not found: %s", sn);
@@ -713,10 +734,18 @@ ets_cbor_post(char *sn, char *uri, char *query, char *id, int size, char *data)
 void
 ets_cbor_put(char *sn, char *uri, char *query, char *id, int size, char *data)
 {
+  ets_cbor_put_with_context_id(sn, sn, uri, query, id, size, data);
+}
+
+  void
+ets_cbor_put_with_context_id(char *sn, char *context_id, char *uri, char *query,
+                             char *id,
+             int size, char *data)
+{
   int ret = -1;
   device_handle_t *device = ets_getdevice_from_sn(sn);
 
-  PRINT("  [C]ets_cbor_put: [%s], [%s] [%s] [%s] %d\n", sn, uri, id, query,
+  PRINT("  [C]ets_cbor_put_with_context_id: sn:%s ctx:%s, [%s] [%s] [%s] %d\n", sn, context_id, uri, id, query,
         size);
   if (device == NULL) {
     OC_ERR("device not found: %s", sn);
@@ -762,10 +791,18 @@ ets_cbor_put(char *sn, char *uri, char *query, char *id, int size, char *data)
 void
 ets_cbor_delete(char *sn, char *uri, char *query, char *id)
 {
+  PRINT("  [C]ets_cbor_delete: [%s], [%s] [%s] [%s]\n", sn, uri, id, query);
+  ets_cbor_delete_with_context_id(sn, sn, uri, query, id);
+}
+
+kisCS_EXPORT void ets_cbor_delete_with_context_id(char *sn, char *context_id,
+                                                  char *uri, char *query,
+                                                  char *r_id)
+{
   int ret = -1;
   device_handle_t *device = ets_getdevice_from_sn(sn);
 
-  PRINT("  [C]ets_cbor_delete: [%s], [%s] [%s] [%s]\n", sn, uri, id, query);
+  PRINT("  [C]ets_cbor_delete_with_context_id: sn:%s ctx:%s, [%s] [%s] [%s]\n", sn, context_id, uri, query, r_id);
   if (device == NULL) {
     OC_ERR("device not found: %s", sn);
     return;
@@ -773,7 +810,7 @@ ets_cbor_delete(char *sn, char *uri, char *query, char *id)
   user_struct_t *new_cbdata;
   new_cbdata = (user_struct_t *)malloc(sizeof(user_struct_t));
   if (new_cbdata != NULL) {
-    strcpy(new_cbdata->r_id, id);
+    strcpy(new_cbdata->r_id, r_id);
     strcpy(new_cbdata->url, uri);
     strcpy(new_cbdata->sn, sn);
     oc_endpoint_copy(&new_cbdata->ep, &device->ep);
@@ -782,7 +819,7 @@ ets_cbor_delete(char *sn, char *uri, char *query, char *id)
     new_cbdata->ep.flags = IPV6;
     new_cbdata->ep.flags |= OSCORE;
     PRINT("  [C] enable OSCORE encryption: Flags :");
-    oc_endpoint_set_serial_number(&new_cbdata->ep, sn);
+    oc_endpoint_set_serial_number(&new_cbdata->ep, context_id);
 #endif
     PRINTipaddr_flags(new_cbdata->ep);
     PRINTipaddr(new_cbdata->ep);
@@ -794,6 +831,7 @@ ets_cbor_delete(char *sn, char *uri, char *query, char *id)
       PRINT("  [C]Could not send DELETE request\n");
     }
   }
+
 }
 
 // -----------------------------------------------------------------------------

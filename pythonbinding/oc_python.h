@@ -185,7 +185,8 @@ kisCS_EXPORT void ets_install_spakeCB(spakeCB spakeCB);
 kisCS_EXPORT void ets_install_gatewayCB(gatewayCB gatewayCB);
 
 /**
- * @brief issue a GET request with expected content type CBOR
+ * @brief issue a GET request 
+ *  - with expected content type CBOR
  *
  * @see clientCB
  * @param sn the serial number of the device
@@ -195,6 +196,23 @@ kisCS_EXPORT void ets_install_gatewayCB(gatewayCB gatewayCB);
  * callback
  */
 kisCS_EXPORT void ets_cbor_get(char *sn, char *uri, char *query, char *r_id);
+
+/**
+ * @brief issue a GET request
+ *  - with expected content type CBOR
+ *  - with OSCORE context
+ *
+ * @see clientCB
+ * @param sn the serial number of the device
+ * @param context_id the OSCORE context id
+ * @param uri the local path
+ * @param query the query
+ * @param r_id the r_id (string), e.g. info that will be returned by the
+ * callback
+ */
+kisCS_EXPORT void ets_cbor_get_with_context_id(char *sn, char *context_id,
+                                              char *uri,
+                                  char *query, char *cbdata);
 
 /**
  * @brief issue a GET request with expected content type CBOR (unsecured)
@@ -210,7 +228,8 @@ kisCS_EXPORT void ets_cbor_get_unsecured(char *sn, char *uri, char *query,
                                          char *r_id);
 
 /**
- * @brief issue a GET request with expected content type LINK-FORMAT
+ * @brief issue a GET request 
+ *  - with expected content type LINK-FORMAT
  *
  * @see clientCB
  * @param sn the serial number of the device
@@ -222,7 +241,24 @@ kisCS_EXPORT void ets_cbor_get_unsecured(char *sn, char *uri, char *query,
 kisCS_EXPORT void ets_linkformat_get(char *sn, char *uri, char *query,
                                      char *r_id);
 
-/*
+/**
+ * @brief issue a GET request
+ *  - with expected content type LINK-FORMAT
+ *  - with OSCORE context
+ *
+ * @see clientCB
+ * @param sn the serial number of the device
+ * @param context_id the OSCORE context id
+ * @param uri the local path
+ * @param query the query
+ * @param r_id the r_id (string), e.g. info that will be returned by the
+ * callback
+ */
+kisCS_EXPORT void ets_linkformat_get_with_context_id(char *sn, char *context_id,
+                                                    char *uri,
+                                        char *query, char *cbdata);
+
+  /*
  * @brief issue a GET request with expected content type LINK-FORMAT unsecured
  *
  * @see clientCB
@@ -236,7 +272,8 @@ kisCS_EXPORT void ets_linkformat_get_unsecured(char *sn, char *uri, char *query,
                                                char *r_id);
 
 /**
- * @brief issue a POST request, content type CBOR
+ * @brief issue a POST request
+ * - content type CBOR
  *
  * @see clientCB
  * @param sn the serial number of the device
@@ -249,6 +286,25 @@ kisCS_EXPORT void ets_linkformat_get_unsecured(char *sn, char *uri, char *query,
  */
 kisCS_EXPORT void ets_cbor_post(char *sn, char *uri, char *query, char *r_id,
                                 int size, char *data);
+
+/**
+ * @brief issue a POST request
+ *  - content type CBOR
+ *  - with OSCORE context
+ *
+ * @see clientCB
+ * @param sn the serial number of the device
+ * @param context_id the OSCORE context id
+ * @param uri the local path
+ * @param query the query
+ * @param r_id the r_id (string), e.g. info that will be returned by the
+ * callback
+ * @param size the size of the data
+ * @param data the request data (in cbor)
+ */
+kisCS_EXPORT void ets_cbor_post_with_context_id(char *sn, char *context_id,
+                                                char *uri, char *query,
+                                                char *id, int size, char *data);
 
 /**
  * @brief issue a PUT request, content type CBOR
@@ -266,6 +322,26 @@ kisCS_EXPORT void ets_cbor_put(char *sn, char *uri, char *query, char *r_id,
                                int size, char *data);
 
 /**
+ * @brief issue a PUT request
+ * - content type CBOR
+ * - with specific OSCORE context id
+ *
+ * @see clientCB
+ * @param sn the serial number of the device
+ * @param context_id the OSCORE context id
+ * @param uri the local path
+ * @param query the query
+ * @param r_id the r_id (string), e.g. info that will be returned by the
+ * callback
+ * @param size the size of the data
+ * @param data the request data (in cbor)
+ */
+void
+ets_cbor_put_with_context_id(char *sn, char *context_id, char *uri, char *query,
+                             char *id, int size, char *data);
+
+
+/**
  * @brief issue a DELETE request, content type CBOR
  *
  * @see clientCB
@@ -276,6 +352,21 @@ kisCS_EXPORT void ets_cbor_put(char *sn, char *uri, char *query, char *r_id,
  * callback
  */
 kisCS_EXPORT void ets_cbor_delete(char *sn, char *uri, char *query, char *r_id);
+
+/**
+ * @brief issue a DELETE request:
+ * - content type CBOR
+ * - with specific context id
+ *
+ * @see clientCB
+ * @param sn the serial number of the device
+ * @param context_id the OSCORE context id
+ * @param uri the local path
+ * @param query the query
+ * @param r_id the r_id (string), e.g. info that will be returned by the
+ * callback
+ */
+kisCS_EXPORT void ets_cbor_delete_with_context_id(char *sn, char* context_id, char *uri, char *query, char *r_id);
 
 /**
  * @brief initiate the spake handshake
