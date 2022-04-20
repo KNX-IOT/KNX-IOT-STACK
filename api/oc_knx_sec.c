@@ -538,12 +538,6 @@ oc_core_auth_at_post_handler(oc_request_t *request,
             }
           }
         } else if (object->type == OC_REP_STRING) {
-          // old, but keep it there for now...
-          // profile (19 ("coap_dtls" or "coap_oscore"))
-          if (object->iname == 19) {
-            g_at_entries[index].profile =
-              oc_string_to_at_profile(object->value.string);
-          }
           if (object->iname == 2) {
             // sub
             oc_free_string(&(g_at_entries[index].sub));
@@ -559,8 +553,8 @@ oc_core_auth_at_post_handler(oc_request_t *request,
                           oc_string_len(object->value.string));
           }
         } else if (object->type == OC_REP_INT) {
-          if (object->iname == 19) {
-            // profile (19 ("coap_dtls" ==1 or "coap_oscore" == 2))
+          if (object->iname == 38) {
+            // profile (38 ("coap_dtls" ==1 or "coap_oscore" == 2))
             PRINT("   profile %d\n", (int)object->value.integer);
             g_at_entries[index].profile = (int)object->value.integer;
           }
