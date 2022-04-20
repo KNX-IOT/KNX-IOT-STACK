@@ -708,15 +708,14 @@ oc_core_auth_at_x_get_handler(oc_request_t *request,
   }
   // return the data
   oc_rep_begin_root_object();
-  // id : 0
-  oc_rep_i_set_text_string(root, 0, oc_string(g_at_entries[index].id));
   // profile : 19
   oc_rep_i_set_int(root, 19, g_at_entries[index].profile);
+  // id : 0
+  oc_rep_i_set_text_string(root, 0, oc_string(g_at_entries[index].id));
   // audience : 3
   if (oc_string_len(g_at_entries[index].aud) > 0) {
     oc_rep_i_set_text_string(root, 3, oc_string(g_at_entries[index].aud));
   }
-
   // the scope as list of cflags or group object table entries
   int nr_entries = oc_total_interface_in_mask(g_at_entries[index].scope);
   if (nr_entries > 0) {
