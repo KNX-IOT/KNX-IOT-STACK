@@ -561,6 +561,7 @@ oc_core_auth_at_post_handler(oc_request_t *request,
         } else if (object->type == OC_REP_INT) {
           if (object->iname == 19) {
             // profile (19 ("coap_dtls" ==1 or "coap_oscore" == 2))
+            PRINT("   profile %d\n", (int)object->value.integer);
             g_at_entries[index].profile = (int)object->value.integer;
           }
         } else if (object->type == OC_REP_OBJECT) {
@@ -686,6 +687,8 @@ oc_core_auth_at_x_get_handler(oc_request_t *request,
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
+  PRINT("oc_core_auth_at_x_get_handler\n");
+
   // - find the id from the URL
   const char *value;
   int value_len = oc_uri_get_wildcard_value_as_string(
@@ -694,18 +697,20 @@ oc_core_auth_at_x_get_handler(oc_request_t *request,
   // - delete the index.
   if (value_len <= 0) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
-    PRINT("index (at) not found\n");
+    PRINT("  index (at) not found\n");
     return;
   }
-  PRINT(" id = %.*s\n", value_len, value);
+  PRINT("  id = %.*s\n", value_len, value);
   // get the index
   int index = find_index_from_at_string(value, value_len);
   // - delete the index.
   if (index < 0) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
-    PRINT("index in structure not found\n");
+    PRINT("  index in structure not found\n");
     return;
   }
+  oc_at_entry_print(0, index);
+
   // return the data
   oc_rep_begin_root_object();
   // profile : 19
@@ -920,7 +925,7 @@ oc_at_entry_print(size_t device_index, int index)
   (void)device_index;
   // PRINT("  at index: %d\n", index);
   if (index > -1) {
-    if (g_at_entries[index].profile != OC_PROFILE_UNKNOWN) {
+    if (oc_string_len(g_at_entries[index].id) > 0) {
 
       PRINT("  at index: %d\n", index);
       PRINT("    id (0)        : %s\n", oc_string(g_at_entries[index].id));
@@ -1351,25 +1356,30 @@ oc_init_oscore(size_t device_index)
     if (oc_string_len(g_at_entries[i].id) > 0) {
       oc_at_entry_print(device_index, i);
 
-      uint64_t ssn = 0;
-      // ssn = oc_knx_get_osn();
+      if (g_at_entries[i].profile == OC_PROFILE_COAP_OSCORE) {
+        uint64_t ssn = 0;
+        // ssn = oc_knx_get_osn();
 
-      // one context: for sending and receiving.
-      oc_oscore_context_t *ctx = oc_oscore_add_context(
-        device_index, oc_string(g_at_entries[i].osc_contextid),
-        oc_string(g_at_entries[i].osc_contextid), ssn, "desc",
-        oc_string(g_at_entries[i].osc_ms),
-        oc_string(g_at_entries[i].osc_contextid), false);
-      if (ctx == NULL) {
-        PRINT("   fail...\n ");
+        // one context: for sending and receiving.
+        oc_oscore_context_t *ctx = oc_oscore_add_context(
+          device_index, oc_string(g_at_entries[i].osc_contextid),
+          oc_string(g_at_entries[i].osc_contextid), ssn, "desc",
+          oc_string(g_at_entries[i].osc_ms),
+          oc_string(g_at_entries[i].osc_contextid), false);
+        if (ctx == NULL) {
+          PRINT("   fail...\n ");
+        }
+
+        // ctx = oc_oscore_add_context(
+        //  device_index, "reci", "sender", oc_knx_get_osn(), "desc",
+        //  oc_string(g_at_entries[i].osc_ms), "token2", false);
+        // if (ctx == NULL) {
+        //  PRINT("   fail...\n ");
+        //}
       }
-
-      // ctx = oc_oscore_add_context(
-      //  device_index, "reci", "sender", oc_knx_get_osn(), "desc",
-      //  oc_string(g_at_entries[i].osc_ms), "token2", false);
-      // if (ctx == NULL) {
-      //  PRINT("   fail...\n ");
-      //}
+      else {
+        PRINT("oc_init_oscore: no oscore context\n");
+      }
     }
   }
 #endif
