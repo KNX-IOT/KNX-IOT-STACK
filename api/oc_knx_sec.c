@@ -474,7 +474,7 @@ oc_core_auth_at_post_handler(oc_request_t *request,
       }
       index = find_index_from_at(at);
       if (index != -1) {
-        PRINT("   already exist!\n");
+        PRINT("   entry already exist! \n");
       } else {
         index = find_empty_at_index();
         if (index == -1) {

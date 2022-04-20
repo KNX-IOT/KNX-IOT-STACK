@@ -289,6 +289,19 @@ def do_install_device(my_stack, sn, ia, iid, got_content, rec_content, pub_conte
         my_stack.purge_response(response)
         response =  my_stack.issue_linkformat_get(sn,"/auth/at")
         safe_print(response)
+        lf = knx_stack.LinkFormat(response.payload)
+        print(" lines:", lf.get_nr_lines())
+        for line in lf.get_lines():
+            print(line)
+        for line in lf.get_lines():
+            print(" -------------------------")
+            print(" url :", lf.get_url(line))
+            print(" ct  :", lf.get_ct(line))
+            print(" rt  :", lf.get_rt(line))
+            response3 =  my_stack.issue_cbor_get(sn, lf.get_url(line))
+            print ("response:",response3)
+            print ("    value:", response3.get_payload_dict())
+            my_stack.purge_response(response3)
         my_stack.purge_response(response)
     else:
         print ("no auth table")
