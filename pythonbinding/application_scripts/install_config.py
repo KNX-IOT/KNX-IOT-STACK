@@ -37,6 +37,7 @@
 # pylint: disable=R0913
 # pylint: disable=R0915
 # pylint: disable=R1732
+# pylint: disable=R0912
 # pylint: disable=W0702
 # pylint: disable=W1514
 
@@ -148,7 +149,7 @@ def convert_json_auth_tag2integer(auth):
     # sub 2
     # aud 3
     # scope 9 map
-    # profile 
+    # profile
     # cnf:osc:id 8:4:0
     # cnf:osc:version 8:4:1
     # cnf:osc:ms 8:4:2
@@ -156,7 +157,6 @@ def convert_json_auth_tag2integer(auth):
     # cnf:osc:alg 8:4:4
     # cnf:osc:salt 8:4:5
     # cnf:osc:contextId 8:4:6
-    
     new_data = []
     for item in auth:
         #print ("input : " ,item)
@@ -335,11 +335,11 @@ def do_install(my_stack, internal_address, filename):
     rep_num = None
     if "recipient" in json_data:
         rep_content = json_data["recipient"]
-        #rep_num = convert_json_tag2integer(rep_content)
+        rep_num = convert_json_tag2integer(rep_content)
     pub_num = None
     if "publisher" in json_data:
         pub_content = json_data["publisher"]
-        #pub_num = convert_json_tag2integer(pub_content)
+        pub_num = convert_json_tag2integer(pub_content)
     auth_num = None
     if "auth" in json_data:
         auth_content = json_data["auth"]
