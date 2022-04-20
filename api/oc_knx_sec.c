@@ -707,8 +707,8 @@ oc_core_auth_at_x_get_handler(oc_request_t *request,
 
   // return the data
   oc_rep_begin_root_object();
-  // profile : 19
-  oc_rep_i_set_int(root, 19, g_at_entries[index].profile);
+  // profile : 38
+  oc_rep_i_set_int(root, 38, g_at_entries[index].profile);
   // id : 0
   oc_rep_i_set_text_string(root, 0, oc_string(g_at_entries[index].id));
   // audience : 3
@@ -1003,7 +1003,7 @@ oc_at_dump_entry(size_t device_index, int entry)
   oc_rep_i_set_text_string(root, 0, oc_string(g_at_entries[entry].id));
   // interface 9 /// this is different than the response on the wire
   oc_rep_i_set_int(root, 9, g_at_entries[entry].scope);
-  oc_rep_i_set_int(root, 19, g_at_entries[entry].profile);
+  oc_rep_i_set_int(root, 38, g_at_entries[entry].profile);
 
   oc_rep_i_set_text_string(root, 840, oc_string(g_at_entries[entry].osc_id));
   oc_rep_i_set_text_string(root, 842, oc_string(g_at_entries[entry].osc_ms));
@@ -1055,7 +1055,7 @@ oc_at_load_entry(int entry)
           if (rep->iname == 9) {
             g_at_entries[entry].scope = (int)rep->value.integer;
           }
-          if (rep->iname == 19) {
+          if (rep->iname == 38) {
             g_at_entries[entry].profile = (int)rep->value.integer;
           }
           break;
