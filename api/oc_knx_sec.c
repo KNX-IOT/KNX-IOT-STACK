@@ -1370,8 +1370,7 @@ oc_init_oscore(size_t device_index)
         // if (ctx == NULL) {
         //  PRINT("   fail...\n ");
         //}
-      }
-      else {
+      } else {
         PRINT("oc_init_oscore: no oscore context\n");
       }
     }
