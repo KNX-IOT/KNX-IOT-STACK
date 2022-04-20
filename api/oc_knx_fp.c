@@ -453,10 +453,9 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     return;
   }
 
-  char buffer[200];
-  memset(buffer, 200, 1);
-  oc_rep_to_json(request->request_payload, (char *)&buffer, 200, true);
-  PRINT("%s", buffer);
+  /* debugging info */
+  oc_print_rep_as_json(request->request_payload, true);
+
   int index = -1;
   int id;
   oc_rep_t *rep = request->request_payload;
@@ -531,9 +530,6 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
               free(g_got[index].ga);
             }
             g_got[index].ga_len = array_size;
-            if (g_got[index].ga) {
-              free(g_got[index].ga);
-            }
             g_got[index].ga = new_array;
           }
         } break;
