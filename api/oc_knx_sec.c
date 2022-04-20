@@ -923,7 +923,7 @@ oc_at_entry_print(size_t device_index, int index)
 
       PRINT("  at index: %d\n", index);
       PRINT("    id (0)        : %s\n", oc_string(g_at_entries[index].id));
-      PRINT("    interfaces    : %d\n", g_at_entries[index].scope);
+      PRINT("    scope (9)     : %d\n", g_at_entries[index].scope);
       PRINT("    profile (38)  : %d (%s)\n", g_at_entries[index].profile,
             oc_at_profile_to_string(g_at_entries[index].profile));
       if (g_at_entries[index].profile == OC_PROFILE_COAP_DTLS) {
