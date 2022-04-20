@@ -124,7 +124,7 @@ typedef struct oc_auth_at_t
 {
   oc_string_t id;            /**< (0) token id*/
   oc_interface_mask_t scope; /**< (9) the scope (interfaces) */
-  oc_at_profile_t profile;   /**< (19) "coap_oscore" or "coap_dtls"*/
+  oc_at_profile_t profile;   /**< (38) "coap_oscore" or "coap_dtls"*/
   oc_string_t aud;           /**< (13) audience (for out going requests) */
   oc_string_t sub;           /**< (2) dtls 2 sub*/
   oc_string_t kid;           /**< (8:2) dtls cnf:kid*/
