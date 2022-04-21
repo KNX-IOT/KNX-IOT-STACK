@@ -187,17 +187,17 @@ void oc_oscore_set_auth(char *serial_number, char *context_id,
                         uint8_t *shared_key, int shared_key_size);
 
 /**
- * @brief retrieve auth at entry 
- * 
+ * @brief retrieve auth at entry
+ *
  * @param device_index the device index
  * @param index the index in the table
  * @return oc_auth_at_t* the auth at entry
  */
-oc_auth_at_t* oc_get_auth_at_entry(size_t device_index, int index);
+oc_auth_at_t *oc_get_auth_at_entry(size_t device_index, int index);
 
 /**
  * @brief print the auth at entry
- * 
+ *
  * @param device_index the device index
  * @param index the index in the table to be printed
  */

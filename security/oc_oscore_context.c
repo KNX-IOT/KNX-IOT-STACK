@@ -198,8 +198,7 @@ oc_oscore_context_t *
 oc_oscore_add_context(size_t device, const char *senderid,
                       const char *recipientid, uint64_t ssn, const char *desc,
                       const char *mastersecret, const char *token_id,
-                      int auth_at_index,
-                      bool from_storage)
+                      int auth_at_index, bool from_storage)
 {
   oc_oscore_context_t *ctx = (oc_oscore_context_t *)oc_memb_alloc(&ctx_s);
 

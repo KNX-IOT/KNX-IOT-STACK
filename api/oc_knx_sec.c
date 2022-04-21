@@ -912,7 +912,8 @@ oc_create_knx_auth_resource(int resource_idx, size_t device)
     OC_DISCOVERABLE, oc_core_knx_auth_get_handler, 0, 0, 0, 1, "urn:knx:xxx");
 }
 
-void oc_print_auth_at_entry(size_t device_index, int index)
+void
+oc_print_auth_at_entry(size_t device_index, int index)
 {
   (void)device_index;
   // PRINT("  at index: %d\n", index);
@@ -1294,7 +1295,6 @@ oc_oscore_set_auth(char *serial_number, char *context_id, uint8_t *shared_key,
     oc_init_oscore(0);
   }
 }
-
 
 oc_auth_at_t *
 oc_get_auth_at_entry(size_t device_index, int index)
