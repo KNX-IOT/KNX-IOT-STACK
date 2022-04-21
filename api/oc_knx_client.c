@@ -434,6 +434,7 @@ oc_issue_s_mode(int scope, int sia_value, int group_address, int iid, char *rp,
   memset(&group_mcast, 0, sizeof(group_mcast));
   group_mcast =
     oc_create_multicast_group_address(group_mcast, group_address, iid, scope);
+
 #endif
 
   oc_send_s_mode(&group_mcast, "/.knx", sia_value, group_address, rp,
@@ -453,6 +454,8 @@ oc_send_s_mode(oc_endpoint_t *endpoint, char *path, int sia_value,
 #ifndef OC_OSCORE
   if (oc_init_post(path, endpoint, NULL, NULL, LOW_QOS, NULL)) {
 #else  /* OC_OSCORE */
+  /* not sure if it is needed, the endpoint should already have the OSCORE flag
+   * set */
   endpoint->flags = endpoint->flags | OSCORE;
   if (oc_init_multicast_update(endpoint, path, NULL)) {
 #endif /* OC_OSCORE */
