@@ -159,7 +159,7 @@ oc_oscore_find_context_by_group_id(size_t device, int group_id)
 
         int64_t group_value = my_entry->ga[i];
         PRINT("   oc_oscore_find_context_by_group_id : %d %d\n", group_id,
-              group_value);
+              (int)group_value);
         if (group_id == (int)group_value) {
           return ctx;
         }
