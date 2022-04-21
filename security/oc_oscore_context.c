@@ -25,26 +25,12 @@
 #include "oc_client_state.h"
 //#include "oc_cred.h"
 #include "oc_oscore_crypto.h"
+#include "api/oc_knx_sec.h"
 #include "oc_rep.h"
 //#include "oc_store.h"
 #include "port/oc_log.h"
 OC_LIST(contexts);
 OC_MEMB(ctx_s, oc_oscore_context_t, 1);
-
-oc_oscore_context_t *
-oc_oscore_find_group_context(uint64_t group_id)
-{
-  oc_oscore_context_t *ctx = (oc_oscore_context_t *)oc_list_head(contexts);
-
-  while (ctx != NULL) {
-    if (group_id == ctx->group_id) {
-      return ctx;
-    }
-    ctx = ctx->next;
-  }
-
-  return ctx;
-}
 
 // checking against receiver...
 oc_oscore_context_t *
@@ -164,10 +150,20 @@ oc_oscore_find_context_by_group_id(size_t device, int group_id)
   (void)device;
 
   oc_oscore_context_t *ctx = (oc_oscore_context_t *)oc_list_head(contexts);
+
   while (ctx != NULL) {
-    int ctx_group_id = (int)ctx->group_id;
-    if (group_id == ctx_group_id) {
-      return ctx;
+    oc_auth_at_t *my_entry = oc_get_auth_at_entry(0, ctx->aut_at_index);
+    if (my_entry) {
+      oc_print_auth_at_entry(0, ctx->aut_at_index);
+      for (int i = 0; i < my_entry->ga_len; i++) {
+
+        int64_t group_value = my_entry->ga[i];
+        PRINT("   oc_oscore_find_context_by_group_id : %d %d\n", group_id,
+              group_value);
+        if (group_id == (int)group_value) {
+          return ctx;
+        }
+      }
     }
     ctx = ctx->next;
   }
@@ -202,7 +198,7 @@ oc_oscore_context_t *
 oc_oscore_add_context(size_t device, const char *senderid,
                       const char *recipientid, uint64_t ssn, const char *desc,
                       const char *mastersecret, const char *token_id,
-                      bool from_storage)
+                      int auth_at_index, bool from_storage)
 {
   oc_oscore_context_t *ctx = (oc_oscore_context_t *)oc_memb_alloc(&ctx_s);
 
@@ -214,6 +210,7 @@ oc_oscore_add_context(size_t device, const char *senderid,
 
   ctx->device = device;
   ctx->ssn = ssn;
+  ctx->aut_at_index = auth_at_index;
 
   PRINT("  device    %d\n", (int)device);
   PRINT("  sender    %s\n", senderid);
@@ -228,6 +225,7 @@ oc_oscore_add_context(size_t device, const char *senderid,
   }
   PRINT("\n");
   PRINT("  desc    %s\n", desc);
+  PRINT("  index   %d\n", auth_at_index);
 
   /* To prevent SSN reuse, bump to higher value that could've been previously
    * used, accounting for any failed writes to nonvolatile storage.

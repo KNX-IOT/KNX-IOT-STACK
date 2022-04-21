@@ -36,7 +36,6 @@ oc_auth_at_t g_at_entries[G_AT_MAX_ENTRIES];
 
 // ----------------------------------------------------------------------------
 
-static void oc_at_entry_print(size_t device_index, int index);
 static void oc_at_delete_entry(size_t device_index, int index);
 static void oc_at_dump_entry(size_t device_index, int entry);
 
@@ -634,7 +633,7 @@ oc_core_auth_at_post_handler(oc_request_t *request,
       } // while (inner object)
     }   // if type == object
     // show the entry on screen
-    oc_at_entry_print(device_index, index);
+    oc_print_auth_at_entry(device_index, index);
     // dump the entry to persistent storage
     oc_at_dump_entry(device_index, index);
     rep = rep->next;
@@ -703,7 +702,7 @@ oc_core_auth_at_x_get_handler(oc_request_t *request,
     PRINT("  index in structure not found\n");
     return;
   }
-  oc_at_entry_print(0, index);
+  oc_print_auth_at_entry(0, index);
 
   // return the data
   oc_rep_begin_root_object();
@@ -913,8 +912,8 @@ oc_create_knx_auth_resource(int resource_idx, size_t device)
     OC_DISCOVERABLE, oc_core_knx_auth_get_handler, 0, 0, 0, 1, "urn:knx:xxx");
 }
 
-static void
-oc_at_entry_print(size_t device_index, int index)
+void
+oc_print_auth_at_entry(size_t device_index, int index)
 {
   (void)device_index;
   // PRINT("  at index: %d\n", index);
@@ -1241,7 +1240,7 @@ oc_load_at_table(size_t device_index)
   for (int i = 0; i < G_AT_MAX_ENTRIES; i++) {
     oc_at_load_entry(i);
     if (oc_string_len(g_at_entries[i].id) > 0) {
-      oc_at_entry_print(device_index, i);
+      oc_print_auth_at_entry(device_index, i);
     }
   }
 }
@@ -1252,7 +1251,7 @@ oc_delete_at_table(size_t device_index)
   PRINT("Deleting AT Object Table from Persistent storage\n");
   for (int i = 0; i < G_AT_MAX_ENTRIES; i++) {
     oc_at_delete_entry(device_index, i);
-    oc_at_entry_print(device_index, i);
+    oc_print_auth_at_entry(device_index, i);
     oc_at_dump_entry(device_index, i);
   }
 #ifdef OC_OSCORE
@@ -1295,6 +1294,20 @@ oc_oscore_set_auth(char *serial_number, char *context_id, uint8_t *shared_key,
     // add the oscore context...
     oc_init_oscore(0);
   }
+}
+
+oc_auth_at_t *
+oc_get_auth_at_entry(size_t device_index, int index)
+{
+  (void)device_index;
+
+  if (index < 0) {
+    return NULL;
+  }
+  if (index >= G_AT_MAX_ENTRIES) {
+    return NULL;
+  }
+  return &g_at_entries[index];
 }
 
 // ----------------------------------------------------------------------------
@@ -1348,7 +1361,7 @@ oc_init_oscore(size_t device_index)
   for (i = 0; i < G_AT_MAX_ENTRIES; i++) {
 
     if (oc_string_len(g_at_entries[i].id) > 0) {
-      oc_at_entry_print(device_index, i);
+      oc_print_auth_at_entry(device_index, i);
 
       if (g_at_entries[i].profile == OC_PROFILE_COAP_OSCORE) {
         uint64_t ssn = 0;
@@ -1359,7 +1372,7 @@ oc_init_oscore(size_t device_index)
           device_index, oc_string(g_at_entries[i].osc_contextid),
           oc_string(g_at_entries[i].osc_contextid), ssn, "desc",
           oc_string(g_at_entries[i].osc_ms),
-          oc_string(g_at_entries[i].osc_contextid), false);
+          oc_string(g_at_entries[i].osc_contextid), i, false);
         if (ctx == NULL) {
           PRINT("   fail...\n ");
         }

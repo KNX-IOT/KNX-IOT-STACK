@@ -175,7 +175,7 @@ int oc_core_find_at_entry_with_context_id(size_t device_index,
 int oc_core_find_at_entry_empty_slot(size_t device_index);
 
 /**
- * @brief set shared (SPAKE) key
+ * @brief set shared (SPAKE) key to the auth at table.
  *
  * @param serial_number the serial_number of the device that has been negotiated
  * with spake2plus with (e.g. client side)
@@ -185,6 +185,23 @@ int oc_core_find_at_entry_empty_slot(size_t device_index);
  */
 void oc_oscore_set_auth(char *serial_number, char *context_id,
                         uint8_t *shared_key, int shared_key_size);
+
+/**
+ * @brief retrieve auth at entry
+ *
+ * @param device_index the device index
+ * @param index the index in the table
+ * @return oc_auth_at_t* the auth at entry
+ */
+oc_auth_at_t *oc_get_auth_at_entry(size_t device_index, int index);
+
+/**
+ * @brief print the auth at entry
+ *
+ * @param device_index the device index
+ * @param index the index in the table to be printed
+ */
+void oc_print_auth_at_entry(size_t device_index, int index);
 
 /**
  * @brief delete the /auth/at table

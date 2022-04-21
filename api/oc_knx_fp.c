@@ -2021,6 +2021,7 @@ oc_create_multicast_group_address(oc_endpoint_t in, int group_nr, int iid,
   PRINT("  ");
   PRINTipaddr(group_mcast);
   PRINT("\n");
+  group_mcast.group_id = group_nr;
   memcpy(&in, &group_mcast, sizeof(oc_endpoint_t));
 
   return in;

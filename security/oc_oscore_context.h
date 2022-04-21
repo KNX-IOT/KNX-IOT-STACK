@@ -33,7 +33,7 @@ typedef struct oc_oscore_context_t
   struct oc_oscore_context_t
     *next; /**< pointer to the next, NULL if there is not any */
   /* Provisioned parameters */
-  uint64_t group_id; /**<  the group id as OSCORE contextid */
+  int aut_at_index;
   uint8_t
     token_id[OSCORE_IDCTX_LEN]; /**< Note: the serial number of the device */
   uint8_t master_secret[OSCORE_IDCTX_LEN];
@@ -68,12 +68,10 @@ void oc_oscore_free_context(oc_oscore_context_t *ctx);
 
 void oc_oscore_free_all_contexts();
 
-oc_oscore_context_t *oc_oscore_add_context(size_t device, const char *senderid,
-                                           const char *recipientid,
-                                           uint64_t ssn, const char *desc,
-                                           const char *mastersecret,
-                                           const char *token_id,
-                                           bool from_storagw);
+oc_oscore_context_t *oc_oscore_add_context(
+  size_t device, const char *senderid, const char *recipientid, uint64_t ssn,
+  const char *desc, const char *mastersecret, const char *token_id,
+  int auth_at_index, bool from_storage);
 
 oc_oscore_context_t *oc_oscore_find_context_by_serial_number(
   size_t device, char *serial_number);
@@ -88,8 +86,6 @@ oc_oscore_context_t *oc_oscore_find_context_by_kid(oc_oscore_context_t *ctx,
 oc_oscore_context_t *oc_oscore_find_context_by_token_mid(
   size_t device, uint8_t *token, uint8_t token_len, uint16_t mid,
   uint8_t **request_piv, uint8_t *request_piv_len, bool tcp);
-
-oc_oscore_context_t *oc_oscore_find_group_context(uint64_t group_id);
 
 #ifdef __cplusplus
 }
