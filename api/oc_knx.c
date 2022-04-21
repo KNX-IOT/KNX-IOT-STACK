@@ -564,15 +564,15 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
   char ip_address[100];
 
   PRINT("KNX KNX Post Handler");
-  char buffer[200];
-  memset(buffer, 200, 1);
-  oc_rep_to_json(request->request_payload, (char *)&buffer, 200, true);
-  PRINT("Decoded Payload: %s\n", buffer);
+  PRINT("Decoded Payload:\n");
+  oc_print_rep_as_json(request->request_payload, true);
+
   PRINT("Full Payload Size: %d\n", (int)request->_payload_len);
   OC_LOGbytes_OSCORE(request->_payload, (int)request->_payload_len);
 
   /* check if the accept header is cbor-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (request->accept != APPLICATION_CBOR &&
+      request->accept != APPLICATION_OSCORE) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;

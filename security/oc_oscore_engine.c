@@ -393,7 +393,8 @@ oc_oscore_send_multicast_message(oc_message_t *message)
     return -1;
   }
 
-  oc_oscore_context_t *oscore_ctx = oc_oscore_find_group_context(group_id);
+  oc_oscore_context_t *oscore_ctx =
+    oc_oscore_find_context_by_group_id(0, group_id);
   PRINT("oc_oscore_send_multicast_message : groupid = %d\n", group_id);
   if (oscore_ctx) {
     OC_DBG_OSCORE("#################################");
