@@ -52,6 +52,12 @@ over multicast "all coap nodes"
 
 Note: can be configured to receive commands from LSSB_minimal_all.
 
+uses pimoroni displayotron hat :
+
+https://pinout.xyz/pinout/display_o_tron_hat?msclkid=02fa4484c6d511ecaaaf64d47a2d5e81
+
+https://github.com/pimoroni/displayotron
+
 ### LSSB_minimal_all.c
 
 KNX-IOT example on Windows & Linux.
@@ -90,6 +96,12 @@ over multicast "all coap nodes"
   - the button is attached to the datapoint
 
 Note: can be configured to send commands to LSAB_minimal_pi.
+
+uses pimoroni displayotron hat:
+
+https://pinout.xyz/pinout/display_o_tron_hat?msclkid=02fa4484c6d511ecaaaf64d47a2d5e81
+
+https://github.com/pimoroni/displayotron
 
 ## support applications
 
