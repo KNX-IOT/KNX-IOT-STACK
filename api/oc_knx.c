@@ -1226,6 +1226,20 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
       goto error;
     }
 
+    OC_DBG_SPAKE("Responder Transcript Inputs:");
+    OC_DBG_SPAKE("w0");
+    oc_spake_print_mpi(&spake_data.w0);
+    OC_DBG_SPAKE("L");
+    oc_spake_print_point(&spake_data.L);
+    OC_DBG_SPAKE("y");
+    oc_spake_print_mpi(&spake_data.y);
+    OC_DBG_SPAKE("pub_y");
+    oc_spake_print_point(&spake_data.pub_y);
+    OC_DBG_SPAKE("pa");
+    OC_LOGbytes_SPAKE(oc_cast(g_pase.pa, uint8_t), 65);
+    OC_DBG_SPAKE("pB");
+    oc_spake_print_point(&pB);
+    uint8_t Ka_Ke[32];
     if (oc_spake_calc_transcript_responder(&spake_data,
                                            oc_cast(g_pase.pa, uint8_t), &pB)) {
       mbedtls_ecp_point_free(&pB);

@@ -160,13 +160,24 @@ do_credential_verification(oc_client_response_t *data)
   mbedtls_ecp_group_init(&grp);
   mbedtls_ecp_group_load(&grp, MBEDTLS_ECP_DP_SECP256R1);
 
+  OC_DBG_SPAKE("Initiator Transcript Inputs:");
+  OC_DBG_SPAKE("w0");
+  oc_spake_print_mpi(&w0);
+  OC_DBG_SPAKE("w1");
+  oc_spake_print_mpi(&w1);
+  OC_DBG_SPAKE("privA");
+  oc_spake_print_mpi(&privA);
+  OC_DBG_SPAKE("pubA");
+  oc_spake_print_point(&pA);
+  OC_DBG_SPAKE("pB");
+  OC_LOGbytes_SPAKE(pB_bytes, kPubKeySize);
   oc_spake_calc_transcript_initiator(&w0, &w1, &privA, &pA, pB_bytes, Ka_Ke);
   OC_DBG_SPAKE("KaKe & pB Bytes");
-  OC_LOGbytes_OSCORE(Ka_Ke, 32);
-  OC_LOGbytes_OSCORE(pB_bytes, kPubKeySize);
+  OC_LOGbytes_SPAKE(Ka_Ke, 32);
+  OC_LOGbytes_SPAKE(pB_bytes, kPubKeySize);
   oc_spake_calc_cA(Ka_Ke, cA, pB_bytes);
   OC_DBG_SPAKE("cA:");
-  OC_LOGbytes_OSCORE(cA, 32);
+  OC_LOGbytes_SPAKE(cA, 32);
 
   mbedtls_ecp_point_write_binary(&grp, &pA, MBEDTLS_ECP_PF_UNCOMPRESSED,
                                  &len_pA, pA_bytes, kPubKeySize);
