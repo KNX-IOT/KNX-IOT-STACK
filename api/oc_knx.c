@@ -1178,7 +1178,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     return;
   }
 #ifdef OC_SPAKE
-  if (valid_request == SPAKE_PA_SHARE_P) {
+  else if (valid_request == SPAKE_PA_SHARE_P) {
     // return changed, frame pb (11) & cb (13)
 
     const char *password = oc_spake_get_password();
@@ -1245,8 +1245,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     oc_rep_end_root_object();
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
     return;
-  }
-  if (valid_request == SPAKE_CA_CONFIRM_P) {
+  } else if (valid_request == SPAKE_CA_CONFIRM_P) {
     // calculate expected cA
     uint8_t expected_ca[32];
     if (g_pase.pb.ptr == NULL)
