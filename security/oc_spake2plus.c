@@ -164,7 +164,7 @@ encode_mpi(mbedtls_mpi *mpi, uint8_t *buffer)
 }
 
 void
-print_point(mbedtls_ecp_point *p)
+oc_spake_print_point(mbedtls_ecp_point *p)
 {
   uint8_t buf[kPubKeySize];
   size_t len = 0;
@@ -178,7 +178,7 @@ print_point(mbedtls_ecp_point *p)
 }
 
 void
-print_mpi(mbedtls_mpi *m)
+oc_spake_print_mpi(mbedtls_mpi *m)
 {
   uint8_t buf[64];
   size_t len = 0;

@@ -153,7 +153,7 @@ do_credential_verification(oc_client_response_t *data)
 
   uint8_t cA[32];
   uint8_t local_cB[32];
-  uint8_t pA_bytes[63];
+  uint8_t pA_bytes[kPubKeySize];
   size_t len_pA;
   mbedtls_ecp_group grp;
 
@@ -163,13 +163,13 @@ do_credential_verification(oc_client_response_t *data)
   oc_spake_calc_transcript_initiator(&w0, &w1, &privA, &pA, pB_bytes, Ka_Ke);
   OC_DBG_SPAKE("KaKe & pB Bytes");
   OC_LOGbytes_OSCORE(Ka_Ke, 32);
-  OC_LOGbytes_OSCORE(pB_bytes, 65);
+  OC_LOGbytes_OSCORE(pB_bytes, kPubKeySize);
   oc_spake_calc_cA(Ka_Ke, cA, pB_bytes);
   OC_DBG_SPAKE("cA:");
   OC_LOGbytes_OSCORE(cA, 32);
 
   mbedtls_ecp_point_write_binary(&grp, &pA, MBEDTLS_ECP_PF_UNCOMPRESSED,
-                                 &len_pA, pA_bytes, 63);
+                                 &len_pA, pA_bytes, kPubKeySize);
   oc_spake_calc_cB(Ka_Ke, local_cB, pA_bytes);
 
   mbedtls_ecp_group_free(&grp);
@@ -199,7 +199,6 @@ do_credential_exchange(oc_client_response_t *data)
   oc_rep_to_json(data->payload, (char *)&buffer, 300, true);
   OC_DBG_SPAKE("%s", buffer);
 
-  // TODO parse payload, obtain seed & salt, use it to derive w0 & w1
   int it;
   uint8_t *salt;
 
@@ -243,14 +242,14 @@ do_credential_exchange(oc_client_response_t *data)
 
   oc_spake_gen_keypair(&privA, &pubA);
   oc_spake_calc_pA(&pA, &pubA, &w0);
-  uint8_t bytes_pA[65];
+  uint8_t bytes_pA[kPubKeySize];
   oc_spake_encode_pubkey(&pA, bytes_pA);
 
   oc_init_post("/.well-known/knx/spake", data->endpoint, NULL,
                &do_credential_verification, HIGH_QOS, NULL);
 
   oc_rep_begin_root_object();
-  oc_rep_i_set_byte_string(root, 10, bytes_pA, 65);
+  oc_rep_i_set_byte_string(root, 10, bytes_pA, kPubKeySize);
   oc_rep_end_root_object();
 
   oc_do_post_ex(APPLICATION_CBOR, APPLICATION_CBOR);

@@ -185,4 +185,8 @@ int oc_spake_calc_cA(uint8_t *Ka_Ke, uint8_t cA[32],
 int oc_spake_calc_cB(uint8_t *Ka_Ke, uint8_t cB[32],
                      uint8_t bytes_X[kPubKeySize]);
 
+void oc_spake_print_point(mbedtls_ecp_point *p);
+
+void oc_spake_print_mpi(mbedtls_mpi *m);
+
 #endif // OC_SPAKE2PLUS_H
