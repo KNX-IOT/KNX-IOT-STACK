@@ -1258,8 +1258,6 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
       goto error;
     }
 
-    // TODO initialize OSCORE and create auth token using this key
-    // shared_key is 16-byte array - NOT NULL TERMINATED
     uint8_t *shared_key = spake_data.Ka_Ke + 16;
     size_t shared_key_len = 16;
 
@@ -1269,7 +1267,12 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     oc_oscore_set_auth(oc_string(device->serialnumber), oc_string(g_pase.id),
                        shared_key, (int)shared_key_len);
 
-    oc_send_cbor_response(request, OC_STATUS_CHANGED);
+    request->response->response_buffer->response_length = 0;
+    int size_of_message = oc_rep_get_encoded_payload_size();
+
+    //oc_send_cbor_response(request, OC_STATUS_CHANGED);
+    oc_send_linkformat_response(request, OC_STATUS_CHANGED, 0);
+
     // handshake completed successfully - clear state
     memset(spake_data.Ka_Ke, 0, sizeof(spake_data.Ka_Ke));
     mbedtls_ecp_point_free(&spake_data.L);
