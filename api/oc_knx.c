@@ -1155,6 +1155,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
   if (valid_request == SPAKE_RND) {
 #ifdef OC_SPAKE
     // generate random numbers for rnd, salt & it (# of iterations)
+    oc_alloc_string(&g_pase.salt, 32);
     oc_spake_parameter_exchange(&g_pase.rnd, &g_pase.salt, &g_pase.it);
 #endif /* OC_SPAKE */
     oc_rep_begin_root_object();
@@ -1253,7 +1254,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
 
     OC_DBG_SPAKE("KaKe & pB Bytes");
     OC_LOGbytes_OSCORE(spake_data.Ka_Ke, 32);
-    OC_LOGbytes_OSCORE(oc_cast(g_pase.pb), 65);
+    OC_LOGbytes_OSCORE(oc_cast(g_pase.pb, uint8_t), 65);
     oc_spake_calc_cA(spake_data.Ka_Ke, expected_ca,
                      oc_cast(g_pase.pb, uint8_t));
     OC_DBG_SPAKE("cA:");
