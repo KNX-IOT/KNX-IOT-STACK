@@ -1258,6 +1258,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
       goto error;
     }
 
+    // shared_key is 16-byte array - NOT NULL TERMINATED
     uint8_t *shared_key = spake_data.Ka_Ke + 16;
     size_t shared_key_len = 16;
 
