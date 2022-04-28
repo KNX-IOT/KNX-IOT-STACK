@@ -1250,8 +1250,14 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     uint8_t expected_ca[32];
     if (g_pase.pb.ptr == NULL)
       goto error;
+
+    OC_DBG_SPAKE("KaKe & pB Bytes");
+    OC_LOGbytes_OSCORE(spake_data.Ka_Ke, 32);
+    OC_LOGbytes_OSCORE(oc_cast(g_pase.pb), 65);
     oc_spake_calc_cA(spake_data.Ka_Ke, expected_ca,
                      oc_cast(g_pase.pb, uint8_t));
+    OC_DBG_SPAKE("cA:");
+    OC_LOGbytes_OSCORE(expected_ca, 32);
 
     if (memcmp(expected_ca, oc_cast(g_pase.ca, uint8_t), 32) != 0) {
       OC_ERR("oc_spake_calc_cA failed");
