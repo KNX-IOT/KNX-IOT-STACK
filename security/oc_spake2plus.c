@@ -164,7 +164,7 @@ encode_mpi(mbedtls_mpi *mpi, uint8_t *buffer)
 }
 
 void
-print_point(mbedtls_ecp_point *p)
+oc_spake_print_point(mbedtls_ecp_point *p)
 {
   uint8_t buf[kPubKeySize];
   size_t len = 0;
@@ -178,7 +178,7 @@ print_point(mbedtls_ecp_point *p)
 }
 
 void
-print_mpi(mbedtls_mpi *m)
+oc_spake_print_mpi(mbedtls_mpi *m)
 {
   uint8_t buf[64];
   size_t len = 0;
@@ -200,20 +200,13 @@ oc_spake_encode_pubkey(mbedtls_ecp_point *P, uint8_t out[kPubKeySize])
 }
 
 int
-oc_spake_parameter_exchange(oc_string_t *rnd, oc_string_t *salt, int *it)
+oc_spake_parameter_exchange(uint8_t rnd[32], uint8_t salt[32], int *it)
 {
   unsigned int it_seed;
   int ret;
-  oc_free_string(rnd);
-  oc_free_string(salt);
 
-  oc_alloc_string(rnd, KNX_RNG_LEN);
-  oc_alloc_string(salt, KNX_SALT_LEN);
-
-  MBEDTLS_MPI_CHK(
-    mbedtls_ctr_drbg_random(&ctr_drbg_ctx, rnd->ptr, KNX_RNG_LEN));
-  MBEDTLS_MPI_CHK(
-    mbedtls_ctr_drbg_random(&ctr_drbg_ctx, salt->ptr, KNX_SALT_LEN));
+  MBEDTLS_MPI_CHK(mbedtls_ctr_drbg_random(&ctr_drbg_ctx, rnd, KNX_RNG_LEN));
+  MBEDTLS_MPI_CHK(mbedtls_ctr_drbg_random(&ctr_drbg_ctx, salt, KNX_SALT_LEN));
   MBEDTLS_MPI_CHK(mbedtls_ctr_drbg_random(
     &ctr_drbg_ctx, (unsigned char *)&it_seed, sizeof(it_seed)));
 
@@ -243,9 +236,9 @@ oc_spake_calc_w0_w1(const char *pw, size_t len_salt, const uint8_t *salt,
   mbedtls_mpi_init(&w0s);
   mbedtls_mpi_init(&w1s);
 
-  len_input += encode_string(pw, input); // password
-  len_input += encode_string("", input); // null idProver
-  len_input += encode_string("", input); // null idVerifier
+  len_input += encode_string(pw, input + len_input); // password
+  len_input += encode_string("", input + len_input); // null idProver
+  len_input += encode_string("", input + len_input); // null idVerifier
 
   MBEDTLS_MPI_CHK(
     mbedtls_md_setup(&ctx, mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), 1));

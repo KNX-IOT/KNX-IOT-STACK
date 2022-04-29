@@ -1081,6 +1081,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
 #endif /* OC_SPAKE */
 
   oc_rep_t *rep = request->request_payload;
+
   int valid_request = 0;
   // check input
   // note: no check if there are multiple byte strings in the request payload
@@ -1120,19 +1121,16 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     switch (rep->type) {
     case OC_REP_BYTE_STRING: {
       if (rep->iname == SPAKE_CA_CONFIRM_P) {
-        oc_free_string(&g_pase.ca);
-        oc_new_string(&g_pase.ca, oc_string(rep->value.string),
-                      oc_byte_string_len(rep->value.string));
+        memcpy(g_pase.ca, oc_cast(rep->value.string, uint8_t),
+               sizeof(g_pase.ca));
       }
       if (rep->iname == SPAKE_PA_SHARE_P) {
-        oc_free_string(&g_pase.pa);
-        oc_new_string(&g_pase.pa, oc_string(rep->value.string),
-                      oc_byte_string_len(rep->value.string));
+        memcpy(g_pase.pa, oc_cast(rep->value.string, uint8_t),
+               sizeof(g_pase.pa));
       }
       if (rep->iname == SPAKE_RND) {
-        oc_free_string(&g_pase.rnd);
-        oc_new_string(&g_pase.rnd, oc_string(rep->value.string),
-                      oc_byte_string_len(rep->value.string));
+        memcpy(g_pase.rnd, oc_cast(rep->value.string, uint8_t),
+               sizeof(g_pase.rnd));
       }
       if (rep->iname == SPAKE_ID) {
         // if the ID is present, overwrite the default
@@ -1152,30 +1150,34 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
   if (valid_request == SPAKE_RND) {
 #ifdef OC_SPAKE
     // generate random numbers for rnd, salt & it (# of iterations)
-    oc_spake_parameter_exchange(&g_pase.rnd, &g_pase.salt, &g_pase.it);
+    oc_spake_parameter_exchange(g_pase.rnd, g_pase.salt, &g_pase.it);
+    OC_DBG_SPAKE("Rnd:");
+    OC_LOGbytes_SPAKE(g_pase.rnd, sizeof(g_pase.rnd));
+    OC_DBG_SPAKE("Salt:");
+    OC_LOGbytes_SPAKE(g_pase.salt, sizeof(g_pase.salt));
+    OC_DBG_SPAKE("Iterations: %d", g_pase.it);
+
 #endif /* OC_SPAKE */
     oc_rep_begin_root_object();
     // id (0)
     oc_rep_i_set_byte_string(root, SPAKE_ID, oc_cast(g_pase.id, uint8_t),
                              oc_byte_string_len(g_pase.id));
     // rnd (15)
-    oc_rep_i_set_byte_string(root, SPAKE_RND, oc_cast(g_pase.rnd, uint8_t),
-                             oc_byte_string_len(g_pase.rnd));
+    oc_rep_i_set_byte_string(root, SPAKE_RND, g_pase.rnd, 32);
     // pbkdf2
     oc_rep_i_set_key(&root_map, SPAKE_PBKDF2);
     oc_rep_begin_object(&root_map, pbkdf2);
     // it 16
     oc_rep_i_set_int(pbkdf2, SPAKE_IT, g_pase.it);
     // salt 5
-    oc_rep_i_set_byte_string(pbkdf2, SPAKE_SALT, oc_cast(g_pase.salt, uint8_t),
-                             oc_byte_string_len(g_pase.salt));
+    oc_rep_i_set_byte_string(pbkdf2, SPAKE_SALT, g_pase.salt, 32);
     oc_rep_end_object(&root_map, pbkdf2);
     oc_rep_end_root_object();
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
     return;
   }
 #ifdef OC_SPAKE
-  if (valid_request == SPAKE_PA_SHARE_P) {
+  else if (valid_request == SPAKE_PA_SHARE_P) {
     // return changed, frame pb (11) & cb (13)
 
     const char *password = oc_spake_get_password();
@@ -1190,9 +1192,9 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     mbedtls_mpi_init(&spake_data.y);
     mbedtls_ecp_point_init(&spake_data.pub_y);
 
-    ret = oc_spake_calc_w0_L(password, oc_byte_string_len(g_pase.salt),
-                             oc_cast(g_pase.salt, uint8_t), g_pase.it,
-                             &spake_data.w0, &spake_data.L);
+    ret = oc_spake_calc_w0_L(password, sizeof(g_pase.salt), g_pase.salt,
+                             g_pase.it, &spake_data.w0, &spake_data.L);
+
     if (ret != 0) {
       OC_ERR("oc_spake_calc_w0_L failed with code %d", ret);
       goto error;
@@ -1212,51 +1214,46 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
       goto error;
     }
 
-    oc_free_string(&g_pase.pb);
-    oc_alloc_string(&g_pase.pb, kPubKeySize);
-    oc_free_string(&g_pase.cb);
-    oc_alloc_string(&g_pase.cb, kPubKeySize);
-
-    if (oc_spake_encode_pubkey(&pB, oc_cast(g_pase.pb, uint8_t))) {
+    if (oc_spake_encode_pubkey(&pB, g_pase.pb)) {
       mbedtls_ecp_point_free(&pB);
       goto error;
     }
 
-    if (oc_spake_calc_transcript_responder(&spake_data,
-                                           oc_cast(g_pase.pa, uint8_t), &pB)) {
+    uint8_t Ka_Ke[32];
+    if (oc_spake_calc_transcript_responder(&spake_data, g_pase.pa, &pB)) {
       mbedtls_ecp_point_free(&pB);
       goto error;
     }
 
-    oc_spake_calc_cB(spake_data.Ka_Ke, oc_cast(g_pase.cb, uint8_t),
-                     oc_cast(g_pase.pa, uint8_t));
+    oc_spake_calc_cB(spake_data.Ka_Ke, g_pase.cb, g_pase.pa);
     mbedtls_ecp_point_free(&pB);
 
     oc_rep_begin_root_object();
     // pb (11)
-    oc_rep_i_set_byte_string(root, SPAKE_PB_SHARE_V, oc_string(g_pase.pb),
-                             oc_byte_string_len(g_pase.pb));
+    oc_rep_i_set_byte_string(root, SPAKE_PB_SHARE_V, g_pase.pb,
+                             sizeof(g_pase.pb));
     // cb (13)
-    oc_rep_i_set_byte_string(root, SPAKE_CB_CONFIRM_V, oc_string(g_pase.cb),
-                             oc_byte_string_len(g_pase.cb));
+    oc_rep_i_set_byte_string(root, SPAKE_CB_CONFIRM_V, g_pase.cb,
+                             sizeof(g_pase.cb));
     oc_rep_end_root_object();
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
     return;
-  }
-  if (valid_request == SPAKE_CA_CONFIRM_P) {
+  } else if (valid_request == SPAKE_CA_CONFIRM_P) {
     // calculate expected cA
     uint8_t expected_ca[32];
-    if (g_pase.pb.ptr == NULL)
-      goto error;
-    oc_spake_calc_cA(spake_data.Ka_Ke, expected_ca,
-                     oc_cast(g_pase.pb, uint8_t));
 
-    if (memcmp(expected_ca, oc_cast(g_pase.ca, uint8_t), 32) != 0) {
+    OC_DBG_SPAKE("KaKe & pB Bytes");
+    OC_LOGbytes_OSCORE(spake_data.Ka_Ke, 32);
+    OC_LOGbytes_OSCORE(g_pase.pb, sizeof(g_pase.pb));
+    oc_spake_calc_cA(spake_data.Ka_Ke, expected_ca, g_pase.pb);
+    OC_DBG_SPAKE("cA:");
+    OC_LOGbytes_OSCORE(expected_ca, 32);
+
+    if (memcmp(expected_ca, g_pase.ca, sizeof(g_pase.ca)) != 0) {
       OC_ERR("oc_spake_calc_cA failed");
       goto error;
     }
 
-    // TODO initialize OSCORE and create auth token using this key
     // shared_key is 16-byte array - NOT NULL TERMINATED
     uint8_t *shared_key = spake_data.Ka_Ke + 16;
     size_t shared_key_len = 16;
@@ -1267,7 +1264,12 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     oc_oscore_set_auth(oc_string(device->serialnumber), oc_string(g_pase.id),
                        shared_key, (int)shared_key_len);
 
-    oc_send_cbor_response(request, OC_STATUS_CHANGED);
+    request->response->response_buffer->response_length = 0;
+    int size_of_message = oc_rep_get_encoded_payload_size();
+
+    // oc_send_cbor_response(request, OC_STATUS_CHANGED);
+    oc_send_linkformat_response(request, OC_STATUS_CHANGED, 0);
+
     // handshake completed successfully - clear state
     memset(spake_data.Ka_Ke, 0, sizeof(spake_data.Ka_Ke));
     mbedtls_ecp_point_free(&spake_data.L);
@@ -1280,12 +1282,12 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     mbedtls_mpi_init(&spake_data.w0);
     mbedtls_mpi_init(&spake_data.y);
 
-    oc_free_string(&g_pase.pa);
-    oc_free_string(&g_pase.pb);
-    oc_free_string(&g_pase.ca);
-    oc_free_string(&g_pase.cb);
-    oc_free_string(&g_pase.rnd);
-    oc_free_string(&g_pase.salt);
+    memset(g_pase.pa, 0, sizeof(g_pase.pa));
+    memset(g_pase.pb, 0, sizeof(g_pase.pb));
+    memset(g_pase.ca, 0, sizeof(g_pase.ca));
+    memset(g_pase.cb, 0, sizeof(g_pase.cb));
+    memset(g_pase.rnd, 0, sizeof(g_pase.rnd));
+    memset(g_pase.salt, 0, sizeof(g_pase.salt));
     g_pase.it = 100000;
     return;
   }
@@ -1303,12 +1305,12 @@ error:
   mbedtls_mpi_init(&spake_data.y);
 #endif /* OC_SPAKE */
 
-  oc_free_string(&g_pase.pa);
-  oc_free_string(&g_pase.pb);
-  oc_free_string(&g_pase.ca);
-  oc_free_string(&g_pase.cb);
-  oc_free_string(&g_pase.rnd);
-  oc_free_string(&g_pase.salt);
+  memset(g_pase.pa, 0, sizeof(g_pase.pa));
+  memset(g_pase.pb, 0, sizeof(g_pase.pb));
+  memset(g_pase.ca, 0, sizeof(g_pase.ca));
+  memset(g_pase.cb, 0, sizeof(g_pase.cb));
+  memset(g_pase.rnd, 0, sizeof(g_pase.rnd));
+  memset(g_pase.salt, 0, sizeof(g_pase.salt));
   g_pase.it = 100000;
 
 #ifdef OC_SPAKE

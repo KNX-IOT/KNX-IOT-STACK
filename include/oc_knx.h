@@ -56,12 +56,12 @@ extern "C" {
 typedef struct oc_pase_t
 {
   oc_string_t id;   /**< oscore id */
-  oc_string_t salt; /**< salt */
-  oc_string_t pa;   /**< pa */
-  oc_string_t pb;   /**< pb */
-  oc_string_t ca;   /**< ca */
-  oc_string_t cb;   /**< cb */
-  oc_string_t rnd;  /**< rnd */
+  uint8_t salt[32]; /**< salt */
+  uint8_t pa[65];   /**< pa */
+  uint8_t pb[65];   /**< pb */
+  uint8_t ca[32];   /**< ca */
+  uint8_t cb[32];   /**< cb */
+  uint8_t rnd[32];  /**< rnd */
   int it;
 } oc_pase_t;
 

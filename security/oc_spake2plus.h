@@ -66,7 +66,7 @@ int oc_spake_test_vector();
  * @param it The number of iterations to be used for PBKDF2
  * @return int 0 on success, mbedtls error code on failure
  */
-int oc_spake_parameter_exchange(oc_string_t *rnd, oc_string_t *salt, int *it);
+int oc_spake_parameter_exchange(uint8_t rnd[32], uint8_t salt[32], int *it);
 
 /**
  * @brief Get the currently set Spake2+ password
@@ -184,5 +184,9 @@ int oc_spake_calc_cA(uint8_t *Ka_Ke, uint8_t cA[32],
 
 int oc_spake_calc_cB(uint8_t *Ka_Ke, uint8_t cB[32],
                      uint8_t bytes_X[kPubKeySize]);
+
+void oc_spake_print_point(mbedtls_ecp_point *p);
+
+void oc_spake_print_mpi(mbedtls_mpi *m);
 
 #endif // OC_SPAKE2PLUS_H
