@@ -236,9 +236,9 @@ oc_spake_calc_w0_w1(const char *pw, size_t len_salt, const uint8_t *salt,
   mbedtls_mpi_init(&w0s);
   mbedtls_mpi_init(&w1s);
 
-  len_input += encode_string(pw, input); // password
-  len_input += encode_string("", input); // null idProver
-  len_input += encode_string("", input); // null idVerifier
+  len_input += encode_string(pw, input + len_input); // password
+  len_input += encode_string("", input + len_input); // null idProver
+  len_input += encode_string("", input + len_input); // null idVerifier
 
   MBEDTLS_MPI_CHK(
     mbedtls_md_setup(&ctx, mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), 1));
