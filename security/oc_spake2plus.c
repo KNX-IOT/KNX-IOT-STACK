@@ -200,20 +200,15 @@ oc_spake_encode_pubkey(mbedtls_ecp_point *P, uint8_t out[kPubKeySize])
 }
 
 int
-oc_spake_parameter_exchange(oc_string_t *rnd, oc_string_t *salt, int *it)
+oc_spake_parameter_exchange(uint8_t rnd[32], uint8_t salt[32], int *it)
 {
   unsigned int it_seed;
   int ret;
-  oc_free_string(rnd);
-  oc_free_string(salt);
-
-  oc_alloc_string(rnd, KNX_RNG_LEN);
-  oc_alloc_string(salt, KNX_SALT_LEN);
 
   MBEDTLS_MPI_CHK(
-    mbedtls_ctr_drbg_random(&ctr_drbg_ctx, rnd->ptr, KNX_RNG_LEN));
+    mbedtls_ctr_drbg_random(&ctr_drbg_ctx, rnd, KNX_RNG_LEN));
   MBEDTLS_MPI_CHK(
-    mbedtls_ctr_drbg_random(&ctr_drbg_ctx, salt->ptr, KNX_SALT_LEN));
+    mbedtls_ctr_drbg_random(&ctr_drbg_ctx, salt, KNX_SALT_LEN));
   MBEDTLS_MPI_CHK(mbedtls_ctr_drbg_random(
     &ctr_drbg_ctx, (unsigned char *)&it_seed, sizeof(it_seed)));
 
