@@ -205,10 +205,8 @@ oc_spake_parameter_exchange(uint8_t rnd[32], uint8_t salt[32], int *it)
   unsigned int it_seed;
   int ret;
 
-  MBEDTLS_MPI_CHK(
-    mbedtls_ctr_drbg_random(&ctr_drbg_ctx, rnd, KNX_RNG_LEN));
-  MBEDTLS_MPI_CHK(
-    mbedtls_ctr_drbg_random(&ctr_drbg_ctx, salt, KNX_SALT_LEN));
+  MBEDTLS_MPI_CHK(mbedtls_ctr_drbg_random(&ctr_drbg_ctx, rnd, KNX_RNG_LEN));
+  MBEDTLS_MPI_CHK(mbedtls_ctr_drbg_random(&ctr_drbg_ctx, salt, KNX_SALT_LEN));
   MBEDTLS_MPI_CHK(mbedtls_ctr_drbg_random(
     &ctr_drbg_ctx, (unsigned char *)&it_seed, sizeof(it_seed)));
 

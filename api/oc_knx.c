@@ -1123,13 +1123,16 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     switch (rep->type) {
     case OC_REP_BYTE_STRING: {
       if (rep->iname == SPAKE_CA_CONFIRM_P) {
-        memcpy(g_pase.ca, oc_cast(rep->value.string, uint8_t), sizeof(g_pase.ca));
+        memcpy(g_pase.ca, oc_cast(rep->value.string, uint8_t),
+               sizeof(g_pase.ca));
       }
       if (rep->iname == SPAKE_PA_SHARE_P) {
-        memcpy(g_pase.pa, oc_cast(rep->value.string, uint8_t), sizeof(g_pase.pa));
+        memcpy(g_pase.pa, oc_cast(rep->value.string, uint8_t),
+               sizeof(g_pase.pa));
       }
       if (rep->iname == SPAKE_RND) {
-        memcpy(g_pase.rnd, oc_cast(rep->value.string, uint8_t), sizeof(g_pase.rnd)); 
+        memcpy(g_pase.rnd, oc_cast(rep->value.string, uint8_t),
+               sizeof(g_pase.rnd));
       }
       if (rep->iname == SPAKE_ID) {
         // if the ID is present, overwrite the default
@@ -1150,6 +1153,12 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
 #ifdef OC_SPAKE
     // generate random numbers for rnd, salt & it (# of iterations)
     oc_spake_parameter_exchange(g_pase.rnd, g_pase.salt, &g_pase.it);
+    OC_DBG_SPAKE("Rnd:");
+    OC_LOGbytes_SPAKE(g_pase.rnd, sizeof(g_pase.rnd));
+    OC_DBG_SPAKE("Salt:");
+    OC_LOGbytes_SPAKE(g_pase.salt, sizeof(g_pase.salt));
+    OC_DBG_SPAKE("Iterations: %d", g_pase.it);
+
 #endif /* OC_SPAKE */
     oc_rep_begin_root_object();
     // id (0)
@@ -1185,7 +1194,12 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     mbedtls_mpi_init(&spake_data.y);
     mbedtls_ecp_point_init(&spake_data.pub_y);
 
-    ret = oc_spake_calc_w0_L(password, 32, g_pase.salt, g_pase.it, &spake_data.w0, &spake_data.L);
+    OC_DBG_SPAKE("Salt:");
+    OC_LOGbytes_SPAKE(g_pase.salt, sizeof(g_pase.salt));
+    OC_DBG_SPAKE("Iterations: %d", g_pase.it);
+    OC_DBG_SPAKE("Password: %s", password);
+    ret = oc_spake_calc_w0_L(password, sizeof(g_pase.salt), g_pase.salt,
+                             g_pase.it, &spake_data.w0, &spake_data.L);
 
     OC_DBG_SPAKE("w0 after calc_w0_L:");
     oc_spake_print_mpi(&spake_data.w0);
@@ -1227,14 +1241,12 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     OC_DBG_SPAKE("pB");
     oc_spake_print_point(&pB);
     uint8_t Ka_Ke[32];
-    if (oc_spake_calc_transcript_responder(&spake_data,
-                                           g_pase.pa, &pB)) {
+    if (oc_spake_calc_transcript_responder(&spake_data, g_pase.pa, &pB)) {
       mbedtls_ecp_point_free(&pB);
       goto error;
     }
 
-    oc_spake_calc_cB(spake_data.Ka_Ke, g_pase.cb,
-                     g_pase.pa);
+    oc_spake_calc_cB(spake_data.Ka_Ke, g_pase.cb, g_pase.pa);
     mbedtls_ecp_point_free(&pB);
 
     oc_rep_begin_root_object();
@@ -1254,8 +1266,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     OC_DBG_SPAKE("KaKe & pB Bytes");
     OC_LOGbytes_OSCORE(spake_data.Ka_Ke, 32);
     OC_LOGbytes_OSCORE(g_pase.pb, sizeof(g_pase.pb));
-    oc_spake_calc_cA(spake_data.Ka_Ke, expected_ca,
-                     g_pase.pb);
+    oc_spake_calc_cA(spake_data.Ka_Ke, expected_ca, g_pase.pb);
     OC_DBG_SPAKE("cA:");
     OC_LOGbytes_OSCORE(expected_ca, 32);
 
@@ -1277,7 +1288,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     request->response->response_buffer->response_length = 0;
     int size_of_message = oc_rep_get_encoded_payload_size();
 
-    //oc_send_cbor_response(request, OC_STATUS_CHANGED);
+    // oc_send_cbor_response(request, OC_STATUS_CHANGED);
     oc_send_linkformat_response(request, OC_STATUS_CHANGED, 0);
 
     // handshake completed successfully - clear state
@@ -1292,7 +1303,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     mbedtls_mpi_init(&spake_data.w0);
     mbedtls_mpi_init(&spake_data.y);
 
-    memset(g_pase.pa, 0 , sizeof(g_pase.pa));
+    memset(g_pase.pa, 0, sizeof(g_pase.pa));
     memset(g_pase.pb, 0, sizeof(g_pase.pb));
     memset(g_pase.ca, 0, sizeof(g_pase.ca));
     memset(g_pase.cb, 0, sizeof(g_pase.cb));

@@ -301,7 +301,7 @@ extern "C" {
 #define OC_DBG_SPAKE(...) OC_LOG("SPAKE", __VA_ARGS__)
 #define OC_LOGbytes_OSCORE(bytes, length)                                      \
   OC_LOGbytes_internal("OSCORE", bytes, length)
-#define OC_LOGbytes_SPAKE(bytes, length)                                      \
+#define OC_LOGbytes_SPAKE(bytes, length)                                       \
   OC_LOGbytes_internal("SPAKE", bytes, length)
 
 //#define OC_DBG_OSCORE(...)
