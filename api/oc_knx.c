@@ -1194,15 +1194,9 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     mbedtls_mpi_init(&spake_data.y);
     mbedtls_ecp_point_init(&spake_data.pub_y);
 
-    OC_DBG_SPAKE("Salt:");
-    OC_LOGbytes_SPAKE(g_pase.salt, sizeof(g_pase.salt));
-    OC_DBG_SPAKE("Iterations: %d", g_pase.it);
-    OC_DBG_SPAKE("Password: %s", password);
     ret = oc_spake_calc_w0_L(password, sizeof(g_pase.salt), g_pase.salt,
                              g_pase.it, &spake_data.w0, &spake_data.L);
 
-    OC_DBG_SPAKE("w0 after calc_w0_L:");
-    oc_spake_print_mpi(&spake_data.w0);
     if (ret != 0) {
       OC_ERR("oc_spake_calc_w0_L failed with code %d", ret);
       goto error;
@@ -1227,19 +1221,6 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
       goto error;
     }
 
-    OC_DBG_SPAKE("Responder Transcript Inputs:");
-    OC_DBG_SPAKE("w0");
-    oc_spake_print_mpi(&spake_data.w0);
-    OC_DBG_SPAKE("L");
-    oc_spake_print_point(&spake_data.L);
-    OC_DBG_SPAKE("y");
-    oc_spake_print_mpi(&spake_data.y);
-    OC_DBG_SPAKE("pub_y");
-    oc_spake_print_point(&spake_data.pub_y);
-    OC_DBG_SPAKE("pa");
-    OC_LOGbytes_SPAKE(g_pase.pa, sizeof(g_pase.pa));
-    OC_DBG_SPAKE("pB");
-    oc_spake_print_point(&pB);
     uint8_t Ka_Ke[32];
     if (oc_spake_calc_transcript_responder(&spake_data, g_pase.pa, &pB)) {
       mbedtls_ecp_point_free(&pB);
