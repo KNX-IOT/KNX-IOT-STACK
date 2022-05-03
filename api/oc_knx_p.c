@@ -85,17 +85,17 @@ oc_core_p_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 }
 
 /*
- * return list of function blocks
+ * handles the /p put command, e.g. list of parameters
  */
 static void
-oc_core_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
+oc_core_p_put_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
                        void *data)
 {
   (void)data;
   oc_rep_t *rep = NULL;
   bool error = false;
 
-  PRINT("oc_core_p_post_handler\n");
+  PRINT("oc_core_p_put_handler\n");
 
   /* check if the accept header is cbor */
   if (request->accept != APPLICATION_CBOR) {
@@ -128,7 +128,7 @@ oc_core_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     rep = rep->next;
   }
   if (error) {
-    PRINT("oc_core_p_post_handler - end\n");
+    PRINT("oc_core_p_put_handler - end\n");
     oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
     return;
   }
@@ -180,7 +180,7 @@ oc_core_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   }
 
   oc_send_cbor_response(request, OC_STATUS_OK);
-  PRINT("oc_core_p_post_handler - end\n");
+  PRINT("oc_core_p_put_handler - end\n");
 }
 
 void
@@ -191,7 +191,7 @@ oc_create_p_resource(int resource_idx, size_t device)
   // the full rt with urn:knx prefix
   oc_core_populate_resource(resource_idx, device, "/p", OC_IF_LI,
                             APPLICATION_LINK_FORMAT, 0, oc_core_p_get_handler,
-                            0, oc_core_p_post_handler, 0, 1, "urn:knx:fb.0");
+                            oc_core_p_put_handler,0, 0, 1, "urn:knx:fb.0");
 }
 
 void

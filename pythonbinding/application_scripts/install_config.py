@@ -288,7 +288,7 @@ def do_install_device(my_stack, sn, ia, iid, got_content,
     if param_content is not None:
         print("===parameter content===")
         content = param_content
-        response =  my_stack.issue_cbor_post(sn,"/p",content)
+        response =  my_stack.issue_cbor_put(sn,"/p",content)
         safe_print(response)
         my_stack.purge_response(response)
     else:
