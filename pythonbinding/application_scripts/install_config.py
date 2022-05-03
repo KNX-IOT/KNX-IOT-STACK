@@ -35,6 +35,7 @@
 # pylint: disable=R0801
 # pylint: disable=R0902
 # pylint: disable=R0913
+# pylint: disable=R0914
 # pylint: disable=R0915
 # pylint: disable=R1732
 # pylint: disable=R0912
@@ -233,7 +234,7 @@ def do_reset(my_stack, sn):
     safe_print(response)
     my_stack.purge_response(response)
 
-def do_install_device(my_stack, sn, ia, iid, got_content, 
+def do_install_device(my_stack, sn, ia, iid, got_content,
     rec_content, pub_content, auth_content, param_content):
     # sensor, e.g sending
     print ("--------------------")
