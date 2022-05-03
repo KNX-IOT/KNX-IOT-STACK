@@ -35,6 +35,7 @@
 # pylint: disable=R0801
 # pylint: disable=R0902
 # pylint: disable=R0913
+# pylint: disable=R0914
 # pylint: disable=R0915
 # pylint: disable=R1732
 # pylint: disable=R0912
@@ -109,6 +110,7 @@ def convert_json_tag2integer(table):
     # cflags (8) = ["r" ] ; read = 1, write = 2, transmit = 3 update = 4
     # publisher table / recipient table
     # id (0)
+    # value (1)
     # ga (7)
     # ia (12)
     # url (10)
@@ -129,6 +131,8 @@ def convert_json_tag2integer(table):
             new_item[8] = value
         if "href" in item:
             new_item[11] = item["href"]
+        if "value" in item:
+            new_item[1] = item["value"]
         # publisher/recipient table
         if "url" in item:
             new_item[10] = item["url"]
@@ -230,7 +234,8 @@ def do_reset(my_stack, sn):
     safe_print(response)
     my_stack.purge_response(response)
 
-def do_install_device(my_stack, sn, ia, iid, got_content, rec_content, pub_content, auth_content):
+def do_install_device(my_stack, sn, ia, iid, got_content,
+    rec_content, pub_content, auth_content, param_content):
     # sensor, e.g sending
     print ("--------------------")
     print ("Installing SN: ", sn)
@@ -280,6 +285,14 @@ def do_install_device(my_stack, sn, ia, iid, got_content, rec_content, pub_conte
         my_stack.purge_response(response)
     else:
         print ("no publisher table")
+    if param_content is not None:
+        print("===parameter content===")
+        content = param_content
+        response =  my_stack.issue_cbor_put(sn,"/p",content)
+        safe_print(response)
+        my_stack.purge_response(response)
+    else:
+        print ("no parameter table")
     if auth_content is not None:
         content = auth_content
         print("===auth===")
@@ -353,13 +366,18 @@ def do_install(my_stack, internal_address, filename):
     if "publisher" in json_data:
         pub_content = json_data["publisher"]
         pub_num = convert_json_tag2integer(pub_content)
+    param_num = None
+    if "memparameter" in json_data:
+        param_content = json_data["memparameter"]
+        param_num = convert_json_tag2integer(param_content)
     auth_num = None
     if "auth" in json_data:
         auth_content = json_data["auth"]
         print (auth_content)
         auth_num = convert_json_auth_tag2integer(auth_content)
         #do_auth(my_stack, sn, auth_num)
-    do_install_device(my_stack, sn, ia, iid, got_num, rep_num, pub_num, auth_num )
+    do_install_device(my_stack, sn, ia, iid,
+      got_num, rep_num, pub_num, auth_num, param_num)
 
 def self_reset(my_stack):
     """
