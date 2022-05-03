@@ -98,6 +98,7 @@ config data:
 - recipient table: Key = "recipient"
 - publisher table: Key = "publisher"
 - access token table: Key = "auth"
+- parameter (table): Key = "memparameter"
 
 The content of the tables are the items in an array.
 The items have the json keys (e.g. "id" instead of 0)
@@ -212,6 +213,33 @@ The access token table contains the array of json objects for an auth/at entry.
       "cnf": {"osc" : { "id": "osc_3", "ms" : "ms_2" }}
   }
   ] 
+....
+}
+```
+
+##### parameter
+
+The parameters can be set on /p.
+
+```bash
+..
+ "memparameter": [{
+            "href": "/p/P-1/R-1",
+            "value": "255"
+        }, {
+            "href": "/p/P-2/R-2",
+            "value": "255"
+        }, {
+            "href": "/p/MD-2/M-1/MI-1/P-1/R-1",
+            "value": "17"
+        }, {
+            "href": "/p/MD-2/M-1/MI-1/P-2/R-2",
+            "value": "1"
+        }, {
+            "href": "/p/MD-2/M-2/MI-1/P-1/R-1",
+            "value": "17"
+        }
+ ]
 ....
 }
 ```
