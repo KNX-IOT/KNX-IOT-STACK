@@ -404,7 +404,7 @@ kisCS_EXPORT void ets_issue_requests_s_mode(int scope, int sia, int ga, int iid,
  *
  * @see ets_listen_s_mode_with_range
  * @see ets_listen_s_mode_single
- *      
+ *
  * @param scope the multicast scope
  * @param ga_max the group address maximum, e.g. all values between 1 and ga_max
  * will be registered
@@ -412,8 +412,6 @@ kisCS_EXPORT void ets_issue_requests_s_mode(int scope, int sia, int ga, int iid,
  * @return kisCS_EXPORT
  */
 kisCS_EXPORT void ets_listen_s_mode(int scope, int ga_max, int iid);
-
-
 
 /**
  * @brief configure the stack to listen to group addresses.
@@ -424,7 +422,7 @@ kisCS_EXPORT void ets_listen_s_mode(int scope, int ga_max, int iid);
  *
  * @see ets_listen_s_mode
  * @see ets_listen_s_mode_single
- *      
+ *
  * @param scope the multicast scope
  * @param ga_min the group address minimum
  * @param ga_max the group address maximum, e.g. all values between 1 and ga_max
@@ -444,7 +442,7 @@ kisCS_EXPORT void ets_listen_s_mode_with_range(int scope, int ga_min,
  *
  * @see ets_listen_s_mode_with_range
  * @see ets_listen_s_mode
- * 
+ *
  * @param scope the multicast scope
  * @param ga the group address
  * @param iid the installation identifier

@@ -1094,7 +1094,6 @@ ets_listen_s_mode_single(int scope, int ga, int iid)
   subscribe_group_to_multicast(ga, iid, scope);
 }
 
-
 // -----------------------------------------------------------------------------
 
 char *
