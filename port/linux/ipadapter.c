@@ -1883,7 +1883,6 @@ oc_connectivity_subscribe_mcast_ipv6(oc_endpoint_t *address)
   return;
 }
 
-
 void
 oc_connectivity_unsubscribe_mcast_ipv6(oc_endpoint_t *address)
 {
@@ -1927,7 +1926,8 @@ oc_connectivity_unsubscribe_mcast_ipv6(oc_endpoint_t *address)
       (void)setsockopt(dev->mcast_sock, IPPROTO_IPV6, IPV6_DROP_MEMBERSHIP,
                        &mreq, sizeof(mreq));
 
-      //if (setsockopt(dev->mcast_sock, IPPROTO_IPV6, IPV6_ADD_MEMBERSHIP, &mreq,
+      // if (setsockopt(dev->mcast_sock, IPPROTO_IPV6, IPV6_ADD_MEMBERSHIP,
+      // &mreq,
       //               sizeof(mreq)) == -1) {
       //  OC_ERR("Failed to add IPv6 multicast membership!");
       //  return;

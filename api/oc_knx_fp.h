@@ -432,7 +432,8 @@ oc_endpoint_t oc_create_multicast_group_address(oc_endpoint_t in, int group_nr,
                                                 int iid, int scope);
 
 /**
- * @brief subscribe to a multicast address, defined by group number and installation id
+ * @brief subscribe to a multicast address, defined by group number and
+ * installation id
  *
  * @see unsubscribe_group_to_multicast
  *
@@ -443,7 +444,8 @@ oc_endpoint_t oc_create_multicast_group_address(oc_endpoint_t in, int group_nr,
 void subscribe_group_to_multicast(int group_nr, int iid, int scope);
 
 /**
- * @brief unsubscribe to a multicast address, defined by group number and installation id
+ * @brief unsubscribe to a multicast address, defined by group number and
+ * installation id
  *
  * @see subscribe_group_to_multicast
  *

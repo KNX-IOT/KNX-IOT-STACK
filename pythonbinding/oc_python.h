@@ -459,7 +459,6 @@ kisCS_EXPORT void ets_listen_s_mode_with_range(int scope, int ga_min,
  */
 kisCS_EXPORT void ets_listen_s_mode_single(int scope, int ga, int iid);
 
-
 /**
  * @brief configure the stack to stop listing to group addresses.
  * the group addresses for s-mode commands are defined per:
@@ -502,7 +501,7 @@ kisCS_EXPORT void ets_unlisten_s_mode(int scope, int ga_max, int iid);
  * @return kisCS_EXPORT
  */
 kisCS_EXPORT void ets_unlisten_s_mode_with_range(int scope, int ga_min,
-                                               int ga_max, int iid);
+                                                 int ga_max, int iid);
 
 /**
  * @brief configure the stack to stop listing to a specific group address.
@@ -523,7 +522,6 @@ kisCS_EXPORT void ets_unlisten_s_mode_with_range(int scope, int ga_min,
  * @return kisCS_EXPORT
  */
 kisCS_EXPORT void ets_unlisten_s_mode_single(int scope, int ga, int iid);
-
 
 /**
  * @brief reset the this client

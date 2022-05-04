@@ -1094,7 +1094,6 @@ ets_listen_s_mode_single(int scope, int ga, int iid)
   subscribe_group_to_multicast(ga, iid, scope);
 }
 
-
 void
 ets_unlisten_s_mode(int scope, int ga_max, int iid)
 {
@@ -1118,7 +1117,6 @@ ets_unlisten_s_mode_single(int scope, int ga, int iid)
 {
   unsubscribe_group_to_multicast(ga, iid, scope);
 }
-
 
 // -----------------------------------------------------------------------------
 

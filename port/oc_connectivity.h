@@ -213,7 +213,6 @@ void handle_session_event_callback(const oc_endpoint_t *endpoint,
  */
 void oc_connectivity_subscribe_mcast_ipv6(oc_endpoint_t *address);
 
-
 /**
  * @brief unsubscribe to a multicast address
  *
@@ -222,7 +221,6 @@ void oc_connectivity_subscribe_mcast_ipv6(oc_endpoint_t *address);
  * function call to be valid.
  */
 void oc_connectivity_unsubscribe_mcast_ipv6(oc_endpoint_t *address);
-
 
 #ifdef OC_TCP
 /**

@@ -2043,7 +2043,6 @@ subscribe_group_to_multicast(int group_nr, int iid, int scope)
   oc_connectivity_subscribe_mcast_ipv6(&group_mcast);
 }
 
-
 void
 unsubscribe_group_to_multicast(int group_nr, int iid, int scope)
 {
