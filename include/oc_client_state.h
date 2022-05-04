@@ -139,7 +139,7 @@ typedef struct oc_client_cb_t
  *
  * @param response the response
  * @param response_state the state of the block-wise transfer
- * @param cb  the callback
+ * @param cb the callback
  * @param endpoint the endpoint
  * @return true
  * @return false

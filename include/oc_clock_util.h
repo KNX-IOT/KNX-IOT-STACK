@@ -26,7 +26,7 @@
  * @brief retrieve time as rfc3339 time (e.g. string)
  *
  * @param out_buf allocated buffer
- * @param out_buf_len buffer lenght of the allocated buffer
+ * @param out_buf_len buffer length of the allocated buffer
  * @return size_t used buffer size
  */
 size_t oc_clock_time_rfc3339(char *out_buf, size_t out_buf_len);
@@ -34,7 +34,7 @@ size_t oc_clock_time_rfc3339(char *out_buf, size_t out_buf_len);
 /**
  * @brief encode time as rfc3339 time
  *
- * @param time thime from the oc clock
+ * @param time the time from the oc_clock
  * @param out_buf allocated buffer to store time in rfc3339 format
  * @param out_buf_len the allocated buffer size
  * @return size_t the used buffer size
@@ -46,7 +46,7 @@ size_t oc_clock_encode_time_rfc3339(oc_clock_time_t time, char *out_buf,
  * @brief parse rfc3339 time into oc_clock format
  *
  * @param in_buf buffer with rfc3339 time
- * @param in_buf_len the lenght of the buffer
+ * @param in_buf_len the length of the buffer
  * @return oc_clock_time_t the clock time
  */
 oc_clock_time_t oc_clock_parse_time_rfc3339(const char *in_buf,

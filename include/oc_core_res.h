@@ -54,7 +54,7 @@ typedef struct oc_platform_info_t
 
 /**
  * @brief version information
- * e.g. [major, minor, third]
+ * e.g. [major, minor, patch]
  */
 typedef struct oc_knx_version_info_t
 {
