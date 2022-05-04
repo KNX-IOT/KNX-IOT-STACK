@@ -1882,3 +1882,59 @@ oc_connectivity_subscribe_mcast_ipv6(oc_endpoint_t *address)
   freeifaddrs(ifs);
   return;
 }
+
+
+void
+oc_connectivity_unsubscribe_mcast_ipv6(oc_endpoint_t *address)
+{
+  ip_context_t *dev = get_ip_context_for_device(address->device);
+
+  if (dev == NULL) {
+    OC_ERR(" dev is NULL");
+    return;
+  }
+
+  // for every interface...
+  int ret = 0;
+  struct ifaddrs *ifs = NULL, *interface = NULL;
+  if (getifaddrs(&ifs) < 0) {
+    return;
+  }
+  for (interface = ifs; interface != NULL; interface = interface->ifa_next) {
+    /* Ignore interfaces that are down and the loopback interface */
+    if (!(interface->ifa_flags & IFF_UP) ||
+        (interface->ifa_flags & IFF_LOOPBACK)) {
+      continue;
+    }
+    /* Ignore interfaces not belonging to the address family under consideration
+     */
+    if (interface->ifa_addr && interface->ifa_addr->sa_family != AF_INET6) {
+      continue;
+    }
+    /* Obtain interface index for this address */
+    int if_index = if_nametoindex(interface->ifa_name);
+    /* Accordingly handle IPv6/IPv4 addresses */
+    struct sockaddr_in6 *a = (struct sockaddr_in6 *)interface->ifa_addr;
+    if (a) {
+      // Subscribe to multicast group
+      struct ipv6_mreq mreq;
+
+      /* Link-local scope */
+      memset(&mreq, 0, sizeof(mreq));
+      memcpy(mreq.ipv6mr_multiaddr.s6_addr, address->addr.ipv6.address, 16);
+      mreq.ipv6mr_interface = if_index;
+
+      (void)setsockopt(dev->mcast_sock, IPPROTO_IPV6, IPV6_DROP_MEMBERSHIP,
+                       &mreq, sizeof(mreq));
+
+      //if (setsockopt(dev->mcast_sock, IPPROTO_IPV6, IPV6_ADD_MEMBERSHIP, &mreq,
+      //               sizeof(mreq)) == -1) {
+      //  OC_ERR("Failed to add IPv6 multicast membership!");
+      //  return;
+      //}
+    }
+  }
+
+  freeifaddrs(ifs);
+  return;
+}
