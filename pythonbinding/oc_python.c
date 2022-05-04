@@ -1079,6 +1079,21 @@ ets_listen_s_mode(int scope, int ga_max, int iid)
   }
 }
 
+void
+ets_listen_s_mode_with_range(int scope, int ga_min, int ga_max, int iid)
+{
+
+  for (int i = ga_min; i < ga_max; i++) {
+    subscribe_group_to_multicast(i, iid, scope);
+  }
+}
+
+void
+ets_listen_s_mode_single(int scope, int ga, int iid)
+{
+  subscribe_group_to_multicast(ga, iid, scope);
+}
+
 // -----------------------------------------------------------------------------
 
 char *
