@@ -402,6 +402,9 @@ kisCS_EXPORT void ets_issue_requests_s_mode(int scope, int sia, int ga, int iid,
  * - ga_max, starting from group address 1.
  * - iid, installation id
  *
+ * @see ets_listen_s_mode_with_range
+ * @see ets_listen_s_mode_single
+ *      
  * @param scope the multicast scope
  * @param ga_max the group address maximum, e.g. all values between 1 and ga_max
  * will be registered
@@ -409,6 +412,45 @@ kisCS_EXPORT void ets_issue_requests_s_mode(int scope, int sia, int ga, int iid,
  * @return kisCS_EXPORT
  */
 kisCS_EXPORT void ets_listen_s_mode(int scope, int ga_max, int iid);
+
+
+
+/**
+ * @brief configure the stack to listen to group addresses.
+ * the group addresses for s-mode commands are defined per:
+ * - scope (2 local, 5 site local)
+ * - ga_max, starting from group address ga_min.
+ * - iid, installation id
+ *
+ * @see ets_listen_s_mode
+ * @see ets_listen_s_mode_single
+ *      
+ * @param scope the multicast scope
+ * @param ga_min the group address minimum
+ * @param ga_max the group address maximum, e.g. all values between 1 and ga_max
+ * will be registered
+ * @param iid the installation identifier
+ * @return kisCS_EXPORT
+ */
+kisCS_EXPORT void ets_listen_s_mode_with_range(int scope, int ga_min,
+                                               int ga_max, int iid);
+
+/**
+ * @brief configure the stack to listen to a specific group address.
+ * the group addresses for s-mode commands are defined per:
+ * - scope (2 local, 5 site local)
+ * - ga, the group address
+ * - iid, installation id
+ *
+ * @see ets_listen_s_mode_with_range
+ * @see ets_listen_s_mode
+ * 
+ * @param scope the multicast scope
+ * @param ga the group address
+ * @param iid the installation identifier
+ * @return kisCS_EXPORT
+ */
+kisCS_EXPORT void ets_listen_s_mode_single(int scope, int ga, int iid);
 
 /**
  * @brief reset the this client
