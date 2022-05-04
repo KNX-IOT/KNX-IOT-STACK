@@ -2043,6 +2043,23 @@ subscribe_group_to_multicast(int group_nr, int iid, int scope)
   oc_connectivity_subscribe_mcast_ipv6(&group_mcast);
 }
 
+
+void
+unsubscribe_group_to_multicast(int group_nr, int iid, int scope)
+{
+  // FF35::30: <ULA-routing-prefix>::<group id>
+  //
+  // create the multi cast address from group and scope
+  oc_endpoint_t group_mcast;
+  memset(&group_mcast, 0, sizeof(group_mcast));
+
+  group_mcast =
+    oc_create_multicast_group_address(group_mcast, group_nr, iid, scope);
+
+  // un subscribe
+  oc_connectivity_unsubscribe_mcast_ipv6(&group_mcast);
+}
+
 void
 oc_register_group_multicasts()
 {
