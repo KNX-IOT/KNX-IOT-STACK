@@ -37,7 +37,8 @@ typedef enum {
 } oc_session_state_t;
 
 /**
- * @brief Callback function to pass the session event information to the Application.
+ * @brief Callback function to pass the session event information to the
+ * Application.
  *
  * @param endpoint the endpoint info which the session event is happened.
  * @param state the enumeration values in oc_session_state_t.
