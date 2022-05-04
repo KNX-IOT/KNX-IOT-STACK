@@ -431,7 +431,29 @@ void oc_free_knx_fp_resources(size_t device_index);
 oc_endpoint_t oc_create_multicast_group_address(oc_endpoint_t in, int group_nr,
                                                 int iid, int scope);
 
+/**
+ * @brief subscribe to a multicast address, defined by group number and
+ * installation id
+ *
+ * @see unsubscribe_group_to_multicast
+ *
+ * @param group_nr the group number (address)
+ * @param iid the installation id
+ * @param scope the address scope
+ */
 void subscribe_group_to_multicast(int group_nr, int iid, int scope);
+
+/**
+ * @brief unsubscribe to a multicast address, defined by group number and
+ * installation id
+ *
+ * @see subscribe_group_to_multicast
+ *
+ * @param group_nr the group number (address)
+ * @param iid the installation id
+ * @param scope the address scope
+ */
+void unsubscribe_group_to_multicast(int group_nr, int iid, int scope);
 
 #ifdef __cplusplus
 }
