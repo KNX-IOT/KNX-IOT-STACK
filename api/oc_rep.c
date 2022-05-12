@@ -323,10 +323,10 @@ get_tagged_value:
     *err |= cbor_value_enter_container(value, &map);
     while (!cbor_value_at_end(&map)) {
       oc_parse_rep_value(&map, obj, err);
-      (*obj)->next = 0;
-      obj = &(*obj)->next;
       if (*err != CborNoError)
         return;
+      (*obj)->next = NULL;
+      obj = &(*obj)->next;
       *err |= cbor_value_advance(&map);
     }
     cur->type = OC_REP_OBJECT;
