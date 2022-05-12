@@ -318,8 +318,11 @@ bool
 oc_do_delete(const char *uri, oc_endpoint_t *endpoint, const char *query,
              oc_response_handler_t handler, oc_qos_t qos, void *user_data)
 {
-  oc_client_handler_t client_handler;
-  client_handler.response = handler;
+  oc_client_handler_t client_handler = {
+    .response = handler,
+    .discovery = NULL,
+    .discovery_all = NULL,
+  };
 
   oc_client_cb_t *cb = oc_ri_alloc_client_cb(uri, endpoint, OC_DELETE, query,
                                              client_handler, qos, user_data);
@@ -343,8 +346,11 @@ oc_do_delete_ex(const char *uri, oc_endpoint_t *endpoint, const char *query,
                 oc_content_format_t content, oc_content_format_t accept,
                 void *user_data)
 {
-  oc_client_handler_t client_handler;
-  client_handler.response = handler;
+  oc_client_handler_t client_handler = {
+    .response = handler,
+    .discovery = NULL,
+    .discovery_all = NULL,
+  };
 
   oc_client_cb_t *cb = oc_ri_alloc_client_cb(uri, endpoint, OC_DELETE, query,
                                              client_handler, qos, user_data);
@@ -369,8 +375,11 @@ oc_do_get_ex_secured(const char *uri, oc_endpoint_t *endpoint,
                      oc_content_format_t content, oc_content_format_t accept,
                      void *user_data)
 {
-  oc_client_handler_t client_handler;
-  client_handler.response = handler;
+  oc_client_handler_t client_handler = {
+    .response = handler,
+    .discovery = NULL,
+    .discovery_all = NULL,
+  };
 
   endpoint->flags += OSCORE;
   PRINT("  enable OSCORE encryption\n");
@@ -398,8 +407,11 @@ oc_do_get_ex(const char *uri, oc_endpoint_t *endpoint, const char *query,
              oc_content_format_t content, oc_content_format_t accept,
              void *user_data)
 {
-  oc_client_handler_t client_handler;
-  client_handler.response = handler;
+  oc_client_handler_t client_handler = {
+    .response = handler,
+    .discovery = NULL,
+    .discovery_all = NULL,
+  };
 
   oc_client_cb_t *cb = oc_ri_alloc_client_cb(uri, endpoint, OC_GET, query,
                                              client_handler, qos, user_data);
@@ -428,8 +440,11 @@ bool
 oc_init_put(const char *uri, oc_endpoint_t *endpoint, const char *query,
             oc_response_handler_t handler, oc_qos_t qos, void *user_data)
 {
-  oc_client_handler_t client_handler;
-  client_handler.response = handler;
+  oc_client_handler_t client_handler = {
+    .response = handler,
+    .discovery = NULL,
+    .discovery_all = NULL,
+  };
 
   oc_client_cb_t *cb = oc_ri_alloc_client_cb(uri, endpoint, OC_PUT, query,
                                              client_handler, qos, user_data);
@@ -443,8 +458,11 @@ bool
 oc_init_post(const char *uri, oc_endpoint_t *endpoint, const char *query,
              oc_response_handler_t handler, oc_qos_t qos, void *user_data)
 {
-  oc_client_handler_t client_handler;
-  client_handler.response = handler;
+  oc_client_handler_t client_handler = {
+    .response = handler,
+    .discovery = NULL,
+    .discovery_all = NULL,
+  };
 
   oc_client_cb_t *cb = oc_ri_alloc_client_cb(uri, endpoint, OC_POST, query,
                                              client_handler, qos, user_data);
@@ -484,8 +502,11 @@ bool
 oc_do_observe(const char *uri, oc_endpoint_t *endpoint, const char *query,
               oc_response_handler_t handler, oc_qos_t qos, void *user_data)
 {
-  oc_client_handler_t client_handler;
-  client_handler.response = handler;
+  oc_client_handler_t client_handler = {
+    .response = handler,
+    .discovery = NULL,
+    .discovery_all = NULL,
+  };
 
   oc_client_cb_t *cb = oc_ri_alloc_client_cb(uri, endpoint, OC_GET, query,
                                              client_handler, qos, user_data);
@@ -546,8 +567,11 @@ bool
 oc_send_ping(bool custody, oc_endpoint_t *endpoint, uint16_t timeout_seconds,
              oc_response_handler_t handler, void *user_data)
 {
-  oc_client_handler_t client_handler;
-  client_handler.response = handler;
+  oc_client_handler_t client_handler = {
+    .response = handler,
+    .discovery = NULL,
+    .discovery_all = NULL,
+  };
 
   oc_client_cb_t *cb = oc_ri_alloc_client_cb(
     "/ping", endpoint, 0, NULL, client_handler, LOW_QOS, user_data);
@@ -646,10 +670,12 @@ bool
 oc_do_wk_discovery(const char *uri_query, oc_discovery_handler_t handler,
                    void *user_data)
 {
-  oc_client_handler_t handlers;
-  handlers.discovery = handler;
-  handlers.discovery_all = NULL;
-
+  oc_client_handler_t handlers = {
+    .response = NULL,
+    .discovery = handler,
+    .discovery_all = NULL,
+  };
+  
   oc_client_cb_t *cb4 = NULL;
   // bool status = multi_scope_ipv6_discovery_wk(cb4, 0x02, uri_query,
   //                                         handlers, user_data);
@@ -667,9 +693,11 @@ bool
 oc_do_wk_discovery_all(const char *uri_query, int scope,
                        oc_discovery_all_handler_t handler, void *user_data)
 {
-  oc_client_handler_t handlers;
-  handlers.discovery = NULL;
-  handlers.discovery_all = handler;
+  oc_client_handler_t handlers = {
+    .response = NULL,
+    .discovery = NULL,
+    .discovery_all = handler,
+  };
 
   oc_client_cb_t *cb4 = NULL;
 
