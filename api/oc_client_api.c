@@ -675,7 +675,7 @@ oc_do_wk_discovery(const char *uri_query, oc_discovery_handler_t handler,
     .discovery = handler,
     .discovery_all = NULL,
   };
-  
+
   oc_client_cb_t *cb4 = NULL;
   // bool status = multi_scope_ipv6_discovery_wk(cb4, 0x02, uri_query,
   //                                         handlers, user_data);
