@@ -24,6 +24,7 @@
 #include "oc_buffer.h"
 #include "oc_core_res.h"
 #include "oc_endpoint.h"
+#include "api/oc_knx_fp.h"
 #include "oc_network_monitor.h"
 #include "port/oc_assert.h"
 #include "port/oc_connectivity.h"
@@ -1381,6 +1382,13 @@ connectivity_ipv4_init(ip_context_t *dev)
 }
 #endif
 
+static void register_multicasts(oc_interface_event_t event)
+{
+  if (event == NETWORK_INTERFACE_DOWN || event == NETWORK_INTERFACE_UP) {
+    oc_register_group_multicasts();
+  }
+}
+
 int
 oc_connectivity_init(size_t device)
 {
@@ -1420,7 +1428,6 @@ oc_connectivity_init(size_t device)
   l->sin6_addr = in6addr_any;
   l->sin6_port = 0;
 
-#//ifdef OC_SECURITY
 #ifdef OC_OSCORE
   memset(&dev->secure, 0, sizeof(struct sockaddr_storage));
   struct sockaddr_in6 *sm = (struct sockaddr_in6 *)&dev->secure;
@@ -1437,7 +1444,6 @@ oc_connectivity_init(size_t device)
     return -1;
   }
 
-//#ifdef OC_SECURITY
 #ifdef OC_OSCORE
   dev->secure_sock = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
   if (dev->secure_sock < 0) {
@@ -1507,7 +1513,6 @@ oc_connectivity_init(size_t device)
     return -1;
   }
 
-// #ifdef OC_SECURITY
 #ifdef OC_OSCORE
   if (setsockopt(dev->secure_sock, IPPROTO_IPV6, IPV6_RECVPKTINFO, &on,
                  sizeof(on)) == -1) {
@@ -1596,6 +1601,7 @@ oc_connectivity_init(size_t device)
     return -1;
   }
 
+  oc_add_network_interface_event_callback(register_multicasts);
   OC_DBG("Successfully initialized connectivity for device %zd", device);
 
   return 0;
