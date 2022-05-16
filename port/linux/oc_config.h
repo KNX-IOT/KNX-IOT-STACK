@@ -100,16 +100,17 @@ typedef uint64_t oc_clock_time_t;
 /* Maximum number of peer for TCP channel */
 #define OC_MAX_TCP_PEERS (2)
 
+#endif /* !OC_DYNAMIC_ALLOCATION */
+
 /* Maximum number of interfaces for IP adapter */
-#define OC_MAX_IP_INTERFACES (2)
+#define OC_MAX_IP_INTERFACES (3)
 
 /* Maximum number of callbacks for Network interface event monitoring */
-#define OC_MAX_NETWORK_INTERFACE_CBS (2)
+#define OC_MAX_NETWORK_INTERFACE_CBS (4)
 
 /* Maximum number of callbacks for connection of session */
 #define OC_MAX_SESSION_EVENT_CBS (2)
 
-#endif /* !OC_DYNAMIC_ALLOCATION */
 
 /* library features that require persistent storage */
 #ifdef OC_SECURITY
