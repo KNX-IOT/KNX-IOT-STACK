@@ -2064,6 +2064,10 @@ oc_register_group_multicasts()
 {
   // installation id will be used as ULA prefix
   oc_device_info_t *device = oc_core_get_device_info(0);
+  if (!device) {
+    PRINT("oc_register_group_multicasts: no device info\n");
+    return;
+  }
   uint32_t installation_id = device->iid;
 
   PRINT("oc_register_group_multicasts\n");
