@@ -1382,7 +1382,8 @@ connectivity_ipv4_init(ip_context_t *dev)
 }
 #endif
 
-static void register_multicasts(oc_interface_event_t event)
+static void
+register_multicasts(oc_interface_event_t event)
 {
   if (event == NETWORK_INTERFACE_DOWN || event == NETWORK_INTERFACE_UP) {
     oc_register_group_multicasts();

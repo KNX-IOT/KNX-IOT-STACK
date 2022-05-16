@@ -111,7 +111,6 @@ typedef uint64_t oc_clock_time_t;
 /* Maximum number of callbacks for connection of session */
 #define OC_MAX_SESSION_EVENT_CBS (2)
 
-
 /* library features that require persistent storage */
 #ifdef OC_SECURITY
 #define OC_STORAGE
