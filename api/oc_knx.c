@@ -530,7 +530,7 @@ oc_s_mode_notification_to_json(char *buffer, size_t buffer_size,
   // { "s": { "st": <st>,  "ga": <ga>, "value": <value> } }
   int size = snprintf(
     buffer, buffer_size,
-    "{ \"sia\": %d \"s\":{ \"st\": \"%s\" , \"ga\":%d, \"value\": %s }  }",
+    "{\"sia\": %d, \"s\":{\"st\": \"%s\", \"ga\":%d, \"value\": %s } }",
     notification.sia, oc_string(notification.st), notification.ga,
     oc_string(notification.value));
   if ((int)size > buffer_size) {
