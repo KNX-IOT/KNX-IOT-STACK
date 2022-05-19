@@ -1,5 +1,0 @@
-
-numpy
-termcolor
-requests
-cbor
