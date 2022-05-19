@@ -164,33 +164,6 @@ target_link_libraries(kisClientServer PUBLIC
 )
 target_include_directories(kisClientServer PUBLIC ${KNX_INCLUDE_DIRS})
 
-if(WIN32 OR UNIX)
-    include (GenerateExportHeader)
-
-    add_library(kisCS SHARED 
-        ${PROJECT_SOURCE_DIR}/pythonbinding/oc_python.c
-        ${API_SOURCES}
-        ${COAP_SOURCES}
-        ${CORE_SOURCES}
-    )
-    GENERATE_EXPORT_HEADER( kisCS
-                BASE_NAME kisCS
-                EXPORT_MACRO_NAME kisCS_EXPORT
-                EXPORT_FILE_NAME kisCS_Export.h
-                STATIC_DEFINE kisCS_BUILT_AS_STATIC
-    )
-
-    target_compile_definitions(kisCS PUBLIC OC_SERVER OC_CLIENT)
-    target_link_libraries(kisCS PUBLIC
-        kis-common
-        mbedtls
-        tinycbor-master
-        kis-port
-    )
-    target_link_libraries(kisCS PUBLIC kis-common)
-
-    target_include_directories(kisCS PRIVATE ${PROJECT_BINARY_DIR} ${KNX_INCLUDE_DIRS})
-endif()
 
 if(MSVC)
     # do not treat warnings as errors on Windows
