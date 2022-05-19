@@ -114,10 +114,6 @@ port/<OS>/*
 apps/*
   contains sample applications.
 
-python_bindings
-  contains a binding to python (and other languages that can use a dll)
-  specific api for creating a client that can talk to the KNX IoT Point API devices.
-
 
 Build instructions
 ------------------
