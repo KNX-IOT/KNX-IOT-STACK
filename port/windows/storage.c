@@ -26,6 +26,8 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
+#include<windows.h>
+
 #define STORE_PATH_SIZE 64
 
 static char store_path[STORE_PATH_SIZE];
@@ -62,7 +64,7 @@ oc_storage_config(const char *store)
   }
 
   PRINT("\tCreating storage directory at %s", temp_dir);
-  int retval = mkdir(temp_dir);
+  int retval = _mkdir(temp_dir);
 
   return 0;
 }
@@ -78,6 +80,7 @@ oc_storage_read(const char *store, uint8_t *buf, size_t size)
 
   strncpy(store_path + store_path_len, store, store_len);
   store_path[store_path_len + store_len] = '\0';
+  OC_DBG("Reading [%s]", store_path);
   fp = fopen(store_path, "rb");
   if (!fp)
     return -EINVAL;
@@ -98,6 +101,7 @@ oc_storage_write(const char *store, uint8_t *buf, size_t size)
 
   strncpy(store_path + store_path_len, store, store_len);
   store_path[store_path_len + store_len] = '\0';
+  OC_DBG("Writing [%s]", store_path);
   fp = fopen(store_path, "wb");
   if (!fp)
   {
