@@ -16,6 +16,7 @@
 
 #include "oc_config.h"
 #include "port/oc_storage.h"
+#include "port/oc_log.h"
 
 #ifdef OC_STORAGE
 #include <errno.h>
@@ -24,6 +25,8 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+
+#include <windows.h>
 
 #define STORE_PATH_SIZE 64
 
@@ -47,7 +50,7 @@ oc_storage_config(const char *store)
     ++store_path_len;
     if (store_path_len >= STORE_PATH_SIZE)
       return -ENOENT;
-    store_path[store_path_len - 1] = '\\';
+    store_path[store_path_len - 1] = '/';
   }
   path_set = true;
 
@@ -60,7 +63,8 @@ oc_storage_config(const char *store)
     temp_dir[dir_len - 1] = 0;
   }
 
-  int retval = mkdir(temp_dir);
+  PRINT("\tCreating storage directory at %s", temp_dir);
+  int retval = _mkdir(temp_dir);
 
   return 0;
 }
@@ -76,6 +80,7 @@ oc_storage_read(const char *store, uint8_t *buf, size_t size)
 
   strncpy(store_path + store_path_len, store, store_len);
   store_path[store_path_len + store_len] = '\0';
+  OC_DBG("Reading [%s]", store_path);
   fp = fopen(store_path, "rb");
   if (!fp)
     return -EINVAL;
@@ -96,9 +101,12 @@ oc_storage_write(const char *store, uint8_t *buf, size_t size)
 
   strncpy(store_path + store_path_len, store, store_len);
   store_path[store_path_len + store_len] = '\0';
+  OC_DBG("Writing [%s]", store_path);
   fp = fopen(store_path, "wb");
-  if (!fp)
+  if (!fp) {
+    OC_ERR("Invalid storage path: %s", store_path);
     return -EINVAL;
+  }
 
   size = fwrite(buf, 1, size, fp);
   fclose(fp);
