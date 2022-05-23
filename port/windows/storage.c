@@ -26,7 +26,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#include<windows.h>
+#include <windows.h>
 
 #define STORE_PATH_SIZE 64
 
@@ -103,8 +103,7 @@ oc_storage_write(const char *store, uint8_t *buf, size_t size)
   store_path[store_path_len + store_len] = '\0';
   OC_DBG("Writing [%s]", store_path);
   fp = fopen(store_path, "wb");
-  if (!fp)
-  {
+  if (!fp) {
     OC_ERR("Invalid storage path: %s", store_path);
     return -EINVAL;
   }
