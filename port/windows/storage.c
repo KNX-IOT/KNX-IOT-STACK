@@ -16,6 +16,7 @@
 
 #include "oc_config.h"
 #include "port/oc_storage.h"
+#include "port/oc_log.h"
 
 #ifdef OC_STORAGE
 #include <errno.h>
@@ -60,6 +61,7 @@ oc_storage_config(const char *store)
     temp_dir[dir_len - 1] = 0;
   }
 
+  PRINT("\tCreating storage directory at %s", temp_dir);
   int retval = mkdir(temp_dir);
 
   return 0;
@@ -98,7 +100,10 @@ oc_storage_write(const char *store, uint8_t *buf, size_t size)
   store_path[store_path_len + store_len] = '\0';
   fp = fopen(store_path, "wb");
   if (!fp)
+  {
+    OC_ERR("Invalid storage path: %s", store_path);
     return -EINVAL;
+  }
 
   size = fwrite(buf, 1, size, fp);
   fclose(fp);
