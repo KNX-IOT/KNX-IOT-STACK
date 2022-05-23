@@ -50,7 +50,7 @@ oc_storage_config(const char *store)
     ++store_path_len;
     if (store_path_len >= STORE_PATH_SIZE)
       return -ENOENT;
-    store_path[store_path_len - 1] = '\\';
+    store_path[store_path_len - 1] = '/';
   }
   path_set = true;
 
