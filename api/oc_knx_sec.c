@@ -1022,7 +1022,7 @@ oc_at_dump_entry(size_t device_index, int entry)
            filename, entry, size);
     long written_size = oc_storage_write(filename, buf, size);
     if (written_size != (long)size) {
-      PRINT("oc_at_dump_entry: written %d != %d (towrite)\n", (int)written_size,
+      PRINT("oc_at_dump_entry: [%s] written %d != %d (towrite)\n", filename, (int)written_size,
             size);
     }
   }
