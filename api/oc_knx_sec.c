@@ -634,12 +634,14 @@ oc_core_auth_at_post_handler(oc_request_t *request,
     }   // if type == object
     // show the entry on screen
     oc_print_auth_at_entry(device_index, index);
+#ifdef OC_OSCORE
     // create oscore context
     oc_oscore_context_t *ctx = oc_oscore_add_context(
       device_index, oc_string(g_at_entries[index].osc_contextid),
       oc_string(g_at_entries[index].osc_contextid), 0 /* ssn */, "desc",
       oc_string(g_at_entries[index].osc_ms),
       oc_string(g_at_entries[index].osc_contextid), index, false /* from_storage */);
+#endif
 
     // dump the entry to persistent storage
     oc_at_dump_entry(device_index, index);
