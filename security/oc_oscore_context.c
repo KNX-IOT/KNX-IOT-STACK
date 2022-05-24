@@ -200,13 +200,18 @@ oc_oscore_add_context(size_t device, const char *senderid,
                       const char *mastersecret, const char *token_id,
                       int auth_at_index, bool from_storage)
 {
+  PRINT("-----oc_oscore_add_context---%s\n", token_id);
   oc_oscore_context_t *ctx = (oc_oscore_context_t *)oc_memb_alloc(&ctx_s);
 
-  if (!ctx || (!senderid && !recipientid)) {
+  if (!ctx)
+  {
+    OC_ERR("No memory for allocating context!!!");
     return NULL;
   }
-
-  PRINT("-----oc_oscore_add_context---%s\n", token_id);
+  if (!senderid && !recipientid) {
+    OC_ERR("No sender or recipient ID");
+    return NULL;
+  }
 
   ctx->device = device;
   ctx->ssn = ssn;
