@@ -151,9 +151,9 @@ set(KNX_INCLUDE_DIRS
 
 add_compile_definitions(OC_CLIENT OC_SERVER)
 add_library(kisClientServer
-    ${API_SOURCES}
-    ${COAP_SOURCES}
     ${CORE_SOURCES}
+    ${COAP_SOURCES}
+    ${API_SOURCES}
 )
 target_compile_definitions(kisClientServer PUBLIC OC_CLIENT OC_SERVER)
 target_link_libraries(kisClientServer PUBLIC
