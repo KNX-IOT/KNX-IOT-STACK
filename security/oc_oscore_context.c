@@ -325,6 +325,7 @@ oc_oscore_add_context(size_t device, const char *senderid,
   return ctx;
 
 add_oscore_context_error:
+  OC_DBG_OSCORE("Encountered error while adding new context!");
   oc_memb_free(&ctx_s, ctx);
   return NULL;
 }
