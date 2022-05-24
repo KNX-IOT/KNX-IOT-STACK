@@ -33,7 +33,7 @@ typedef struct oc_oscore_context_t
   struct oc_oscore_context_t
     *next; /**< pointer to the next, NULL if there is not any */
   /* Provisioned parameters */
-  int aut_at_index;
+  int auth_at_index;
   uint8_t
     token_id[OSCORE_IDCTX_LEN]; /**< Note: the serial number of the device */
   uint8_t master_secret[OSCORE_IDCTX_LEN];

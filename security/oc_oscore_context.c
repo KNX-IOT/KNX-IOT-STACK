@@ -152,9 +152,9 @@ oc_oscore_find_context_by_group_id(size_t device, int group_id)
   oc_oscore_context_t *ctx = (oc_oscore_context_t *)oc_list_head(contexts);
 
   while (ctx != NULL) {
-    oc_auth_at_t *my_entry = oc_get_auth_at_entry(0, ctx->aut_at_index);
+    oc_auth_at_t *my_entry = oc_get_auth_at_entry(0, ctx->auth_at_index);
     if (my_entry) {
-      oc_print_auth_at_entry(0, ctx->aut_at_index);
+      oc_print_auth_at_entry(0, ctx->auth_at_index);
       for (int i = 0; i < my_entry->ga_len; i++) {
 
         int64_t group_value = my_entry->ga[i];
@@ -210,7 +210,7 @@ oc_oscore_add_context(size_t device, const char *senderid,
 
   ctx->device = device;
   ctx->ssn = ssn;
-  ctx->aut_at_index = auth_at_index;
+  ctx->auth_at_index = auth_at_index;
 
   PRINT("  device    %d\n", (int)device);
   PRINT("  sender    %s\n", senderid);
@@ -233,7 +233,6 @@ oc_oscore_add_context(size_t device, const char *senderid,
   if (from_storage) {
     ctx->ssn += OSCORE_SSN_WRITE_FREQ_K + OSCORE_SSN_PAD_F;
   }
-  // ctx->cred = cred_entry;
   if (desc) {
     oc_new_string(&ctx->desc, desc, strlen(desc));
   }
