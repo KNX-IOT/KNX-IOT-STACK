@@ -36,7 +36,7 @@ OC_PROCESS(oc_oscore_handler, "OSCORE Process");
 
 static increment_ssn_in_context(oc_oscore_context_t *ctx)
 {
-  // ctx->ssn++;
+  ctx->ssn++;
 }
 
 static oc_event_callback_retval_t
