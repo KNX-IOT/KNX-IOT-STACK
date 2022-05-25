@@ -516,6 +516,7 @@ oc_oscore_send_multicast_message(oc_message_t *message)
   /* Dispatch oc_message_t to the IP layer */
   OC_DBG_OSCORE("Outbound network event: forwarding to IP Connectivity layer");
   oc_send_discovery_request(message);
+  oc_send_discovery_request(message);
   oc_message_unref(message);
   return 0;
 
