@@ -145,6 +145,13 @@ typedef struct oc_auth_at_t
 } oc_auth_at_t;
 
 /**
+ * @brief returns the size (amount of total entries) of the auth / at table
+ *
+ * @return the allocated amount of entries of the auth at table
+ */
+int oc_core_get_at_table_size();
+
+/**
  * @brief set an entry in the auth/at table
  *
  * @param device_index index of the device
