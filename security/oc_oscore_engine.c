@@ -59,6 +59,7 @@ check_if_replayed_request(oc_oscore_context_t *oscore_ctx, uint64_t piv)
   }
   for (i = 0; i < OSCORE_REPLAY_WINDOW_SIZE; i++) {
     if (oscore_ctx->rwin[i] == piv) {
+      OC_DBG_OSCORE("Duplicate message!");
       return true;
     }
   }
