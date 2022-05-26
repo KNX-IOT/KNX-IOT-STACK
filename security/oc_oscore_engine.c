@@ -52,9 +52,7 @@ dump_cred(void *data)
 static bool
 check_if_replayed_request(oc_oscore_context_t *oscore_ctx, uint64_t piv, oc_endpoint_t *source_endpoint)
 {
-  OC_DBG_OSCORE("Checking if message has been received before...\n\tIP Addresses:");
-  PRINTipaddr(*source_endpoint);
-  PRINTipaddr_local(*source_endpoint);
+  OC_DBG("Checking if message has been received before...");
   uint8_t i;
   if (piv == 0 && oscore_ctx->rwin[0].ssn == 0 &&
       oscore_ctx->rwin[OSCORE_REPLAY_WINDOW_SIZE - 1].ssn == 0) {
@@ -528,8 +526,6 @@ oc_oscore_send_multicast_message(oc_message_t *message)
   OC_DBG_OSCORE("#################################");
   /* Dispatch oc_message_t to the IP layer */
   OC_DBG_OSCORE("Outbound network event: forwarding to IP Connectivity layer");
-  oc_send_discovery_request(message);
-  // TODO: REMOVE THE SECOND SEND DISCOVERY REQUEST, ITS FOR DEDUP TESTING **ONLY**
   oc_send_discovery_request(message);
   oc_message_unref(message);
   return 0;
