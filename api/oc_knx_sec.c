@@ -956,10 +956,9 @@ oc_print_auth_at_entry(size_t device_index, int index)
                 oc_string(g_at_entries[index].osc_contextid));
         }
         if (g_at_entries[index].ga_len > 0) {
-          PRINT("    osc:ga        : [",
-                oc_string(g_at_entries[index].osc_contextid));
+          PRINT("    osc:ga        : [");
           for (int i = 0; i < g_at_entries[index].ga_len; i++) {
-            PRINT(" %d", g_at_entries[index].ga[i]);
+            PRINT(" %d", (int)g_at_entries[index].ga[i]);
           }
           PRINT(" ]\n");
         }
