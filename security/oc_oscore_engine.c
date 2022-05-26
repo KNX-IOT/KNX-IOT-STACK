@@ -50,7 +50,7 @@ dump_cred(void *data)
 }
 
 static bool
-check_if_replayed_request(oc_oscore_context_t *oscore_ctx, uint64_t piv)
+check_if_replayed_request(oc_oscore_context_t *oscore_ctx, uint64_t piv, oc_endpoint_t *source_endpoint)
 {
   uint8_t i;
   if (piv == 0 && oscore_ctx->rwin[0] == 0 &&
@@ -146,7 +146,7 @@ oc_oscore_recv_message(oc_message_t *message)
     /* Check if this is a replayed request and discard */
     uint64_t piv = 0;
     oscore_read_piv(oscore_pkt->piv, oscore_pkt->piv_len, &piv);
-    if (check_if_replayed_request(oscore_ctx, piv)) {
+    if (check_if_replayed_request(oscore_ctx, piv, &message->endpoint)) {
       oscore_send_error(oscore_pkt, UNAUTHORIZED_4_01, &message->endpoint);
       goto oscore_recv_error;
     }
@@ -217,7 +217,7 @@ oc_oscore_recv_message(oc_message_t *message)
         /* Check if this is a repeat request and discard */
         uint64_t piv = 0;
         oscore_read_piv(oscore_pkt->piv, oscore_pkt->piv_len, &piv);
-        if (check_if_replayed_request(oscore_ctx, piv)) {
+        if (check_if_replayed_request(oscore_ctx, piv, &message->endpoint)) {
           oscore_send_error(oscore_pkt, UNAUTHORIZED_4_01, &message->endpoint);
           goto oscore_recv_error;
         }
