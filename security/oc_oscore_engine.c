@@ -143,6 +143,13 @@ oc_oscore_recv_message(oc_message_t *message)
         goto oscore_recv_error;
       }
     }
+    /* Check if this is a replayed request and discard */
+    uint64_t piv = 0;
+    oscore_read_piv(oscore_pkt->piv, oscore_pkt->piv_len, &piv);
+    if (check_if_replayed_request(oscore_ctx, piv)) {
+      oscore_send_error(oscore_pkt, UNAUTHORIZED_4_01, &message->endpoint);
+      goto oscore_recv_error;
+    }
 
     uint8_t *request_piv = NULL, request_piv_len = 0;
 
