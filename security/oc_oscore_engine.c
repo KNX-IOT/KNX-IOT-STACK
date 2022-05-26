@@ -52,6 +52,9 @@ dump_cred(void *data)
 static bool
 check_if_replayed_request(oc_oscore_context_t *oscore_ctx, uint64_t piv, oc_endpoint_t *source_endpoint)
 {
+  OC_DBG_OSCORE("Checking if message has been received before...\n\tIP Addresses:");
+  PRINTipaddr(*source_endpoint);
+  PRINTipaddr_local(*source_endpoint);
   uint8_t i;
   if (piv == 0 && oscore_ctx->rwin[0].ssn == 0 &&
       oscore_ctx->rwin[OSCORE_REPLAY_WINDOW_SIZE - 1].ssn == 0) {
@@ -71,6 +74,10 @@ check_if_replayed_request(oc_oscore_context_t *oscore_ctx, uint64_t piv, oc_endp
   }
 fresh_request:
   oscore_ctx->rwin_idx = (oscore_ctx->rwin_idx + 1) % OSCORE_REPLAY_WINDOW_SIZE;
+  memcpy(oscore_ctx->rwin[oscore_ctx->rwin_idx].sender_address, 
+    source_endpoint->addr.ipv6.address, 
+    sizeof(oscore_ctx->rwin[oscore_ctx->rwin_idx].sender_address
+  ));
   oscore_ctx->rwin[oscore_ctx->rwin_idx].ssn = piv;
   return false;
 }
