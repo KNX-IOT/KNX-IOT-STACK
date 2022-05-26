@@ -156,13 +156,6 @@ oc_oscore_recv_message(oc_message_t *message)
         goto oscore_recv_error;
       }
     }
-    /* Check if this is a replayed request and discard */
-    uint64_t piv = 0;
-    oscore_read_piv(oscore_pkt->piv, oscore_pkt->piv_len, &piv);
-    if (check_if_replayed_request(oscore_ctx, piv, &message->endpoint)) {
-      oscore_send_error(oscore_pkt, UNAUTHORIZED_4_01, &message->endpoint);
-      goto oscore_recv_error;
-    }
 
     uint8_t *request_piv = NULL, request_piv_len = 0;
 
@@ -674,7 +667,6 @@ oc_oscore_send_message(oc_message_t *msg)
       OC_LOGbytes_OSCORE(piv, piv_len);
       /* Increment SSN */
       increment_ssn_in_context(oscore_ctx);
-      // oscore_ctx->ssn++;
 
 #ifdef OC_CLIENT
       if (coap_pkt->code >= OC_GET && coap_pkt->code <= OC_DELETE) {
