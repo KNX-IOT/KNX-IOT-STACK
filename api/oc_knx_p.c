@@ -114,8 +114,8 @@ oc_core_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
         // href == 11
         if ((entry->iname == 11) && (entry->type == OC_REP_STRING)) {
 
-          if (oc_belongs_href_to_resource(entry->value.string, false, device_index) ==
-              false) {
+          if (oc_belongs_href_to_resource(entry->value.string, false,
+                                          device_index) == false) {
             error = true;
             OC_ERR("href '%.*s' does not belong to device",
                    (int)oc_string_len(entry->value.string),
