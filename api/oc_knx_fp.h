@@ -395,12 +395,15 @@ bool oc_add_points_in_group_object_table_to_response(oc_request_t *request,
  * @brief checks if the href (url) belongs to the device
  *
  * @param href the url to be checked if it belongs to the device
+ * @param discoverable checks only discoverable devices, e.g. belonging to a
+ * function (/fp)
  * @param device_index The device index
-
+ *
  * @return true
  * @return false
  */
-bool oc_belongs_href_to_resource(oc_string_t href, size_t device_index);
+bool oc_belongs_href_to_resource(oc_string_t href, bool discoverable,
+                                 size_t device_index);
 
 /**
  * @brief Creation of the KNX feature point resources.
