@@ -89,7 +89,7 @@ oc_core_p_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
  */
 static void
 oc_core_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
-                      void *data)
+                       void *data)
 {
   (void)data;
   oc_rep_t *rep = NULL;
@@ -192,8 +192,7 @@ oc_create_p_resource(int resource_idx, size_t device)
   oc_core_populate_resource(resource_idx, device, "/p",
                             OC_IF_LI | OC_IF_C | OC_IF_B,
                             APPLICATION_LINK_FORMAT, 0, oc_core_p_get_handler,
-                            0, oc_core_p_post_handler, 0, 1,
-                            "urn:knx:fb.0");
+                            0, oc_core_p_post_handler, 0, 1, "urn:knx:fb.0");
 }
 
 void
