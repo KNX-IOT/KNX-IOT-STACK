@@ -53,19 +53,25 @@ static bool
 check_if_replayed_request(oc_oscore_context_t *oscore_ctx, uint64_t piv, oc_endpoint_t *source_endpoint)
 {
   uint8_t i;
-  if (piv == 0 && oscore_ctx->rwin[0] == 0 &&
-      oscore_ctx->rwin[OSCORE_REPLAY_WINDOW_SIZE - 1] == 0) {
+  if (piv == 0 && oscore_ctx->rwin[0].ssn == 0 &&
+      oscore_ctx->rwin[OSCORE_REPLAY_WINDOW_SIZE - 1].ssn == 0) {
     goto fresh_request;
   }
   for (i = 0; i < OSCORE_REPLAY_WINDOW_SIZE; i++) {
-    if (oscore_ctx->rwin[i] == piv) {
+    bool has_same_ssn = oscore_ctx->rwin[i].ssn == piv;
+    bool has_same_sender = 
+      memcmp(oscore_ctx->rwin[i].sender_address, 
+             source_endpoint->addr.ipv6.address, 
+             sizeof(oscore_ctx->rwin[i].sender_address
+      )) == 0;
+    if (has_same_ssn && has_same_sender) {
       OC_DBG_OSCORE("Duplicate message!");
       return true;
     }
   }
 fresh_request:
   oscore_ctx->rwin_idx = (oscore_ctx->rwin_idx + 1) % OSCORE_REPLAY_WINDOW_SIZE;
-  oscore_ctx->rwin[oscore_ctx->rwin_idx] = piv;
+  oscore_ctx->rwin[oscore_ctx->rwin_idx].ssn = piv;
   return false;
 }
 

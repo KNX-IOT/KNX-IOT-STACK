@@ -28,6 +28,13 @@
 extern "C" {
 #endif
 
+typedef struct oc_rwin_t
+{
+  uint64_t ssn;
+  uint8_t sender_address[16];
+  uint8_t group_address[16];
+} oc_rwin_t;
+
 typedef struct oc_oscore_context_t
 {
   struct oc_oscore_context_t
@@ -53,7 +60,7 @@ typedef struct oc_oscore_context_t
   /* Common IV */
   uint8_t commoniv[OSCORE_COMMON_IV_LEN];
   /* Replay Window */
-  uint64_t rwin[OSCORE_REPLAY_WINDOW_SIZE];
+  oc_rwin_t rwin[OSCORE_REPLAY_WINDOW_SIZE];
   uint8_t rwin_idx;
 } oc_oscore_context_t;
 
