@@ -25,6 +25,10 @@
 extern "C" {
 #endif
 
+#define KNX_STORAGE_IA "dev_knx_ia"
+#define KNX_STORAGE_IID "dev_knx_iid"
+#define KNX_STORAGE_FID "dev_knx_fid"
+
 /**
  * @brief Creation of the KNX device resources.
  * e.g. the dev resources:

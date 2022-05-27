@@ -324,14 +324,17 @@ oc_core_find_next_group_object_table_url(char *url, int cur_index)
 }
 
 bool
-oc_belongs_href_to_resource(oc_string_t href, size_t device_index)
+oc_belongs_href_to_resource(oc_string_t href, bool discoverable,
+                            size_t device_index)
 {
 
   oc_resource_t *resource = oc_ri_get_app_resources();
   for (; resource; resource = resource->next) {
-    if (resource->device != device_index ||
-        !(resource->properties & OC_DISCOVERABLE)) {
-      continue;
+    if (discoverable) {
+      if (resource->device != device_index ||
+          !(resource->properties & OC_DISCOVERABLE)) {
+        continue;
+      }
     }
     if (oc_url_cmp(href, resource->uri) == 0) {
       return true;
@@ -412,7 +415,8 @@ oc_fp_p_check_and_save(int index, size_t device_index, bool status_ok)
     do_save = false;
     OC_ERR("  index %d href is longer than %d", index, (int)OC_MAX_URL_LENGTH);
   }
-  if (oc_belongs_href_to_resource(g_got[index].href, device_index) == false) {
+  if (oc_belongs_href_to_resource(g_got[index].href, true, device_index) ==
+      false) {
     do_save = false;
     OC_ERR("  index %d href '%s' does not belong to device\n", index,
            oc_string(g_got[index].href));

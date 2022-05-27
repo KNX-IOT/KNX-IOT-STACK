@@ -964,6 +964,13 @@ oc_print_auth_at_entry(size_t device_index, int index)
           PRINT("    osc:contextid : %s\n",
                 oc_string(g_at_entries[index].osc_contextid));
         }
+        if (g_at_entries[index].ga_len > 0) {
+          PRINT("    osc:ga        : [");
+          for (int i = 0; i < g_at_entries[index].ga_len; i++) {
+            PRINT(" %d", (int)g_at_entries[index].ga[i]);
+          }
+          PRINT(" ]\n");
+        }
       }
     }
   }
@@ -1021,6 +1028,9 @@ oc_at_dump_entry(size_t device_index, int entry)
 
   oc_rep_i_set_text_string(root, 82, oc_string(g_at_entries[entry].sub));
   oc_rep_i_set_text_string(root, 81, oc_string(g_at_entries[entry].kid));
+
+  oc_rep_i_set_int_array(root, 777, g_at_entries[entry].ga,
+                         g_at_entries[entry].ga_len);
 
   oc_rep_end_root_object();
 
@@ -1149,6 +1159,12 @@ oc_at_load_entry(int entry)
     oc_free_rep(head);
   }
   free(buf);
+}
+
+int
+oc_core_get_at_table_size()
+{
+  return G_AT_MAX_ENTRIES;
 }
 
 int
@@ -1425,7 +1441,8 @@ oc_is_resource_secure(oc_method_t method, oc_resource_t *resource)
 #ifdef OC_OSCORE
   return true;
 #else
-  PRINT("oc_is_resource_secure: OSCORE is turned off\n");
+  PRINT("oc_is_resource_secure: OSCORE is turned off %s\n",
+        oc_string(resource->uri));
   return false;
 #endif /* OC_OSCORE*/
 }

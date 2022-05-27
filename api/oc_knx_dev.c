@@ -25,10 +25,7 @@
 #include "oc_discovery.h"
 #include <stdio.h>
 
-#define KNX_STORAGE_IA "dev_knx_ia"
 #define KNX_STORAGE_HOSTNAME "dev_knx_hostname"
-#define KNX_STORAGE_IID "dev_knx_iid"
-#define KNX_STORAGE_FID "dev_knx_fid"
 #define KNX_STORAGE_PM "dev_knx_pm"
 #define KNX_STORAGE_SA "dev_knx_sa"
 #define KNX_STORAGE_DA "dev_knx_da"
