@@ -50,13 +50,12 @@ dump_cred(void *data)
 }
 
 static bool
-check_if_replayed_request(oc_oscore_context_t *oscore_ctx, uint64_t piv, const oc_endpoint_t *source_endpoint)
+check_if_replayed_request(oc_oscore_context_t *oscore_ctx, uint64_t piv, const oc_endpoint_t *source_endpoint, oc_ipv6_addr_t *dest_addr)
 {
   OC_DBG("Checking if message has been received before...");
-  OC_DBG("PIV: %d, IP Address: ", piv);
+  OC_DBG("PIV: %d, Destination IP Address: ", piv);
   PRINTipaddr(*source_endpoint);
   PRINT("\n");
-  OC_DBG("Group Address: %d", source_endpoint->group_id);
 
   uint8_t i;
   if (piv == 0 && oscore_ctx->rwin[0].ssn == 0 &&
@@ -70,7 +69,11 @@ check_if_replayed_request(oc_oscore_context_t *oscore_ctx, uint64_t piv, const o
              source_endpoint->addr.ipv6.address, 
              sizeof(oscore_ctx->rwin[i].sender_address
       )) == 0;
-    bool has_same_ga = source_endpoint->group_id == oscore_ctx->rwin[i].group_address;
+    bool has_same_ga = 
+      memcmp(oscore_ctx->rwin[i].destination_address,
+        dest_addr->address,
+        sizeof(dest_addr->address)
+      ) == 0;
     if (has_same_ssn && has_same_sender && has_same_ga && oscore_ctx->rwin[i].ssn != 0) {
       OC_DBG_OSCORE("Duplicate message!");
       return true;
@@ -87,7 +90,10 @@ fresh_request:
     sizeof(oscore_ctx->rwin[oscore_ctx->rwin_idx].sender_address
   ));
   // group address
-  oscore_ctx->rwin[oscore_ctx->rwin_idx].group_address = source_endpoint->group_id;
+  memcpy(oscore_ctx->rwin[oscore_ctx->rwin_idx].destination_address, 
+        dest_addr->address,
+        sizeof(dest_addr->address)
+  );
   
   return false;
 }
@@ -233,7 +239,7 @@ oc_oscore_recv_message(oc_message_t *message)
         /* Check if this is a repeat request and discard */
         uint64_t piv = 0;
         oscore_read_piv(oscore_pkt->piv, oscore_pkt->piv_len, &piv);
-        if (check_if_replayed_request(oscore_ctx, piv, &message->endpoint)) {
+        if (check_if_replayed_request(oscore_ctx, piv, &message->endpoint, &message->mcast_dest)) {
           oscore_send_error(oscore_pkt, UNAUTHORIZED_4_01, &message->endpoint);
           goto oscore_recv_error;
         }
