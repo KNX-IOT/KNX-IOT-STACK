@@ -50,7 +50,7 @@ dump_cred(void *data)
 }
 
 static bool
-check_if_replayed_request(oc_oscore_context_t *oscore_ctx, uint64_t piv, oc_endpoint_t *source_endpoint)
+check_if_replayed_request(oc_oscore_context_t *oscore_ctx, uint64_t piv, const oc_endpoint_t *source_endpoint)
 {
   OC_DBG("Checking if message has been received before...");
   uint8_t i;
@@ -65,7 +65,7 @@ check_if_replayed_request(oc_oscore_context_t *oscore_ctx, uint64_t piv, oc_endp
              source_endpoint->addr.ipv6.address, 
              sizeof(oscore_ctx->rwin[i].sender_address
       )) == 0;
-    if (has_same_ssn && has_same_sender) {
+    if (has_same_ssn && has_same_sender && oscore_ctx->rwin[i].ssn != 0) {
       OC_DBG_OSCORE("Duplicate message!");
       return true;
     }
