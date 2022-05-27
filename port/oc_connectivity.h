@@ -106,6 +106,7 @@ struct oc_message_s
   struct oc_message_s *next;
   struct oc_memb *pool;
   oc_endpoint_t endpoint;
+  oc_ipv6_addr_t mcast_dest;
   size_t length;
   uint8_t ref_count;
 #ifdef OC_DYNAMIC_ALLOCATION

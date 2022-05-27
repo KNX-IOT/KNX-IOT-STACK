@@ -571,7 +571,7 @@ get_WSARecvMsg(void)
 
 static int
 recv_msg(SOCKET sock, uint8_t *recv_buf, int recv_buf_size,
-         oc_endpoint_t *endpoint, bool multicast)
+         oc_endpoint_t *endpoint, bool multicast, oc_ipv6_addr_t *mcast_dest)
 {
   if (!PWSARecvMsg && get_WSARecvMsg() < 0) {
     OC_ERR("could not get handle to WSARecvMsg");
@@ -657,6 +657,7 @@ recv_msg(SOCKET sock, uint8_t *recv_buf, int recv_buf_size,
                    16);
           } else {
             memset(endpoint->addr_local.ipv6.address, 0, 16);
+            memcpy(mcast_dest->address, pktinfo->ipi6_addr.u.Byte, 16);
           }
           return (int)NumberOfBytes;
         } break;
@@ -789,7 +790,7 @@ network_event_thread(void *data)
 
         if (i == SERVER6) {
           int count = recv_msg(dev->server_sock, message->data, OC_PDU_SIZE,
-                               &message->endpoint, false);
+                               &message->endpoint, false, &message->mcast_dest);
           if (count < 0) {
             oc_message_unref(message);
             continue;
@@ -801,7 +802,7 @@ network_event_thread(void *data)
 
         if (i == MCAST6) {
           int count = recv_msg(dev->mcast_sock, message->data, OC_PDU_SIZE,
-                               &message->endpoint, true);
+                               &message->endpoint, true, &message->mcast_dest);
           if (count < 0) {
             oc_message_unref(message);
             continue;
