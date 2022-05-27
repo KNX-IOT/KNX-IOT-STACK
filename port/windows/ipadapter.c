@@ -652,12 +652,8 @@ recv_msg(SOCKET sock, uint8_t *recv_buf, int recv_buf_size,
           struct in6_pktinfo *pktinfo =
             (struct in6_pktinfo *)WSA_CMSG_DATA(MsgHdr);
           endpoint->interface_index = pktinfo->ipi6_ifindex;
-          if (!multicast) {
-            memcpy(endpoint->addr_local.ipv6.address, pktinfo->ipi6_addr.u.Byte,
-                   16);
-          } else {
-            memset(endpoint->addr_local.ipv6.address, 0, 16);
-          }
+          memcpy(endpoint->addr_local.ipv6.address, pktinfo->ipi6_addr.u.Byte,
+                  16);
           return (int)NumberOfBytes;
         } break;
         default:

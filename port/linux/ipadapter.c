@@ -707,17 +707,14 @@ recv_msg(int sock, uint8_t *recv_buf, int recv_buf_size,
       struct in6_pktinfo *pktinfo = (struct in6_pktinfo *)CMSG_DATA(cmsg);
       endpoint->interface_index = pktinfo->ipi6_ifindex;
 
-      /* For a unicast receiving socket, extract the destination address
-       * of the UDP packet into the endpoint's addr_local attribute.
+      /* Extract the destination address of the UDP packet into the endpoint's
+       * addr_local attribute.
        * This would be used to set the source address of a response that
-       * results from this message.
+       * results from this message. For multicast S-Mode messages, it contains
+       * the installation ID & group ID, which are needed for deduplication
        */
-      if (!multicast) {
-        memcpy(endpoint->addr_local.ipv6.address, pktinfo->ipi6_addr.s6_addr,
-               16);
-      } else {
-        memset(endpoint->addr_local.ipv6.address, 0, 16);
-      }
+      memcpy(endpoint->addr_local.ipv6.address, pktinfo->ipi6_addr.s6_addr,
+              16);
       break;
     }
 #ifdef OC_IPV4
