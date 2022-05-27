@@ -53,6 +53,10 @@ static bool
 check_if_replayed_request(oc_oscore_context_t *oscore_ctx, uint64_t piv, const oc_endpoint_t *source_endpoint)
 {
   OC_DBG("Checking if message has been received before...");
+  OC_DBG("PIV: %d, IP Address: ", piv);
+  PRINTipaddr(*source_endpoint);
+  OC_DBG("\n");
+
   uint8_t i;
   if (piv == 0 && oscore_ctx->rwin[0].ssn == 0 &&
       oscore_ctx->rwin[OSCORE_REPLAY_WINDOW_SIZE - 1].ssn == 0) {
