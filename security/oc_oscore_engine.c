@@ -56,8 +56,7 @@ check_if_replayed_request(oc_oscore_context_t *oscore_ctx, uint64_t piv, const o
   OC_DBG("PIV: %d, IP Address: ", piv);
   PRINTipaddr(*source_endpoint);
   PRINT("\n");
-  PRINTipaddr_local(*source_endpoint);
-  PRINT("\n");
+  OC_DBG("Group Address: %d", source_endpoint->group_id);
 
   uint8_t i;
   if (piv == 0 && oscore_ctx->rwin[0].ssn == 0 &&
@@ -71,11 +70,7 @@ check_if_replayed_request(oc_oscore_context_t *oscore_ctx, uint64_t piv, const o
              source_endpoint->addr.ipv6.address, 
              sizeof(oscore_ctx->rwin[i].sender_address
       )) == 0;
-    bool has_same_ga = 
-      memcmp(oscore_ctx->rwin[i].destination_address, 
-             source_endpoint->addr_local.ipv6.address, 
-             sizeof(oscore_ctx->rwin[i].destination_address
-      )) == 0;
+    bool has_same_ga = source_endpoint->group_id == oscore_ctx->rwin[i].group_address;
     if (has_same_ssn && has_same_sender && has_same_ga && oscore_ctx->rwin[i].ssn != 0) {
       OC_DBG_OSCORE("Duplicate message!");
       return true;
@@ -92,10 +87,7 @@ fresh_request:
     sizeof(oscore_ctx->rwin[oscore_ctx->rwin_idx].sender_address
   ));
   // group address
-  memcpy(oscore_ctx->rwin[oscore_ctx->rwin_idx].destination_address, 
-    source_endpoint->addr_local.ipv6.address, 
-    sizeof(oscore_ctx->rwin[oscore_ctx->rwin_idx].destination_address
-  ));
+  oscore_ctx->rwin[oscore_ctx->rwin_idx].group_address = source_endpoint->group_id;
   
   return false;
 }
@@ -459,6 +451,7 @@ oc_oscore_send_multicast_message(oc_message_t *message)
     OC_DBG_OSCORE("---using SSN as Partial IV: %lu", oscore_ctx->ssn);
     OC_LOGbytes_OSCORE(piv, piv_len);
     /* Increment SSN */
+    // oscore_ctx->ssn++;
     increment_ssn_in_context(oscore_ctx);
     // store it so that it can be retrieved by the clients
     oc_knx_set_osn(oscore_ctx->ssn);

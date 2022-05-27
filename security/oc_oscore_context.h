@@ -32,7 +32,7 @@ typedef struct oc_rwin_t
 {
   uint64_t ssn;
   uint8_t sender_address[16];
-  uint8_t destination_address[16];
+  int group_address;
 } oc_rwin_t;
 
 typedef struct oc_oscore_context_t
