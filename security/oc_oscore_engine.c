@@ -55,7 +55,8 @@ check_if_replayed_request(oc_oscore_context_t *oscore_ctx, uint64_t piv, const o
   OC_DBG("Checking if message has been received before...");
   OC_DBG("PIV: %d, IP Address: ", piv);
   PRINTipaddr(*source_endpoint);
-  OC_DBG("\n");
+  PRINT("\n");
+  OC_DBG("Group Address: %d", source_endpoint->group_id);
 
   uint8_t i;
   if (piv == 0 && oscore_ctx->rwin[0].ssn == 0 &&
@@ -69,18 +70,25 @@ check_if_replayed_request(oc_oscore_context_t *oscore_ctx, uint64_t piv, const o
              source_endpoint->addr.ipv6.address, 
              sizeof(oscore_ctx->rwin[i].sender_address
       )) == 0;
-    if (has_same_ssn && has_same_sender && oscore_ctx->rwin[i].ssn != 0) {
+    bool has_same_ga = source_endpoint->group_id == oscore_ctx->rwin[i].group_address;
+    if (has_same_ssn && has_same_sender && has_same_ga && oscore_ctx->rwin[i].ssn != 0) {
       OC_DBG_OSCORE("Duplicate message!");
       return true;
     }
   }
 fresh_request:
   oscore_ctx->rwin_idx = (oscore_ctx->rwin_idx + 1) % OSCORE_REPLAY_WINDOW_SIZE;
+  
+  // SSN
+  oscore_ctx->rwin[oscore_ctx->rwin_idx].ssn = piv;
+  // source address
   memcpy(oscore_ctx->rwin[oscore_ctx->rwin_idx].sender_address, 
     source_endpoint->addr.ipv6.address, 
     sizeof(oscore_ctx->rwin[oscore_ctx->rwin_idx].sender_address
   ));
-  oscore_ctx->rwin[oscore_ctx->rwin_idx].ssn = piv;
+  // group address
+  oscore_ctx->rwin[oscore_ctx->rwin_idx].group_address = source_endpoint->group_id;
+  
   return false;
 }
 
