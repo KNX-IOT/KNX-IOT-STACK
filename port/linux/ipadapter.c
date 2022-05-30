@@ -661,7 +661,7 @@ process_interface_change_event(void)
 
 static int
 recv_msg(int sock, uint8_t *recv_buf, int recv_buf_size,
-         oc_endpoint_t *endpoint, bool multicast)
+         oc_endpoint_t *endpoint, bool multicast, oc_ipv6_addr_t *mcast_dest)
 {
   struct sockaddr_storage client;
   struct iovec iovec[1];
@@ -717,6 +717,7 @@ recv_msg(int sock, uint8_t *recv_buf, int recv_buf_size,
                16);
       } else {
         memset(endpoint->addr_local.ipv6.address, 0, 16);
+        memcpy(mcast_dest->address, pktinfo->ipi6_addr.s6_addr, 16);
       }
       break;
     }
@@ -770,7 +771,7 @@ oc_udp_receive_message(ip_context_t *dev, fd_set *fds, oc_message_t *message)
 {
   if (FD_ISSET(dev->server_sock, fds)) {
     int count = recv_msg(dev->server_sock, message->data, OC_PDU_SIZE,
-                         &message->endpoint, false);
+                         &message->endpoint, false, &message->mcast_dest);
     if (count < 0) {
       return ADAPTER_STATUS_ERROR;
     }
@@ -782,7 +783,7 @@ oc_udp_receive_message(ip_context_t *dev, fd_set *fds, oc_message_t *message)
 
   if (FD_ISSET(dev->mcast_sock, fds)) {
     int count = recv_msg(dev->mcast_sock, message->data, OC_PDU_SIZE,
-                         &message->endpoint, true);
+                         &message->endpoint, true, &message->mcast_dest);
     if (count < 0) {
       return ADAPTER_STATUS_ERROR;
     }
