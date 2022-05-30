@@ -1269,13 +1269,14 @@ oc_load_at_table(size_t device_index)
 #ifdef OC_OSCORE
       // create oscore context
       oc_oscore_context_t *ctx = oc_oscore_add_context(
-        device_index, oc_string(g_at_entries[i].osc_contextid),
-        oc_string(g_at_entries[i].osc_contextid), 
-        0, // TODO store sender sequence number in persistent memory & load it here 
+        device_index,
+        oc_string(g_at_entries[i].osc_contextid),
+        oc_string(g_at_entries[i].osc_contextid),
+        0, // TODO store sender sequence number in persistent memory & load it here
         "desc",
         oc_string(g_at_entries[i].osc_ms),
-        oc_string(g_at_entries[i].osc_contextid), 
-        i, 
+        oc_string(g_at_entries[i].osc_contextid),
+        i,
         true /* from_storage */
       );
 #endif
