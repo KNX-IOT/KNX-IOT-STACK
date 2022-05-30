@@ -203,8 +203,7 @@ oc_oscore_add_context(size_t device, const char *senderid,
   PRINT("-----oc_oscore_add_context---%s\n", token_id);
   oc_oscore_context_t *ctx = (oc_oscore_context_t *)oc_memb_alloc(&ctx_s);
 
-  if (!ctx)
-  {
+  if (!ctx) {
     OC_ERR("No memory for allocating context!!!");
     return NULL;
   }
