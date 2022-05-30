@@ -30,7 +30,7 @@ extern "C" {
 
 /**
  * @brief Replay window type definition
- * 
+ *
  */
 typedef struct oc_rwin_t
 {
@@ -39,7 +39,8 @@ typedef struct oc_rwin_t
    */
   uint64_t ssn;
   /**
-   * @brief Sender Address, usually the IPv6 source address of the sending device
+   * @brief Sender Address, usually the IPv6 source address of the sending
+   * device
    */
   uint8_t sender_address[16];
   /**
