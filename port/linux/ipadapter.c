@@ -771,7 +771,7 @@ oc_udp_receive_message(ip_context_t *dev, fd_set *fds, oc_message_t *message)
 {
   if (FD_ISSET(dev->server_sock, fds)) {
     int count = recv_msg(dev->server_sock, message->data, OC_PDU_SIZE,
-                         &message->endpoint, false, message->mcast_dest);
+                         &message->endpoint, false, &message->mcast_dest);
     if (count < 0) {
       return ADAPTER_STATUS_ERROR;
     }
@@ -783,7 +783,7 @@ oc_udp_receive_message(ip_context_t *dev, fd_set *fds, oc_message_t *message)
 
   if (FD_ISSET(dev->mcast_sock, fds)) {
     int count = recv_msg(dev->mcast_sock, message->data, OC_PDU_SIZE,
-                         &message->endpoint, true, message->mcast_dest);
+                         &message->endpoint, true, &message->mcast_dest);
     if (count < 0) {
       return ADAPTER_STATUS_ERROR;
     }
