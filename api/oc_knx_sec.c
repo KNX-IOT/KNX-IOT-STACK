@@ -640,7 +640,8 @@ oc_core_auth_at_post_handler(oc_request_t *request,
       device_index, oc_string(g_at_entries[index].osc_contextid),
       oc_string(g_at_entries[index].osc_contextid), 0 /* ssn */, "desc",
       oc_string(g_at_entries[index].osc_ms),
-      oc_string(g_at_entries[index].osc_contextid), index, false /* from_storage */);
+      oc_string(g_at_entries[index].osc_contextid), index,
+      false /* from_storage */);
 #endif
 
     // dump the entry to persistent storage

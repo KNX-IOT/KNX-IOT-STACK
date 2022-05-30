@@ -28,10 +28,24 @@
 extern "C" {
 #endif
 
+/**
+ * @brief Replay window type definition
+ *
+ */
 typedef struct oc_rwin_t
 {
+  /**
+   * @brief Sender Sequence Number
+   */
   uint64_t ssn;
+  /**
+   * @brief Sender Address, usually the IPv6 source address of the sending
+   * device
+   */
   uint8_t sender_address[16];
+  /**
+   * @brief  Destination Address, usually an S-mode multicast address
+   */
   uint8_t destination_address[16];
 } oc_rwin_t;
 

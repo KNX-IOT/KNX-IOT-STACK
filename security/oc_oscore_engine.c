@@ -50,7 +50,9 @@ dump_cred(void *data)
 }
 
 static bool
-check_if_replayed_request(oc_oscore_context_t *oscore_ctx, uint64_t piv, const oc_endpoint_t *source_endpoint, oc_ipv6_addr_t *dest_addr)
+check_if_replayed_request(oc_oscore_context_t *oscore_ctx, uint64_t piv,
+                          const oc_endpoint_t *source_endpoint,
+                          oc_ipv6_addr_t *dest_addr)
 {
   OC_DBG("Checking if message has been received before...");
   OC_DBG("PIV: %d, Destination IP Address: ", piv);
@@ -64,37 +66,32 @@ check_if_replayed_request(oc_oscore_context_t *oscore_ctx, uint64_t piv, const o
   }
   for (i = 0; i < OSCORE_REPLAY_WINDOW_SIZE; i++) {
     bool has_same_ssn = oscore_ctx->rwin[i].ssn == piv;
-    bool has_same_sender = 
-      memcmp(oscore_ctx->rwin[i].sender_address, 
-             source_endpoint->addr.ipv6.address, 
-             sizeof(oscore_ctx->rwin[i].sender_address
-      )) == 0;
-    bool has_same_ga = 
-      memcmp(oscore_ctx->rwin[i].destination_address,
-        dest_addr->address,
-        sizeof(dest_addr->address)
-      ) == 0;
-    if (has_same_ssn && has_same_sender && has_same_ga && oscore_ctx->rwin[i].ssn != 0) {
+    bool has_same_sender =
+      memcmp(oscore_ctx->rwin[i].sender_address,
+             source_endpoint->addr.ipv6.address,
+             sizeof(oscore_ctx->rwin[i].sender_address)) == 0;
+    bool has_same_ga =
+      memcmp(oscore_ctx->rwin[i].destination_address, dest_addr->address,
+             sizeof(dest_addr->address)) == 0;
+    if (has_same_ssn && has_same_sender && has_same_ga &&
+        oscore_ctx->rwin[i].ssn != 0) {
       OC_DBG_OSCORE("Duplicate message!");
       return true;
     }
   }
 fresh_request:
   oscore_ctx->rwin_idx = (oscore_ctx->rwin_idx + 1) % OSCORE_REPLAY_WINDOW_SIZE;
-  
+
   // SSN
   oscore_ctx->rwin[oscore_ctx->rwin_idx].ssn = piv;
   // source address
-  memcpy(oscore_ctx->rwin[oscore_ctx->rwin_idx].sender_address, 
-    source_endpoint->addr.ipv6.address, 
-    sizeof(oscore_ctx->rwin[oscore_ctx->rwin_idx].sender_address
-  ));
+  memcpy(oscore_ctx->rwin[oscore_ctx->rwin_idx].sender_address,
+         source_endpoint->addr.ipv6.address,
+         sizeof(oscore_ctx->rwin[oscore_ctx->rwin_idx].sender_address));
   // group address
-  memcpy(oscore_ctx->rwin[oscore_ctx->rwin_idx].destination_address, 
-        dest_addr->address,
-        sizeof(dest_addr->address)
-  );
-  
+  memcpy(oscore_ctx->rwin[oscore_ctx->rwin_idx].destination_address,
+         dest_addr->address, sizeof(dest_addr->address));
+
   return false;
 }
 
@@ -239,7 +236,8 @@ oc_oscore_recv_message(oc_message_t *message)
         /* Check if this is a repeat request and discard */
         uint64_t piv = 0;
         oscore_read_piv(oscore_pkt->piv, oscore_pkt->piv_len, &piv);
-        if (check_if_replayed_request(oscore_ctx, piv, &message->endpoint, &message->mcast_dest)) {
+        if (check_if_replayed_request(oscore_ctx, piv, &message->endpoint,
+                                      &message->mcast_dest)) {
           oscore_send_error(oscore_pkt, UNAUTHORIZED_4_01, &message->endpoint);
           goto oscore_recv_error;
         }
