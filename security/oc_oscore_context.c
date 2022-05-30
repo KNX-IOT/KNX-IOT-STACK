@@ -30,7 +30,7 @@
 //#include "oc_store.h"
 #include "port/oc_log.h"
 OC_LIST(contexts);
-OC_MEMB(ctx_s, oc_oscore_context_t, 10);
+OC_MEMB(ctx_s, oc_oscore_context_t, 20);
 
 // checking against receiver...
 oc_oscore_context_t *
