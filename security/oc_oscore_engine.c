@@ -37,6 +37,17 @@ OC_PROCESS(oc_oscore_handler, "OSCORE Process");
 static increment_ssn_in_context(oc_oscore_context_t *ctx)
 {
   ctx->ssn++;
+
+  if(ctx->ssn % OSCORE_SSN_WRITE_FREQ_K == 0)
+  {
+    // save ssn to persistent memory, using kid as part of the key
+    uint8_t key_buf[OSCORE_STORAGE_KEY_LEN];
+    memcpy(key_buf, OSCORE_STORAGE_PREFIX, OSCORE_STORAGE_PREFIX_LEN);
+    memcpy(key_buf + OSCORE_STORAGE_PREFIX_LEN, ctx->sendid, ctx->sendid_len);
+    key_buf[OSCORE_STORAGE_KEY_LEN - 1] = '\0';
+    
+    oc_storage_write(key_buf, (uint8_t *) &ctx->ssn, sizeof(ctx->ssn));
+  }
 }
 
 static oc_event_callback_retval_t

@@ -1268,12 +1268,23 @@ oc_load_at_table(size_t device_index)
     if (oc_string_len(g_at_entries[i].id) > 0) {
       oc_print_auth_at_entry(device_index, i);
 #ifdef OC_OSCORE
+      // save ssn to persistent memory, using kid as part of the key
+      uint64_t stored_ssn = 0;
+      uint8_t key_buf[OSCORE_STORAGE_KEY_LEN];
+      memcpy(key_buf, OSCORE_STORAGE_PREFIX, OSCORE_STORAGE_PREFIX_LEN);
+      memcpy(key_buf + OSCORE_STORAGE_PREFIX_LEN,
+        oc_string(g_at_entries[i].osc_contextid),
+        oc_string_len(g_at_entries[i].osc_contextid
+      ));
+      key_buf[OSCORE_STORAGE_KEY_LEN - 1] = '\0';
+      
+      oc_storage_read(key_buf, (uint8_t*) stored_ssn, sizeof(stored_ssn));
       // create oscore context
       oc_oscore_context_t *ctx = oc_oscore_add_context(
         device_index,
         oc_string(g_at_entries[i].osc_contextid),
         oc_string(g_at_entries[i].osc_contextid),
-        0, // TODO store sender sequence number in persistent memory & load it here
+        stored_ssn,
         "desc",
         oc_string(g_at_entries[i].osc_ms),
         oc_string(g_at_entries[i].osc_contextid),
