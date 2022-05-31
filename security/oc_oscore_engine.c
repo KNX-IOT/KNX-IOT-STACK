@@ -38,6 +38,9 @@ static increment_ssn_in_context(oc_oscore_context_t *ctx)
 {
   ctx->ssn++;
 
+  /* Store current SSN with frequency OSCORE_WRITE_FREQ_K
+   * Based on recommendations in RFC 8613, Appendix B.1. to prevent SSN reuse
+   */
   if(ctx->ssn % OSCORE_SSN_WRITE_FREQ_K == 0)
   {
     // save ssn to persistent memory, using kid as part of the key
@@ -777,13 +780,6 @@ oc_oscore_send_message(oc_message_t *msg)
         memcpy(msg->endpoint.piv, piv, piv_len);
         msg->endpoint.piv_len = piv_len;
       }
-    }
-
-    /* Store current SSN with frequency OSCORE_WRITE_FREQ_K */
-    /* Based on recommendations in RFC 8613, Appendix B.1. to prevent SSN reuse
-     */
-    if (oscore_ctx->ssn % OSCORE_SSN_WRITE_FREQ_K == 0) {
-      oc_set_delayed_callback((void *)message->endpoint.device, dump_cred, 0);
     }
 
     /* Move CoAP payload to offset 2*COAP_MAX_HEADER_SIZE to accommodate for
