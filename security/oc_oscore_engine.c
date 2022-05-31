@@ -41,15 +41,14 @@ static increment_ssn_in_context(oc_oscore_context_t *ctx)
   /* Store current SSN with frequency OSCORE_WRITE_FREQ_K
    * Based on recommendations in RFC 8613, Appendix B.1. to prevent SSN reuse
    */
-  if(ctx->ssn % OSCORE_SSN_WRITE_FREQ_K == 0)
-  {
+  if (ctx->ssn % OSCORE_SSN_WRITE_FREQ_K == 0) {
     // save ssn to persistent memory, using kid as part of the key
     uint8_t key_buf[OSCORE_STORAGE_KEY_LEN];
     memcpy(key_buf, OSCORE_STORAGE_PREFIX, OSCORE_STORAGE_PREFIX_LEN);
     memcpy(key_buf + OSCORE_STORAGE_PREFIX_LEN, ctx->sendid, ctx->sendid_len);
     key_buf[OSCORE_STORAGE_KEY_LEN - 1] = '\0';
-    
-    oc_storage_write(key_buf, (uint8_t *) &ctx->ssn, sizeof(ctx->ssn));
+
+    oc_storage_write(key_buf, (uint8_t *)&ctx->ssn, sizeof(ctx->ssn));
   }
 }
 

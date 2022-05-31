@@ -1273,26 +1273,19 @@ oc_load_at_table(size_t device_index)
       uint8_t key_buf[OSCORE_STORAGE_KEY_LEN];
       memcpy(key_buf, OSCORE_STORAGE_PREFIX, OSCORE_STORAGE_PREFIX_LEN);
       memcpy(key_buf + OSCORE_STORAGE_PREFIX_LEN,
-        oc_string(g_at_entries[i].osc_contextid),
-        oc_string_len(g_at_entries[i].osc_contextid
-      ));
+             oc_string(g_at_entries[i].osc_contextid),
+             oc_string_len(g_at_entries[i].osc_contextid));
       key_buf[OSCORE_STORAGE_KEY_LEN - 1] = '\0';
-      
-      oc_storage_read(key_buf, (uint8_t*) stored_ssn, sizeof(stored_ssn));
+
+      oc_storage_read(key_buf, (uint8_t *)stored_ssn, sizeof(stored_ssn));
       // create oscore context
       oc_oscore_context_t *ctx = oc_oscore_add_context(
-        device_index,
-        oc_string(g_at_entries[i].osc_contextid),
-        oc_string(g_at_entries[i].osc_contextid),
-        stored_ssn,
-        "desc",
+        device_index, oc_string(g_at_entries[i].osc_contextid),
+        oc_string(g_at_entries[i].osc_contextid), stored_ssn, "desc",
         oc_string(g_at_entries[i].osc_ms),
-        oc_string(g_at_entries[i].osc_contextid),
-        i,
-        true /* from_storage */
+        oc_string(g_at_entries[i].osc_contextid), i, true /* from_storage */
       );
 #endif
-
     }
   }
 }
