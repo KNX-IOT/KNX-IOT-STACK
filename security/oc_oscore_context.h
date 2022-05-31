@@ -28,12 +28,33 @@
 extern "C" {
 #endif
 
+/**
+ * @brief Replay window type definition
+ *
+ */
+typedef struct oc_rwin_t
+{
+  /**
+   * @brief Sender Sequence Number
+   */
+  uint64_t ssn;
+  /**
+   * @brief Sender Address, usually the IPv6 source address of the sending
+   * device
+   */
+  uint8_t sender_address[16];
+  /**
+   * @brief  Destination Address, usually an S-mode multicast address
+   */
+  uint8_t destination_address[16];
+} oc_rwin_t;
+
 typedef struct oc_oscore_context_t
 {
   struct oc_oscore_context_t
     *next; /**< pointer to the next, NULL if there is not any */
   /* Provisioned parameters */
-  int aut_at_index;
+  int auth_at_index;
   uint8_t
     token_id[OSCORE_IDCTX_LEN]; /**< Note: the serial number of the device */
   uint8_t master_secret[OSCORE_IDCTX_LEN];
@@ -53,7 +74,7 @@ typedef struct oc_oscore_context_t
   /* Common IV */
   uint8_t commoniv[OSCORE_COMMON_IV_LEN];
   /* Replay Window */
-  uint64_t rwin[OSCORE_REPLAY_WINDOW_SIZE];
+  oc_rwin_t rwin[OSCORE_REPLAY_WINDOW_SIZE];
   uint8_t rwin_idx;
 } oc_oscore_context_t;
 

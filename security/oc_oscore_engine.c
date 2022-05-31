@@ -36,7 +36,20 @@ OC_PROCESS(oc_oscore_handler, "OSCORE Process");
 
 static increment_ssn_in_context(oc_oscore_context_t *ctx)
 {
-  // ctx->ssn++;
+  ctx->ssn++;
+
+  /* Store current SSN with frequency OSCORE_WRITE_FREQ_K
+   * Based on recommendations in RFC 8613, Appendix B.1. to prevent SSN reuse
+   */
+  if (ctx->ssn % OSCORE_SSN_WRITE_FREQ_K == 0) {
+    // save ssn to persistent memory, using kid as part of the key
+    uint8_t key_buf[OSCORE_STORAGE_KEY_LEN];
+    memcpy(key_buf, OSCORE_STORAGE_PREFIX, OSCORE_STORAGE_PREFIX_LEN);
+    memcpy(key_buf + OSCORE_STORAGE_PREFIX_LEN, ctx->sendid, ctx->sendid_len);
+    key_buf[OSCORE_STORAGE_KEY_LEN - 1] = '\0';
+
+    oc_storage_write(key_buf, (uint8_t *)&ctx->ssn, sizeof(ctx->ssn));
+  }
 }
 
 static oc_event_callback_retval_t
@@ -50,21 +63,48 @@ dump_cred(void *data)
 }
 
 static bool
-check_if_replayed_request(oc_oscore_context_t *oscore_ctx, uint64_t piv)
+check_if_replayed_request(oc_oscore_context_t *oscore_ctx, uint64_t piv,
+                          const oc_endpoint_t *source_endpoint,
+                          oc_ipv6_addr_t *dest_addr)
 {
+  OC_DBG("Checking if message has been received before...");
+  OC_DBG("PIV: %d, Destination IP Address: ", piv);
+  PRINTipaddr(*source_endpoint);
+  PRINT("\n");
+
   uint8_t i;
-  if (piv == 0 && oscore_ctx->rwin[0] == 0 &&
-      oscore_ctx->rwin[OSCORE_REPLAY_WINDOW_SIZE - 1] == 0) {
+  if (piv == 0 && oscore_ctx->rwin[0].ssn == 0 &&
+      oscore_ctx->rwin[OSCORE_REPLAY_WINDOW_SIZE - 1].ssn == 0) {
     goto fresh_request;
   }
   for (i = 0; i < OSCORE_REPLAY_WINDOW_SIZE; i++) {
-    if (oscore_ctx->rwin[i] == piv) {
+    bool has_same_ssn = oscore_ctx->rwin[i].ssn == piv;
+    bool has_same_sender =
+      memcmp(oscore_ctx->rwin[i].sender_address,
+             source_endpoint->addr.ipv6.address,
+             sizeof(oscore_ctx->rwin[i].sender_address)) == 0;
+    bool has_same_ga =
+      memcmp(oscore_ctx->rwin[i].destination_address, dest_addr->address,
+             sizeof(dest_addr->address)) == 0;
+    if (has_same_ssn && has_same_sender && has_same_ga &&
+        oscore_ctx->rwin[i].ssn != 0) {
+      OC_DBG_OSCORE("Duplicate message!");
       return true;
     }
   }
 fresh_request:
   oscore_ctx->rwin_idx = (oscore_ctx->rwin_idx + 1) % OSCORE_REPLAY_WINDOW_SIZE;
-  oscore_ctx->rwin[oscore_ctx->rwin_idx] = piv;
+
+  // SSN
+  oscore_ctx->rwin[oscore_ctx->rwin_idx].ssn = piv;
+  // source address
+  memcpy(oscore_ctx->rwin[oscore_ctx->rwin_idx].sender_address,
+         source_endpoint->addr.ipv6.address,
+         sizeof(oscore_ctx->rwin[oscore_ctx->rwin_idx].sender_address));
+  // group address
+  memcpy(oscore_ctx->rwin[oscore_ctx->rwin_idx].destination_address,
+         dest_addr->address, sizeof(dest_addr->address));
+
   return false;
 }
 
@@ -209,7 +249,8 @@ oc_oscore_recv_message(oc_message_t *message)
         /* Check if this is a repeat request and discard */
         uint64_t piv = 0;
         oscore_read_piv(oscore_pkt->piv, oscore_pkt->piv_len, &piv);
-        if (check_if_replayed_request(oscore_ctx, piv)) {
+        if (check_if_replayed_request(oscore_ctx, piv, &message->endpoint,
+                                      &message->mcast_dest)) {
           oscore_send_error(oscore_pkt, UNAUTHORIZED_4_01, &message->endpoint);
           goto oscore_recv_error;
         }
@@ -429,8 +470,6 @@ oc_oscore_send_multicast_message(oc_message_t *message)
     /* Increment SSN */
     // oscore_ctx->ssn++;
     increment_ssn_in_context(oscore_ctx);
-    // store it so that it can be retrieved by the clients
-    oc_knx_set_osn(oscore_ctx->ssn);
 
     /* Use context-sendid as kid */
     memcpy(kid, oscore_ctx->sendid, oscore_ctx->sendid_len);
@@ -651,7 +690,6 @@ oc_oscore_send_message(oc_message_t *msg)
       OC_LOGbytes_OSCORE(piv, piv_len);
       /* Increment SSN */
       increment_ssn_in_context(oscore_ctx);
-      // oscore_ctx->ssn++;
 
 #ifdef OC_CLIENT
       if (coap_pkt->code >= OC_GET && coap_pkt->code <= OC_DELETE) {
@@ -739,13 +777,6 @@ oc_oscore_send_message(oc_message_t *msg)
         memcpy(msg->endpoint.piv, piv, piv_len);
         msg->endpoint.piv_len = piv_len;
       }
-    }
-
-    /* Store current SSN with frequency OSCORE_WRITE_FREQ_K */
-    /* Based on recommendations in RFC 8613, Appendix B.1. to prevent SSN reuse
-     */
-    if (oscore_ctx->ssn % OSCORE_SSN_WRITE_FREQ_K == 0) {
-      oc_set_delayed_callback((void *)message->endpoint.device, dump_cred, 0);
     }
 
     /* Move CoAP payload to offset 2*COAP_MAX_HEADER_SIZE to accommodate for

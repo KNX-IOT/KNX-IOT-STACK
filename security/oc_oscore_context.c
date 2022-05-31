@@ -30,7 +30,7 @@
 //#include "oc_store.h"
 #include "port/oc_log.h"
 OC_LIST(contexts);
-OC_MEMB(ctx_s, oc_oscore_context_t, 1);
+OC_MEMB(ctx_s, oc_oscore_context_t, 20);
 
 // checking against receiver...
 oc_oscore_context_t *
@@ -152,9 +152,9 @@ oc_oscore_find_context_by_group_id(size_t device, int group_id)
   oc_oscore_context_t *ctx = (oc_oscore_context_t *)oc_list_head(contexts);
 
   while (ctx != NULL) {
-    oc_auth_at_t *my_entry = oc_get_auth_at_entry(0, ctx->aut_at_index);
+    oc_auth_at_t *my_entry = oc_get_auth_at_entry(0, ctx->auth_at_index);
     if (my_entry) {
-      oc_print_auth_at_entry(0, ctx->aut_at_index);
+      oc_print_auth_at_entry(0, ctx->auth_at_index);
       for (int i = 0; i < my_entry->ga_len; i++) {
 
         int64_t group_value = my_entry->ga[i];
@@ -200,17 +200,21 @@ oc_oscore_add_context(size_t device, const char *senderid,
                       const char *mastersecret, const char *token_id,
                       int auth_at_index, bool from_storage)
 {
+  PRINT("-----oc_oscore_add_context---%s\n", token_id);
   oc_oscore_context_t *ctx = (oc_oscore_context_t *)oc_memb_alloc(&ctx_s);
 
-  if (!ctx || (!senderid && !recipientid)) {
+  if (!ctx) {
+    OC_ERR("No memory for allocating context!!!");
+    return NULL;
+  }
+  if (!senderid && !recipientid) {
+    OC_ERR("No sender or recipient ID");
     return NULL;
   }
 
-  PRINT("-----oc_oscore_add_context---%s\n", token_id);
-
   ctx->device = device;
   ctx->ssn = ssn;
-  ctx->aut_at_index = auth_at_index;
+  ctx->auth_at_index = auth_at_index;
 
   PRINT("  device    %d\n", (int)device);
   PRINT("  sender    %s\n", senderid);
@@ -233,7 +237,6 @@ oc_oscore_add_context(size_t device, const char *senderid,
   if (from_storage) {
     ctx->ssn += OSCORE_SSN_WRITE_FREQ_K + OSCORE_SSN_PAD_F;
   }
-  // ctx->cred = cred_entry;
   if (desc) {
     oc_new_string(&ctx->desc, desc, strlen(desc));
   }
@@ -321,6 +324,7 @@ oc_oscore_add_context(size_t device, const char *senderid,
   return ctx;
 
 add_oscore_context_error:
+  OC_DBG_OSCORE("Encountered error while adding new context!");
   oc_memb_free(&ctx_s, ctx);
   return NULL;
 }

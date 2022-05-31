@@ -32,6 +32,11 @@
   (8) /* Size in bytes of AES-CCM-16-64-128 authentication tag */
 #define OSCORE_REPLAY_WINDOW_SIZE (32)
 
+#define OSCORE_STORAGE_PREFIX "ssn"
+#define OSCORE_STORAGE_PREFIX_LEN (3)
+#define OSCORE_STORAGE_KEY_LEN                                                 \
+  (OSCORE_CTXID_LEN + OSCORE_STORAGE_PREFIX_LEN + 1)
+
 #define OSCORE_INFO_MAX_LEN (128)
 #define OSCORE_AAD_MAX_LEN (128)
 
