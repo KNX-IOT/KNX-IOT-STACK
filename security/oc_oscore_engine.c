@@ -37,6 +37,19 @@ OC_PROCESS(oc_oscore_handler, "OSCORE Process");
 static increment_ssn_in_context(oc_oscore_context_t *ctx)
 {
   ctx->ssn++;
+
+  /* Store current SSN with frequency OSCORE_WRITE_FREQ_K
+   * Based on recommendations in RFC 8613, Appendix B.1. to prevent SSN reuse
+   */
+  if (ctx->ssn % OSCORE_SSN_WRITE_FREQ_K == 0) {
+    // save ssn to persistent memory, using kid as part of the key
+    uint8_t key_buf[OSCORE_STORAGE_KEY_LEN];
+    memcpy(key_buf, OSCORE_STORAGE_PREFIX, OSCORE_STORAGE_PREFIX_LEN);
+    memcpy(key_buf + OSCORE_STORAGE_PREFIX_LEN, ctx->sendid, ctx->sendid_len);
+    key_buf[OSCORE_STORAGE_KEY_LEN - 1] = '\0';
+
+    oc_storage_write(key_buf, (uint8_t *)&ctx->ssn, sizeof(ctx->ssn));
+  }
 }
 
 static oc_event_callback_retval_t
@@ -457,8 +470,6 @@ oc_oscore_send_multicast_message(oc_message_t *message)
     /* Increment SSN */
     // oscore_ctx->ssn++;
     increment_ssn_in_context(oscore_ctx);
-    // store it so that it can be retrieved by the clients
-    oc_knx_set_osn(oscore_ctx->ssn);
 
     /* Use context-sendid as kid */
     memcpy(kid, oscore_ctx->sendid, oscore_ctx->sendid_len);
@@ -766,13 +777,6 @@ oc_oscore_send_message(oc_message_t *msg)
         memcpy(msg->endpoint.piv, piv, piv_len);
         msg->endpoint.piv_len = piv_len;
       }
-    }
-
-    /* Store current SSN with frequency OSCORE_WRITE_FREQ_K */
-    /* Based on recommendations in RFC 8613, Appendix B.1. to prevent SSN reuse
-     */
-    if (oscore_ctx->ssn % OSCORE_SSN_WRITE_FREQ_K == 0) {
-      oc_set_delayed_callback((void *)message->endpoint.device, dump_cred, 0);
     }
 
     /* Move CoAP payload to offset 2*COAP_MAX_HEADER_SIZE to accommodate for

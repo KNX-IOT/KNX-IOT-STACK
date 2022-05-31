@@ -1267,6 +1267,25 @@ oc_load_at_table(size_t device_index)
     oc_at_load_entry(i);
     if (oc_string_len(g_at_entries[i].id) > 0) {
       oc_print_auth_at_entry(device_index, i);
+#ifdef OC_OSCORE
+      // save ssn to persistent memory, using kid as part of the key
+      uint64_t stored_ssn = 0;
+      uint8_t key_buf[OSCORE_STORAGE_KEY_LEN];
+      memcpy(key_buf, OSCORE_STORAGE_PREFIX, OSCORE_STORAGE_PREFIX_LEN);
+      memcpy(key_buf + OSCORE_STORAGE_PREFIX_LEN,
+             oc_string(g_at_entries[i].osc_contextid),
+             oc_string_len(g_at_entries[i].osc_contextid));
+      key_buf[OSCORE_STORAGE_KEY_LEN - 1] = '\0';
+
+      oc_storage_read(key_buf, (uint8_t *)stored_ssn, sizeof(stored_ssn));
+      // create oscore context
+      oc_oscore_context_t *ctx = oc_oscore_add_context(
+        device_index, oc_string(g_at_entries[i].osc_contextid),
+        oc_string(g_at_entries[i].osc_contextid), stored_ssn, "desc",
+        oc_string(g_at_entries[i].osc_ms),
+        oc_string(g_at_entries[i].osc_contextid), i, true /* from_storage */
+      );
+#endif
     }
   }
 }
@@ -1391,8 +1410,6 @@ oc_init_oscore(size_t device_index)
 
       if (g_at_entries[i].profile == OC_PROFILE_COAP_OSCORE) {
         uint64_t ssn = 0;
-        // ssn = oc_knx_get_osn();
-
         // one context: for sending and receiving.
         oc_oscore_context_t *ctx = oc_oscore_add_context(
           device_index, oc_string(g_at_entries[i].osc_contextid),
@@ -1402,13 +1419,6 @@ oc_init_oscore(size_t device_index)
         if (ctx == NULL) {
           PRINT("   fail...\n ");
         }
-
-        // ctx = oc_oscore_add_context(
-        //  device_index, "reci", "sender", oc_knx_get_osn(), "desc",
-        //  oc_string(g_at_entries[i].osc_ms), "token2", false);
-        // if (ctx == NULL) {
-        //  PRINT("   fail...\n ");
-        //}
       } else {
         PRINT("oc_init_oscore: no oscore context\n");
       }
