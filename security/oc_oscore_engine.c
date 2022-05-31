@@ -471,8 +471,6 @@ oc_oscore_send_multicast_message(oc_message_t *message)
     /* Increment SSN */
     // oscore_ctx->ssn++;
     increment_ssn_in_context(oscore_ctx);
-    // store it so that it can be retrieved by the clients
-    oc_knx_set_osn(oscore_ctx->ssn);
 
     /* Use context-sendid as kid */
     memcpy(kid, oscore_ctx->sendid, oscore_ctx->sendid_len);
