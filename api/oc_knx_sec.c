@@ -1417,8 +1417,6 @@ oc_init_oscore(size_t device_index)
 
       if (g_at_entries[i].profile == OC_PROFILE_COAP_OSCORE) {
         uint64_t ssn = 0;
-        // ssn = oc_knx_get_osn();
-
         // one context: for sending and receiving.
         oc_oscore_context_t *ctx = oc_oscore_add_context(
           device_index, oc_string(g_at_entries[i].osc_contextid),
@@ -1428,13 +1426,6 @@ oc_init_oscore(size_t device_index)
         if (ctx == NULL) {
           PRINT("   fail...\n ");
         }
-
-        // ctx = oc_oscore_add_context(
-        //  device_index, "reci", "sender", oc_knx_get_osn(), "desc",
-        //  oc_string(g_at_entries[i].osc_ms), "token2", false);
-        // if (ctx == NULL) {
-        //  PRINT("   fail...\n ");
-        //}
       } else {
         PRINT("oc_init_oscore: no oscore context\n");
       }

@@ -214,20 +214,6 @@ void oc_knx_load_fingerprint();
 void oc_knx_dump_fingerprint();
 
 /**
- * @brief sets the oscore sequence number
- *
- * @param osn the oscore sequence number
- */
-void oc_knx_set_osn(uint64_t osn);
-
-/**
- * @brief retrieves the oscore sequence number
- *
- *  @return osn the oscore sequence number
- */
-uint64_t oc_knx_get_osn();
-
-/**
  * @brief load the state of the device from persistent storage
  * load data for:
  * - load state machine (lsm)
