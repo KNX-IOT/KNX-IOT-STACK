@@ -622,7 +622,18 @@ oc_core_auth_at_post_handler(oc_request_t *request,
                                   oc_string(oscobject->value.string),
                                   oc_string_len(oscobject->value.string));
                   }
+                } else if (oscobject->type == OC_REP_BYTE_STRING) {
+                  // master secret as byte string, e.g. tolerating 0 in the data 
+                  if (oscobject->iname == 2 && subobject_nr == 8 &&
+                      oscobject_nr == 4) {
+                    // cnf::osc::ms
+                    oc_free_string(&(g_at_entries[index].osc_ms));
+                    oc_new_string(&g_at_entries[index].osc_ms,
+                                  oc_string(oscobject->value.string),
+                                  oc_string_len(oscobject->value.string));
+                  }
                 }
+
                 oscobject = oscobject->next;
               }
             }
