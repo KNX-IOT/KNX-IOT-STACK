@@ -149,7 +149,7 @@ coap_send_unauth_echo_response(coap_message_type_t type, uint16_t mid,
     if (token && token_len > 0) {
       coap_set_token(msg, token, token_len);
     }
-    coap_set_header_echo(msg, echo, sizeof(echo_len));
+    coap_set_header_echo(msg, echo, echo_len);
     size_t len = coap_serialize_message(msg, message->data);
     if (len > 0) {
       message->length = len;
