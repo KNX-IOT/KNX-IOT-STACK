@@ -1831,6 +1831,7 @@ coap_set_header_echo(void *packet, uint8_t *echo, size_t len)
   coap_packet_t *const coap_pkt = (coap_packet_t *)packet;
 
   memcpy(coap_pkt->echo, echo, len);
+  coap_pkt->echo_len = len;
   SET_OPTION(coap_pkt, COAP_OPTION_ECHO);
   return 1;
 }
