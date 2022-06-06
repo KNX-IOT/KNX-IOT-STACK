@@ -166,7 +166,7 @@ typedef struct
 #endif /* OC_OSCORE */
 
   uint8_t echo[COAP_ECHO_LEN];
-  uint8_t echo_len;
+  size_t echo_len;
 
   uint32_t payload_len;
   uint8_t *payload;
