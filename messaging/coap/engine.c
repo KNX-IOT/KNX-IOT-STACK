@@ -135,6 +135,32 @@ coap_send_empty_response(coap_message_type_t type, uint16_t mid,
   }
 }
 
+static void
+coap_send_unauth_echo_response(coap_message_type_t type, uint16_t mid,
+                         const uint8_t *token, size_t token_len, uint8_t *echo, size_t echo_len,
+                         oc_endpoint_t *endpoint)
+{
+  OC_DBG("CoAP send echo message: mid=%u", mid);
+  coap_packet_t msg[1]; // empty response
+  coap_udp_init_message(msg, type, UNAUTHORIZED_4_01, mid);
+  oc_message_t *message = oc_internal_allocate_outgoing_message();
+  if (message) {
+    memcpy(&message->endpoint, endpoint, sizeof(*endpoint));
+    if (token && token_len > 0) {
+      coap_set_token(msg, token, token_len);
+    }
+    coap_set_header_echo(msg, echo, sizeof(echo_len));
+    size_t len = coap_serialize_message(msg, message->data);
+    if (len > 0) {
+      message->length = len;
+      coap_send_message(message);
+    }
+    if (message->ref_count == 0) {
+      oc_message_unref(message);
+    }
+  }
+}
+
 #ifdef OC_SECURITY
 static oc_event_callback_retval_t
 close_all_tls_sessions(void *data)
@@ -310,6 +336,17 @@ coap_receive(oc_message_t *msg)
         coap_new_transaction(response->mid, NULL, 0, &msg->endpoint);
 
       if (transaction) {
+
+      if (true) // if a new sender
+      {
+        OC_DBG("Received request from new sender, sending Echo...");
+        uint64_t echo_value = 1337;
+        coap_send_unauth_echo_response(message->type == COAP_TYPE_CON ? COAP_TYPE_ACK
+                                                                : COAP_TYPE_NON,
+                                message->mid, message->token, message->token_len,
+                                (uint8_t*) echo_value, sizeof(echo_value), &msg->endpoint);
+        return UNAUTHORIZED_4_01;
+      }
 #ifdef OC_BLOCK_WISE
         const uint8_t *incoming_block;
         uint32_t incoming_block_len =
