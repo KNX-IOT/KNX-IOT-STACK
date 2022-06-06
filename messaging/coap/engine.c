@@ -96,6 +96,13 @@ static uint16_t history[OC_REQUEST_HISTORY_SIZE];
 static uint8_t history_dev[OC_REQUEST_HISTORY_SIZE];
 static uint8_t idx;
 
+#ifndef OC_SEEN_SENDERS_SIZE
+#define OC_SEEN_SENDERS_SIZE (32)
+#endif
+// cache of 
+static oc_ipv6_addr_t seen_senders[OC_SEEN_SENDERS_SIZE];
+size_t seen_sender_idx = 0;
+
 bool
 oc_coap_check_if_duplicate(uint16_t mid, uint8_t device)
 {
@@ -336,17 +343,56 @@ coap_receive(oc_message_t *msg)
         coap_new_transaction(response->mid, NULL, 0, &msg->endpoint);
 
       if (transaction) {
+        bool new_sender = true;
+        for (int i = 0; i < OC_SEEN_SENDERS_SIZE; ++i)
+        {
+          if (memcmp(seen_senders[i].address, msg->endpoint.addr.ipv6.address, 16) == 0)
+          {
+            new_sender = false;
+            break;
+          }
+        }
 
-      if (true) // if a new sender
-      {
-        OC_DBG("Received request from new sender, sending Echo...");
-        uint64_t echo_value = 1337;
-        coap_send_unauth_echo_response(message->type == COAP_TYPE_CON ? COAP_TYPE_ACK
-                                                                : COAP_TYPE_NON,
-                                message->mid, message->token, message->token_len,
-                                (uint8_t*) &echo_value, sizeof(echo_value), &msg->endpoint);
-        return UNAUTHORIZED_4_01;
-      }
+        if (new_sender) // if a new sender
+        {
+          bool echo_option = false; // this should probably not be a bool
+
+          uint8_t echo_value[COAP_ECHO_LEN];
+          size_t echo_len = coap_get_header_echo(message, echo_value);
+
+          // KNX-IoT servers use 8-byte echo options 
+          if (echo_len != sizeof(uint64_t))
+          {
+            coap_send_empty_response(message->type == COAP_TYPE_CON ? COAP_TYPE_ACK
+                                                                    : COAP_TYPE_NON,
+                                    message->mid, message->token, message->token_len,
+                                    BAD_OPTION_4_02, &msg->endpoint);
+            return BAD_OPTION_4_02;
+          }
+          
+          // this is potentially endianess-sensitive, but we've already checked that
+          // the echo value is 8 bytes, and correct echo values originate on the same
+          // machine where they are generated, so this should be okay
+          uint64_t received_timestamp = (*(uint64_t*)echo_value);
+
+          /*
+          if received_timestamp < oc_port_get_time() - ten_seconds
+            message is stale, drop
+          else
+            message is fresh, add to seen senders list and continue processing
+          */
+
+          if (!echo_option)
+          {
+            OC_DBG("Received request from new sender, sending Echo...");
+            uint64_t echo_value = 0x1337; // TODO replace this with value from port clock
+            coap_send_unauth_echo_response(message->type == COAP_TYPE_CON ? COAP_TYPE_ACK
+                                                                    : COAP_TYPE_NON,
+                                    message->mid, message->token, message->token_len,
+                                    (uint8_t*) &echo_value, sizeof(echo_value), &msg->endpoint);
+            return UNAUTHORIZED_4_01;
+          }
+        }
 #ifdef OC_BLOCK_WISE
         const uint8_t *incoming_block;
         uint32_t incoming_block_len =
@@ -944,6 +990,7 @@ void
 coap_init_engine(void)
 {
   coap_register_as_transaction_handler();
+  memset(seen_senders, 0, sizeof(seen_senders));
 }
 /*---------------------------------------------------------------------------*/
 OC_PROCESS_THREAD(coap_engine, ev, data)
