@@ -165,6 +165,9 @@ typedef struct
   uint8_t kid_len;
 #endif /* OC_OSCORE */
 
+  uint8_t echo[COAP_ECHO_LEN];
+  uint8_t echo_len;
+
   uint32_t payload_len;
   uint8_t *payload;
 } coap_packet_t;
@@ -331,6 +334,9 @@ int coap_set_header_size2(void *packet, uint32_t size);
 
 int coap_get_header_size1(void *packet, uint32_t *size);
 int coap_set_header_size1(void *packet, uint32_t size);
+
+int coap_get_header_echo(void *packet, uint8_t echo[COAP_ECHO_LEN]);
+int coap_set_header_echo(void *packet, uint8_t *echo, size_t len);
 
 int coap_get_payload(void *packet, const uint8_t **payload);
 int coap_set_payload(void *packet, const void *payload, size_t length);

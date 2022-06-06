@@ -78,6 +78,7 @@ extern "C" {
   4 /* | version:0x03 type:0x0C tkl:0xF0 | code | mid:0x00FF | mid:0xFF00 | */
 #define COAP_TOKEN_LEN 8 /* The maximum number of bytes for the Token */
 #define COAP_ETAG_LEN 8  /* The maximum number of bytes for the ETag */
+#define COAP_ECHO_LEN 40 /* The maximum size of the Echo option */
 
 #define COAP_HEADER_VERSION_MASK 0xC0
 #define COAP_HEADER_VERSION_POSITION 6
@@ -177,6 +178,7 @@ typedef enum {
   COAP_OPTION_PROXY_URI = 35,                  /* 1-1034 B */
   COAP_OPTION_PROXY_SCHEME = 39,               /* 1-255 B */
   COAP_OPTION_SIZE1 = 60,                      /* 0-4 B */
+  COAP_OPTION_ECHO = 252,                      /* 1-40 */
   OCF_OPTION_ACCEPT_CONTENT_FORMAT_VER = 2049, /* 2 B */
   OCF_OPTION_CONTENT_FORMAT_VER = 2053         /* 2 B */
 } coap_option_t;
