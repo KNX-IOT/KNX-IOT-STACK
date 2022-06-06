@@ -344,7 +344,7 @@ coap_receive(oc_message_t *msg)
         coap_send_unauth_echo_response(message->type == COAP_TYPE_CON ? COAP_TYPE_ACK
                                                                 : COAP_TYPE_NON,
                                 message->mid, message->token, message->token_len,
-                                (uint8_t*) echo_value, sizeof(echo_value), &msg->endpoint);
+                                (uint8_t*) &echo_value, sizeof(echo_value), &msg->endpoint);
         return UNAUTHORIZED_4_01;
       }
 #ifdef OC_BLOCK_WISE
