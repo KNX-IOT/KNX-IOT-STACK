@@ -54,7 +54,7 @@ Project directory structure
 ---------------------------
 
 api/*
-  contains the implementations of `client/server APIs <https://knx-iot.github.io/KNX-IOT-STACK-doxygen/>`, the resources,
+  contains the implementations of `client/server APIs <https://knx-iot.github.io/KNX-IOT-STACK-doxygen/>`_, the resources,
   utility and helper functions to encode/decode CBOR
   to/from data points (function blocks), module for encoding and interpreting endpoints, and handlers for the discovery, device
   and application resources.
