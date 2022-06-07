@@ -360,7 +360,6 @@ coap_receive(oc_message_t *msg)
         }
 
         // server-side logic for handling responses with echo option
-        
         if (new_sender && msg->endpoint.flags & OSCORE_DECRYPTED) 
         {
           uint8_t echo_value[COAP_ECHO_LEN];
