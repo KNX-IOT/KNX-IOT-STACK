@@ -61,7 +61,7 @@ void
 oc_endpoint_set_serial_number(oc_endpoint_t *endpoint, char *serial_number)
 {
   if (endpoint) {
-    strncpy((char*)&endpoint->serial_number, serial_number, SERIAL_NUM_SIZE);
+    strncpy((char *)&endpoint->serial_number, serial_number, SERIAL_NUM_SIZE);
   }
 }
 
