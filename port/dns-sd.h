@@ -13,8 +13,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 */
+/**
+  @file
+*/
 #ifndef DNS_SD_H
 #define DNS_SD_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include <stdint.h>
 
@@ -30,5 +37,9 @@
  * @return int 0 on success, -1 on error.
  */
 int knx_publish_service(char *serial_no, uint32_t iid, uint32_t ia);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // DNS_SD_H
