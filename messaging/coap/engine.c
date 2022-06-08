@@ -284,7 +284,7 @@ coap_receive(oc_message_t *msg)
       transaction = coap_get_transaction_by_mid(message->mid);
       if (transaction) {
 #ifdef OC_CLIENT
-        if (message->code == UNAUTHORIZED_4_01 && message->echo_len != 0)
+        if (/*message->code == UNAUTHORIZED_4_01 && */message->echo_len != 0)
         {
           // Received Unauthorised response - retransmit request,
           // but include Echo header included in this response
