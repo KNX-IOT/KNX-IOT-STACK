@@ -12,7 +12,7 @@ jobs:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
-    - uses: wangchucheng/git-repo-sync@v0.1.0
+    - uses: WAvdBeek/git-repo-sync@v0.1.1
       with:
         # Such as https://github.com/wangchucheng/git-repo-sync.git
         # https://gitlab.knx.org/knxiot/knx-iot-point-api.git
