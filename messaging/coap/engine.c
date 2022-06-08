@@ -284,7 +284,9 @@ coap_receive(oc_message_t *msg)
       transaction = coap_get_transaction_by_mid(message->mid);
       if (transaction) {
 #ifdef OC_CLIENT
-        if (/*message->code == UNAUTHORIZED_4_01 && */message->echo_len != 0)
+        uint8_t echo_value[COAP_ECHO_LEN];
+        size_t echo_len = coap_get_header_echo(message, echo_value);
+        if (/*message->code == UNAUTHORIZED_4_01 && */echo_len != 0)
         {
           // Received Unauthorised response - retransmit request,
           // but include Echo header included in this response
@@ -294,7 +296,9 @@ coap_receive(oc_message_t *msg)
           // get the payload from the old request, add it to new request, send it out
           coap_packet_t old_request_pkt[1];
           coap_udp_parse_message(old_request_pkt, transaction->message->data, (uint16_t) transaction->message->length);
-          old_request_pkt->echo_len = coap_get_header_echo(message, old_request_pkt->echo);
+          //old_request_pkt->echo_len = coap_get_header_echo(message, old_request_pkt->echo);
+          old_request_pkt->echo_len = echo_len;
+          memcpy(old_request_pkt->echo, echo_value, echo_len);
 
           // create a new transaction and send the request
           // should probably send with a new MID / token - check coap spec
