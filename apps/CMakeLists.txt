@@ -37,7 +37,7 @@ add_executable(LSSB_minimal_all
 target_link_libraries(LSSB_minimal_all
         kisClientServer
     )
-file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/LSSB_minimal_all_creds)
+file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/lssb_minimal_all_creds)
 
 if(EXISTS ${PROJECT_SOURCE_DIR}/knx_iot_device.c)
     add_executable(knx_iot_device
@@ -49,9 +49,9 @@ endif()
 
 # demo: actuator (e.g. receiving command)
 add_executable(LSAB_minimal_all
-    ${PROJECT_SOURCE_DIR}/LSAB_minimal_all.c
+    ${PROJECT_SOURCE_DIR}/lsab_minimal_all.c
 )
-target_link_libraries(LSAB_minimal_all
+target_link_libraries(lsab_minimal_all
         kisClientServer
     )
-file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/LSAB_minimal_all_creds)
+file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/lsab_minimal_all_creds)
