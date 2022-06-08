@@ -16,7 +16,7 @@ jobs:
       with:
         # Such as https://github.com/wangchucheng/git-repo-sync.git
         # https://gitlab.knx.org/knxiot/knx-iot-point-api.git
-        target-url: https://gitlab.knx.org/knxiot/knx-iot-point-api.git
+        target-url: https://gitlab.knx.org/shared-projects/knx-iot-point-api-public-stack.git
         # Such as wangchucheng
         target-username: ${{ secrets.TARGET_USERNAME }}
           # You can store token in your project's 'Setting > Secrets' and reference the name here. Such as ${{ secrets.ACCESS\_TOKEN }}
