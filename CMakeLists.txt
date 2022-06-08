@@ -13,6 +13,7 @@ option(BUILD_TESTING "Build KNX tests" OFF)
 
 #set(OC_SECURITY_ENABLED ON CACHE BOOL "Enable security")
 
+set(OC_DNS_SD_ENABLED OFF CACHE BOOL "Enable DNS SD")
 set(OC_OSCORE_ENABLED OFF CACHE BOOL "Enable oscore")
 set(OC_PKI_ENABLED OFF CACHE BOOL "Enable PKI security")
 set(OC_DEBUG_ENABLED OFF CACHE BOOL "Enable debug messages")
@@ -138,6 +139,10 @@ endif()
 
 if(OC_DEBUG_ENABLED)
     target_compile_definitions(kis-common INTERFACE OC_DEBUG)
+endif()
+
+if(OC_DNS_SD_ENABLED)
+    target_compile_definitions(kis-common INTERFACE OC_DNS_SD)
 endif()
 
 # Client and server versions

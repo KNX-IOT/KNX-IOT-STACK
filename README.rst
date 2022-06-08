@@ -130,9 +130,9 @@ Grab source and dependencies using:
 
 Please check here for build instructions:
 
-windows: https://github.com/KNX-IOT/knx-iot.github.io/blob/main/_pages/building_windows.md
+ - `Windows <https://knx-iot.github.io/building_windows/>`_
 
-linux: https://github.com/KNX-IOT/knx-iot.github.io/blob/main/_pages/building_linux.md
+ - Linux <https://knx-iot.github.io/building_linux/>`_
 
 
 Send Feedback
