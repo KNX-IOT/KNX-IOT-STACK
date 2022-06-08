@@ -1,3 +1,19 @@
+/*
+// Copyright (c) 2022 Cascoda Ltd.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+*/
+
 #include <unistd.h>
 #include <signal.h>
 #include <stdio.h>
@@ -14,13 +30,18 @@ static char installation_subtype[200];
 int
 knx_publish_service(char *serial_no, uint32_t iid, uint32_t ia)
 {
+  (void)serial_no;
+  (void)iid;
+  (void)ia;
+
+#ifdef OC_DNS_SD
   if (avahi_pid != 0) {
-    // A previously published service advertisment is still running
+    // A previously published service advertisement is still running
     // Kill it so that you can start a new one
     kill(avahi_pid, SIGTERM);
   }
 
-  // Start the service advertisment in a new process
+  // Start the service advertisement in a new process
   avahi_pid = fork();
 
   if (avahi_pid == 0) {
@@ -37,7 +58,7 @@ knx_publish_service(char *serial_no, uint32_t iid, uint32_t ia)
 
       error =
         execlp("avahi-publish-service", "avahi-publish-service",
-               "--subtype=_ia0._sub._knx._udp", // for uncommissioned devices
+               "--subtype=_ia0._sub._knx._udp", // for noncommissioned devices
                serial_no_subtype,
                serial_no,   // service name = serial number
                "_knx._udp", // service type
@@ -74,5 +95,7 @@ knx_publish_service(char *serial_no, uint32_t iid, uint32_t ia)
            strerror(errno));
     return -1;
   }
+#endif /* OC_DNS_SD */
+
   return 0;
 }
