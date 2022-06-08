@@ -132,7 +132,7 @@ Please check here for build instructions:
 
  - `Windows <https://knx-iot.github.io/building_windows/>`_
 
- - Linux <https://knx-iot.github.io/building_linux/>`_
+ - `Linux <https://knx-iot.github.io/building_linux/>`_
 
 
 Send Feedback
