@@ -44,7 +44,7 @@
     - functionality to handle the s-mode objects & transmission flags.
 
 
-  Therefore an KNX_IOT application exist of:
+  Therefore an KNX IoT Point API application exist of:
 
   - Code for each specific data points (handling GET/POST)
   - own code to talk to hardware
@@ -56,8 +56,8 @@
   - main loop
 
   Examples of functional devices :
-  - LSAB_minimal_all.c an example that implements Functional Block LSAB
-  - LSSB_minimal_all.c an example that implements Functional Block LSSB
+  - lsab_minimal_all.c an example that implements Functional Block LSAB
+  - lssb_minimal_all.c an example that implements Functional Block LSSB
 
   ## handling of transmission flags
 
