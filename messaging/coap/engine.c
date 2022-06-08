@@ -163,7 +163,7 @@ coap_send_unauth_echo_response(coap_message_type_t type, uint16_t mid,
       coap_set_token(msg, token, token_len);
     }
     coap_set_header_echo(msg, echo, echo_len);
-    size_t len = coap_serialize_message(msg, message->data);
+    size_t len = oscore_serialize_message(msg, message->data);
     if (len > 0) {
       message->length = len;
       coap_send_message(message);
@@ -283,6 +283,42 @@ coap_receive(oc_message_t *msg)
     {
       transaction = coap_get_transaction_by_mid(message->mid);
       if (transaction) {
+#ifdef OC_CLIENT
+        if (message->code == UNAUTHORIZED_4_01 && message->echo_len != 0)
+        {
+          // Received Unauthorised response - retransmit request,
+          // but include Echo header included in this response
+          OC_DBG("Received Unauthorised response with Echo option");
+          OC_DBG("Retransmitting with included Echo...");
+          // something like: parse coap headers from old request, add echo header,
+          // get the payload from the old request, add it to new request, send it out
+          coap_packet_t old_request_pkt[1];
+          coap_udp_parse_message(old_request_pkt, transaction->message->data, (uint16_t) transaction->message->length);
+          old_request_pkt->echo_len = coap_get_header_echo(message, old_request_pkt->echo);
+
+          // create a new transaction and send the request
+          // should probably send with a new MID / token - check coap spec
+          int i = 0;
+          while (i < old_request_pkt->token_len) {
+            int r = oc_random_value();
+            memcpy(old_request_pkt->token + i, &r, sizeof(r));
+            i += sizeof(r);
+          }
+          coap_transaction_t *new_transaction = 
+            coap_new_transaction(coap_get_mid(), old_request_pkt->token, old_request_pkt->token_len, &msg->endpoint);
+
+          new_transaction->message = oc_internal_allocate_outgoing_message();
+          new_transaction->message->length =
+            oscore_serialize_message(response, new_transaction->message->data);
+          if (new_transaction->message->length > 0) {
+            coap_send_transaction(new_transaction);
+          } else {
+            coap_clear_transaction(new_transaction);
+          }
+          return 0;
+        }
+#endif
+
         coap_clear_transaction(transaction);
       }
       transaction = NULL;
@@ -702,6 +738,8 @@ coap_receive(oc_message_t *msg)
           goto send_message;
         }
       }
+    
+    /* handle responses */
     } else {
 #ifdef OC_CLIENT
 #ifdef OC_BLOCK_WISE
