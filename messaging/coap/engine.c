@@ -163,7 +163,7 @@ coap_send_unauth_echo_response(coap_message_type_t type, uint16_t mid,
       coap_set_token(msg, token, token_len);
     }
     coap_set_header_echo(msg, echo, echo_len);
-    size_t len = oscore_serialize_message(msg, message->data);
+    size_t len = coap_oscore_serialize_message(msg, message->data, true, true, true);
     if (len > 0) {
       message->length = len;
       coap_send_message(message);
