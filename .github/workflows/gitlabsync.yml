@@ -18,6 +18,6 @@ jobs:
         # https://gitlab.knx.org/knxiot/knx-iot-point-api.git
         target-url: 'gitlab.knx.org/shared-projects/knx-iot-point-api-public-stack.git'
         # Such as wangchucheng
-        target-username: 'Wouter van der Beek'
+        target-username: 'WoutervanderBeek'
           # You can store token in your project's 'Setting > Secrets' and reference the name here. Such as ${{ secrets.ACCESS\_TOKEN }}
         target-token: ${{ secrets.TARGET_TOKEN }}
