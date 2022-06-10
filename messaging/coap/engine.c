@@ -312,7 +312,7 @@ coap_receive(oc_message_t *msg)
             coap_new_transaction(coap_get_mid(), old_request_pkt->token, old_request_pkt->token_len, &msg->endpoint);
 
           new_transaction->message = oc_internal_allocate_outgoing_message();
-          new_transaction->message->endpoint = msg->endpoint;
+          new_transaction->message->endpoint = transaction->message->endpoint;
           new_transaction->message->length =
             coap_oscore_serialize_message(old_request_pkt, new_transaction->message->data, true, true, true);
           if (new_transaction->message->length > 0) {
@@ -320,6 +320,7 @@ coap_receive(oc_message_t *msg)
           } else {
             coap_clear_transaction(new_transaction);
           }
+          coap_clear_transaction(transaction);
           return 0;
         }
 #endif
