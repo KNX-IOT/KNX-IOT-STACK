@@ -124,9 +124,13 @@ Examples are:
 Build instructions
 ------------------
 
-Grab source and dependencies using:
+Grab source and dependencies from GitHub using:
 
 ``git clone --recursive https://github.com/KNX-IOT/KNX-IOT_STACK.git``
+
+or use GitLab:
+
+``git clone --recursive https://gitlab.knx.org/shared-projects/knx-iot-point-api-public-stack.git``
 
 Please check here for build instructions:
 
@@ -139,4 +143,4 @@ Send Feedback
 -------------------------------------------------
 
 Bugs
-`Github issues <https://github.com/KNX-IOT/KNX-IOT-STACK/issues>`_
+`Issues <https://github.com/KNX-IOT/KNX-IOT-STACK/issues>`_
