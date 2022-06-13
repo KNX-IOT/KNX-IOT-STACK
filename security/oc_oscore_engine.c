@@ -607,11 +607,41 @@ oc_oscore_send_message(oc_message_t *msg)
    */
   oc_message_t *message = msg;
   oc_oscore_context_t *oscore_ctx = NULL;
+  coap_packet_t coap_pkt[1];
+  coap_status_t code = 0;
+
+  OC_DBG_OSCORE("### parse CoAP message ###");
+  /* Parse CoAP message */
+#ifdef OC_TCP
+  if (message->endpoint.flags & TCP) {
+    code = coap_tcp_parse_message(coap_pkt, message->data,
+                                  (uint32_t)message->length);
+  } else
+#endif /* OC_TCP */
+  {
+    code = coap_udp_parse_message(coap_pkt, message->data,
+                                  (uint16_t)message->length);
+  }
+
+  if (code != COAP_NO_ERROR) {
+    OC_ERR("***error parsing CoAP packet***");
+    goto oscore_send_error;
+  }
+
+    OC_DBG_OSCORE("### parsed CoAP message ###");
+
   oscore_ctx = oc_oscore_find_context_by_serial_number(
     message->endpoint.device, message->endpoint.serial_number);
   if (oscore_ctx == NULL) {
     oscore_ctx = oc_oscore_find_context_by_group_id(message->endpoint.device,
                                                     message->endpoint.group_id);
+  }
+  if (oscore_ctx == NULL) {
+    uint8_t *request_piv, request_piv_len;
+    oscore_ctx = oc_oscore_find_context_by_token_mid(
+      message->endpoint.device, coap_pkt->token, coap_pkt->token_len,
+      coap_pkt->mid, &request_piv, &request_piv_len,
+      message->endpoint.flags & TCP);
   }
   if (oscore_ctx == NULL) {
     OC_ERR("oc_oscore_send_message: No OSCORE context found. ERROR");
@@ -646,28 +676,6 @@ oc_oscore_send_message(oc_message_t *msg)
     }
 
     oc_message_unref(msg);
-
-    OC_DBG_OSCORE("### parse CoAP message ###");
-    /* Parse CoAP message */
-    coap_packet_t coap_pkt[1];
-    coap_status_t code = 0;
-#ifdef OC_TCP
-    if (message->endpoint.flags & TCP) {
-      code = coap_tcp_parse_message(coap_pkt, message->data,
-                                    (uint32_t)message->length);
-    } else
-#endif /* OC_TCP */
-    {
-      code = coap_udp_parse_message(coap_pkt, message->data,
-                                    (uint16_t)message->length);
-    }
-
-    if (code != COAP_NO_ERROR) {
-      OC_ERR("***error parsing CoAP packet***");
-      goto oscore_send_error;
-    }
-
-    OC_DBG_OSCORE("### parsed CoAP message ###");
 
     uint8_t piv[OSCORE_PIV_LEN], piv_len = 0, kid[OSCORE_CTXID_LEN],
                                  kid_len = 0, nonce[OSCORE_AEAD_NONCE_LEN],
