@@ -8,8 +8,14 @@
 .. image:: https://github.com/KNX-IOT/KNX-IOT-STACK/actions/workflows/doxygen.yml/badge.svg
    :target: https://github.com/KNX-IOT/KNX-IOT-STACK/actions/workflows/doxygen.yml
 
+.. image:: https://github.com/KNX-IOT/KNX-IOT-STACK/actions/workflows/doxygen-publish.yml/badge.svg
+   :target: https://github.com/KNX-IOT/KNX-IOT-STACK/actions/workflows/doxygen-publish.yml
+
 .. image:: https://github.com/KNX-IOT/KNX-IOT-STACK/actions/workflows/check-format.yml/badge.svg
    :target: https://github.com/KNX-IOT/KNX-IOT-STACK/actions/workflows/check-format.yml
+
+.. image:: https://github.com/KNX-IOT/KNX-IOT-STACK/actions/workflows/gitlabsync.yml/badge.svg
+   :target: https://github.com/KNX-IOT/KNX-IOT-STACK/actions/workflows/gitlabsync.yml
 
 
 Introduction
