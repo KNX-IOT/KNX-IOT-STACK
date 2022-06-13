@@ -117,7 +117,7 @@ table_find_id_from_rep(oc_rep_t *object)
       break;
     } /* switch */
     object = object->next;
-  }   /* while */
+  } /* while */
   PRINT("  table_find_id_from_rep ERR: id=%d \n", id);
   return id;
 }
@@ -782,7 +782,7 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
             oc_new_string(&g_gpt[index].url, oc_string(object->value.string),
                           oc_string_len(object->value.string));
           }
-         } break;
+        } break;
         case OC_REP_INT_ARRAY: {
           if (object->iname == 7) {
             // g_got[index].id = object->value.integer;
@@ -962,7 +962,6 @@ oc_create_fp_p_x_resource(int resource_idx, size_t device)
 #endif /* OC_PUBLISHER_TABLE */
 
 // -----------------------------------------------------------------------------
-
 
 static void
 oc_core_fp_r_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
@@ -1807,7 +1806,8 @@ oc_core_get_recipient_table_size()
   return GRT_MAX_ENTRIES;
 }
 
-oc_group_rp_table_t *oc_core_get_recipient_table_entry(int index)
+oc_group_rp_table_t *
+oc_core_get_recipient_table_entry(int index)
 {
   if (index < 0) {
     return NULL;
@@ -1818,7 +1818,8 @@ oc_group_rp_table_t *oc_core_get_recipient_table_entry(int index)
   return &g_grt[index];
 }
 
-int oc_core_get_publisher_table_size()
+int
+oc_core_get_publisher_table_size()
 {
 #ifdef OC_PUBLISHER_TABLE
   return GPT_MAX_ENTRIES;
@@ -1827,7 +1828,8 @@ int oc_core_get_publisher_table_size()
 #endif
 }
 
-oc_group_rp_table_t *oc_core_get_publisher_table_entry(int index)
+oc_group_rp_table_t *
+oc_core_get_publisher_table_entry(int index)
 {
 
 #ifdef OC_PUBLISHER_TABLE
@@ -1840,7 +1842,7 @@ oc_group_rp_table_t *oc_core_get_publisher_table_entry(int index)
   return &g_gpt[index];
 #else
   return NULL;
-#endif 
+#endif
 }
 
 // -----------------------------------------------------------------------------
