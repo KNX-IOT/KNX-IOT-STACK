@@ -310,8 +310,6 @@ coap_receive(oc_message_t *msg)
           }
           coap_transaction_t *new_transaction = 
             coap_new_transaction(coap_get_mid(), old_request_pkt->token, old_request_pkt->token_len, &msg->endpoint);
-          
-          // Try to save the serial number the first time it is received, store it in the transaction
           oc_client_cb_t *cb = oc_ri_find_client_cb_by_token(old_request_pkt->token, old_request_pkt->token_len);
 
           new_transaction->message = oc_internal_allocate_outgoing_message();
