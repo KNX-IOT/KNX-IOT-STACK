@@ -314,7 +314,10 @@ coap_receive(oc_message_t *msg)
             coap_new_transaction(coap_get_mid(), old_request_pkt->token, old_request_pkt->token_len, &msg->endpoint);
 
           oc_client_cb_t *client_cb = oc_ri_find_client_cb_by_token(old_request_pkt->token, old_request_pkt->token_len);
-          OC_DBG("Pointer to Client Callback: %p", client_cb);
+          OC_DBG("Pointer to Token Client Callback: %p", client_cb);
+
+          client_cb = oc_ri_find_client_cb_by_mid(old_request_pkt->mid);
+          OC_DBG("Pointer to MID Client Callback: %p", client_cb);
 
           new_transaction->message = oc_internal_allocate_outgoing_message();
           new_transaction->message->endpoint = transaction->message->endpoint;
