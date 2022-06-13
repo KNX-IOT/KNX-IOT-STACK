@@ -286,43 +286,42 @@ coap_receive(oc_message_t *msg)
 #ifdef OC_CLIENT
         uint8_t echo_value[COAP_ECHO_LEN];
         size_t echo_len = coap_get_header_echo(message, echo_value);
-        if (/*message->code == UNAUTHORIZED_4_01 && */echo_len != 0)
+        if (message->code == UNAUTHORIZED_4_01 && echo_len != 0)
         {
           // Received Unauthorised response - retransmit request,
           // but include Echo header included in this response
           OC_DBG("Received Unauthorised response with Echo option");
           OC_DBG("Retransmitting with included Echo...");
-          // something like: parse coap headers from old request, add echo header,
-          // get the payload from the old request, add it to new request, send it out
-          coap_packet_t old_request_pkt[1];
-          coap_udp_parse_message(old_request_pkt, transaction->message->data, (uint16_t) transaction->message->length);
-          //old_request_pkt->echo_len = coap_get_header_echo(message, old_request_pkt->echo);
-          old_request_pkt->echo_len = echo_len;
-          memcpy(old_request_pkt->echo, echo_value, echo_len);
+          coap_packet_t retransmitted_pkt[1];
+          coap_udp_parse_message(retransmitted_pkt, transaction->message->data, (uint16_t) transaction->message->length);
 
-          // create a new transaction and send the request
-          // should probably send with a new MID / token - check coap spec
+          client_cb = oc_ri_find_client_cb_by_mid(retransmitted_pkt->mid);
+          OC_DBG("Pointer to MID Client Callback: %p", client_cb);
+
+          // copy the echo from the unauthorised response into the new request
+          coap_set_header_echo(retransmitted_pkt, echo_value, echo_len);
+          // Create a new transaction and send the request. New transaction has different
+          // MID & token, but should use the same client callback 
           int i = 0;
-          while (i < old_request_pkt->token_len) {
+          while (i < retransmitted_pkt->token_len) {
             int r = oc_random_value();
-            memcpy(old_request_pkt->token + i, &r, sizeof(r));
+            memcpy(retransmitted_pkt->token + i, &r, sizeof(r));
             i += sizeof(r);
           }
-          oc_endpoint_print(&transaction->message->endpoint);
-
+          retransmitted_pkt->mid = coap_get_mid();
           coap_transaction_t *new_transaction = 
-            coap_new_transaction(coap_get_mid(), old_request_pkt->token, old_request_pkt->token_len, &msg->endpoint);
+            coap_new_transaction(retransmitted_pkt->mid, retransmitted_pkt->token, retransmitted_pkt->token_len, &msg->endpoint);
 
-          oc_client_cb_t *client_cb = oc_ri_find_client_cb_by_token(old_request_pkt->token, old_request_pkt->token_len);
-          OC_DBG("Pointer to Token Client Callback: %p", client_cb);
-
-          client_cb = oc_ri_find_client_cb_by_mid(old_request_pkt->mid);
-          OC_DBG("Pointer to MID Client Callback: %p", client_cb);
+          // a little bit naughty - modify the old client callback to refer to the
+          // new (retransmitted) packet
+          client_cb->mid = retransmitted_pkt->mid;
+          client_cb->token_len = retransmitted_pkt->token_len;
+          memcpy(client_cb->token, retransmitted_pkt->token, client_cb->token_len);
 
           new_transaction->message = oc_internal_allocate_outgoing_message();
           new_transaction->message->endpoint = transaction->message->endpoint;
           new_transaction->message->length =
-            coap_oscore_serialize_message(old_request_pkt, new_transaction->message->data, true, true, true);
+            coap_oscore_serialize_message(retransmitted_pkt, new_transaction->message->data, true, true, true);
           if (new_transaction->message->length > 0) {
             coap_send_transaction(new_transaction);
           } else {
