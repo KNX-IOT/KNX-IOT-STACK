@@ -308,14 +308,13 @@ coap_receive(oc_message_t *msg)
             memcpy(old_request_pkt->token + i, &r, sizeof(r));
             i += sizeof(r);
           }
-          oc_client_cb_t *cb = oc_ri_find_client_cb_by_token(old_request_pkt->token, old_request_pkt->token_len);
-          oc_endpoint_print(&cb->endpoint);
+          oc_endpoint_print(&transaction->message->endpoint);
 
           coap_transaction_t *new_transaction = 
             coap_new_transaction(coap_get_mid(), old_request_pkt->token, old_request_pkt->token_len, &msg->endpoint);
 
           new_transaction->message = oc_internal_allocate_outgoing_message();
-          new_transaction->message->endpoint = cb->endpoint;
+          new_transaction->message->endpoint = transaction->message->endpoint;
           new_transaction->message->length =
             coap_oscore_serialize_message(old_request_pkt, new_transaction->message->data, true, true, true);
           if (new_transaction->message->length > 0) {
