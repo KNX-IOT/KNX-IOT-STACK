@@ -17,6 +17,9 @@ typedef uint64_t oc_clock_time_t;
 /* Max inactivity timeout before tearing down DTLS connection */
 #define OC_DTLS_INACTIVITY_TIMEOUT (300)
 
+/* Maximum number of concurrent requests */
+#define OC_MAX_NUM_CONCURRENT_REQUESTS (5)
+
 /* Add support for passing network up/down events to the app */
 #define OC_NETWORK_MONITOR
 /* Add support for passing TCP/TLS/DTLS session connection events to the app */
