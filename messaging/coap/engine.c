@@ -314,6 +314,7 @@ coap_receive(oc_message_t *msg)
 
           new_transaction->message = oc_internal_allocate_outgoing_message();
           new_transaction->message->endpoint = cb->endpoint;
+          oc_endpoint_print(&new_transaction->message->endpoint);
           new_transaction->message->length =
             coap_oscore_serialize_message(old_request_pkt, new_transaction->message->data, true, true, true);
           if (new_transaction->message->length > 0) {
