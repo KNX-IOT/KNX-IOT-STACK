@@ -23,12 +23,8 @@
 #define TAGS_AS_STRINGS
 
 #define GOT_STORE "GOT_STORE"
-#define GPT_STORE "GPT_STORE"
-#define GRT_STORE "GRT_STORE"
-
-#ifdef OC_PUBLISHER_TABLE
-#define GPT_STORE "GPT_STORE"
-#endif /* OC_PUBLISHER_TABLE */
+#define GPT_STORE "GPUBT_STORE"
+#define GRT_STORE "GRECT_STORE"
 
 /**
  * @brief Group Address Mapping Table Resource
@@ -109,14 +105,6 @@ table_find_id_from_rep(oc_rep_t *object)
   while (object != NULL) {
     switch (object->type) {
     case OC_REP_INT: {
-#ifdef TAGS_AS_STRINGS
-      if ((oc_string_len(object->name) == 2 &&
-           memcmp(oc_string(object->name), "id", 2) == 0)) {
-        id = (int)object->value.integer;
-        PRINT("  table_find_id_from_rep id=%d \n", id);
-        return id;
-      }
-#endif
       if (oc_string_len(object->name) == 0 && object->iname == 0) {
         id = (int)object->value.integer;
         PRINT(" table_find_id_from_rep id=%d \n", id);
@@ -128,7 +116,8 @@ table_find_id_from_rep(oc_rep_t *object)
     default:
       break;
     } /* switch */
-  }   /* while */
+    object = object->next;
+  } /* while */
   PRINT("  table_find_id_from_rep ERR: id=%d \n", id);
   return id;
 }
@@ -754,10 +743,7 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
-  char buffer[200];
-  memset(buffer, 200, 1);
-  oc_rep_to_json(request->request_payload, (char *)&buffer, 200, true);
-  PRINT("%s", buffer);
+  oc_print_rep_as_json(request->request_payload, true);
 
   int index = -1;
   int id;
@@ -786,20 +772,6 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
           }
         } break;
         case OC_REP_STRING: {
-#ifdef TAGS_AS_STRINGS
-          if (oc_string_len(object->name) == 4 &&
-              memcmp(oc_string(object->name), "path", 4) == 0) {
-            oc_free_string(&g_gpt[index].path);
-            oc_new_string(&g_gpt[index].path, oc_string(object->value.string),
-                          oc_string_len(object->value.string));
-          }
-          if (oc_string_len(object->name) == 3 &&
-              memcmp(oc_string(object->name), "url", 3) == 0) {
-            oc_free_string(&g_gpt[index].url);
-            oc_new_string(&g_gpt[index].url, oc_string(object->value.string),
-                          oc_string_len(object->value.string));
-          }
-#endif
           if (object->iname == 112) {
             oc_free_string(&g_gpt[index].path);
             oc_new_string(&g_gpt[index].path, oc_string(object->value.string),
@@ -812,24 +784,6 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
           }
         } break;
         case OC_REP_INT_ARRAY: {
-#ifdef TAGS_AS_STRINGS
-          if (oc_string_len(object->name) == 2 &&
-              memcmp(oc_string(object->name), "ga", 2) == 0) {
-            // g_got[index].id = object->value.integer;
-            int64_t *arr = oc_int_array(object->value.array);
-            int array_size = (int)oc_int_array_size(object->value.array);
-            int *new_array = (int *)malloc(array_size * sizeof(int));
-
-            for (int i = 0; i < array_size; i++) {
-              new_array[i] = arr[i];
-            }
-            if (g_gpt[index].ga != 0) {
-              free(g_gpt[index].ga);
-            }
-            g_gpt[index].ga_len = array_size;
-            g_gpt[index].ga = new_array;
-          }
-#endif
           if (object->iname == 7) {
             // g_got[index].id = object->value.integer;
             int64_t *arr = oc_int_array(object->value.array);
@@ -1009,8 +963,6 @@ oc_create_fp_p_x_resource(int resource_idx, size_t device)
 
 // -----------------------------------------------------------------------------
 
-//#ifdef OC_RECIPIENT_TABLE
-
 static void
 oc_core_fp_r_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
                          void *data)
@@ -1074,10 +1026,7 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     return;
   }
 
-  char buffer[200];
-  memset(buffer, 200, 1);
-  oc_rep_to_json(request->request_payload, (char *)&buffer, 200, true);
-  PRINT("%s", buffer);
+  oc_print_rep_as_json(request->request_payload, true);
 
   int index = -1;
   int id = -1;
@@ -1111,23 +1060,12 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
           if (object->iname == 12) {
             g_grt[index].ia = (int)object->value.integer;
           }
+          if (object->iname == 13) {
+            g_grt[index].grpid = (int)object->value.integer;
+          }
         } break;
 
         case OC_REP_STRING: {
-#ifdef TAGS_AS_STRINGS
-          if (oc_string_len(object->name) == 4 &&
-              memcmp(oc_string(object->name), "path", 4) == 0) {
-            oc_free_string(&g_grt[index].path);
-            oc_new_string(&g_grt[index].path, oc_string(object->value.string),
-                          oc_string_len(object->value.string));
-          }
-          if (oc_string_len(object->name) == 3 &&
-              memcmp(oc_string(object->name), "url", 3) == 0) {
-            oc_free_string(&g_grt[index].url);
-            oc_new_string(&g_grt[index].url, oc_string(object->value.string),
-                          oc_string_len(object->value.string));
-          }
-#endif
           if (object->iname == 112) {
             oc_free_string(&g_grt[index].path);
             oc_new_string(&g_grt[index].path, oc_string(object->value.string),
@@ -1140,24 +1078,6 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
           }
         } break;
         case OC_REP_INT_ARRAY: {
-#ifdef TAGS_AS_STRINGS
-          if (oc_string_len(object->name) == 2 &&
-              memcmp(oc_string(object->name), "ga", 2) == 0) {
-            // g_got[index].id = object->value.integer;
-            int64_t *arr = oc_int_array(object->value.array);
-            int array_size = (int)oc_int_array_size(object->value.array);
-            int *new_array = (int *)malloc(array_size * sizeof(int));
-
-            for (int i = 0; i < array_size; i++) {
-              new_array[i] = (int)arr[i];
-            }
-            if (g_grt[index].ga != 0) {
-              free(g_grt[index].ga);
-            }
-            g_grt[index].ga_len = array_size;
-            g_grt[index].ga = new_array;
-          }
-#endif
           if (object->iname == 7) {
             // g_got[index].id = object->value.integer;
             int64_t *arr = oc_int_array(object->value.array);
@@ -1637,6 +1557,7 @@ oc_print_group_rp_table_entry(int entry, char *Store,
   PRINT("  %s [%d] --> [%d]\n", Store, entry, rp_table[entry].ga_len);
   PRINT("    id (0)     : %d\n", rp_table[entry].id);
   PRINT("    ia (12)    : %d\n", rp_table[entry].ia);
+  PRINT("    grpid (13) : %d\n", rp_table[entry].grpid);
   PRINT("    path (112) : '%s'\n", oc_string(rp_table[entry].path));
   PRINT("    url (10)   : '%s'\n", oc_string(rp_table[entry].url));
   // PRINT("    cflags  %d\n", rp_table[entry].cflags);
@@ -1667,11 +1588,13 @@ oc_dump_group_rp_table_entry(int entry, char *Store,
   oc_rep_begin_root_object();
   // id 0
   oc_rep_i_set_int(root, 0, rp_table[entry].id);
-  // href- 11
+  // ia- 12
   oc_rep_i_set_int(root, 12, rp_table[entry].ia);
-  // href- 11
+  // grpid - 13
+  oc_rep_i_set_int(root, 13, rp_table[entry].grpid);
+  // path- 112
   oc_rep_i_set_text_string(root, 112, oc_string(rp_table[entry].path));
-  // href- 11
+  // url - 10
   oc_rep_i_set_text_string(root, 10, oc_string(rp_table[entry].url));
   // ga - 7
   oc_rep_i_set_int_array(root, 7, rp_table[entry].ga, rp_table[entry].ga_len);
@@ -1728,6 +1651,9 @@ oc_load_group_rp_table_entry(int entry, char *Store,
           }
           if (rep->iname == 12) {
             rp_table[entry].ia = (int)rep->value.integer;
+          }
+          if (rep->iname == 13) {
+            rp_table[entry].grpid = (int)rep->value.integer;
           }
           break;
         case OC_REP_STRING:
@@ -1801,6 +1727,7 @@ oc_free_group_rp_table_entry(int entry, char *Store,
   (void)Store;
   rp_table[entry].id = -1;
   rp_table[entry].ia = -1;
+  rp_table[entry].grpid = -1;
   oc_free_string(&rp_table[entry].path);
   oc_free_string(&rp_table[entry].url);
   free(rp_table[entry].ga);
@@ -1837,7 +1764,6 @@ oc_delete_group_rp_table()
 void
 oc_free_group_rp_table()
 {
-
   PRINT("Free Group Recipient Table from Persistent storage\n");
   for (int i = 0; i < GRT_MAX_ENTRIES; i++) {
     oc_free_group_rp_table_entry(i, GRT_STORE, g_grt, GRT_MAX_ENTRIES);
@@ -1880,13 +1806,44 @@ oc_core_get_recipient_table_size()
   return GRT_MAX_ENTRIES;
 }
 
-#ifdef OC_PUBLISHER_TABLE
+oc_group_rp_table_t *
+oc_core_get_recipient_table_entry(int index)
+{
+  if (index < 0) {
+    return NULL;
+  }
+  if (index >= GRT_MAX_ENTRIES) {
+    return NULL;
+  }
+  return &g_grt[index];
+}
+
 int
 oc_core_get_publisher_table_size()
 {
+#ifdef OC_PUBLISHER_TABLE
   return GPT_MAX_ENTRIES;
+#else
+  return 0;
+#endif
 }
-#endif /* OC_PUBLISHER_TABLE */
+
+oc_group_rp_table_t *
+oc_core_get_publisher_table_entry(int index)
+{
+
+#ifdef OC_PUBLISHER_TABLE
+  if (index < 0) {
+    return NULL;
+  }
+  if (index >= GPT_MAX_ENTRIES) {
+    return NULL;
+  }
+  return &g_gpt[index];
+#else
+  return NULL;
+#endif
+}
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
