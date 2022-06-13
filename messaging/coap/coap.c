@@ -617,11 +617,13 @@ coap_oscore_parse_options(void *packet, uint8_t *data, uint32_t data_len,
              option_length);
       SET_OPTION(coap_pkt, option_number);
     }
+    /*
     if (current_option + option_length > data + data_len) {
       OC_WRN("Unsupported option");
       OC_ERR("Unsupported option");
       return BAD_OPTION_4_02;
     }
+    */
 
 #ifdef OC_TCP
     if (coap_check_signal_message(packet)) {
