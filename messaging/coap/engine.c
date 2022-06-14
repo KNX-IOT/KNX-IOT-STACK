@@ -441,8 +441,11 @@ coap_receive(oc_message_t *msg)
           // machine where they are generated, so this should be okay
           oc_clock_time_t received_timestamp = (*(oc_clock_time_t*)echo_value);
           
+          OC_DBG("Echo timestamp difference %d, threshold %d", current_time - received_timestamp, OC_ECHO_FRESHNESS_TIME);
           if (current_time - received_timestamp < OC_ECHO_FRESHNESS_TIME)
           {
+            OC_ERR("Stale timestamp! Current time %d, received time %d", current_time, received_timestamp);
+            OC_ERR("Dropping frame!");
             // message containing echo is stale, just drop it
             coap_clear_transaction(transaction);
             return 0;
@@ -450,6 +453,7 @@ coap_receive(oc_message_t *msg)
           else
           {
             // message received with fresh echo, add to seen senders list
+            OC_DBG("Fresh echo! Adding endpoint to seen senders list...");
             oc_ipv6_addr_t *entry_ptr = &seen_senders[seen_sender_idx];
             memcpy(entry_ptr, &msg->endpoint.addr.ipv6, sizeof(oc_ipv6_addr_t));
             seen_sender_idx = (seen_sender_idx + 1) % OC_SEEN_SENDERS_SIZE;
