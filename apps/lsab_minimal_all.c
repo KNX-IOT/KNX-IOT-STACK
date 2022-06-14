@@ -271,10 +271,11 @@ post_dpa_417_61(oc_request_t *request, oc_interface_mask_t interfaces,
 void
 register_resources(void)
 {
-  PRINT("Register Resource with local path \"/p/1\"\n");
+  PRINT("Register Resource with local path \"/p/o_1_1\"\n");
   PRINT("Light Switching actuator 417 (LSAB) : SwitchOnOff \n");
   PRINT("Data point 417.61 (DPT_Switch) \n");
-  oc_resource_t *res_light = oc_new_resource("light actuation", "p/1", 2, 0);
+  oc_resource_t *res_light =
+    oc_new_resource("light actuation", "p/o_1_1", 2, 0);
   oc_resource_bind_resource_type(res_light, "urn:knx:dpa.417.61");
   oc_resource_bind_resource_type(res_light, "DPT_Switch");
   oc_resource_bind_content_type(res_light, APPLICATION_CBOR);
