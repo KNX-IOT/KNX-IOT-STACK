@@ -475,8 +475,7 @@ coap_serialize_options(void *packet, uint8_t *option_array, bool inner,
     COAP_SERIALIZE_INT_OPTION(COAP_OPTION_SIZE1, size1, "Size1");
   }
 
-  if (inner && IS_OPTION(coap_pkt, COAP_OPTION_ECHO))
-  {
+  if (inner && IS_OPTION(coap_pkt, COAP_OPTION_ECHO)) {
     COAP_SERIALIZE_BYTE_OPTION(COAP_OPTION_ECHO, echo, "Echo");
   }
 
@@ -852,7 +851,7 @@ coap_oscore_parse_options(void *packet, uint8_t *data, uint32_t data_len,
       OC_DBG("  Size1 [%lu]", (unsigned long)coap_pkt->size1);
       break;
     case COAP_OPTION_ECHO:
-      if (!inner || option_length > COAP_ECHO_LEN) { 
+      if (!inner || option_length > COAP_ECHO_LEN) {
         // Echo options must be OSCORE-encrypted for the deduplication to work
         return BAD_OPTION_4_02;
       }
