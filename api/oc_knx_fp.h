@@ -133,7 +133,7 @@ typedef struct oc_group_object_table_t
  * [
  *    {
  *        "id": "1",
- *         ia": 5,
+ *        "ia": 5,
  *        "ga":[2305, 2401],
  *        "path": ".knx",
  *    },
@@ -150,6 +150,8 @@ typedef struct oc_group_object_table_t
  * | -------- | ------------- |
  * | id       | 0             |
  * | ia       | 12            |
+ * | iid      | 26            |
+ * | fid      | 25            |
  * | grpid    | 13            |
  * | path     | 112           |
  * | url      | 10            |
@@ -171,6 +173,8 @@ typedef struct oc_group_rp_table_t
 {
   int id;           /**< contents of id*/
   int ia;           /**< contents of ia (internal address)*/
+  int iid;          /**< contents of installation id */
+  int fid;          /**< contents of fabric id */
   int grpid;        /**< the multicast group id */
   oc_string_t path; /**< contents of path, default path = ".knx"*/
   oc_string_t url;  /**< contents of url */
@@ -213,7 +217,7 @@ oc_group_object_table_t *oc_core_get_group_object_table_entry(int index);
 void oc_register_group_multicasts();
 
 /**
- * @brief initializes the data points at initialisation
+ * @brief initializes the data points at initialization
  * e.g. sends out an read s-mode message when the I flag is set.
  *
  */
