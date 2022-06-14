@@ -8,8 +8,14 @@
 .. image:: https://github.com/KNX-IOT/KNX-IOT-STACK/actions/workflows/doxygen.yml/badge.svg
    :target: https://github.com/KNX-IOT/KNX-IOT-STACK/actions/workflows/doxygen.yml
 
+.. image:: https://github.com/KNX-IOT/KNX-IOT-STACK/actions/workflows/doxygen-publish.yml/badge.svg
+   :target: https://github.com/KNX-IOT/KNX-IOT-STACK/actions/workflows/doxygen-publish.yml
+
 .. image:: https://github.com/KNX-IOT/KNX-IOT-STACK/actions/workflows/check-format.yml/badge.svg
    :target: https://github.com/KNX-IOT/KNX-IOT-STACK/actions/workflows/check-format.yml
+
+.. image:: https://github.com/KNX-IOT/KNX-IOT-STACK/actions/workflows/gitlabsync.yml/badge.svg
+   :target: https://github.com/KNX-IOT/KNX-IOT-STACK/actions/workflows/gitlabsync.yml
 
 
 Introduction
@@ -29,10 +35,6 @@ The responsibilities between the stack and an actual KNX IoT Point API device im
    :scale: 100%
    :alt: application vs stack
    :align: center
-
-
-Please review the following resources for more details:
-
 
 The project was created to bring together the open-source community to accelerate the development of the KNX IoT Point API devices and services required to connect the growing number of IoT devices. 
 The project offers device vendors and application developers royalty-free access  under the `Apache 2.0 license <https://github.com/KNX-IOT/KNX-IOT-STACK/blob/main/LICENSE.md>`_.
@@ -58,8 +60,8 @@ Project directory structure
 ---------------------------
 
 api/*
-  contains the implementations of client/server APIs, the resource model,
-  utility and helper functions to encode/decode
+  contains the implementations of `client/server APIs <https://knx-iot.github.io/KNX-IOT-STACK-doxygen/>`_, the resources,
+  utility and helper functions to encode/decode CBOR
   to/from data points (function blocks), module for encoding and interpreting endpoints, and handlers for the discovery, device
   and application resources.
 
@@ -115,24 +117,36 @@ apps/*
   contains sample applications.
 
 
+External Sample Applications
+----------------------------
+
+The external sample applications are using CMAKE to pull in the KNX IoT Point API stack
+
+Examples are:
+  - `(simple) example <https://github.com/KNX-IOT/Example-Application>`_
+  - `KNX IoT Virtual <https://github.com/KNX-IOT/KNX-IOT-Virtual>`_
+
+
 Build instructions
 ------------------
 
-Grab source and dependencies using:
+Grab source and dependencies from GitHub using:
 
 ``git clone --recursive https://github.com/KNX-IOT/KNX-IOT_STACK.git``
 
+or use GitLab:
+
+``git clone --recursive https://gitlab.knx.org/shared-projects/knx-iot-point-api-public-stack.git``
+
 Please check here for build instructions:
 
-windows: https://github.com/KNX-IOT/knx-iot.github.io/blob/main/_pages/building_windows.md
+ - `Windows <https://knx-iot.github.io/building_windows/>`_
 
-linux: https://github.com/KNX-IOT/knx-iot.github.io/blob/main/_pages/building_linux.md
+ - `Linux <https://knx-iot.github.io/building_linux/>`_
 
 
 Send Feedback
 -------------------------------------------------
-Questions
-`Wiki <https://github.com/KNX-IOT/KNX-IOT-STACK/wiki>`_
 
 Bugs
-`Github issues <https://github.com/KNX-IOT/KNX-IOT-STACK/issues>`_
+`Issues <https://github.com/KNX-IOT/KNX-IOT-STACK/issues>`_

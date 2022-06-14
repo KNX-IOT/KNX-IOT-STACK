@@ -133,7 +133,7 @@ typedef struct oc_group_object_table_t
  * [
  *    {
  *        "id": "1",
- *         ia": 5,
+ *        "ia": 5,
  *        "ga":[2305, 2401],
  *        "path": ".knx",
  *    },
@@ -150,6 +150,9 @@ typedef struct oc_group_object_table_t
  * | -------- | ------------- |
  * | id       | 0             |
  * | ia       | 12            |
+ * | iid      | 26            |
+ * | fid      | 25            |
+ * | grpid    | 13            |
  * | path     | 112           |
  * | url      | 10            |
  * | ga       | 7             |
@@ -158,21 +161,26 @@ typedef struct oc_group_object_table_t
  * The structure stores the information.
  * The structure will be used as an array.
  * There are function to find:
+ * - max amount of entries
  * - empty index in the array
  * - find the index with a specific id
  * - delete an index, e.g. delete the array entry of data
  * - make the entry persistent
  * - free up the allocated data
+ * - return the structure at a specific index
  */
 typedef struct oc_group_rp_table_t
 {
   int id;           /**< contents of id*/
   int ia;           /**< contents of ia (internal address)*/
+  int iid;          /**< contents of installation id */
+  int fid;          /**< contents of fabric id */
+  int grpid;        /**< the multicast group id */
   oc_string_t path; /**< contents of path, default path = ".knx"*/
-  oc_string_t url;  /**< contents of url*/
+  oc_string_t url;  /**< contents of url */
   bool con;         /**< confirmed message, default = false*/
-  int *ga;          /**< array of integers*/
-  int ga_len;       /**< length of the array of ga identifiers*/
+  int *ga;          /**< array of integers */
+  int ga_len;       /**< length of the array of ga identifiers */
 } oc_group_rp_table_t;
 
 /**
@@ -209,7 +217,7 @@ oc_group_object_table_t *oc_core_get_group_object_table_entry(int index);
 void oc_register_group_multicasts();
 
 /**
- * @brief initializes the data points at initialisation
+ * @brief initializes the data points at initialization
  * e.g. sends out an read s-mode message when the I flag is set.
  *
  */
@@ -372,6 +380,29 @@ int oc_core_get_recipient_ia(int index);
  * @return int the size of the table
  */
 int oc_core_get_recipient_table_size();
+
+/**
+ * @brief retrieve the recipient table entry
+ *
+ * @param index the index in the recipient table
+ * @return oc_group_rp_table_t* pointer to the entry
+ */
+oc_group_rp_table_t *oc_core_get_recipient_table_entry(int index);
+
+/**
+ * @brief return the size of the publisher table
+ *
+ * @return int the size of the table
+ */
+int oc_core_get_publisher_table_size();
+
+/**
+ * @brief retrieve the publisher table entry
+ *
+ * @param index the index in the publisher table
+ * @return oc_group_rp_table_t* pointer to the entry
+ */
+oc_group_rp_table_t *oc_core_get_publisher_table_entry(int index);
 
 /**
  * @brief add points to the well-known core discovery response
