@@ -3,11 +3,11 @@
 This folder contains code examples.
 
 The intention of the examples is to explain certain aspects of the stack.
-e.g. provide information in how to build an KNX-IOT device based on the stack.
+e.g. provide information in how to build an KNX IoT Point API device based on the stack.
 
 naming convention:
 
-- [filename]**_all** has code specific for linux and Windows OS
+- [filename]**_all** has code specific for Linux and Windows OS
 
 ## Example applications
 
@@ -25,53 +25,39 @@ naming convention:
 Test server on Windows & Linux.
 
 - no KNX compliant application
-- example to receive data to other device
+- example to receive data from other device
 
 ### testclient_all.c
 
 Test Client on Windows & Linux.
 
+- no KNX compliant application
 - KNX client application
    example to send data to other device
 - can discover devices through well-known/core
-- can send s-mode multicast message (on all coap nodes)
+- can send s-mode multicast message
 
 ### LSAB_minimal_all.c
 
 KNX-IOT example on Windows & Linux.
-capable of receiving commands for datapoint 417.61
-over multicast "all coap nodes"
+capable of receiving commands for data point 417.61
 
-- Implements FB LSAB 417
-  - only datapoint 61
+- Implements Functional Block LSAB 417
+  - only data point 61
   - e.g. dpa: 417.61
+  - url : "p/o_1_1"
 
-Note: can be configured to receive commands from LSSB_minimal_all.
-
-uses pimoroni displayotron hat :
-
-https://pinout.xyz/pinout/display_o_tron_hat?msclkid=02fa4484c6d511ecaaaf64d47a2d5e81
-
-https://github.com/pimoroni/displayotron
+Note: can be configured to receive s-mode commands from LSSB_minimal_all.
 
 ### LSSB_minimal_all.c
 
 KNX-IOT example on Windows & Linux.
-capable of sending commands from datapoint 421.61
-over multicast "all coap nodes"
+capable of sending commands from data point 421.61
 
-- Implements FB LSSB 421
-  - only datapoint 61
+- Implements Functional Block LSSB 421
+  - only data point 61
   - e.g. dpa: 421.61
+  - url : "p/o_1_1"
 
-Note: can be configured to send commands to LSAB_minimal_all.
-
-## support applications
-
-### simpleclient_displayotron.c
-
-example code for the displayotron pi hat.
-Works on Linux (Pi) with the pi-hat mounted.
-example functionallity:
-
-- reads out the buttons on the pi-hat
+Note: can be configured to send s-mode commands to LSAB_minimal_all.
+Note: this application has no trigger mechanism to send the s-mode message
