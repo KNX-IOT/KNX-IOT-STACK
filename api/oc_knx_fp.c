@@ -770,6 +770,15 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
           if (object->iname == 12) {
             g_gpt[index].ia = object->value.integer;
           }
+          if (object->iname == 13) {
+            g_grt[index].grpid = (int)object->value.integer;
+          }
+          if (object->iname == 26) {
+            g_grt[index].iid = (int)object->value.integer;
+          }
+          if (object->iname == 25) {
+            g_grt[index].fid = (int)object->value.integer;
+          }
         } break;
         case OC_REP_STRING: {
           if (object->iname == 112) {
@@ -1062,6 +1071,12 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
           }
           if (object->iname == 13) {
             g_grt[index].grpid = (int)object->value.integer;
+          }
+          if (object->iname == 26) {
+            g_grt[index].iid = (int)object->value.integer;
+          }
+          if (object->iname == 25) {
+            g_grt[index].fid = (int)object->value.integer;
           }
         } break;
 
@@ -1557,10 +1572,11 @@ oc_print_group_rp_table_entry(int entry, char *Store,
   PRINT("  %s [%d] --> [%d]\n", Store, entry, rp_table[entry].ga_len);
   PRINT("    id (0)     : %d\n", rp_table[entry].id);
   PRINT("    ia (12)    : %d\n", rp_table[entry].ia);
+  PRINT("    iid (26)   : %d\n", rp_table[entry].iid);
+  PRINT("    fid (25)   : %d\n", rp_table[entry].fid);
   PRINT("    grpid (13) : %d\n", rp_table[entry].grpid);
   PRINT("    path (112) : '%s'\n", oc_string(rp_table[entry].path));
   PRINT("    url (10)   : '%s'\n", oc_string(rp_table[entry].url));
-  // PRINT("    cflags  %d\n", rp_table[entry].cflags);
   PRINT("    ga (7)     : [");
   for (int i = 0; i < rp_table[entry].ga_len; i++) {
     PRINT(" %d", rp_table[entry].ga[i]);
@@ -1590,6 +1606,10 @@ oc_dump_group_rp_table_entry(int entry, char *Store,
   oc_rep_i_set_int(root, 0, rp_table[entry].id);
   // ia- 12
   oc_rep_i_set_int(root, 12, rp_table[entry].ia);
+  // iid 26
+  oc_rep_i_set_int(root, 26, rp_table[entry].iid);
+  // fid - 25
+  oc_rep_i_set_int(root, 25, rp_table[entry].fid);
   // grpid - 13
   oc_rep_i_set_int(root, 13, rp_table[entry].grpid);
   // path- 112
@@ -1654,6 +1674,12 @@ oc_load_group_rp_table_entry(int entry, char *Store,
           }
           if (rep->iname == 13) {
             rp_table[entry].grpid = (int)rep->value.integer;
+          }
+          if (rep->iname == 25) {
+            rp_table[entry].fid = (int)rep->value.integer;
+          }
+          if (rep->iname == 26) {
+            rp_table[entry].iid = (int)rep->value.integer;
           }
           break;
         case OC_REP_STRING:
@@ -1727,6 +1753,8 @@ oc_free_group_rp_table_entry(int entry, char *Store,
   (void)Store;
   rp_table[entry].id = -1;
   rp_table[entry].ia = -1;
+  rp_table[entry].iid = -1;
+  rp_table[entry].fid = -1;
   rp_table[entry].grpid = -1;
   oc_free_string(&rp_table[entry].path);
   oc_free_string(&rp_table[entry].url);
