@@ -22,7 +22,7 @@
  *
  * Collection of functions used to add public key infrastructure (PKI)
  * support to devices.
- * 
+ *
  * This is work in progress
  */
 #ifndef OC_PKI_H
