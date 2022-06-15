@@ -238,7 +238,7 @@ get_dpa_421_61(oc_request_t *request, oc_interface_mask_t interfaces,
  *   - observable
  *   - discoverable
  *   - used interfaces
- * 
+ *
  * URL Table
  * | resource url |  functional block/dpa  | GET | POST |
  * | ------------ | ---------------------- | ----| ---- |
