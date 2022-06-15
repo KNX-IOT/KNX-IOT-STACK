@@ -652,7 +652,7 @@ oc_create_fp_g_x_resource(int resource_idx, size_t device)
                             oc_core_fp_g_x_del_handler, 0, 1, "urn:knx:if.c");
 }
 
-// ----------------------------------------------------------------------------
+// ---------------------PUBLISHER------------------------------------------
 
 #ifdef OC_PUBLISHER_TABLE
 
@@ -771,13 +771,13 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
             g_gpt[index].ia = object->value.integer;
           }
           if (object->iname == 13) {
-            g_grt[index].grpid = (int)object->value.integer;
+            g_gpt[index].grpid = (int)object->value.integer;
           }
           if (object->iname == 26) {
-            g_grt[index].iid = (int)object->value.integer;
+            g_gpt[index].iid = (int)object->value.integer;
           }
           if (object->iname == 25) {
-            g_grt[index].fid = (int)object->value.integer;
+            g_gpt[index].fid = (int)object->value.integer;
           }
         } break;
         case OC_REP_STRING: {
@@ -895,8 +895,15 @@ oc_core_fp_p_x_get_handler(oc_request_t *request,
   oc_rep_i_set_int(root, 0, g_gpt[index].id);
   /* ia - 12 */
   if (g_gpt[index].ia > -1) {
-    // oc_rep_i_set_text_string(root, 11, oc_string(g_gpt[index].ia));
     oc_rep_i_set_int(root, 11, g_gpt[index].ia);
+  }
+  /* iid - 26 */
+  if (g_gpt[index].iid > -1) {
+    oc_rep_i_set_int(root, 26, g_gpt[index].iid);
+  }
+  /* fid - 25 */
+  if (g_gpt[index].fid > -1) {
+    oc_rep_i_set_int(root, 25, g_gpt[index].fid);
   }
 
   /* frame url as ia exist.*/
@@ -970,7 +977,7 @@ oc_create_fp_p_x_resource(int resource_idx, size_t device)
 
 #endif /* OC_PUBLISHER_TABLE */
 
-// -----------------------------------------------------------------------------
+// --------------------------RECIPIENT-----------------------------------------
 
 static void
 oc_core_fp_r_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
@@ -1192,8 +1199,22 @@ oc_core_fp_r_x_get_handler(oc_request_t *request,
   oc_rep_begin_root_object();
   // id 0
   oc_rep_i_set_int(root, 0, g_grt[index].id);
+  // grpid - 13
+  if (g_grt[index].grpid > 0) {
+    oc_rep_i_set_int(root, 13, g_grt[index].grpid);
+  }
   // ia - 12
-  oc_rep_i_set_int(root, 11, g_grt[index].ia);
+  if (g_grt[index].ia > 0) {
+    oc_rep_i_set_int(root, 11, g_grt[index].ia);
+  }
+  // fid - 25
+  if (g_grt[index].ia > 0) {
+    oc_rep_i_set_int(root, 25, g_grt[index].fid);
+  }
+  // iid - 26
+  if (g_grt[index].ia > 0) {
+    oc_rep_i_set_int(root, 26, g_grt[index].iid);
+  }
   // path- 112
   oc_rep_i_set_text_string(root, 112, oc_string(g_grt[index].path));
   // url- 10
