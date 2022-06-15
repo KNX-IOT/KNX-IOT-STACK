@@ -964,15 +964,15 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
      all addressing information and security configuration data SHALL be reset
      to default ex-factory state. */
     // writing the empty values
-    oc_storage_write(KNX_STORAGE_IA, (char *)&zero, sizeof(int));
-    oc_storage_write(KNX_STORAGE_IID, (char *)&zero, sizeof(uint32_t));
-    oc_storage_write(KNX_STORAGE_PM, (char *)&zero, sizeof(uint8_t));
-    oc_storage_write(KNX_STORAGE_SA, (char *)&zero, sizeof(uint32_t));
-    oc_storage_write(KNX_STORAGE_DA, (char *)&zero, sizeof(uint32_t));
+    oc_storage_erase(KNX_STORAGE_IA);
+    oc_storage_erase(KNX_STORAGE_IID);
+    oc_storage_erase(KNX_STORAGE_PM);
+    oc_storage_erase(KNX_STORAGE_SA);
+    oc_storage_erase(KNX_STORAGE_DA);
     uint32_t port =
       5683; // TODO: should be using all coap nodes define from the stack
     oc_storage_write(KNX_STORAGE_PORT, (char *)&port, sizeof(uint32_t));
-    oc_storage_write(KNX_STORAGE_HOSTNAME, (char *)&buf, 1);
+    oc_storage_erase(KNX_STORAGE_HOSTNAME);
     // load state: unloaded, and programming mode is true
     oc_knx_lsm_set_state(device_index, LSM_S_UNLOADED);
     oc_device_info_t *device = oc_core_get_device_info(device_index);

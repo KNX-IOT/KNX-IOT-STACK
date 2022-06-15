@@ -1011,6 +1011,10 @@ oc_at_delete_entry(size_t device_index, int index)
   oc_new_string(&g_at_entries[index].sub, "", 0);
   oc_free_string(&g_at_entries[index].kid);
   oc_new_string(&g_at_entries[index].kid, "", 0);
+
+  char filename[20];
+  snprintf(filename, 20, "%s_%d", AT_STORE, index);
+  oc_storage_erase(filename);
 }
 
 static void
@@ -1308,7 +1312,6 @@ oc_delete_at_table(size_t device_index)
   for (int i = 0; i < G_AT_MAX_ENTRIES; i++) {
     oc_at_delete_entry(device_index, i);
     oc_print_auth_at_entry(device_index, i);
-    oc_at_dump_entry(device_index, i);
   }
 #ifdef OC_OSCORE
   oc_oscore_free_all_contexts();
