@@ -286,6 +286,11 @@ oc_spake_gen_keypair(mbedtls_mpi *y, mbedtls_ecp_point *pub_y)
                                  &ctr_drbg_ctx);
 }
 
+int oc_gen_masterkey(uint8_t array[OSCORE_IDCTX_LEN])
+{
+  return mbedtls_ctr_drbg_random(&ctr_drbg_ctx, array, 16);
+}
+
 // generic formula for
 // pX = pubX + wX * L
 static int

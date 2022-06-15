@@ -83,6 +83,18 @@ const char *oc_spake_get_password();
 void oc_spake_set_password(char *new_pass);
 
 /**
+ * @brief Generate a 16-byte number, suitable for use as a masterkey within OSCORE
+ * secure communication.
+ * 
+ * oc_spake_init() MUST be called before this function can be used. If it is not called,
+ * the RNG context will be uninitialised & this function should return an error. 
+ * 
+ * @param array Array into which the masterkey will be written. Must be of length OSCORE_IDCTX_LEN
+ * @return int Zero on success, negative MBEDTLS error code on failure.
+ */
+int oc_gen_masterkey(uint8_t array[OSCORE_IDCTX_LEN]);
+
+/**
  * @brief Calculate the w0 & L parameter
  *
  * Uses PBKDF2 with SHA256 & HMAC to calculate a 40-byte output which is
