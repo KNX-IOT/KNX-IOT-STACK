@@ -87,7 +87,7 @@ void oc_spake_set_password(char *new_pass);
  * secure communication.
  * 
  * oc_spake_init() MUST be called before this function can be used. If it is not called,
- * the RNG context will be uninitialised & this function should return an error. 
+ * the RNG context will be uninitialised & this function should return an error.
  * 
  * @param array Array into which the masterkey will be written. Must be of length OSCORE_IDCTX_LEN
  * @return int Zero on success, negative MBEDTLS error code on failure.
