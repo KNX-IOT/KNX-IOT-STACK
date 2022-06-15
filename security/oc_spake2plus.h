@@ -20,6 +20,7 @@
 #include "mbedtls/bignum.h"
 #include "mbedtls/ecp.h"
 #include "oc_helpers.h"
+#include "oscore_constants.h"
 
 enum { kPubKeySize = 65 };
 
