@@ -14,6 +14,7 @@
 // limitations under the License.
 */
 /**
+  @brief CoAP message buffer implementation, e.g. for the payloads being transferred
   @file
 */
 #ifndef OC_BUFFER_H

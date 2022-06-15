@@ -16,6 +16,7 @@
  *
  ****************************************************************************/
 /**
+  @brief monitoring (callbacks) for network events (network interfaces going up/down)
   @file
 */
 #ifndef OC_NETWORK_HELPERS_H

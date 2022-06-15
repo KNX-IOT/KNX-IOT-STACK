@@ -15,6 +15,7 @@
 */
 
 /**
+  @brief request and response payload handling in cbor
   @file
 */
 #ifndef OC_REP_H
