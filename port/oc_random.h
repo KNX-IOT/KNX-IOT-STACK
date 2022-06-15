@@ -32,6 +32,7 @@
  *
  */
 /**
+  @brief platform abstraction of a random number generator
   @file
 */
 #ifndef OC_RANDOM_H

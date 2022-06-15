@@ -14,6 +14,7 @@
 // limitations under the License.
 */
 /**
+  @brief CoAP Discovery.
   @file
 */
 #ifndef OC_DISCOVERY_H

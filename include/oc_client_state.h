@@ -15,6 +15,7 @@
 // limitations under the License.
 */
 /**
+  @brief CoAP client.
   @file
 */
 #ifndef OC_CLIENT_STATE_H

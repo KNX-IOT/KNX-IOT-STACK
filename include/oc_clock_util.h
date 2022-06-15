@@ -14,7 +14,7 @@
 // limitations under the License.
 */
 /**
-  @brief rfc3339 timing conversions.
+ * @brief rfc3339 timing conversions.
  * @file
  */
 #ifndef OC_CLOCK_UTIL_H

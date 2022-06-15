@@ -35,6 +35,7 @@
  */
 
 /**
+  @brief platform abstraction of a real time clock
   @file
 */
 
