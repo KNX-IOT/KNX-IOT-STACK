@@ -87,13 +87,13 @@ enum { OPTION_MAP_SIZE = sizeof(uint8_t) * 8 };
   ((packet)->options[(opt) / OPTION_MAP_SIZE] &                                \
    (1 << ((opt) % OPTION_MAP_SIZE)))
 
-/* enum value for coap transport type  */
+/** enum value for coap transport type  */
 typedef enum { COAP_TRANSPORT_UDP, COAP_TRANSPORT_TCP } coap_transport_type_t;
 
-/* parsed message struct */
+/** parsed message struct */
 typedef struct
 {
-  uint8_t *buffer; /* pointer to CoAP header / incoming packet buffer / memory
+  uint8_t *buffer; /**< pointer to CoAP header / incoming packet buffer / memory
                       to serialize packet */
   coap_transport_type_t transport_type;
   uint8_t version;
@@ -172,7 +172,7 @@ typedef struct
   uint8_t *payload;
 } coap_packet_t;
 
-/* option format serialization */
+/** option format serialization */
 #define COAP_SERIALIZE_INT_OPTION(number, field, text)                         \
   if (IS_OPTION(coap_pkt, number)) {                                           \
     option_length += coap_serialize_int_option(number, current_number, option, \
@@ -227,8 +227,9 @@ typedef struct
     current_number = number;                                                   \
   }
 
-/* to store error code and human-readable payload */
+/** stores error code */
 extern coap_status_t coap_status_code;
+/** stores human-readable payload */
 extern char *coap_error_message;
 
 void coap_init_connection(void);
