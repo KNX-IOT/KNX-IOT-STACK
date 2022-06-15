@@ -15,6 +15,7 @@
 // limitations under the License.
 */
 /**
+  @brief network events (network interfaces going up/down)
   @file
 */
 #ifndef OC_NETWORK_EVENTS_H

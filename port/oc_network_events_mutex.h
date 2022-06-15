@@ -14,6 +14,7 @@
 // limitations under the License.
 */
 /**
+  @brief platform abstraction of networking events (mutexes)
   @file
 */
 #ifndef OC_NETWORK_EVENTS_MUTEX_H

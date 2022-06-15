@@ -14,6 +14,7 @@
 // limitations under the License.
 */
 /**
+  @brief knx application level security
   @file
 */
 
