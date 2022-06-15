@@ -14,6 +14,7 @@
 // limitations under the License.
 */
 /**
+ * @brief uuid implementation
  * @file
  * Generate and work with UUIDs as specified in RFC 4122.
  *

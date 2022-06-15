@@ -14,6 +14,8 @@
 // limitations under the License.
 */
 /**
+  @brief end point implementation, e.g. IP(v6) addressing for sending &
+  receiving data
   @file
 */
 #ifndef OC_ENDPOINT_H

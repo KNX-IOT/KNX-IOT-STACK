@@ -60,4 +60,4 @@ capable of sending commands from data point 421.61
   - url : "p/o_1_1"
 
 Note: can be configured to send s-mode commands to LSAB_minimal_all.
-Note: this application has no trigger mechanism to send the s-mode message
+Note: this application has only trigger mechanism to send the s-mode message at start up.

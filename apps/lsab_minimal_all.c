@@ -260,13 +260,16 @@ post_dpa_417_61(oc_request_t *request, oc_interface_mask_t interfaces,
  * this function registers all application level resources:
  * - each resource path is bind to a specific function for the supported methods
  * (GET, POST, PUT, DELETE)
- * - each resource is
+ * - each resource is:
  *   - secure
  *   - observable
  *   - discoverable
- *   - used interfaces, including the default interface.
- *     default interface is the first of the list of interfaces as specified in
- * the input file
+ *   - used interfaces
+ *
+ * URL Table
+ * | resource url |  functional block/dpa  | GET | POST |
+ * | ------------ | ---------------------- | ----| ---- |
+ * | p/o_1_1   -  | urn:knx:dpa.417.61     | Yes | Yes |
  */
 void
 register_resources(void)

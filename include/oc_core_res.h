@@ -15,6 +15,7 @@
 // limitations under the License.
 */
 /**
+  @brief KNX mandatory resources implementation.
   @file
 */
 #ifndef OC_CORE_RES_H

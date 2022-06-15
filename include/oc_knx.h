@@ -14,6 +14,7 @@
 // limitations under the License.
 */
 /**
+  @brief implementation of /.well-known/knx and .knx resources
   @file
 */
 

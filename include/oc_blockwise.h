@@ -14,6 +14,7 @@
 // limitations under the License.
 */
 /**
+  @brief CoAP block wise transfer implementation
   @file
 */
 #ifndef OC_BLOCKWISE_H

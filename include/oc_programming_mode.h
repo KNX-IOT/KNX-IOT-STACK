@@ -14,10 +14,8 @@
 // limitations under the License.
 */
 /**
- * @file
- * Device status
- *
-
+  @brief programming mode code
+  @file
  */
 #ifndef OC_DEVICE_MODE_H
 #define OC_DEVICE_MODE_H

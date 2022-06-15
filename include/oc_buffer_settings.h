@@ -14,6 +14,7 @@
 // limitations under the License.
 */
 /**
+  @brief CoAP message buffer setting implementation.
   @file
 */
 #ifndef OC_BUFFER_SETTINGS_H

@@ -14,6 +14,7 @@
 // limitations under the License.
 */
 /**
+  @brief security credentials.
   @file
 */
 #ifndef OC_CRED_COMMON_H

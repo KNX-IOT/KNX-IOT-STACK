@@ -14,6 +14,7 @@
 // limitations under the License.
 */
 /**
+  @brief generic helpers
   @file
 */
 #ifndef OC_HELPERS_H

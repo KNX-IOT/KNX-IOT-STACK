@@ -15,6 +15,7 @@
 // limitations under the License.
 */
 /**
+  @brief resource internals
   @file
 */
 #ifndef OC_RI_H

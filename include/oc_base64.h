@@ -14,6 +14,7 @@
 // limitations under the License.
 */
 /**
+  @brief Base64 encoding and decoding functions
   @file
 */
 #ifndef OC_BASE64_H

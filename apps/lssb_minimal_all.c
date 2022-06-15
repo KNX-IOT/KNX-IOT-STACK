@@ -237,9 +237,12 @@ get_dpa_421_61(oc_request_t *request, oc_interface_mask_t interfaces,
  *   - secure
  *   - observable
  *   - discoverable
- *   - used interfaces, including the default interface.
- *     default interface is the first of the list of interfaces as specified in
- * the input file
+ *   - used interfaces
+ *
+ * URL Table
+ * | resource url |  functional block/dpa  | GET | POST |
+ * | ------------ | ---------------------- | ----| ---- |
+ * | p/o_1_1   -  | urn:knx:dpa.421.61     | Yes | Yes |
  */
 void
 register_resources(void)
@@ -377,10 +380,10 @@ initialize_variables(void)
 static void
 issue_requests_s_mode(void)
 {
-  PRINT("issue_requests_s_mode: TEST TEST \n\n");
+  PRINT("issue_requests_s_mode: Demo \n\n");
 
-  oc_do_s_mode_with_scope(2, "p/1", "w");
-  oc_do_s_mode_with_scope(5, "p/1", "w");
+  oc_do_s_mode_with_scope(2, "p/o_1_1", "w");
+  oc_do_s_mode_with_scope(5, "p/o_1_1", "w");
 }
 
 #ifndef NO_MAIN
