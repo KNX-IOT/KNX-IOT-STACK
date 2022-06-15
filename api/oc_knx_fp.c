@@ -1524,6 +1524,10 @@ oc_free_group_object_table_entry(int entry)
 void
 oc_delete_group_object_table_entry(int entry)
 {
+  char filename[20];
+  snprintf(filename, 20, "%s_%d", GOT_STORE, entry);
+  oc_storage_erase(filename);
+
   oc_free_group_object_table_entry(entry);
 }
 
@@ -1534,7 +1538,6 @@ oc_delete_group_object_table()
   for (int i = 0; i < GOT_MAX_ENTRIES; i++) {
     oc_delete_group_object_table_entry(i);
     oc_print_group_object_table_entry(i);
-    oc_dump_group_object_table_entry(i);
   }
 }
 
@@ -1767,6 +1770,10 @@ static void
 oc_delete_group_rp_table_entry(int entry, char *Store,
                                oc_group_rp_table_t *rp_table, int max_size)
 {
+  char filename[20];
+  snprintf(filename, 20, "%s_%d", Store, entry);
+  oc_storage_erase(filename);
+
   oc_free_group_rp_table_entry(entry, Store, rp_table, max_size);
 }
 
@@ -1777,7 +1784,6 @@ oc_delete_group_rp_table()
   for (int i = 0; i < GRT_MAX_ENTRIES; i++) {
     oc_delete_group_rp_table_entry(i, GRT_STORE, g_grt, GRT_MAX_ENTRIES);
     oc_print_group_rp_table_entry(i, GRT_STORE, g_grt, GRT_MAX_ENTRIES);
-    oc_dump_group_rp_table_entry(i, GRT_STORE, g_grt, GRT_MAX_ENTRIES);
   }
 
 #ifdef OC_PUBLISHER_TABLE
@@ -1785,7 +1791,6 @@ oc_delete_group_rp_table()
   for (int i = 0; i < GPT_MAX_ENTRIES; i++) {
     oc_delete_group_rp_table_entry(i, GPT_STORE, g_gpt, GPT_MAX_ENTRIES);
     oc_print_group_rp_table_entry(i, GPT_STORE, g_gpt, GPT_MAX_ENTRIES);
-    oc_dump_group_rp_table_entry(i, GPT_STORE, g_gpt, GPT_MAX_ENTRIES);
   }
 #endif /*  OC_PUBLISHER_TABLE */
 }
