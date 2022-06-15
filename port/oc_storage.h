@@ -57,7 +57,7 @@ long oc_storage_write(const char *store, uint8_t *buf, size_t size);
 
 /**
  * @brief erase a stored file
- * 
+ *
  * @param store the store (file path)
  * @return int 0 on success
  */

@@ -88,7 +88,8 @@ oc_storage_write(const char *store, uint8_t *buf, size_t size)
   return (long)wsize;
 }
 
-int oc_storage_erase(const char *store)
+int
+oc_storage_erase(const char *store)
 {
   size_t store_len = strlen(store);
 
