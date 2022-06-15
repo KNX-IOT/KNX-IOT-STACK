@@ -112,4 +112,18 @@ oc_storage_write(const char *store, uint8_t *buf, size_t size)
   fclose(fp);
   return (long)size;
 }
+
+int oc_storage_erase(const char *store)
+{
+  size_t store_len = strlen(store);
+
+  if (!path_set || (store_len + store_path_len >= STORE_PATH_SIZE))
+    return -ENOENT;
+
+  store_path[store_path_len] = '/';
+  strncpy(store_path + store_path_len + 1, store, store_len);
+  store_path[1 + store_path_len + store_len] = '\0';
+
+  return remove(store_path);
+}
 #endif /* OC_STORAGE */
