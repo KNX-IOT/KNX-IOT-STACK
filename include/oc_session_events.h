@@ -14,6 +14,7 @@
 // limitations under the License.
 */
 /**
+  @brief session events
   @file
 */
 #ifndef OC_SESSION_EVENTS_H

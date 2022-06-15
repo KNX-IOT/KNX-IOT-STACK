@@ -60,6 +60,7 @@
  *   build for windows
  * - OC_OSCORE
  *   oscore is enabled as compile flag
+ *
  * File specific defines:
  * - NO_MAIN
  *   compile out the function main()
