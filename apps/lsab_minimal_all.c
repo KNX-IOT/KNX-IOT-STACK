@@ -51,7 +51,7 @@
  *     - if input data is correct
  *        - updates the global variables
  *
- * ## Defines 
+ * ## Defines
  * stack specific defines:
  * - __linux__
  *   build for Linux
@@ -174,7 +174,7 @@ app_init(void)
  */
 STATIC void
 get_o_1_1(oc_request_t *request, oc_interface_mask_t interfaces,
-               void *user_data)
+          void *user_data)
 {
   (void)user_data; /* variable not used */
 
@@ -226,7 +226,7 @@ get_o_1_1(oc_request_t *request, oc_interface_mask_t interfaces,
  */
 STATIC void
 post_o_1_1(oc_request_t *request, oc_interface_mask_t interfaces,
-                void *user_data)
+           void *user_data)
 {
   (void)interfaces;
   (void)user_data;

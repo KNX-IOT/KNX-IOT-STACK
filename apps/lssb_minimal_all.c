@@ -21,7 +21,7 @@
 #define STATIC static
 #endif
 
-/** 
+/**
  * @brief Example device implementing Function Block LSSB
  * @file
  *  Example code for Function Block LSSB
@@ -191,7 +191,7 @@ app_init(void)
  */
 STATIC void
 get_o_1_1(oc_request_t *request, oc_interface_mask_t interfaces,
-               void *user_data)
+          void *user_data)
 {
   (void)user_data; /* variable not used */
 
