@@ -14,6 +14,7 @@
 // limitations under the License.
 */
 /**
+  @brief DNS SD platform abstraction
   @file
 */
 #ifndef DNS_SD_H

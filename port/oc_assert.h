@@ -14,6 +14,7 @@
 // limitations under the License.
 */
 /**
+  @brief platform specific asserts
   @file
 */
 #ifndef OC_ASSERT_H

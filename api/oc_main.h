@@ -15,6 +15,7 @@
 // limitations under the License.
 */
 /**
+  @brief functions to be called from main, including device callbacks 
   @file
 */
 #ifndef OC_MAIN_H

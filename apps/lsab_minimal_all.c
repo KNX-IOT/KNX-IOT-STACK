@@ -21,49 +21,50 @@
 #endif
 
 /**
+ * @brief Example device implementing Function Block LSAB
  * @file
- *  Example code for Function Block LSAB
- *  Implements only data point 61: switch on/off
- *  This implementation is a actuator, e.g. receives data
+ *  Example code for Function Block LSAB.
+ *  Implements data point 61: switch on/off.
+ *  This implementation is a actuator, e.g. receives data and acts on it.
  *
  * ## Application Design
  *
- * support functions:
+ * Support functions:
  *
- * - app_init
- *   initializes the stack values.
- * - register_resources
- *   function that registers all endpoints,
- *   e.g. sets the GET/PUT/POST/DELETE
- *      handlers for each end point
+ * - app_init:
+ *   - initializes the stack values.
+ * - register_resources:
+ *   - function that registers all endpoints,
+ *   - sets the GET/PUT/POST/DELETE handlers for each end point
  *
- * - main
- *   starts the stack, with the registered resources.
- *   can be compiled out with NO_MAIN
+ * - main:
+ *   - starts the stack, with the registered resources.
+ *   - can be compiled out with NO_MAIN
  *
- *  handlers for the implemented methods (get/post):
- *   - get_[path]
- *     function that is being called when a GET is called on [path]
- *     set the global variables in the output
- *   - post_[path]
- *     function that is being called when a POST is called on [path]
- *     checks the input data
- *     if input data is correct
- *       updates the global variables
+ *  Handlers for the implemented methods (get/post):
+ *   - get_[path] :
+ *     - function that is being called when a GET is called on [path]
+ *     - set the global variables in the output
+ *   - post_[path] :
+ *     - function that is being called when a POST is called on [path]
+ *     - checks the input data
+ *     - if input data is correct
+ *        - updates the global variables
  *
- * ## stack specific defines
+ * ## Defines 
+ * stack specific defines:
  * - __linux__
- *   build for linux
+ *   build for Linux
  * - WIN32
  *   build for windows
  * - OC_OSCORE
  *   oscore is enabled as compile flag
- * ## File specific defines
+ * File specific defines:
  * - NO_MAIN
  *   compile out the function main()
  * - INCLUDE_EXTERNAL
  *   includes header file "external_header.h", so that other tools/dependencies
- can be included without changing this code
+ *   can be included without changing this code
  */
 
 #include "oc_api.h"
@@ -160,7 +161,7 @@ app_init(void)
 }
 
 /**
- * get method for "p/light" resource.
+ * get method for "p/o_1_1" resource.
  * function is called to initialize the return values of the GET method.
  * initialization of the returned values are done from the global property
  * values. Resource Description: This Resource describes a binary switch
@@ -172,7 +173,7 @@ app_init(void)
  * @param user_data the user data.
  */
 STATIC void
-get_dpa_417_61(oc_request_t *request, oc_interface_mask_t interfaces,
+get_o_1_1(oc_request_t *request, oc_interface_mask_t interfaces,
                void *user_data)
 {
   (void)user_data; /* variable not used */
@@ -212,7 +213,7 @@ get_dpa_417_61(oc_request_t *request, oc_interface_mask_t interfaces,
 }
 
 /**
- * post method for "p/light" resource.
+ * post method for "p/o_1_1" resource.
  * The function has as input the request body, which are the input values of the
  * POST method.
  * The input values (as a set) are checked if all supplied values are correct.
@@ -224,7 +225,7 @@ get_dpa_417_61(oc_request_t *request, oc_interface_mask_t interfaces,
  * @param user_data the supplied user data.
  */
 STATIC void
-post_dpa_417_61(oc_request_t *request, oc_interface_mask_t interfaces,
+post_o_1_1(oc_request_t *request, oc_interface_mask_t interfaces,
                 void *user_data)
 {
   (void)interfaces;
@@ -269,7 +270,7 @@ post_dpa_417_61(oc_request_t *request, oc_interface_mask_t interfaces,
  * URL Table
  * | resource url |  functional block/dpa  | GET | POST |
  * | ------------ | ---------------------- | ----| ---- |
- * | p/o_1_1   -  | urn:knx:dpa.417.61     | Yes | Yes |
+ * | p/o_1_1      | urn:knx:dpa.417.61     | Yes | Yes  |
  */
 void
 register_resources(void)
@@ -294,9 +295,9 @@ register_resources(void)
     an interrupt when something is read from the hardware. */
   // oc_resource_set_observable(res_352, true);
   // set the GET handler
-  oc_resource_set_request_handler(res_light, OC_GET, get_dpa_417_61, NULL);
+  oc_resource_set_request_handler(res_light, OC_GET, get_o_1_1, NULL);
   // set the POST handler
-  oc_resource_set_request_handler(res_light, OC_POST, post_dpa_417_61, NULL);
+  oc_resource_set_request_handler(res_light, OC_POST, post_o_1_1, NULL);
   // register this resource,
   // this means that the resource will be listed in /.well-known/core
   oc_add_resource(res_light);

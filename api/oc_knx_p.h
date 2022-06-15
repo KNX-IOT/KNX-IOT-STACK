@@ -14,6 +14,7 @@
 // limitations under the License.
 */
 /**
+  @brief knx /p resource implementations
   @file
 */
 #ifndef OC_KNX_P_INTERNAL_H

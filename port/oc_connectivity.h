@@ -14,6 +14,7 @@
 // limitations under the License.
 */
 /**
+  @brief platform abstraction of networking
   @file
 */
 #ifndef OC_CONNECTIVITY_H

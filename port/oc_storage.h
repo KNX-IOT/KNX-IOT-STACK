@@ -14,6 +14,7 @@
 // limitations under the License.
 */
 /**
+  @brief platform abstraction for storage (e.g. file writing)
   @file
 */
 #ifndef OC_STORAGE_H
