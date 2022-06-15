@@ -14,6 +14,7 @@
 // limitations under the License.
 */
 /**
+  @brief knx /fp/gm resource implementations
   @file
 */
 #ifndef OC_KNX_GM_INTERNAL_H

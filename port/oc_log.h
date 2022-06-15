@@ -15,6 +15,7 @@
 // limitations under the License.
 */
 /**
+  @brief platform abstraction of logging
   @file
 
   generic logging functions:

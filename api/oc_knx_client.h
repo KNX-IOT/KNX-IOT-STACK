@@ -14,6 +14,7 @@
 // limitations under the License.
 */
 /**
+  @brief client code for the device (s-mode)
   @file
 */
 #ifndef OC_KNX_CLIENT_INTERNAL_H
