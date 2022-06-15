@@ -475,6 +475,10 @@ coap_serialize_options(void *packet, uint8_t *option_array, bool inner,
     COAP_SERIALIZE_INT_OPTION(COAP_OPTION_SIZE1, size1, "Size1");
   }
 
+  if (inner && IS_OPTION(coap_pkt, COAP_OPTION_ECHO)) {
+    COAP_SERIALIZE_BYTE_OPTION(COAP_OPTION_ECHO, echo, "Echo");
+  }
+
   if (inner && IS_OPTION(coap_pkt, COAP_OPTION_ACCEPT)) {
     current_number = OCF_OPTION_ACCEPT_CONTENT_FORMAT_VER;
   }
@@ -607,7 +611,7 @@ coap_oscore_parse_options(void *packet, uint8_t *data, uint32_t data_len,
 
     option_number += option_delta;
 
-    if (option_number <= COAP_OPTION_SIZE1) {
+    if (option_number <= COAP_OPTION_ECHO) {
       OC_DBG("OPTION %u (delta %u, len %zu):", option_number, option_delta,
              option_length);
       SET_OPTION(coap_pkt, option_number);
@@ -845,6 +849,15 @@ coap_oscore_parse_options(void *packet, uint8_t *data, uint32_t data_len,
       }
       coap_pkt->size1 = coap_parse_int_option(current_option, option_length);
       OC_DBG("  Size1 [%lu]", (unsigned long)coap_pkt->size1);
+      break;
+    case COAP_OPTION_ECHO:
+      if (!inner || option_length > COAP_ECHO_LEN) {
+        // Echo options must be OSCORE-encrypted for the deduplication to work
+        return BAD_OPTION_4_02;
+      }
+      memcpy(coap_pkt->echo, current_option, option_length);
+      coap_pkt->echo_len = option_length;
+      OC_DBG("  Echo [%lu]", (unsigned long)coap_pkt->echo);
       break;
     case OCF_OPTION_CONTENT_FORMAT_VER:
     case OCF_OPTION_ACCEPT_CONTENT_FORMAT_VER: {
@@ -1798,6 +1811,28 @@ coap_set_header_size1(void *packet, uint32_t size)
 
   coap_pkt->size1 = size;
   SET_OPTION(coap_pkt, COAP_OPTION_SIZE1);
+  return 1;
+}
+/*---------------------------------------------------------------------------*/
+int
+coap_get_header_echo(void *packet, uint8_t echo[COAP_ECHO_LEN])
+{
+  coap_packet_t *const coap_pkt = (coap_packet_t *)packet;
+
+  if (!IS_OPTION(coap_pkt, COAP_OPTION_ECHO)) {
+    return 0;
+  }
+  memcpy(echo, coap_pkt->echo, coap_pkt->echo_len);
+  return coap_pkt->echo_len;
+}
+int
+coap_set_header_echo(void *packet, uint8_t *echo, size_t len)
+{
+  coap_packet_t *const coap_pkt = (coap_packet_t *)packet;
+
+  memcpy(coap_pkt->echo, echo, len);
+  coap_pkt->echo_len = len;
+  SET_OPTION(coap_pkt, COAP_OPTION_ECHO);
   return 1;
 }
 /*---------------------------------------------------------------------------*/

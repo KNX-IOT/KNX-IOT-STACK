@@ -96,6 +96,19 @@ static uint16_t history[OC_REQUEST_HISTORY_SIZE];
 static uint8_t history_dev[OC_REQUEST_HISTORY_SIZE];
 static uint8_t idx;
 
+#ifndef OC_SEEN_SENDERS_SIZE
+#define OC_SEEN_SENDERS_SIZE (32)
+#endif
+
+#ifndef OC_ECHO_FRESHNESS_TIME
+#define OC_ECHO_FRESHNESS_TIME (10 * OC_CLOCK_CONF_TICKS_PER_SECOND)
+#endif
+
+// cache of previously seen senders - they have responded with a valid Echo
+// response when asked to do so
+static oc_ipv6_addr_t seen_senders[OC_SEEN_SENDERS_SIZE];
+size_t seen_sender_idx = 0;
+
 bool
 oc_coap_check_if_duplicate(uint16_t mid, uint8_t device)
 {
@@ -125,6 +138,34 @@ coap_send_empty_response(coap_message_type_t type, uint16_t mid,
       coap_set_token(msg, token, token_len);
     }
     size_t len = coap_serialize_message(msg, message->data);
+    if (len > 0) {
+      message->length = len;
+      coap_send_message(message);
+    }
+    if (message->ref_count == 0) {
+      oc_message_unref(message);
+    }
+  }
+}
+
+static void
+coap_send_unauth_echo_response(coap_message_type_t type, uint16_t mid,
+                               const uint8_t *token, size_t token_len,
+                               uint8_t *echo, size_t echo_len,
+                               oc_endpoint_t *endpoint)
+{
+  OC_DBG("CoAP send echo message: mid=%u", mid);
+  coap_packet_t msg[1]; // empty response
+  coap_udp_init_message(msg, type, UNAUTHORIZED_4_01, mid);
+  oc_message_t *message = oc_internal_allocate_outgoing_message();
+  if (message) {
+    memcpy(&message->endpoint, endpoint, sizeof(*endpoint));
+    if (token && token_len > 0) {
+      coap_set_token(msg, token, token_len);
+    }
+    coap_set_header_echo(msg, echo, echo_len);
+    size_t len =
+      coap_oscore_serialize_message(msg, message->data, true, true, true);
     if (len > 0) {
       message->length = len;
       coap_send_message(message);
@@ -244,6 +285,58 @@ coap_receive(oc_message_t *msg)
     {
       transaction = coap_get_transaction_by_mid(message->mid);
       if (transaction) {
+#ifdef OC_CLIENT
+        uint8_t echo_value[COAP_ECHO_LEN];
+        size_t echo_len = coap_get_header_echo(message, echo_value);
+        if (message->code == UNAUTHORIZED_4_01 && echo_len != 0) {
+          // Received Unauthorised response - retransmit request,
+          // but include Echo header included in this response
+          OC_DBG("Received Unauthorised response with Echo option");
+          OC_DBG("Retransmitting with included Echo...");
+          coap_packet_t retransmitted_pkt[1];
+          coap_udp_parse_message(retransmitted_pkt, transaction->message->data,
+                                 (uint16_t)transaction->message->length);
+
+          client_cb = oc_ri_find_client_cb_by_mid(retransmitted_pkt->mid);
+          OC_DBG("Pointer to MID Client Callback: %p", client_cb);
+
+          // copy the echo from the unauthorised response into the new request
+          coap_set_header_echo(retransmitted_pkt, echo_value, echo_len);
+          // Create a new transaction and send the request. New transaction has
+          // different MID & token, but should use the same client callback
+          int i = 0;
+          while (i < retransmitted_pkt->token_len) {
+            int r = oc_random_value();
+            memcpy(retransmitted_pkt->token + i, &r, sizeof(r));
+            i += sizeof(r);
+          }
+          retransmitted_pkt->mid = coap_get_mid();
+          coap_transaction_t *new_transaction = coap_new_transaction(
+            retransmitted_pkt->mid, retransmitted_pkt->token,
+            retransmitted_pkt->token_len, &msg->endpoint);
+
+          // a little bit naughty - modify the old client callback to refer to
+          // the new (retransmitted) packet
+          client_cb->mid = retransmitted_pkt->mid;
+          client_cb->token_len = retransmitted_pkt->token_len;
+          memcpy(client_cb->token, retransmitted_pkt->token,
+                 client_cb->token_len);
+
+          new_transaction->message = oc_internal_allocate_outgoing_message();
+          new_transaction->message->endpoint = transaction->message->endpoint;
+          new_transaction->message->length = coap_oscore_serialize_message(
+            retransmitted_pkt, new_transaction->message->data, true, true,
+            true);
+          if (new_transaction->message->length > 0) {
+            coap_send_transaction(new_transaction);
+          } else {
+            coap_clear_transaction(new_transaction);
+          }
+          coap_clear_transaction(transaction);
+          return 0;
+        }
+#endif
+
         coap_clear_transaction(transaction);
       }
       transaction = NULL;
@@ -310,6 +403,65 @@ coap_receive(oc_message_t *msg)
         coap_new_transaction(response->mid, NULL, 0, &msg->endpoint);
 
       if (transaction) {
+        bool new_sender = true;
+        for (int i = 0; i < OC_SEEN_SENDERS_SIZE; ++i) {
+          if (memcmp(seen_senders[i].address, msg->endpoint.addr.ipv6.address,
+                     16) == 0) {
+            new_sender = false;
+            break;
+          }
+        }
+
+        // server-side logic for handling responses with echo option
+        if (new_sender && msg->endpoint.flags & OSCORE_DECRYPTED) {
+          uint8_t echo_value[COAP_ECHO_LEN];
+          size_t echo_len = coap_get_header_echo(message, echo_value);
+          oc_clock_time_t current_time = oc_clock_time();
+
+          if (echo_len == 0) {
+            OC_DBG("Received request from new sender, sending Echo...");
+            coap_send_unauth_echo_response(
+              message->type == COAP_TYPE_CON ? COAP_TYPE_ACK : COAP_TYPE_NON,
+              message->mid, message->token, message->token_len,
+              (uint8_t *)&current_time, sizeof(current_time), &msg->endpoint);
+            coap_clear_transaction(transaction);
+            return UNAUTHORIZED_4_01;
+          } else if (echo_len != sizeof(oc_clock_time_t)) // KNX-IoT servers use
+                                                          // 8-byte echo options
+          {
+            OC_DBG("Received request with echo size %d! Sending bad option...",
+                   echo_len);
+            coap_send_empty_response(
+              message->type == COAP_TYPE_CON ? COAP_TYPE_ACK : COAP_TYPE_NON,
+              message->mid, message->token, message->token_len, BAD_OPTION_4_02,
+              &msg->endpoint);
+            coap_clear_transaction(transaction);
+            return BAD_OPTION_4_02;
+          }
+
+          // this is potentially endianess-sensitive, but we've already checked
+          // that the echo value is 8 bytes, and correct echo values originate
+          // on the same machine where they are generated, so this should be
+          // okay
+          oc_clock_time_t received_timestamp = (*(oc_clock_time_t *)echo_value);
+
+          OC_DBG("Echo timestamp difference %d, threshold %d",
+                 current_time - received_timestamp, OC_ECHO_FRESHNESS_TIME);
+          if (current_time - received_timestamp > OC_ECHO_FRESHNESS_TIME) {
+            OC_ERR("Stale timestamp! Current time %d, received time %d",
+                   current_time, received_timestamp);
+            OC_ERR("Dropping frame!");
+            // message containing echo is stale, just drop it
+            coap_clear_transaction(transaction);
+            return 0;
+          } else {
+            // message received with fresh echo, add to seen senders list
+            OC_DBG("Fresh echo! Adding endpoint to seen senders list...");
+            oc_ipv6_addr_t *entry_ptr = &seen_senders[seen_sender_idx];
+            memcpy(entry_ptr, &msg->endpoint.addr.ipv6, sizeof(oc_ipv6_addr_t));
+            seen_sender_idx = (seen_sender_idx + 1) % OC_SEEN_SENDERS_SIZE;
+          }
+        }
 #ifdef OC_BLOCK_WISE
         const uint8_t *incoming_block;
         uint32_t incoming_block_len =
@@ -606,6 +758,8 @@ coap_receive(oc_message_t *msg)
           goto send_message;
         }
       }
+
+      /* handle responses */
     } else {
 #ifdef OC_CLIENT
 #ifdef OC_BLOCK_WISE
@@ -907,6 +1061,7 @@ void
 coap_init_engine(void)
 {
   coap_register_as_transaction_handler();
+  memset(seen_senders, 0, sizeof(seen_senders));
 }
 /*---------------------------------------------------------------------------*/
 OC_PROCESS_THREAD(coap_engine, ev, data)

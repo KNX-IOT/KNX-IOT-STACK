@@ -750,7 +750,6 @@ oc_oscore_send_message(oc_message_t *msg)
       OC_DBG_OSCORE("---");
 
       /* Increment SSN */
-      // oscore_ctx->ssn++;
       increment_ssn_in_context(oscore_ctx);
 
       /* Compute nonce using partial IV and context->sendid */

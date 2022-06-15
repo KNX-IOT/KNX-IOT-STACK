@@ -76,8 +76,9 @@ extern "C" {
 
 #define COAP_HEADER_LEN                                                        \
   4 /* | version:0x03 type:0x0C tkl:0xF0 | code | mid:0x00FF | mid:0xFF00 | */
-#define COAP_TOKEN_LEN 8 /* The maximum number of bytes for the Token */
-#define COAP_ETAG_LEN 8  /* The maximum number of bytes for the ETag */
+#define COAP_TOKEN_LEN 8 /**< The maximum number of bytes for the Token */
+#define COAP_ETAG_LEN 8  /**< The maximum number of bytes for the ETag */
+#define COAP_ECHO_LEN 40 /**< The maximum size of the Echo option */
 
 #define COAP_HEADER_VERSION_MASK 0xC0
 #define COAP_HEADER_VERSION_POSITION 6
@@ -107,7 +108,7 @@ extern "C" {
 #define COAP_TCP_EXTENDED_LENGTH_3 15
 #define COAP_TCP_EXTENDED_LENGTH_3_DEFAULT_LEN 65805
 
-/* CoAP message types */
+/** CoAP message types */
 typedef enum {
   COAP_TYPE_CON, /* confirmables */
   COAP_TYPE_NON, /* non-confirmables */
@@ -115,10 +116,10 @@ typedef enum {
   COAP_TYPE_RST  /* reset */
 } coap_message_type_t;
 
-/* CoAP request method codes */
+/** CoAP request method codes */
 typedef enum { COAP_GET = 1, COAP_POST, COAP_PUT, COAP_DELETE } coap_method_t;
 
-/* CoAP response codes */
+/** CoAP response codes */
 typedef enum {
   COAP_NO_ERROR = 0,
 
@@ -155,7 +156,7 @@ typedef enum {
   CLOSE_ALL_TLS_SESSIONS
 } coap_status_t;
 
-/* CoAP header option numbers */
+/** CoAP header option numbers */
 typedef enum {
   COAP_OPTION_IF_MATCH = 1,                    /* 0-8 B */
   COAP_OPTION_URI_HOST = 3,                    /* 1-255 B */
@@ -177,6 +178,7 @@ typedef enum {
   COAP_OPTION_PROXY_URI = 35,                  /* 1-1034 B */
   COAP_OPTION_PROXY_SCHEME = 39,               /* 1-255 B */
   COAP_OPTION_SIZE1 = 60,                      /* 0-4 B */
+  COAP_OPTION_ECHO = 252,                      /* 1-40 */
   OCF_OPTION_ACCEPT_CONTENT_FORMAT_VER = 2049, /* 2 B */
   OCF_OPTION_CONTENT_FORMAT_VER = 2053         /* 2 B */
 } coap_option_t;
