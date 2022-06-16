@@ -34,7 +34,8 @@
 
 OC_PROCESS(oc_oscore_handler, "OSCORE Process");
 
-static void increment_ssn_in_context(oc_oscore_context_t *ctx)
+static void
+increment_ssn_in_context(oc_oscore_context_t *ctx)
 {
   ctx->ssn++;
 
