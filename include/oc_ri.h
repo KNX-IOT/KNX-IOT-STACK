@@ -595,8 +595,8 @@ bool oc_ri_is_app_resource_valid(oc_resource_t *resource);
  * @param request the new request
  * @param response_buffer the dummy response buffer for the new request
  * @param response_obj the dummy response object
- * @return true
- * @return false
+ * @return true new request valid
+ * @return false new request invalid
  */
 bool oc_ri_new_request_from_request(oc_request_t new_request,
                                     oc_request_t request,
