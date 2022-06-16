@@ -1823,7 +1823,7 @@ coap_get_header_echo(void *packet, uint8_t echo[COAP_ECHO_LEN])
     return 0;
   }
   memcpy(echo, coap_pkt->echo, coap_pkt->echo_len);
-  return coap_pkt->echo_len;
+  return (int)coap_pkt->echo_len;
 }
 int
 coap_set_header_echo(void *packet, uint8_t *echo, size_t len)

@@ -768,7 +768,7 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
         switch (object->type) {
         case OC_REP_INT: {
           if (object->iname == 12) {
-            g_gpt[index].ia = object->value.integer;
+            g_gpt[index].ia = (int)object->value.integer;
           }
           if (object->iname == 13) {
             g_gpt[index].grpid = (int)object->value.integer;
@@ -800,7 +800,7 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
             int *new_array = (int *)malloc(array_size * sizeof(int));
 
             for (int i = 0; i < array_size; i++) {
-              new_array[i] = arr[i];
+              new_array[i] = (int)arr[i];
             }
             if (g_gpt[index].ga != 0) {
               free(g_gpt[index].ga);

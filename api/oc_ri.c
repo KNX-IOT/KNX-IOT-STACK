@@ -321,6 +321,8 @@ oc_ri_new_request_from_request(oc_request_t new_request, oc_request_t request,
   response_obj.separate_response = NULL;
   response_obj.response_buffer = &response_buffer;
   new_request.response = &response_obj;
+
+  return true;
 }
 
 #ifdef OC_SERVER
@@ -477,7 +479,7 @@ oc_ri_query_nth_key_exists(const char *query, size_t query_len, char **key,
     /* there is no value */
     *key = start;
     *key_len = (current - start);
-    next_pos = *key_len + 1;
+    next_pos = (int)(*key_len + 1);
   }
 
   return next_pos;
@@ -1066,7 +1068,7 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
         break;
       }
       if (oc_uri_contains_wildcard(oc_string(resource->uri))) {
-        len_resource = oc_string_len(resource->uri);
+        len_resource = (int)oc_string_len(resource->uri);
         // incoming URL should be equal or larger than the one with the wild
         // card comparison should match to what ever is in front of the last
         // char.
@@ -1146,7 +1148,7 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
      * points to memory allocated in the messaging layer for the "CoAP
      * Transaction" to service this request.
      */
-    oc_rep_new(response_buffer.buffer, response_buffer.buffer_size);
+    oc_rep_new(response_buffer.buffer, (int)response_buffer.buffer_size);
 
     if (!oc_knx_sec_check_acl(method, cur_resource, endpoint)) {
       authorized = false;

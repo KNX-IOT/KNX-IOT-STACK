@@ -540,7 +540,7 @@ oc_filter_resource_by_rt(oc_resource_t *resource, oc_request_t *request)
       /* adapt size when a wild card exists */
       char *wildcart = memchr(rt, '*', rt_len);
       if (wildcart != NULL) {
-        rt_len = wildcart - rt;
+        rt_len = (int)(wildcart - rt);
       }
 
       match = false;
