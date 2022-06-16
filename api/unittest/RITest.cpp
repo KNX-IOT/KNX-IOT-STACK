@@ -57,7 +57,7 @@ TEST_F(TestOcRi, GetAppResourceByUri_P)
   oc_ri_add_resource(res);
 
   res = oc_ri_get_app_resource_by_uri(RESOURCE_URI, strlen(RESOURCE_URI), 0);
-  EXPECT_NE(res, NULL);
+  EXPECT_NE(res, nullptr);
   oc_ri_delete_resource(res);
 }
 
@@ -66,7 +66,7 @@ TEST_F(TestOcRi, GetAppResourceByUri_N)
   oc_resource_t *res;
 
   res = oc_ri_get_app_resource_by_uri(RESOURCE_URI, strlen(RESOURCE_URI), 0);
-  EXPECT_EQ(res, NULL);
+  EXPECT_EQ(res, nullptr);
 }
 
 TEST_F(TestOcRi, RiGetAppResource_P)
