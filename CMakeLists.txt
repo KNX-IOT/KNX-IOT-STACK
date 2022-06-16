@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.10)
+cmake_minimum_required (VERSION 3.15)
 project(knx-iot-stack)
 
 if(CMAKE_COMPILER_IS_GNUCC AND UNIX)
