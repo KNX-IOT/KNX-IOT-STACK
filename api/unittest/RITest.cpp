@@ -79,7 +79,7 @@ TEST_F(TestOcRi, RiGetAppResource_P)
   oc_resource_set_request_handler(res, OC_GET, onGet, NULL);
   oc_ri_add_resource(res);
   res = oc_ri_get_app_resources();
-  EXPECT_NE(0, res);
+  EXPECT_NE(nullptr, res);
   oc_ri_delete_resource(res);
 }
 
