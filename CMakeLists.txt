@@ -6,6 +6,10 @@ if(CMAKE_COMPILER_IS_GNUCC AND UNIX)
 endif()
 add_compile_definitions(OC_DYNAMIC_ALLOCATION)
 
+if(MSVC)
+  add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+endif()
+
 # Do not build anything except for the library
 option(ENABLE_PROGRAMS "Build mbed TLS programs." OFF)
 option(ENABLE_TESTING "Build mbed TLS tests." OFF)
