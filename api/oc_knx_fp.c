@@ -2091,8 +2091,8 @@ oc_find_grpid_in_table(oc_group_rp_table_t *rp_table, int max_size,
   return -1;
 }
 
-
-int oc_find_grpid_in_publisher_table(int group_address)
+int
+oc_find_grpid_in_publisher_table(int group_address)
 {
   return oc_find_grpid_in_table(g_gpt, GPT_MAX_ENTRIES, group_address);
 }

@@ -410,8 +410,8 @@ oc_s_mode_get_value(oc_request_t *request)
 }
 
 static void
-oc_issue_s_mode(int scope, int sia_value, int grpid, int group_address, int iid, char *rp,
-                uint8_t *value_data, int value_size)
+oc_issue_s_mode(int scope, int sia_value, int grpid, int group_address, int iid,
+                char *rp, uint8_t *value_data, int value_size)
 {
   PRINT("  oc_issue_s_mode : scope %d\n", scope);
 
@@ -598,13 +598,14 @@ oc_do_s_mode_read(size_t group_address)
   // find the grpid that belongs to the group address
   grpid = oc_find_grpid_in_publisher_table((int)group_address);
   if (grpid > 0) {
-    oc_issue_s_mode(2, sia_value, (int) grpid, (int)group_address, iid, "r", 0, 0);
+    oc_issue_s_mode(2, sia_value, (int)grpid, (int)group_address, iid, "r", 0,
+                    0);
     oc_issue_s_mode(5, sia_value, (int)grpid, (int)group_address, iid, "r", 0,
                     0);
   } else if (group_address > 0) {
-    oc_issue_s_mode(2, sia_value, (int)group_address, (int) group_address, iid,
+    oc_issue_s_mode(2, sia_value, (int)group_address, (int)group_address, iid,
                     "r", 0, 0);
-    oc_issue_s_mode(5, sia_value, (int)group_address, (int) group_address, iid,
+    oc_issue_s_mode(5, sia_value, (int)group_address, (int)group_address, iid,
                     "r", 0, 0);
   }
 }
@@ -689,16 +690,13 @@ oc_do_s_mode_with_scope_and_check(int scope, char *resource_url, char *rp,
         if (j == 0) {
           // issue the s-mode command, but only for the first ga entry
           int grpid = oc_find_grpid_in_publisher_table((int)group_address);
-          if (grpid > 0)
-          {
-            oc_issue_s_mode(scope, sia_value, grpid,group_address, iid, rp, buffer,
-                            value_size);
-          }
-          else {
+          if (grpid > 0) {
+            oc_issue_s_mode(scope, sia_value, grpid, group_address, iid, rp,
+                            buffer, value_size);
+          } else {
             // send to group address in multicast address
             oc_issue_s_mode(scope, sia_value, group_address, group_address, iid,
-                            rp, buffer,
-                            value_size);
+                            rp, buffer, value_size);
           }
         }
         // the recipient table contains the list of destinations that will

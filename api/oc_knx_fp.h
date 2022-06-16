@@ -237,11 +237,11 @@ void oc_register_group_multicasts();
 
 /**
  * @brief find the grpid from the group_address
- * 
+ *
  * @see oc_register_group_multicasts
- * 
+ *
  * @param group_address The group_address from the group object table
- * @return the grpid matching the group_address the table publisher table 
+ * @return the grpid matching the group_address the table publisher table
  *  or -1 if not found
  */
 int oc_find_grpid_in_publisher_table(int group_address);
