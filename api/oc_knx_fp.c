@@ -2074,6 +2074,22 @@ unsubscribe_group_to_multicast(int group_nr, int iid, int scope)
   oc_connectivity_unsubscribe_mcast_ipv6(&group_mcast);
 }
 
+int
+oc_find_grpid_in_table(oc_group_rp_table_t *rp_table, int max_size, int group_address)
+{
+  int index;
+  for (index = 0; index < max_size; index++) {
+    int *array = rp_table[index].ga;
+    int array_size = rp_table[index].ga_len;
+    bool found = is_in_array(group_address, array, array_size);
+    if (found) {
+      rp_table[index].grpid;
+    }
+  }
+  // not found
+  return -1;
+}
+
 void
 oc_register_group_multicasts()
 {
@@ -2087,26 +2103,71 @@ oc_register_group_multicasts()
 
   PRINT("oc_register_group_multicasts\n");
 
+  bool registered_pub = false;
+  bool pub_entry = false;
+    
   int index;
-  for (index = 0; index < GOT_MAX_ENTRIES; index++) {
-    int nr_entries = g_got[index].ga_len;
+  for (index = 0; index < GPT_MAX_ENTRIES; index++) {
+    int grpid = g_gpt[index].grpid;
+    if (grpid > 0) {
+      pub_entry = true;
+      break;
+    }
+  }
+  if (pub_entry == true) {
+    for (index = 0; index < GOT_MAX_ENTRIES; index++) {
+      int nr_entries = g_got[index].ga_len;
 
-    oc_cflag_mask_t cflags = g_got[index].cflags;
-    // check if the group address is used for receiving.
-    // e.g. WRITE or UPDATE
-    if (((cflags & OC_CFLAG_WRITE) > 0) || ((cflags & OC_CFLAG_UPDATE) > 0) ||
-        ((cflags & OC_CFLAG_READ) > 0)) {
+      oc_cflag_mask_t cflags = g_got[index].cflags;
+      // check if the group address is used for receiving.
+      // e.g. WRITE or UPDATE
+      if (((cflags & OC_CFLAG_WRITE) > 0) || ((cflags & OC_CFLAG_UPDATE) > 0) ||
+          ((cflags & OC_CFLAG_READ) > 0)) {
 
-      for (int i = 0; i < nr_entries; i++) {
-        PRINT(" oc_register_group_multicasts index=%d i=%d group: %d  cflags=",
-              index, i, g_got[index].ga[i]);
-        oc_print_cflags(cflags);
-        subscribe_group_to_multicast(g_got[index].ga[i], installation_id, 2);
-        subscribe_group_to_multicast(g_got[index].ga[i], installation_id, 5);
+        for (int i = 0; i < nr_entries; i++) {
+          int grpid =
+            oc_find_grpid_in_table(g_gpt, GPT_MAX_ENTRIES, g_got[index].ga[i]);
+
+          PRINT(
+            " oc_register_group_multicasts index=%d i=%d grpid: %d group_address: %d cflags=",
+            index, i, grpid, g_got[index].ga[i]);
+          oc_print_cflags(cflags);
+
+          if (grpid > 0) {
+            subscribe_group_to_multicast(grpid, installation_id, 2);
+            subscribe_group_to_multicast(grpid, installation_id, 5);
+          }
+        }
       }
     }
   }
-}
+  if (pub_entry == false) {
+      // register via group object table
+      int index;
+      for (index = 0; index < GOT_MAX_ENTRIES; index++) {
+        int nr_entries = g_got[index].ga_len;
+
+        oc_cflag_mask_t cflags = g_got[index].cflags;
+        // check if the group address is used for receiving.
+        // e.g. WRITE or UPDATE
+        if (((cflags & OC_CFLAG_WRITE) > 0) ||
+            ((cflags & OC_CFLAG_UPDATE) > 0) ||
+            ((cflags & OC_CFLAG_READ) > 0)) {
+
+          for (int i = 0; i < nr_entries; i++) {
+            PRINT(
+              " oc_register_group_multicasts index=%d i=%d group: %d  cflags=",
+              index, i, g_got[index].ga[i]);
+            oc_print_cflags(cflags);
+            subscribe_group_to_multicast(g_got[index].ga[i], installation_id,
+                                         2);
+            subscribe_group_to_multicast(g_got[index].ga[i], installation_id,
+                                         5);
+          }
+        }
+      }
+    }
+  }
 
 void
 oc_init_datapoints_at_initialization()
