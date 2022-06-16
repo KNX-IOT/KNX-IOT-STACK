@@ -34,7 +34,7 @@
 
 OC_PROCESS(oc_oscore_handler, "OSCORE Process");
 
-static increment_ssn_in_context(oc_oscore_context_t *ctx)
+static void increment_ssn_in_context(oc_oscore_context_t *ctx)
 {
   ctx->ssn++;
 
@@ -436,10 +436,10 @@ oc_oscore_send_multicast_message(oc_message_t *message)
 
   oc_oscore_context_t *oscore_ctx =
     oc_oscore_find_context_by_group_id(0, group_id);
-  PRINT("oc_oscore_send_multicast_message : groupid = %d\n", group_id);
+  PRINT("oc_oscore_send_multicast_message : groupid = %d\n", (int)group_id);
   if (oscore_ctx) {
     OC_DBG_OSCORE("#################################");
-    OC_DBG_OSCORE("found group OSCORE context %s", oscore_ctx->desc);
+    OC_DBG_OSCORE("found group OSCORE context %s", oc_string(oscore_ctx->desc));
 
     /* Use sender key for encryption */
     uint8_t *key = oscore_ctx->sendkey;
