@@ -213,24 +213,25 @@ oc_group_object_table_t *oc_core_get_group_object_table_entry(int index);
  * @brief register the multicast addresses to listen to
  *
  * The addresses are formed from:
- * - situation 1) grpid of the publisher entries 
+ * - situation 1) grpid of the publisher entries
  * or if no grpid exist:
  * - situation 2) group address entries in the Group Object table
- * 
+ *
  * for situation 1):
  * - loop over the group object table
  *   - for each group address entry
  *     - if cflags is "Write" "Update" "Read"
  *       - find the grpid entry in the publisher table
  *       - register the grpid as part of the address
- * 
+ *
  * for situation 2):
  * - loop over the group object table
  *   - for each group address entry
  *     - if cflags is "Write" "Update" "Read"
  *       - register the  group address as part of the address
- * 
- * function is called when the device is (re)started in run-time mode (e.g. state = "loaded")
+ *
+ * function is called when the device is (re)started in run-time mode (e.g.
+ * state = "loaded")
  */
 void oc_register_group_multicasts();
 
