@@ -410,7 +410,7 @@ oc_s_mode_get_value(oc_request_t *request)
 }
 
 static void
-oc_issue_s_mode(int scope, int sia_value, int group_address, int iid, char *rp,
+oc_issue_s_mode(int scope, int sia_value, int grpid, int group_address, int iid, char *rp,
                 uint8_t *value_data, int value_size)
 {
   PRINT("  oc_issue_s_mode : scope %d\n", scope);
@@ -433,7 +433,7 @@ oc_issue_s_mode(int scope, int sia_value, int group_address, int iid, char *rp,
   oc_endpoint_t group_mcast;
   memset(&group_mcast, 0, sizeof(group_mcast));
   group_mcast =
-    oc_create_multicast_group_address(group_mcast, group_address, iid, scope);
+    oc_create_multicast_group_address(group_mcast, grpid, iid, scope);
 
 #endif
 
@@ -590,13 +590,22 @@ oc_do_s_mode_read(size_t group_address)
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   int sia_value = device->ia;
   int iid = device->iid;
+  int grpid = -1;
 
   PRINT("oc_do_s_mode_read : ga=%d ia=%d, iid=%d\n", (int)group_address,
         sia_value, iid);
 
-  if (group_address > 0) {
-    oc_issue_s_mode(2, sia_value, (int)group_address, iid, "r", 0, 0);
-    oc_issue_s_mode(5, sia_value, (int)group_address, iid, "r", 0, 0);
+  // find the grpid that belongs to the group address
+  grpid = oc_find_grpid_in_publisher_table((int)group_address);
+  if (grpid > 0) {
+    oc_issue_s_mode(2, sia_value, (int) grpid, (int)group_address, iid, "r", 0, 0);
+    oc_issue_s_mode(5, sia_value, (int)grpid, (int)group_address, iid, "r", 0,
+                    0);
+  } else if (group_address > 0) {
+    oc_issue_s_mode(2, sia_value, (int)group_address, (int) group_address, iid,
+                    "r", 0, 0);
+    oc_issue_s_mode(5, sia_value, (int)group_address, (int) group_address, iid,
+                    "r", 0, 0);
   }
 }
 
@@ -679,8 +688,18 @@ oc_do_s_mode_with_scope_and_check(int scope, char *resource_url, char *rp,
         PRINT("      ga : %d\n", group_address);
         if (j == 0) {
           // issue the s-mode command, but only for the first ga entry
-          oc_issue_s_mode(scope, sia_value, group_address, iid, rp, buffer,
-                          value_size);
+          int grpid = oc_find_grpid_in_publisher_table((int)group_address);
+          if (grpid > 0)
+          {
+            oc_issue_s_mode(scope, sia_value, grpid,group_address, iid, rp, buffer,
+                            value_size);
+          }
+          else {
+            // send to group address in multicast address
+            oc_issue_s_mode(scope, sia_value, group_address, group_address, iid,
+                            rp, buffer,
+                            value_size);
+          }
         }
         // the recipient table contains the list of destinations that will
         // receive data. loop over the full recipient table and send a message
