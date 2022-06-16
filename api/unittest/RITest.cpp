@@ -88,7 +88,7 @@ TEST_F(TestOcRi, RiGetAppResource_N)
   oc_resource_t *res;
 
   res = oc_ri_get_app_resources();
-  EXPECT_EQ(0, res);
+  EXPECT_EQ(nullptr, res);
 }
 
 TEST_F(TestOcRi, RiAllocResource_P)
@@ -96,7 +96,7 @@ TEST_F(TestOcRi, RiAllocResource_P)
   oc_resource_t *res;
 
   res = oc_ri_alloc_resource();
-  EXPECT_NE(0, res);
+  EXPECT_NE(nullptr, res);
   oc_ri_delete_resource(res);
 }
 
