@@ -1,50 +1,78 @@
 @startuml
 skinparam sequenceMessageAlign center
+Title Configuration sequence (no security)
+
+participant "Configuration Tool" as ETS
+participant "Device with SN 000005" as Device
 
 == Discovery ==
+alt Device serial number known
+ETS --> Device: discover_devices_with_query(ep=urn:knx:sn.<sn>)
+ETS <- Device: DeviceList with serial number(<>;ep=urn:knx:sn.000005 [ipaddress])
+else Programming Mode (not needed for now)
+end
 
-ETS --> Device: CoAP Discovery ep=urn:knx:sn.<sn>
-note left : Device serial number known
-ETS <- Device: <>;ep=urn:knx:sn.000005 [ipaddress]
+note left 
+ETS knows SN & IP address of Device
+can be performed by: **list_devices.py**
+end note
 
-== Security handshake  ===
-ETS -> Device: initate spake [sn, password]
-note left : Device password known
-ETS <-> Device: Handshake
-ETS -> ETS : store MS as oscore 
-Device -> Device : store MS as oscore 
+== Device reset ==
+ETS -> Device: ets_post_reset("reset") 
+ETS <- Device: ok (device in ex-factory state)
+note left 
+Device in ex-factory state
+can be performed by: **reset_device.py**
+end note
 
-== Device individualisation ==
-ETS --> Device: set programming mode on
-ETS -> Device: Search for if=urn:knx:ia.<x>
-ETS -> Device: set ia = <x>
-ETS -> Device: set iid = <x>
-ETS -> Device: // set hname = <x>
-ETS --> Device: set programming mode off
+== Device individualisation check ==
+ETS -> Device:discover_devices_with_query(if=urn:knx:ia.<x>)
+note left 
+note ia=<x> should not exist on the network, 
+so no reply is expected
+can be performed by: **list_devices.py**
+end note
+
+== Device individualisation == 
+
+ETS -> Device: ets_post_ia (ia=x, iid=y)
+Device -> ETS: ok
+
+note left 
+all remaining actions performed by: **install_config.py**
+end note
 
 == Device configuration ==
-ETS -> Device: set loadstate: unload 
-ETS <- Device: unloaded
-note left : group object table cleared
-ETS -> Device: set loadstate: load 
-ETS <- Device: loading
+ETS -> Device: ets_post_lsm(1) startloading
+ETS <- Device: state: loading
+loop for each group object table entry
+ETS -> Device: ets_post_fp_g (id, url, cflag, [<groupnumber1>, <groupnumber2>, ..]  )
+Device -> ETS: ok
+end
 
-ETS -> Device: set group object table
-note left : multiple calls
-ETS -> Device: set publisher table
-note left : multiple calls
-ETS -> Device: set loadstate: loadcomplete 
-ETS -> Device: set loadstate: loaded
+loop for each publisher table entry
+ETS -> Device: ets_post_fp_p (id, ...  )
+Device -> ETS: ok
+end
 
+loop for each recipient table entry
+ETS -> Device: ets_post_fp_p (id, ...  )
+Device -> ETS: ok
+end
 
+opt if device supports parameters
+loop for each parameter entry
+ETS -> Device: ets_post_param(url, param_type, param_value)
+Device -> ETS: ok
+end
+end
+ETS -> Device: ets_post_lsm(2) loadComplete
+Device -> ETS: state: loaded
+Device -> Device: Device goes into run-time
+note right : device is functional
 ETS -> Device: retrieve finger print
 ETS <- Device: finger print
 ETS -> ETS: store finger print
 
-== Security configuration  ==
-ETS -> Device: set auth/at info
-note left : multiple calls
-ETS <- Device: 
 
-note left : device is functional
 @enduml
