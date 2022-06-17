@@ -2097,6 +2097,12 @@ oc_find_grpid_in_publisher_table(int group_address)
   return oc_find_grpid_in_table(g_gpt, GPT_MAX_ENTRIES, group_address);
 }
 
+int
+oc_find_grpid_in_recipient_table(int group_address)
+{
+  return oc_find_grpid_in_table(g_grt, GRT_MAX_ENTRIES, group_address);
+}
+
 void
 oc_register_group_multicasts()
 {
