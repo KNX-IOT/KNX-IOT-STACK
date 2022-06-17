@@ -19,7 +19,7 @@ Dev <- Resource : value
 Dev -> GOT : Get groupId's for sending message
 Dev <- GOT : GroupId's
 
-group per GroupID [on multi-cast groupid address]
+group per GroupID [on multi-cast address]
     Dev --> Dev2 : s-mode [GroupID, value]
 end
 
