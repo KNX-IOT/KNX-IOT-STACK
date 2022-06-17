@@ -689,7 +689,7 @@ oc_do_s_mode_with_scope_and_check(int scope, char *resource_url, char *rp,
         PRINT("      ga : %d\n", group_address);
         if (j == 0) {
           // issue the s-mode command, but only for the first ga entry
-          int grpid = oc_find_grpid_in_publisher_table((int)group_address);
+          int grpid = oc_find_grpid_in_recipient_table((int)group_address);
           if (grpid > 0) {
             oc_issue_s_mode(scope, sia_value, grpid, group_address, iid, rp,
                             buffer, value_size);
