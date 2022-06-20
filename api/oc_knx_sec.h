@@ -38,7 +38,7 @@ typedef enum {
 } oc_at_profile_t;
 
 /**
- * @brief string to accesst token profile
+ * @brief string to access token profile
  *
  * @param str input string
  * @return oc_at_profile_t the token profile
@@ -49,7 +49,7 @@ oc_at_profile_t oc_string_to_at_profile(oc_string_t str);
  * @brief access token profile to string
  *
  * @param at_profile the access token profile
- * @return char* the string denoting the at accss token profile
+ * @return char* the string denoting the at access token profile
  */
 char *oc_at_profile_to_string(oc_at_profile_t at_profile);
 
@@ -70,7 +70,7 @@ char *oc_at_profile_to_string(oc_at_profile_t at_profile);
  * "ms": "f9af8s.6bd94e6f"
  * }}}
  * ```
- * second example of (json) payload for a group address:
+ * second example of (JSON) payload for a group address:
  * ```
  *{
  * "id": "OC5BLLhkAG ...",
