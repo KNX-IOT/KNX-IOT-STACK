@@ -1911,17 +1911,17 @@ oc_init_tables()
 {
 #ifdef OC_PUBLISHER_TABLE
   for (int i = 0; i < GPT_MAX_ENTRIES; i++) {
-    //oc_delete_group_rp_table_entry(i, GPT_STORE, g_gpt, GPT_MAX_ENTRIES);
+    // oc_delete_group_rp_table_entry(i, GPT_STORE, g_gpt, GPT_MAX_ENTRIES);
     oc_free_group_rp_table_entry(i, GPT_STORE, g_gpt, GPT_MAX_ENTRIES, true);
   }
 #endif /* OC_PUBLISHER_TABLE */
   for (int i = 0; i < GRT_MAX_ENTRIES; i++) {
-    //oc_delete_group_rp_table_entry(i, GRT_STORE, g_grt, GRT_MAX_ENTRIES);
+    // oc_delete_group_rp_table_entry(i, GRT_STORE, g_grt, GRT_MAX_ENTRIES);
     oc_free_group_rp_table_entry(i, GRT_STORE, g_grt, GRT_MAX_ENTRIES, true);
   }
   for (int i = 0; i < GOT_MAX_ENTRIES; i++) {
     oc_free_group_object_table_entry(i, true);
-    //oc_delete_group_object_table_entry(i);
+    // oc_delete_group_object_table_entry(i);
   }
 }
 
