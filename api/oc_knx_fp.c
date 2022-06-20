@@ -1530,14 +1530,15 @@ oc_load_group_object_table()
 }
 
 void
-oc_free_group_object_table_entry(int entry)
+oc_free_group_object_table_entry(int entry, bool init)
 {
   g_got[entry].id = -1;
-  oc_free_string(&g_got[entry].href);
-  // oc_new_string(&g_got[entry].href, "", 0);
-  free(g_got[entry].ga);
+  if (init == false) {
+    oc_free_string(&g_got[entry].href);
+    free(g_got[entry].ga);
+  }
+
   g_got[entry].ga = NULL;
-  // oc_free_int_array(g_got[value].ga);
   g_got[entry].ga_len = 0;
   g_got[entry].cflags = 0;
 }
@@ -1549,7 +1550,7 @@ oc_delete_group_object_table_entry(int entry)
   snprintf(filename, 20, "%s_%d", GOT_STORE, entry);
   oc_storage_erase(filename);
 
-  oc_free_group_object_table_entry(entry);
+  oc_free_group_object_table_entry(entry, false);
 }
 
 void
@@ -1567,7 +1568,7 @@ oc_free_group_object_table()
 {
   PRINT("Free Group Object Table\n");
   for (int i = 0; i < GOT_MAX_ENTRIES; i++) {
-    oc_free_group_object_table_entry(i);
+    oc_free_group_object_table_entry(i, false);
   }
 }
 
@@ -1771,7 +1772,8 @@ oc_load_rp_object_table()
 
 static void
 oc_free_group_rp_table_entry(int entry, char *Store,
-                             oc_group_rp_table_t *rp_table, int max_size)
+                             oc_group_rp_table_t *rp_table, int max_size,
+                             bool init)
 {
   (void)max_size;
   (void)Store;
@@ -1780,9 +1782,11 @@ oc_free_group_rp_table_entry(int entry, char *Store,
   rp_table[entry].iid = -1;
   rp_table[entry].fid = -1;
   rp_table[entry].grpid = -1;
-  oc_free_string(&rp_table[entry].path);
-  oc_free_string(&rp_table[entry].url);
-  free(rp_table[entry].ga);
+  if (init == false) {
+    oc_free_string(&rp_table[entry].path);
+    oc_free_string(&rp_table[entry].url);
+    free(rp_table[entry].ga);
+  }
   rp_table[entry].ga = NULL;
   rp_table[entry].ga_len = 0;
 }
@@ -1795,7 +1799,7 @@ oc_delete_group_rp_table_entry(int entry, char *Store,
   snprintf(filename, 20, "%s_%d", Store, entry);
   oc_storage_erase(filename);
 
-  oc_free_group_rp_table_entry(entry, Store, rp_table, max_size);
+  oc_free_group_rp_table_entry(entry, Store, rp_table, max_size, false);
 }
 
 void
@@ -1820,13 +1824,13 @@ oc_free_group_rp_table()
 {
   PRINT("Free Group Recipient Table from Persistent storage\n");
   for (int i = 0; i < GRT_MAX_ENTRIES; i++) {
-    oc_free_group_rp_table_entry(i, GRT_STORE, g_grt, GRT_MAX_ENTRIES);
+    oc_free_group_rp_table_entry(i, GRT_STORE, g_grt, GRT_MAX_ENTRIES, false);
   }
 
 #ifdef OC_PUBLISHER_TABLE
   PRINT("Deleting Group Publisher Table from Persistent storage\n");
   for (int i = 0; i < GPT_MAX_ENTRIES; i++) {
-    oc_free_group_rp_table_entry(i, GPT_STORE, g_gpt, GPT_MAX_ENTRIES);
+    oc_free_group_rp_table_entry(i, GPT_STORE, g_gpt, GPT_MAX_ENTRIES, false);
   }
 #endif /*  OC_PUBLISHER_TABLE */
 }
@@ -1907,14 +1911,17 @@ oc_init_tables()
 {
 #ifdef OC_PUBLISHER_TABLE
   for (int i = 0; i < GPT_MAX_ENTRIES; i++) {
-    oc_delete_group_rp_table_entry(i, GPT_STORE, g_gpt, GPT_MAX_ENTRIES);
+    // oc_delete_group_rp_table_entry(i, GPT_STORE, g_gpt, GPT_MAX_ENTRIES);
+    oc_free_group_rp_table_entry(i, GPT_STORE, g_gpt, GPT_MAX_ENTRIES, true);
   }
 #endif /* OC_PUBLISHER_TABLE */
   for (int i = 0; i < GRT_MAX_ENTRIES; i++) {
-    oc_delete_group_rp_table_entry(i, GRT_STORE, g_grt, GRT_MAX_ENTRIES);
+    // oc_delete_group_rp_table_entry(i, GRT_STORE, g_grt, GRT_MAX_ENTRIES);
+    oc_free_group_rp_table_entry(i, GRT_STORE, g_grt, GRT_MAX_ENTRIES, true);
   }
   for (int i = 0; i < GOT_MAX_ENTRIES; i++) {
-    oc_delete_group_object_table_entry(i);
+    oc_free_group_object_table_entry(i, true);
+    // oc_delete_group_object_table_entry(i);
   }
 }
 
