@@ -40,7 +40,6 @@ round-trip time, as opposed to just once.
 
 */
 
-
 #ifndef OC_OSCORE_REPLAY_H
 #define OC_OSCORE_REPLAY_H
 
