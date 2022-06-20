@@ -2084,7 +2084,7 @@ oc_find_grpid_in_table(oc_group_rp_table_t *rp_table, int max_size,
     int array_size = rp_table[index].ga_len;
     bool found = is_in_array(group_address, array, array_size);
     if (found) {
-      rp_table[index].grpid;
+      return rp_table[index].grpid;
     }
   }
   // not found
