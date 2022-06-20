@@ -246,7 +246,6 @@ void oc_register_group_multicasts();
  */
 int oc_find_grpid_in_publisher_table(int group_address);
 
-
 /**
  * @brief find the grpid from the group_address in the recipient table
  *
@@ -257,8 +256,6 @@ int oc_find_grpid_in_publisher_table(int group_address);
  *  or -1 if not found
  */
 int oc_find_grpid_in_recipient_table(int group_address);
-
-
 
 /**
  * @brief initializes the data points at initialization
