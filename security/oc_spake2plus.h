@@ -13,6 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 */
+/**
+  @brief security: spake2plus implementation
+  @file
+*/
 
 #ifndef OC_SPAKE2PLUS_H
 #define OC_SPAKE2PLUS_H
@@ -43,7 +47,7 @@ typedef struct
 int oc_spake_init(void);
 
 /**
- * @brief Deinitialize Spake2+
+ * @brief De-initialize Spake2+
  *
  * @return int 0 on success
  */
