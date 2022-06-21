@@ -28,17 +28,17 @@
   Description of the implemented replay window algorithm.
 
   The KNX servers keep a list endpoints that they have received a
-  'synchronised' message from. Upon boot, this list endpoints is empty, so servers
-  will respond to requests from all new client endpoints with `4.01 UNAUTHORISED`
-  message containing an Echo option. The echo option is OSCORE-encrypted, and its
-  actual value is the local time of the server. Upon receiving such a response,
-  the client retransmits the request and includes the Echo value that the server
-  sent. This verifies that:
+  'synchronised' message from. Upon boot, this list endpoints is empty, so
+  servers will respond to requests from all new client endpoints with `4.01
+  UNAUTHORISED` message containing an Echo option. The echo option is
+  OSCORE-encrypted, and its actual value is the local time of the server. Upon
+  receiving such a response, the client retransmits the request and includes the
+  Echo value that the server sent. This verifies that:
 
   a) the client is reachable at the source IP address, preventing attackers
   from attempting to bypass the deduplication code by changing the source IP
   address of packets.
-  
+
   b) the request is fresh - the server drops request where the
   timestamp contained in the Echo option is older than a given threshold,
   configurable within engine.c.
