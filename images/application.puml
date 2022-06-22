@@ -21,7 +21,7 @@ class Application {
 class Stack {
   Functionallity
   ..
-  CoAP discovery
+  Discovery (CoAP & mDNS)
   ..
   S-Mode client and server
   ..
