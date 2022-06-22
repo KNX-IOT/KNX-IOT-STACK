@@ -2,14 +2,14 @@
 skinparam componentStyle rectangle
 
 class Application {
-  Implements
+  Implements :
   ..
-  application datapoints:
-  listen to GET/PUT/POST/DELETE requests
+  Application datapoints:
+  Listen to GET/PUT/POST/DELETE requests
   ..
-  issuing S-Mode requests
+  Issuing S-Mode requests
   ..
-  receives S-Mode requests
+  Receives S-Mode requests
   ==
   Sets
   ..
@@ -21,11 +21,11 @@ class Application {
 class Stack {
   Functionallity
   ..
-  CoAP discovery
+  Discovery (CoAP & mDNS)
   ..
   S-Mode client and server
   ..
-  datapoint client and server
+  Datapoint client and server
   ..
   Security  
   ==
@@ -33,7 +33,7 @@ class Stack {
   ..
   Device characteristics data
   ..
-  application data (tables)
+  Application data (tables)
   ==
   Server:
   ..
