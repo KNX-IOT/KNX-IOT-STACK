@@ -368,12 +368,12 @@ typedef void (*oc_restart_cb_t)(size_t device, void *data);
  *
  * The restart callback is called by the stack to enable per-device
  * reset on application level.
- * 
+ *
  * Implemented by the stack:
  *  - reset of the programming mode (e.g. turn it off)
- * 
+ *
  * @note The restart function is not restarting the device.
- * 
+ *
  * @note oc_set_restart_cb() must be called before oc_main_init().
  *
  * @param[in] cb oc_restart_cb_t function pointer to be called

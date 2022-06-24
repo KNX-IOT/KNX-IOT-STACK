@@ -93,7 +93,7 @@ restart_device(size_t device_index)
   } else {
     device->pm = false;
   }
-  
+
   // clear run time errors
   // ??
 
