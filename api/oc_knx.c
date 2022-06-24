@@ -86,9 +86,23 @@ restart_device(size_t device_index)
 {
   PRINT("restart device\n");
 
+  // reset the programming mode
+  oc_device_info_t *device = oc_core_get_device_info(device_index);
+  if (device == NULL) {
+    OC_ERR("device not found %d", (int)device_index);
+  } else {
+    device->pm = false;
+  }
+  
+  // clear run time errors
+  // ??
+
+  // switch off safe state
+  // ??
+
   oc_restart_t *my_restart = oc_get_restart_cb();
   if (my_restart && my_restart->cb) {
-    // do a reboot on application level
+    // do a restart on application level
     my_restart->cb(device_index, my_restart->data);
   }
 

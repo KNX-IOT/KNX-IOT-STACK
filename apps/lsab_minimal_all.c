@@ -351,7 +351,7 @@ restart_cb(size_t device_index, void *data)
   (void)data;
 
   PRINT("-----restart_cb -------\n");
-  exit(0);
+  //exit(0);
 }
 
 /**
