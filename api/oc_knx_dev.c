@@ -960,7 +960,7 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
     return;
   }
   if (reset_mode == 2) {
-    /* With erase code �2� (�Factory Reset to default state�),
+    /* With erase code 2 (Factory Reset to default state),
      all addressing information and security configuration data SHALL be reset
      to default ex-factory state. */
     // writing the empty values
@@ -989,6 +989,13 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
     oc_delete_group_rp_table();
 
     oc_delete_at_table(device_index);
+  } else if (reset_mode == 3) {
+    /*  ResetIA The IA shall be reset to the medium
+      specific default IA when this A_Restart is executed.Channel Number
+      : Fixed : 00h */
+    oc_storage_erase(KNX_STORAGE_IA);
+    oc_device_info_t *device = oc_core_get_device_info(device_index);
+    device->ia = zero;
 
   } else if (reset_mode == 7) {
     /*
@@ -1000,7 +1007,6 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
       to discover the device again and /
       or renew addressing information and security credentials.
         */
-
     oc_delete_group_object_table();
     oc_delete_group_rp_table();
     // load state: unloaded

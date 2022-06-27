@@ -60,23 +60,23 @@ void oc_knx_device_storage_read(size_t device);
 
 /**
  * @brief clear the persistent storage
- *  reset = 2 (reset all) :
- *
- * - internal address (ia)
- * - host name (hname)
- * - Installation ID (iid)
- * - programming mode (pm)
- * - device address (da)
- * - sub address (sa)
- * - group object table
- * - recipient object table
- * - publisher object table
- *
- *  reset = 7 (reset tables):
- *
- * - group object table
- * - recipient object table
- * - publisher object table
+ * reset behavior according to the supplied erase code
+ * - reset = 2 (Factory Reset) :
+ *   - internal address (ia)
+ *   - host name (hname)
+ *   - Installation ID (iid)
+ *   - programming mode (pm)
+ *   - device address (da)
+ *   - sub address (sa)
+ *   - group object table
+ *   - recipient object table
+ *   - publisher object table
+ * - reset = 3 (reset ia) :
+ *   - internal address (ia)
+ * - reset = 7 (Factory Reset without IA):
+ *   - group object table
+ *   - recipient object table
+ *   - publisher object table
  *
  * @param device_index The device index
  * @param reset_mode the KNX reset mode
