@@ -86,6 +86,7 @@
 
 #include "messaging/coap/oc_coap.h"
 #include "oc_buffer_settings.h"
+#include "oc_knx.h"
 #include "oc_rep.h"
 #include "oc_ri.h"
 #include "oc_client_state.h"
