@@ -98,7 +98,7 @@ typedef struct oc_group_object_notification_t
  * @brief LSM state machine values
  *
  */
-typedef enum {
+typedef enum oc_lsm_state {
   LSM_S_UNLOADED = 0,      /**< (0) state is unloaded, e.g. ready for loading */
   LSM_S_LOADED = 1,        /**< (1) state is LOADED, e.g. normal operation */
   LSM_S_LOADING = 2,       /**< (2) state loading. */
@@ -118,8 +118,6 @@ typedef enum {
   LSM_E_UNLOAD = 4        /**< (4) cmd unload: state will be UNLOADED */
 } oc_lsm_event_t;
 
-bool gob_notification_to_json(char *buffer, int buffer_size,
-                              oc_group_object_notification_t notification);
 
 /**
  * @brief retrieve the current lsm state

@@ -418,7 +418,7 @@ void oc_set_hostname_cb(oc_hostname_cb_t cb, void *data);
  * @param[in] data the user supplied data
  *
  */
-typedef void (*oc_lsm_change_cb_t)(size_t device, enum oc_lsm_state_t lsm_state,
+typedef void (*oc_lsm_change_cb_t)(size_t device, enum oc_lsm_state lsm_state,
                                  void *data);
 
 /**
