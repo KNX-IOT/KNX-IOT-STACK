@@ -86,6 +86,7 @@
 
 #include "messaging/coap/oc_coap.h"
 #include "oc_buffer_settings.h"
+#include "oc_knx.h"
 #include "oc_rep.h"
 #include "oc_ri.h"
 #include "oc_client_state.h"
@@ -408,6 +409,32 @@ typedef void (*oc_hostname_cb_t)(size_t device, oc_string_t host_name,
  *                 call completes.
  */
 void oc_set_hostname_cb(oc_hostname_cb_t cb, void *data);
+
+/**
+ * Callback invoked by the stack to inform the change of the lsm
+ *
+ * @param[in] device the device index
+ * @param[out] lsm_state the new state of the lsm
+ * @param[in] data the user supplied data
+ *
+ */
+typedef void (*oc_lsm_change_cb_t)(size_t device, enum oc_lsm_state_t lsm_state,
+                                 void *data);
+
+/**
+ * Set the load state machine change callback.
+ *
+ * The callback is called by the stack when lsm is changed
+ *
+ * @note oc_set_hostname_cb() must be called before oc_main_init().
+ *
+ * @param[in] cb oc_hostname_cb_t function pointer to be called
+ * @param[in] data context pointer that is passed to the oc_restart_cb_t
+ *                 the pointer must be a valid pointer till after oc_main_init()
+ *                 call completes.
+ */
+void oc_set_lsm_change_cb(oc_lsm_change_cb_t cb, void *data);
+
 
 /**
  * Add an a device to the stack.

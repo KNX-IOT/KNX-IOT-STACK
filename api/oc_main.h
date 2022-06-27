@@ -95,6 +95,28 @@ typedef struct oc_hostname_t
  */
 oc_hostname_t *oc_get_hostname_cb(void);
 
+//-------------
+
+
+/**
+ * @brief The lsm change info
+ *
+ */
+typedef struct oc_loadstate_t
+{
+  oc_lsm_change_cb_t cb; /**< the callback */
+  void *data;          /**< the callback user data */
+} oc_loadstate_t;
+
+/**
+ * @brief retrieve the lsm change info, e.g. the callback and callback data
+ *
+ * @return oc_hostname_t* the load state info
+ */
+oc_loadstate_t *oc_get_lsm_change_cb(void);
+
+
+
 /**
  * @brief is main initialized
  *

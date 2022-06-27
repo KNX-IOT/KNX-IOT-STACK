@@ -293,7 +293,7 @@ oc_conv_hex_string_to_byte_array(const char *hex_str, size_t hex_str_len,
     return -1;
   }
 
-  size_t a = hex_str_len / 2.0 + 0.5;
+  size_t a = (size_t)((double)hex_str_len / 2.0 + 0.5);
 
   if (*array_len < a) {
     return -1;
