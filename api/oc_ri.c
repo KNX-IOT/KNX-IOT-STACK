@@ -1353,7 +1353,8 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
 #endif /* OC_SERVER */
     if (response_buffer.response_length > 0) {
 #ifdef OC_BLOCK_WISE
-      (*response_state)->payload_size = (uint32_t)response_buffer.response_length;
+      (*response_state)->payload_size =
+        (uint32_t)response_buffer.response_length;
 #else  /* OC_BLOCK_WISE */
       coap_set_payload(response, response_buffer.buffer,
                        response_buffer.response_length);

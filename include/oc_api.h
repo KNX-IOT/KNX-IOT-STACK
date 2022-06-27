@@ -410,7 +410,6 @@ typedef void (*oc_hostname_cb_t)(size_t device, oc_string_t host_name,
  */
 void oc_set_hostname_cb(oc_hostname_cb_t cb, void *data);
 
-
 /**
  * Add an a device to the stack.
  *

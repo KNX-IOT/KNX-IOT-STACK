@@ -452,7 +452,7 @@ oc_core_knx_lsm_post_handler(oc_request_t *request,
 
   /* input was set, so create the response*/
   if (changed == true) {
-    oc_loadstate_t* lsm_cb = oc_get_lsm_change_cb();
+    oc_loadstate_t *lsm_cb = oc_get_lsm_change_cb();
 
     if (lsm_cb->cb != NULL) {
       lsm_cb->cb(device_index, oc_knx_lsm_state(device_index), lsm_cb->data);

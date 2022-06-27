@@ -118,7 +118,6 @@ typedef enum {
   LSM_E_UNLOAD = 4        /**< (4) cmd unload: state will be UNLOADED */
 } oc_lsm_event_t;
 
-
 /**
  * @brief retrieve the current lsm state
  *
@@ -178,8 +177,6 @@ typedef void (*oc_lsm_change_cb_t)(size_t device, oc_lsm_state_t lsm_state,
  *                 call completes.
  */
 void oc_set_lsm_change_cb(oc_lsm_change_cb_t cb, void *data);
-
-
 
 bool oc_s_mode_notification_to_json(
   char *buffer, size_t buffer_size,
