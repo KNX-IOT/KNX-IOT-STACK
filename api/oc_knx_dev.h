@@ -71,7 +71,6 @@ void oc_knx_device_storage_read(size_t device);
  *   - group object table
  *   - recipient object table
  *   - publisher object table
- *
  * - reset = 3 (reset ia) :
  *   - internal address (ia)
  * - reset = 7 (Factory Reset without IA):
