@@ -264,7 +264,7 @@ void oc_knx_load_state(size_t device_index);
  *   - group object table
  *   - recipient object table
  *   - publisher object table
- * 
+ *
  * @see oc_knx_device_storage_reset
  * @param device_index the device index
  * @param reset_value the reset value
