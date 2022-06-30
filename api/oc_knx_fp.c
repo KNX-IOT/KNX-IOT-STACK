@@ -1312,7 +1312,7 @@ oc_core_get_recipient_index_url_or_path(int index)
     return NULL;
   }
 
-  if (g_grt[index].ia > -1) {
+  if (g_grt[index].ia > 0) {
     PRINT("oc_core_get_recipient_index_url_or_path: ia %d\n", g_grt[index].ia);
     if (oc_string_len(g_grt[index].path) > 0) {
       PRINT("      oc_core_get_recipient_index_url_or_path path %s\n",
