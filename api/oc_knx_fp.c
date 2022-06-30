@@ -1284,6 +1284,9 @@ oc_core_check_recipient_index_on_group_address(int index, int group_address)
   if (index >= GRT_MAX_ENTRIES) {
     return -1;
   }
+  if (group_address <= 0) {
+    return -1;
+  }
   for (int i = 0; g_grt[index].ga_len; i++) {
     if (g_grt[index].ga[i] == group_address) {
       return true;
