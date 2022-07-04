@@ -56,30 +56,33 @@ typedef enum {
 } oc_resource_properties_t;
 
 /**
- * @brief response status
- * can be translated to HTTP or CoAP.
+ * @brief CoAP status codes
+ *
+ * Note: can be translated to HTTP or CoAP.
+ *
+ * @see oc_status_code for translation to to the CoAP status codes
  */
 typedef enum {
-  OC_STATUS_OK = 0,                   /**< OK */
-  OC_STATUS_CREATED,                  /**< Created */
-  OC_STATUS_CHANGED,                  /**< Changed */
-  OC_STATUS_DELETED,                  /**< Deleted */
-  OC_STATUS_NOT_MODIFIED,             /**< Not Modified */
-  OC_STATUS_BAD_REQUEST,              /**< Bad Request */
-  OC_STATUS_UNAUTHORIZED,             /**< Unauthorized */
-  OC_STATUS_BAD_OPTION,               /**< Bad Option */
-  OC_STATUS_FORBIDDEN,                /**< Forbidden */
-  OC_STATUS_NOT_FOUND,                /**< Not Found */
-  OC_STATUS_METHOD_NOT_ALLOWED,       /**< Method Not Allowed */
-  OC_STATUS_NOT_ACCEPTABLE,           /**< Not Acceptable */
-  OC_STATUS_REQUEST_ENTITY_TOO_LARGE, /**< Request Entity Too Large */
-  OC_STATUS_UNSUPPORTED_MEDIA_TYPE,   /**< Unsupported Media Type */
-  OC_STATUS_INTERNAL_SERVER_ERROR,    /**< Internal Server Error */
-  OC_STATUS_NOT_IMPLEMENTED,          /**< Not Implemented */
-  OC_STATUS_BAD_GATEWAY,              /**< Bad Gateway */
-  OC_STATUS_SERVICE_UNAVAILABLE,      /**< Service Unavailable */
-  OC_STATUS_GATEWAY_TIMEOUT,          /**< Gateway Timeout */
-  OC_STATUS_PROXYING_NOT_SUPPORTED,   /**< Proxying not supported */
+  OC_STATUS_OK = 0,                   /**< OK 2.00*/
+  OC_STATUS_CREATED,                  /**< Created 2.01*/
+  OC_STATUS_CHANGED,                  /**< Changed 2.04*/
+  OC_STATUS_DELETED,                  /**< Deleted 2.02 */
+  OC_STATUS_NOT_MODIFIED,             /**< Not Modified (VALID 2.03) */
+  OC_STATUS_BAD_REQUEST,              /**< Bad Request 4.00*/
+  OC_STATUS_UNAUTHORIZED,             /**< Unauthorized 4.01*/
+  OC_STATUS_BAD_OPTION,               /**< Bad Option 4.02*/
+  OC_STATUS_FORBIDDEN,                /**< Forbidden 4.03*/
+  OC_STATUS_NOT_FOUND,                /**< Not Found 4.04*/
+  OC_STATUS_METHOD_NOT_ALLOWED,       /**< Method Not Allowed 4.05*/
+  OC_STATUS_NOT_ACCEPTABLE,           /**< Not Acceptable 4.06 */
+  OC_STATUS_REQUEST_ENTITY_TOO_LARGE, /**< Request Entity Too Large 4.13*/
+  OC_STATUS_UNSUPPORTED_MEDIA_TYPE,   /**< Unsupported Media Type 4.15*/
+  OC_STATUS_INTERNAL_SERVER_ERROR,    /**< Internal Server Error 5.00 */
+  OC_STATUS_NOT_IMPLEMENTED,          /**< Not Implemented 5.01*/
+  OC_STATUS_BAD_GATEWAY,              /**< Bad Gateway 5.02*/
+  OC_STATUS_SERVICE_UNAVAILABLE,      /**< Service Unavailable 5.03*/
+  OC_STATUS_GATEWAY_TIMEOUT,          /**< Gateway Timeout 5.04*/
+  OC_STATUS_PROXYING_NOT_SUPPORTED,   /**< Proxying not supported 5.05 */
   __NUM_OC_STATUS_CODES__,
   OC_IGNORE,      /**< Ignore: do not respond to request */
   OC_PING_TIMEOUT /**< Ping Time out */
