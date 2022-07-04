@@ -59,6 +59,8 @@ typedef enum {
  * @brief CoAP status codes
  * 
  * Note: can be translated to HTTP or CoAP.
+ * 
+ * @see oc_status_code for translation to to the CoAP status codes
  */
 typedef enum {
   OC_STATUS_OK = 0,                    /**< OK 2.00*/
