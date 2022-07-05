@@ -460,7 +460,7 @@ void oc_ri_remove_timed_event_callback(void *cb_data,
                                        oc_trigger_t event_callback);
 
 /**
- * @brief convert the status code to integer
+ * @brief convert the (internal) status code to coap status as integer
  *
  * @param key the application level key of the code
  * @return int the CoAP status code
