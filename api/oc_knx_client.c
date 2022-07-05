@@ -663,6 +663,11 @@ oc_do_s_mode_with_scope_and_check(int scope, char *resource_url, char *rp,
 
   // loop over all group addresses and issue the s-mode command
   int index = oc_core_find_group_object_table_url(resource_url);
+  if (index  == -1) {
+    PRINT(" oc_do_s_mode_with_scope_internal : table entry found for %s\n",
+          resource_url);
+    return;
+  }
   while (index != -1) {
     int ga_len = oc_core_find_group_object_table_number_group_entries(index);
     oc_cflag_mask_t cflags = oc_core_group_object_table_cflag_entries(index);
@@ -715,7 +720,10 @@ oc_do_s_mode_with_scope_and_check(int scope, char *resource_url, char *rp,
           }
         }
       }
-    } /* cflag */
+    } else {
+      PRINT("    not send due to flags\n");
+    }
+    /* cflag */
     index = oc_core_find_next_group_object_table_url(resource_url, index);
   }
 }
