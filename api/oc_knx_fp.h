@@ -204,6 +204,13 @@ int oc_core_get_group_object_table_total_size();
 /**
  * @brief retrieve the group object table entry
  *
+ * Note that always the group object table is returned.
+ * regardless if the data is valid or not.
+ *
+ * To check if the data is valid, please check if
+ * ga_len > 0, if ga_len <= 0 then the group object table does
+ * not contain an entry.
+ *
  * @param index the index in the group object table
  * @return oc_group_object_table_t* pointer to the entry
  */
