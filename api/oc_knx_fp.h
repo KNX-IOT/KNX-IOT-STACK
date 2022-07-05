@@ -438,7 +438,7 @@ int oc_core_get_recipient_table_size();
  * To check if the data is valid, please check if
  * ga_len > 0, if ga_len <= 0 then the group object table does
  * not contain an entry.
- * 
+ *
  * @param index the index in the recipient table
  * @return oc_group_rp_table_t* pointer to the entry
  */
@@ -460,7 +460,7 @@ int oc_core_get_publisher_table_size();
  * To check if the data is valid, please check if
  * ga_len > 0, if ga_len <= 0 then the group object table does
  * not contain an entry.
- * 
+ *
  * @param index the index in the publisher table
  * @return oc_group_rp_table_t* pointer to the entry
  */
