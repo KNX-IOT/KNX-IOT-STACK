@@ -498,13 +498,17 @@ process_interface_change_event(void)
 
   for (i = 0; i < num_devices; i++) {
     ip_context_t *dev = get_ip_context_for_device(i);
-    ret += update_mcast_socket(dev->mcast_sock, AF_INET6, ifaddr_list);
+    if (dev != NULL) {
+      ret += update_mcast_socket(dev->mcast_sock, AF_INET6, ifaddr_list);
 #ifdef OC_IPV4
-    ret += update_mcast_socket(dev->mcast4_sock, AF_INET, ifaddr_list);
+      ret += update_mcast_socket(dev->mcast4_sock, AF_INET, ifaddr_list);
 #endif /* OC_IPV4 */
-    oc_network_event_handler_mutex_lock();
-    refresh_endpoints_list(dev, ifaddr_list);
-    oc_network_event_handler_mutex_unlock();
+      oc_network_event_handler_mutex_lock();
+      refresh_endpoints_list(dev, ifaddr_list);
+      oc_network_event_handler_mutex_unlock();
+    } else {
+      OC_ERR("IP context for dev %d is NULL", i);
+    }
   }
 
 #ifdef OC_NETWORK_MONITOR
