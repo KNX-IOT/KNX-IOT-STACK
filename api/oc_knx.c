@@ -1339,18 +1339,21 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     // next step: calculate pB, encode it into the struct
     mbedtls_ecp_point pB;
     mbedtls_ecp_point_init(&pB);
-    if (oc_spake_calc_pB(&pB, &spake_data.pub_y, &spake_data.w0)) {
+    if (ret = oc_spake_calc_pB(&pB, &spake_data.pub_y, &spake_data.w0)) {
+      OC_ERR("oc_spake_calc_pB failed with code %d", ret);
       mbedtls_ecp_point_free(&pB);
       goto error;
     }
 
-    if (oc_spake_encode_pubkey(&pB, g_pase.pb)) {
+    if (ret = oc_spake_encode_pubkey(&pB, g_pase.pb)) {
+      OC_ERR("oc_spake_encode_pubkey failed with code %d", ret);
       mbedtls_ecp_point_free(&pB);
       goto error;
     }
 
     uint8_t Ka_Ke[32];
-    if (oc_spake_calc_transcript_responder(&spake_data, g_pase.pa, &pB)) {
+    if (ret = oc_spake_calc_transcript_responder(&spake_data, g_pase.pa, &pB)) {
+      OC_ERR("oc_spake_calc_transcript_responder failed with code %d", ret);
       mbedtls_ecp_point_free(&pB);
       goto error;
     }
