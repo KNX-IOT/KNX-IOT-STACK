@@ -42,7 +42,8 @@ typedef struct oc_mmem oc_handle_t, oc_string_t, oc_array_t, oc_string_array_t,
  */
 #define oc_string(ocstring) (oc_cast(ocstring, char))
 
-#define oc_string_checked(ocstring) (oc_cast(ocstring, char) ? oc_cast(ocstring, char) : "NULL")
+#define oc_string_checked(ocstring)                                            \
+  (oc_cast(ocstring, char) ? oc_cast(ocstring, char) : "NULL")
 
 #ifdef OC_MEMORY_TRACE
 #define oc_alloc_string(ocstring, size)                                        \

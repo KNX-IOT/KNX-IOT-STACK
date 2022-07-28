@@ -131,8 +131,8 @@ add_observer(oc_resource_t *resource, oc_endpoint_t *endpoint,
     resource->num_observers++;
 #ifdef OC_DYNAMIC_ALLOCATION
     OC_DBG("Adding observer (%u) for /%s [0x%02X%02X]",
-           oc_list_length(observers_list) + 1, oc_string_checked(o->url), o->token[0],
-           o->token[1]);
+           oc_list_length(observers_list) + 1, oc_string_checked(o->url),
+           o->token[0], o->token[1]);
 #else  /* OC_DYNAMIC_ALLOCATION */
     OC_DBG("Adding observer (%u/%u) for /%s [0x%02X%02X]",
            oc_list_length(observers_list) + 1, COAP_MAX_OBSERVERS,

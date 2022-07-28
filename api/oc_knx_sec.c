@@ -373,14 +373,16 @@ find_access_token_from_payload(oc_rep_t *object)
     case OC_REP_BYTE_STRING: {
       if (oc_string_len(object->name) == 0 && object->iname == 0) {
         index = &object->value.string;
-        PRINT(" find_access_token_from_payload: %s \n", oc_string_checked(*index));
+        PRINT(" find_access_token_from_payload: %s \n",
+              oc_string_checked(*index));
         return index;
       }
     } break;
     case OC_REP_STRING: {
       if (oc_string_len(object->name) == 0 && object->iname == 0) {
         index = &object->value.string;
-        PRINT(" find_access_token_from_payload: %s \n", oc_string_checked(*index));
+        PRINT(" find_access_token_from_payload: %s \n",
+              oc_string_checked(*index));
         return index;
       }
     } break;
@@ -942,16 +944,19 @@ oc_print_auth_at_entry(size_t device_index, int index)
     if (oc_string_len(g_at_entries[index].id) > 0) {
 
       PRINT("  at index: %d\n", index);
-      PRINT("    id (0)        : %s\n", oc_string_checked(g_at_entries[index].id));
+      PRINT("    id (0)        : %s\n",
+            oc_string_checked(g_at_entries[index].id));
       PRINT("    scope (9)     : %d\n", g_at_entries[index].scope);
       PRINT("    profile (38)  : %d (%s)\n", g_at_entries[index].profile,
             oc_at_profile_to_string(g_at_entries[index].profile));
       if (g_at_entries[index].profile == OC_PROFILE_COAP_DTLS) {
         if (oc_string_len(g_at_entries[index].sub) > 0) {
-          PRINT("    sub           : %s\n", oc_string_checked(g_at_entries[index].sub));
+          PRINT("    sub           : %s\n",
+                oc_string_checked(g_at_entries[index].sub));
         }
         if (oc_string_len(g_at_entries[index].kid) > 0) {
-          PRINT("    kid           : %s\n", oc_string_checked(g_at_entries[index].kid));
+          PRINT("    kid           : %s\n",
+                oc_string_checked(g_at_entries[index].kid));
         }
       }
       if (g_at_entries[index].profile == OC_PROFILE_COAP_OSCORE) {
