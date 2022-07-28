@@ -440,7 +440,8 @@ oc_oscore_send_multicast_message(oc_message_t *message)
   PRINT("oc_oscore_send_multicast_message : groupid = %d\n", (int)group_id);
   if (oscore_ctx) {
     OC_DBG_OSCORE("#################################");
-    OC_DBG_OSCORE("found group OSCORE context %s", oc_string(oscore_ctx->desc));
+    OC_DBG_OSCORE("found group OSCORE context %s",
+                  oc_string_checked(oscore_ctx->desc));
 
     /* Use sender key for encryption */
     uint8_t *key = oscore_ctx->sendkey;

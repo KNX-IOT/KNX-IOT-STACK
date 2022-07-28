@@ -219,7 +219,7 @@ RIHelper::postLightCb(oc_request_t *request, oc_interface_mask_t interface,
   bool state = false;
   oc_rep_t *rep = request->request_payload;
   while (rep != NULL) {
-    PRINT("key: %s ", oc_string(rep->name));
+    PRINT("key: %s ", oc_string_checked(rep->name));
     switch (rep->type) {
     case OC_REP_BOOL:
       state = rep->value.boolean;
@@ -261,7 +261,7 @@ RIHelper::observeLightCb(oc_client_response_t *data)
   PRINT("observeLightCb\n");
   oc_rep_t *rep = data->payload;
   while (rep != NULL) {
-    PRINT("key %s, value ", oc_string(rep->name));
+    PRINT("key %s, value ", oc_string_checked(rep->name));
     switch (rep->type) {
     case OC_REP_BOOL:
       PRINT("%d\n", rep->value.boolean);

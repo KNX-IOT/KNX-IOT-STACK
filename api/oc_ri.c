@@ -1667,8 +1667,9 @@ oc_ri_invoke_client_cb(void *response, oc_client_cb_t *cb,
             oc_string_len(dup_cb->uri) == uri_len &&
             strncmp(oc_string(dup_cb->uri), oc_string(cb->uri), uri_len) == 0 &&
             oc_endpoint_compare(&dup_cb->endpoint, endpoint) == 0) {
-          OC_DBG("Freeing cb %s, token 0x%02X%02X", oc_string(dup_cb->uri),
-                 dup_cb->token[0], dup_cb->token[1]);
+          OC_DBG("Freeing cb %s, token 0x%02X%02X",
+                 oc_string_checked(dup_cb->uri), dup_cb->token[0],
+                 dup_cb->token[1]);
           oc_ri_remove_timed_event_callback(dup_cb, &oc_ri_remove_client_cb);
           free_client_cb(dup_cb);
           break;

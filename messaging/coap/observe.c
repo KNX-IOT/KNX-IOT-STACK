@@ -131,12 +131,12 @@ add_observer(oc_resource_t *resource, oc_endpoint_t *endpoint,
     resource->num_observers++;
 #ifdef OC_DYNAMIC_ALLOCATION
     OC_DBG("Adding observer (%u) for /%s [0x%02X%02X]",
-           oc_list_length(observers_list) + 1, oc_string(o->url), o->token[0],
-           o->token[1]);
+           oc_list_length(observers_list) + 1, oc_string_checked(o->url),
+           o->token[0], o->token[1]);
 #else  /* OC_DYNAMIC_ALLOCATION */
     OC_DBG("Adding observer (%u/%u) for /%s [0x%02X%02X]",
            oc_list_length(observers_list) + 1, COAP_MAX_OBSERVERS,
-           oc_string(o->url), o->token[0], o->token[1]);
+           oc_string_checked(o->url), o->token[0], o->token[1]);
 #endif /* !OC_DYNAMIC_ALLOCATION */
     oc_list_add(observers_list, o);
     return dup;
@@ -158,7 +158,7 @@ get_iface_query(oc_interface_mask_t iface_mask)
 void
 coap_remove_observer(coap_observer_t *o)
 {
-  OC_DBG("Removing observer for /%s [0x%02X%02X]", oc_string(o->url),
+  OC_DBG("Removing observer for /%s [0x%02X%02X]", oc_string_checked(o->url),
          o->token[0], o->token[1]);
 
 #ifdef OC_BLOCK_WISE
@@ -360,7 +360,7 @@ coap_notify_observers(oc_resource_t *resource,
     oc_response_buffer_t response_buffer;
     if (!response_buf && resource) {
       OC_DBG("coap_notify_observers: Issue GET request to resource %s\n\n",
-             oc_string(resource->uri));
+             oc_string_checked(resource->uri));
       response_buffer.buffer = buffer;
       response_buffer.buffer_size = OC_MAX_OBSERVE_SIZE;
       response.response_buffer = &response_buffer;
@@ -586,7 +586,7 @@ notify_resource_defaults_observer(oc_resource_t *resource,
   response.separate_response = 0;
   oc_response_buffer_t response_buffer;
   OC_DBG("coap_notify_observers: Issue GET request to resource %s\n\n",
-         oc_string(resource->uri));
+         oc_string_checked(resource->uri));
   response_buffer.buffer = buffer;
   response_buffer.buffer_size = OC_MAX_APP_DATA_SIZE;
   response.response_buffer = &response_buffer;

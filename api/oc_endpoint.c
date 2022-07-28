@@ -662,6 +662,6 @@ oc_endpoint_print(oc_endpoint_t *ep)
 {
   oc_string_t ip_str;
   oc_endpoint_to_string(ep, &ip_str);
-  PRINT("IP address (ep) to: %s\n", oc_string(ip_str));
+  PRINT("IP address (ep) to: %s\n", oc_string_checked(ip_str));
   oc_free_string(&ip_str);
 }

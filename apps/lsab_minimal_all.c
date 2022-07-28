@@ -138,7 +138,7 @@ app_init(void)
   ret |= oc_add_device(MY_NAME, "1.0.0", "//", "000001", NULL, NULL);
 
   oc_device_info_t *device = oc_core_get_device_info(0);
-  PRINT("Serial Number: %s\n", oc_string(device->serialnumber));
+  PRINT("Serial Number: %s\n", oc_string_checked(device->serialnumber));
 
   /* set the hardware version 1.0.0 */
   oc_core_set_device_hwv(0, 1, 0, 0);
@@ -367,7 +367,7 @@ hostname_cb(size_t device_index, oc_string_t host_name, void *data)
   (void)device_index;
   (void)data;
 
-  PRINT("-----host name ------- %s\n", oc_string(host_name));
+  PRINT("-----host name ------- %s\n", oc_string_checked(host_name));
 }
 
 /**
@@ -554,7 +554,7 @@ main(int argc, char *argv[])
 #endif /* OC_OSCORE */
 
   oc_device_info_t *device = oc_core_get_device_info(0);
-  PRINT("serial number: %s", oc_string(device->serialnumber));
+  PRINT("serial number: %s", oc_string_checked(device->serialnumber));
 
   oc_endpoint_t *my_ep = oc_connectivity_get_endpoints(0);
   if (my_ep != NULL) {

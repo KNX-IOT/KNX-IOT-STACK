@@ -1267,7 +1267,7 @@ bool oc_do_get(const char *uri, oc_endpoint_t *endpoint, const char *query,
  *   PRINT("GET_light:\n");
  *   oc_rep_t *rep = data->payload;
  *   while (rep != NULL) {
- *     PRINT("key %s, value ", oc_string(rep->name));
+ *     PRINT("key %s, value ", oc_string_checked(rep->name));
  *     switch (rep->type) {
  *     case OC_REP_BOOL:
  *       PRINT("%d\n", rep->value.boolean);

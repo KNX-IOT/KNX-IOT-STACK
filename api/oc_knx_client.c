@@ -537,7 +537,7 @@ oc_s_mode_get_resource_value(char *resource_url, char *rp, uint8_t *buf,
   oc_response_buffer_t response_buffer;
   // if (!response_buf && resource) {
   //  OC_DBG("coap_notify_observers: Issue GET request to resource %s\n\n",
-  //         oc_string(resource->uri));
+  //         oc_string_checked(resource->uri));
   response_buffer.buffer = buffer;
   response_buffer.buffer_size = 100;
 

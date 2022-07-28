@@ -1049,7 +1049,7 @@ verify_certificate(void *opq, mbedtls_x509_crt *crt, int depth, uint32_t *flags)
       }
     } else {
       oc_str_to_uuid(oc_string(uuid), &peer->uuid);
-      OC_DBG("attempting to connect with peer %s", oc_string(uuid));
+      OC_DBG("attempting to connect with peer %s", oc_string_checked(uuid));
       oc_free_string(&uuid);
     }
 
