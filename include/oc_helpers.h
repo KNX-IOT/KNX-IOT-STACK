@@ -45,7 +45,7 @@ typedef struct oc_mmem oc_handle_t, oc_string_t, oc_array_t, oc_string_array_t,
 /**
  * @brief cast oc_string to string, replace null pointer results
  * with a pointer to "NULL"
- * 
+ *
  */
 #define oc_string_checked(ocstring)                                            \
   (oc_cast(ocstring, char) ? oc_cast(ocstring, char) : "NULL")
