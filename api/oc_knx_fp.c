@@ -1603,8 +1603,8 @@ oc_print_group_rp_table_entry(int entry, char *Store,
   PRINT("    iid (26)   : %d\n", rp_table[entry].iid);
   PRINT("    fid (25)   : %d\n", rp_table[entry].fid);
   PRINT("    grpid (13) : %d\n", rp_table[entry].grpid);
-  PRINT("    path (112) : '%s'\n", oc_string(rp_table[entry].path));
-  PRINT("    url (10)   : '%s'\n", oc_string(rp_table[entry].url));
+  PRINT("    path (112) : '%s'\n", oc_string_checked(rp_table[entry].path));
+  PRINT("    url (10)   : '%s'\n", oc_string_checked(rp_table[entry].url));
   PRINT("    ga (7)     : [");
   for (int i = 0; i < rp_table[entry].ga_len; i++) {
     PRINT(" %d", rp_table[entry].ga[i]);

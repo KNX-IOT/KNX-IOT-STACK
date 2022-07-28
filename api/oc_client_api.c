@@ -655,7 +655,7 @@ multi_scope_ipv6_discovery_wk(oc_client_cb_t *cb4, uint8_t scope,
   // debug info
   oc_string_t mcast_str;
   oc_endpoint_to_string(&mcast, &mcast_str);
-  PRINT("   sending to: %s\n", oc_string(mcast_str));
+  PRINT("   sending to: %s\n", oc_string_checked(mcast_str));
   oc_free_string(&mcast_str);
 
   PRINT("   query: %s\n", query);
