@@ -408,7 +408,7 @@ oc_fp_p_check_and_save(int index, size_t device_index, bool status_ok)
       false) {
     do_save = false;
     OC_ERR("  index %d href '%s' does not belong to device\n", index,
-           oc_string(g_got[index].href));
+           oc_string_checked(g_got[index].href));
   }
 
   oc_print_group_object_table_entry(index);
@@ -1316,7 +1316,7 @@ oc_core_get_recipient_index_url_or_path(int index)
     PRINT("oc_core_get_recipient_index_url_or_path: ia %d\n", g_grt[index].ia);
     if (oc_string_len(g_grt[index].path) > 0) {
       PRINT("      oc_core_get_recipient_index_url_or_path path %s\n",
-            oc_string(g_grt[index].path));
+            oc_string_checked(g_grt[index].path));
       return oc_string(g_grt[index].path);
 
     } else {
@@ -1330,7 +1330,7 @@ oc_core_get_recipient_index_url_or_path(int index)
     if (oc_string_len(g_grt[index].url) > 0) {
       //
       PRINT("      oc_core_get_recipient_index_url_or_path url %s\n",
-            oc_string(g_grt[index].url));
+            oc_string_checked(g_grt[index].url));
       return oc_string(g_grt[index].url);
     }
   }
@@ -1403,7 +1403,7 @@ oc_print_group_object_table_entry(int entry)
   }
 
   PRINT("    id (0)     : %d\n", g_got[entry].id);
-  PRINT("    href (11)  : %s\n", oc_string(g_got[entry].href));
+  PRINT("    href (11)  : %s\n", oc_string_checked(g_got[entry].href));
   PRINT("    cflags (8) : %d string: ", g_got[entry].cflags);
   oc_print_cflags(g_got[entry].cflags);
   PRINT("    ga (7)     : [");
@@ -1996,7 +1996,7 @@ oc_add_points_in_group_object_table_to_response(oc_request_t *request,
         // add the resource
         // note, not checked if the resource is already there...
         PRINT("oc_add_points_in_group_object_table_to_response [%d] %s\n",
-              index, oc_string(g_got[index].href));
+              index, oc_string_checked(g_got[index].href));
         oc_add_resource_to_wk(oc_ri_get_app_resource_by_uri(
                                 oc_string(g_got[index].href),
                                 oc_string_len(g_got[index].href), device_index),

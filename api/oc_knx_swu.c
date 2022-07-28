@@ -607,7 +607,7 @@ oc_knx_swu_pkgqurl_put_handler(oc_request_t *request,
   oc_rep_t *rep = request->request_payload;
   if ((rep != NULL) && (rep->type == OC_REP_STRING)) {
     PRINT("  oc_knx_swu_pkgqurl_put_handler received : %s\n",
-          oc_string(rep->value.string));
+          oc_string_checked(rep->value.string));
 
     oc_send_cbor_response(request, OC_STATUS_OK);
     return;

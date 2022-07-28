@@ -149,8 +149,8 @@ oc_gateway_s_mode_cb(size_t device_index, char *sender_ip_address,
   PRINT("testserver_all: oc_gateway_s_mode_cb %s\n", sender_ip_address);
   PRINT("   ga  = %d\n", s_mode_message->ga);
   PRINT("   sia = %d\n", s_mode_message->sia);
-  PRINT("   st  = %s\n", oc_string(s_mode_message->st));
-  PRINT("   val = %s\n", oc_string(s_mode_message->value));
+  PRINT("   st  = %s\n", oc_string_checked(s_mode_message->st));
+  PRINT("   val = %s\n", oc_string_checked(s_mode_message->value));
 }
 
 /**
@@ -730,7 +730,7 @@ hostname_cb(size_t device_index, oc_string_t host_name, void *data)
 {
   (void)data;
 
-  PRINT("-----host name ------- %s\n", oc_string(host_name));
+  PRINT("-----host name ------- %s\n", oc_string_checked(host_name));
 }
 
 /* separate files for each call to transport a block of data*/

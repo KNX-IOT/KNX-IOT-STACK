@@ -119,7 +119,7 @@ oc_core_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
             error = true;
             OC_ERR("href '%.*s' does not belong to device",
                    (int)oc_string_len(entry->value.string),
-                   oc_string(entry->value.string));
+                   oc_string_checked(entry->value.string));
           }
         }
         entry = entry->next;

@@ -365,7 +365,7 @@ oc_core_dev_hostname_put_handler(oc_request_t *request,
     if (rep->type == OC_REP_STRING) {
       if (rep->iname == 1) {
         PRINT("  oc_core_dev_hostname_put_handler received : %s\n",
-              oc_string(rep->value.string));
+              oc_string_checked(rep->value.string));
         oc_core_set_device_hostname(device_index, oc_string(rep->value.string));
 
         oc_storage_write(KNX_STORAGE_HOSTNAME,
@@ -919,7 +919,7 @@ oc_knx_device_storage_read(size_t device_index)
   if (temp_size > 1) {
     tempstring[temp_size] = 0;
     oc_core_set_device_hostname(device_index, tempstring);
-    PRINT("  hostname (storage) %s\n", oc_string(device->hostname));
+    PRINT("  hostname (storage) %s\n", oc_string_checked(device->hostname));
   }
 
   /* KNX_STORAGE_IID */

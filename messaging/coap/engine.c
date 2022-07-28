@@ -804,7 +804,7 @@ coap_receive(oc_message_t *msg)
       if (!error_response && request_buffer &&
           (block1 || message->code == REQUEST_ENTITY_TOO_LARGE_4_13)) {
         OC_DBG("found request buffer for uri %s",
-               oc_string(request_buffer->href));
+               oc_string_checked(request_buffer->href));
         client_cb = (oc_client_cb_t *)request_buffer->client_cb;
         uint32_t payload_size = 0;
         const void *payload = 0;
@@ -875,7 +875,7 @@ coap_receive(oc_message_t *msg)
             &msg->endpoint, client_cb->method, OC_BLOCKWISE_CLIENT);
           if (response_buffer) {
             OC_DBG("created new response buffer for uri %s",
-                   oc_string(response_buffer->href));
+                   oc_string_checked(response_buffer->href));
             response_buffer->client_cb = client_cb;
           }
         }
@@ -889,7 +889,7 @@ coap_receive(oc_message_t *msg)
       }
       if (!error_response && response_buffer) {
         OC_DBG("got response buffer for uri %s",
-               oc_string(response_buffer->href));
+               oc_string_checked(response_buffer->href));
         client_cb = (oc_client_cb_t *)response_buffer->client_cb;
         oc_blockwise_response_state_t *response_state =
           (oc_blockwise_response_state_t *)response_buffer;

@@ -288,7 +288,7 @@ oc_core_a_sen_post_handler(oc_request_t *request,
   rep = request->request_payload;
   while (rep != NULL) {
     PRINT("oc_core_a_sen_post_handler: key: (check) %s \n",
-          oc_string(rep->name));
+          oc_string_checked(rep->name));
     if (rep->type == OC_REP_STRING) {
       if (rep->iname == 2) {
         cmd = a_sen_convert_cmd(oc_string(rep->value.string));
@@ -373,14 +373,14 @@ find_access_token_from_payload(oc_rep_t *object)
     case OC_REP_BYTE_STRING: {
       if (oc_string_len(object->name) == 0 && object->iname == 0) {
         index = &object->value.string;
-        PRINT(" find_access_token_from_payload: %s \n", oc_string(*index));
+        PRINT(" find_access_token_from_payload: %s \n", oc_string_checked(*index));
         return index;
       }
     } break;
     case OC_REP_STRING: {
       if (oc_string_len(object->name) == 0 && object->iname == 0) {
         index = &object->value.string;
-        PRINT(" find_access_token_from_payload: %s \n", oc_string(*index));
+        PRINT(" find_access_token_from_payload: %s \n", oc_string_checked(*index));
         return index;
       }
     } break;
@@ -482,7 +482,7 @@ oc_core_auth_at_post_handler(oc_request_t *request,
           return;
         }
       }
-      PRINT("  storage index: %d (%s)\n", index, oc_string(*at));
+      PRINT("  storage index: %d (%s)\n", index, oc_string_checked(*at));
       oc_free_string(&(g_at_entries[index].id));
       oc_new_string(&g_at_entries[index].id, oc_string(*at),
                     oc_string_len(*at));
@@ -753,10 +753,10 @@ oc_core_auth_at_x_get_handler(oc_request_t *request,
   }
   if (g_at_entries[index].profile == OC_PROFILE_COAP_DTLS) {
     if (oc_string_len(g_at_entries[index].sub) > 0) {
-      PRINT("    sub    : %s\n", oc_string(g_at_entries[index].sub));
+      PRINT("    sub    : %s\n", oc_string_checked(g_at_entries[index].sub));
     }
     if (oc_string_len(g_at_entries[index].kid) > 0) {
-      PRINT("    kid    : %s\n", oc_string(g_at_entries[index].kid));
+      PRINT("    kid    : %s\n", oc_string_checked(g_at_entries[index].kid));
     }
   }
   if (g_at_entries[index].profile == OC_PROFILE_COAP_OSCORE) {
@@ -817,7 +817,7 @@ oc_core_auth_at_x_post_handler(oc_request_t *request,
   /* loop over the request document to check if all inputs are ok */
   rep = request->request_payload;
   while (rep != NULL) {
-    PRINT("key: (check) %s \n", oc_string(rep->name));
+    PRINT("key: (check) %s \n", oc_string_checked(rep->name));
     if (rep->type == OC_REP_STRING) {
       if (rep->iname == 2) {
         cmd = a_sen_convert_cmd(oc_string(rep->value.string));
@@ -942,22 +942,22 @@ oc_print_auth_at_entry(size_t device_index, int index)
     if (oc_string_len(g_at_entries[index].id) > 0) {
 
       PRINT("  at index: %d\n", index);
-      PRINT("    id (0)        : %s\n", oc_string(g_at_entries[index].id));
+      PRINT("    id (0)        : %s\n", oc_string_checked(g_at_entries[index].id));
       PRINT("    scope (9)     : %d\n", g_at_entries[index].scope);
       PRINT("    profile (38)  : %d (%s)\n", g_at_entries[index].profile,
             oc_at_profile_to_string(g_at_entries[index].profile));
       if (g_at_entries[index].profile == OC_PROFILE_COAP_DTLS) {
         if (oc_string_len(g_at_entries[index].sub) > 0) {
-          PRINT("    sub           : %s\n", oc_string(g_at_entries[index].sub));
+          PRINT("    sub           : %s\n", oc_string_checked(g_at_entries[index].sub));
         }
         if (oc_string_len(g_at_entries[index].kid) > 0) {
-          PRINT("    kid           : %s\n", oc_string(g_at_entries[index].kid));
+          PRINT("    kid           : %s\n", oc_string_checked(g_at_entries[index].kid));
         }
       }
       if (g_at_entries[index].profile == OC_PROFILE_COAP_OSCORE) {
         if (oc_string_len(g_at_entries[index].osc_id) > 0) {
           PRINT("    osc:id        : %s\n",
-                oc_string(g_at_entries[index].osc_id));
+                oc_string_checked(g_at_entries[index].osc_id));
         }
         if (oc_string_len(g_at_entries[index].osc_ms) > 0) {
           PRINT("    osc:ms        : ");
@@ -970,11 +970,11 @@ oc_print_auth_at_entry(size_t device_index, int index)
         }
         if (oc_string_len(g_at_entries[index].osc_alg) > 0) {
           PRINT("    osc:alg       : %s\n",
-                oc_string(g_at_entries[index].osc_alg));
+                oc_string_checked(g_at_entries[index].osc_alg));
         }
         if (oc_string_len(g_at_entries[index].osc_contextid) > 0) {
           PRINT("    osc:contextid : %s\n",
-                oc_string(g_at_entries[index].osc_contextid));
+                oc_string_checked(g_at_entries[index].osc_contextid));
         }
         if (g_at_entries[index].ga_len > 0) {
           PRINT("    osc:ga        : [");
@@ -1467,7 +1467,7 @@ oc_is_resource_secure(oc_method_t method, oc_resource_t *resource)
   return true;
 #else
   PRINT("oc_is_resource_secure: OSCORE is turned off %s\n",
-        oc_string(resource->uri));
+        oc_string_checked(resource->uri));
   return false;
 #endif /* OC_OSCORE*/
 }
@@ -1595,13 +1595,13 @@ method_allowed(oc_method_t method, oc_resource_t *resource,
     // not an OSCORE protected message, but OSCORE is enabled
     // so the is call is unprotected and should not go ahead
     OC_DBG_OSCORE("unprotected message, access denied for: %s [%s]",
-                  get_method_name(method), oc_string(resource->uri));
+                  get_method_name(method), oc_string_checked(resource->uri));
     return false;
   }
   if ((endpoint->flags & OSCORE_DECRYPTED) == 0) {
     // not an decrypted message
     OC_DBG_OSCORE("not a decrypted message, access denied for: %s [%s]",
-                  get_method_name(method), oc_string(resource->uri));
+                  get_method_name(method), oc_string_checked(resource->uri));
     return false;
   }
 #endif
@@ -1663,7 +1663,7 @@ oc_knx_sec_check_acl(oc_method_t method, oc_resource_t *resource,
     return true;
   }
   PRINT("oc_knx_sec_check_acl: method %s NOT allowed on %s\n",
-        get_method_name(method), oc_string(resource->uri));
+        get_method_name(method), oc_string_checked(resource->uri));
 
   return false;
 }

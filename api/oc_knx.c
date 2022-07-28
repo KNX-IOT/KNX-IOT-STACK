@@ -551,8 +551,8 @@ oc_s_mode_notification_to_json(char *buffer, size_t buffer_size,
   int size = snprintf(
     buffer, buffer_size,
     "{\"sia\": %d, \"s\":{\"st\": \"%s\", \"ga\":%d, \"value\": %s } }",
-    notification.sia, oc_string(notification.st), notification.ga,
-    oc_string(notification.value));
+    notification.sia, oc_string_checked(notification.st), notification.ga,
+    oc_string_checked(notification.value));
   if ((int)size > buffer_size) {
     return false;
   }
@@ -726,7 +726,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
   // loop over the group addresses of the /fp/r
   PRINT(" .knx : origin:%s sia: %d ga: %d st: %s\n", ip_address,
         g_received_notification.sia, g_received_notification.ga,
-        oc_string(g_received_notification.st));
+        oc_string_checked(g_received_notification.st));
   if (strcmp(oc_string(g_received_notification.st), "w") == 0) {
     // case_1 :
     // Received from bus: -st w, any ga ==> @receiver:
@@ -768,7 +768,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
 
   while (index != -1) {
     oc_string_t myurl = oc_core_find_group_object_table_url_from_index(index);
-    PRINT(" .knx : url  %s\n", oc_string(myurl));
+    PRINT(" .knx : url  %s\n", oc_string_checked(myurl));
     if (oc_string_len(myurl) > 0) {
       // get the resource to do the fake post on
       oc_resource_t *my_resource = oc_ri_get_app_resource_by_uri(
