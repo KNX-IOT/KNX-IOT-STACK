@@ -1621,7 +1621,9 @@ oc_ri_invoke_client_cb(void *response, oc_client_cb_t *cb,
     } else if (!cb->discovery) {
       oc_response_handler_t handler =
         (oc_response_handler_t)cb->handler.response;
-      handler(&client_response);
+      if (handler != NULL) {
+        handler(&client_response);
+      }
     }
   }
 
