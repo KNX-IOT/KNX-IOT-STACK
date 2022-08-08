@@ -697,7 +697,7 @@ oc_core_fp_p_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     return;
   }
   /* example entry: </fp/p/1>;ct=60 */
-  for (i = 0; i < GPT_MAX_ENTRIES; i++) {
+  for (i = 0; i < oc_core_get_publisher_table_size(); i++) {
 
     if (g_gpt[i].ga_len != 0) {
       // index  in use
@@ -755,7 +755,8 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       /* find the storage index, e.g. for this object */
       oc_rep_t *object = rep->value.object;
       id = table_find_id_from_rep(object);
-      index = find_empty_slot_in_rp_table(id, g_gpt, GPT_MAX_ENTRIES);
+      index = find_empty_slot_in_rp_table(id, g_gpt,
+                                          oc_core_get_publisher_table_size());
       if (index == -1) {
         PRINT("  ERROR index %d\n", index);
         oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
@@ -823,7 +824,8 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       break;
     }
 
-    oc_print_group_rp_table_entry(index, GPT_STORE, g_gpt, GPT_MAX_ENTRIES);
+    oc_print_group_rp_table_entry(index, GPT_STORE, g_gpt,
+                                  oc_core_get_publisher_table_size());
     bool do_save = true;
     if (oc_string_len(g_gpt[index].url) > OC_MAX_URL_LENGTH) {
       // do_save = false;
@@ -834,9 +836,11 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       OC_ERR("  path is longer than %d \n", (int)OC_MAX_URL_LENGTH);
     }
 
-    oc_print_group_rp_table_entry(index, GPT_STORE, g_gpt, GPT_MAX_ENTRIES);
+    oc_print_group_rp_table_entry(index, GPT_STORE, g_gpt,
+                                  oc_core_get_publisher_table_size());
     if (do_save) {
-      oc_dump_group_rp_table_entry(index, GPT_STORE, g_gpt, GPT_MAX_ENTRIES);
+      oc_dump_group_rp_table_entry(index, GPT_STORE, g_gpt,
+                                   oc_core_get_publisher_table_size());
     }
 
     rep = rep->next;
@@ -875,11 +879,11 @@ oc_core_fp_p_x_get_handler(oc_request_t *request,
   int id = oc_uri_get_wildcard_value_as_int(
     oc_string(request->resource->uri), oc_string_len(request->resource->uri),
     request->uri_path, request->uri_path_len);
-  int index =
-    oc_core_find_index_in_rp_table_from_id(id, g_gpt, GPT_MAX_ENTRIES);
+  int index = oc_core_find_index_in_rp_table_from_id(
+    id, g_gpt, oc_core_get_publisher_table_size());
   PRINT("  id:%d index = %d\n", id, index);
 
-  if (index >= GPT_MAX_ENTRIES) {
+  if (index >= oc_core_get_publisher_table_size()) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -940,10 +944,10 @@ oc_core_fp_p_x_del_handler(oc_request_t *request,
   int id = oc_uri_get_wildcard_value_as_int(
     oc_string(request->resource->uri), oc_string_len(request->resource->uri),
     request->uri_path, request->uri_path_len);
-  int index =
-    oc_core_find_index_in_rp_table_from_id(id, g_gpt, GPT_MAX_ENTRIES);
+  int index = oc_core_find_index_in_rp_table_from_id(
+    id, g_gpt, oc_core_get_publisher_table_size());
 
-  if (index >= GPT_MAX_ENTRIES) {
+  if (index >= oc_core_get_publisher_table_size()) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -957,7 +961,8 @@ oc_core_fp_p_x_del_handler(oc_request_t *request,
   g_gpt[index].ga_len = 0;
 
   // make the change persistent
-  oc_dump_group_rp_table_entry(index, GPT_STORE, g_gpt, GPT_MAX_ENTRIES);
+  oc_dump_group_rp_table_entry(index, GPT_STORE, g_gpt,
+                               oc_core_get_publisher_table_size());
 
   oc_knx_increase_fingerprint();
   PRINT("oc_core_fp_p_x_del_handler - end\n");
@@ -1603,8 +1608,12 @@ oc_print_group_rp_table_entry(int entry, char *Store,
   PRINT("    iid (26)   : %d\n", rp_table[entry].iid);
   PRINT("    fid (25)   : %d\n", rp_table[entry].fid);
   PRINT("    grpid (13) : %d\n", rp_table[entry].grpid);
-  PRINT("    path (112) : '%s'\n", oc_string_checked(rp_table[entry].path));
-  PRINT("    url (10)   : '%s'\n", oc_string_checked(rp_table[entry].url));
+  if (oc_string_len(rp_table[entry].path) > 0) {
+    PRINT("    path (112) : '%s'\n", oc_string_checked(rp_table[entry].path));
+  }
+  if (oc_string_len(rp_table[entry].url) > 0) {
+    PRINT("    url (10)   : '%s'\n", oc_string_checked(rp_table[entry].url));
+  }
   PRINT("    ga (7)     : [");
   for (int i = 0; i < rp_table[entry].ga_len; i++) {
     PRINT(" %d", rp_table[entry].ga[i]);
@@ -1766,9 +1775,11 @@ oc_load_rp_object_table()
 
 #ifdef OC_PUBLISHER_TABLE
   PRINT("Loading Group Publisher Table from Persistent storage\n");
-  for (int i = 0; i < GPT_MAX_ENTRIES; i++) {
-    oc_load_group_rp_table_entry(i, GPT_STORE, g_gpt, GPT_MAX_ENTRIES);
-    oc_print_group_rp_table_entry(i, GPT_STORE, g_gpt, GPT_MAX_ENTRIES);
+  for (int i = 0; i < oc_core_get_publisher_table_size(); i++) {
+    oc_load_group_rp_table_entry(i, GPT_STORE, g_gpt,
+                                 oc_core_get_publisher_table_size());
+    oc_print_group_rp_table_entry(i, GPT_STORE, g_gpt,
+                                  oc_core_get_publisher_table_size());
   }
 #endif /* OC_PUBLISHER_TABLE */
 }
@@ -1816,9 +1827,11 @@ oc_delete_group_rp_table()
 
 #ifdef OC_PUBLISHER_TABLE
   PRINT("Deleting Group Publisher Table from Persistent storage\n");
-  for (int i = 0; i < GPT_MAX_ENTRIES; i++) {
-    oc_delete_group_rp_table_entry(i, GPT_STORE, g_gpt, GPT_MAX_ENTRIES);
-    oc_print_group_rp_table_entry(i, GPT_STORE, g_gpt, GPT_MAX_ENTRIES);
+  for (int i = 0; i < oc_core_get_publisher_table_size(); i++) {
+    oc_delete_group_rp_table_entry(i, GPT_STORE, g_gpt,
+                                   oc_core_get_publisher_table_size());
+    oc_print_group_rp_table_entry(i, GPT_STORE, g_gpt,
+                                  oc_core_get_publisher_table_size());
   }
 #endif /*  OC_PUBLISHER_TABLE */
 }
@@ -1832,8 +1845,9 @@ oc_free_group_rp_table()
 
 #ifdef OC_PUBLISHER_TABLE
   PRINT("Deleting Group Publisher Table from Persistent storage\n");
-  for (int i = 0; i < GPT_MAX_ENTRIES; i++) {
-    oc_free_group_rp_table_entry(i, GPT_STORE, g_gpt, GPT_MAX_ENTRIES, false);
+  for (int i = 0; i < oc_core_get_publisher_table_size(); i++) {
+    oc_free_group_rp_table_entry(i, GPT_STORE, g_gpt,
+                                 oc_core_get_publisher_table_size(), false);
   }
 #endif /*  OC_PUBLISHER_TABLE */
 }
@@ -1897,7 +1911,7 @@ oc_core_get_publisher_table_entry(int index)
   if (index < 0) {
     return NULL;
   }
-  if (index >= GPT_MAX_ENTRIES) {
+  if (index >= oc_core_get_publisher_table_size()) {
     return NULL;
   }
   return &g_gpt[index];
@@ -1913,9 +1927,10 @@ void
 oc_init_tables()
 {
 #ifdef OC_PUBLISHER_TABLE
-  for (int i = 0; i < GPT_MAX_ENTRIES; i++) {
+  for (int i = 0; i < oc_core_get_publisher_table_size(); i++) {
     // oc_delete_group_rp_table_entry(i, GPT_STORE, g_gpt, GPT_MAX_ENTRIES);
-    oc_free_group_rp_table_entry(i, GPT_STORE, g_gpt, GPT_MAX_ENTRIES, true);
+    oc_free_group_rp_table_entry(i, GPT_STORE, g_gpt,
+                                 oc_core_get_publisher_table_size(), true);
   }
 #endif /* OC_PUBLISHER_TABLE */
   for (int i = 0; i < GRT_MAX_ENTRIES; i++) {
@@ -2104,7 +2119,8 @@ oc_find_grpid_in_table(oc_group_rp_table_t *rp_table, int max_size,
 int
 oc_find_grpid_in_publisher_table(int group_address)
 {
-  return oc_find_grpid_in_table(g_gpt, GPT_MAX_ENTRIES, group_address);
+  return oc_find_grpid_in_table(g_gpt, oc_core_get_publisher_table_size(),
+                                group_address);
 }
 
 int
@@ -2130,7 +2146,7 @@ oc_register_group_multicasts()
   bool pub_entry = false;
 
   int index;
-  for (index = 0; index < GPT_MAX_ENTRIES; index++) {
+  for (index = 0; index < oc_core_get_publisher_table_size(); index++) {
     int grpid = g_gpt[index].grpid;
     if (grpid > 0) {
       pub_entry = true;
@@ -2138,7 +2154,7 @@ oc_register_group_multicasts()
     }
   }
   if (pub_entry == true) {
-    for (index = 0; index < GOT_MAX_ENTRIES; index++) {
+    for (index = 0; index < oc_core_get_publisher_table_size(); index++) {
       int nr_entries = g_got[index].ga_len;
 
       oc_cflag_mask_t cflags = g_got[index].cflags;
@@ -2148,8 +2164,8 @@ oc_register_group_multicasts()
           ((cflags & OC_CFLAG_READ) > 0)) {
 
         for (int i = 0; i < nr_entries; i++) {
-          int grpid =
-            oc_find_grpid_in_table(g_gpt, GPT_MAX_ENTRIES, g_got[index].ga[i]);
+          int grpid = oc_find_grpid_in_table(
+            g_gpt, oc_core_get_publisher_table_size(), g_got[index].ga[i]);
 
           PRINT(" oc_register_group_multicasts index=%d i=%d grpid: %d "
                 "group_address: %d cflags=",
