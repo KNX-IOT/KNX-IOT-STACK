@@ -95,7 +95,7 @@ oc_core_fb_x_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     request->uri_path, request->uri_path_len);
   PRINT("  fb_value: %d\n", fb_value);
   PRINT("  resource url: %s\n", oc_string(request->resource->uri));
-  PRINT("  request url: %.*s", request->uri_path_len,request->uri_path );
+  PRINT("  request url: %.*s", (int)request->uri_path_len,request->uri_path );
   bool has_instance = oc_uri_contains_wildcard_value_underscore(
     oc_string(request->resource->uri), oc_string_len(request->resource->uri),
     request->uri_path, request->uri_path_len);
