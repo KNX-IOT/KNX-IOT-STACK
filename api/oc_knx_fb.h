@@ -17,10 +17,10 @@
   @brief knx /f resource implementation
   @file
 
-  This module implements the /f and /f/* resource
+  This module implements the /f and /f/x resource
   The /f resource list all functional blocks.
   The functional blocks will have urls defined as
-  `<functionalblocknumber>` (instance 0) or when there there are more instances
+  `<functionalblocknumber>` (instance 0) or when there are more instances
   as`<functionalblocknumber>_instance`
 
 */
