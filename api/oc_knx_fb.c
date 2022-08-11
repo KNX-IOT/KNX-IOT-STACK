@@ -24,7 +24,7 @@
 
 // -----------------------------------------------------------------------------
 // note this can be optimized.
-#define ARRAY_SIZE 50  // upto 50 data points in a functional block
+#define ARRAY_SIZE 50 // upto 50 data points in a functional block
 int g_int_array[2][ARRAY_SIZE];
 int g_array_size = 0;
 
