@@ -23,7 +23,8 @@
 #include <stdio.h>
 
 // -----------------------------------------------------------------------------
-#define ARRAY_SIZE 50
+// note this can be optimized.
+#define ARRAY_SIZE 50 // upto 50 data points in a functional block
 int g_int_array[2][ARRAY_SIZE];
 int g_array_size = 0;
 
@@ -87,10 +88,12 @@ oc_core_fb_x_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     return;
   }
 
+  // if instance is not set, it is instance 0
   int instance = 0;
-  int value = oc_uri_get_wildcard_value_as_int(
+  int fb_value = oc_uri_get_wildcard_value_as_int(
     oc_string(request->resource->uri), oc_string_len(request->resource->uri),
     request->uri_path, request->uri_path_len);
+  PRINT("  fb_value: %d\n", fb_value);
   bool has_instance = oc_uri_contains_wildcard_value_underscore(
     oc_string(request->resource->uri), oc_string_len(request->resource->uri),
     request->uri_path, request->uri_path_len);
@@ -99,6 +102,7 @@ oc_core_fb_x_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       oc_string(request->resource->uri), oc_string_len(request->resource->uri),
       request->uri_path, request->uri_path_len);
   }
+  PRINT("  instance: %d\n", instance);
 
   size_t device_index = request->resource->device;
 
@@ -118,7 +122,7 @@ oc_core_fb_x_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       if ((strncmp(t, ":dpa", 4) == 0) ||
           (strncmp(t, "urn:knx:dpa", 11) == 0)) {
         int fp_int = get_fp_from_dp(t);
-        if (fp_int == value && instance_resource == instance) {
+        if (fp_int == fb_value && instance_resource == instance) {
           frame_resource = true;
         }
       }
@@ -195,8 +199,10 @@ oc_add_function_blocks_to_response(oc_request_t *request, size_t device_index,
     length = oc_rep_add_line_to_buffer("</f/");
     *response_length += length;
     if (g_int_array[1][i] > 0) {
+      // functional block with instance with 2 numbers
       snprintf(number, 23, "%03d_%02d", g_int_array[0][i], g_int_array[1][i]);
     } else {
+      // functional block with no instance, e.g. defaulting to instance 0.
       snprintf(number, 5, "%d", g_int_array[0][i]);
     }
     length = oc_rep_add_line_to_buffer(number);

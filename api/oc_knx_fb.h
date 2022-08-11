@@ -16,6 +16,13 @@
 /**
   @brief knx /f resource implementation
   @file
+
+  This module implements the /f and /f/x resource
+  The /f resource list all functional blocks.
+  The functional blocks will have urls defined as
+  `<functionalblocknumber>` (instance 0) or when there are more instances
+  as`<functionalblocknumber>_instance`
+
 */
 #ifndef OC_KNX_FB_INTERNAL_H
 #define OC_KNX_FB_INTERNAL_H
