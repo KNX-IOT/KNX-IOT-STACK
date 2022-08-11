@@ -899,7 +899,7 @@ oc_core_fp_p_x_get_handler(oc_request_t *request,
   oc_rep_i_set_int(root, 0, g_gpt[index].id);
   /* ia - 12 */
   if (g_gpt[index].ia > -1) {
-    oc_rep_i_set_int(root, 11, g_gpt[index].ia);
+    oc_rep_i_set_int(root, 12, g_gpt[index].ia);
   }
   /* iid - 26 */
   if (g_gpt[index].iid > -1) {
@@ -1210,7 +1210,7 @@ oc_core_fp_r_x_get_handler(oc_request_t *request,
   }
   // ia - 12
   if (g_grt[index].ia > 0) {
-    oc_rep_i_set_int(root, 11, g_grt[index].ia);
+    oc_rep_i_set_int(root, 12, g_grt[index].ia);
   }
   // fid - 25
   if (g_grt[index].ia > 0) {
