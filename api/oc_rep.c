@@ -1033,13 +1033,13 @@ oc_rep_to_json_format(oc_rep_t *rep, char *buf, size_t buf_size, int tab_depth,
       break;
     }
     case OC_REP_INT: {
-      #ifdef KNX_LOG_CAST_64_BIT_INTS
-      num_char_printed =
-        snprintf(buf, buf_size, "%d", (int)rep->value.integer);
-      #else
+#ifdef KNX_LOG_CAST_64_BIT_INTS
+      num_char_printed = snprintf(buf, buf_size, "%d", (int)rep->value.integer);
+#else
       num_char_printed =
         snprintf(buf, buf_size, "%" PRId64, rep->value.integer);
-      #endif
+#endif
+
       OC_JSON_UPDATE_BUFFER_AND_TOTAL;
       break;
     }
@@ -1102,13 +1102,11 @@ oc_rep_to_json_format(oc_rep_t *rep, char *buf, size_t buf_size, int tab_depth,
         oc_rep_i_get_int_array(rep, rep->iname, &int_array, &int_array_size);
       }
       for (size_t i = 0; i < int_array_size; i++) {
-        #ifdef KNX_LOG_CAST_64_BIT_INTS
-        num_char_printed =
-          snprintf(buf, buf_size, "%d", (int)int_array[i]);
-        #else
-        num_char_printed =
-          snprintf(buf, buf_size, "%" PRId64, int_array[i]);
-        #endif
+#ifdef KNX_LOG_CAST_64_BIT_INTS
+        num_char_printed = snprintf(buf, buf_size, "%d", (int)int_array[i]);
+#else
+        num_char_printed = snprintf(buf, buf_size, "%" PRId64, int_array[i]);
+#endif
 
         OC_JSON_UPDATE_BUFFER_AND_TOTAL;
         if (i < int_array_size - 1) {
