@@ -156,6 +156,10 @@ if(OC_PUBLISHER_TABLE_ENABLED)
     target_compile_definitions(kis-common INTERFACE OC_PUBLISHER_TABLE)
 endif()
 
+if(KNX_LOG_CAST_64_BIT_INTS)
+    target_compile_definitions(kis-common INTERFACE KNX_LOG_CAST_64_BIT_INTS)
+endif()
+
 # Client and server versions
 set(KNX_INCLUDE_DIRS 
     ${PROJECT_SOURCE_DIR}/
@@ -179,7 +183,6 @@ target_link_libraries(kisClientServer PUBLIC
     kis-port
 )
 target_include_directories(kisClientServer PUBLIC ${KNX_INCLUDE_DIRS})
-
 
 if(MSVC)
     # do not treat warnings as errors on Windows
