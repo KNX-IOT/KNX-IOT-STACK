@@ -164,12 +164,10 @@ oc_core_knx_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   } else {
 
     oc_rep_begin_root_object();
-    oc_rep_set_key(&root_map, "api");
-    oc_rep_begin_object(&root_map, api);
+    oc_rep_set_object(root, api);
     oc_rep_set_text_string(api, version, "1.0.0");
     oc_rep_set_text_string(api, base, "/");
-    oc_rep_end_object(&root_map, api);
-
+    oc_rep_close_object(root, api);
     oc_rep_end_root_object();
 
     oc_send_cbor_response(request, OC_STATUS_OK);
