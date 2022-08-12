@@ -51,8 +51,8 @@ endif()
 add_executable(lsab_minimal_all
     ${PROJECT_SOURCE_DIR}/lsab_minimal_all.c
 )
-if(KNX_CBOR_LOG_64_BIT_INT)
-    target_compile_definitions(lsab_minimal_all INTERFACE KNX_CBOR_LOG_64_BIT_INT)
+if(KNX_LOG_CAST_64_BIT_INTS)
+    target_compile_definitions(lsab_minimal_all INTERFACE KNX_LOG_CAST_64_BIT_INTS)
 endif()
 target_link_libraries(lsab_minimal_all
         kisClientServer
