@@ -27,6 +27,8 @@ set(CLANG_TIDY_ENABLED OFF CACHE BOOL "Enable clang-tidy analysis during compila
 set(KNX_BUILTIN_MBEDTLS ON CACHE BOOL "Use builtin mbedTLS, as opposed to external lib from different project")
 set(KNX_BUILTIN_TINYCBOR ON CACHE BOOL "Use builtin TinyCBOR, as opposed to external lib from different project")
 
+set(KNX_CBOR_LOG_64_BIT_INT ON CACHE BOOL "Directly log CBOR int values if platform supports 64 bit int format specifiers, else cast them to (int)")
+
 include(tools/clang-tidy.cmake)
 
 if(KNX_BUILTIN_MBEDTLS)
