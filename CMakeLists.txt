@@ -27,6 +27,8 @@ set(CLANG_TIDY_ENABLED OFF CACHE BOOL "Enable clang-tidy analysis during compila
 set(KNX_BUILTIN_MBEDTLS ON CACHE BOOL "Use builtin mbedTLS, as opposed to external lib from different project")
 set(KNX_BUILTIN_TINYCBOR ON CACHE BOOL "Use builtin TinyCBOR, as opposed to external lib from different project")
 
+set(KNX_LOG_CAST_64_BIT_INTS_ENABLED OFF CACHE BOOL "Cast int64_t and uint64_t values to (int) if platform doesn't support 64 bit int format specifiers")
+
 include(tools/clang-tidy.cmake)
 
 if(KNX_BUILTIN_MBEDTLS)
@@ -154,6 +156,10 @@ if(OC_PUBLISHER_TABLE_ENABLED)
     target_compile_definitions(kis-common INTERFACE OC_PUBLISHER_TABLE)
 endif()
 
+if(KNX_LOG_CAST_64_BIT_INTS_ENABLED)
+    target_compile_definitions(kis-common INTERFACE KNX_LOG_CAST_64_BIT_INTS)
+endif()
+
 # Client and server versions
 set(KNX_INCLUDE_DIRS 
     ${PROJECT_SOURCE_DIR}/
@@ -177,7 +183,6 @@ target_link_libraries(kisClientServer PUBLIC
     kis-port
 )
 target_include_directories(kisClientServer PUBLIC ${KNX_INCLUDE_DIRS})
-
 
 if(MSVC)
     # do not treat warnings as errors on Windows
