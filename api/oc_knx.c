@@ -50,6 +50,8 @@ oc_pase_t g_pase;
 oc_string_t g_idevid;
 oc_string_t g_ldevid;
 
+bool g_ignore_smessage_from_self = false;
+
 // ----------------------------------------------------------------------------
 
 enum SpakeKeys {
@@ -603,6 +605,32 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
     return;
   }
 
+  if (g_ignore_smessage_from_self) {
+    // check if incoming message is from myself.
+    // if so, then return with bad request
+    oc_endpoint_t *origin = request->origin;
+
+    if (origin != NULL) {
+      PRINT(".knx post : orgin:");
+      PRINTipaddr(*origin);
+      PRINT("\n");
+      // my_ep = my_ep->next;
+    }
+
+    oc_endpoint_t *my_ep = oc_connectivity_get_endpoints(0);
+    if (my_ep != NULL) {
+      PRINT(".knx post : myself:");
+      PRINTipaddr(*my_ep);
+      PRINT("\n");
+    }
+    if (oc_endpoint_compare_address(origin, my_ep) == 0) {
+      request->response->response_buffer->code =
+        oc_status_code(OC_STATUS_BAD_REQUEST);
+      PRINT(" same address: not handling message");
+      return;
+    }
+  }
+
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device == NULL) {
@@ -865,6 +893,13 @@ oc_create_knx_knx_resource(int resource_idx, size_t device)
                             APPLICATION_CBOR, OC_DISCOVERABLE,
                             oc_core_knx_knx_get_handler, 0,
                             oc_core_knx_knx_post_handler, 0, 1, "urn:knx:g.s");
+}
+
+int
+oc_knx_knx_ignore_smessage_from_self(bool ignore)
+{
+  g_ignore_smessage_from_self = ignore;
+  return 0;
 }
 
 // ----------------------------------------------------------------------------

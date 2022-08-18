@@ -282,7 +282,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
       response_length = response_length + size;
       size = oc_rep_add_line_to_buffer(oc_string(device->serialnumber));
       response_length = response_length + size;
-      size = oc_rep_add_line_to_buffer("\"|");
+      size = oc_rep_add_line_to_buffer("\"");
       response_length = response_length + size;
       matches = 1;
     }
