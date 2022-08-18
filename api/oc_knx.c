@@ -608,7 +608,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
   if (g_ignore_smessage_from_self) {
     // check if incoming message is from myself.
     // if so, then return with bad request
-    oc_endpoint_t* origin = request->origin;
+    oc_endpoint_t *origin = request->origin;
 
     if (origin != NULL) {
       PRINT(".knx post : orgin:");
@@ -616,7 +616,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
       PRINT("\n");
       // my_ep = my_ep->next;
     }
-    
+
     oc_endpoint_t *my_ep = oc_connectivity_get_endpoints(0);
     if (my_ep != NULL) {
       PRINT(".knx post : myself:");
@@ -895,7 +895,9 @@ oc_create_knx_knx_resource(int resource_idx, size_t device)
                             oc_core_knx_knx_post_handler, 0, 1, "urn:knx:g.s");
 }
 
-int oc_knx_knx_ignore_smessage_from_self(bool ignore) {
+int
+oc_knx_knx_ignore_smessage_from_self(bool ignore)
+{
   g_ignore_smessage_from_self = ignore;
   return 0;
 }
