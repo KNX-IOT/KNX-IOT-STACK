@@ -274,12 +274,15 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   }
 
   if (oc_is_device_mode_in_programming(device_index)) {
-    // add only the serial number when the interface is if.pm && device is in
-    // programming mode
+    /* add only the serial number when the interface is if.pm && device is in
+       programming mode
+       return <>; ep="urn:knx:sn.<serial-number>"*/
     if (if_len == 13 && strncmp(if_request, "urn:knx:if.pm", 13) == 0) {
-      int size = oc_rep_add_line_to_buffer("<>;ep=urn:knx:sn.");
+      int size = oc_rep_add_line_to_buffer("<>;ep=\"urn:knx:sn.");
       response_length = response_length + size;
       size = oc_rep_add_line_to_buffer(oc_string(device->serialnumber));
+      response_length = response_length + size;
+      size = oc_rep_add_line_to_buffer("\"|");
       response_length = response_length + size;
       matches = 1;
     }
@@ -332,9 +335,11 @@ oc_wkcore_discovery_handler(oc_request_t *request,
     }
     if (frame_ep) {
       /* return <>; ep="urn:knx:sn.<serial-number>"*/
-      int size = oc_rep_add_line_to_buffer("<>;ep=urn:knx:sn.");
+      int size = oc_rep_add_line_to_buffer("<>;ep=\"urn:knx:sn.");
       response_length = response_length + size;
       size = oc_rep_add_line_to_buffer(oc_string(device->serialnumber));
+      response_length = response_length + size;
+      size = oc_rep_add_line_to_buffer("\"");
       response_length = response_length + size;
       matches = 1;
     }
