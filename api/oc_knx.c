@@ -605,17 +605,17 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
     return;
   }
 
+  // print out origin of message (for debugging)
+  oc_endpoint_t *origin = request->origin;
+  if (origin != NULL) {
+    PRINT(".knx post : orgin of message:");
+    PRINTipaddr(*origin);
+    PRINT("\n");
+  }
+
   if (g_ignore_smessage_from_self) {
     // check if incoming message is from myself.
     // if so, then return with bad request
-    oc_endpoint_t *origin = request->origin;
-
-    if (origin != NULL) {
-      PRINT(".knx post : orgin:");
-      PRINTipaddr(*origin);
-      PRINT("\n");
-      // my_ep = my_ep->next;
-    }
 
     oc_endpoint_t *my_ep = oc_connectivity_get_endpoints(0);
     if (my_ep != NULL) {
