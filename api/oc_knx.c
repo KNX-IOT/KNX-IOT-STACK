@@ -600,22 +600,19 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_CBOR &&
       request->accept != APPLICATION_OSCORE) {
-    request->response->response_buffer->code =
-      oc_status_code(OC_STATUS_BAD_REQUEST);
+    request->response->response_buffer->code = oc_status_code(OC_IGNORE);
     return;
-  }
-
-  // print out origin of message (for debugging)
-  oc_endpoint_t *origin = request->origin;
-  if (origin != NULL) {
-    PRINT(".knx post : orgin of message:");
-    PRINTipaddr(*origin);
-    PRINT("\n");
   }
 
   if (g_ignore_smessage_from_self) {
     // check if incoming message is from myself.
     // if so, then return with bad request
+    oc_endpoint_t *origin = request->origin;
+    if (origin != NULL) {
+      PRINT(".knx post : orgin of message:");
+      PRINTipaddr(*origin);
+      PRINT("\n");
+    }
 
     oc_endpoint_t *my_ep = oc_connectivity_get_endpoints(0);
     if (my_ep != NULL) {
@@ -625,7 +622,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
     }
     if (oc_endpoint_compare_address(origin, my_ep) == 0) {
       request->response->response_buffer->code =
-        oc_status_code(OC_STATUS_BAD_REQUEST);
+        oc_status_code(OC_IGNORE);
       PRINT(" same address: not handling message");
       return;
     }
@@ -634,7 +631,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device == NULL) {
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    oc_send_cbor_response(request, OC_IGNORE);
     return;
   }
   oc_reset_g_received_notification();
@@ -782,7 +779,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
   PRINT(" .knx : index %d\n", index);
   if (index == -1) {
     // if nothing is found (initially) then return a bad request.
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    oc_send_cbor_response(request, OC_IGNORE);
     return;
   }
 
@@ -874,12 +871,10 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
 
   // don't send anything back on a multi cast message
   if (request->origin && (request->origin->flags & MULTICAST)) {
-    // PRINT(" .knx : Multicast - not sending response\n");
+    PRINT(" .knx : Multicast - not sending response\n");
     oc_send_cbor_response(request, OC_IGNORE);
     return;
   }
-
-  // PRINT(" .knx : Unicast - sending response\n");
   // send the response
   oc_send_cbor_response(request, OC_STATUS_OK);
 }
