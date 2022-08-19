@@ -165,19 +165,19 @@ if(KNX_LOG_CAST_64_BIT_INTS_ENABLED)
     target_compile_definitions(kis-common INTERFACE KNX_LOG_CAST_64_BIT_INTS)
 endif()
 
-if(${KNX_GAMT_MAX_ENTRIES})
+if(NOT ${KNX_GAMT_MAX_ENTRIES} EQUAL "")
     add_compile_definitions(GAMT_MAX_ENTRIES=${KNX_GAMT_MAX_ENTRIES})
 endif()
 
-if(${KNX_GOT_MAX_ENTRIES})
+if(NOT ${KNX_GOT_MAX_ENTRIES} EQUAL "")
     add_compile_definitions(GOT_MAX_ENTRIES=${KNX_GOT_MAX_ENTRIES})
 endif()
 
-if(${KNX_GPT_MAX_ENTRIES})
+if(NOT ${KNX_GPT_MAX_ENTRIES} EQUAL "")
     add_compile_definitions(GPT_MAX_ENTRIES=${KNX_GPT_MAX_ENTRIES})
 endif()
 
-if(${KNX_GRT_MAX_ENTRIES})
+if(NOT ${KNX_GRT_MAX_ENTRIES} EQUAL "")
     add_compile_definitions(GRT_MAX_ENTRIES=${KNX_GRT_MAX_ENTRIES})
 endif()
 
