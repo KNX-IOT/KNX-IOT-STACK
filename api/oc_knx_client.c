@@ -715,7 +715,10 @@ oc_do_s_mode_with_scope_and_check(int scope, char *resource_url, char *rp,
             if (url) {
               PRINT(" broker send: %s\n", url);
               int ia = oc_core_get_recipient_ia(j);
-              oc_knx_client_do_broker_request(resource_url, ia, url, rp);
+              if (ia > 0) {
+                // ia == 0 is reserved, so only send with ia > 0
+                oc_knx_client_do_broker_request(resource_url, ia, url, rp);
+              }
             }
           }
         }
