@@ -1980,6 +1980,9 @@ oc_free_knx_fp_resources(size_t device_index)
 bool
 is_in_array(int value, int *array, int array_size)
 {
+  if (array_size <= 0) {
+    return false;
+  }
   if (array == NULL) {
     return false;
   }

@@ -626,8 +626,6 @@ oc_do_s_mode_with_scope_and_check(int scope, char *resource_url, char *rp,
     return;
   }
 
-  value_size = oc_s_mode_get_resource_value(resource_url, rp, buffer, 50);
-
   oc_resource_t *my_resource =
     oc_ri_get_app_resource_by_uri(resource_url, strlen(resource_url), 0);
   if (my_resource == NULL) {
@@ -635,6 +633,8 @@ oc_do_s_mode_with_scope_and_check(int scope, char *resource_url, char *rp,
           resource_url);
     return;
   }
+
+  value_size = oc_s_mode_get_resource_value(resource_url, rp, buffer, 50);
 
   // get the sender ia
   size_t device_index = 0;
