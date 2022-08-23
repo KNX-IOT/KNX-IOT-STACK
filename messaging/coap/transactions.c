@@ -199,7 +199,7 @@ coap_send_transaction(coap_transaction_t *t)
       }
     }
   } else {
-    OC_DBG("no confirmable message");
+    OC_DBG("non-confirmable message");
     oc_message_add_ref(t->message);
 
     coap_send_message(t->message);
