@@ -89,8 +89,9 @@ dispatch_coap_request(oc_content_format_t content, oc_content_format_t accept)
     if (client_cb->handler.response == NULL) {
       // set the delayed callback on 0, so we clean up immediately
       // since there is no response callback, so we are not expecting a result
-      // so set the ref count on 0, so that the transaction is deleted, withoug
+      // so set the ref count on 0, so that the transaction is deleted, without
       // callback
+      OC_DBG(" refcount for handle.reponse=None : %d", transaction->message->ref_count);
       transaction->message->ref_count = 0;
     }
 
@@ -113,6 +114,8 @@ dispatch_coap_request(oc_content_format_t content, oc_content_format_t accept)
 
     success = true;
   } else {
+    // transaction->message->length == 0
+    // did not send the request, just remove the transaction
     coap_clear_transaction(transaction);
     oc_ri_remove_client_cb(client_cb);
   }
