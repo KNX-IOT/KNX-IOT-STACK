@@ -89,16 +89,18 @@ dispatch_coap_request(oc_content_format_t content, oc_content_format_t accept)
     if (client_cb->handler.response == NULL) {
       // set the delayed callback on 0, so we clean up immediately
       // since there is no response callback, so we are not expecting a result
-      // so set the ref count on 0, so that the transaction is deleted, withoug callback
+      // so set the ref count on 0, so that the transaction is deleted, withoug
+      // callback
       transaction->message->ref_count = 0;
-    } 
+    }
 
     coap_send_transaction(transaction);
 
     if (client_cb->handler.response == NULL) {
-      // set the delayed callback on 0, so we clean up immediately the client_cb data
-      // since there is no response callback, so we are not expecting a result
-      OC_DBG("Not set delayed callback for transaction: %p",transaction);
+      // set the delayed callback on 0, so we clean up immediately the client_cb
+      // data since there is no response callback, so we are not expecting a
+      // result
+      OC_DBG("Not set delayed callback for transaction: %p", transaction);
       oc_ri_remove_client_cb(client_cb);
     } else if (client_cb->observe_seq == -1) {
       if (client_cb->qos == LOW_QOS)

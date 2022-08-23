@@ -1747,13 +1747,11 @@ oc_ri_alloc_client_cb(const char *uri, oc_endpoint_t *endpoint,
   if (query && strlen(query) > 0) {
     oc_new_string(&cb->query, query, strlen(query));
   }
-  if ((handler.response != NULL) &&
-      (handler.discovery_all != NULL) && 
-      (handler.discovery != NULL))
-  {
+  if ((handler.response != NULL) && (handler.discovery_all != NULL) &&
+      (handler.discovery != NULL)) {
     oc_list_add(client_cbs, cb);
   }
- 
+
   return cb;
 }
 #endif /* OC_CLIENT */

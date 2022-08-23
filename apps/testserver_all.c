@@ -802,7 +802,6 @@ handle_signal(int signal)
   quit = 1;
 }
 
-
 void
 issue_requests()
 {
@@ -820,7 +819,6 @@ issue_requests()
 #endif
   }
 }
-
 
 /**
  * send a multicast s-mode message
