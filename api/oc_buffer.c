@@ -66,6 +66,7 @@ allocate_message(struct oc_memb *pool)
     message->endpoint.interface_index = -1;
     message->endpoint.device = 0;
     message->endpoint.group_id = 0;
+    OC_DBG("allocating message ref_count %d", message->ref_count);
 #ifdef OC_OSCORE
     message->encrypted = 0;
 #endif /* OC_OSCORE */
@@ -112,8 +113,10 @@ oc_internal_allocate_outgoing_message(void)
 void
 oc_message_add_ref(oc_message_t *message)
 {
-  if (message)
+  if (message) {
     message->ref_count++;
+  }
+  OC_DBG("%d", message->ref_count);
 }
 
 void
@@ -121,7 +124,9 @@ oc_message_unref(oc_message_t *message)
 {
   if (message) {
     message->ref_count--;
+    OC_DBG("%d", message->ref_count);
     if (message->ref_count <= 0) {
+      PRINT("oc_message_unref: deallocating\n");
 #if defined(OC_DYNAMIC_ALLOCATION) && !defined(OC_INOUT_BUFFER_SIZE)
       free(message->data);
 #endif /* OC_DYNAMIC_ALLOCATION && !OC_INOUT_BUFFER_SIZE */
@@ -209,17 +214,17 @@ OC_PROCESS_THREAD(message_buffer_handler, ev, data)
       } else
 #endif /* !OC_OSCORE */
         if (message->endpoint.flags & DISCOVERY) {
-        OC_DBG_OSCORE("Outbound network event: multicast request");
+        OC_DBG("Outbound network event: multicast request");
         oc_send_discovery_request(message);
         oc_message_unref(message);
       } else {
-        OC_DBG_OSCORE("Outbound network event: unicast message");
+        OC_DBG("Outbound network event: unicast message");
         oc_message_t *message = (oc_message_t *)data;
         oc_send_buffer(message);
         oc_message_unref(message);
       }
     } else if (ev == oc_events[OUTBOUND_NETWORK_EVENT_ENCRYPTED]) {
-      OC_DBG_OSCORE("Outbound network event:OUTBOUND_NETWORK_EVENT_ENCRYPTED");
+      OC_DBG("Outbound network event:OUTBOUND_NETWORK_EVENT_ENCRYPTED");
       oc_message_t *message = (oc_message_t *)data;
       oc_send_buffer(message);
       oc_message_unref(message);

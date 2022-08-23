@@ -802,6 +802,24 @@ handle_signal(int signal)
   quit = 1;
 }
 
+void
+issue_requests()
+{
+
+  for (int i = 0; i < 10000; i++) {
+    PRINT("  issue_requests_s_mode: issue\n");
+
+    oc_do_s_mode_with_scope(2, "/p/b", "w");
+    oc_do_s_mode_with_scope(5, "/p/b", "w");
+
+    oc_do_s_mode_with_scope(2, "/p/c", "w");
+    oc_do_s_mode_with_scope(5, "/p/c", "w");
+#ifdef WIN32
+    Sleep(5);
+#endif
+  }
+}
+
 /**
  * send a multicast s-mode message
  * fires only once
@@ -874,6 +892,8 @@ issue_requests_s_mode_delayed(void *data)
 
   // test invoking read on initialization.
   oc_init_datapoints_at_initialization();
+
+  issue_requests();
 
   return OC_EVENT_DONE;
 }
@@ -1002,8 +1022,8 @@ main(int argc, char *argv[])
 {
   int init;
 
-  bool do_send_s_mode = false;
-  bool do_send_oscore = true;
+  bool do_send_s_mode = true;
+  bool do_send_oscore = false;
   // false;
   true; //  false;
   g_reset = true;

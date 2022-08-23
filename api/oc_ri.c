@@ -1346,6 +1346,7 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
      */
     if (cur_resource && (method == OC_PUT || method == OC_POST) &&
         response_buffer.code < oc_status_code(OC_STATUS_BAD_REQUEST)) {
+      // check this with s-mode
       oc_ri_add_timed_event_callback_ticks(cur_resource,
                                            &oc_observe_notification_delayed, 0);
     }
@@ -1398,6 +1399,7 @@ free_client_cb(oc_client_cb_t *cb)
 oc_event_callback_retval_t
 oc_ri_remove_client_cb(void *data)
 {
+  OC_DBG("removing client %p", data);
   free_client_cb(data);
   return OC_EVENT_DONE;
 }
@@ -1745,7 +1747,11 @@ oc_ri_alloc_client_cb(const char *uri, oc_endpoint_t *endpoint,
   if (query && strlen(query) > 0) {
     oc_new_string(&cb->query, query, strlen(query));
   }
-  oc_list_add(client_cbs, cb);
+  if ((handler.response != NULL) && (handler.discovery_all != NULL) &&
+      (handler.discovery != NULL)) {
+    oc_list_add(client_cbs, cb);
+  }
+
   return cb;
 }
 #endif /* OC_CLIENT */
