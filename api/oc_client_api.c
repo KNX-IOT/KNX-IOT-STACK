@@ -91,7 +91,8 @@ dispatch_coap_request(oc_content_format_t content, oc_content_format_t accept)
       // since there is no response callback, so we are not expecting a result
       // so set the ref count on 0, so that the transaction is deleted, without
       // callback
-      OC_DBG(" refcount for handle.reponse=None : %d", transaction->message->ref_count);
+      OC_DBG(" refcount for handle.reponse=None : %d",
+             transaction->message->ref_count);
       transaction->message->ref_count = 0;
     }
 
