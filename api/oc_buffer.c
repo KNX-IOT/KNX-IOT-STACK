@@ -128,10 +128,17 @@ oc_message_unref(oc_message_t *message)
     if (message->ref_count <= 0) {
       PRINT("oc_message_unref: deallocating\n");
 #if defined(OC_DYNAMIC_ALLOCATION) && !defined(OC_INOUT_BUFFER_SIZE)
-      free(message->data);
+      if (message->data != NULL) {
+        free(message->data);
+      }
+      message->data = NULL;
+
 #endif /* OC_DYNAMIC_ALLOCATION && !OC_INOUT_BUFFER_SIZE */
       struct oc_memb *pool = message->pool;
-      oc_memb_free(pool, message);
+      if (pool != NULL) {
+        oc_memb_free(pool, message);
+      }
+      message->pool = NULL;
 #if !defined(OC_DYNAMIC_ALLOCATION) || defined(OC_INOUT_BUFFER_SIZE)
       OC_DBG("buffer: freed TX/RX buffer; num free: %d", oc_memb_numfree(pool));
 #endif /* !OC_DYNAMIC_ALLOCATION || OC_INOUT_BUFFER_SIZE */
