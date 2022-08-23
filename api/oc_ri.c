@@ -1418,7 +1418,9 @@ notify_client_cb_503(oc_client_cb_t *cb)
   client_response.code = OC_STATUS_SERVICE_UNAVAILABLE;
 
   oc_response_handler_t handler = (oc_response_handler_t)cb->handler.response;
-  handler(&client_response);
+  if (handler != NULL) {
+    handler(&client_response);
+  }
 
 #ifdef OC_TCP
   if ((oc_string_len(cb->uri) == 5 &&
@@ -1608,7 +1610,9 @@ oc_ri_invoke_client_cb(void *response, oc_client_cb_t *cb,
       if (err == 0) {
         oc_response_handler_t handler =
           (oc_response_handler_t)cb->handler.response;
-        handler(&client_response);
+        if (handler != NULL) {
+          handler(&client_response);
+        }
       } else {
         OC_WRN("Error parsing payload!");
       }
