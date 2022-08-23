@@ -65,18 +65,26 @@ typedef struct oc_group_address_mapping_table_t
                      ///< be applied for KNX Classic secure group communication.
 } oc_group_address_mapping_table_t;
 
+#ifndef GAMT_MAX_ENTRIES
 #define GAMT_MAX_ENTRIES 20
+#endif
 static oc_group_address_mapping_table_t g_groups[GAMT_MAX_ENTRIES];
 
+#ifndef GOT_MAX_ENTRIES
 #define GOT_MAX_ENTRIES 20
+#endif
 static oc_group_object_table_t g_got[GOT_MAX_ENTRIES];
 
 #ifdef OC_PUBLISHER_TABLE
+#ifndef GPT_MAX_ENTRIES
 #define GPT_MAX_ENTRIES 20
+#endif
 static oc_group_rp_table_t g_gpt[GPT_MAX_ENTRIES];
 #endif /* OC_PUBLISHER_TABLE */
 
+#ifndef GRT_MAX_ENTRIES
 #define GRT_MAX_ENTRIES 20
+#endif
 static oc_group_rp_table_t g_grt[GRT_MAX_ENTRIES];
 
 // -----------------------------------------------------------------------------
