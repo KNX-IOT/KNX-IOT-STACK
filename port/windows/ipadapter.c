@@ -1172,6 +1172,10 @@ oc_send_discovery_request(oc_message_t *message)
   ifaddr_t *ifaddr;
 
   ip_context_t *dev = get_ip_context_for_device(message->endpoint.device);
+  if (dev == NULL) {
+    OC_ERR("ip_context_t is null");
+    return;
+  }
 
   for (ifaddr = ifaddr_list; ifaddr != NULL; ifaddr = ifaddr->next) {
     if (message->endpoint.flags & IPV6 && ifaddr->addr.ss_family == AF_INET6) {

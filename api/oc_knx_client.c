@@ -646,7 +646,7 @@ oc_do_s_mode_with_scope_and_check(int scope, char *resource_url, char *rp,
   // loop over all group addresses and issue the s-mode command
   int index = oc_core_find_group_object_table_url(resource_url);
   if (index == -1) {
-    PRINT(" oc_do_s_mode_with_scope_internal : table entry found for %s\n",
+    PRINT(" oc_do_s_mode_with_scope_internal : no table entry found for %s\n",
           resource_url);
     return;
   }
