@@ -31,9 +31,9 @@ static coap_transaction_t *transaction;
 coap_packet_t request[1];
 oc_client_cb_t *client_cb;
 
-#ifdef OC_BLOCK_WISE
+#ifdef OC_BLOCK_WISE_REQUEST
 static oc_blockwise_state_t *request_buffer = NULL;
-#endif /* OC_BLOCK_WISE */
+#endif /* OC_BLOCK_WISE_REQUEST */
 
 #ifdef OC_OSCORE
 oc_message_t *multicast_update = NULL;
@@ -48,7 +48,7 @@ dispatch_coap_request(oc_content_format_t content, oc_content_format_t accept)
   if ((client_cb->method == OC_PUT || client_cb->method == OC_POST) &&
       payload_size > 0) {
 
-#ifdef OC_BLOCK_WISE
+#ifdef OC_BLOCK_WISE_REQUEST
     request_buffer->payload_size = (uint32_t)payload_size;
     uint32_t block_size;
 #ifdef OC_TCP
@@ -70,10 +70,10 @@ dispatch_coap_request(oc_content_format_t content, oc_content_format_t accept)
       coap_set_payload(request, request_buffer->buffer, payload_size);
       request_buffer->ref_count = 0;
     }
-#else  /* OC_BLOCK_WISE */
+#else  /* OC_BLOCK_WISE_REQUEST */
     coap_set_payload(request, transaction->message->data + COAP_MAX_HEADER_SIZE,
                      payload_size);
-#endif /* !OC_BLOCK_WISE */
+#endif /* !OC_BLOCK_WISE_REQUEST */
   }
 
   if (payload_size > 0) {
@@ -121,12 +121,12 @@ dispatch_coap_request(oc_content_format_t content, oc_content_format_t accept)
     oc_ri_remove_client_cb(client_cb);
   }
 
-#ifdef OC_BLOCK_WISE
+#ifdef OC_BLOCK_WISE_REQUEST
   if (request_buffer && request_buffer->ref_count == 0) {
     oc_blockwise_free_request_buffer(request_buffer);
   }
   request_buffer = NULL;
-#endif /* OC_BLOCK_WISE */
+#endif /* OC_BLOCK_WISE_REQUEST */
 
   transaction = NULL;
   client_cb = NULL;
@@ -152,7 +152,7 @@ prepare_coap_request_ex(oc_client_cb_t *cb, oc_content_format_t accept)
 
   oc_rep_new(transaction->message->data + COAP_MAX_HEADER_SIZE, OC_BLOCK_SIZE);
 
-#ifdef OC_BLOCK_WISE
+#ifdef OC_BLOCK_WISE_REQUEST
   if (cb->method == OC_PUT || cb->method == OC_POST) {
     request_buffer = oc_blockwise_alloc_request_buffer(
       oc_string(cb->uri) + 1, oc_string_len(cb->uri) - 1, &cb->endpoint,
@@ -166,7 +166,7 @@ prepare_coap_request_ex(oc_client_cb_t *cb, oc_content_format_t accept)
     request_buffer->mid = cb->mid;
     request_buffer->client_cb = cb;
   }
-#endif /* OC_BLOCK_WISE */
+#endif /* OC_BLOCK_WISE_REQUEST */
 
 #ifdef OC_TCP
   if (cb->endpoint.flags & TCP) {
