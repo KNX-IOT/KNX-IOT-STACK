@@ -294,6 +294,7 @@ discovery_ia_cb(const char *payload, int len, oc_endpoint_t *endpoint,
   //(void)anchor;
   (void)payload;
   (void)len;
+  uint8_t buffer[100];
 
   PRINT("discovery_ia_cb\n");
   oc_endpoint_print(endpoint);
@@ -311,12 +312,6 @@ discovery_ia_cb(const char *payload, int len, oc_endpoint_t *endpoint,
   if (cb_data->path == NULL) {
     return OC_STOP_DISCOVERY;
   }
-
-  // todo: where is the free?
-  uint8_t *buffer = malloc(100);
-  if (!buffer) {
-    OC_WRN("discovery_ia_cb: out of memory allocating buffer");
-  } //! buffer
 
   value_size =
     oc_s_mode_get_resource_value(cb_data->resource_url, "r", buffer, 100);
@@ -513,6 +508,7 @@ oc_s_mode_get_resource_value(char *resource_url, char *rp, uint8_t *buf,
                              int buf_size)
 {
   (void)rp;
+  uint8_t buffer[50];
 
   if (resource_url == NULL) {
     return 0;
@@ -525,21 +521,13 @@ oc_s_mode_get_resource_value(char *resource_url, char *rp, uint8_t *buf,
     return 0;
   }
 
-  // todo: where is the free??
-  uint8_t *buffer = malloc(100);
-  if (!buffer) {
-    OC_WRN("oc_do_s_mode: out of memory allocating buffer");
-  } //! buffer
-
   oc_request_t request = { 0 };
   oc_response_t response = { 0 };
   response.separate_response = 0;
   oc_response_buffer_t response_buffer;
-  // if (!response_buf && resource) {
-  //  OC_DBG("coap_notify_observers: Issue GET request to resource %s\n\n",
-  //         oc_string_checked(resource->uri));
+
   response_buffer.buffer = buffer;
-  response_buffer.buffer_size = 100;
+  response_buffer.buffer_size = 50;
 
   // same initialization as oc_ri.c
   response_buffer.code = 0;
@@ -618,6 +606,7 @@ oc_do_s_mode_with_scope_and_check(int scope, char *resource_url, char *rp,
 {
   int value_size;
   bool error = true;
+  uint8_t buffer[50];
 
   // do the checks
   if (strcmp(rp, "w") == 0) {
@@ -637,15 +626,6 @@ oc_do_s_mode_with_scope_and_check(int scope, char *resource_url, char *rp,
     return;
   }
 
-  // todo: where is the free?
-  uint8_t *buffer = malloc(100);
-  if (!buffer) {
-    OC_ERR("oc_do_s_mode_with_scope_internal: out of memory allocating buffer");
-    return;
-  } //! buffer
-
-  value_size = oc_s_mode_get_resource_value(resource_url, rp, buffer, 100);
-
   oc_resource_t *my_resource =
     oc_ri_get_app_resource_by_uri(resource_url, strlen(resource_url), 0);
   if (my_resource == NULL) {
@@ -653,6 +633,8 @@ oc_do_s_mode_with_scope_and_check(int scope, char *resource_url, char *rp,
           resource_url);
     return;
   }
+
+  value_size = oc_s_mode_get_resource_value(resource_url, rp, buffer, 50);
 
   // get the sender ia
   size_t device_index = 0;
