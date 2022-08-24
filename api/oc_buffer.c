@@ -140,7 +140,7 @@ oc_message_unref(oc_message_t *message)
       if (pool != NULL) {
         oc_memb_free(pool, message);
       }
-      //message->pool = NULL;
+      // message->pool = NULL;
 #if !defined(OC_DYNAMIC_ALLOCATION) || defined(OC_INOUT_BUFFER_SIZE)
       OC_DBG("buffer: freed TX/RX buffer; num free: %d", oc_memb_numfree(pool));
 #endif /* !OC_DYNAMIC_ALLOCATION || OC_INOUT_BUFFER_SIZE */
@@ -163,7 +163,7 @@ oc_send_message(oc_message_t *message)
                       oc_events[OUTBOUND_NETWORK_EVENT],
                       message) == OC_PROCESS_ERR_FULL)
     oc_message_unref(message);
-    //message->ref_count--;
+  // message->ref_count--;
 
   _oc_signal_event_loop();
 }
