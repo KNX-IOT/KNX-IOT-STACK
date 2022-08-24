@@ -31,6 +31,8 @@ static coap_transaction_t *transaction;
 coap_packet_t request[1];
 oc_client_cb_t *client_cb;
 
+//#define OC_BLOCK_WISE_REQUEST
+
 #ifdef OC_BLOCK_WISE_REQUEST
 static oc_blockwise_state_t *request_buffer = NULL;
 #endif /* OC_BLOCK_WISE_REQUEST */
@@ -100,7 +102,9 @@ dispatch_coap_request(oc_content_format_t content, oc_content_format_t accept)
 
     coap_send_transaction(transaction);
 
-    if (client_cb->handler.response == NULL) {
+    if ((client_cb->handler.response == NULL) &&
+        (client_cb->handler.discovery_all == NULL) &&
+        (client_cb->handler.discovery == NULL)) {
       // set the delayed callback on 0, so we clean up immediately the client_cb
       // data since there is no response callback, so we are not expecting a
       // result

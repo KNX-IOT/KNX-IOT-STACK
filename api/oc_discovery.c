@@ -376,7 +376,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   request->response->response_buffer->content_format = APPLICATION_LINK_FORMAT;
 
   if (matches > 0 && response_length > 0) {
-    PRINT("  oc_wkcore_discovery_handler response_lenght %d'\n",
+    PRINT("  oc_wkcore_discovery_handler response_length %d'\n",
           response_length);
     request->response->response_buffer->response_length = response_length;
     request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
