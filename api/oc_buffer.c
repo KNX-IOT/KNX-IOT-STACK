@@ -162,8 +162,8 @@ oc_send_message(oc_message_t *message)
   if (oc_process_post(&message_buffer_handler,
                       oc_events[OUTBOUND_NETWORK_EVENT],
                       message) == OC_PROCESS_ERR_FULL)
-  //oc_message_unref(message);
-  message->ref_count--;
+    // oc_message_unref(message);
+    message->ref_count--;
 
   _oc_signal_event_loop();
 }
