@@ -814,10 +814,14 @@ issue_requests()
 
     oc_do_s_mode_with_scope(2, "/p/c", "w");
     oc_do_s_mode_with_scope(5, "/p/c", "w");
+
+    PRINT("---------------> %d", i);
+
 #ifdef WIN32
     Sleep(5);
 #endif
   }
+  exit(0);
 }
 
 /**
