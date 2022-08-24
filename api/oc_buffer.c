@@ -49,6 +49,7 @@ allocate_message(struct oc_memb *pool)
 {
   oc_network_event_handler_mutex_lock();
   oc_message_t *message = (oc_message_t *)oc_memb_alloc(pool);
+  OC_DBG(" message allocated %p", *message);
   oc_network_event_handler_mutex_unlock();
   if (message) {
 #if defined(OC_DYNAMIC_ALLOCATION) && !defined(OC_INOUT_BUFFER_SIZE)
@@ -67,6 +68,7 @@ allocate_message(struct oc_memb *pool)
     message->endpoint.device = 0;
     message->endpoint.group_id = 0;
     OC_DBG("allocating message ref_count %d", message->ref_count);
+    OC_DBG("message data: %p", message->data);
 #ifdef OC_OSCORE
     message->encrypted = 0;
 #endif /* OC_OSCORE */
@@ -138,7 +140,7 @@ oc_message_unref(oc_message_t *message)
       if (pool != NULL) {
         oc_memb_free(pool, message);
       }
-      message->pool = NULL;
+      // message->pool = NULL;
 #if !defined(OC_DYNAMIC_ALLOCATION) || defined(OC_INOUT_BUFFER_SIZE)
       OC_DBG("buffer: freed TX/RX buffer; num free: %d", oc_memb_numfree(pool));
 #endif /* !OC_DYNAMIC_ALLOCATION || OC_INOUT_BUFFER_SIZE */
@@ -160,7 +162,8 @@ oc_send_message(oc_message_t *message)
   if (oc_process_post(&message_buffer_handler,
                       oc_events[OUTBOUND_NETWORK_EVENT],
                       message) == OC_PROCESS_ERR_FULL)
-    message->ref_count--;
+    oc_message_unref(message);
+  // message->ref_count--;
 
   _oc_signal_event_loop();
 }
