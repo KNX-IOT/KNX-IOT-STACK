@@ -83,7 +83,7 @@ _oc_memb_alloc(
 #ifdef OC_DYNAMIC_ALLOCATION
   else {
     ptr = calloc(1, m->size);
-    OC_DBG("==> calloc %p size=%d", ptr, m->size);
+    //OC_DBG("==> calloc %p size=%d", ptr, m->size);
   }
 #endif /* OC_DYNAMIC_ALLOCATION */
 
@@ -138,7 +138,7 @@ _oc_memb_free(
 #ifdef OC_DYNAMIC_ALLOCATION
   else {
     free(ptr);
-    OC_DBG(" ==< free %p", ptr);
+    //OC_DBG(" ==< free %p", ptr);
   }
 #endif /* OC_DYNAMIC_ALLOCATION */
   if (m->buffers_avail_cb) {
