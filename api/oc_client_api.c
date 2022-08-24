@@ -86,7 +86,9 @@ dispatch_coap_request(oc_content_format_t content, oc_content_format_t accept)
     coap_serialize_message(request, transaction->message->data);
   if (transaction->message->length > 0) {
 
-    if (client_cb->handler.response == NULL) {
+    if ((client_cb->handler.response == NULL) &&
+        (client_cb->handler.discovery_all == NULL) &&
+        (client_cb->handler.discovery == NULL)) {
       // set the delayed callback on 0, so we clean up immediately
       // since there is no response callback, so we are not expecting a result
       // so set the ref count on 0, so that the transaction is deleted, without
