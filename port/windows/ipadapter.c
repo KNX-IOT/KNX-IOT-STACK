@@ -1026,7 +1026,7 @@ send_msg(SOCKET sock, struct sockaddr_storage *receiver, oc_message_t *message)
 
     struct in6_pktinfo *pktinfo = (struct in6_pktinfo *)WSA_CMSG_DATA(MsgHdr);
 
-    /* Get the outgoing interface index from message->endpint */
+    /* Get the outgoing interface index from message->endpoint */
     pktinfo->ipi6_ifindex = message->endpoint.interface_index;
 
     /* Set the source address of this message using the address
@@ -1096,7 +1096,7 @@ int
 oc_send_buffer(oc_message_t *message)
 {
 #ifdef OC_DEBUG
-  PRINT("Outgoing message of size %zd bytes to ", message->length);
+  PRINT("oc_send_buffer: Outgoing message of size %zd bytes to ", message->length);
   PRINTipaddr(message->endpoint);
   PRINT("\n");
 #endif /* OC_DEBUG */

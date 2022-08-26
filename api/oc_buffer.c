@@ -54,6 +54,7 @@ allocate_message(struct oc_memb *pool)
   if (message) {
 #if defined(OC_DYNAMIC_ALLOCATION) && !defined(OC_INOUT_BUFFER_SIZE)
     message->data = malloc(OC_PDU_SIZE);
+    OC_DBG(" (((((((( message data %p size: %d", message->data, OC_PDU_SIZE);
     if (!message->data) {
       OC_ERR("Out of memory, cannot allocate message");
       oc_memb_free(pool, message);
@@ -67,6 +68,7 @@ allocate_message(struct oc_memb *pool)
     message->endpoint.interface_index = -1;
     message->endpoint.device = 0;
     message->endpoint.group_id = 0;
+
     OC_DBG("allocating message ref_count %d", message->ref_count);
     OC_DBG("message data: %p", message->data);
 #ifdef OC_OSCORE
@@ -126,21 +128,20 @@ oc_message_unref(oc_message_t *message)
 {
   if (message) {
     message->ref_count--;
-    OC_DBG("%d", message->ref_count);
+    OC_DBG("refcount: %d", message->ref_count);
     if (message->ref_count <= 0) {
       PRINT("oc_message_unref: deallocating\n");
 #if defined(OC_DYNAMIC_ALLOCATION) && !defined(OC_INOUT_BUFFER_SIZE)
       if (message->data != NULL) {
+        OC_DBG(" )))))))) Free message data %p", message->data);
         free(message->data);
       }
-      message->data = NULL;
-
 #endif /* OC_DYNAMIC_ALLOCATION && !OC_INOUT_BUFFER_SIZE */
       struct oc_memb *pool = message->pool;
       if (pool != NULL) {
+        OC_DBG(" FFFFFFFFFFF  Free message %p from pool %p size %d", message, pool, pool->size);
         oc_memb_free(pool, message);
       }
-      // message->pool = NULL;
 #if !defined(OC_DYNAMIC_ALLOCATION) || defined(OC_INOUT_BUFFER_SIZE)
       OC_DBG("buffer: freed TX/RX buffer; num free: %d", oc_memb_numfree(pool));
 #endif /* !OC_DYNAMIC_ALLOCATION || OC_INOUT_BUFFER_SIZE */
@@ -152,18 +153,21 @@ void
 oc_recv_message(oc_message_t *message)
 {
   if (oc_process_post(&message_buffer_handler, oc_events[INBOUND_NETWORK_EVENT],
-                      message) == OC_PROCESS_ERR_FULL)
+                      message) == OC_PROCESS_ERR_FULL) {
     oc_message_unref(message);
+  }
 }
 
 void
 oc_send_message(oc_message_t *message)
 {
+  oc_endpoint_print(&message->endpoint);
   if (oc_process_post(&message_buffer_handler,
                       oc_events[OUTBOUND_NETWORK_EVENT],
-                      message) == OC_PROCESS_ERR_FULL)
-    // oc_message_unref(message);
+                      message) == OC_PROCESS_ERR_FULL) {
+    OC_ERR("oc_send_message  ref_count decrease due to FULL\n");
     message->ref_count--;
+  }
 
   _oc_signal_event_loop();
 }
@@ -224,9 +228,10 @@ OC_PROCESS_THREAD(message_buffer_handler, ev, data)
       } else
 #endif /* !OC_OSCORE */
         if (message->endpoint.flags & DISCOVERY) {
-        OC_DBG("Outbound network event: multicast request");
-        oc_send_discovery_request(message);
-        oc_message_unref(message);
+          OC_DBG("Outbound network event: multicast request");
+          oc_endpoint_print(&message->endpoint);
+          oc_send_discovery_request(message);
+          oc_message_unref(message);
       } else {
         OC_DBG("Outbound network event: unicast message");
         oc_message_t *message = (oc_message_t *)data;

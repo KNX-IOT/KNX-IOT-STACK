@@ -802,27 +802,32 @@ handle_signal(int signal)
   quit = 1;
 }
 
-void
-issue_requests()
+int g_counter = 0;
+
+oc_event_callback_retval_t
+issue_requests(void *data)
 {
+  g_counter++;
 
-  for (int i = 0; i < 10000; i++) {
-    PRINT("  issue_requests_s_mode: issue\n");
+  PRINT("  issue_requests_s_mode: issue\n");
 
-    oc_do_s_mode_with_scope(2, "/p/b", "w");
-    oc_do_s_mode_with_scope(5, "/p/b", "w");
+  oc_do_s_mode_with_scope(2, "/p/a", "w");
+  oc_do_s_mode_with_scope(5, "/p/a", "w");
 
-    oc_do_s_mode_with_scope(2, "/p/c", "w");
-    oc_do_s_mode_with_scope(5, "/p/c", "w");
+  oc_do_s_mode_with_scope(2, "/p/b", "w");
+  oc_do_s_mode_with_scope(5, "/p/b", "w");
 
-    PRINT("---------------> s_mode loop %d\n", i);
+  oc_do_s_mode_with_scope(2, "/p/c", "w");
+  oc_do_s_mode_with_scope(5, "/p/c", "w");
 
-#ifdef WIN32
-    Sleep(5);
-#endif
+  PRINT("---------------> s_mode loop %d\n", g_counter);
+  if (g_counter == 10000) {
+    PRINT("---------------> QUIT  %d\n", g_counter);
+    exit(0);
   }
-  PRINT("---------------> QUIT\n");
-  exit(0);
+
+  oc_set_delayed_callback(NULL, issue_requests,
+                          0);
 }
 
 /**
@@ -856,7 +861,10 @@ issue_requests_s_mode_delayed(void *data)
   entry.ga = (int *)&ga_values;
 
   oc_core_set_group_object_table(0, entry);
+
+  PRINT("INDEX 0\n");
   oc_print_group_object_table_entry(0);
+  PRINT("\n");
 
   oc_group_object_table_t entry2;
   entry2.cflags = OC_CFLAG_TRANSMISSION;
@@ -866,39 +874,46 @@ issue_requests_s_mode_delayed(void *data)
   entry2.ga = (int *)&ga_values;
 
   oc_core_set_group_object_table(1, entry2);
-  PRINT("\n");
+  PRINT("INDEX 1\n");
   oc_print_group_object_table_entry(1);
+  PRINT("\n");
 
   oc_group_object_table_t entry3;
-  entry3.cflags = OC_CFLAG_INIT;
-  entry3.id = 5;
+  entry3.cflags = OC_CFLAG_WRITE | OC_CFLAG_INIT;
+  entry3.id = 6;
   entry3.href = href;
   entry3.ga_len = 1;
   entry3.ga = (int *)&ga_values;
 
   oc_core_set_group_object_table(2, entry3);
-  PRINT("\n");
+  PRINT("INDEX 2\n");
   oc_print_group_object_table_entry(2);
+  PRINT("\n");
+
+  oc_group_object_table_t entry4;
+  entry4.cflags = OC_CFLAG_WRITE;
+  entry4.id = 7;
+  entry4.href = href;
+  entry4.ga_len = 1;
+  entry4.ga = (int *)&ga_values;
+  oc_core_set_group_object_table(3, entry4);
+  PRINT("INDEX 3\n");
+  oc_print_group_object_table_entry(3);
+  PRINT("\n");
+
 
   // set loaded
   device->lsm_s = LSM_S_LOADED;
 
-  // testing, since the data is already reset...
+  // listen to the registered multicast addresses e.g. group address 1 
   oc_register_group_multicasts();
-
-  PRINT("  issue_requests_s_mode: issue\n");
-
-  PRINT("  issue_requests_s_mode: issue\n");
-  oc_do_s_mode_with_scope(2, "/p/b", "w");
-  oc_do_s_mode_with_scope(5, "/p/b", "w");
-
-  oc_do_s_mode_with_scope(2, "/p/c", "w");
-  oc_do_s_mode_with_scope(5, "/p/c", "w");
 
   // test invoking read on initialization.
   oc_init_datapoints_at_initialization();
 
-  issue_requests();
+  
+  oc_set_delayed_callback(NULL, issue_requests, 1);
+  //issue_requests();
 
   return OC_EVENT_DONE;
 }
