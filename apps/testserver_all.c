@@ -826,8 +826,7 @@ issue_requests(void *data)
     exit(0);
   }
 
-  oc_set_delayed_callback(NULL, issue_requests,
-                          0);
+  oc_set_delayed_callback(NULL, issue_requests, 0);
 }
 
 /**
@@ -901,19 +900,17 @@ issue_requests_s_mode_delayed(void *data)
   oc_print_group_object_table_entry(3);
   PRINT("\n");
 
-
   // set loaded
   device->lsm_s = LSM_S_LOADED;
 
-  // listen to the registered multicast addresses e.g. group address 1 
+  // listen to the registered multicast addresses e.g. group address 1
   oc_register_group_multicasts();
 
   // test invoking read on initialization.
   oc_init_datapoints_at_initialization();
 
-  
   oc_set_delayed_callback(NULL, issue_requests, 1);
-  //issue_requests();
+  // issue_requests();
 
   return OC_EVENT_DONE;
 }

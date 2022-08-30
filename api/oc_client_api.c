@@ -97,7 +97,7 @@ dispatch_coap_request(oc_content_format_t content, oc_content_format_t accept)
       // callback
       OC_DBG(" refcount for handle.reponse=None : %d",
              transaction->message->ref_count);
-      //transaction->message->ref_count = 0;
+      // transaction->message->ref_count = 0;
     }
 
     coap_send_transaction(transaction);
@@ -108,8 +108,8 @@ dispatch_coap_request(oc_content_format_t content, oc_content_format_t accept)
       // set the delayed callback on 0, so we clean up immediately the client_cb
       // data since there is no response callback, so we are not expecting a
       // result
-      //OC_DBG("Not set delayed callback for transaction: %p", transaction);
-      //oc_ri_remove_client_cb(client_cb);
+      // OC_DBG("Not set delayed callback for transaction: %p", transaction);
+      // oc_ri_remove_client_cb(client_cb);
     } else if (client_cb->observe_seq == -1) {
       if (client_cb->qos == LOW_QOS)
         oc_set_delayed_callback(client_cb, &oc_ri_remove_client_cb,

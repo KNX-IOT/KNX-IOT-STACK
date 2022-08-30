@@ -139,7 +139,8 @@ oc_message_unref(oc_message_t *message)
 #endif /* OC_DYNAMIC_ALLOCATION && !OC_INOUT_BUFFER_SIZE */
       struct oc_memb *pool = message->pool;
       if (pool != NULL) {
-        OC_DBG(" FFFFFFFFFFF  Free message %p from pool %p size %d", message, pool, pool->size);
+        OC_DBG(" FFFFFFFFFFF  Free message %p from pool %p size %d", message,
+               pool, pool->size);
         oc_memb_free(pool, message);
       }
 #if !defined(OC_DYNAMIC_ALLOCATION) || defined(OC_INOUT_BUFFER_SIZE)
@@ -228,10 +229,10 @@ OC_PROCESS_THREAD(message_buffer_handler, ev, data)
       } else
 #endif /* !OC_OSCORE */
         if (message->endpoint.flags & DISCOVERY) {
-          OC_DBG("Outbound network event: multicast request");
-          oc_endpoint_print(&message->endpoint);
-          oc_send_discovery_request(message);
-          oc_message_unref(message);
+        OC_DBG("Outbound network event: multicast request");
+        oc_endpoint_print(&message->endpoint);
+        oc_send_discovery_request(message);
+        oc_message_unref(message);
       } else {
         OC_DBG("Outbound network event: unicast message");
         oc_message_t *message = (oc_message_t *)data;
