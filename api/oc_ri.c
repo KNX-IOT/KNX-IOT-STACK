@@ -1347,8 +1347,11 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
     if (cur_resource && (method == OC_PUT || method == OC_POST) &&
         response_buffer.code < oc_status_code(OC_STATUS_BAD_REQUEST)) {
       // check this with s-mode
-      oc_ri_add_timed_event_callback_ticks(cur_resource,
+      if ((endpoint->flags & MULTICAST) == 0) {
+        // only handle observe when not doing multicast 
+        oc_ri_add_timed_event_callback_ticks(cur_resource,
                                            &oc_observe_notification_delayed, 0);
+      }
     }
 
 #endif /* OC_SERVER */
