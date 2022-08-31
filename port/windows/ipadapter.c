@@ -1096,7 +1096,8 @@ int
 oc_send_buffer(oc_message_t *message)
 {
 #ifdef OC_DEBUG
-  PRINT("oc_send_buffer: Outgoing message of size %zd bytes to ", message->length);
+  PRINT("oc_send_buffer: Outgoing message of size %zd bytes to ",
+        message->length);
   PRINTipaddr(message->endpoint);
   PRINT("\n");
 #endif /* OC_DEBUG */
