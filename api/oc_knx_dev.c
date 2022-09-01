@@ -31,6 +31,28 @@
 #define KNX_STORAGE_DA "dev_knx_da"
 #define KNX_STORAGE_PORT "dev_knx_port"
 
+bool
+oc_handle_query_m_dpt(oc_request_t *request, char *dpt_value)
+{
+  // handle the query parameter m
+  char *m;
+  int m_len = oc_get_query_value(request, "m", &m);
+  if (m_len != -1) {
+    PRINT("  Query param: %.*s", m_len, m);
+    if (strncmp(m, "dpt", m_len) == 0) {
+      oc_rep_begin_root_object();
+      oc_rep_set_text_string(root, dpt, dpt_value);
+      oc_rep_end_root_object();
+      oc_send_cbor_response(request, OC_STATUS_OK);
+      return true;
+    }
+    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    return true;
+  }
+  return false;
+}
+
+
 static void
 oc_core_dev_sn_get_handler(oc_request_t *request,
                            oc_interface_mask_t iface_mask, void *data)
@@ -41,6 +63,11 @@ oc_core_dev_sn_get_handler(oc_request_t *request,
   /* check if the accept header is CBOR-format */
   if (request->accept != APPLICATION_CBOR) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    return;
+  }
+
+  // handle the query parameter m
+  if (oc_handle_query_m_dpt(request, "urn:knx:dpt.serNum") == true) {
     return;
   }
 
@@ -68,7 +95,7 @@ oc_create_dev_sn_resource(int resource_idx, size_t device)
   // rt :dpt.serNum
   oc_core_populate_resource(
     resource_idx, device, "/dev/sn", OC_IF_D, APPLICATION_CBOR, OC_DISCOVERABLE,
-    oc_core_dev_sn_get_handler, 0, 0, 0, 2, ":dpa:0.11", "dpt.serNum");
+    oc_core_dev_sn_get_handler, 0, 0, 0, 2, "urn:knx:dpa:0.11", "urn:knx:dpt.serNum");
 }
 
 // -----------------------------------------------------------------------------
@@ -86,6 +113,11 @@ oc_core_dev_hwv_get_handler(oc_request_t *request,
     return;
   }
   PRINT("oc_core_dev_hwv_get_handler\n");
+
+  // handle the query parameter m
+  if (oc_handle_query_m_dpt(request, "urn:knx:dpt.version") == true) {
+    return;
+  }
 
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
@@ -111,7 +143,7 @@ oc_create_dev_hwv_resource(int resource_idx, size_t device)
   OC_DBG("oc_create_dev_hwv_resource\n");
   oc_core_populate_resource(
     resource_idx, device, "/dev/hwv", OC_IF_D, APPLICATION_CBOR,
-    OC_DISCOVERABLE, oc_core_dev_hwv_get_handler, 0, 0, 0, 1, ":dpt.version");
+    OC_DISCOVERABLE, oc_core_dev_hwv_get_handler, 0, 0, 0, 1, "urn:knx:dpt.version");
 }
 
 // -----------------------------------------------------------------------------
@@ -130,6 +162,10 @@ oc_core_dev_fwv_get_handler(oc_request_t *request,
   }
 
   PRINT("oc_core_dev_fwv_get_handler\n");
+  // handle the query parameter m
+  if (oc_handle_query_m_dpt(request, "urn:knx:dpt.version") == true) {
+    return;
+  }
 
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
@@ -157,7 +193,7 @@ oc_create_dev_fwv_resource(int resource_idx, size_t device)
   oc_core_populate_resource(resource_idx, device, "/dev/fwv", OC_IF_D,
                             APPLICATION_CBOR, OC_DISCOVERABLE,
                             oc_core_dev_fwv_get_handler, 0, 0, 0, 2,
-                            ":dpa.0.25", ":dpt.version");
+                            "urn:knx:dpa.0.25", "urn:knx:dpt.version");
 }
 
 // -----------------------------------------------------------------------------
@@ -172,6 +208,10 @@ oc_core_dev_hwt_get_handler(oc_request_t *request,
   /* check if the accept header is CBOR-format */
   if (request->accept != APPLICATION_CBOR) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    return;
+  }
+  // handle the query parameter m
+  if (oc_handle_query_m_dpt(request, "urn:knx:dpt.varString8859_1") == true) {
     return;
   }
 
@@ -195,7 +235,7 @@ oc_create_dev_hwt_resource(int resource_idx, size_t device)
   oc_core_populate_resource(resource_idx, device, "/dev/hwt", OC_IF_D,
                             APPLICATION_CBOR, OC_DISCOVERABLE,
                             oc_core_dev_hwt_get_handler, 0, 0, 0, 1,
-                            ":dpt.varString8859_1");
+                            "urn:knx:dpt.varString8859_1");
 }
 
 // -----------------------------------------------------------------------------
@@ -212,6 +252,11 @@ oc_core_dev_model_get_handler(oc_request_t *request,
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
+  // handle the query parameter m
+  if (oc_handle_query_m_dpt(request, "urn:knx:dpt.utf8") == true) {
+    return;
+  }
+
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device != NULL && oc_string(device->model) != NULL) {
@@ -231,7 +276,7 @@ oc_create_dev_model_resource(int resource_idx, size_t device)
   oc_core_populate_resource(resource_idx, device, "/dev/model", OC_IF_D,
                             APPLICATION_CBOR, OC_DISCOVERABLE,
                             oc_core_dev_model_get_handler, 0, 0, 0, 2,
-                            ":dpa.0.15", ":dpt.utf8");
+                            "urn:knx:dpa.0.15", "urn:knx:dpt.utf8");
 }
 
 // -----------------------------------------------------------------------------
@@ -247,6 +292,10 @@ oc_core_dev_ia_get_handler(oc_request_t *request,
   if (request->accept != APPLICATION_CBOR) {
     OC_ERR("invalid request");
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    return;
+  }
+  // handle the query parameter m
+  if (oc_handle_query_m_dpt(request, "urn:knx:dpt.value2Ucount") == true) {
     return;
   }
 
@@ -341,7 +390,7 @@ oc_create_dev_ia_resource(int resource_idx, size_t device)
   oc_core_populate_resource(
     resource_idx, device, "/dev/ia", OC_IF_P, APPLICATION_CBOR, OC_DISCOVERABLE,
     oc_core_dev_ia_get_handler, oc_core_dev_ia_put_handler, 0, 0, 1,
-    ":dpt.value2Ucount");
+    "urn:knx:dpt.value2Ucount");
 }
 
 // -----------------------------------------------------------------------------
@@ -399,6 +448,10 @@ oc_core_dev_hostname_get_handler(oc_request_t *request,
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
+  // handle the query parameter m
+  if (oc_handle_query_m_dpt(request, "urn:knx:dpt.varString8859_1") == true) {
+    return;
+  }
 
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
@@ -419,7 +472,7 @@ oc_create_dev_hostname_resource(int resource_idx, size_t device)
   oc_core_populate_resource(
     resource_idx, device, "/dev/hname", OC_IF_P, APPLICATION_CBOR,
     OC_DISCOVERABLE, oc_core_dev_hostname_get_handler,
-    oc_core_dev_hostname_put_handler, 0, 0, 1, ":dpt.varString8859_1");
+    oc_core_dev_hostname_put_handler, 0, 0, 1, "urn:knx:dpt.varString8859_1");
 }
 
 // -----------------------------------------------------------------------------
@@ -479,6 +532,10 @@ oc_core_dev_iid_get_handler(oc_request_t *request,
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
+  // handle the query parameter m
+  if (oc_handle_query_m_dpt(request, "urn:knx:dpt.value4Ucount") == true) {
+    return;
+  }
 
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
@@ -502,7 +559,7 @@ oc_create_dev_iid_resource(int resource_idx, size_t device)
   oc_core_populate_resource(
     resource_idx, device, "/dev/iid", OC_IF_P, APPLICATION_CBOR,
     OC_DISCOVERABLE, oc_core_dev_iid_get_handler, oc_core_dev_iid_put_handler,
-    0, 0, 1, ":dpt.value4Ucount ");
+    0, 0, 1, "urn:knx:dpt.value4Ucount");
 }
 
 // -----------------------------------------------------------------------------
@@ -517,6 +574,10 @@ oc_core_dev_ipv6_get_handler(oc_request_t *request,
   /* check if the accept header is CBOR-format */
   if (request->accept != APPLICATION_CBOR) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    return;
+  }
+  // handle the query parameter m
+  if (oc_handle_query_m_dpt(request, "urn:knx:dpt.ipv6") == true) {
     return;
   }
 
@@ -539,7 +600,7 @@ oc_create_dev_ipv6_resource(int resource_idx, size_t device)
   OC_DBG("oc_create_dev_ipv6_resource\n");
   oc_core_populate_resource(
     resource_idx, device, "/dev/ipv6", OC_IF_P, APPLICATION_CBOR,
-    OC_DISCOVERABLE, oc_core_dev_ipv6_get_handler, 0, 0, 0, 1, ":dpt.ipv6");
+    OC_DISCOVERABLE, oc_core_dev_ipv6_get_handler, 0, 0, 0, 1, "urn:knx:dpt.ipv6");
 }
 
 // -----------------------------------------------------------------------------
@@ -554,6 +615,10 @@ oc_core_dev_pm_get_handler(oc_request_t *request,
   /* check if the accept header is CBOR-format */
   if (request->accept != APPLICATION_CBOR) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    return;
+  }
+  // handle the query parameter m
+  if (oc_handle_query_m_dpt(request, "urn:knx:dpa.binaryValue") == true) {
     return;
   }
 
@@ -614,7 +679,7 @@ oc_create_dev_pm_resource(int resource_idx, size_t device)
   oc_core_populate_resource(
     resource_idx, device, "/dev/pm", OC_IF_P, APPLICATION_CBOR, OC_DISCOVERABLE,
     oc_core_dev_pm_get_handler, oc_core_dev_pm_put_handler, 0, 0, 2,
-    ":dpa.0.54", "dpa.binaryValue");
+    ":dpa.0.54", "urn:knx:dpa.binaryValue");
 }
 
 // -----------------------------------------------------------------------------
@@ -681,6 +746,10 @@ oc_core_dev_sa_get_handler(oc_request_t *request,
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
+  // handle the query parameter m
+  if (oc_handle_query_m_dpt(request, "urn:knx:dpt.value1Ucount") == true) {
+    return;
+  }
 
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
@@ -737,7 +806,7 @@ oc_create_dev_sa_resource(int resource_idx, size_t device)
   oc_core_populate_resource(
     resource_idx, device, "/dev/sa", OC_IF_P, APPLICATION_CBOR, OC_DISCOVERABLE,
     oc_core_dev_sa_get_handler, oc_core_dev_sa_put_handler, 0, 0, 2,
-    ":dpa.0.57", ":dpt.value1Ucount");
+    "urn:knx:dpa.0.57", "urn:knx:dpt.value1Ucount");
 }
 
 // -----------------------------------------------------------------------------
@@ -752,6 +821,10 @@ oc_core_dev_da_get_handler(oc_request_t *request,
   /* check if the accept header is CBOR-format */
   if (request->accept != APPLICATION_CBOR) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    return;
+  }
+  // handle the query parameter m
+  if (oc_handle_query_m_dpt(request, "urn:knx:dpt.value1Ucount") == true) {
     return;
   }
 
@@ -809,7 +882,7 @@ oc_create_dev_da_resource(int resource_idx, size_t device)
   oc_core_populate_resource(
     resource_idx, device, "/dev/da", OC_IF_P, APPLICATION_CBOR, OC_DISCOVERABLE,
     oc_core_dev_da_get_handler, oc_core_dev_da_put_handler, 0, 0, 2,
-    ":dpa.0.58", ":dpt.value1Ucount");
+    "urn:knx:dpa.0.58", "urn:knx:dpt.value1Ucount");
 }
 
 // -----------------------------------------------------------------------------
@@ -824,6 +897,10 @@ oc_core_dev_port_get_handler(oc_request_t *request,
   /* check if the accept header is CBOR-format */
   if (request->accept != APPLICATION_CBOR) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    return;
+  }
+  // handle the query parameter m
+  if (oc_handle_query_m_dpt(request, "urn:knx:dpt.value2Ucount") == true) {
     return;
   }
 
@@ -881,7 +958,7 @@ oc_create_dev_port_resource(int resource_idx, size_t device)
   oc_core_populate_resource(
     resource_idx, device, "/dev/port", OC_IF_P, APPLICATION_CBOR,
     OC_DISCOVERABLE, oc_core_dev_port_get_handler, oc_core_dev_port_put_handler,
-    0, 0, 1, ":dpt.value2Ucount");
+    0, 0, 1, "urn:knx:dpt.value2Ucount");
 }
 
 // -----------------------------------------------------------------------------
