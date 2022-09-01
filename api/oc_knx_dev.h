@@ -95,7 +95,7 @@ bool oc_knx_device_in_programming_mode(size_t device_index);
 /**
  * @brief handles the query with dpt e.g. url?m=dpt
  *
- * Note: handles only dpt, all other query parameters 
+ * Note: handles only dpt, all other query parameters
  *       will be treaded as error
  * @param request the (GET) request
  * @param dpt_value the dpt value to be returned
@@ -103,7 +103,6 @@ bool oc_knx_device_in_programming_mode(size_t device_index);
  * @return false query not present, not handled
  */
 bool oc_handle_query_m_dpt(oc_request_t *request, char *dpt_value);
-
 
 #ifdef __cplusplus
 }

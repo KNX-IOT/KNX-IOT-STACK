@@ -336,7 +336,7 @@ get_dpa_352_52(oc_request_t *request, oc_interface_mask_t interfaces,
   if (request->accept != APPLICATION_CBOR) {
     oc_send_response(request, OC_STATUS_BAD_OPTION);
     return;
-  } 
+  }
   // handle the query parameter m
   if (oc_handle_query_m_dpt(request, "urn:knx:NOT_VALID") == true) {
     return;

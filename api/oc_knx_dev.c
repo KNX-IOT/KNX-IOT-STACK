@@ -52,7 +52,6 @@ oc_handle_query_m_dpt(oc_request_t *request, char *dpt_value)
   return false;
 }
 
-
 static void
 oc_core_dev_sn_get_handler(oc_request_t *request,
                            oc_interface_mask_t iface_mask, void *data)
@@ -93,9 +92,10 @@ oc_create_dev_sn_resource(int resource_idx, size_t device)
   OC_DBG("oc_create_dev_sn_resource\n");
   // rt :dpa:0.11
   // rt :dpt.serNum
-  oc_core_populate_resource(
-    resource_idx, device, "/dev/sn", OC_IF_D, APPLICATION_CBOR, OC_DISCOVERABLE,
-    oc_core_dev_sn_get_handler, 0, 0, 0, 2, "urn:knx:dpa:0.11", "urn:knx:dpt.serNum");
+  oc_core_populate_resource(resource_idx, device, "/dev/sn", OC_IF_D,
+                            APPLICATION_CBOR, OC_DISCOVERABLE,
+                            oc_core_dev_sn_get_handler, 0, 0, 0, 2,
+                            "urn:knx:dpa:0.11", "urn:knx:dpt.serNum");
 }
 
 // -----------------------------------------------------------------------------
@@ -141,9 +141,10 @@ void
 oc_create_dev_hwv_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_dev_hwv_resource\n");
-  oc_core_populate_resource(
-    resource_idx, device, "/dev/hwv", OC_IF_D, APPLICATION_CBOR,
-    OC_DISCOVERABLE, oc_core_dev_hwv_get_handler, 0, 0, 0, 1, "urn:knx:dpt.version");
+  oc_core_populate_resource(resource_idx, device, "/dev/hwv", OC_IF_D,
+                            APPLICATION_CBOR, OC_DISCOVERABLE,
+                            oc_core_dev_hwv_get_handler, 0, 0, 0, 1,
+                            "urn:knx:dpt.version");
 }
 
 // -----------------------------------------------------------------------------
@@ -598,9 +599,10 @@ void
 oc_create_dev_ipv6_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_dev_ipv6_resource\n");
-  oc_core_populate_resource(
-    resource_idx, device, "/dev/ipv6", OC_IF_P, APPLICATION_CBOR,
-    OC_DISCOVERABLE, oc_core_dev_ipv6_get_handler, 0, 0, 0, 1, "urn:knx:dpt.ipv6");
+  oc_core_populate_resource(resource_idx, device, "/dev/ipv6", OC_IF_P,
+                            APPLICATION_CBOR, OC_DISCOVERABLE,
+                            oc_core_dev_ipv6_get_handler, 0, 0, 0, 1,
+                            "urn:knx:dpt.ipv6");
 }
 
 // -----------------------------------------------------------------------------
