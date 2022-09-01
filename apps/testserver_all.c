@@ -233,6 +233,10 @@ get_dpa_352_51(oc_request_t *request, oc_interface_mask_t interfaces,
     oc_send_response(request, OC_STATUS_BAD_OPTION);
     return;
   }
+  // handle the query parameter m
+  if (oc_handle_query_m_dpt(request, "urn:knx:NOT_VALID") == true) {
+    return;
+  }
 
   CborError error;
   // error = cbor_encode_boolean(&g_encoder, g_352_51_state);
@@ -279,6 +283,10 @@ get_dpa_352_51_1(oc_request_t *request, oc_interface_mask_t interfaces,
   /* check if the accept header is CBOR */
   if (request->accept != APPLICATION_CBOR) {
     oc_send_response(request, OC_STATUS_BAD_OPTION);
+    return;
+  }
+  // handle the query parameter m
+  if (oc_handle_query_m_dpt(request, "urn:knx:NOT_VALID") == true) {
     return;
   }
 
@@ -329,6 +337,10 @@ get_dpa_352_52(oc_request_t *request, oc_interface_mask_t interfaces,
     oc_send_response(request, OC_STATUS_BAD_OPTION);
     return;
   }
+  // handle the query parameter m
+  if (oc_handle_query_m_dpt(request, "urn:knx:NOT_VALID") == true) {
+    return;
+  }
 
   CborError error;
   // error = cbor_encode_boolean(&g_encoder, g_352_52_state);
@@ -375,6 +387,10 @@ get_dpa_353_52(oc_request_t *request, oc_interface_mask_t interfaces,
   if (request->accept != APPLICATION_CBOR) {
     PRINT(" accept %d", request->accept);
     oc_send_response(request, OC_STATUS_BAD_OPTION);
+    return;
+  }
+  // handle the query parameter m
+  if (oc_handle_query_m_dpt(request, "urn:knx:NOT_VALID") == true) {
     return;
   }
 
