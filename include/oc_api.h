@@ -633,12 +633,12 @@ void oc_resource_bind_resource_type(oc_resource_t *resource, const char *type);
 void oc_resource_bind_content_type(oc_resource_t *resource,
                                    oc_content_format_t content_type);
 
-
 /**
  * Add a Data Point Type "dpt" property to the resource.
  *
  * @param[in] resource the resource that the Data Point Type will be set on
- * @param[in] dpt the Data Point Type to add to the Data Point Type "dpt" property
+ * @param[in] dpt the Data Point Type to add to the Data Point Type "dpt"
+ * property
  *
  * @see oc_new_resource
  * @see oc_device_bind_resource_type

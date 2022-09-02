@@ -295,7 +295,6 @@ oc_resource_bind_dpt(oc_resource_t *resource, const char *dpt)
   }
 }
 
-
 void
 oc_resource_bind_content_type(oc_resource_t *resource,
                               oc_content_format_t content_type)
