@@ -277,6 +277,25 @@ oc_resource_bind_resource_type(oc_resource_t *resource, const char *type)
 }
 
 void
+oc_resource_bind_dpt(oc_resource_t *resource, const char *dpt)
+{
+  if (resource) {
+    if (dpt) {
+      if (oc_string_len(resource->dpt)) {
+        oc_free_string(&resource->dpt);
+        memset(&resource->dpt, 0, sizeof(oc_string_t));
+      }
+      oc_new_string(&resource->dpt, dpt, strlen(dpt));
+    } else {
+      memset(&resource->dpt, 0, sizeof(oc_string_t));
+    }
+
+  } else {
+    OC_ERR("oc_resource_bind_dpt: resource is NULL");
+  }
+}
+
+void
 oc_resource_bind_content_type(oc_resource_t *resource,
                               oc_content_format_t content_type)
 {

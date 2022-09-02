@@ -165,7 +165,8 @@ typedef struct
    * static void register_resources(void)
    * {
    *   oc_resource_t *bswitch = oc_new_resource(NULL, "/switch", 1, 0);
-   *   oc_resource_bind_resource_type(bswitch, "dpa.321.51");
+   *   oc_resource_bind_resource_type(bswitch, "urn:knx:dpa.417.61");
+   *   oc_resource_bind_dpt(bswitch, "urn:knx:dpt.switch");
    *   oc_resource_bind_resource_interface(bswitch, OC_IF_A);
    *   oc_resource_set_discoverable(bswitch, true);
    *   oc_resource_set_request_handler(bswitch, OC_GET, get_switch, NULL);
@@ -179,6 +180,7 @@ typedef struct
    * @see oc_new_resource
    * @see oc_resource_bind_resource_interface
    * @see oc_resource_bind_resource_type
+   * @see oc_resource_bind_dpt
    * @see oc_resource_make_public
    * @see oc_resource_set_discoverable
    * @see oc_resource_set_observable
@@ -547,8 +549,6 @@ int oc_init_platform(const char *mfg_name,
  * `num_resource_types` the actual Resource Types are added later using the
  * oc_resource_bind_resource_type() function.
  *
- * The resource is populated with a default interface OC_IF_BASELINE.
- *
  * Many properties associated with a resource are set or modified after the
  * new resource has been created.
  *
@@ -559,7 +559,8 @@ int oc_init_platform(const char *mfg_name,
  * static void register_resources(void)
  * {
  *   oc_resource_t *bswitch = oc_new_resource("light switch", "/switch", 1, 0);
- *   oc_resource_bind_resource_type(bswitch, "dpt.0.5");
+ *   oc_resource_bind_resource_type(bswitch, "urn:knx:dpa.417.61");
+ *   oc_resource_bind_dpt(bswitch, "urn:knx:dpt.switch");
  *   oc_resource_bind_resource_interface(bswitch, OC_IF_A);
  *   oc_resource_set_observable(bswitch, true);
  *   oc_resource_set_discoverable(bswitch, true);
@@ -578,6 +579,7 @@ int oc_init_platform(const char *mfg_name,
  *
  * @see oc_resource_bind_resource_interface
  * @see oc_resource_bind_resource_type
+ * @see oc_resource_bind_dpt
  * @see oc_process_baseline_interface
  * @see oc_resource_set_discoverable
  * @see oc_resource_set_periodic_observable
@@ -611,7 +613,7 @@ void oc_resource_bind_resource_interface(oc_resource_t *resource,
  *
  * Multi-value "rt" Resource means a resource with multiple Resource Types. i.e.
  * oc_resource_bind_resource_type() is called multiple times for a single
- * resource. When using a Mulit-value Resource the different resources
+ * resource. When using a Multi-value Resource the different resources
  * properties must not conflict.
  *
  * @param[in] resource the resource that the Resource Type will be set on
@@ -630,6 +632,18 @@ void oc_resource_bind_resource_type(oc_resource_t *resource, const char *type);
  */
 void oc_resource_bind_content_type(oc_resource_t *resource,
                                    oc_content_format_t content_type);
+
+/**
+ * Add a Data Point Type "dpt" property to the resource.
+ *
+ * @param[in] resource the resource that the Data Point Type will be set on
+ * @param[in] dpt the Data Point Type to add to the Data Point Type "dpt"
+ * property
+ *
+ * @see oc_new_resource
+ * @see oc_device_bind_resource_type
+ */
+void oc_resource_bind_dpt(oc_resource_t *resource, const char *dpt);
 
 /**
  * Expose unsecured coap:// endpoints (in addition to secured coaps://
