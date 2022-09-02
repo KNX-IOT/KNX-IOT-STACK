@@ -211,7 +211,8 @@ get_o_1_1(oc_request_t *request, oc_interface_mask_t interfaces,
         // unique identifier
         if ((strncmp(m, "id", m_len) == 0) | (strncmp(m, "*", m_len) == 0)) {
           char mystring[100];
-          snprintf(mystring, 99,"urn:knx:sn:%s%s", oc_string(device->serialnumber),
+          snprintf(mystring, 99, "urn:knx:sn:%s%s",
+                   oc_string(device->serialnumber),
                    oc_string(request->resource->uri));
           oc_rep_i_set_text_string(root, 9, mystring);
         }
@@ -247,7 +248,7 @@ get_o_1_1(oc_request_t *request, oc_interface_mask_t interfaces,
     }
     oc_send_cbor_response(request, OC_STATUS_OK);
     return;
-  } 
+  }
 
   CborError error;
   oc_rep_begin_root_object();
