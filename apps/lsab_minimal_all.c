@@ -201,7 +201,7 @@ get_o_1_1(oc_request_t *request, oc_interface_mask_t interfaces,
   size_t m_key_len;
   size_t m_len = (int)oc_get_query_value(request, "m", &m);
   if (m_len != -1) {
-    PRINT("  Query param: %.*s", m_len, m);
+    PRINT("  Query param: %.*s", (int)m_len, m);
     oc_init_query_iterator();
     size_t device_index = request->resource->device;
     oc_device_info_t *device = oc_core_get_device_info(device_index);
@@ -211,7 +211,7 @@ get_o_1_1(oc_request_t *request, oc_interface_mask_t interfaces,
         // unique identifier
         if ((strncmp(m, "id", m_len) == 0) | (strncmp(m, "*", m_len) == 0)) {
           char mystring[100];
-          snprintf(mystring, "urn:knx:sn:%s%s", oc_string(device->serialnumber),
+          snprintf(mystring, 99,"urn:knx:sn:%s%s", oc_string(device->serialnumber),
                    oc_string(request->resource->uri));
           oc_rep_i_set_text_string(root, 9, mystring);
         }
