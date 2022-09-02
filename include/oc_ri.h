@@ -372,6 +372,7 @@ struct oc_resource_s
   oc_string_t name;                    /**< name of the resource (e.g. "n") */
   oc_string_t uri;                     /**< uri of the resource */
   oc_string_array_t types;             /**< "rt" types of the resource */
+  oc_string_t dpt;                     /**< dpt of the resource */
   oc_interface_mask_t interfaces;      /**< supported interfaces */
   oc_content_format_t content_type;    /**< the content format that the resource
                                             supports, e.g. only 1 at the moment */

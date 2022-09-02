@@ -611,7 +611,7 @@ void oc_resource_bind_resource_interface(oc_resource_t *resource,
  *
  * Multi-value "rt" Resource means a resource with multiple Resource Types. i.e.
  * oc_resource_bind_resource_type() is called multiple times for a single
- * resource. When using a Mulit-value Resource the different resources
+ * resource. When using a Multi-value Resource the different resources
  * properties must not conflict.
  *
  * @param[in] resource the resource that the Resource Type will be set on
@@ -630,6 +630,18 @@ void oc_resource_bind_resource_type(oc_resource_t *resource, const char *type);
  */
 void oc_resource_bind_content_type(oc_resource_t *resource,
                                    oc_content_format_t content_type);
+
+
+/**
+ * Add a Data Point Type "dpt" property to the resource.
+ *
+ * @param[in] resource the resource that the Data Point Type will be set on
+ * @param[in] type the Resource Type to add to the Data Point Type "dpt" property
+ *
+ * @see oc_new_resource
+ * @see oc_device_bind_resource_type
+ */
+void oc_resource_bind_dpt(oc_resource_t *resource, const char *dpt);
 
 /**
  * Expose unsecured coap:// endpoints (in addition to secured coaps://

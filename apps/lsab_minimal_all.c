@@ -286,7 +286,7 @@ register_resources(void)
   oc_resource_t *res_light =
     oc_new_resource("light actuation", "p/o_1_1", 2, 0);
   oc_resource_bind_resource_type(res_light, "urn:knx:dpa.417.61");
-  oc_resource_bind_resource_type(res_light, "urn:knx:dpt.Switch");
+  oc_resource_bind_dpt(res_light, "urn:knx:dpt.Switch");
   oc_resource_bind_content_type(res_light, APPLICATION_CBOR);
   oc_resource_bind_resource_interface(res_light, OC_IF_A); /* if.a */
   oc_resource_set_discoverable(res_light, true);

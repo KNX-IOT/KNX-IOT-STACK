@@ -261,7 +261,7 @@ register_resources(void)
   oc_resource_t *res_pushbutton =
     oc_new_resource("push button", "p/o_1_1", 2, 0);
   oc_resource_bind_resource_type(res_pushbutton, "urn:knx:dpa.421.61");
-  oc_resource_bind_resource_type(res_pushbutton, "urn:knx:dpt.Switch");
+  oc_resource_bind_dpt(res_pushbutton, "urn:knx:dpt.Switch");
   oc_resource_bind_content_type(res_pushbutton, APPLICATION_CBOR);
   oc_resource_bind_resource_interface(res_pushbutton, OC_IF_S); /* if.s */
   oc_resource_set_discoverable(res_pushbutton, true);
