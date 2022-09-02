@@ -430,7 +430,7 @@ coap_receive(oc_message_t *msg)
                                                           // 8-byte echo options
           {
             OC_DBG("Received request with echo size %d! Sending bad option...",
-                   echo_len);
+                   (int)echo_len);
             coap_send_empty_response(
               message->type == COAP_TYPE_CON ? COAP_TYPE_ACK : COAP_TYPE_NON,
               message->mid, message->token, message->token_len, BAD_OPTION_4_02,
@@ -445,7 +445,7 @@ coap_receive(oc_message_t *msg)
           // okay
           oc_clock_time_t received_timestamp = (*(oc_clock_time_t *)echo_value);
 
-          OC_DBG("Echo timestamp difference %d, threshold %d",
+          OC_DBG("Echo timestamp difference %lld, threshold %d",
                  current_time - received_timestamp, OC_ECHO_FRESHNESS_TIME);
           if (current_time - received_timestamp > OC_ECHO_FRESHNESS_TIME) {
             OC_ERR("Stale timestamp! Current time %lld, received time %lld",

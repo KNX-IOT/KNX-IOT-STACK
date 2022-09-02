@@ -377,7 +377,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
 
   if (matches > 0 && response_length > 0) {
     PRINT("  oc_wkcore_discovery_handler response_length %d'\n",
-          response_length);
+          (int)response_length);
     request->response->response_buffer->response_length = response_length;
     request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
   } else if (request->origin && (request->origin->flags & MULTICAST) == 0) {

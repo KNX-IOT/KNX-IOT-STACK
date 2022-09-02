@@ -49,7 +49,7 @@ allocate_message(struct oc_memb *pool)
 {
   oc_network_event_handler_mutex_lock();
   oc_message_t *message = (oc_message_t *)oc_memb_alloc(pool);
-  OC_DBG(" message allocated %p", *message);
+  OC_DBG(" message allocated %p", message);
   oc_network_event_handler_mutex_unlock();
   if (message) {
 #if defined(OC_DYNAMIC_ALLOCATION) && !defined(OC_INOUT_BUFFER_SIZE)

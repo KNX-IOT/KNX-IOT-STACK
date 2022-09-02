@@ -857,7 +857,7 @@ coap_oscore_parse_options(void *packet, uint8_t *data, uint32_t data_len,
       }
       memcpy(coap_pkt->echo, current_option, option_length);
       coap_pkt->echo_len = option_length;
-      OC_DBG("  Echo [%lu]", (unsigned long)coap_pkt->echo);
+      // OC_DBG("  Echo [%lu]", (unsigned long)coap_pkt->echo);
       break;
     case OCF_OPTION_CONTENT_FORMAT_VER:
     case OCF_OPTION_ACCEPT_CONTENT_FORMAT_VER: {
