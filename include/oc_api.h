@@ -165,7 +165,8 @@ typedef struct
    * static void register_resources(void)
    * {
    *   oc_resource_t *bswitch = oc_new_resource(NULL, "/switch", 1, 0);
-   *   oc_resource_bind_resource_type(bswitch, "dpa.321.51");
+   *   oc_resource_bind_resource_type(bswitch, "urn:knx:dpa.417.61");
+   *   oc_resource_bind_dpt(bswitch, "urn:knx:dpt.switch");
    *   oc_resource_bind_resource_interface(bswitch, OC_IF_A);
    *   oc_resource_set_discoverable(bswitch, true);
    *   oc_resource_set_request_handler(bswitch, OC_GET, get_switch, NULL);
@@ -179,6 +180,7 @@ typedef struct
    * @see oc_new_resource
    * @see oc_resource_bind_resource_interface
    * @see oc_resource_bind_resource_type
+   * @see oc_resource_bind_dpt
    * @see oc_resource_make_public
    * @see oc_resource_set_discoverable
    * @see oc_resource_set_observable
@@ -547,8 +549,6 @@ int oc_init_platform(const char *mfg_name,
  * `num_resource_types` the actual Resource Types are added later using the
  * oc_resource_bind_resource_type() function.
  *
- * The resource is populated with a default interface OC_IF_BASELINE.
- *
  * Many properties associated with a resource are set or modified after the
  * new resource has been created.
  *
@@ -559,7 +559,8 @@ int oc_init_platform(const char *mfg_name,
  * static void register_resources(void)
  * {
  *   oc_resource_t *bswitch = oc_new_resource("light switch", "/switch", 1, 0);
- *   oc_resource_bind_resource_type(bswitch, "dpt.0.5");
+ *   oc_resource_bind_resource_type(bswitch, "urn:knx:dpa.417.61");
+ *   oc_resource_bind_dpt(bswitch, "urn:knx:dpt.switch");
  *   oc_resource_bind_resource_interface(bswitch, OC_IF_A);
  *   oc_resource_set_observable(bswitch, true);
  *   oc_resource_set_discoverable(bswitch, true);
@@ -578,6 +579,7 @@ int oc_init_platform(const char *mfg_name,
  *
  * @see oc_resource_bind_resource_interface
  * @see oc_resource_bind_resource_type
+ * @see oc_resource_bind_dpt
  * @see oc_process_baseline_interface
  * @see oc_resource_set_discoverable
  * @see oc_resource_set_periodic_observable
