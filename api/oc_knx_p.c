@@ -34,9 +34,10 @@ oc_add_data_points_to_response(oc_request_t *request, size_t device_index,
   oc_resource_t *resource = oc_ri_get_app_resources();
   for (; resource; resource = resource->next) {
     if (resource->device != device_index ||
-        !(resource->properties & OC_DISCOVERABLE)) {
+        (resource->properties & OC_DISCOVERABLE)) {
       continue;
     }
+    // add the none discoverable resource that belongs to this device
     oc_add_resource_to_wk(resource, request, device_index, response_length,
                           matches);
     matches++;
