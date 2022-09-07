@@ -1117,35 +1117,34 @@ oc_send_discovery_request(oc_message_t *message)
     if ((message->endpoint.flags & IPV6) && iface->ifa_addr &&
         iface->ifa_addr->sa_family == AF_INET6) {
       struct sockaddr_in6 *addr = (struct sockaddr_in6 *)iface->ifa_addr;
-      if (IN6_IS_ADDR_LINKLOCAL(&addr->sin6_addr)) {
-        unsigned int mif = if_nametoindex(iface->ifa_name);
-        if (setsockopt(dev->server_sock, IPPROTO_IPV6, IPV6_MULTICAST_IF, &mif,
-                       sizeof(mif)) == -1) {
-          OC_ERR("setting socket option for default IPV6_MULTICAST_IF: %d",
-                 errno);
-          goto done;
-        }
-        message->endpoint.interface_index = mif;
-        if (IN6_IS_ADDR_MC_LINKLOCAL(message->endpoint.addr.ipv6.address)) {
-          message->endpoint.addr.ipv6.scope = mif;
-          unsigned int hops = 1;
-          setsockopt(dev->server_sock, IPPROTO_IPV6, IPV6_MULTICAST_HOPS, &hops,
-                     sizeof(hops));
-        } else if (IN6_IS_ADDR_MC_REALM_LOCAL(
-                     message->endpoint.addr.ipv6.address)) {
-          unsigned int hops = 255;
-          setsockopt(dev->server_sock, IPPROTO_IPV6, IPV6_MULTICAST_HOPS, &hops,
-                     sizeof(hops));
-          message->endpoint.addr.ipv6.scope = 0;
-        } else if (IN6_IS_ADDR_MC_SITELOCAL(
-                     message->endpoint.addr.ipv6.address)) {
-          unsigned int hops = 255;
-          setsockopt(dev->server_sock, IPPROTO_IPV6, IPV6_MULTICAST_HOPS, &hops,
-                     sizeof(hops));
-          message->endpoint.addr.ipv6.scope = 0;
-        }
-        oc_send_buffer(message);
+      memcpy(&message->endpoint.addr_local.ipv6.address, &addr->sin6_addr, 16);
+      unsigned int mif = if_nametoindex(iface->ifa_name);
+      if (setsockopt(dev->server_sock, IPPROTO_IPV6, IPV6_MULTICAST_IF, &mif,
+                      sizeof(mif)) == -1) {
+        OC_ERR("setting socket option for default IPV6_MULTICAST_IF: %d",
+                errno);
+        goto done;
       }
+      message->endpoint.interface_index = mif;
+      if (IN6_IS_ADDR_MC_LINKLOCAL(message->endpoint.addr.ipv6.address)) {
+        message->endpoint.addr.ipv6.scope = mif;
+        unsigned int hops = 1;
+        setsockopt(dev->server_sock, IPPROTO_IPV6, IPV6_MULTICAST_HOPS, &hops,
+                    sizeof(hops));
+      } else if (IN6_IS_ADDR_MC_REALM_LOCAL(
+                    message->endpoint.addr.ipv6.address)) {
+        unsigned int hops = 255;
+        setsockopt(dev->server_sock, IPPROTO_IPV6, IPV6_MULTICAST_HOPS, &hops,
+                    sizeof(hops));
+        message->endpoint.addr.ipv6.scope = 0;
+      } else if (IN6_IS_ADDR_MC_SITELOCAL(
+                    message->endpoint.addr.ipv6.address)) {
+        unsigned int hops = 255;
+        setsockopt(dev->server_sock, IPPROTO_IPV6, IPV6_MULTICAST_HOPS, &hops,
+                    sizeof(hops));
+        message->endpoint.addr.ipv6.scope = 0;
+      }
+      oc_send_buffer(message);
 #ifdef OC_IPV4
     } else if (message->endpoint.flags & IPV4 && iface->ifa_addr &&
                iface->ifa_addr->sa_family == AF_INET) {
