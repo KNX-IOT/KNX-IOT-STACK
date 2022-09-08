@@ -1181,6 +1181,7 @@ oc_send_discovery_request(oc_message_t *message)
   for (ifaddr = ifaddr_list; ifaddr != NULL; ifaddr = ifaddr->next) {
     if (message->endpoint.flags & IPV6 && ifaddr->addr.ss_family == AF_INET6) {
       struct sockaddr_in6 *addr = (struct sockaddr_in6 *)&ifaddr->addr;
+      memcpy(&message->endpoint.addr_local.ipv6.address, &addr->sin6_addr, 16);
       DWORD mif = (DWORD)ifaddr->if_index;
       if (setsockopt(dev->server_sock, IPPROTO_IPV6, IPV6_MULTICAST_IF,
                      (char *)&mif, sizeof(mif)) == SOCKET_ERROR) {
@@ -1192,8 +1193,6 @@ oc_send_discovery_request(oc_message_t *message)
         message->endpoint.addr.ipv6.scope = (uint8_t)ifaddr->if_index;
       }
       message->endpoint.interface_index = ifaddr->if_index;
-      memcpy(message->endpoint.addr_local.ipv6.address, addr->sin6_addr.u.Byte,
-             16);
       oc_send_buffer(message);
 #ifdef OC_IPV4
     } else if (message->endpoint.flags & IPV4 &&
