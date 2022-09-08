@@ -26,8 +26,6 @@
 #define GPT_STORE "GPUBT_STORE"
 #define GRT_STORE "GRECT_STORE"
 
-
-
 #ifndef GOT_MAX_ENTRIES
 #define GOT_MAX_ENTRIES 20
 #endif
