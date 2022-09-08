@@ -26,49 +26,7 @@
 #define GPT_STORE "GPUBT_STORE"
 #define GRT_STORE "GRECT_STORE"
 
-/**
- * @brief Group Address Mapping Table Resource
- *      data for mapping between KNX-IOT and KNX-classic
- *
- * array of objects (as json)
- * [
- *  {
- *    "ga": 2305,
- *    "dpt": "1"
- *  },
- *  {
- *    "ga": 2306,
- *    "dpt": "5.1",
- *    "s": {
- *       "ga": 1306,
- *       "groupkey": "<key2>",
- *       "secSettings": {
- *        "a": true,
- *        "c": true
- *       }
- *    }
- *  }
- * ]
- */
-typedef struct oc_group_address_mapping_table_t
-{
-  int ga;          ///< KNX IoT group address, "ga" - 7
-  oc_string_t dpt; ///< Datapoint type, "dpt" 116
 
-  int s_ga;                ///< KNX Classic group address  "ga" - 7
-  oc_string_t s_group_key; ///< KNX secure shared group key "groupKey" - 107
-  bool
-    s_secSettings_a; ///< "a" - 97 The field determine if authentication shall
-                     ///< be applied for KNX Classic secure group communication.
-  bool
-    s_secSettings_b; ///< "c" - 99 The field determine if authentication shall
-                     ///< be applied for KNX Classic secure group communication.
-} oc_group_address_mapping_table_t;
-
-#ifndef GAMT_MAX_ENTRIES
-#define GAMT_MAX_ENTRIES 20
-#endif
-static oc_group_address_mapping_table_t g_groups[GAMT_MAX_ENTRIES];
 
 #ifndef GOT_MAX_ENTRIES
 #define GOT_MAX_ENTRIES 20
@@ -668,7 +626,7 @@ int
 oc_core_find_publisher_table_index(int group_address)
 {
   int i, j;
-  for (i = 0; i < GAMT_MAX_ENTRIES; i++) {
+  for (i = 0; i < GPT_MAX_ENTRIES; i++) {
 
     if (g_gpt[i].ga_len != 0) {
       for (j = 0; j < g_gpt[i].ga_len; j++) {
