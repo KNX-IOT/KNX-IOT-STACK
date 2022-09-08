@@ -19,8 +19,8 @@
 
   The properties are implemented as non discoverable resources.
   The same API for data points can be used to create properties.
-  The only difference is that the discoverable field is set on "not discoverable"
-  All these none discoverable resources are listed under /p
+  The only difference is that the discoverable field is set on "not
+  discoverable" All these none discoverable resources are listed under /p
 */
 #ifndef OC_KNX_P_INTERNAL_H
 #define OC_KNX_P_INTERNAL_H
@@ -34,7 +34,7 @@ extern "C" {
 /**
  *@brief Creation of the KNX /p resource.
  * - /p
- * 
+ *
  *@param device index of the device to which the resource is to be created
  */
 void oc_create_knx_p_resources(size_t device);
