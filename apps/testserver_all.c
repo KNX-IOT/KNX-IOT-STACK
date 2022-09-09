@@ -287,7 +287,7 @@ get_dpa_352_51(oc_request_t *request, oc_interface_mask_t interfaces,
     }
     oc_send_cbor_response(request, OC_STATUS_OK);
     return;
-  } 
+  }
 
   CborError error;
   // error = cbor_encode_boolean(&g_encoder, g_352_51_state);
@@ -389,7 +389,7 @@ get_dpa_352_51_1(oc_request_t *request, oc_interface_mask_t interfaces,
     }
     oc_send_cbor_response(request, OC_STATUS_OK);
     return;
-  } 
+  }
 
   CborError error;
   error = cbor_encode_boolean(&g_encoder, g_352_51_1_state);
@@ -491,7 +491,7 @@ get_dpa_352_52(oc_request_t *request, oc_interface_mask_t interfaces,
     }
     oc_send_cbor_response(request, OC_STATUS_OK);
     return;
-  } 
+  }
 
   CborError error;
   // error = cbor_encode_boolean(&g_encoder, g_352_52_state);
@@ -593,7 +593,7 @@ get_dpa_353_52(oc_request_t *request, oc_interface_mask_t interfaces,
     }
     oc_send_cbor_response(request, OC_STATUS_OK);
     return;
-  } 
+  }
 
   // error = cbor_encode_boolean(&g_encoder, g_352_52_state);
   oc_rep_begin_root_object();
