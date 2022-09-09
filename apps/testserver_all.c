@@ -234,9 +234,60 @@ get_dpa_352_51(oc_request_t *request, oc_interface_mask_t interfaces,
     return;
   }
   // handle the query parameter m
-  if (oc_handle_query_m_dpt(request, "urn:knx:NOT_VALID") == true) {
+  // check the query parameter m with the various values
+  char *m;
+  char *m_key;
+  size_t m_key_len;
+  size_t m_len = (int)oc_get_query_value(request, "m", &m);
+  if (m_len != -1) {
+    PRINT("  Query param: %.*s", (int)m_len, m);
+    oc_init_query_iterator();
+    size_t device_index = request->resource->device;
+    oc_device_info_t *device = oc_core_get_device_info(device_index);
+    if (device != NULL) {
+      oc_rep_begin_root_object();
+      while (oc_iterate_query(request, &m_key, &m_key_len, &m, &m_len) != -1) {
+        // unique identifier
+        if ((strncmp(m, "id", m_len) == 0) | (strncmp(m, "*", m_len) == 0)) {
+          char mystring[100];
+          snprintf(mystring, 99, "urn:knx:sn:%s%s",
+                   oc_string(device->serialnumber),
+                   oc_string(request->resource->uri));
+          oc_rep_i_set_text_string(root, 9, mystring);
+        }
+        // resource types
+        if ((strncmp(m, "rt", m_len) == 0) | (strncmp(m, "*", m_len) == 0)) {
+          oc_rep_set_text_string(root, rt, "urn:knx:dpa.417.61");
+        }
+        // interfaces
+        if ((strncmp(m, "if", m_len) == 0) | (strncmp(m, "*", m_len) == 0)) {
+          oc_rep_set_text_string(root, if, "if.a");
+        }
+        if ((strncmp(m, "dpt", m_len) == 0) | (strncmp(m, "*", m_len) == 0)) {
+          oc_rep_set_text_string(root, dpt, oc_string(request->resource->dpt));
+        }
+        // ga
+        if ((strncmp(m, "ga", m_len) == 0) | (strncmp(m, "*", m_len) == 0)) {
+          int index = oc_core_find_group_object_table_url(
+            oc_string(request->resource->uri));
+          if (index > -1) {
+            oc_group_object_table_t *got_table_entry =
+              oc_core_get_group_object_table_entry(index);
+            if (got_table_entry) {
+              oc_rep_set_int_array(root, ga, got_table_entry->ga,
+                                   got_table_entry->ga_len);
+            }
+          }
+        }
+      } /* query iterator */
+      oc_rep_end_root_object();
+    } else {
+      /* device is NULL */
+      oc_send_cbor_response(request, OC_STATUS_BAD_OPTION);
+    }
+    oc_send_cbor_response(request, OC_STATUS_OK);
     return;
-  }
+  } 
 
   CborError error;
   // error = cbor_encode_boolean(&g_encoder, g_352_51_state);
@@ -285,10 +336,60 @@ get_dpa_352_51_1(oc_request_t *request, oc_interface_mask_t interfaces,
     oc_send_response(request, OC_STATUS_BAD_OPTION);
     return;
   }
-  // handle the query parameter m
-  if (oc_handle_query_m_dpt(request, "urn:knx:NOT_VALID") == true) {
+  // check the query parameter m with the various values
+  char *m;
+  char *m_key;
+  size_t m_key_len;
+  size_t m_len = (int)oc_get_query_value(request, "m", &m);
+  if (m_len != -1) {
+    PRINT("  Query param: %.*s", (int)m_len, m);
+    oc_init_query_iterator();
+    size_t device_index = request->resource->device;
+    oc_device_info_t *device = oc_core_get_device_info(device_index);
+    if (device != NULL) {
+      oc_rep_begin_root_object();
+      while (oc_iterate_query(request, &m_key, &m_key_len, &m, &m_len) != -1) {
+        // unique identifier
+        if ((strncmp(m, "id", m_len) == 0) | (strncmp(m, "*", m_len) == 0)) {
+          char mystring[100];
+          snprintf(mystring, 99, "urn:knx:sn:%s%s",
+                   oc_string(device->serialnumber),
+                   oc_string(request->resource->uri));
+          oc_rep_i_set_text_string(root, 9, mystring);
+        }
+        // resource types
+        if ((strncmp(m, "rt", m_len) == 0) | (strncmp(m, "*", m_len) == 0)) {
+          oc_rep_set_text_string(root, rt, "urn:knx:dpa.417.61");
+        }
+        // interfaces
+        if ((strncmp(m, "if", m_len) == 0) | (strncmp(m, "*", m_len) == 0)) {
+          oc_rep_set_text_string(root, if, "if.a");
+        }
+        if ((strncmp(m, "dpt", m_len) == 0) | (strncmp(m, "*", m_len) == 0)) {
+          oc_rep_set_text_string(root, dpt, oc_string(request->resource->dpt));
+        }
+        // ga
+        if ((strncmp(m, "ga", m_len) == 0) | (strncmp(m, "*", m_len) == 0)) {
+          int index = oc_core_find_group_object_table_url(
+            oc_string(request->resource->uri));
+          if (index > -1) {
+            oc_group_object_table_t *got_table_entry =
+              oc_core_get_group_object_table_entry(index);
+            if (got_table_entry) {
+              oc_rep_set_int_array(root, ga, got_table_entry->ga,
+                                   got_table_entry->ga_len);
+            }
+          }
+        }
+      } /* query iterator */
+      oc_rep_end_root_object();
+    } else {
+      /* device is NULL */
+      oc_send_cbor_response(request, OC_STATUS_BAD_OPTION);
+    }
+    oc_send_cbor_response(request, OC_STATUS_OK);
     return;
-  }
+  } 
 
   CborError error;
   error = cbor_encode_boolean(&g_encoder, g_352_51_1_state);
@@ -337,10 +438,60 @@ get_dpa_352_52(oc_request_t *request, oc_interface_mask_t interfaces,
     oc_send_response(request, OC_STATUS_BAD_OPTION);
     return;
   }
-  // handle the query parameter m
-  if (oc_handle_query_m_dpt(request, "urn:knx:NOT_VALID") == true) {
+  // check the query parameter m with the various values
+  char *m;
+  char *m_key;
+  size_t m_key_len;
+  size_t m_len = (int)oc_get_query_value(request, "m", &m);
+  if (m_len != -1) {
+    PRINT("  Query param: %.*s", (int)m_len, m);
+    oc_init_query_iterator();
+    size_t device_index = request->resource->device;
+    oc_device_info_t *device = oc_core_get_device_info(device_index);
+    if (device != NULL) {
+      oc_rep_begin_root_object();
+      while (oc_iterate_query(request, &m_key, &m_key_len, &m, &m_len) != -1) {
+        // unique identifier
+        if ((strncmp(m, "id", m_len) == 0) | (strncmp(m, "*", m_len) == 0)) {
+          char mystring[100];
+          snprintf(mystring, 99, "urn:knx:sn:%s%s",
+                   oc_string(device->serialnumber),
+                   oc_string(request->resource->uri));
+          oc_rep_i_set_text_string(root, 9, mystring);
+        }
+        // resource types
+        if ((strncmp(m, "rt", m_len) == 0) | (strncmp(m, "*", m_len) == 0)) {
+          oc_rep_set_text_string(root, rt, "urn:knx:dpa.417.61");
+        }
+        // interfaces
+        if ((strncmp(m, "if", m_len) == 0) | (strncmp(m, "*", m_len) == 0)) {
+          oc_rep_set_text_string(root, if, "if.a");
+        }
+        if ((strncmp(m, "dpt", m_len) == 0) | (strncmp(m, "*", m_len) == 0)) {
+          oc_rep_set_text_string(root, dpt, oc_string(request->resource->dpt));
+        }
+        // ga
+        if ((strncmp(m, "ga", m_len) == 0) | (strncmp(m, "*", m_len) == 0)) {
+          int index = oc_core_find_group_object_table_url(
+            oc_string(request->resource->uri));
+          if (index > -1) {
+            oc_group_object_table_t *got_table_entry =
+              oc_core_get_group_object_table_entry(index);
+            if (got_table_entry) {
+              oc_rep_set_int_array(root, ga, got_table_entry->ga,
+                                   got_table_entry->ga_len);
+            }
+          }
+        }
+      } /* query iterator */
+      oc_rep_end_root_object();
+    } else {
+      /* device is NULL */
+      oc_send_cbor_response(request, OC_STATUS_BAD_OPTION);
+    }
+    oc_send_cbor_response(request, OC_STATUS_OK);
     return;
-  }
+  } 
 
   CborError error;
   // error = cbor_encode_boolean(&g_encoder, g_352_52_state);
@@ -389,10 +540,60 @@ get_dpa_353_52(oc_request_t *request, oc_interface_mask_t interfaces,
     oc_send_response(request, OC_STATUS_BAD_OPTION);
     return;
   }
-  // handle the query parameter m
-  if (oc_handle_query_m_dpt(request, "urn:knx:NOT_VALID") == true) {
+  // check the query parameter m with the various values
+  char *m;
+  char *m_key;
+  size_t m_key_len;
+  size_t m_len = (int)oc_get_query_value(request, "m", &m);
+  if (m_len != -1) {
+    PRINT("  Query param: %.*s", (int)m_len, m);
+    oc_init_query_iterator();
+    size_t device_index = request->resource->device;
+    oc_device_info_t *device = oc_core_get_device_info(device_index);
+    if (device != NULL) {
+      oc_rep_begin_root_object();
+      while (oc_iterate_query(request, &m_key, &m_key_len, &m, &m_len) != -1) {
+        // unique identifier
+        if ((strncmp(m, "id", m_len) == 0) | (strncmp(m, "*", m_len) == 0)) {
+          char mystring[100];
+          snprintf(mystring, 99, "urn:knx:sn:%s%s",
+                   oc_string(device->serialnumber),
+                   oc_string(request->resource->uri));
+          oc_rep_i_set_text_string(root, 9, mystring);
+        }
+        // resource types
+        if ((strncmp(m, "rt", m_len) == 0) | (strncmp(m, "*", m_len) == 0)) {
+          oc_rep_set_text_string(root, rt, "urn:knx:dpa.417.61");
+        }
+        // interfaces
+        if ((strncmp(m, "if", m_len) == 0) | (strncmp(m, "*", m_len) == 0)) {
+          oc_rep_set_text_string(root, if, "if.a");
+        }
+        if ((strncmp(m, "dpt", m_len) == 0) | (strncmp(m, "*", m_len) == 0)) {
+          oc_rep_set_text_string(root, dpt, oc_string(request->resource->dpt));
+        }
+        // ga
+        if ((strncmp(m, "ga", m_len) == 0) | (strncmp(m, "*", m_len) == 0)) {
+          int index = oc_core_find_group_object_table_url(
+            oc_string(request->resource->uri));
+          if (index > -1) {
+            oc_group_object_table_t *got_table_entry =
+              oc_core_get_group_object_table_entry(index);
+            if (got_table_entry) {
+              oc_rep_set_int_array(root, ga, got_table_entry->ga,
+                                   got_table_entry->ga_len);
+            }
+          }
+        }
+      } /* query iterator */
+      oc_rep_end_root_object();
+    } else {
+      /* device is NULL */
+      oc_send_cbor_response(request, OC_STATUS_BAD_OPTION);
+    }
+    oc_send_cbor_response(request, OC_STATUS_OK);
     return;
-  }
+  } 
 
   // error = cbor_encode_boolean(&g_encoder, g_352_52_state);
   oc_rep_begin_root_object();
