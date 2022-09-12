@@ -1194,25 +1194,25 @@ oc_send_discovery_request(oc_message_t *message)
       if (IN6_IS_ADDR_LINKLOCAL(&addr->sin6_addr)) {
         unsigned int hops = 1;
         if (setsockopt(dev->server_sock, IPPROTO_IPV6, IPV6_MULTICAST_HOPS,
-                      &hops, sizeof(hops)) == SOCKET_ERROR) {
+                       &hops, sizeof(hops)) == SOCKET_ERROR) {
           OC_ERR("setting socket option for default IPV6_MULTICAST_IF: %d",
-                WSAGetLastError());
+                 WSAGetLastError());
           goto done;
         }
         message->endpoint.addr.ipv6.scope = (uint8_t)ifaddr->if_index;
-      }
-      else {
+      } else {
         unsigned int hops = 255;
         if (setsockopt(dev->server_sock, IPPROTO_IPV6, IPV6_MULTICAST_HOPS,
-                      &hops, sizeof(hops)) == SOCKET_ERROR) {
+                       &hops, sizeof(hops)) == SOCKET_ERROR) {
           OC_ERR("setting socket option for default IPV6_MULTICAST_IF: %d",
-                WSAGetLastError());
+                 WSAGetLastError());
           goto done;
         }
         message->endpoint.addr.ipv6.scope = 0;
       }
       message->endpoint.interface_index = ifaddr->if_index;
-      memcpy(message->endpoint.addr_local.ipv6.address, addr->sin6_addr.u.Byte, 16);
+      memcpy(message->endpoint.addr_local.ipv6.address, addr->sin6_addr.u.Byte,
+             16);
       oc_send_buffer(message);
 #ifdef OC_IPV4
     } else if (message->endpoint.flags & IPV4 &&
