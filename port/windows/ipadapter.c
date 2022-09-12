@@ -1165,6 +1165,7 @@ oc_send_buffer(oc_message_t *message)
   return send_msg(send_sock, &receiver, message);
 }
 
+#ifdef OC_CLIENT
 void
 oc_send_discovery_request(oc_message_t *message)
 {
@@ -1237,6 +1238,7 @@ oc_send_discovery_request(oc_message_t *message)
 done:
   free_network_addresses(ifaddr_list);
 }
+#endif /* OC_CLIENT */
 
 #ifdef OC_IPV4
 static int
