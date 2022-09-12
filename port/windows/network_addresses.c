@@ -118,63 +118,19 @@ get_network_addresses()
       if (address->Address.lpSockaddr->sa_family == AF_INET6) {
         struct sockaddr_in6 *addr =
           (struct sockaddr_in6 *)address->Address.lpSockaddr;
-        /* If the first address we see is link-local save it. */
-        if (!v6addr && IN6_IS_ADDR_LINKLOCAL(&addr->sin6_addr)) {
-          v6addr = addr;
+        v6addr = addr;
+
+        ifaddr_t *ifaddr = calloc(1, sizeof(ifaddr_t));
+        if (ifaddr == NULL) {
+          OC_ERR("no memory for ifaddr");
+          goto cleanup;
         }
-        /* If we see a non link-local and DNS_ELIGIBLE address, */
-        if (!IN6_IS_ADDR_LINKLOCAL(&addr->sin6_addr) &&
-            (address->Flags & IP_ADAPTER_ADDRESS_DNS_ELIGIBLE)) {
-          /* If this is the first address we're seeing, save it. */
-          if (!v6addr) {
-            v6addr = addr;
-          }
-          uint8_t b = addr->sin6_addr.u.Byte[0];
-          if (!((b & 0xfc) == b) && !((b & 0xfd) == b)) {
-            /* We've gotten a non-private global address
-             * which we could use. So, break.
-             */
-            v6addr = addr;
-            break;
-          } else {
-            /* We've gotten a private IPv6 address in global scope. */
-            /* If the saved address is link-local, substitute that with this. */
-            if (IN6_IS_ADDR_LINKLOCAL(&v6addr->sin6_addr)) {
-              v6addr = addr;
-            }
-            /* Process the remaining addresses on this interface to see if we
-            /* can find the global address assigned by our ISP. */
-            continue;
-          }
-        }
-        /* If we see a non link-local and non DNS_ELIGIBLE address, ignore it.
-         */
-        if (!IN6_IS_ADDR_LINKLOCAL(&addr->sin6_addr) &&
-            !(address->Flags & IP_ADAPTER_ADDRESS_DNS_ELIGIBLE)) {
-#ifdef OC_DEBUG
-          char dotname[NI_MAXHOST] = { 0 };
-          getnameinfo((const SOCKADDR *)addr, sizeof(struct sockaddr_in6),
-                      dotname, sizeof(dotname), NULL, 0, NI_NUMERICHOST);
-          PRINT("%s is not IN6_IS_ADDR_LINKLOCAL and not "
-                "IP_ADAPTER_ADDRESS_DNS_ELIGIBLE, skipped.\n",
-                dotname);
-#endif /* OC_DEBUG */
-          continue;
-        }
+        memcpy(&ifaddr->addr, v6addr, sizeof(struct sockaddr_in6));
+        ifaddr->if_index = interface->Ipv6IfIndex;
+        ifaddr->next = ifaddr_list;
+        ifaddr_list = ifaddr;
       }
     }
-    if (!v6addr) {
-      continue;
-    }
-    ifaddr_t *ifaddr = calloc(1, sizeof(ifaddr_t));
-    if (ifaddr == NULL) {
-      OC_ERR("no memory for ifaddr");
-      goto cleanup;
-    }
-    memcpy(&ifaddr->addr, v6addr, sizeof(struct sockaddr_in6));
-    ifaddr->if_index = interface->Ipv6IfIndex;
-    ifaddr->next = ifaddr_list;
-    ifaddr_list = ifaddr;
   }
 
 cleanup:

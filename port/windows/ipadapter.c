@@ -1165,7 +1165,6 @@ oc_send_buffer(oc_message_t *message)
   return send_msg(send_sock, &receiver, message);
 }
 
-#ifdef OC_CLIENT
 void
 oc_send_discovery_request(oc_message_t *message)
 {
@@ -1178,6 +1177,10 @@ oc_send_discovery_request(oc_message_t *message)
     return;
   }
 
+  memset(&message->endpoint.addr_local, 0,
+         sizeof(message->endpoint.addr_local));
+  message->endpoint.interface_index = 0;
+
   for (ifaddr = ifaddr_list; ifaddr != NULL; ifaddr = ifaddr->next) {
     if (message->endpoint.flags & IPV6 && ifaddr->addr.ss_family == AF_INET6) {
       struct sockaddr_in6 *addr = (struct sockaddr_in6 *)&ifaddr->addr;
@@ -1189,7 +1192,23 @@ oc_send_discovery_request(oc_message_t *message)
         goto done;
       }
       if (IN6_IS_ADDR_LINKLOCAL(&addr->sin6_addr)) {
+        unsigned int hops = 1;
+        if (setsockopt(dev->server_sock, IPPROTO_IPV6, IPV6_MULTICAST_HOPS,
+                       &hops, sizeof(hops)) == SOCKET_ERROR) {
+          OC_ERR("setting socket option for default IPV6_MULTICAST_IF: %d",
+                 WSAGetLastError());
+          goto done;
+        }
         message->endpoint.addr.ipv6.scope = (uint8_t)ifaddr->if_index;
+      } else {
+        unsigned int hops = 255;
+        if (setsockopt(dev->server_sock, IPPROTO_IPV6, IPV6_MULTICAST_HOPS,
+                       &hops, sizeof(hops)) == SOCKET_ERROR) {
+          OC_ERR("setting socket option for default IPV6_MULTICAST_IF: %d",
+                 WSAGetLastError());
+          goto done;
+        }
+        message->endpoint.addr.ipv6.scope = 0;
       }
       message->endpoint.interface_index = ifaddr->if_index;
       memcpy(message->endpoint.addr_local.ipv6.address, addr->sin6_addr.u.Byte,
@@ -1218,7 +1237,6 @@ oc_send_discovery_request(oc_message_t *message)
 done:
   free_network_addresses(ifaddr_list);
 }
-#endif /* OC_CLIENT */
 
 #ifdef OC_IPV4
 static int
