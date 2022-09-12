@@ -1199,6 +1199,7 @@ oc_send_discovery_request(oc_message_t *message)
                 WSAGetLastError());
           goto done;
         }
+        message->endpoint.addr.ipv6.scope = (uint8_t)ifaddr->if_index;
       }
       else {
         unsigned int hops = 255;
@@ -1209,9 +1210,6 @@ oc_send_discovery_request(oc_message_t *message)
           goto done;
         }
         message->endpoint.addr.ipv6.scope = 0;
-      }
-      if (IN6_IS_ADDR_LINKLOCAL(&addr->sin6_addr)) {
-        message->endpoint.addr.ipv6.scope = (uint8_t)ifaddr->if_index;
       }
       message->endpoint.interface_index = ifaddr->if_index;
       memcpy(message->endpoint.addr_local.ipv6.address, addr->sin6_addr.u.Byte, 16);
