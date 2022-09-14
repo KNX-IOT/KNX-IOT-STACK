@@ -504,7 +504,7 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     rep = rep->next;
   } // top level
 
-  PRINT("oc_core_fp_g_post_handler - end\n");
+  PRINT("oc_core_fp_g_post_handler status=%d - end\n", (int)status_ok);
   if (status_ok) {
     oc_knx_increase_fingerprint();
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
