@@ -1207,40 +1207,53 @@ get_seconds_until_unblocked()
 
 #endif /* OC_SPAKE */
 
+static oc_separate_response_t spake_separate_rsp;
+static oc_event_callback_retval_t oc_core_knx_spake_separate_post_handler(void *req_p);
+
 static void
 oc_core_knx_spake_post_handler(oc_request_t *request,
                                oc_interface_mask_t iface_mask, void *data)
 {
-  (void)data;
-  (void)iface_mask;
-  PRINT("oc_core_knx_spake_post_handler\n");
+  oc_indicate_separate_response(request, &spake_separate_rsp);
+  oc_set_delayed_callback(request, &oc_core_knx_spake_separate_post_handler, 0);
+}
+
+static oc_event_callback_retval_t oc_core_knx_spake_separate_post_handler(void *req_p)
+{
+  oc_request_t *request = req_p;
+  PRINT("oc_core_knx_spake_separate_post_handler\n");
+
+  if (!spake_separate_rsp.active)
+  {
+    return OC_EVENT_DONE;
+  }
+  oc_set_separate_response_buffer(&spake_separate_rsp);
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_CBOR) {
-    request->response->response_buffer->code =
-      oc_status_code(OC_STATUS_BAD_REQUEST);
-    return;
+    // TODO CHANGE ALL OC STATUS CODE THIGNOVAJIGS TO 
+    // SEND SEPARATE RESPONSE YOU SICK FUCK
+    oc_send_separate_response(&spake_separate_rsp, OC_STATUS_BAD_REQUEST);
+    return OC_EVENT_DONE;
   }
   if (request->content_format != APPLICATION_CBOR) {
-    request->response->response_buffer->code =
-      oc_status_code(OC_STATUS_BAD_REQUEST);
-    return;
+    oc_send_separate_response(&spake_separate_rsp, OC_STATUS_BAD_REQUEST);
+    return OC_EVENT_DONE;
   }
   // check if the state is unloaded
   size_t device_index = request->resource->device;
   if (oc_knx_lsm_state(device_index) != LSM_S_UNLOADED) {
     PRINT(" not in unloading state\n");
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
-    return;
+    oc_send_separate_response(&spake_separate_rsp, OC_STATUS_BAD_REQUEST);
+    return OC_EVENT_DONE;
   }
 
 #ifdef OC_SPAKE
   if (is_handshake_blocked()) {
-    request->response->response_buffer->code =
-      oc_status_code(OC_STATUS_SERVICE_UNAVAILABLE);
+    oc_send_separate_response(&spake_separate_rsp, OC_STATUS_SERVICE_UNAVAILABLE);
 
     request->response->response_buffer->max_age = get_seconds_until_unblocked();
-    return;
+    return OC_EVENT_DONE;
   }
 #endif /* OC_SPAKE */
 
@@ -1269,7 +1282,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
   }
 
   if (valid_request == 0) {
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    oc_send_separate_response(&spake_separate_rsp, OC_STATUS_BAD_REQUEST);
   }
   rep = request->request_payload;
 
@@ -1337,8 +1350,8 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     oc_rep_i_set_byte_string(pbkdf2, SPAKE_SALT, g_pase.salt, 32);
     oc_rep_end_object(&root_map, pbkdf2);
     oc_rep_end_root_object();
-    oc_send_cbor_response(request, OC_STATUS_CHANGED);
-    return;
+    oc_send_separate_response(&spake_separate_rsp, OC_STATUS_CHANGED);
+    return OC_EVENT_DONE;
   }
 #ifdef OC_SPAKE
   else if (valid_request == SPAKE_PA_SHARE_P) {
@@ -1403,8 +1416,8 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     oc_rep_i_set_byte_string(root, SPAKE_CB_CONFIRM_V, g_pase.cb,
                              sizeof(g_pase.cb));
     oc_rep_end_root_object();
-    oc_send_cbor_response(request, OC_STATUS_CHANGED);
-    return;
+    oc_send_separate_response(&spake_separate_rsp, OC_STATUS_CHANGED);
+    return OC_EVENT_DONE;
   } else if (valid_request == SPAKE_CA_CONFIRM_P) {
     // calculate expected cA
     uint8_t expected_ca[32];
@@ -1434,8 +1447,10 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     request->response->response_buffer->response_length = 0;
     int size_of_message = oc_rep_get_encoded_payload_size();
 
-    // oc_send_cbor_response(request, OC_STATUS_CHANGED);
-    oc_send_linkformat_response(request, OC_STATUS_CHANGED, 0);
+    // TODO - ensure sending separate response here is ok, and there
+    // is no bug because of the length
+    //oc_send_linkformat_response(request, OC_STATUS_CHANGED, 0);
+    oc_send_separate_response(&spake_separate_rsp, OC_STATUS_CHANGED);
 
     // handshake completed successfully - clear state
     memset(spake_data.Ka_Ke, 0, sizeof(spake_data.Ka_Ke));
@@ -1456,7 +1471,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     memset(g_pase.rnd, 0, sizeof(g_pase.rnd));
     memset(g_pase.salt, 0, sizeof(g_pase.salt));
     g_pase.it = 100000;
-    return;
+    return OC_EVENT_DONE;
   }
 error:
   // be paranoid: wipe all global data after an error
@@ -1483,7 +1498,8 @@ error:
 #ifdef OC_SPAKE
   increment_counter();
 #endif /* OC_SPAKE */
-  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+  oc_send_separate_response(&spake_separate_rsp, OC_STATUS_BAD_REQUEST);
+  return OC_EVENT_DONE;
 }
 
 void
