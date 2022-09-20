@@ -478,7 +478,7 @@ oc_send_separate_response(oc_separate_response_t *handle,
     response_buffer.response_length = response_length();
 
   response_buffer.code = oc_status_code(response_code);
-  response_buffer.content_format = APPLICATION_VND_OCF_CBOR;
+  response_buffer.content_format = APPLICATION_CBOR;
 
   coap_separate_t *cur = oc_list_head(handle->requests), *next = NULL;
   coap_packet_t response[1];
