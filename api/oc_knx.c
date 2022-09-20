@@ -1231,8 +1231,6 @@ static oc_event_callback_retval_t oc_core_knx_spake_separate_post_handler(void *
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_CBOR) {
-    // TODO CHANGE ALL OC STATUS CODE THIGNOVAJIGS TO 
-    // SEND SEPARATE RESPONSE YOU SICK FUCK
     oc_send_separate_response(&spake_separate_rsp, OC_STATUS_BAD_REQUEST);
     return OC_EVENT_DONE;
   }
@@ -1323,6 +1321,7 @@ static oc_event_callback_retval_t oc_core_knx_spake_separate_post_handler(void *
   }
 
   PRINT("oc_core_knx_spake_post_handler valid_request: %d\n", valid_request);
+  // TODO consider moving spake separate response handling code here
 
   if (valid_request == SPAKE_RND) {
 #ifdef OC_SPAKE
