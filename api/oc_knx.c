@@ -1290,6 +1290,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
       if (rep->iname == SPAKE_CA_CONFIRM_P) {
         memcpy(g_pase.ca, oc_cast(rep->value.string, uint8_t),
                sizeof(g_pase.ca));
+        request->response->response_buffer->response_length = 0;
       }
       if (rep->iname == SPAKE_PA_SHARE_P) {
         memcpy(g_pase.pa, oc_cast(rep->value.string, uint8_t),
@@ -1315,11 +1316,13 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
 
   PRINT("oc_core_knx_spake_post_handler valid_request: %d\n", valid_request);
   oc_indicate_separate_response(request, &spake_separate_rsp);
+  // TODO missing pointer cast warning here
   oc_set_delayed_callback(valid_request, &oc_core_knx_spake_separate_post_handler, 0);
 }
 
 static oc_event_callback_retval_t oc_core_knx_spake_separate_post_handler(void *req_p)
 {
+  // TODO cast of pointer of different size
   int valid_request = (int) req_p;
   PRINT("oc_core_knx_spake_separate_post_handler\n");
 
@@ -1452,12 +1455,6 @@ static oc_event_callback_retval_t oc_core_knx_spake_separate_post_handler(void *
     oc_oscore_set_auth(oc_string(device->serialnumber), oc_string(g_pase.id),
                        shared_key, (int)shared_key_len);
 
-    //request->response->response_buffer->response_length = 0;
-    int size_of_message = oc_rep_get_encoded_payload_size();
-
-    // TODO - ensure sending separate response here is ok, and there
-    // is no bug because of the length
-    //oc_send_linkformat_response(request, OC_STATUS_CHANGED, 0);
     oc_send_separate_response(&spake_separate_rsp, OC_STATUS_CHANGED);
 
     // handshake completed successfully - clear state

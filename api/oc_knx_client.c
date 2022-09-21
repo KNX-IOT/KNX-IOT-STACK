@@ -264,6 +264,7 @@ oc_initiate_spake(oc_endpoint_t *endpoint, char *password, char *oscore_id)
   oc_init_post("/.well-known/knx/spake", endpoint, NULL,
                &do_credential_exchange, HIGH_QOS, NULL);
 
+  // TODO fill with actual random data
   uint8_t
     rnd[32]; // not actually used by the server, so just send some gibberish
   oc_rep_begin_root_object();
