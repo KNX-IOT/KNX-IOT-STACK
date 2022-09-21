@@ -1457,7 +1457,7 @@ static oc_event_callback_retval_t oc_core_knx_spake_separate_post_handler(void *
     // empty payload
     oc_rep_begin_root_object();
     oc_rep_end_root_object();
-    oc_rep_encode_raw(NULL, 0);
+    //oc_rep_encode_raw(NULL, 0);
     oc_send_separate_response(&spake_separate_rsp, OC_STATUS_CHANGED);
 
     // handshake completed successfully - clear state
