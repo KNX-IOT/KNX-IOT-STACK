@@ -1454,7 +1454,8 @@ static oc_event_callback_retval_t oc_core_knx_spake_separate_post_handler(void *
     oc_oscore_set_auth(oc_string(device->serialnumber), oc_string(g_pase.id),
                        shared_key, (int)shared_key_len);
 
-    spake_separate_rsp.response_state->payload_size = 0;
+    // empty payload
+    oc_rep_encode_raw(NULL, 0);
     oc_send_separate_response(&spake_separate_rsp, OC_STATUS_CHANGED);
 
     // handshake completed successfully - clear state
