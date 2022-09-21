@@ -1214,44 +1214,36 @@ static void
 oc_core_knx_spake_post_handler(oc_request_t *request,
                                oc_interface_mask_t iface_mask, void *data)
 {
-  oc_indicate_separate_response(request, &spake_separate_rsp);
-  oc_set_delayed_callback(request, &oc_core_knx_spake_separate_post_handler, 0);
-}
-
-static oc_event_callback_retval_t oc_core_knx_spake_separate_post_handler(void *req_p)
-{
-  oc_request_t *request = req_p;
-  PRINT("oc_core_knx_spake_separate_post_handler\n");
-
-  if (!spake_separate_rsp.active)
-  {
-    return OC_EVENT_DONE;
-  }
-  oc_set_separate_response_buffer(&spake_separate_rsp);
+  (void)data;
+  (void)iface_mask;
+  PRINT("oc_core_knx_spake_post_handler\n");
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_CBOR) {
-    oc_send_separate_response(&spake_separate_rsp, OC_STATUS_BAD_REQUEST);
-    return OC_EVENT_DONE;
+    request->response->response_buffer->code =
+      oc_status_code(OC_STATUS_BAD_REQUEST);
+    return;
   }
   if (request->content_format != APPLICATION_CBOR) {
-    oc_send_separate_response(&spake_separate_rsp, OC_STATUS_BAD_REQUEST);
-    return OC_EVENT_DONE;
+    request->response->response_buffer->code =
+      oc_status_code(OC_STATUS_BAD_REQUEST);
+    return;
   }
   // check if the state is unloaded
   size_t device_index = request->resource->device;
   if (oc_knx_lsm_state(device_index) != LSM_S_UNLOADED) {
     PRINT(" not in unloading state\n");
-    oc_send_separate_response(&spake_separate_rsp, OC_STATUS_BAD_REQUEST);
-    return OC_EVENT_DONE;
+    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    return;
   }
 
 #ifdef OC_SPAKE
   if (is_handshake_blocked()) {
-    oc_send_separate_response(&spake_separate_rsp, OC_STATUS_SERVICE_UNAVAILABLE);
+    request->response->response_buffer->code =
+      oc_status_code(OC_STATUS_SERVICE_UNAVAILABLE);
 
     request->response->response_buffer->max_age = get_seconds_until_unblocked();
-    return OC_EVENT_DONE;
+    return;
   }
 #endif /* OC_SPAKE */
 
@@ -1280,7 +1272,7 @@ static oc_event_callback_retval_t oc_core_knx_spake_separate_post_handler(void *
   }
 
   if (valid_request == 0) {
-    oc_send_separate_response(&spake_separate_rsp, OC_STATUS_BAD_REQUEST);
+    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
   }
   rep = request->request_payload;
 
@@ -1320,8 +1312,22 @@ static oc_event_callback_retval_t oc_core_knx_spake_separate_post_handler(void *
     rep = rep->next;
   }
 
+
   PRINT("oc_core_knx_spake_post_handler valid_request: %d\n", valid_request);
-  // TODO consider moving spake separate response handling code here
+  oc_indicate_separate_response(request, &spake_separate_rsp);
+  oc_set_delayed_callback(valid_request, &oc_core_knx_spake_separate_post_handler, 0);
+}
+
+static oc_event_callback_retval_t oc_core_knx_spake_separate_post_handler(void *req_p)
+{
+  int valid_request = (int) req_p;
+  PRINT("oc_core_knx_spake_separate_post_handler\n");
+
+  if (!spake_separate_rsp.active)
+  {
+    return OC_EVENT_DONE;
+  }
+  oc_set_separate_response_buffer(&spake_separate_rsp);
 
   if (valid_request == SPAKE_RND) {
 #ifdef OC_SPAKE
@@ -1438,12 +1444,15 @@ static oc_event_callback_retval_t oc_core_knx_spake_separate_post_handler(void *
     size_t shared_key_len = 16;
 
     // set thet /auth/at entry with the calculated shared key
-    size_t device_index = request->resource->device;
-    oc_device_info_t *device = oc_core_get_device_info(device_index);
+    //size_t device_index = request->resource->device;
+    
+    // knx does not have multiple devices per instance (for now), so hardcode
+    // the use of the first device
+    oc_device_info_t *device = oc_core_get_device_info(0);
     oc_oscore_set_auth(oc_string(device->serialnumber), oc_string(g_pase.id),
                        shared_key, (int)shared_key_len);
 
-    request->response->response_buffer->response_length = 0;
+    //request->response->response_buffer->response_length = 0;
     int size_of_message = oc_rep_get_encoded_payload_size();
 
     // TODO - ensure sending separate response here is ok, and there
