@@ -621,9 +621,11 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
       PRINT("\n");
     }
     if (oc_endpoint_compare_address(origin, my_ep) == 0) {
-      request->response->response_buffer->code = oc_status_code(OC_IGNORE);
-      PRINT(" same address: not handling message");
-      return;
+      if (origin->addr.ipv6.port == my_ep->addr.ipv6.port) {
+        request->response->response_buffer->code = oc_status_code(OC_IGNORE);
+        PRINT(" same address and port: not handling message");
+        return;
+      }
     }
   }
 
