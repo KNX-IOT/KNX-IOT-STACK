@@ -466,17 +466,13 @@ oc_set_separate_response_buffer(oc_separate_response_t *handle)
 #endif /* !OC_BLOCK_WISE */
 }
 
-void
-oc_send_separate_response(oc_separate_response_t *handle,
-                          oc_status_t response_code)
+static void
+oc_send_separate_response_with_length(oc_separate_response_t *handle,
+                          oc_status_t response_code, size_t length)
 {
   oc_response_buffer_t response_buffer;
   response_buffer.buffer = handle->response_state->buffer;
-  if (handle->response_state->payload_size != 0)
-    response_buffer.response_length = handle->response_state->payload_size;
-  else
-    response_buffer.response_length = response_length();
-
+  response_buffer.response_length = length;
   response_buffer.code = oc_status_code(response_code);
   response_buffer.content_format = APPLICATION_CBOR;
 
@@ -566,6 +562,26 @@ oc_send_separate_response(oc_separate_response_t *handle,
   }
   handle->active = 0;
   oc_blockwise_free_response_buffer(handle->response_state);
+}
+
+
+void
+oc_send_separate_response(oc_separate_response_t *handle,
+                          oc_status_t response_code)
+{
+  size_t length;
+  if (handle->response_state->payload_size != 0)
+    length = handle->response_state->payload_size;
+  else
+    length = response_length();
+
+  oc_send_separate_response_with_length(handle, response_code, length);
+}
+
+void oc_send_empty_separate_response(oc_separate_response_t *handle,
+                          oc_status_t response_code)
+{
+  oc_send_separate_response_with_length(handle, response_code, 0);
 }
 
 int
