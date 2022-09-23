@@ -1209,6 +1209,10 @@ get_seconds_until_unblocked()
 
 #endif /* OC_SPAKE */
 
+static oc_separate_response_t spake_separate_rsp;
+static oc_event_callback_retval_t oc_core_knx_spake_separate_post_handler(
+  void *req_p);
+
 static void
 oc_core_knx_spake_post_handler(oc_request_t *request,
                                oc_interface_mask_t iface_mask, void *data)
@@ -1312,6 +1316,23 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
   }
 
   PRINT("oc_core_knx_spake_post_handler valid_request: %d\n", valid_request);
+  oc_indicate_separate_response(request, &spake_separate_rsp);
+  // TODO missing pointer cast warning here
+  oc_set_delayed_callback(valid_request,
+                          &oc_core_knx_spake_separate_post_handler, 0);
+}
+
+static oc_event_callback_retval_t
+oc_core_knx_spake_separate_post_handler(void *req_p)
+{
+  // TODO cast of pointer of different size
+  int valid_request = (int)req_p;
+  PRINT("oc_core_knx_spake_separate_post_handler\n");
+
+  if (!spake_separate_rsp.active) {
+    return OC_EVENT_DONE;
+  }
+  oc_set_separate_response_buffer(&spake_separate_rsp);
 
   if (valid_request == SPAKE_RND) {
 #ifdef OC_SPAKE
@@ -1339,8 +1360,8 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     oc_rep_i_set_byte_string(pbkdf2, SPAKE_SALT, g_pase.salt, 32);
     oc_rep_end_object(&root_map, pbkdf2);
     oc_rep_end_root_object();
-    oc_send_cbor_response(request, OC_STATUS_CHANGED);
-    return;
+    oc_send_separate_response(&spake_separate_rsp, OC_STATUS_CHANGED);
+    return OC_EVENT_DONE;
   }
 #ifdef OC_SPAKE
   else if (valid_request == SPAKE_PA_SHARE_P) {
@@ -1405,8 +1426,8 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     oc_rep_i_set_byte_string(root, SPAKE_CB_CONFIRM_V, g_pase.cb,
                              sizeof(g_pase.cb));
     oc_rep_end_root_object();
-    oc_send_cbor_response(request, OC_STATUS_CHANGED);
-    return;
+    oc_send_separate_response(&spake_separate_rsp, OC_STATUS_CHANGED);
+    return OC_EVENT_DONE;
   } else if (valid_request == SPAKE_CA_CONFIRM_P) {
     // calculate expected cA
     uint8_t expected_ca[32];
@@ -1428,16 +1449,16 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     size_t shared_key_len = 16;
 
     // set thet /auth/at entry with the calculated shared key
-    size_t device_index = request->resource->device;
-    oc_device_info_t *device = oc_core_get_device_info(device_index);
+    // size_t device_index = request->resource->device;
+
+    // knx does not have multiple devices per instance (for now), so hardcode
+    // the use of the first device
+    oc_device_info_t *device = oc_core_get_device_info(0);
     oc_oscore_set_auth(oc_string(device->serialnumber), oc_string(g_pase.id),
                        shared_key, (int)shared_key_len);
 
-    request->response->response_buffer->response_length = 0;
-    int size_of_message = oc_rep_get_encoded_payload_size();
-
-    // oc_send_cbor_response(request, OC_STATUS_CHANGED);
-    oc_send_linkformat_response(request, OC_STATUS_CHANGED, 0);
+    // empty payload
+    oc_send_empty_separate_response(&spake_separate_rsp, OC_STATUS_CHANGED);
 
     // handshake completed successfully - clear state
     memset(spake_data.Ka_Ke, 0, sizeof(spake_data.Ka_Ke));
@@ -1458,7 +1479,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     memset(g_pase.rnd, 0, sizeof(g_pase.rnd));
     memset(g_pase.salt, 0, sizeof(g_pase.salt));
     g_pase.it = 100000;
-    return;
+    return OC_EVENT_DONE;
   }
 error:
   // be paranoid: wipe all global data after an error
@@ -1485,7 +1506,8 @@ error:
 #ifdef OC_SPAKE
   increment_counter();
 #endif /* OC_SPAKE */
-  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+  oc_send_separate_response(&spake_separate_rsp, OC_STATUS_BAD_REQUEST);
+  return OC_EVENT_DONE;
 }
 
 void
@@ -1498,7 +1520,8 @@ oc_create_knx_spake_resource(int resource_idx, size_t device)
 
 #ifdef OC_SPAKE
   // can fail if initialization of the RNG does not work
-  assert(oc_spake_init() == 0);
+  int ret = oc_spake_init();
+  assert(ret == 0);
   mbedtls_mpi_init(&spake_data.w0);
   mbedtls_ecp_point_init(&spake_data.L);
   mbedtls_mpi_init(&spake_data.y);

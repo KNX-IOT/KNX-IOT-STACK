@@ -1141,6 +1141,26 @@ void oc_send_separate_response(oc_separate_response_t *handle,
                                oc_status_t response_code);
 
 /**
+ * Called to send the deferred response to a GET, PUT, POST or DELETE request,
+ * with an empty payload.
+ *
+ * The function oc_send_empty_separate_response is called to initiate transfer
+ of the
+ * response.
+ *
+ * @param[in] handle instance of the internal struct that was passed to
+                     oc_indicate_separate_response()
+ * @param[in] response_code the status of the response
+ *
+ * @see oc_indicate_separate_response
+ * @see oc_send_separate_response
+ * @see oc_send_response
+ * @see oc_ignore_request
+ */
+void oc_send_empty_separate_response(oc_separate_response_t *handle,
+                                     oc_status_t response_code);
+
+/**
  * Notify all observers of a change to a given resource's property
  *
  * @note no need to call oc_notify_observers about resource changes that
