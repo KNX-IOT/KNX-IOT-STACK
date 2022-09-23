@@ -1517,7 +1517,8 @@ oc_create_knx_spake_resource(int resource_idx, size_t device)
 
 #ifdef OC_SPAKE
   // can fail if initialization of the RNG does not work
-  assert(oc_spake_init() == 0);
+  int ret = oc_spake_init();
+  assert(ret == 0);
   mbedtls_mpi_init(&spake_data.w0);
   mbedtls_ecp_point_init(&spake_data.L);
   mbedtls_mpi_init(&spake_data.y);
