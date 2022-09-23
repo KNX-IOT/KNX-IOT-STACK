@@ -1293,8 +1293,7 @@ oc_load_at_table(size_t device_index)
       uint8_t key_buf[OSCORE_STORAGE_KEY_LEN];
       memcpy(key_buf, OSCORE_STORAGE_PREFIX, OSCORE_STORAGE_PREFIX_LEN);
       memcpy(key_buf + OSCORE_STORAGE_PREFIX_LEN,
-             oc_string(g_at_entries[i].osc_contextid),
-             OSCORE_CTXID_LEN);
+             oc_string(g_at_entries[i].osc_contextid), OSCORE_CTXID_LEN);
       key_buf[OSCORE_STORAGE_KEY_LEN - 1] = '\0';
 
       oc_storage_read(key_buf, (uint8_t *)stored_ssn, sizeof(stored_ssn));

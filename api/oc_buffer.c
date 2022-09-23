@@ -140,7 +140,7 @@ oc_message_unref(oc_message_t *message)
       struct oc_memb *pool = message->pool;
       if (pool != NULL) {
         // OC_DBG(" FFFFFFFFFFF  Free message %p from pool %p size %d", message,
-              //  pool, pool->size);
+        //  pool, pool->size);
         oc_memb_free(pool, message);
       }
 #if !defined(OC_DYNAMIC_ALLOCATION) || defined(OC_INOUT_BUFFER_SIZE)

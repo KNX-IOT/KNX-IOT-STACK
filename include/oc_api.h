@@ -1144,7 +1144,8 @@ void oc_send_separate_response(oc_separate_response_t *handle,
  * Called to send the deferred response to a GET, PUT, POST or DELETE request,
  * with an empty payload.
  *
- * The function oc_send_empty_separate_response is called to initiate transfer of the
+ * The function oc_send_empty_separate_response is called to initiate transfer
+ of the
  * response.
  *
  * @param[in] handle instance of the internal struct that was passed to

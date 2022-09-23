@@ -1208,7 +1208,8 @@ get_seconds_until_unblocked()
 #endif /* OC_SPAKE */
 
 static oc_separate_response_t spake_separate_rsp;
-static oc_event_callback_retval_t oc_core_knx_spake_separate_post_handler(void *req_p);
+static oc_event_callback_retval_t oc_core_knx_spake_separate_post_handler(
+  void *req_p);
 
 static void
 oc_core_knx_spake_post_handler(oc_request_t *request,
@@ -1312,21 +1313,21 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     rep = rep->next;
   }
 
-
   PRINT("oc_core_knx_spake_post_handler valid_request: %d\n", valid_request);
   oc_indicate_separate_response(request, &spake_separate_rsp);
   // TODO missing pointer cast warning here
-  oc_set_delayed_callback(valid_request, &oc_core_knx_spake_separate_post_handler, 0);
+  oc_set_delayed_callback(valid_request,
+                          &oc_core_knx_spake_separate_post_handler, 0);
 }
 
-static oc_event_callback_retval_t oc_core_knx_spake_separate_post_handler(void *req_p)
+static oc_event_callback_retval_t
+oc_core_knx_spake_separate_post_handler(void *req_p)
 {
   // TODO cast of pointer of different size
-  int valid_request = (int) req_p;
+  int valid_request = (int)req_p;
   PRINT("oc_core_knx_spake_separate_post_handler\n");
 
-  if (!spake_separate_rsp.active)
-  {
+  if (!spake_separate_rsp.active) {
     return OC_EVENT_DONE;
   }
   oc_set_separate_response_buffer(&spake_separate_rsp);
@@ -1446,8 +1447,8 @@ static oc_event_callback_retval_t oc_core_knx_spake_separate_post_handler(void *
     size_t shared_key_len = 16;
 
     // set thet /auth/at entry with the calculated shared key
-    //size_t device_index = request->resource->device;
-    
+    // size_t device_index = request->resource->device;
+
     // knx does not have multiple devices per instance (for now), so hardcode
     // the use of the first device
     oc_device_info_t *device = oc_core_get_device_info(0);

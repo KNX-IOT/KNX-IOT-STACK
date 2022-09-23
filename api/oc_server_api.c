@@ -468,7 +468,7 @@ oc_set_separate_response_buffer(oc_separate_response_t *handle)
 
 static void
 oc_send_separate_response_with_length(oc_separate_response_t *handle,
-                          oc_status_t response_code, size_t length)
+                                      oc_status_t response_code, size_t length)
 {
   oc_response_buffer_t response_buffer;
   response_buffer.buffer = handle->response_state->buffer;
@@ -564,7 +564,6 @@ oc_send_separate_response_with_length(oc_separate_response_t *handle,
   oc_blockwise_free_response_buffer(handle->response_state);
 }
 
-
 void
 oc_send_separate_response(oc_separate_response_t *handle,
                           oc_status_t response_code)
@@ -578,8 +577,9 @@ oc_send_separate_response(oc_separate_response_t *handle,
   oc_send_separate_response_with_length(handle, response_code, length);
 }
 
-void oc_send_empty_separate_response(oc_separate_response_t *handle,
-                          oc_status_t response_code)
+void
+oc_send_empty_separate_response(oc_separate_response_t *handle,
+                                oc_status_t response_code)
 {
   oc_send_separate_response_with_length(handle, response_code, 0);
 }

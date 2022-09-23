@@ -224,7 +224,7 @@ coap_serialize_array_option(unsigned int number, unsigned int current_number,
     size_t temp_length;
 
     for (j = 0; j <= length + 1; ++j) {
-      
+
       if (array[j] == split_char || j == length) {
         part_end = array + j;
         temp_length = part_end - part_start;
