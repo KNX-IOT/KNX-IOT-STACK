@@ -1,6 +1,6 @@
 # Introduction
 
-This folder contains code examples.
+This folder contains code examples of how to use the stack.
 
 The intention of the examples is to explain certain aspects of the stack.
 e.g. provide information in how to build an KNX IoT Point API device based on the stack.
@@ -15,10 +15,13 @@ naming convention:
 
 | Application       | serial number |
 | ----------------- | ----------- |
-| LSAB_minimal_all  | 000001 |
-| LSSB_minimal_all  | 000003 |
+| LSAB_minimal_all  | 00FA10010701 |
+| LSSB_minimal_all  | 00FA10010401 |
 | testserver_all    | 000005 |
 | testclient_all    | 000006 |
+
+Note: The test applications have deliberated incorrect serial numbers.
+
 
 ### testserver_all.c
 
