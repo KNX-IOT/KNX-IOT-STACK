@@ -291,7 +291,8 @@ void oc_store_uri(const char *s_uri, oc_string_t *d_uri);
  * @param delete_cb delete callback function
  * @param num_resource_types amount of resource types, listed as variable
  * arguments after this argument
- * @param ...
+ * @param ... Resource types, passed as zero-terminated strings. In order
+ * to save memory, the maximum length of each resource type is 32 bytes.
  */
 void oc_core_populate_resource(int core_resource, size_t device_index,
                                const char *uri, oc_interface_mask_t iface_mask,

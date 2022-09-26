@@ -929,7 +929,7 @@ void
 oc_create_knx_auth_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_auth_resource\n");
-  //
+  // TODO: what is type of auth resource?
   oc_core_populate_resource(
     resource_idx, device, "/auth", OC_IF_LI, APPLICATION_LINK_FORMAT,
     OC_DISCOVERABLE, oc_core_knx_auth_get_handler, 0, 0, 0, 1, "urn:knx:xxx");

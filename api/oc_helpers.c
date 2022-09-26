@@ -177,6 +177,7 @@ _oc_copy_byte_string_to_array(oc_string_array_t *ocstringarray,
                               const char str[], size_t str_len, size_t index)
 {
   if (strlen(str) >= STRING_ARRAY_ITEM_MAX_LEN) {
+    oc_assert(false);
     return false;
   }
   size_t pos = index * STRING_ARRAY_ITEM_MAX_LEN;
