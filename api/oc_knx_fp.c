@@ -1590,7 +1590,6 @@ oc_print_group_rp_table_entry(int entry, char *Store,
   PRINT(" ]\n");
 }
 
-
 #define RP_ENTRY_MAX_SIZE (1024)
 static void
 oc_dump_group_rp_table_entry(int entry, char *Store,
