@@ -271,7 +271,7 @@ oc_resource_t *oc_core_get_resource_by_uri(const char *uri, size_t device);
  *
  * @param uri the URI to check
  */
-void oc_check_uri(const char *s_uri);
+void oc_check_uri(const char *uri);
 
 /**
  * @brief populate resource for link-format responses
