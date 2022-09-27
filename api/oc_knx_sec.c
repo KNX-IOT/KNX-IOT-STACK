@@ -129,7 +129,7 @@ oc_create_knx_p_oscore_osndelay_resource(int resource_idx, size_t device)
   OC_DBG("oc_create_knx_p_oscore_osndelay_resource\n");
   //
   oc_core_populate_resource(
-    resource_idx, device, "p/oscore/osndelay", OC_IF_D, APPLICATION_CBOR,
+    resource_idx, device, "/p/oscore/osndelay", OC_IF_D, APPLICATION_CBOR,
     OC_DISCOVERABLE, oc_core_knx_f_oscore_osndelay_get_handler,
     oc_core_knx_p_oscore_osndelay_put_handler, 0, 0, 1, ":dpt:timePeriodMsec");
 }
