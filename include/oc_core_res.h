@@ -267,12 +267,11 @@ oc_resource_t *oc_core_get_resource_by_index(int type, size_t device);
 oc_resource_t *oc_core_get_resource_by_uri(const char *uri, size_t device);
 
 /**
- * @brief store the URI as a string
+ * @brief Ensure that the given URI starts with a forward slash
  *
- * @param s_uri source string
- * @param d_uri destination (to be allocated) to store the URI
+ * @param uri the URI to check
  */
-void oc_store_uri(const char *s_uri, oc_string_t *d_uri);
+void oc_check_uri(const char *uri);
 
 /**
  * @brief populate resource for link-format responses
@@ -291,7 +290,8 @@ void oc_store_uri(const char *s_uri, oc_string_t *d_uri);
  * @param delete_cb delete callback function
  * @param num_resource_types amount of resource types, listed as variable
  * arguments after this argument
- * @param ...
+ * @param ... Resource types, passed as zero-terminated strings. In order
+ * to save memory, the maximum length of each resource type is 32 bytes.
  */
 void oc_core_populate_resource(int core_resource, size_t device_index,
                                const char *uri, oc_interface_mask_t iface_mask,

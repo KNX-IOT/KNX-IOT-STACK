@@ -426,17 +426,9 @@ oc_core_init_platform(const char *mfg_name, oc_core_init_platform_cb_t init_cb,
 }
 
 void
-oc_store_uri(const char *s_uri, oc_string_t *d_uri)
+oc_check_uri(const char *uri)
 {
-  if (s_uri[0] != '/') {
-    size_t s_len = strlen(s_uri);
-    oc_alloc_string(d_uri, s_len + 2);
-    memcpy((char *)oc_string(*d_uri) + 1, s_uri, s_len);
-    ((char *)oc_string(*d_uri))[0] = '/';
-    ((char *)oc_string(*d_uri))[s_len + 1] = '\0';
-  } else {
-    oc_new_string(d_uri, s_uri, strlen(s_uri));
-  }
+  oc_assert(uri[0] == '/');
 }
 
 void
@@ -453,7 +445,10 @@ oc_core_populate_resource(int core_resource, size_t device_index,
     return;
   }
   r->device = device_index;
-  oc_store_uri(uri, &r->uri);
+  oc_check_uri(uri);
+  r->uri.next = NULL;
+  r->uri.ptr = uri;
+  r->uri.size = strlen(uri) + 1; // include null terminator in size
   r->properties = properties;
   va_list rt_list;
   int i;
@@ -461,7 +456,9 @@ oc_core_populate_resource(int core_resource, size_t device_index,
   if (num_resource_types > 0) {
     oc_new_string_array(&r->types, num_resource_types);
     for (i = 0; i < num_resource_types; i++) {
-      oc_string_array_add_item(r->types, va_arg(rt_list, const char *));
+      const char *resource_type = va_arg(rt_list, const char *);
+      oc_assert(strlen(resource_type) < STRING_ARRAY_ITEM_MAX_LEN);
+      oc_string_array_add_item(r->types, resource_type);
     }
   }
   va_end(rt_list);

@@ -1426,6 +1426,7 @@ oc_dump_group_object_table_entry(int entry)
   free(buf);
 }
 
+#define GOT_ENTRY_MAX_SIZE (1024)
 void
 oc_load_group_object_table_entry(int entry)
 {
@@ -1435,12 +1436,12 @@ oc_load_group_object_table_entry(int entry)
 
   oc_rep_t *rep, *head;
 
-  uint8_t *buf = malloc(OC_MAX_APP_DATA_SIZE);
+  uint8_t *buf = malloc(GOT_ENTRY_MAX_SIZE);
   if (!buf) {
     return;
   }
 
-  ret = oc_storage_read(filename, buf, OC_MAX_APP_DATA_SIZE);
+  ret = oc_storage_read(filename, buf, GOT_ENTRY_MAX_SIZE);
   if (ret > 0) {
     struct oc_memb rep_objects = { sizeof(oc_rep_t), 0, 0, 0, 0 };
     oc_rep_set_pool(&rep_objects);
@@ -1589,6 +1590,7 @@ oc_print_group_rp_table_entry(int entry, char *Store,
   PRINT(" ]\n");
 }
 
+#define RP_ENTRY_MAX_SIZE (1024)
 static void
 oc_dump_group_rp_table_entry(int entry, char *Store,
                              oc_group_rp_table_t *rp_table, int max_size)
@@ -1598,13 +1600,13 @@ oc_dump_group_rp_table_entry(int entry, char *Store,
   snprintf(filename, 20, "%s_%d", Store, entry);
   // PRINT("oc_dump_group_rp_table_entry %s, fname=%s\n", Store, filename);
 
-  uint8_t *buf = malloc(OC_MAX_APP_DATA_SIZE);
+  uint8_t *buf = malloc(RP_ENTRY_MAX_SIZE);
   if (!buf) {
     PRINT("oc_dump_group_rp_table_entry: no allocated mem\n");
     return;
   }
 
-  oc_rep_new(buf, OC_MAX_APP_DATA_SIZE);
+  oc_rep_new(buf, RP_ENTRY_MAX_SIZE);
   // write the data
   oc_rep_begin_root_object();
   // id 0

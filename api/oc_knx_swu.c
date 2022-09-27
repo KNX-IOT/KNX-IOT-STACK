@@ -535,7 +535,7 @@ void
 oc_create_knx_swu_a_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_swu_a_resource\n");
-  oc_core_populate_resource(resource_idx, device, "a/swu", OC_IF_NONE,
+  oc_core_populate_resource(resource_idx, device, "/a/swu", OC_IF_NONE,
                             APPLICATION_CBOR, OC_DISCOVERABLE, 0,
                             oc_knx_swu_a_put_handler, oc_knx_swu_a_post_handler,
                             0, 1, ":dpt.file");

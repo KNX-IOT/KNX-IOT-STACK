@@ -684,7 +684,9 @@ oc_ri_free_resource_properties(oc_resource_t *resource)
 {
   if (resource) {
     oc_free_string(&(resource->name));
-    oc_free_string(&(resource->uri));
+    // Resource URIs use the oc_string_t type to point to read-only memory,
+    // so we do not need to free
+    // oc_free_string(&(resource->uri));
     if (oc_string_array_get_allocated_size(resource->types) > 0) {
       oc_free_string_array(&(resource->types));
     }

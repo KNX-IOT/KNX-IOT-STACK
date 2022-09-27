@@ -221,7 +221,10 @@ oc_populate_resource_object(oc_resource_t *resource, const char *name,
   } else {
     memset(&resource->name, 0, sizeof(oc_string_t));
   }
-  oc_store_uri(uri, &resource->uri);
+  oc_check_uri(uri);
+  resource->uri.next = NULL;
+  resource->uri.ptr = uri;
+  resource->uri.size = strlen(uri) + 1; // include null terminator in size
   oc_new_string_array(&resource->types, num_resource_types);
   resource->properties = 0;
   resource->device = device;
