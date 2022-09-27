@@ -74,6 +74,7 @@ typedef struct oc_oscore_context_t
   /* Common IV */
   uint8_t commoniv[OSCORE_COMMON_IV_LEN];
   /* Replay Window */
+  // TODO make the replay window configurable from CMake
   oc_rwin_t rwin[OSCORE_REPLAY_WINDOW_SIZE];
   uint8_t rwin_idx;
 } oc_oscore_context_t;
