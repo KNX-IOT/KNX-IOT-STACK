@@ -456,9 +456,10 @@ oc_core_populate_resource(int core_resource, size_t device_index,
   if (num_resource_types > 0) {
     oc_new_string_array(&r->types, num_resource_types);
     for (i = 0; i < num_resource_types; i++) {
-      oc_assert(strlen(va_arg(rt_list, const char *)) <
+      const char * resource_type = va_arg(rt_list, const char *);
+      oc_assert(strlen(resource_type) <
                 STRING_ARRAY_ITEM_MAX_LEN);
-      oc_string_array_add_item(r->types, va_arg(rt_list, const char *));
+      oc_string_array_add_item(r->types, resource_type);
     }
   }
   va_end(rt_list);
