@@ -217,9 +217,9 @@ oc_populate_resource_object(oc_resource_t *resource, const char *name,
                             size_t device)
 {
   if (name) {
-    oc_new_string(&resource->name, name, strlen(name));
-  } else {
-    memset(&resource->name, 0, sizeof(oc_string_t));
+    resource->name.ptr = name;
+    resource->name.size = strlen(name) + 1;
+    resource->name.next = NULL;
   }
   oc_check_uri(uri);
   resource->uri.next = NULL;
