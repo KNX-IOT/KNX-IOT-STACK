@@ -425,6 +425,8 @@ oc_core_init_platform(const char *mfg_name, oc_core_init_platform_cb_t init_cb,
   return &oc_platform_info;
 }
 
+// TODO see if you can get rid of this, by also refactoring oc_core_populate_resource
+// to store the pointer to the URI instead of making a copy
 void
 oc_store_uri(const char *s_uri, oc_string_t *d_uri)
 {
@@ -453,6 +455,7 @@ oc_core_populate_resource(int core_resource, size_t device_index,
     return;
   }
   r->device = device_index;
+  // TODO check if uri starts with slash here
   oc_store_uri(uri, &r->uri);
   r->properties = properties;
   va_list rt_list;

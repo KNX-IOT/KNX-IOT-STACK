@@ -1426,7 +1426,7 @@ oc_dump_group_object_table_entry(int entry)
   free(buf);
 }
 
-#define GOT_ENTRY_MAX_SIZE (2048)
+#define GOT_ENTRY_MAX_SIZE (1024)
 void
 oc_load_group_object_table_entry(int entry)
 {
@@ -1591,7 +1591,7 @@ oc_print_group_rp_table_entry(int entry, char *Store,
 }
 
 
-#define RP_ENTRY_MAX_SIZE (2048)
+#define RP_ENTRY_MAX_SIZE (1024)
 static void
 oc_dump_group_rp_table_entry(int entry, char *Store,
                              oc_group_rp_table_t *rp_table, int max_size)
