@@ -1368,13 +1368,12 @@ TEST(TestRep, OCRepSetGetStringArray)
   json_size = oc_rep_to_json(rep, NULL, 0, true);
   json = (char *)malloc(json_size + 1);
   oc_rep_to_json(rep, json, json_size + 1, true);
-  const char pretty_json[] =
-    "{\n  \"quotes\" : [\n"
-    "    \"Do not take life too seriously\",\n"
-    "    \"You won't get out of it alive.\",\n"
-    "    \"I refuse to join any club that\",\n"
-    "    \"would have me as a member.\"\n  ]\n"
-    "}\n";
+  const char pretty_json[] = "{\n  \"quotes\" : [\n"
+                             "    \"Do not take life too seriously\",\n"
+                             "    \"You won't get out of it alive.\",\n"
+                             "    \"I refuse to join any club that\",\n"
+                             "    \"would have me as a member.\"\n  ]\n"
+                             "}\n";
   EXPECT_STREQ(pretty_json, json);
   free(json);
   json = NULL;
@@ -1454,13 +1453,12 @@ TEST(TestRep, OCRepAddGetStringArray)
   json_size = oc_rep_to_json(rep, NULL, 0, true);
   json = (char *)malloc(json_size + 1);
   oc_rep_to_json(rep, json, json_size + 1, true);
-  const char pretty_json[] =
-    "{\n  \"quotes\" : [\n"
-    "    \"Do not take life too seriously\",\n"
-    "    \"You won't get out of it alive.\",\n"
-    "    \"I refuse to join any club that\",\n"
-    "    \"would have me as a member.\"\n  ]\n"
-    "}\n";
+  const char pretty_json[] = "{\n  \"quotes\" : [\n"
+                             "    \"Do not take life too seriously\",\n"
+                             "    \"You won't get out of it alive.\",\n"
+                             "    \"I refuse to join any club that\",\n"
+                             "    \"would have me as a member.\"\n  ]\n"
+                             "}\n";
   EXPECT_STREQ(pretty_json, json);
   free(json);
   json = NULL;
@@ -2132,24 +2130,22 @@ TEST(TestRep, OCRepISetGetStringArray)
   json_size = oc_rep_to_json(rep, NULL, 0, false);
   json = (char *)malloc(json_size + 1);
   oc_rep_to_json(rep, json, json_size + 1, false);
-  const char non_pretty_json[] =
-    "{\"3\":[\"Do not take life too seriously\","
-    "\"You won't get out of it alive.\","
-    "\"I refuse to join any club that\","
-    "\"would have me as a member.\"]}";
+  const char non_pretty_json[] = "{\"3\":[\"Do not take life too seriously\","
+                                 "\"You won't get out of it alive.\","
+                                 "\"I refuse to join any club that\","
+                                 "\"would have me as a member.\"]}";
   EXPECT_STREQ(non_pretty_json, json);
   free(json);
   json = NULL;
   json_size = oc_rep_to_json(rep, NULL, 0, true);
   json = (char *)malloc(json_size + 1);
   oc_rep_to_json(rep, json, json_size + 1, true);
-  const char pretty_json[] =
-    "{\n  \"3\" : [\n"
-    "    \"Do not take life too seriously\",\n"
-    "    \"You won't get out of it alive.\",\n"
-    "    \"I refuse to join any club that\",\n"
-    "    \"would have me as a member.\"\n  ]\n"
-    "}\n";
+  const char pretty_json[] = "{\n  \"3\" : [\n"
+                             "    \"Do not take life too seriously\",\n"
+                             "    \"You won't get out of it alive.\",\n"
+                             "    \"I refuse to join any club that\",\n"
+                             "    \"would have me as a member.\"\n  ]\n"
+                             "}\n";
   EXPECT_STREQ(pretty_json, json);
   free(json);
   json = NULL;
