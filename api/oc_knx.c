@@ -1319,7 +1319,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
   oc_indicate_separate_response(request, &spake_separate_rsp);
   // TODO missing pointer cast warning here
   oc_set_delayed_callback(valid_request,
-                          &oc_core_knx_spake_separate_post_handler, 0);
+                          &oc_core_knx_spake_separate_post_handler, 1);
 }
 
 static oc_event_callback_retval_t

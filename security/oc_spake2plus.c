@@ -210,7 +210,8 @@ oc_spake_parameter_exchange(uint8_t rnd[32], uint8_t salt[32], int *it)
   MBEDTLS_MPI_CHK(mbedtls_ctr_drbg_random(
     &ctr_drbg_ctx, (unsigned char *)&it_seed, sizeof(it_seed)));
 
-  *it = it_seed % (KNX_MAX_IT - KNX_MIN_IT) + KNX_MIN_IT;
+  //*it = it_seed % (KNX_MAX_IT - KNX_MIN_IT) + KNX_MIN_IT;
+  *it = it_seed % (50 - 10) + 10;
 cleanup:
   return ret;
 }
