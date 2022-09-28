@@ -36,6 +36,7 @@ set(KNX_GRT_MAX_ENTRIES "" CACHE STRING "Maximum number of group recipient table
 
 set(KNX_SPAKE_MIN_IT "1000" CACHE STRING "Minimum number of SHA256 iterations used within the SPAKE2+ handshake")
 set(KNX_SPAKE_MAX_IT "100000" CACHE STRING "Maximum number of SHA256 iterations used within the SPAKE2+ handshake")
+mark_as_advanced(KNX_SPAKE_MIN_IT KNX_SPAKE_MAX_IT)
 
 include(tools/clang-tidy.cmake)
 
