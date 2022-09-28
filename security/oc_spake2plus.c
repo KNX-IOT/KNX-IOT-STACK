@@ -56,8 +56,12 @@ static char password[33];
 
 #define KNX_RNG_LEN (32)
 #define KNX_SALT_LEN (32)
+/*
 #define KNX_MIN_IT (1000)
 #define KNX_MAX_IT (100000)
+*/
+#define KNX_MIN_IT (10)
+#define KNX_MAX_IT (100)
 
 int
 oc_spake_init(void)
@@ -210,8 +214,7 @@ oc_spake_parameter_exchange(uint8_t rnd[32], uint8_t salt[32], int *it)
   MBEDTLS_MPI_CHK(mbedtls_ctr_drbg_random(
     &ctr_drbg_ctx, (unsigned char *)&it_seed, sizeof(it_seed)));
 
-  //*it = it_seed % (KNX_MAX_IT - KNX_MIN_IT) + KNX_MIN_IT;
-  *it = it_seed % (50 - 10) + 10;
+  *it = it_seed % (KNX_MAX_IT - KNX_MIN_IT) + KNX_MIN_IT;
 cleanup:
   return ret;
 }
