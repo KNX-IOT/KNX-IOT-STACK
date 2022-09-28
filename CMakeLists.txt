@@ -34,6 +34,9 @@ set(KNX_GOT_MAX_ENTRIES "" CACHE STRING "Maximum number of group object table en
 set(KNX_GPT_MAX_ENTRIES "" CACHE STRING "Maximum number of group publisher table entries")
 set(KNX_GRT_MAX_ENTRIES "" CACHE STRING "Maximum number of group recipient table entries")
 
+set(KNX_SPAKE_MIN_IT "1000" CACHE STRING "Minimum number of SHA256 iterations used within the SPAKE2+ handshake")
+set(KNX_SPAKE_MAX_IT "100000" CACHE STRING "Maximum number of SHA256 iterations used within the SPAKE2+ handshake")
+
 include(tools/clang-tidy.cmake)
 
 if(KNX_BUILTIN_MBEDTLS)
@@ -147,6 +150,9 @@ add_library(kis-common INTERFACE)
 if(OC_OSCORE_ENABLED)
    target_compile_definitions(kis-common INTERFACE OC_OSCORE)
    target_compile_definitions(kis-common INTERFACE OC_SPAKE)
+   target_compile_definitions(kis-common INTERFACE KNX_MIN_IT=${KNX_SPAKE_MIN_IT})
+   target_compile_definitions(kis-common INTERFACE KNX_MAX_IT=${KNX_SPAKE_MAX_IT})
+
 endif()
 
 if(OC_DEBUG_ENABLED)

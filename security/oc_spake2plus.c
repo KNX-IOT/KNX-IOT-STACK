@@ -14,6 +14,8 @@
 // limitations under the License.
 */
 
+#ifdef OC_SPAKE
+
 #include "mbedtls/md.h"
 #include "mbedtls/ecp.h"
 #include "mbedtls/entropy.h"
@@ -56,12 +58,6 @@ static char password[33];
 
 #define KNX_RNG_LEN (32)
 #define KNX_SALT_LEN (32)
-/*
-#define KNX_MIN_IT (1000)
-#define KNX_MAX_IT (100000)
-*/
-#define KNX_MIN_IT (10)
-#define KNX_MAX_IT (100)
 
 int
 oc_spake_init(void)
@@ -605,3 +601,5 @@ oc_spake_calc_cA(uint8_t *Ka_Ke, uint8_t cA[32], uint8_t bytes_Y[kPubKeySize])
                   sizeof(KcA_KcB) / 2, bytes_Y, kPubKeySize, cA);
   return 0;
 }
+
+#endif // OC_SPAKE
