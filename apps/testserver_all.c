@@ -816,7 +816,7 @@ register_resources(void)
 {
 
   PRINT("Register Resource with local path \"/p/a\"\n");
-  oc_resource_t *res_352 = oc_new_resource("myname", "p/a", 1, 0);
+  oc_resource_t *res_352 = oc_new_resource("myname", "/p/a", 1, 0);
   oc_resource_bind_resource_type(res_352, "urn:knx:dpa.352.51");
   oc_resource_bind_dpt(res_352, "urn:knx:dpt.switch");
   oc_resource_bind_content_type(res_352, APPLICATION_CBOR);
@@ -836,7 +836,7 @@ register_resources(void)
   oc_resource_set_request_handler(res_352, OC_POST, post_dpa_352_51, NULL);
   oc_add_resource(res_352);
 
-  oc_resource_t *res_352_1 = oc_new_resource("myname", "p/a_1", 1, 0);
+  oc_resource_t *res_352_1 = oc_new_resource("myname", "/p/a_1", 1, 0);
   oc_resource_bind_resource_type(res_352_1, "urn:knx:dpa.352.51");
   oc_resource_bind_dpt(res_352_1, "urn:knx:dpt.switch");
   oc_resource_bind_content_type(res_352_1, APPLICATION_CBOR);
@@ -849,7 +849,7 @@ register_resources(void)
   oc_add_resource(res_352_1);
 
   PRINT("Register Resource with local path \"/p/b\"\n");
-  oc_resource_t *res_352b = oc_new_resource("myname_b", "p/b", 1, 0);
+  oc_resource_t *res_352b = oc_new_resource("myname_b", "/p/b", 1, 0);
   oc_resource_bind_resource_type(res_352b, "urn:knx:dpa.352.52");
   oc_resource_bind_dpt(res_352b, "urn:knx:dpt.switch");
   oc_resource_bind_content_type(res_352b, APPLICATION_CBOR);
@@ -869,7 +869,7 @@ register_resources(void)
   oc_add_resource(res_352b);
 
   PRINT("Register Resource with local path \"/p/c\"\n");
-  oc_resource_t *res_353 = oc_new_resource("myname_c", "p/c", 1, 0);
+  oc_resource_t *res_353 = oc_new_resource("myname_c", "/p/c", 1, 0);
   oc_resource_bind_resource_type(res_353, "urn:knx:dpa.353.52");
   oc_resource_bind_dpt(res_353, "urn:knx:dpt.switch");
   oc_resource_bind_dpt(res_353, "urn:knx:dpt.switch2");
@@ -907,8 +907,8 @@ factory_presets_cb(size_t device_index, void *data)
     oc_knx_device_storage_reset(0, 2);
   }
 
-  oc_core_set_device_ia(device_index, 5);
-  oc_core_set_device_iid(device_index, 7);
+  oc_core_set_and_store_device_ia(device_index, 5);
+  oc_core_set_and_store_device_iid(device_index, 7);
 }
 
 /**
