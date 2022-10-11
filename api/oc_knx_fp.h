@@ -21,6 +21,8 @@
 #define OC_KNX_FP_INTERNAL_H
 
 #include <stddef.h>
+#include "oc_helpers.h"
+#include "oc_ri.h"
 
 #ifdef __cplusplus
 extern "C" {
