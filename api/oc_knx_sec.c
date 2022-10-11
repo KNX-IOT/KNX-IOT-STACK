@@ -1,5 +1,5 @@
 /*
- // Copyright (c) 2021 Cascoda Ltd
+ // Copyright (c) 2021-2022 Cascoda Ltd
  //
  // Licensed under the Apache License, Version 2.0 (the "License");
  // you may not use this file except in compliance with the License.
@@ -1246,7 +1246,7 @@ oc_core_set_at_table(size_t device_index, int index, oc_auth_at_t entry)
       }
     }
 
-    oc_at_dump_entry(device_index, index);
+    //oc_at_dump_entry(device_index, index);
   }
   if (index == 0) {
     // set the OSCORE stuff
@@ -1354,6 +1354,7 @@ oc_oscore_set_auth(char *serial_number, char *context_id, uint8_t *shared_key,
     OC_ERR("no space left in auth/at");
   } else {
     oc_core_set_at_table((size_t)0, index, os_token);
+    oc_at_dump_entry((size_t)0, index);
     // add the oscore context...
     oc_init_oscore(0);
   }
