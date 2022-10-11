@@ -226,7 +226,6 @@ int oc_core_set_device_iid(size_t device_index, uint32_t iid);
  */
 int oc_core_set_and_store_device_iid(size_t device_index, uint32_t iid);
 
-
 /**
  * @brief sets the fabric identifier (fid) (unsigned int)
  *

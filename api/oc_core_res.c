@@ -280,7 +280,6 @@ oc_core_set_and_store_device_ia(size_t device_index, int ia)
   return status;
 }
 
-
 int
 oc_core_set_device_hwt(size_t device_index, const char *hardwaretype)
 {

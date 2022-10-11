@@ -446,7 +446,7 @@ oc_group_rp_table_t *oc_core_get_recipient_table_entry(int index);
 
 /**
  * @brief find empty slot in recipient table
- * 
+ *
  * @param id : supply 0
  * @return -1 : no empty slot, otherwise index of emtpy slot
  */
@@ -454,7 +454,7 @@ int oc_core_find_empty_slot_in_recipient_table(int id);
 
 /**
  * @brief find index of id in recipient table
- * 
+ *
  * @param id index to finde
  * @return -1 not found, otherwise index in recipient table
  */
@@ -462,7 +462,7 @@ int oc_core_find_index_in_recipient_table_from_id(int id);
 
 /**
  * @brief add recipient entry
- * 
+ *
  * @param index index in the table
  * @param entry entry to be added
  * @return 0 : successfull
