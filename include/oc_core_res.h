@@ -170,7 +170,7 @@ int oc_core_set_device_ia(size_t device_index, int ia);
  * @param ia the internal address
  * @return int error status, 0 = OK
  */
-int oc_core_set_and_store_device_ia(size_t device_index, int ia)
+int oc_core_set_and_store_device_ia(size_t device_index, int ia);
 
 /**
  * @brief sets the hardware type (string)

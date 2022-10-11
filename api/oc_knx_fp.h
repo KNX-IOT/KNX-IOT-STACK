@@ -21,8 +21,6 @@
 #define OC_KNX_FP_INTERNAL_H
 
 #include <stddef.h>
-#include "oc_helpers.h"
-#include "oc_ri.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -49,21 +47,21 @@ typedef enum {
 } oc_cflag_mask_t;
 
 /**
- * @brief print the cflags to standard output
- * cflags in ASCII e.g. "w" "r" "i" "t" "u" without quotes
+ * @brief print the communication flags to standard output
+ * communication flags in ASCII e.g. "w" "r" "i" "t" "u" without quotes
  *
- * @param cflags the cflags
+ * @param cflags the communication flags
  */
 void oc_print_cflags(oc_cflag_mask_t cflags);
 
 /**
- * @brief adds the cflags a preallocated buffer
+ * @brief adds the communication flags a preallocated buffer
 
  * cflags in ASCII e.g. "w" "r" "i" "t" "u" without quotes
  * if the flag does not exist, then a "." will be added instead
  *
  * @param buffer the string buffer to add the cflags too
- * @param cflags The cflags
+ * @param cflags The communication flags
  */
 void oc_cflags_as_string(char *buffer, oc_cflag_mask_t cflags);
 
