@@ -336,7 +336,7 @@ register_resources(void)
   PRINT("Light Switching actuator 417 (LSAB) : SwitchOnOff \n");
   PRINT("Data point 417.61 (DPT_Switch) \n");
   oc_resource_t *res_light =
-    oc_new_resource("light actuation", "p/o_1_1", 2, 0);
+    oc_new_resource("light actuation", "/p/o_1_1", 2, 0);
   oc_resource_bind_resource_type(res_light, "urn:knx:dpa.417.61");
   oc_resource_bind_dpt(res_light, "urn:knx:dpt.Switch");
   oc_resource_bind_content_type(res_light, APPLICATION_CBOR);

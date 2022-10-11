@@ -268,6 +268,19 @@ oc_core_set_device_ia(size_t device_index, int ia)
 }
 
 int
+oc_core_set_and_store_device_ia(size_t device_index, int ia)
+{
+  const int status = oc_core_set_device_ia(device_index, ia);
+
+  // If successful write to storage
+  if (status == 0) {
+    oc_storage_write(KNX_STORAGE_IA, (uint8_t *)&ia, sizeof(ia));
+  }
+
+  return status;
+}
+
+int
 oc_core_set_device_hwt(size_t device_index, const char *hardwaretype)
 {
   if (device_index >= (int)oc_core_get_num_devices()) {
@@ -332,6 +345,19 @@ oc_core_set_device_iid(size_t device_index, uint32_t iid)
   oc_device_info[device_index].iid = iid;
 
   return 0;
+}
+
+int
+oc_core_set_and_store_device_iid(size_t device_index, uint32_t iid)
+{
+  const int status = oc_core_set_device_iid(device_index, iid);
+
+  // If successful write to storage
+  if (status == 0) {
+    oc_storage_write(KNX_STORAGE_IID, (uint8_t *)&iid, sizeof(iid));
+  }
+
+  return status;
 }
 
 int

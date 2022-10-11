@@ -311,7 +311,7 @@ register_resources(void)
   PRINT("Register Resource with local path \"/p/o_1_1\"\n");
 
   oc_resource_t *res_pushbutton =
-    oc_new_resource("push button", "p/o_1_1", 2, 0);
+    oc_new_resource("push button", "/p/o_1_1", 2, 0);
   oc_resource_bind_resource_type(res_pushbutton, "urn:knx:dpa.421.61");
   oc_resource_bind_dpt(res_pushbutton, "urn:knx:dpt.Switch");
   oc_resource_bind_content_type(res_pushbutton, APPLICATION_CBOR);

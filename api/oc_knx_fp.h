@@ -21,8 +21,6 @@
 #define OC_KNX_FP_INTERNAL_H
 
 #include <stddef.h>
-#include "oc_helpers.h"
-#include "oc_ri.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -49,21 +47,21 @@ typedef enum {
 } oc_cflag_mask_t;
 
 /**
- * @brief print the cflags to standard output
- * cflags in ASCII e.g. "w" "r" "i" "t" "u" without quotes
+ * @brief print the communication flags to standard output
+ * communication flags in ASCII e.g. "w" "r" "i" "t" "u" without quotes
  *
- * @param cflags the cflags
+ * @param cflags the communication flags
  */
 void oc_print_cflags(oc_cflag_mask_t cflags);
 
 /**
- * @brief adds the cflags a preallocated buffer
+ * @brief adds the communication flags a preallocated buffer
 
  * cflags in ASCII e.g. "w" "r" "i" "t" "u" without quotes
  * if the flag does not exist, then a "." will be added instead
  *
  * @param buffer the string buffer to add the cflags too
- * @param cflags The cflags
+ * @param cflags The communication flags
  */
 void oc_cflags_as_string(char *buffer, oc_cflag_mask_t cflags);
 
@@ -447,6 +445,31 @@ int oc_core_get_recipient_table_size();
 oc_group_rp_table_t *oc_core_get_recipient_table_entry(int index);
 
 /**
+ * @brief find empty slot in recipient table
+ *
+ * @param id : supply 0
+ * @return -1 : no empty slot, otherwise index of emtpy slot
+ */
+int oc_core_find_empty_slot_in_recipient_table(int id);
+
+/**
+ * @brief find index of id in recipient table
+ *
+ * @param id index to finde
+ * @return -1 not found, otherwise index in recipient table
+ */
+int oc_core_find_index_in_recipient_table_from_id(int id);
+
+/**
+ * @brief add recipient entry
+ *
+ * @param index index in the table
+ * @param entry entry to be added
+ * @return 0 : successfull
+ */
+int oc_core_add_recipient_entry(int index, oc_group_rp_table_t entry);
+
+/**
  * @brief return the size of the publisher table
  *
  * @return int the size of the table
@@ -467,6 +490,8 @@ int oc_core_get_publisher_table_size();
  * @return oc_group_rp_table_t* pointer to the entry
  */
 oc_group_rp_table_t *oc_core_get_publisher_table_entry(int index);
+
+int oc_core_add_publisher_entry(int index, oc_group_rp_table_t entry);
 
 /**
  * @brief add points to the well-known core discovery response
