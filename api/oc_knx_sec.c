@@ -1211,7 +1211,7 @@ oc_core_set_at_table(size_t device_index, int index, oc_auth_at_t entry)
     oc_free_string(&g_at_entries[index].osc_ms);
     oc_new_string(&g_at_entries[index].osc_ms, oc_string(entry.osc_ms),
                   oc_string_len(entry.osc_ms));
-    oc_free_string(&g_at_entries[index].osc_id);
+    oc_free_string(&g_at_entries[index].osc_alg);
     oc_new_string(&g_at_entries[index].osc_alg, oc_string(entry.osc_alg),
                   oc_string_len(entry.osc_alg));
     oc_free_string(&g_at_entries[index].osc_contextid);
