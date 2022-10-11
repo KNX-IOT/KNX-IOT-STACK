@@ -164,6 +164,15 @@ int oc_core_set_device_hwv(size_t device_index, int major, int minor,
 int oc_core_set_device_ia(size_t device_index, int ia);
 
 /**
+ * @brief sets and stores the internal address
+ *
+ * @param device_index the device index
+ * @param ia the internal address
+ * @return int error status, 0 = OK
+ */
+int oc_core_set_and_store_device_ia(size_t device_index, int ia)
+
+/**
  * @brief sets the hardware type (string)
  *
  * @param device_index the device index
@@ -207,6 +216,16 @@ int oc_core_set_device_hostname(size_t device_index, const char *host_name);
  * @return int error status, 0 = OK
  */
 int oc_core_set_device_iid(size_t device_index, uint32_t iid);
+
+/**
+ * @brief sets the installation identifier (iid) (unsigned int) and store it
+ *
+ * @param device_index the device index
+ * @param iid the KNX installation id
+ * @return int error status, 0 = OK
+ */
+int oc_core_set_and_store_device_iid(size_t device_index, uint32_t iid);
+
 
 /**
  * @brief sets the fabric identifier (fid) (unsigned int)

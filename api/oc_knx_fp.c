@@ -1370,7 +1370,6 @@ oc_print_cflags(oc_cflag_mask_t cflags)
 void
 oc_print_group_object_table_entry(int entry)
 {
-  // PRINT("  GOT [%d] -> %d\n", entry, g_got[entry].ga_len);
   if (g_got[entry].ga_len == 0) {
     return;
   }
@@ -1846,6 +1845,47 @@ find_empty_slot_in_rp_table(int id, oc_group_rp_table_t *rp_table, int max_size)
 }
 
 int
+oc_core_add_rp_entry(int index, oc_group_rp_table_t *rp_table,
+                      int rp_table_size,
+                      oc_group_rp_table_t entry)
+{
+  if (index >= rp_table_size) {
+    OC_ERR("recipient table index is to large: index(%d) max_size(%d)", index,
+           rp_table_size);
+  }
+
+  // Store entries
+  rp_table[index].id = entry.id;
+  rp_table[index].iid = entry.iid;
+  rp_table[index].fid = entry.fid;
+  rp_table[index].grpid = entry.grpid;
+
+  // Copy group addresses
+  rp_table[index].ga_len = entry.ga_len;
+  int *new_array = (int *)malloc(entry.ga_len * sizeof(int));
+
+  if (new_array != NULL) {
+    for (int i = 0; i < entry.ga_len; i++) {
+      new_array[i] = entry.ga[i];
+    }
+    if (rp_table[index].ga != 0) {
+      free(rp_table[index].ga);
+    }
+    rp_table[index].ga = new_array;
+  }
+
+  return 0;
+}
+
+int
+oc_core_add_recipient_entry(int index, oc_group_rp_table_t entry)
+{
+  return oc_core_add_rp_entry(index, g_grt, oc_core_get_recipient_table_size(),
+                              entry);
+
+}
+
+int
 oc_core_get_recipient_table_size()
 {
   return GRT_MAX_ENTRIES;
@@ -1889,6 +1929,26 @@ oc_core_get_publisher_table_entry(int index)
   return NULL;
 #endif
 }
+
+int
+oc_core_add_publisher_entry(int index, oc_group_rp_table_t entry)
+{
+  return oc_core_add_rp_entry(index, g_gpt, oc_core_get_publisher_table_size(),
+                              entry);
+}
+
+int oc_core_find_empty_slot_in_recipient_table(int id)
+{
+  return find_empty_slot_in_rp_table(id, g_grt, oc_core_get_publisher_table_size());
+}
+
+int
+oc_core_find_index_in_recipient_table_from_id(int id)
+{
+  return oc_core_find_index_in_rp_table_from_id(
+    id, g_grt, oc_core_get_publisher_table_size());
+}
+
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

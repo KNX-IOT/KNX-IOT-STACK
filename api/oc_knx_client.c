@@ -487,7 +487,7 @@ oc_send_s_mode(oc_endpoint_t *endpoint, char *path, int sia_value,
 
     oc_rep_end_root_object();
 
-    PRINT("S-MODE Payload Size: %d\n", oc_rep_get_encoded_payload_size());
+    PRINT("oc_send_s_mode: S-MODE Payload Size: %d\n", oc_rep_get_encoded_payload_size());
     // OC_LOGbytes_OSCORE(oc_rep_get_encoder_buf(),
     //                   oc_rep_get_encoded_payload_size());
 
