@@ -188,6 +188,7 @@ int oc_core_get_at_table_size();
 /**
  * @brief set an entry in the auth/at table
  *
+ * Note: does not write to persistent storage
  * @param device_index index of the device
  * @param index the index in the table, will overwrite if something is there
  * @param entry the auth/at entry
