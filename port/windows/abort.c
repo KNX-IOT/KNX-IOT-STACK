@@ -15,7 +15,6 @@
 // limitations under the License.
 */
 
-
 #include "port/oc_assert.h"
 #include <stdlib.h>
 

@@ -312,7 +312,6 @@ extern "C" {
 #define OC_LOGbytes_SPAKE(bytes, length)                                       \
   OC_LOGbytes_internal("SPAKE", bytes, length)
 
-
 #ifdef __cplusplus
 }
 #endif
