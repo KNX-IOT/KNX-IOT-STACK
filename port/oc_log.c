@@ -1,5 +1,4 @@
 /*
-// Copyright (c) 2018 Intel Corporation
 // Copyright (c) 2022 Cascoda Ltd.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,18 +13,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 */
+#include <stdarg.h>
+#include <stdio.h>
 
-#include "port/oc_assert.h"
-#include <stdlib.h>
-
-void
-abort_impl(void)
-{
-  exit(1);
-}
+#define OUTPUT_FILE_NAME "stack_print_output.txt"
+static FILE *fptr = NULL;
 
 void
-exit_impl(int status)
+oc_file_print(char *format, ...)
 {
-  exit(status);
+  va_list args;
+  if (fptr == NULL) {
+    fptr = fopen(OUTPUT_FILE_NAME, "w");
+  }
+  if (fptr) {
+    va_start(args, format);
+    vfprintf(fptr, format, args);
+    va_end(args);
+  }
 }

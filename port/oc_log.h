@@ -40,6 +40,8 @@
 #ifndef OC_LOG_H
 #define OC_LOG_H
 
+//#define OC_LOG_TO_FILE
+
 #include <stdio.h>
 #include <string.h>
 #ifdef WIN32
@@ -62,7 +64,12 @@ extern "C" {
 #define TAG "OC-JNI"
 #define PRINT(...) __android_log_print(ANDROID_LOG_INFO, TAG, __VA_ARGS__)
 #else
+#ifdef OC_LOG_TO_FILE
+// logging to file
+#define PRINT(...) oc_file_print(__VA_ARGS__)
+#else
 #define PRINT(...) printf(__VA_ARGS__)
+#endif
 #endif
 
 #define SPRINTF(...) sprintf(__VA_ARGS__)
@@ -304,8 +311,6 @@ extern "C" {
   OC_LOGbytes_internal("OSCORE", bytes, length)
 #define OC_LOGbytes_SPAKE(bytes, length)                                       \
   OC_LOGbytes_internal("SPAKE", bytes, length)
-
-//#define OC_DBG_OSCORE(...)
 
 #ifdef __cplusplus
 }

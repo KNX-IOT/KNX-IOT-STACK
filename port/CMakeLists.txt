@@ -1,15 +1,19 @@
 # This CMakeLists can only build the port for Linux & Windows
-if(UNIX OR WIN32)
-	project(knx-iot-stack-port)
 
-	# Detect the platform and pick the right port
-	if(UNIX)
+
+
+if(UNIX OR WIN32)
+    project(knx-iot-stack-port)
+
+    # Detect the platform and pick the right port
+    if(UNIX)
         set(PORT_DIR ${PROJECT_SOURCE_DIR}/linux)
-	elseif(WIN32)
+    elseif(WIN32)
         set(PORT_DIR ${PROJECT_SOURCE_DIR}/windows)
-	endif()
+    endif()
 
     add_library(kis-port
+        ${PROJECT_SOURCE_DIR}/oc_log.c
         ${PORT_DIR}/abort.c
         ${PORT_DIR}/clock.c
         ${PORT_DIR}/dns-sd.c
@@ -18,6 +22,10 @@ if(UNIX OR WIN32)
         ${PORT_DIR}/storage.c
         ${PORT_DIR}/tcpadapter.c
     )
+
+    if(OC_LOG_TO_FILE_ENABLED)
+        target_compile_definitions(kis-port INTERFACE OC_LOG_TO_FILE)
+    endif()
 
     target_include_directories(kis-port PUBLIC 
         ${PORT_DIR}
