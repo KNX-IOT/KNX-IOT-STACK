@@ -314,9 +314,12 @@ oc_conv_hex_string_to_byte_array(const char *hex_str, size_t hex_str_len,
     array[a++] = (uint8_t)tmp;
   }
 
-  for (i = start; i <= hex_str_len - 2; i += 2) {
-    sscanf(&hex_str[i], "%2x", &tmp);
-    array[a++] = (uint8_t)tmp;
+  if (hex_str_len > 2) {
+    // save guard against string lengths of 1
+    for (i = start; i <= hex_str_len - 2; i += 2) {
+      sscanf(&hex_str[i], "%2x", &tmp);
+      array[a++] = (uint8_t)tmp;
+    }
   }
 
   return 0;

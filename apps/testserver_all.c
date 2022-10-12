@@ -1227,8 +1227,11 @@ issue_requests_oscore(void)
 
   access_token.profile = OC_PROFILE_COAP_OSCORE;
   oc_core_set_at_table(0, index, access_token, false);
+  oc_print_auth_at_entry(0, index);
+  oc_init_oscore(0);
 
   oc_new_string(&access_token.osc_id, "123", strlen("123"));
+  oc_new_string(&access_token.id, "1234", strlen("1234"));
   oc_new_string(&access_token.osc_contextid, "id1", strlen("id1"));
   oc_new_string(&access_token.osc_ms, (char *)"ABCDE", 5);
   oc_new_string(&access_token.kid, "", 0);
@@ -1239,8 +1242,16 @@ issue_requests_oscore(void)
   access_token.ga = ga_values;
   access_token.ga_len = 3;
   oc_core_set_at_table(0, index, access_token, false);
+  oc_print_auth_at_entry(0, index);
+  oc_init_oscore(0);
+
   access_token.ga_len = 5;
+  oc_new_string(&access_token.id, "1", strlen("1"));
+  oc_new_string(&access_token.osc_id, "2", strlen("2"));
+  oc_new_string(&access_token.osc_contextid, "3", strlen("3"));
   oc_core_set_at_table(0, index, access_token, false);
+  oc_print_auth_at_entry(0, index);
+  oc_init_oscore(0);
 
   // first step is discover myself..
   oc_do_wk_discovery_all("ep=urn:knx:sn.000005", 2, discovery_cb, NULL);
