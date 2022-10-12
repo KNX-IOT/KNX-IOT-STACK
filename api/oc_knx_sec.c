@@ -1246,7 +1246,7 @@ oc_core_set_at_table(size_t device_index, int index, oc_auth_at_t entry)
       }
     }
 
-    //oc_at_dump_entry(device_index, index);
+    // oc_at_dump_entry(device_index, index);
   }
   if (index == 0) {
     // set the OSCORE stuff

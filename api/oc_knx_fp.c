@@ -1935,14 +1935,15 @@ oc_core_add_publisher_entry(int index, oc_group_rp_table_t entry)
                               entry);
 }
 
-int oc_core_find_empty_slot_in_publisher_table(int id)
+int
+oc_core_find_empty_slot_in_publisher_table(int id)
 {
   return find_empty_slot_in_rp_table(id, g_gpt,
                                      oc_core_get_publisher_table_size());
 }
 
-
-int oc_core_find_index_in_publisher_table_from_id(int id)
+int
+oc_core_find_index_in_publisher_table_from_id(int id)
 {
   return oc_core_find_index_in_rp_table_from_id(
     id, g_gpt, oc_core_get_publisher_table_size());
