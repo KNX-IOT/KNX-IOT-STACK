@@ -1,4 +1,9 @@
 # This CMakeLists can only build the port for Linux & Windows
+
+if(OC_LOG_TO_FILE_ENABLED)
+    target_compile_definitions(kis-port INTERFACE OC_LOG_TO_FILE)
+endif()
+
 if(UNIX OR WIN32)
     project(knx-iot-stack-port)
 

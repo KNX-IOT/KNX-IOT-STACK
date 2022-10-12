@@ -25,8 +25,8 @@ set(OC_DEBUG_ENABLED OFF CACHE BOOL "Enable debug messages")
 set(OC_LOG_TO_FILE_ENABLED OFF CACHE BOOL "redirect debug messages to file")
 set(CLANG_TIDY_ENABLED OFF CACHE BOOL "Enable clang-tidy analysis during compilation.")
 
-set(KNX_BUILTIN_MBEDTLS ON CACHE BOOL "Use builtin mbedTLS, as opposed to external lib from different project")
-set(KNX_BUILTIN_TINYCBOR ON CACHE BOOL "Use builtin TinyCBOR, as opposed to external lib from different project")
+set(KNX_BUILTIN_MBEDTLS ON CACHE BOOL "Use built-in mbedTLS, as opposed to external lib from different project")
+set(KNX_BUILTIN_TINYCBOR ON CACHE BOOL "Use built-in TinyCBOR, as opposed to external lib from different project")
 
 set(KNX_LOG_CAST_64_BIT_INTS_ENABLED OFF CACHE BOOL "Cast int64_t and uint64_t values to (int) if platform doesn't support 64 bit int format specifiers")
 
@@ -162,7 +162,7 @@ if(OC_DEBUG_ENABLED)
 endif()
 
 if(OC_LOG_TO_FILE_ENABLED)
-    target_compile_definitions(kis-common INTERFACE OC_LOG_TO_FILE)
+    target_compile_definitions(kis-port INTERFACE OC_LOG_TO_FILE)
 endif()
 
 if(OC_DNS_SD_ENABLED)
