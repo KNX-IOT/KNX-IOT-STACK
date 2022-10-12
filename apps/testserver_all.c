@@ -1235,7 +1235,7 @@ issue_requests_oscore(void)
   oc_new_string(&access_token.sub, "", 0);
   oc_new_string(&access_token.osc_alg, "", 0);
   access_token.profile = OC_PROFILE_COAP_OSCORE;
-  int ga_values[5] = { 1, 2, 3, 4, 5 };
+  int64_t ga_values[5] = { 1, 2, 3, 4, 5 };
   access_token.ga = ga_values;
   access_token.ga_len = 3;
   oc_core_set_at_table(0, index, access_token, false);
