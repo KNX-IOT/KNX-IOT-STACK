@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.15)
-project(knx-iot-stack)
+project(knx-iot-stack) 
 
 if(CMAKE_COMPILER_IS_GNUCC AND UNIX)
     add_compile_options(-fPIC)
@@ -22,6 +22,7 @@ set(OC_PUBLISHER_TABLE_ENABLED ON CACHE BOOL "enable Publisher table")
 set(OC_OSCORE_ENABLED OFF CACHE BOOL "Enable oscore")
 set(OC_PKI_ENABLED OFF CACHE BOOL "Enable PKI security")
 set(OC_DEBUG_ENABLED OFF CACHE BOOL "Enable debug messages")
+set(OC_LOG_TO_FILE_ENABLED OFF CACHE BOOL "redirect debug messages to file")
 set(CLANG_TIDY_ENABLED OFF CACHE BOOL "Enable clang-tidy analysis during compilation.")
 
 set(KNX_BUILTIN_MBEDTLS ON CACHE BOOL "Use builtin mbedTLS, as opposed to external lib from different project")
@@ -158,6 +159,10 @@ endif()
 
 if(OC_DEBUG_ENABLED)
     target_compile_definitions(kis-common INTERFACE OC_DEBUG)
+endif()
+
+if(OC_LOG_TO_FILE_ENABLED)
+    target_compile_definitions(kis-common INTERFACE OC_LOG_TO_FILE)
 endif()
 
 if(OC_DNS_SD_ENABLED)

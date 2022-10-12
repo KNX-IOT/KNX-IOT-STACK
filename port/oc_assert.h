@@ -47,7 +47,7 @@ void exit_impl(int status);
 static inline void
 oc_abort(const char *msg)
 {
-  PRINT("\n%s\nAbort.\n", msg);
+  //PRINT("\n%s\nAbort.\n", msg);
   abort_impl();
 }
 
