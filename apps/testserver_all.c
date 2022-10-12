@@ -68,6 +68,7 @@
 #include "oc_api.h"
 #include "oc_core_res.h"
 #include "api/oc_knx_fp.h"
+#include "api/oc_knx_sec.h"
 #include "api/oc_knx_gm.h"
 #ifdef OC_SPAKE
 #include "security/oc_spake2plus.h"
@@ -1049,6 +1050,7 @@ issue_requests(void *data)
   }
 
   oc_set_delayed_callback(NULL, issue_requests, 0);
+  return OC_EVENT_DONE;
 }
 
 /**
@@ -1121,6 +1123,8 @@ issue_requests_s_mode_delayed(void *data)
   PRINT("INDEX 3\n");
   oc_print_group_object_table_entry(3);
   PRINT("\n");
+
+  int index = 0;
 
   // set loaded
   device->lsm_s = LSM_S_LOADED;
@@ -1215,6 +1219,29 @@ discovery_cb(const char *payload, int len, oc_endpoint_t *endpoint,
 void
 issue_requests_oscore(void)
 {
+
+  PRINT("issue_requests_oscore");
+  int index = 0;
+  oc_auth_at_t access_token;
+  memset(&access_token, 0, sizeof(access_token));
+
+  access_token.profile = OC_PROFILE_COAP_OSCORE;
+  oc_core_set_at_table(0, index, access_token, false);
+
+  oc_new_string(&access_token.osc_id, "123", strlen("123"));
+  oc_new_string(&access_token.osc_contextid, "id1", strlen("id1"));
+  oc_new_string(&access_token.osc_ms, (char *)"ABCDE", 5);
+  oc_new_string(&access_token.kid, "", 0);
+  oc_new_string(&access_token.sub, "", 0);
+  oc_new_string(&access_token.osc_alg, "", 0);
+  access_token.profile = OC_PROFILE_COAP_OSCORE;
+  int64_t ga_values[5] = { 1, 2, 3, 4, 5 };
+  access_token.ga = ga_values;
+  access_token.ga_len = 3;
+  oc_core_set_at_table(0, index, access_token, false);
+  access_token.ga_len = 5;
+  oc_core_set_at_table(0, index, access_token, false);
+
   // first step is discover myself..
   oc_do_wk_discovery_all("ep=urn:knx:sn.000005", 2, discovery_cb, NULL);
 }
@@ -1261,8 +1288,8 @@ main(int argc, char *argv[])
 {
   int init;
 
-  bool do_send_s_mode = true;
-  bool do_send_oscore = false;
+  bool do_send_s_mode = false;
+  bool do_send_oscore = true;
   // false;
   true; //  false;
   g_reset = true;
