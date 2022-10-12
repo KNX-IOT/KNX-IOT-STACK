@@ -213,7 +213,7 @@ oc_do_multicast_update(void)
 {
   int payload_size = oc_rep_get_encoded_payload_size();
 
-  if (payload_size > 0) {
+  if (payload_size > 0 && multicast_update) {
     coap_set_payload(request, multicast_update->data + COAP_MAX_HEADER_SIZE,
                      payload_size);
   } else {
