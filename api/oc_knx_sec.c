@@ -1189,7 +1189,8 @@ oc_core_get_at_table_size()
 }
 
 int
-oc_core_set_at_table(size_t device_index, int index, oc_auth_at_t entry, bool store)
+oc_core_set_at_table(size_t device_index, int index, oc_auth_at_t entry,
+                     bool store)
 {
   (void)device_index;
   if (index < G_AT_MAX_ENTRIES) {
@@ -1226,7 +1227,7 @@ oc_core_set_at_table(size_t device_index, int index, oc_auth_at_t entry, bool st
         free(cur_arr);
       }
     }
-    // copy initial data 
+    // copy initial data
     g_at_entries[index].ga_len = entry.ga_len;
     g_at_entries[index].ga = NULL;
     // copy the array

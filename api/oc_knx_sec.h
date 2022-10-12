@@ -195,7 +195,8 @@ int oc_core_get_at_table_size();
  * @param store store the entry to persistent storage
  * @return int 0 == successful
  */
-int oc_core_set_at_table(size_t device_index, int index, oc_auth_at_t entry, bool store);
+int oc_core_set_at_table(size_t device_index, int index, oc_auth_at_t entry,
+                         bool store);
 
 /**
  * @brief find the entry with context_id as id
