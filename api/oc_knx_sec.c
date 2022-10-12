@@ -1189,7 +1189,7 @@ oc_core_get_at_table_size()
 }
 
 int
-oc_core_set_at_table(size_t device_index, int index, oc_auth_at_t entry)
+oc_core_set_at_table(size_t device_index, int index, oc_auth_at_t entry, bool store)
 {
   (void)device_index;
   if (index < G_AT_MAX_ENTRIES) {
@@ -1219,23 +1219,21 @@ oc_core_set_at_table(size_t device_index, int index, oc_auth_at_t entry)
                   oc_string(entry.osc_contextid),
                   oc_string_len(entry.osc_contextid));
 
-    g_at_entries[index].ga_len = entry.ga_len;
-
-    // make deep copy..
-    size_t array_size = (int)entry.ga_len;
-    // not making a deep copy
-    if (array_size > 0) {
-      // make the deep copy
-      if (g_at_entries[index].ga_len > 0) {
-        int64_t *cur_arr = g_at_entries[index].ga;
-        if (cur_arr) {
-          free(cur_arr);
-        }
-        // free(&g_at_entries[index].ga);
+    // clean up existing entry
+    if (g_at_entries[index].ga_len > 0) {
+      int64_t *cur_arr = g_at_entries[index].ga;
+      if (cur_arr) {
+        free(cur_arr);
       }
+    }
+    // copy initial data 
+    g_at_entries[index].ga_len = entry.ga_len;
+    g_at_entries[index].ga = NULL;
+    // copy the array
+    if (g_at_entries[index].ga_len > 0) {
+      int array_size = (int)g_at_entries[index].ga_len;
       g_at_entries[index].ga_len = (int)array_size;
       int64_t *new_array = (int64_t *)malloc(array_size * sizeof(uint64_t));
-
       if (new_array) {
         for (size_t i = 0; i < array_size; i++) {
           new_array[i] = entry.ga[i];
@@ -1243,10 +1241,13 @@ oc_core_set_at_table(size_t device_index, int index, oc_auth_at_t entry)
         g_at_entries[index].ga = new_array;
       } else {
         OC_ERR("out of memory");
+        return -1;
       }
     }
 
-    // oc_at_dump_entry(device_index, index);
+    if (store) {
+      oc_at_dump_entry(device_index, index);
+    }
   }
   if (index == 0) {
     // set the OSCORE stuff
@@ -1353,7 +1354,7 @@ oc_oscore_set_auth(char *serial_number, char *context_id, uint8_t *shared_key,
   if (index == -1) {
     OC_ERR("no space left in auth/at");
   } else {
-    oc_core_set_at_table((size_t)0, index, os_token);
+    oc_core_set_at_table((size_t)0, index, os_token, true);
     oc_at_dump_entry((size_t)0, index);
     // add the oscore context...
     oc_init_oscore(0);

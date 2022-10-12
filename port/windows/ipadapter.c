@@ -507,7 +507,7 @@ process_interface_change_event(void)
       refresh_endpoints_list(dev, ifaddr_list);
       oc_network_event_handler_mutex_unlock();
     } else {
-      OC_ERR("IP context for dev %d is NULL", i);
+      OC_ERR("IP context for dev %d is NULL", (int)i);
     }
   }
 
