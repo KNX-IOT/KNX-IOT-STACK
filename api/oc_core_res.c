@@ -429,7 +429,7 @@ oc_core_add_device(const char *name, const char *version, const char *base,
   }
 
   /* must be before the increase of device_count */
-  oc_init_oscore(device_count, true);
+  oc_init_oscore_from_storage(device_count, true);
 
   device_count++;
 
