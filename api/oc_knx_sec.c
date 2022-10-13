@@ -36,7 +36,6 @@ oc_auth_at_t g_at_entries[G_AT_MAX_ENTRIES];
 
 // ----------------------------------------------------------------------------
 
-static void oc_at_delete_entry(size_t device_index, int index);
 static void oc_at_dump_entry(size_t device_index, int entry);
 
 // ----------------------------------------------------------------------------
@@ -983,10 +982,17 @@ oc_print_auth_at_entry(size_t device_index, int index)
   }
 }
 
-static void
+int
 oc_at_delete_entry(size_t device_index, int index)
 {
   (void)device_index;
+  if (index < 0) {
+    return -1;
+  }
+  if (index > oc_core_get_at_table_size()-1) {
+    return -1;
+  }
+
   // generic
   oc_free_string(&g_at_entries[index].id);
   oc_new_string(&g_at_entries[index].id, "", 0);
@@ -1010,6 +1016,8 @@ oc_at_delete_entry(size_t device_index, int index)
   char filename[20];
   snprintf(filename, 20, "%s_%d", AT_STORE, index);
   oc_storage_erase(filename);
+
+  return 0;
 }
 
 static void

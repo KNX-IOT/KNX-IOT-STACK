@@ -256,6 +256,15 @@ void oc_print_auth_at_entry(size_t device_index, int index);
 void oc_delete_at_table(size_t device_index);
 
 /**
+ * @brief delete the /auth/at table entry
+ *
+ * @param device_index the device index
+ * @param index the index in the table
+ * return 0 == success
+ */
+int oc_at_delete_entry(size_t device_index, int index);
+
+/**
  * @brief retrieve the replay window
  *
  * @return uint64_t the replay window
