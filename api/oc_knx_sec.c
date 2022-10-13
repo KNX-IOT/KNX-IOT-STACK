@@ -416,7 +416,6 @@ oc_core_auth_at_get_handler(oc_request_t *request,
   }
   /* example entry: </auth/at/token-id>;ct=50 */
   for (i = 0; i < G_AT_MAX_ENTRIES; i++) {
-    // g_at_entries[i].contextId != NULL &&
     if (oc_string_len(g_at_entries[i].id) > 0) {
       // index  in use
       if (response_length > 0) {
@@ -566,20 +565,6 @@ oc_core_auth_at_post_handler(oc_request_t *request,
           PRINT("  subobject_nr %d\n", subobject_nr);
           while (subobject) {
             if (subobject->type == OC_REP_STRING) {
-              // if (subobject->iname == 2 && subobject_nr == 2) {
-              //  // sub::dnsname :: 2:x?
-              //  oc_free_string(&(g_at_entries[index].dnsname));
-              //  oc_new_string(&g_at_entries[index].dnsname,
-              //                oc_string(subobject->value.string),
-              //                oc_string_len(subobject->value.string));
-              //}
-              // if (subobject->iname == 3 && subobject_nr == 8) {
-              //  // cnf::kty 8::2
-              //  oc_free_string(&(g_at_entries[index].kty));
-              //  oc_new_string(&g_at_entries[index].kty,
-              //                oc_string(subobject->value.string),
-              //                oc_string_len(subobject->value.string));
-              //}
               if (subobject->iname == 3 && subobject_nr == 8) {
                 // cnf::kid (8::3)
                 oc_free_string(&(g_at_entries[index].kid));
@@ -662,6 +647,9 @@ oc_core_auth_at_post_handler(oc_request_t *request,
     rep = rep->next;
   } // while (rep)
 
+  PRINT("oc_core_auth_at_post_handler - activating oscore context\n");
+  // add the key by reinitializing all used oscore keys.
+  oc_init_oscore(device_index);
   PRINT("oc_core_auth_at_post_handler - end\n");
   oc_send_cbor_response(request, OC_STATUS_CHANGED);
 }
@@ -871,13 +859,15 @@ oc_core_auth_at_x_delete_handler(oc_request_t *request,
   // - delete the index.
   if (index < 0) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
-    PRINT("index in struct not found\n");
+    PRINT("oc_core_auth_at_x_delete_handler: index in structure not found\n");
     return;
   }
   // actual delete of the context id so that this entry is seen as empty
   oc_at_delete_entry(device_index, index);
   // do the persistent storage
   oc_at_dump_entry(device_index, index);
+  // remove the key by reinitializing all used oscore keys.
+  oc_init_oscore(device_index);
   PRINT("oc_core_auth_at_x_delete_handler - done\n");
   oc_send_cbor_response(request, OC_STATUS_OK);
 }
@@ -1250,9 +1240,9 @@ oc_core_set_at_table(size_t device_index, int index, oc_auth_at_t entry,
       oc_at_dump_entry(device_index, index);
     }
   }
-  if (index == 0) {
-    // set the OSCORE stuff
-  }
+  // activate the credentials
+  PRINT("oc_core_set_at_table: activating oscore credentials");
+  oc_init_oscore(device_index);
 
   return 0;
 }
@@ -1356,7 +1346,9 @@ oc_oscore_set_auth(char *serial_number, char *context_id, uint8_t *shared_key,
     OC_ERR("no space left in auth/at");
   } else {
     oc_core_set_at_table((size_t)0, index, os_token, true);
+#ifndef OC_NO_STORAGE
     oc_at_dump_entry((size_t)0, index);
+#endif
     // add the oscore context...
     oc_init_oscore(0);
   }
