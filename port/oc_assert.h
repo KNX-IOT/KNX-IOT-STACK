@@ -48,7 +48,7 @@ static inline void
 oc_abort(const char *msg)
 {
 #if OC_LOG_TO_FILE
-(void)msg;
+  (void)msg;
 #else
   PRINT("\n%s\nAbort.\n", msg);
 #endif
