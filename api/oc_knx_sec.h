@@ -28,7 +28,7 @@
   Description of the implemented replay window algorithm.
 
   The KNX servers keep a list endpoints that they have received a
-  'synchronised' message from. Upon boot, this list endpoints is empty, so
+  'synchronized' message from. Upon boot, this list endpoints is empty, so
   servers will respond to requests from all new client endpoints with `4.01
   UNAUTHORISED` message containing an Echo option. The echo option is
   OSCORE-encrypted, and its actual value is the local time of the server. Upon
@@ -36,11 +36,11 @@
   Echo value that the server sent. This verifies that:
 
   a) the client is reachable at the source IP address, preventing attackers
-  from attempting to bypass the deduplication code by changing the source IP
+  from attempting to bypass the de-duplication code by changing the source IP
   address of packets.
 
   b) the request is fresh - the server drops request where the
-  timestamp contained in the Echo option is older than a given threshold,
+  time stamp contained in the Echo option is older than a given threshold,
   configurable within engine.c.
 
   The handling of the replay is transparent to the higher layers.
@@ -192,7 +192,7 @@ int oc_core_get_at_table_size();
  * @param device_index index of the device
  * @param index the index in the table, will overwrite if something is there
  * @param entry the auth/at entry
- * @param store store the entry to persistent storage
+ * @param store the store the entry to persistent storage
  * @return int 0 == successful
  */
 int oc_core_set_at_table(size_t device_index, int index, oc_auth_at_t entry,
@@ -297,9 +297,18 @@ void oc_create_knx_sec_resources(size_t device);
 /**
  * @brief initialize OSCORE for the device
  *
+ * Note: does not read the context from storage
  * @param device_index The device index
  */
 void oc_init_oscore(size_t device_index);
+
+/**
+ * @brief initialize OSCORE for the device
+ *
+ * @param device_index The device index
+ * @param from_storage contents read from storage
+ */
+void oc_init_oscore_from_storage(size_t device_index, bool from_storage);
 
 /**
  * @brief function to check if the at_interface is listed in the resource
