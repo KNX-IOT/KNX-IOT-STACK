@@ -989,7 +989,7 @@ oc_at_delete_entry(size_t device_index, int index)
   if (index < 0) {
     return -1;
   }
-  if (index > oc_core_get_at_table_size()-1) {
+  if (index > oc_core_get_at_table_size() - 1) {
     return -1;
   }
 
