@@ -1255,15 +1255,15 @@ issue_requests_oscore(void)
   oc_do_wk_discovery_all("ep=urn:knx:sn.000005", 2, discovery_cb, NULL);
 }
 
-void oc_issue_s_mode(int scope, int sia_value, int grpid,
-                              int group_address, int iid, char *rp,
-                              uint8_t *value_data, int value_size);
+void oc_issue_s_mode(int scope, int sia_value, int grpid, int group_address,
+                     int iid, char *rp, uint8_t *value_data, int value_size);
 
 /**
  * test of decoding a message to myself
  */
 oc_event_callback_retval_t
-issue_s_mode_secure(void *data) {
+issue_s_mode_secure(void *data)
+{
 
   PRINT("issue_s_mode_secure");
   int index = 0;
@@ -1291,15 +1291,12 @@ issue_s_mode_secure(void *data) {
 
   subscribe_group_to_multicast(1, 16, 1);
 
-  oc_issue_s_mode(2, 6, 1, 1,
-                  16, "w", 0,0);
+  oc_issue_s_mode(2, 6, 1, 1, 16, "w", 0, 0);
 
-  //static void oc_issue_s_mode(int scope, int sia_value, int grpid,
+  // static void oc_issue_s_mode(int scope, int sia_value, int grpid,
   //                            int group_address, int iid, char *rp,
   //                            uint8_t *value_data, int value_size)
-
 }
-
 
 /**
  * set a multicast s-mode message as delayed callback
@@ -1308,7 +1305,7 @@ void
 issue_requests_s_mode(void)
 {
   PRINT(" issue_requests_s_mode\n");
-  //oc_set_delayed_callback(NULL, issue_requests_s_mode_delayed, 2);
+  // oc_set_delayed_callback(NULL, issue_requests_s_mode_delayed, 2);
   oc_set_delayed_callback(NULL, issue_s_mode_secure, 2);
 }
 
@@ -1440,19 +1437,18 @@ main(int argc, char *argv[])
 #endif
 
 #ifdef OC_CLIENT
-  //oc_set_delayed_callback(NULL, issue_requests_s_mode_delayed, 2);
+  // oc_set_delayed_callback(NULL, issue_requests_s_mode_delayed, 2);
   if (do_send_oscore) {
     handler.requests_entry = issue_requests_oscore;
   }
 #endif
 
 #ifdef OC_CLIENT
-  //if (do_test_myself) {
+  // if (do_test_myself) {
   //  handler.requests_entry = issue_s_mode_secure;
   //}
   oc_set_delayed_callback(NULL, issue_s_mode_secure, 2);
 #endif
-
 
   char *fname = "myswu_app";
 
