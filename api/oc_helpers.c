@@ -1,5 +1,6 @@
 /*
 // Copyright (c) 2016 Intel Corporation
+// Copyright (c) 2022 Cascoda Ltd.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,6 +20,7 @@
 #include "port/oc_log.h"
 #include <stdbool.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 static bool mmem_initialized = false;
 
@@ -310,18 +312,37 @@ oc_conv_hex_string_to_byte_array(const char *hex_str, size_t hex_str_len,
     start = 0;
   } else {
     start = 1;
-    sscanf(&hex_str[0], "%1x", &tmp);
+    int processed_fields = sscanf(&hex_str[0], "%1x", &tmp);
+    if (processed_fields != 1) {
+      return -1;
+    }
     array[a++] = (uint8_t)tmp;
   }
 
   if (hex_str_len >= 2) {
     // save guard against string lengths of 1
     for (i = start; i <= hex_str_len - 2; i += 2) {
-      sscanf(&hex_str[i], "%2x", &tmp);
+      int processed_fields = sscanf(&hex_str[i], "%2x", &tmp);
+      if (processed_fields != 1) {
+        return -1;
+      }
       array[a++] = (uint8_t)tmp;
     }
   }
 
+  return 0;
+}
+
+int
+oc_string_is_hex_array(oc_string_t hex_string)
+{
+  char *array = oc_string(hex_string);
+  int array_len = strlen(array);
+  for (int i = 0; i < array_len; i++) {
+    if (isxdigit(array[i]) == false) {
+      return -1;
+    }
+  }
   return 0;
 }
 
