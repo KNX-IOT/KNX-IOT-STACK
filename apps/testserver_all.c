@@ -1228,7 +1228,6 @@ issue_requests_oscore(void)
   access_token.profile = OC_PROFILE_COAP_OSCORE;
   oc_core_set_at_table(0, index, access_token, false);
   oc_print_auth_at_entry(0, index);
-  oc_init_oscore(0);
 
   oc_new_string(&access_token.osc_id, "123", strlen("123"));
   oc_new_string(&access_token.id, "1234", strlen("1234"));
@@ -1251,11 +1250,56 @@ issue_requests_oscore(void)
   oc_new_string(&access_token.osc_contextid, "3", strlen("3"));
   oc_core_set_at_table(0, index, access_token, false);
   oc_print_auth_at_entry(0, index);
-  oc_init_oscore(0);
 
   // first step is discover myself..
   oc_do_wk_discovery_all("ep=urn:knx:sn.000005", 2, discovery_cb, NULL);
 }
+
+void oc_issue_s_mode(int scope, int sia_value, int grpid,
+                              int group_address, int iid, char *rp,
+                              uint8_t *value_data, int value_size);
+
+/**
+ * test of decoding a message to myself
+ */
+oc_event_callback_retval_t
+issue_s_mode_secure(void *data) {
+
+  PRINT("issue_s_mode_secure");
+  int index = 0;
+  oc_auth_at_t access_token;
+  memset(&access_token, 0, sizeof(access_token));
+
+  access_token.profile = OC_PROFILE_COAP_OSCORE;
+  oc_core_set_at_table(0, index, access_token, false);
+  oc_print_auth_at_entry(0, index);
+
+  oc_new_string(&access_token.osc_id, "123", strlen("123"));
+  oc_new_string(&access_token.id, "1234", strlen("1234"));
+  oc_new_string(&access_token.osc_contextid, "id1", strlen("id1"));
+  oc_new_string(&access_token.osc_ms, (char *)"ABCDE", 5);
+  oc_new_string(&access_token.kid, "", 0);
+  oc_new_string(&access_token.sub, "", 0);
+  oc_new_string(&access_token.osc_alg, "", 0);
+  access_token.profile = OC_PROFILE_COAP_OSCORE;
+  int64_t ga_values[5] = { 1, 2, 3, 4, 5 };
+  access_token.ga = ga_values;
+  access_token.ga_len = 3;
+  oc_core_set_at_table(0, index, access_token, false);
+  oc_print_auth_at_entry(0, index);
+  oc_init_oscore(0);
+
+  subscribe_group_to_multicast(1, 16, 1);
+
+  oc_issue_s_mode(2, 6, 1, 1,
+                  16, "w", 0,0);
+
+  //static void oc_issue_s_mode(int scope, int sia_value, int grpid,
+  //                            int group_address, int iid, char *rp,
+  //                            uint8_t *value_data, int value_size)
+
+}
+
 
 /**
  * set a multicast s-mode message as delayed callback
@@ -1264,7 +1308,8 @@ void
 issue_requests_s_mode(void)
 {
   PRINT(" issue_requests_s_mode\n");
-  oc_set_delayed_callback(NULL, issue_requests_s_mode_delayed, 2);
+  //oc_set_delayed_callback(NULL, issue_requests_s_mode_delayed, 2);
+  oc_set_delayed_callback(NULL, issue_s_mode_secure, 2);
 }
 
 /**
@@ -1299,8 +1344,9 @@ main(int argc, char *argv[])
 {
   int init;
 
-  bool do_send_s_mode = false;
-  bool do_send_oscore = true;
+  bool do_send_s_mode = true;
+  bool do_send_oscore = false;
+  bool do_test_myself = true;
   // false;
   true; //  false;
   g_reset = true;
@@ -1394,10 +1440,19 @@ main(int argc, char *argv[])
 #endif
 
 #ifdef OC_CLIENT
+  //oc_set_delayed_callback(NULL, issue_requests_s_mode_delayed, 2);
   if (do_send_oscore) {
     handler.requests_entry = issue_requests_oscore;
   }
 #endif
+
+#ifdef OC_CLIENT
+  //if (do_test_myself) {
+  //  handler.requests_entry = issue_s_mode_secure;
+  //}
+  oc_set_delayed_callback(NULL, issue_s_mode_secure, 2);
+#endif
+
 
   char *fname = "myswu_app";
 

@@ -161,9 +161,7 @@ if(OC_DEBUG_ENABLED)
     target_compile_definitions(kis-common INTERFACE OC_DEBUG)
 endif()
 
-if(OC_LOG_TO_FILE_ENABLED)
-    target_compile_definitions(kis-port INTERFACE OC_LOG_TO_FILE)
-endif()
+
 
 if(OC_DNS_SD_ENABLED)
     target_compile_definitions(kis-common INTERFACE OC_DNS_SD)
@@ -275,3 +273,7 @@ endif() #CMAKE_BUILD_TYPE STREQUAL "Coverage"
 add_subdirectory(port)
 add_subdirectory(apps)
 add_subdirectory(deps)
+
+if(OC_LOG_TO_FILE_ENABLED)
+    target_compile_definitions(kis-port INTERFACE OC_LOG_TO_FILE)
+endif()
