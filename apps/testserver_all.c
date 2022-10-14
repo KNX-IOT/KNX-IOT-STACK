@@ -1259,6 +1259,8 @@ void oc_issue_s_mode(int scope, int sia_value, int grpid,
                               int group_address, int iid, char *rp,
                               uint8_t *value_data, int value_size);
 
+static bool oscore_init = false;
+
 /**
  * test of decoding a message to myself
  */
@@ -1266,30 +1268,44 @@ oc_event_callback_retval_t
 issue_s_mode_secure(void *data) {
 
   PRINT("issue_s_mode_secure");
+
   int index = 0;
-  oc_auth_at_t access_token;
-  memset(&access_token, 0, sizeof(access_token));
 
-  access_token.profile = OC_PROFILE_COAP_OSCORE;
-  oc_core_set_at_table(0, index, access_token, false);
-  oc_print_auth_at_entry(0, index);
+  if (oscore_init == false) {
+    oc_auth_at_t access_token;
+    memset(&access_token, 0, sizeof(access_token));
 
-  oc_new_string(&access_token.osc_id, "123", strlen("123"));
-  oc_new_string(&access_token.id, "1234", strlen("1234"));
-  oc_new_string(&access_token.osc_contextid, "id1", strlen("id1"));
-  oc_new_string(&access_token.osc_ms, (char *)"ABCDE", 5);
-  oc_new_string(&access_token.kid, "", 0);
-  oc_new_string(&access_token.sub, "", 0);
-  oc_new_string(&access_token.osc_alg, "", 0);
-  access_token.profile = OC_PROFILE_COAP_OSCORE;
-  int64_t ga_values[5] = { 1, 2, 3, 4, 5 };
-  access_token.ga = ga_values;
-  access_token.ga_len = 3;
-  oc_core_set_at_table(0, index, access_token, false);
-  oc_print_auth_at_entry(0, index);
-  oc_init_oscore(0);
+    access_token.profile = OC_PROFILE_COAP_OSCORE;
+    oc_core_set_at_table(0, index, access_token, false);
+    oc_print_auth_at_entry(0, index);
 
-  subscribe_group_to_multicast(1, 16, 1);
+    oc_new_string(&access_token.osc_id, "y1234567890AB",
+                  strlen("01234567890AB"));
+
+    if (oc_string_is_hex_array(access_token.osc_id) == -1) {
+      PRINT("not a valid hex-string: %s", oc_string(access_token.osc_id));
+    }
+
+    oc_new_string(&access_token.id, "1234", strlen("1234"));
+    oc_new_string(&access_token.osc_contextid, "y1234567890AB",
+                  strlen("01234567890AB"));
+    oc_new_string(&access_token.osc_ms, (char *)"abcd0edf",
+                  strlen("abcd0edf"));
+    oc_new_string(&access_token.kid, "", 0);
+    oc_new_string(&access_token.sub, "", 0);
+    oc_new_string(&access_token.osc_alg, "", 0);
+    access_token.profile = OC_PROFILE_COAP_OSCORE;
+    int64_t ga_values[5] = { 1, 2, 3, 4, 5 };
+    access_token.ga = ga_values;
+    access_token.ga_len = 3;
+    oc_core_set_at_table(0, index, access_token, false);
+    oc_print_auth_at_entry(0, index);
+    oc_init_oscore(0);
+
+    subscribe_group_to_multicast(1, 16, 2);
+
+    oscore_init = true;
+  }
 
   oc_issue_s_mode(2, 6, 1, 1,
                   16, "w", 0,0);

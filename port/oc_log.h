@@ -36,11 +36,11 @@
   - OC_NO_LOG_BYTES
     disables output of OC_LOGbytes logging function
     if OC_DEBUG is enabled.
+  - OC_LOG_TO_FILE
+    logs the PRINT statements to file
 */
 #ifndef OC_LOG_H
 #define OC_LOG_H
-
-//#define OC_LOG_TO_FILE
 
 #include <stdio.h>
 #include <string.h>
