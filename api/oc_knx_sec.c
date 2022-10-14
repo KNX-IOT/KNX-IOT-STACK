@@ -631,15 +631,6 @@ oc_core_auth_at_post_handler(oc_request_t *request,
     }   // if type == object
     // show the entry on screen
     oc_print_auth_at_entry(device_index, index);
-#ifdef OC_OSCORE
-    // create oscore context
-    oc_oscore_context_t *ctx = oc_oscore_add_context(
-      device_index, oc_string(g_at_entries[index].osc_contextid),
-      oc_string(g_at_entries[index].osc_contextid), 0 /* ssn */, "desc",
-      oc_string(g_at_entries[index].osc_ms),
-      oc_string(g_at_entries[index].osc_contextid), index,
-      false /* from_storage */);
-#endif
 
     // dump the entry to persistent storage
     oc_at_dump_entry(device_index, index);
@@ -647,8 +638,8 @@ oc_core_auth_at_post_handler(oc_request_t *request,
   } // while (rep)
 
   PRINT("oc_core_auth_at_post_handler - activating oscore context\n");
-  // add the key by reinitializing all used oscore keys.
-  oc_init_oscore(device_index);
+  // add the oscore contexts by reinitializing all used oscore keys.
+  oc_init_oscore_from_storage(device_index, false);
   PRINT("oc_core_auth_at_post_handler - end\n");
   oc_send_cbor_response(request, OC_STATUS_CHANGED);
 }
@@ -866,7 +857,7 @@ oc_core_auth_at_x_delete_handler(oc_request_t *request,
   // do the persistent storage
   oc_at_dump_entry(device_index, index);
   // remove the key by reinitializing all used oscore keys.
-  oc_init_oscore(device_index);
+  oc_init_oscore_from_storage(device_index, false);
   PRINT("oc_core_auth_at_x_delete_handler - done\n");
   oc_send_cbor_response(request, OC_STATUS_OK);
 }
@@ -1250,7 +1241,7 @@ oc_core_set_at_table(size_t device_index, int index, oc_auth_at_t entry,
   }
   // activate the credentials
   PRINT("oc_core_set_at_table: activating oscore credentials");
-  oc_init_oscore(device_index);
+  oc_init_oscore_from_storage(device_index, false);
 
   return 0;
 }
@@ -1287,26 +1278,10 @@ oc_load_at_table(size_t device_index)
     oc_at_load_entry(i);
     if (oc_string_len(g_at_entries[i].id) > 0) {
       oc_print_auth_at_entry(device_index, i);
-#ifdef OC_OSCORE
-      // save ssn to persistent memory, using kid as part of the key
-      uint64_t stored_ssn = 0;
-      uint8_t key_buf[OSCORE_STORAGE_KEY_LEN];
-      memcpy(key_buf, OSCORE_STORAGE_PREFIX, OSCORE_STORAGE_PREFIX_LEN);
-      memcpy(key_buf + OSCORE_STORAGE_PREFIX_LEN,
-             oc_string(g_at_entries[i].osc_contextid), OSCORE_CTXID_LEN);
-      key_buf[OSCORE_STORAGE_KEY_LEN - 1] = '\0';
-
-      oc_storage_read(key_buf, (uint8_t *)stored_ssn, sizeof(stored_ssn));
-      // create oscore context
-      oc_oscore_context_t *ctx = oc_oscore_add_context(
-        device_index, oc_string(g_at_entries[i].osc_contextid),
-        oc_string(g_at_entries[i].osc_contextid), stored_ssn, "desc",
-        oc_string(g_at_entries[i].osc_ms),
-        oc_string(g_at_entries[i].osc_contextid), i, true /* from_storage */
-      );
-#endif
     }
   }
+  // create the oscore contexts
+  oc_init_oscore_from_storage(device_index, true);
 }
 
 void
@@ -1413,6 +1388,12 @@ oc_create_knx_sec_resources(size_t device_index)
 void
 oc_init_oscore(size_t device_index)
 {
+  oc_init_oscore_from_storage(device_index, false);
+}
+
+void
+oc_init_oscore_from_storage(size_t device_index, bool from_storage)
+{
 #ifndef OC_OSCORE
   (void)device_index;
 #else /* OC_OSCORE */
@@ -1436,7 +1417,7 @@ oc_init_oscore(size_t device_index)
           device_index, oc_string(g_at_entries[i].osc_contextid),
           oc_string(g_at_entries[i].osc_contextid), ssn, "desc",
           oc_string(g_at_entries[i].osc_ms),
-          oc_string(g_at_entries[i].osc_contextid), i, false);
+          oc_string(g_at_entries[i].osc_contextid), i, from_storage);
         if (ctx == NULL) {
           PRINT("   fail...\n ");
         }

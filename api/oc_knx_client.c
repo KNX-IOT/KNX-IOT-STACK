@@ -405,7 +405,7 @@ oc_s_mode_get_value(oc_request_t *request)
   return NULL;
 }
 
-static void
+void
 oc_issue_s_mode(int scope, int sia_value, int grpid, int group_address, int iid,
                 char *rp, uint8_t *value_data, int value_size)
 {
