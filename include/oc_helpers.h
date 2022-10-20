@@ -324,7 +324,6 @@ int oc_conv_hex_string_to_byte_array(const char *hex_str, size_t hex_str_len,
  */
 int oc_string_is_hex_array(oc_string_t hex_string);
 
-
 /**
  * @brief checks if the uri contains a wildcard (e.g. "*")
  *

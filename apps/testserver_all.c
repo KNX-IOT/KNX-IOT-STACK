@@ -1289,8 +1289,7 @@ issue_s_mode_secure(void *data)
     oc_new_string(&access_token.id, "1234", strlen("1234"));
     oc_new_string(&access_token.osc_contextid, "1234567890AB",
                   strlen("01234567890AB"));
-    oc_new_string(&access_token.osc_ms, (char *)"abcd0edf",
-                  strlen("abcd0edf"));
+    oc_new_string(&access_token.osc_ms, (char *)"abcd0edf", strlen("abcd0edf"));
     oc_new_string(&access_token.kid, "", 0);
     oc_new_string(&access_token.sub, "", 0);
     oc_new_string(&access_token.osc_alg, "", 0);
