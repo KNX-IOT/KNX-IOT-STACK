@@ -412,8 +412,28 @@ coap_receive(oc_message_t *msg)
           }
         }
 
+        bool is_myself = false;
+        //
+        // check if incoming message is from myself.
+        // if so, then return with bad request
+        oc_endpoint_t *my_ep = oc_connectivity_get_endpoints(0);
+#ifdef OC_DEBUG
+        if (my_ep != NULL) {
+          PRINT("engine : myself:");
+          PRINTipaddr(*my_ep);
+          PRINT("\n");
+        }
+#endif /* OC_DEBUG */
+        if (oc_endpoint_compare_address(&msg->endpoint, my_ep) == 0) {
+          if (msg->endpoint.addr.ipv6.port == my_ep->addr.ipv6.port) {
+            OC_DBG(" same address and port: not handling message");
+            is_myself = true;
+          }
+        }
+
         // server-side logic for handling responses with echo option
-        if (new_sender && msg->endpoint.flags & OSCORE_DECRYPTED) {
+        if (new_sender && msg->endpoint.flags & OSCORE_DECRYPTED &&
+            is_myself == false) {
           uint8_t echo_value[COAP_ECHO_LEN];
           size_t echo_len = coap_get_header_echo(message, echo_value);
           oc_clock_time_t current_time = oc_clock_time();
