@@ -1287,7 +1287,7 @@ issue_s_mode_secure(void *data)
     }
 
     oc_new_string(&access_token.id, "1234", strlen("1234"));
-    oc_new_string(&access_token.osc_contextid, "y1234567890AB",
+    oc_new_string(&access_token.osc_contextid, "1234567890AB",
                   strlen("01234567890AB"));
     oc_new_string(&access_token.osc_ms, (char *)"abcd0edf",
                   strlen("abcd0edf"));
@@ -1308,6 +1308,8 @@ issue_s_mode_secure(void *data)
   }
 
   oc_issue_s_mode(2, 6, 1, 1, 16, "w", 0, 0);
+
+  return OC_EVENT_CONTINUE;
 
   // static void oc_issue_s_mode(int scope, int sia_value, int grpid,
   //                            int group_address, int iid, char *rp,
