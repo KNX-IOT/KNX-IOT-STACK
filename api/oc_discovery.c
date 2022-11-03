@@ -365,10 +365,6 @@ oc_wkcore_discovery_handler(oc_request_t *request,
       size = oc_rep_add_line_to_buffer("\"");
       response_length = response_length + size;
       matches = 1;
-
-
-
-
     }
   }
 
