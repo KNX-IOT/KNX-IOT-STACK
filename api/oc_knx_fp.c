@@ -893,7 +893,6 @@ oc_core_fp_p_x_get_handler(oc_request_t *request,
 
   /* ga -7 */
   oc_rep_i_set_int_array(root, 7, g_gpt[index].ga, g_gpt[index].ga_len);
-
   oc_rep_end_root_object();
 
   oc_send_cbor_response(request, OC_STATUS_OK);
