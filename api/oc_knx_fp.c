@@ -508,6 +508,7 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   if (status_ok) {
     oc_knx_increase_fingerprint();
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
+    return;
   }
   oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
 }
