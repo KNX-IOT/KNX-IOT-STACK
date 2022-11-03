@@ -378,12 +378,14 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   oc_add_resource_to_wk(oc_core_get_resource_by_index(OC_DEV, device_index),
                         request, device_index, &response_length, matches);
 
-  // oc_add_resource_to_wk(oc_core_get_resource_by_index(OC_AUTH, device_index),
-  //                      request, device_index, &response_length, matches);
+  oc_add_resource_to_wk(
+    oc_core_get_resource_by_index(OC_KNX_AUTH, device_index), request,
+    device_index, &response_length, matches);
 
   oc_add_resource_to_wk(oc_core_get_resource_by_index(OC_KNX_SWU, device_index),
                         request, device_index, &response_length, matches);
 
+  // optional, not yet implemented
   // oc_add_resource_to_wk(oc_core_get_resource_by_index(OC_SUB, device_index),
   //                      request, device_index, &response_length, matches);
 
