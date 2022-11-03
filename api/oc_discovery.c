@@ -323,16 +323,8 @@ oc_wkcore_discovery_handler(oc_request_t *request,
       size = oc_rep_add_line_to_buffer("</dev/dp>;rt=\"dpa.0.58\";ct=50,");
       response_length = response_length + size;
       size =
-        oc_rep_add_line_to_buffer("</dev/ia>;rt=\"dpt.value2Ucount\";ct=50,");
+        oc_rep_add_line_to_buffer("</dev/ia>;rt=\"dpt.value2Ucount\";ct=50");
       response_length = response_length + size;
-
-      /* errata: add serial number */
-      //int size = oc_rep_add_line_to_buffer("<>;ep=\"urn:knx:sn.");
-      //response_length = response_length + size;
-      //size = oc_rep_add_line_to_buffer(oc_string(device->serialnumber));
-      //response_length = response_length + size;
-      //size = oc_rep_add_line_to_buffer("\"");
-      //response_length = response_length + size;
 
       request->response->response_buffer->response_length = response_length;
       request->response->response_buffer->content_format =
@@ -373,6 +365,10 @@ oc_wkcore_discovery_handler(oc_request_t *request,
       size = oc_rep_add_line_to_buffer("\"");
       response_length = response_length + size;
       matches = 1;
+
+
+
+
     }
   }
 
