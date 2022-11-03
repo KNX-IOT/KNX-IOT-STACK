@@ -273,11 +273,16 @@ oc_wkcore_discovery_handler(oc_request_t *request,
     return;
   }
 
-  if (oc_is_device_mode_in_programming(device_index)) {
-    /* add only the serial number when the interface is if.pm && device is in
-       programming mode
-       return <>; ep="urn:knx:sn.<serial-number>"*/
-    if (if_len == 13 && strncmp(if_request, "urn:knx:if.pm", 13) == 0) {
+  if (if_len == 13 && strncmp(if_request, "urn:knx:if.pm", 13) == 0) {
+
+    if (oc_is_device_mode_in_programming(device_index)) {
+      /* device is in programming mode so create the response */
+      /* add only the serial number when the interface is if.pm && device is
+         in programming mode return <>; ep="urn:knx:sn.<serial-number>" return
+         immediately so we do not process any other query params note: we ignore
+         the ep=urn:knx:sn.* and if=urn:knx:if.pm concatenation. since that only
+         needs to respond when the device is in programming mode
+      */
       int size = oc_rep_add_line_to_buffer("<>;ep=\"urn:knx:sn.");
       response_length = response_length + size;
       size = oc_rep_add_line_to_buffer(oc_string(device->serialnumber));
@@ -285,7 +290,25 @@ oc_wkcore_discovery_handler(oc_request_t *request,
       size = oc_rep_add_line_to_buffer("\"");
       response_length = response_length + size;
       matches = 1;
+
+      request->response->response_buffer->response_length = response_length;
+      request->response->response_buffer->content_format =
+        APPLICATION_LINK_FORMAT;
+      request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
+
+      PRINT(" oc_wkcore_discovery_handler PM HANDLING: OK\n");
+    } else {
+      /* device is not in programming mode so ignore this request*/
+      request->response->response_buffer->content_format =
+        APPLICATION_LINK_FORMAT;
+      if (request->origin && (request->origin->flags & MULTICAST) == 0) {
+        request->response->response_buffer->code =
+          oc_status_code(OC_STATUS_BAD_REQUEST);
+      } else {
+        request->response->response_buffer->code = OC_IGNORE;
+      }
     }
+    return;
   }
 
   /* handle individual address */
@@ -307,7 +330,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
       request->response->response_buffer->content_format =
         APPLICATION_LINK_FORMAT;
       request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
-      ;
+
       PRINT(" oc_wkcore_discovery_handler IA HANDLING: OK\n");
       return;
     } else {
