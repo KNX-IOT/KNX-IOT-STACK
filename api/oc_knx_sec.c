@@ -242,10 +242,10 @@ oc_create_knx_f_oscore_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_f_oscore_resource\n");
   // TODO: what is resource type?
+  // none for now
   oc_core_populate_resource(resource_idx, device, "/f/oscore", OC_IF_LI,
                             APPLICATION_LINK_FORMAT, OC_DISCOVERABLE,
-                            oc_core_knx_f_oscore_get_handler, 0, 0, 0, 1,
-                            "urn:knx:xxx");
+                            oc_core_knx_f_oscore_get_handler, 0, 0, 0, 0);
 }
 
 // ----------------------------------------------------------------------------
@@ -395,6 +395,8 @@ find_access_token_from_payload(oc_rep_t *object)
   PRINT("  find_access_token_from_payload Error \n");
   return index;
 }
+
+// ----------------------------------------------------------------------------
 
 static void
 oc_core_auth_at_get_handler(oc_request_t *request,
@@ -669,6 +671,19 @@ oc_create_auth_at_resource(int resource_idx, size_t device)
 
 // ----------------------------------------------------------------------------
 
+// note that this list all auth/at/x resources
+// it does not list the auth/at resource !!
+void
+oc_create_auth_resource(int resource_idx, size_t device)
+{
+  oc_core_populate_resource(resource_idx, device, "/auth",
+                            OC_IF_B | OC_IF_SEC, APPLICATION_LINK_FORMAT,
+                            OC_DISCOVERABLE, oc_core_auth_at_get_handler, 0, 0,
+                            0, 0);
+}
+
+// ----------------------------------------------------------------------------
+
 static void
 oc_core_auth_at_x_get_handler(oc_request_t *request,
                               oc_interface_mask_t iface_mask, void *data)
@@ -912,7 +927,7 @@ oc_create_knx_auth_resource(int resource_idx, size_t device)
   // TODO: what is type of auth resource?
   oc_core_populate_resource(
     resource_idx, device, "/auth", OC_IF_LI, APPLICATION_LINK_FORMAT,
-    OC_DISCOVERABLE, oc_core_knx_auth_get_handler, 0, 0, 0, 1, "urn:knx:xxx");
+    OC_DISCOVERABLE, oc_core_knx_auth_get_handler, 0, 0, 0, 0);
 }
 
 void
@@ -1380,6 +1395,8 @@ oc_create_knx_sec_resources(size_t device_index)
                                            device_index);
   oc_create_knx_f_oscore_resource(OC_KNX_F_OSCORE, device_index);
   oc_create_a_sen_resource(OC_KNX_A_SEN, device_index);
+
+  oc_create_auth_resource(OC_KNX_AUTH, device_index);
   oc_create_auth_at_resource(OC_KNX_AUTH_AT, device_index);
   oc_create_auth_at_x_resource(OC_KNX_AUTH_AT_X, device_index);
   oc_create_knx_auth_resource(OC_KNX_AUTH, device_index);
