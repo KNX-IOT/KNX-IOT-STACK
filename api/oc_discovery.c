@@ -276,7 +276,10 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   if (oc_is_device_mode_in_programming(device_index)) {
     /* add only the serial number when the interface is if.pm && device is in
        programming mode
-       return <>; ep="urn:knx:sn.<serial-number>"*/
+       return <>; ep="urn:knx:sn.<serial-number>"
+       note: we ignore the ep=urn:knx:sn.* and if=urn:knx:if.pm concatenation.
+       since that only needs to respond when the device is in programming mode
+    */
     if (if_len == 13 && strncmp(if_request, "urn:knx:if.pm", 13) == 0) {
       int size = oc_rep_add_line_to_buffer("<>;ep=\"urn:knx:sn.");
       response_length = response_length + size;
@@ -285,6 +288,14 @@ oc_wkcore_discovery_handler(oc_request_t *request,
       size = oc_rep_add_line_to_buffer("\"");
       response_length = response_length + size;
       matches = 1;
+
+      request->response->response_buffer->response_length = response_length;
+      request->response->response_buffer->content_format =
+        APPLICATION_LINK_FORMAT;
+      request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
+
+      PRINT(" oc_wkcore_discovery_handler PM HANDLING: OK\n");
+      return;
     }
   }
 
@@ -307,7 +318,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
       request->response->response_buffer->content_format =
         APPLICATION_LINK_FORMAT;
       request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
-      ;
+
       PRINT(" oc_wkcore_discovery_handler IA HANDLING: OK\n");
       return;
     } else {
