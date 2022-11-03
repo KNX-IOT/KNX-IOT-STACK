@@ -439,7 +439,7 @@ oc_ri_process_discovery_payload(uint8_t *payload, int len,
 
   if (content == APPLICATION_LINK_FORMAT) {
 
-    PRINT("calling handler all\n");
+    PRINT("oc_ri_process_discovery_payload: calling handler all\n");
     if (all_handler) {
       all_handler((const char *)payload, len, endpoint, user_data);
     }
