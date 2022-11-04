@@ -1024,6 +1024,9 @@ oc_core_knx_ia_post_handler(oc_request_t *request,
     if (oc_is_device_in_runtime(device_index)) {
       oc_register_group_multicasts();
       oc_init_datapoints_at_initialization();
+      oc_device_info_t *device = oc_core_get_device_info(device_index);
+      knx_publish_service(oc_string(device->serialnumber), device->iid,
+                          device->ia);
     }
 
     oc_send_cbor_response(request, OC_STATUS_CHANGED);

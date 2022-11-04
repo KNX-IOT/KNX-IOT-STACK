@@ -233,7 +233,7 @@ oc_network_event_handler_mutex_destroy(void)
   pthread_mutex_destroy(&mutex);
 }
 
-static ip_context_t *
+ip_context_t *
 get_ip_context_for_device(size_t device)
 {
   ip_context_t *dev = oc_list_head(ip_contexts);

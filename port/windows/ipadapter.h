@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- * Copyright 2019 Jozef Kralik All Rights Reserved.
+ * Copyright 2022 Cascoda All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,6 @@
 #define IPADAPTER_H
 
 #include "ipcontext.h"
-
-int set_nonblock_socket(int sockfd);
 
 ip_context_t *get_ip_context_for_device(size_t device);
 

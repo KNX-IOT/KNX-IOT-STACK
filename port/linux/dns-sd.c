@@ -22,10 +22,12 @@
 #include <stdint.h>
 
 #include "dns-sd.h"
+#include "ipadapter.h"
 
 static pid_t avahi_pid = 0;
 static char serial_no_subtype[200];
 static char installation_subtype[200];
+static char port_str[7];
 
 int
 knx_publish_service(char *serial_no, uint32_t iid, uint32_t ia)
@@ -52,6 +54,9 @@ knx_publish_service(char *serial_no, uint32_t iid, uint32_t ia)
     snprintf(serial_no_subtype, sizeof(serial_no_subtype), serial_format_string,
              serial_no);
 
+    uint16_t port = get_ip_context_for_device(0)->port;
+    snprintf(port_str, sizeof(port), "%d", port);
+
     int error;
     if (!iid || !ia) {
       // No Installation ID or Individual Address - we are in Programming mode
@@ -62,7 +67,7 @@ knx_publish_service(char *serial_no, uint32_t iid, uint32_t ia)
                serial_no_subtype,
                serial_no,   // service name = serial number
                "_knx._udp", // service type
-               "5683",      // port
+               port_str,    // port
                (char *)NULL);
     } else {
       // We have already been commissioned
@@ -78,7 +83,7 @@ knx_publish_service(char *serial_no, uint32_t iid, uint32_t ia)
                      serial_no_subtype, installation_subtype,
                      serial_no,   // service name = serial number
                      "_knx._udp", // service type
-                     "5683",      // port
+                     port_str,    // port
                      (char *)NULL);
     }
 

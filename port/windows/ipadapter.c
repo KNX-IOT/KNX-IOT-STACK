@@ -201,7 +201,7 @@ oc_network_event_handler_mutex_destroy(void)
   WSACleanup();
 }
 
-static ip_context_t *
+ip_context_t *
 get_ip_context_for_device(size_t device)
 {
 #ifdef OC_DYNAMIC_ALLOCATION
