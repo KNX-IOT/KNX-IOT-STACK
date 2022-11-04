@@ -18,6 +18,10 @@
 #ifndef IPADAPTER_H
 #define IPADAPTER_H
 
+#include "ipcontext.h"
+
 int set_nonblock_socket(int sockfd);
+
+ip_context_t *get_ip_context_for_device(size_t device);
 
 #endif /* IPADAPTER_H */
