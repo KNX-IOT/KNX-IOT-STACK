@@ -459,7 +459,7 @@ oc_core_dev_iid_put_handler(oc_request_t *request,
           oc_init_datapoints_at_initialization();
           oc_device_info_t *device = oc_core_get_device_info(device_index);
           knx_publish_service(oc_string(device->serialnumber), device->iid,
-                              device->ia);
+                              device->ia, device->pm);
         }
         return;
       }
@@ -601,6 +601,8 @@ oc_core_dev_pm_put_handler(oc_request_t *request,
         device->pm = rep->value.boolean;
         oc_send_cbor_response(request, OC_STATUS_CHANGED);
 
+        knx_publish_service(oc_string(device->serialnumber), device->iid,
+                            device->ia, device->pm);
         oc_storage_write(KNX_STORAGE_PM, (uint8_t *)&(rep->value.boolean), 1);
         return;
       }

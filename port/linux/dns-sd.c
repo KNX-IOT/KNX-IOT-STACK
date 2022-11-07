@@ -30,11 +30,12 @@ static char installation_subtype[200];
 static char port_str[7];
 
 int
-knx_publish_service(char *serial_no, uint32_t iid, uint32_t ia)
+knx_publish_service(char *serial_no, uint32_t iid, uint32_t ia, bool pm)
 {
   (void)serial_no;
   (void)iid;
   (void)ia;
+  (void)pm;
 
 #ifdef OC_DNS_SD
   if (avahi_pid != 0) {
@@ -54,39 +55,56 @@ knx_publish_service(char *serial_no, uint32_t iid, uint32_t ia)
     snprintf(serial_no_subtype, sizeof(serial_no_subtype), serial_format_string,
              serial_no);
 
+    char *ia0_subtype = "--subtype=_ia0._sub._knx._udp";
+
     uint16_t port = get_ip_context_for_device(0)->port;
     snprintf(port_str, sizeof(port), "%d", port);
 
     int error;
-    if (!iid || !ia) {
-      // No Installation ID or Individual Address - we are in Programming mode
+    if (pm) {
+      if (!iid || !ia) {
+        // No Installation ID or Individual Address
 
-      error =
-        execlp("avahi-publish-service", "avahi-publish-service",
-               "--subtype=_ia0._sub._knx._udp", // for noncommissioned devices
-               serial_no_subtype,
-               serial_no,   // service name = serial number
-               "_knx._udp", // service type
-               port_str,    // port
-               (char *)NULL);
+        error = execlp("avahi-publish-service", "avahi-publish-service",
+                       serial_no_subtype,
+                       ia0_subtype, // programming mode is true - we publish the
+                                    // _ia0 subtype too
+                       serial_no,   // service name = serial number
+                       "_knx._udp", // service type
+                       port_str,    // port
+                       (char *)NULL);
+      } else {
+        // --subtype=_ia3333-CA._sub._knx._udp
+        char *format_string = "--subtype=_ia%X-%X._sub._knx._udp";
+        snprintf(installation_subtype, sizeof(serial_no_subtype), format_string,
+                 iid, ia);
+
+        error =
+          execlp("avahi-publish-service", "avahi-publish-service",
+                 serial_no_subtype, installation_subtype,
+                 ia0_subtype, // programming mode is true - publish _ia0 even
+                              // though we have an installation already
+                 serial_no,   // service name = serial number
+                 "_knx._udp", // service type
+                 port_str,    // port
+                 (char *)NULL);
+      }
     } else {
-      // We have already been commissioned
+      if (!iid || !ia) {
+        error = execlp("avahi-publish-service", "avahi-publish-service",
+                       serial_no_subtype, serial_no, "_knx._udp", port_str,
+                       (char *)NULL);
+      } else {
+        // --subtype=_ia3333-CA._sub._knx._udp
+        char *format_string = "--subtype=_ia%X-%X._sub._knx._udp";
+        snprintf(installation_subtype, sizeof(serial_no_subtype), format_string,
+                 iid, ia);
 
-      // Set up the subtype for IID and IA
-      // --subtype=_ia3333-CA._sub._knx._udp
-
-      char *format_string = "--subtype=_ia%X-%X._sub._knx._udp";
-      snprintf(installation_subtype, sizeof(serial_no_subtype), format_string,
-               iid, ia);
-
-      error = execlp("avahi-publish-service", "avahi-publish-service",
-                     serial_no_subtype, installation_subtype,
-                     serial_no,   // service name = serial number
-                     "_knx._udp", // service type
-                     port_str,    // port
-                     (char *)NULL);
+        error = execlp("avahi-publish-service", "avahi-publish-service",
+                       serial_no_subtype, installation_subtype, serial_no,
+                       "_knx._udp", port_str, (char *)NULL);
+      }
     }
-
     if (error == -1) {
       OC_ERR("Failed to execute avahi-publish-service: %s", strerror(errno));
       return -1;
