@@ -1254,7 +1254,7 @@ oc_core_set_at_table(size_t device_index, int index, oc_auth_at_t entry,
     }
   }
   // activate the credentials
-  PRINT("oc_core_set_at_table: activating oscore credentials");
+  OC_DBG_OSCORE("oc_core_set_at_table: activating oscore credentials");
   oc_init_oscore_from_storage(device_index, false);
 
   return 0;
@@ -1414,13 +1414,14 @@ oc_init_oscore_from_storage(size_t device_index, bool from_storage)
   (void)device_index;
 #else /* OC_OSCORE */
   int i;
-  PRINT("oc_init_oscore deleting old contexts!!\n");
+  OC_DBG_OSCORE("oc_init_oscore deleting old contexts!!");
 
   // deleting all contexts!!
   oc_oscore_free_all_contexts();
 
-  PRINT("oc_init_oscore adding OSCORE context, using context id for sender & "
-        "receiver\n");
+  OC_DBG_OSCORE(
+    "oc_init_oscore adding OSCORE context, using context id for sender & "
+        "receiver");
   for (i = 0; i < G_AT_MAX_ENTRIES; i++) {
 
     if (oc_string_len(g_at_entries[i].id) > 0) {
@@ -1435,10 +1436,10 @@ oc_init_oscore_from_storage(size_t device_index, bool from_storage)
           oc_string(g_at_entries[i].osc_ms),
           oc_string(g_at_entries[i].osc_contextid), i, from_storage);
         if (ctx == NULL) {
-          PRINT("   fail...\n ");
+          OC_DBG_OSCORE("   fail...");
         }
       } else {
-        PRINT("oc_init_oscore: no oscore context\n");
+        OC_DBG_OSCORE("oc_init_oscore: no oscore context");
       }
     }
   }
