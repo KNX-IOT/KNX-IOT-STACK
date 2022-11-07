@@ -25,6 +25,7 @@ extern "C" {
 #endif
 
 #include <stdint.h>
+#include <stdbool.h>
 
 /**
  * @brief Publish the KNX mDNS service in order to enable DNS-SD discovery.
@@ -32,12 +33,13 @@ extern "C" {
  * @param serial_no KNX serial number. The advertised service will be
  * "${serial_no}._knx._udp"
  * @param iid KNX Installation ID. Set to 0 if the device has not been
- * commissioned yet (in programming mode)
+ * commissioned yet
  * @param ia KNX Individual Address. Set to 0 if the device has not been
- * commissioned yet (in programming mode)
+ * commissioned yet
+ * @param pm True if the device is in Programming Mode, false otherwise.
  * @return int 0 on success, -1 on error.
  */
-int knx_publish_service(char *serial_no, uint32_t iid, uint32_t ia);
+int knx_publish_service(char *serial_no, uint32_t iid, uint32_t ia, bool pm);
 
 #ifdef __cplusplus
 }

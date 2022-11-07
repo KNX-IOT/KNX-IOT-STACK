@@ -26,11 +26,12 @@ char subtypes[200];
 static char port_str[7];
 
 int
-knx_publish_service(char *serial_no, uint32_t iid, uint32_t ia)
+knx_publish_service(char *serial_no, uint32_t iid, uint32_t ia, bool pm)
 {
   (void)serial_no;
   (void)iid;
   (void)ia;
+  (void)pm;
 
 #ifdef OC_DNS_SD
   if (process_handle != 0) {
@@ -40,12 +41,18 @@ knx_publish_service(char *serial_no, uint32_t iid, uint32_t ia)
   uint16_t port = get_ip_context_for_device(0)->port;
   snprintf(port_str, sizeof(port), "%d", port);
 
+  char *ia0_subtype;
+  if(pm)
+    ia0_subtype = ",ia0";
+  else
+    ia0_subtype = "";
+
   if (iid == 0 || ia == 0) {
-    sprintf(subtypes, "_knx._udp,_%s,_ia0", serial_no);
+    sprintf(subtypes, "_knx._udp,_%s%s", serial_no, ia0_subtype);
     process_handle = _spawnlp(_P_NOWAIT, "dns-sd", "dns-sd", "-R", serial_no,
                               subtypes, "local", port_str, NULL);
   } else {
-    sprintf(subtypes, "_knx._udp,_%s,_ia%X-%X", serial_no, iid, ia);
+    sprintf(subtypes, "_knx._udp,_%s,_ia%X-%X%s", serial_no, iid, ia, ia0_subtype);
     process_handle = _spawnlp(_P_NOWAIT, "dns-sd", "dns-sd", "-R", serial_no,
                               subtypes, "local", port_str, NULL);
   }
