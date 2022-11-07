@@ -42,7 +42,7 @@ knx_publish_service(char *serial_no, uint32_t iid, uint32_t ia, bool pm)
   snprintf(port_str, sizeof(port), "%d", port);
 
   char *ia0_subtype;
-  if(pm)
+  if (pm)
     ia0_subtype = ",ia0";
   else
     ia0_subtype = "";
@@ -52,7 +52,8 @@ knx_publish_service(char *serial_no, uint32_t iid, uint32_t ia, bool pm)
     process_handle = _spawnlp(_P_NOWAIT, "dns-sd", "dns-sd", "-R", serial_no,
                               subtypes, "local", port_str, NULL);
   } else {
-    sprintf(subtypes, "_knx._udp,_%s,_ia%X-%X%s", serial_no, iid, ia, ia0_subtype);
+    sprintf(subtypes, "_knx._udp,_%s,_ia%X-%X%s", serial_no, iid, ia,
+            ia0_subtype);
     process_handle = _spawnlp(_P_NOWAIT, "dns-sd", "dns-sd", "-R", serial_no,
                               subtypes, "local", port_str, NULL);
   }
