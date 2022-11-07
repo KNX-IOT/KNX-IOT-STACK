@@ -601,6 +601,8 @@ oc_core_dev_pm_put_handler(oc_request_t *request,
         device->pm = rep->value.boolean;
         oc_send_cbor_response(request, OC_STATUS_CHANGED);
 
+        knx_publish_service(oc_string(device->serialnumber), device->iid,
+                            device->ia, device->pm);
         oc_storage_write(KNX_STORAGE_PM, (uint8_t *)&(rep->value.boolean), 1);
         return;
       }
