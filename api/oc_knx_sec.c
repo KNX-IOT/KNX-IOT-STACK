@@ -1421,7 +1421,7 @@ oc_init_oscore_from_storage(size_t device_index, bool from_storage)
 
   OC_DBG_OSCORE(
     "oc_init_oscore adding OSCORE context, using context id for sender & "
-        "receiver");
+    "receiver");
   for (i = 0; i < G_AT_MAX_ENTRIES; i++) {
 
     if (oc_string_len(g_at_entries[i].id) > 0) {
