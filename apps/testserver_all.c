@@ -1255,8 +1255,9 @@ issue_requests_oscore(void)
   oc_do_wk_discovery_all("ep=urn:knx:sn.000005", 2, discovery_cb, NULL);
 }
 
-//void oc_issue_s_mode(int scope, int sia_value, int grpid, int group_address,
-//                     int iid, char *rp, uint8_t *value_data, int value_size);
+void oc_issue_s_mode(int scope, int sia_value, uint32_t grpid,
+                     uint32_t group_address, uint64_t iid, char *rp,
+                     uint8_t *value_data, int value_size);
 
 static bool oscore_init = false;
 
