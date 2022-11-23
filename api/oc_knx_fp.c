@@ -2078,7 +2078,8 @@ oc_add_points_in_group_object_table_to_response(oc_request_t *request,
 }
 
 oc_endpoint_t
-oc_create_multicast_group_address(oc_endpoint_t in, int group_nr, int iid,
+oc_create_multicast_group_address(oc_endpoint_t in, uint32_t group_nr,
+                                  int64_t iid,
                                   int scope)
 {
   // create the multicast address from group and scope
@@ -2122,7 +2123,7 @@ oc_create_multicast_group_address(oc_endpoint_t in, int group_nr, int iid,
 }
 
 void
-subscribe_group_to_multicast(int group_nr, int iid, int scope)
+subscribe_group_to_multicast(uint32_t group_nr, int64_t iid, int scope)
 {
   // FF35::30: <ULA-routing-prefix>::<group id>
   //
@@ -2138,7 +2139,7 @@ subscribe_group_to_multicast(int group_nr, int iid, int scope)
 }
 
 void
-unsubscribe_group_to_multicast(int group_nr, int iid, int scope)
+unsubscribe_group_to_multicast(uint32_t group_nr, int64_t iid, int scope)
 {
   // FF35::30: <ULA-routing-prefix>::<group id>
   //
@@ -2167,7 +2168,7 @@ oc_find_grpid_in_table(oc_group_rp_table_t *rp_table, int max_size,
     }
   }
   // not found
-  return -1;
+  return 0;
 }
 
 uint32_t
