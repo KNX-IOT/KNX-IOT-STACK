@@ -738,7 +738,7 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
             g_gpt[index].ia = (int)object->value.integer;
           }
           if (object->iname == 13) {
-            g_gpt[index].grpid = (int)object->value.integer;
+            g_gpt[index].grpid = (uint32_t)object->value.integer;
           }
           if (object->iname == 26) {
             g_gpt[index].iid = (int)object->value.integer;
@@ -1052,7 +1052,7 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
             g_grt[index].ia = (int)object->value.integer;
           }
           if (object->iname == 13) {
-            g_grt[index].grpid = (int)object->value.integer;
+            g_grt[index].grpid = (uint32_t)object->value.integer;
           }
           if (object->iname == 26) {
             g_grt[index].iid = (int)object->value.integer;
@@ -1576,8 +1576,8 @@ oc_print_group_rp_table_entry(int entry, char *Store,
   PRINT("  %s [%d] --> [%d]\n", Store, entry, rp_table[entry].ga_len);
   PRINT("    id (0)     : %d\n", rp_table[entry].id);
   PRINT("    ia (12)    : %d\n", rp_table[entry].ia);
-  PRINT("    iid (26)   : %I64d\n", rp_table[entry].iid);
-  PRINT("    fid (25)   : %I64d\n", rp_table[entry].fid);
+  PRINT("    iid (26)   : %ld\n", rp_table[entry].iid);
+  PRINT("    fid (25)   : %ld\n", rp_table[entry].fid);
   PRINT("    grpid (13) : %d\n", rp_table[entry].grpid);
   if (oc_string_len(rp_table[entry].path) > 0) {
     PRINT("    path (112) : '%s'\n", oc_string_checked(rp_table[entry].path));
@@ -1682,13 +1682,13 @@ oc_load_group_rp_table_entry(int entry, char *Store,
             rp_table[entry].ia = (int)rep->value.integer;
           }
           if (rep->iname == 13) {
-            rp_table[entry].grpid = (int)rep->value.integer;
+            rp_table[entry].grpid = (uint32_t)rep->value.integer;
           }
           if (rep->iname == 25) {
-            rp_table[entry].fid = (int)rep->value.integer;
+            rp_table[entry].fid = rep->value.integer;
           }
           if (rep->iname == 26) {
-            rp_table[entry].iid = (int)rep->value.integer;
+            rp_table[entry].iid = rep->value.integer;
           }
           break;
         case OC_REP_STRING:
@@ -1768,7 +1768,7 @@ oc_free_group_rp_table_entry(int entry, char *Store,
   rp_table[entry].ia = -1;
   rp_table[entry].iid = -1;
   rp_table[entry].fid = -1;
-  rp_table[entry].grpid = -1;
+  rp_table[entry].grpid = 0;
   if (init == false) {
     oc_free_string(&rp_table[entry].path);
     oc_free_string(&rp_table[entry].url);
@@ -1865,7 +1865,7 @@ oc_core_add_rp_entry(int index, oc_group_rp_table_t *rp_table,
 
   // Copy group addresses
   rp_table[index].ga_len = entry.ga_len;
-  int *new_array = (int *)malloc(entry.ga_len * sizeof(int));
+  uint32_t *new_array = (uint32_t *)malloc(entry.ga_len * sizeof(int));
 
   if (new_array != NULL) {
     for (int i = 0; i < entry.ga_len; i++) {
@@ -2152,7 +2152,7 @@ unsubscribe_group_to_multicast(int group_nr, int iid, int scope)
   oc_connectivity_unsubscribe_mcast_ipv6(&group_mcast);
 }
 
-int
+uint32_t
 oc_find_grpid_in_table(oc_group_rp_table_t *rp_table, int max_size,
                        int group_address)
 {
@@ -2169,14 +2169,14 @@ oc_find_grpid_in_table(oc_group_rp_table_t *rp_table, int max_size,
   return -1;
 }
 
-int
+uint32_t
 oc_find_grpid_in_publisher_table(int group_address)
 {
   return oc_find_grpid_in_table(g_gpt, oc_core_get_publisher_table_size(),
                                 group_address);
 }
 
-int
+uint32_t
 oc_find_grpid_in_recipient_table(int group_address)
 {
   return oc_find_grpid_in_table(g_grt, GRT_MAX_ENTRIES, group_address);
@@ -2191,7 +2191,7 @@ oc_register_group_multicasts()
     PRINT("oc_register_group_multicasts: no device info\n");
     return;
   }
-  uint32_t installation_id = device->iid;
+  int64_t installation_id = device->iid;
 
   PRINT("oc_register_group_multicasts\n");
 
