@@ -477,11 +477,12 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
           }
           if (object->iname == 7) {
             int64_t *arr = oc_int_array(object->value.array);
-            int array_size = (int)oc_int_array_size(object->value.array);
-            int *new_array = (int *)malloc(array_size * sizeof(int));
+            int array_size = (uint32_t)oc_int_array_size(object->value.array);
+            uint32_t *new_array =
+              (uint32_t *)malloc(array_size * sizeof(uint32_t));
 
             for (int i = 0; i < array_size; i++) {
-              new_array[i] = (int)arr[i];
+              new_array[i] = (uint32_t)arr[i];
             }
             if (g_got[index].ga != 0) {
               free(g_got[index].ga);
@@ -763,10 +764,11 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
             // g_got[index].id = object->value.integer;
             int64_t *arr = oc_int_array(object->value.array);
             int array_size = (int)oc_int_array_size(object->value.array);
-            int *new_array = (int *)malloc(array_size * sizeof(int));
+            uint32_t *new_array =
+              (uint32_t *)malloc(array_size * sizeof(uint32_t));
 
             for (int i = 0; i < array_size; i++) {
-              new_array[i] = (int)arr[i];
+              new_array[i] = (uint32_t)arr[i];
             }
             if (g_gpt[index].ga != 0) {
               free(g_gpt[index].ga);
@@ -1077,7 +1079,7 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
             // g_got[index].id = object->value.integer;
             int64_t *arr = oc_int_array(object->value.array);
             int array_size = (int)oc_int_array_size(object->value.array);
-            int *new_array = (int *)malloc(array_size * sizeof(int));
+            uint32_t *new_array = (int *)malloc(array_size * sizeof(int));
 
             for (int i = 0; i < array_size; i++) {
               new_array[i] = (int)arr[i];
@@ -1470,10 +1472,11 @@ oc_load_group_object_table_entry(int entry)
           if (rep->iname == 7) {
             int64_t *arr = oc_int_array(rep->value.array);
             int array_size = (int)oc_int_array_size(rep->value.array);
-            int *new_array = (int *)malloc(array_size * sizeof(int));
+            uint32_t *new_array =
+              (uint32_t *)malloc(array_size * sizeof(uint32_t));
             if (new_array) {
               for (int i = 0; i < array_size; i++) {
-                new_array[i] = (int)arr[i];
+                new_array[i] = (uint32_t)arr[i];
               }
               if (g_got[entry].ga != 0) {
                 free(g_got[entry].ga);
@@ -1704,10 +1707,11 @@ oc_load_group_rp_table_entry(int entry, char *Store,
           if (rep->iname == 7) {
             int64_t *arr = oc_int_array(rep->value.array);
             int array_size = (int)oc_int_array_size(rep->value.array);
-            int *new_array = (int *)malloc(array_size * sizeof(int));
+            uint32_t *new_array =
+              (uint32_t *)malloc(array_size * sizeof(uint32_t));
             if (new_array != 0) {
               for (int i = 0; i < array_size; i++) {
-                new_array[i] = (int)arr[i];
+                new_array[i] = (uint32_t)arr[i];
               }
             }
             if (rp_table[entry].ga != 0) {
