@@ -121,7 +121,7 @@ typedef struct oc_group_object_table_t
   oc_string_t href;       /**< contents of href*/
   oc_cflag_mask_t cflags; /**< contents of cflags as bitmap*/
   int ga_len;             /**< length of the array of ga identifiers*/
-  int *ga;                /**< array of integers*/
+  uint32_t *ga;           /**< array of integers*/
 } oc_group_object_table_t;
 
 /**
@@ -176,13 +176,13 @@ typedef struct oc_group_rp_table_t
 {
   int id;           /**< contents of id*/
   int ia;           /**< contents of ia (internal address)*/
-  int iid;          /**< contents of installation id */
-  int fid;          /**< contents of fabric id */
-  int grpid;        /**< the multicast group id */
+  int64_t iid;      /**< contents of installation id */
+  int64_t fid;          /**< contents of fabric id */
+  uint32_t grpid;   /**< the multicast group id */
   oc_string_t path; /**< contents of path, default path = ".knx"*/
   oc_string_t url;  /**< contents of url */
   bool con;         /**< confirmed message, default = false*/
-  int *ga;          /**< array of integers */
+  uint32_t *ga;     /**< array of integers */
   int ga_len;       /**< length of the array of ga identifiers */
 } oc_group_rp_table_t;
 
