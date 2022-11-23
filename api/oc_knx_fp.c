@@ -169,7 +169,7 @@ oc_core_find_index_in_group_object_table_from_id(int id)
 }
 
 int
-oc_core_find_group_object_table_index(int group_address)
+oc_core_find_group_object_table_index(uint32_t group_address)
 {
   int i, j;
   for (i = 0; i < GOT_MAX_ENTRIES; i++) {
@@ -182,14 +182,15 @@ oc_core_find_group_object_table_index(int group_address)
       }
     }
   }
-  return -1;
+  return 0;
 }
 
 int
-oc_core_find_next_group_object_table_index(int group_address, int cur_index)
+oc_core_find_next_group_object_table_index(uint32_t group_address,
+                                           int cur_index)
 {
   if (cur_index == -1) {
-    return -1;
+    return 0;
   }
 
   int i, j;
@@ -203,7 +204,7 @@ oc_core_find_next_group_object_table_index(int group_address, int cur_index)
       }
     }
   }
-  return -1;
+  return 0;
 }
 
 oc_string_t
@@ -477,11 +478,12 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
           }
           if (object->iname == 7) {
             int64_t *arr = oc_int_array(object->value.array);
-            int array_size = (int)oc_int_array_size(object->value.array);
-            int *new_array = (int *)malloc(array_size * sizeof(int));
+            int array_size = (uint32_t)oc_int_array_size(object->value.array);
+            uint32_t *new_array =
+              (uint32_t *)malloc(array_size * sizeof(uint32_t));
 
             for (int i = 0; i < array_size; i++) {
-              new_array[i] = (int)arr[i];
+              new_array[i] = (uint32_t)arr[i];
             }
             if (g_got[index].ga != 0) {
               free(g_got[index].ga);
@@ -737,7 +739,7 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
             g_gpt[index].ia = (int)object->value.integer;
           }
           if (object->iname == 13) {
-            g_gpt[index].grpid = (int)object->value.integer;
+            g_gpt[index].grpid = (uint32_t)object->value.integer;
           }
           if (object->iname == 26) {
             g_gpt[index].iid = (int)object->value.integer;
@@ -763,10 +765,11 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
             // g_got[index].id = object->value.integer;
             int64_t *arr = oc_int_array(object->value.array);
             int array_size = (int)oc_int_array_size(object->value.array);
-            int *new_array = (int *)malloc(array_size * sizeof(int));
+            uint32_t *new_array =
+              (uint32_t *)malloc(array_size * sizeof(uint32_t));
 
             for (int i = 0; i < array_size; i++) {
-              new_array[i] = (int)arr[i];
+              new_array[i] = (uint32_t)arr[i];
             }
             if (g_gpt[index].ga != 0) {
               free(g_gpt[index].ga);
@@ -1050,7 +1053,7 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
             g_grt[index].ia = (int)object->value.integer;
           }
           if (object->iname == 13) {
-            g_grt[index].grpid = (int)object->value.integer;
+            g_grt[index].grpid = (uint32_t)object->value.integer;
           }
           if (object->iname == 26) {
             g_grt[index].iid = (int)object->value.integer;
@@ -1077,7 +1080,7 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
             // g_got[index].id = object->value.integer;
             int64_t *arr = oc_int_array(object->value.array);
             int array_size = (int)oc_int_array_size(object->value.array);
-            int *new_array = (int *)malloc(array_size * sizeof(int));
+            uint32_t *new_array = (int *)malloc(array_size * sizeof(int));
 
             for (int i = 0; i < array_size; i++) {
               new_array[i] = (int)arr[i];
@@ -1252,7 +1255,8 @@ oc_create_fp_r_x_resource(int resource_idx, size_t device)
 }
 
 bool
-oc_core_check_recipient_index_on_group_address(int index, int group_address)
+oc_core_check_recipient_index_on_group_address(int index,
+                                               uint32_t group_address)
 {
   if (index >= GRT_MAX_ENTRIES) {
     return -1;
@@ -1470,10 +1474,11 @@ oc_load_group_object_table_entry(int entry)
           if (rep->iname == 7) {
             int64_t *arr = oc_int_array(rep->value.array);
             int array_size = (int)oc_int_array_size(rep->value.array);
-            int *new_array = (int *)malloc(array_size * sizeof(int));
+            uint32_t *new_array =
+              (uint32_t *)malloc(array_size * sizeof(uint32_t));
             if (new_array) {
               for (int i = 0; i < array_size; i++) {
-                new_array[i] = (int)arr[i];
+                new_array[i] = (uint32_t)arr[i];
               }
               if (g_got[entry].ga != 0) {
                 free(g_got[entry].ga);
@@ -1573,8 +1578,8 @@ oc_print_group_rp_table_entry(int entry, char *Store,
   PRINT("  %s [%d] --> [%d]\n", Store, entry, rp_table[entry].ga_len);
   PRINT("    id (0)     : %d\n", rp_table[entry].id);
   PRINT("    ia (12)    : %d\n", rp_table[entry].ia);
-  PRINT("    iid (26)   : %d\n", rp_table[entry].iid);
-  PRINT("    fid (25)   : %d\n", rp_table[entry].fid);
+  PRINT("    iid (26)   : %ld\n", rp_table[entry].iid);
+  PRINT("    fid (25)   : %ld\n", rp_table[entry].fid);
   PRINT("    grpid (13) : %d\n", rp_table[entry].grpid);
   if (oc_string_len(rp_table[entry].path) > 0) {
     PRINT("    path (112) : '%s'\n", oc_string_checked(rp_table[entry].path));
@@ -1679,13 +1684,13 @@ oc_load_group_rp_table_entry(int entry, char *Store,
             rp_table[entry].ia = (int)rep->value.integer;
           }
           if (rep->iname == 13) {
-            rp_table[entry].grpid = (int)rep->value.integer;
+            rp_table[entry].grpid = (uint32_t)rep->value.integer;
           }
           if (rep->iname == 25) {
-            rp_table[entry].fid = (int)rep->value.integer;
+            rp_table[entry].fid = rep->value.integer;
           }
           if (rep->iname == 26) {
-            rp_table[entry].iid = (int)rep->value.integer;
+            rp_table[entry].iid = rep->value.integer;
           }
           break;
         case OC_REP_STRING:
@@ -1704,10 +1709,11 @@ oc_load_group_rp_table_entry(int entry, char *Store,
           if (rep->iname == 7) {
             int64_t *arr = oc_int_array(rep->value.array);
             int array_size = (int)oc_int_array_size(rep->value.array);
-            int *new_array = (int *)malloc(array_size * sizeof(int));
+            uint32_t *new_array =
+              (uint32_t *)malloc(array_size * sizeof(uint32_t));
             if (new_array != 0) {
               for (int i = 0; i < array_size; i++) {
-                new_array[i] = (int)arr[i];
+                new_array[i] = (uint32_t)arr[i];
               }
             }
             if (rp_table[entry].ga != 0) {
@@ -1764,7 +1770,7 @@ oc_free_group_rp_table_entry(int entry, char *Store,
   rp_table[entry].ia = -1;
   rp_table[entry].iid = -1;
   rp_table[entry].fid = -1;
-  rp_table[entry].grpid = -1;
+  rp_table[entry].grpid = 0;
   if (init == false) {
     oc_free_string(&rp_table[entry].path);
     oc_free_string(&rp_table[entry].url);
@@ -1861,7 +1867,7 @@ oc_core_add_rp_entry(int index, oc_group_rp_table_t *rp_table,
 
   // Copy group addresses
   rp_table[index].ga_len = entry.ga_len;
-  int *new_array = (int *)malloc(entry.ga_len * sizeof(int));
+  uint32_t *new_array = (uint32_t *)malloc(entry.ga_len * sizeof(int));
 
   if (new_array != NULL) {
     for (int i = 0; i < entry.ga_len; i++) {
@@ -2021,7 +2027,7 @@ oc_free_knx_fp_resources(size_t device_index)
 // -----------------------------------------------------------------------------
 
 bool
-is_in_array(int value, int *array, int array_size)
+is_in_array(uint32_t value, uint32_t *array, int array_size)
 {
   if (array_size <= 0) {
     return false;
@@ -2040,7 +2046,7 @@ is_in_array(int value, int *array, int array_size)
 bool
 oc_add_points_in_group_object_table_to_response(oc_request_t *request,
                                                 size_t device_index,
-                                                int group_address,
+                                                uint32_t group_address,
                                                 size_t *response_length,
                                                 int matches)
 {
@@ -2073,8 +2079,8 @@ oc_add_points_in_group_object_table_to_response(oc_request_t *request,
 }
 
 oc_endpoint_t
-oc_create_multicast_group_address(oc_endpoint_t in, int group_nr, int iid,
-                                  int scope)
+oc_create_multicast_group_address(oc_endpoint_t in, uint32_t group_nr,
+                                  int64_t iid, int scope)
 {
   // create the multicast address from group and scope
   // FF35::30: <ULA-routing-prefix>::<group id>
@@ -2104,7 +2110,7 @@ oc_create_multicast_group_address(oc_endpoint_t in, int group_nr, int iid,
   oc_make_ipv6_endpoint(group_mcast, my_transport_flags, 5683, 0xff,
                         0x30 + scope, ula_4, ula_3, ula_2, ula_1, 0, 0, 0, 0, 0,
                         0, byte_4, byte_3, byte_2, byte_1);
-  PRINT("  oc_create_multicast_group_address S=%d U=%d G=%d B4=%d B3=%d B2=%d "
+  PRINT("  oc_create_multicast_group_address S=%d U=%ld G=%d B4=%d B3=%d B2=%d "
         "B1=%d\n",
         scope, iid, group_nr, byte_4, byte_3, byte_2, byte_1);
   PRINT("  ");
@@ -2117,7 +2123,7 @@ oc_create_multicast_group_address(oc_endpoint_t in, int group_nr, int iid,
 }
 
 void
-subscribe_group_to_multicast(int group_nr, int iid, int scope)
+subscribe_group_to_multicast(uint32_t group_nr, int64_t iid, int scope)
 {
   // FF35::30: <ULA-routing-prefix>::<group id>
   //
@@ -2133,7 +2139,7 @@ subscribe_group_to_multicast(int group_nr, int iid, int scope)
 }
 
 void
-unsubscribe_group_to_multicast(int group_nr, int iid, int scope)
+unsubscribe_group_to_multicast(uint32_t group_nr, int64_t iid, int scope)
 {
   // FF35::30: <ULA-routing-prefix>::<group id>
   //
@@ -2148,13 +2154,13 @@ unsubscribe_group_to_multicast(int group_nr, int iid, int scope)
   oc_connectivity_unsubscribe_mcast_ipv6(&group_mcast);
 }
 
-int
+uint32_t
 oc_find_grpid_in_table(oc_group_rp_table_t *rp_table, int max_size,
-                       int group_address)
+                       uint32_t group_address)
 {
   int index;
   for (index = 0; index < max_size; index++) {
-    int *array = rp_table[index].ga;
+    uint32_t *array = rp_table[index].ga;
     int array_size = rp_table[index].ga_len;
     bool found = is_in_array(group_address, array, array_size);
     if (found) {
@@ -2162,18 +2168,18 @@ oc_find_grpid_in_table(oc_group_rp_table_t *rp_table, int max_size,
     }
   }
   // not found
-  return -1;
+  return 0;
 }
 
-int
-oc_find_grpid_in_publisher_table(int group_address)
+uint32_t
+oc_find_grpid_in_publisher_table(uint32_t group_address)
 {
   return oc_find_grpid_in_table(g_gpt, oc_core_get_publisher_table_size(),
                                 group_address);
 }
 
-int
-oc_find_grpid_in_recipient_table(int group_address)
+uint32_t
+oc_find_grpid_in_recipient_table(uint32_t group_address)
 {
   return oc_find_grpid_in_table(g_grt, GRT_MAX_ENTRIES, group_address);
 }
@@ -2187,7 +2193,7 @@ oc_register_group_multicasts()
     PRINT("oc_register_group_multicasts: no device info\n");
     return;
   }
-  uint32_t installation_id = device->iid;
+  int64_t installation_id = device->iid;
 
   PRINT("oc_register_group_multicasts\n");
 
@@ -2196,7 +2202,7 @@ oc_register_group_multicasts()
 
   int index;
   for (index = 0; index < oc_core_get_publisher_table_size(); index++) {
-    int grpid = g_gpt[index].grpid;
+    uint32_t grpid = g_gpt[index].grpid;
     if (grpid > 0) {
       pub_entry = true;
       break;
@@ -2213,7 +2219,7 @@ oc_register_group_multicasts()
           ((cflags & OC_CFLAG_READ) > 0)) {
 
         for (int i = 0; i < nr_entries; i++) {
-          int grpid = oc_find_grpid_in_table(
+          uint32_t grpid = oc_find_grpid_in_table(
             g_gpt, oc_core_get_publisher_table_size(), g_got[index].ga[i]);
 
           PRINT(" oc_register_group_multicasts index=%d i=%d grpid: %d "

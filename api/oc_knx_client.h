@@ -126,7 +126,7 @@ oc_rep_t *oc_s_mode_get_value(oc_request_t *request);
  * @see oc_do_s_mode_with_scope
  * @param group_address the group address to invoke a read on
  */
-void oc_do_s_mode_read(size_t group_address);
+void oc_do_s_mode_read(int64_t group_address);
 
 /**
  * @brief sends (transmits) an s-mode message

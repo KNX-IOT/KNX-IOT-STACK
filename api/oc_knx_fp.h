@@ -121,7 +121,7 @@ typedef struct oc_group_object_table_t
   oc_string_t href;       /**< contents of href*/
   oc_cflag_mask_t cflags; /**< contents of cflags as bitmap*/
   int ga_len;             /**< length of the array of ga identifiers*/
-  int *ga;                /**< array of integers*/
+  uint32_t *ga;           /**< array of integers*/
 } oc_group_object_table_t;
 
 /**
@@ -176,13 +176,13 @@ typedef struct oc_group_rp_table_t
 {
   int id;           /**< contents of id*/
   int ia;           /**< contents of ia (internal address)*/
-  int iid;          /**< contents of installation id */
-  int fid;          /**< contents of fabric id */
-  int grpid;        /**< the multicast group id */
+  int64_t iid;      /**< contents of installation id */
+  int64_t fid;      /**< contents of fabric id */
+  uint32_t grpid;   /**< the multicast group id */
   oc_string_t path; /**< contents of path, default path = ".knx"*/
   oc_string_t url;  /**< contents of url */
   bool con;         /**< confirmed message, default = false*/
-  int *ga;          /**< array of integers */
+  uint32_t *ga;     /**< array of integers */
   int ga_len;       /**< length of the array of ga identifiers */
 } oc_group_rp_table_t;
 
@@ -251,9 +251,9 @@ void oc_register_group_multicasts();
  *
  * @param group_address The group_address from the group object table
  * @return the grpid matching the group_address the table publisher table
- *  or -1 if not found
+ *  or 0 if not found
  */
-int oc_find_grpid_in_publisher_table(int group_address);
+uint32_t oc_find_grpid_in_publisher_table(uint32_t group_address);
 
 /**
  * @brief find the grpid from the group_address in the recipient table
@@ -262,9 +262,9 @@ int oc_find_grpid_in_publisher_table(int group_address);
  *
  * @param group_address The group_address from the group object table
  * @return the grpid matching the group_address the table publisher table
- *  or -1 if not found
+ *  or 0 if not found
  */
-int oc_find_grpid_in_recipient_table(int group_address);
+uint32_t oc_find_grpid_in_recipient_table(uint32_t group_address);
 
 /**
  * @brief initializes the data points at initialization
@@ -287,7 +287,7 @@ int oc_core_find_index_in_group_object_table_from_id(int id);
  * @param group_address the group address
  * @return int the index in the table or -1
  */
-int oc_core_find_group_object_table_index(int group_address);
+int oc_core_find_group_object_table_index(uint32_t group_address);
 
 /**
  * @brief find next index in the group address table
@@ -296,7 +296,7 @@ int oc_core_find_group_object_table_index(int group_address);
  * @param cur_index  the current index to start from.
  * @return int the index in the table or -1
  */
-int oc_core_find_next_group_object_table_index(int group_address,
+int oc_core_find_next_group_object_table_index(uint32_t group_address,
                                                int cur_index);
 
 /**
@@ -406,7 +406,7 @@ void oc_delete_group_rp_table();
  * @return false is not part of the recipient entry
  */
 bool oc_core_check_recipient_index_on_group_address(int index,
-                                                    int group_address);
+                                                    uint32_t group_address);
 
 /**
  * @brief get the destination (path or url) of the recipient table at index
@@ -531,7 +531,7 @@ int oc_core_find_index_in_publisher_table_from_id(int id);
  */
 bool oc_add_points_in_group_object_table_to_response(oc_request_t *request,
                                                      size_t device_index,
-                                                     int group_address,
+                                                     uint32_t group_address,
                                                      size_t *response_length,
                                                      int matches);
 
@@ -575,8 +575,9 @@ void oc_free_knx_fp_resources(size_t device_index);
  * @param scope the address scope
  * @return oc_endpoint_t the modified endpoint
  */
-oc_endpoint_t oc_create_multicast_group_address(oc_endpoint_t in, int group_nr,
-                                                int iid, int scope);
+oc_endpoint_t oc_create_multicast_group_address(oc_endpoint_t in,
+                                                uint32_t group_nr, int64_t iid,
+                                                int scope);
 
 /**
  * @brief subscribe to a multicast address, defined by group number and
@@ -588,7 +589,7 @@ oc_endpoint_t oc_create_multicast_group_address(oc_endpoint_t in, int group_nr,
  * @param iid the installation id
  * @param scope the address scope
  */
-void subscribe_group_to_multicast(int group_nr, int iid, int scope);
+void subscribe_group_to_multicast(uint32_t group_nr, int64_t iid, int scope);
 
 /**
  * @brief unsubscribe to a multicast address, defined by group number and
@@ -600,7 +601,7 @@ void subscribe_group_to_multicast(int group_nr, int iid, int scope);
  * @param iid the installation id
  * @param scope the address scope
  */
-void unsubscribe_group_to_multicast(int group_nr, int iid, int scope);
+void unsubscribe_group_to_multicast(uint32_t group_nr, int64_t iid, int scope);
 
 #ifdef __cplusplus
 }
