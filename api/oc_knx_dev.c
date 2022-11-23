@@ -896,7 +896,7 @@ void
 oc_knx_device_storage_read(size_t device_index)
 {
 
-  uint64_t ia;
+  uint32_t ia;
   int temp_size;
   char tempstring[20];
   bool pm;
@@ -916,8 +916,8 @@ oc_knx_device_storage_read(size_t device_index)
   /* IA */
   temp_size = oc_storage_read(KNX_STORAGE_IA, (uint8_t *)&ia, sizeof(ia));
   if (temp_size > 0) {
-    device->ia = (int)ia;
-    PRINT("  ia (storage) %ld\n", (long)ia);
+    device->ia = ia;
+    PRINT("  ia (storage) %ld\n", ia);
   }
 
   /* HOST NAME */
@@ -930,8 +930,8 @@ oc_knx_device_storage_read(size_t device_index)
 
   /* KNX_STORAGE_IID */
   temp_size =
-    oc_storage_read(KNX_STORAGE_IID, (uint8_t *)&device->iid, sizeof(uint32_t));
-  PRINT("  idd (storage) %d\n", device->iid);
+    oc_storage_read(KNX_STORAGE_IID, (uint8_t *)&device->iid, sizeof(int64_t));
+  PRINT("  idd (storage) %ld\n", device->iid);
 
   /* KNX_STORAGE_PM */
   temp_size = oc_storage_read(KNX_STORAGE_PM, (uint8_t *)&pm, 1);

@@ -169,7 +169,7 @@ oc_core_find_index_in_group_object_table_from_id(int id)
 }
 
 int
-oc_core_find_group_object_table_index(int group_address)
+oc_core_find_group_object_table_index(uint32_t group_address)
 {
   int i, j;
   for (i = 0; i < GOT_MAX_ENTRIES; i++) {
@@ -182,14 +182,15 @@ oc_core_find_group_object_table_index(int group_address)
       }
     }
   }
-  return -1;
+  return 0;
 }
 
 int
-oc_core_find_next_group_object_table_index(int group_address, int cur_index)
+oc_core_find_next_group_object_table_index(uint32_t group_address,
+                                           int cur_index)
 {
   if (cur_index == -1) {
-    return -1;
+    return 0;
   }
 
   int i, j;
@@ -203,7 +204,7 @@ oc_core_find_next_group_object_table_index(int group_address, int cur_index)
       }
     }
   }
-  return -1;
+  return 0;
 }
 
 oc_string_t

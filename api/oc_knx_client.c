@@ -576,7 +576,7 @@ oc_s_mode_get_resource_value(char *resource_url, char *rp, uint8_t *buf,
 }
 
 void
-oc_do_s_mode_read(size_t group_address)
+oc_do_s_mode_read(int64_t group_address)
 {
   size_t device_index = 0;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
@@ -584,15 +584,15 @@ oc_do_s_mode_read(size_t group_address)
   int64_t iid = device->iid;
   uint32_t grpid = 0;
 
-  PRINT("oc_do_s_mode_read : ga=%d ia=%d, iid=%d\n", (int)group_address,
+  PRINT("oc_do_s_mode_read : ga=%d ia=%d, iid=%ld\n", (uint32_t)group_address,
         sia_value, iid);
 
   // find the grpid that belongs to the group address
-  grpid = oc_find_grpid_in_publisher_table((int)group_address);
+  grpid = oc_find_grpid_in_publisher_table(group_address);
   if (grpid > 0) {
-    oc_issue_s_mode(2, sia_value, (int)grpid, (int)group_address, iid, "r", 0,
+    oc_issue_s_mode(2, sia_value, grpid, group_address, iid, "r", 0,
                     0);
-    oc_issue_s_mode(5, sia_value, (int)grpid, (int)group_address, iid, "r", 0,
+    oc_issue_s_mode(5, sia_value, grpid, group_address, iid, "r", 0,
                     0);
   } else if (group_address > 0) {
     oc_issue_s_mode(2, sia_value, (int)group_address, (int)group_address, iid,
