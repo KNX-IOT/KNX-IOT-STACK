@@ -406,7 +406,8 @@ oc_s_mode_get_value(oc_request_t *request)
 }
 
 void
-oc_issue_s_mode(int scope, int sia_value, int grpid, int group_address, int iid,
+oc_issue_s_mode(int scope, int sia_value, uint32_t grpid,
+                uint32_t group_address, uint64_t iid,
                 char *rp, uint8_t *value_data, int value_size)
 {
   PRINT("  oc_issue_s_mode : scope %d\n", scope);
@@ -441,6 +442,7 @@ static void
 oc_send_s_mode(oc_endpoint_t *endpoint, char *path, int sia_value,
                int group_address, char *rp, uint8_t *value_data, int value_size)
 {
+  char token[8];
 
   PRINT("  oc_send_s_mode : \n");
   PRINT("  ");
@@ -578,9 +580,9 @@ oc_do_s_mode_read(size_t group_address)
 {
   size_t device_index = 0;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
-  int sia_value = device->ia;
-  int iid = device->iid;
-  int grpid = -1;
+  uint32_t sia_value = device->ia;
+  int64_t iid = device->iid;
+  uint32_t grpid = 0;
 
   PRINT("oc_do_s_mode_read : ga=%d ia=%d, iid=%d\n", (int)group_address,
         sia_value, iid);
