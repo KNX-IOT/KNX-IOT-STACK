@@ -125,7 +125,7 @@ oc_core_set_group_object_table(int index, oc_group_object_table_t entry)
                 oc_string_len(entry.href));
   /* copy the ga array */
   g_got[index].ga_len = entry.ga_len;
-  int *new_array = (int *)malloc(entry.ga_len * sizeof(int));
+  uint32_t *new_array = (uint32_t *)malloc(entry.ga_len * sizeof(int));
 
   if (new_array != NULL) {
     for (int i = 0; i < entry.ga_len; i++) {
@@ -1080,10 +1080,10 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
             // g_got[index].id = object->value.integer;
             int64_t *arr = oc_int_array(object->value.array);
             int array_size = (int)oc_int_array_size(object->value.array);
-            uint32_t *new_array = (int *)malloc(array_size * sizeof(int));
+            uint32_t *new_array = (uint32_t *)malloc(array_size * sizeof(int));
 
             for (int i = 0; i < array_size; i++) {
-              new_array[i] = (int)arr[i];
+              new_array[i] = (uint32_t)arr[i];
             }
             if (g_grt[index].ga != 0) {
               free(g_grt[index].ga);
