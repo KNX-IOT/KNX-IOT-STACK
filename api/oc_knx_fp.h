@@ -177,7 +177,7 @@ typedef struct oc_group_rp_table_t
   int id;           /**< contents of id*/
   int ia;           /**< contents of ia (internal address)*/
   int64_t iid;      /**< contents of installation id */
-  int64_t fid;          /**< contents of fabric id */
+  int64_t fid;      /**< contents of fabric id */
   uint32_t grpid;   /**< the multicast group id */
   oc_string_t path; /**< contents of path, default path = ".knx"*/
   oc_string_t url;  /**< contents of url */
@@ -576,8 +576,8 @@ void oc_free_knx_fp_resources(size_t device_index);
  * @return oc_endpoint_t the modified endpoint
  */
 oc_endpoint_t oc_create_multicast_group_address(oc_endpoint_t in,
-                                                uint32_t group_nr,
-                                                int64_t iid, int scope);
+                                                uint32_t group_nr, int64_t iid,
+                                                int scope);
 
 /**
  * @brief subscribe to a multicast address, defined by group number and

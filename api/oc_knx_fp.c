@@ -2080,8 +2080,7 @@ oc_add_points_in_group_object_table_to_response(oc_request_t *request,
 
 oc_endpoint_t
 oc_create_multicast_group_address(oc_endpoint_t in, uint32_t group_nr,
-                                  int64_t iid,
-                                  int scope)
+                                  int64_t iid, int scope)
 {
   // create the multicast address from group and scope
   // FF35::30: <ULA-routing-prefix>::<group id>
