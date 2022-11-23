@@ -2200,7 +2200,7 @@ oc_register_group_multicasts()
 
   int index;
   for (index = 0; index < oc_core_get_publisher_table_size(); index++) {
-    int grpid = g_gpt[index].grpid;
+    uint32_t grpid = g_gpt[index].grpid;
     if (grpid > 0) {
       pub_entry = true;
       break;
@@ -2217,7 +2217,7 @@ oc_register_group_multicasts()
           ((cflags & OC_CFLAG_READ) > 0)) {
 
         for (int i = 0; i < nr_entries; i++) {
-          int grpid = oc_find_grpid_in_table(
+          uint32_t grpid = oc_find_grpid_in_table(
             g_gpt, oc_core_get_publisher_table_size(), g_got[index].ga[i]);
 
           PRINT(" oc_register_group_multicasts index=%d i=%d grpid: %d "
