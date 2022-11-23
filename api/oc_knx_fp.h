@@ -531,7 +531,7 @@ int oc_core_find_index_in_publisher_table_from_id(int id);
  */
 bool oc_add_points_in_group_object_table_to_response(oc_request_t *request,
                                                      size_t device_index,
-                                                     int group_address,
+                                                     uint32_t group_address,
                                                      size_t *response_length,
                                                      int matches);
 

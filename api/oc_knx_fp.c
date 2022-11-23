@@ -1254,7 +1254,8 @@ oc_create_fp_r_x_resource(int resource_idx, size_t device)
 }
 
 bool
-oc_core_check_recipient_index_on_group_address(int index, int group_address)
+oc_core_check_recipient_index_on_group_address(int index,
+                                               uint32_t group_address)
 {
   if (index >= GRT_MAX_ENTRIES) {
     return -1;
@@ -2025,7 +2026,7 @@ oc_free_knx_fp_resources(size_t device_index)
 // -----------------------------------------------------------------------------
 
 bool
-is_in_array(int value, int *array, int array_size)
+is_in_array(uint32_t value, uint32_t *array, int array_size)
 {
   if (array_size <= 0) {
     return false;
@@ -2044,7 +2045,7 @@ is_in_array(int value, int *array, int array_size)
 bool
 oc_add_points_in_group_object_table_to_response(oc_request_t *request,
                                                 size_t device_index,
-                                                int group_address,
+                                                uint32_t group_address,
                                                 size_t *response_length,
                                                 int matches)
 {
@@ -2154,11 +2155,11 @@ unsubscribe_group_to_multicast(int group_nr, int iid, int scope)
 
 uint32_t
 oc_find_grpid_in_table(oc_group_rp_table_t *rp_table, int max_size,
-                       int group_address)
+                       uint32_t group_address)
 {
   int index;
   for (index = 0; index < max_size; index++) {
-    int *array = rp_table[index].ga;
+    uint32_t *array = rp_table[index].ga;
     int array_size = rp_table[index].ga_len;
     bool found = is_in_array(group_address, array, array_size);
     if (found) {
@@ -2170,14 +2171,14 @@ oc_find_grpid_in_table(oc_group_rp_table_t *rp_table, int max_size,
 }
 
 uint32_t
-oc_find_grpid_in_publisher_table(int group_address)
+oc_find_grpid_in_publisher_table(uint32_t group_address)
 {
   return oc_find_grpid_in_table(g_gpt, oc_core_get_publisher_table_size(),
                                 group_address);
 }
 
 uint32_t
-oc_find_grpid_in_recipient_table(int group_address)
+oc_find_grpid_in_recipient_table(uint32_t group_address)
 {
   return oc_find_grpid_in_table(g_grt, GRT_MAX_ENTRIES, group_address);
 }
