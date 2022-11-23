@@ -1069,7 +1069,7 @@ issue_requests_s_mode_delayed(void *data)
   device->iid = 16;
 
   PRINT(" issue_requests_s_mode_delayed : ia = %d\n", device->ia);
-  PRINT(" issue_requests_s_mode_delayed : iid = %d\n", device->iid);
+  PRINT(" issue_requests_s_mode_delayed : iid = %ld\n", device->iid);
 
   PRINT(" issue_requests_s_mode_delayed : config data\n");
   int ga_values[5] = { 1, 255, 256, 1024, 1024 * 256 };
@@ -1255,8 +1255,8 @@ issue_requests_oscore(void)
   oc_do_wk_discovery_all("ep=urn:knx:sn.000005", 2, discovery_cb, NULL);
 }
 
-void oc_issue_s_mode(int scope, int sia_value, int grpid, int group_address,
-                     int iid, char *rp, uint8_t *value_data, int value_size);
+//void oc_issue_s_mode(int scope, int sia_value, int grpid, int group_address,
+//                     int iid, char *rp, uint8_t *value_data, int value_size);
 
 static bool oscore_init = false;
 
@@ -1358,9 +1358,9 @@ main(int argc, char *argv[])
 {
   int init;
 
-  bool do_send_s_mode = true;
+  bool do_send_s_mode = false;
   bool do_send_oscore = false;
-  bool do_test_myself = true;
+  bool do_test_myself = false;
   // false;
   true; //  false;
   g_reset = true;
@@ -1485,6 +1485,7 @@ main(int argc, char *argv[])
 
   oc_device_info_t *device = oc_core_get_device_info(0);
   PRINT("serial number: %s\n", oc_string(device->serialnumber));
+  device->pm = 1;
 
   oc_endpoint_t *my_ep = oc_connectivity_get_endpoints(0);
   if (my_ep != NULL) {

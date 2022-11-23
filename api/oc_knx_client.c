@@ -595,9 +595,9 @@ oc_do_s_mode_read(int64_t group_address)
     oc_issue_s_mode(5, sia_value, grpid, group_address, iid, "r", 0,
                     0);
   } else if (group_address > 0) {
-    oc_issue_s_mode(2, sia_value, (int)group_address, (int)group_address, iid,
+    oc_issue_s_mode(2, sia_value, group_address, group_address, iid,
                     "r", 0, 0);
-    oc_issue_s_mode(5, sia_value, (int)group_address, (int)group_address, iid,
+    oc_issue_s_mode(5, sia_value, group_address, group_address, iid,
                     "r", 0, 0);
   }
 }

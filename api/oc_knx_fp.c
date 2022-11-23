@@ -2111,7 +2111,7 @@ oc_create_multicast_group_address(oc_endpoint_t in, uint32_t group_nr,
   oc_make_ipv6_endpoint(group_mcast, my_transport_flags, 5683, 0xff,
                         0x30 + scope, ula_4, ula_3, ula_2, ula_1, 0, 0, 0, 0, 0,
                         0, byte_4, byte_3, byte_2, byte_1);
-  PRINT("  oc_create_multicast_group_address S=%d U=%d G=%d B4=%d B3=%d B2=%d "
+  PRINT("  oc_create_multicast_group_address S=%d U=%ld G=%d B4=%d B3=%d B2=%d "
         "B1=%d\n",
         scope, iid, group_nr, byte_4, byte_3, byte_2, byte_1);
   PRINT("  ");
