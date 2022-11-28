@@ -336,7 +336,7 @@ oc_core_set_device_hostname(size_t device_index, const char *host_name)
 }
 
 int
-oc_core_set_device_iid(size_t device_index, uint32_t iid)
+oc_core_set_device_iid(size_t device_index, uint64_t iid)
 {
   if (device_index >= (int)oc_core_get_num_devices()) {
     OC_ERR("  device_index %d to large\n", (int)device_index);
