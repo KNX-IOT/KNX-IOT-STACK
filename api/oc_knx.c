@@ -991,14 +991,14 @@ oc_core_knx_ia_post_handler(oc_request_t *request,
       if (rep->iname == 12) {
         PRINT("  oc_core_knx_ia_post_handler received 12 (ia) : %d\n",
               (int)rep->value.integer);
-        oc_core_set_device_ia(device_index, (int)rep->value.integer);
+        oc_core_set_device_ia(device_index, (uint32_t)rep->value.integer);
         int temp = (int)rep->value.integer;
         oc_storage_write(KNX_STORAGE_IA, (uint8_t *)&temp, sizeof(temp));
         ia_set = true;
       } else if (rep->iname == 25) {
         PRINT("  oc_core_knx_ia_post_handler received 25 (fid): %d\n",
               (int)rep->value.integer);
-        oc_core_set_device_fid(device_index, (int)rep->value.integer);
+        oc_core_set_device_fid(device_index, rep->value.integer);
         int temp = (int)rep->value.integer;
         oc_storage_write(KNX_STORAGE_FID, (uint8_t *)&temp, sizeof(temp));
         fid_set = true;
