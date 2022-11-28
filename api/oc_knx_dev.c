@@ -931,7 +931,7 @@ oc_knx_device_storage_read(size_t device_index)
   /* KNX_STORAGE_IID */
   temp_size =
     oc_storage_read(KNX_STORAGE_IID, (uint8_t *)&device->iid, sizeof(int64_t));
-  PRINT("  idd (storage) %lld\n", device->iid);
+  PRINT("  idd (storage) %llu\n", device->iid);
 
   /* KNX_STORAGE_PM */
   temp_size = oc_storage_read(KNX_STORAGE_PM, (uint8_t *)&pm, 1);
