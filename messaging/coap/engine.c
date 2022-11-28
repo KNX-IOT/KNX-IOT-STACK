@@ -465,10 +465,10 @@ coap_receive(oc_message_t *msg)
           // okay
           oc_clock_time_t received_timestamp = (*(oc_clock_time_t *)echo_value);
 
-          OC_DBG("Echo timestamp difference %lld, threshold %d",
+          OC_DBG("Echo timestamp difference %lu, threshold %d",
                  current_time - received_timestamp, OC_ECHO_FRESHNESS_TIME);
           if (current_time - received_timestamp > OC_ECHO_FRESHNESS_TIME) {
-            OC_ERR("Stale timestamp! Current time %llu, received time %llu",
+            OC_ERR("Stale timestamp! Current time %lu, received time %lu",
                    current_time, received_timestamp);
             OC_ERR("Dropping frame!");
             // message containing echo is stale, just drop it
