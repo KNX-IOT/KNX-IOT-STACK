@@ -257,7 +257,7 @@ oc_core_set_device_hwv(size_t device_index, int major, int minor, int minor2)
 }
 
 int
-oc_core_set_device_ia(size_t device_index, int ia)
+oc_core_set_device_ia(size_t device_index, uint32_t ia)
 {
   if (device_index >= (int)oc_core_get_num_devices()) {
     OC_ERR("device_index %d to large\n", (int)device_index);
@@ -268,7 +268,7 @@ oc_core_set_device_ia(size_t device_index, int ia)
 }
 
 int
-oc_core_set_and_store_device_ia(size_t device_index, int ia)
+oc_core_set_and_store_device_ia(size_t device_index, uint32_t ia)
 {
   const int status = oc_core_set_device_ia(device_index, ia);
 
@@ -336,7 +336,7 @@ oc_core_set_device_hostname(size_t device_index, const char *host_name)
 }
 
 int
-oc_core_set_device_iid(size_t device_index, uint32_t iid)
+oc_core_set_device_iid(size_t device_index, uint64_t iid)
 {
   if (device_index >= (int)oc_core_get_num_devices()) {
     OC_ERR("  device_index %d to large\n", (int)device_index);
@@ -348,7 +348,7 @@ oc_core_set_device_iid(size_t device_index, uint32_t iid)
 }
 
 int
-oc_core_set_and_store_device_iid(size_t device_index, uint32_t iid)
+oc_core_set_and_store_device_iid(size_t device_index, uint64_t iid)
 {
   const int status = oc_core_set_device_iid(device_index, iid);
 
@@ -361,7 +361,7 @@ oc_core_set_and_store_device_iid(size_t device_index, uint32_t iid)
 }
 
 int
-oc_core_set_device_fid(size_t device_index, uint32_t fid)
+oc_core_set_device_fid(size_t device_index, uint64_t fid)
 {
   if (device_index >= (int)oc_core_get_num_devices()) {
     OC_ERR("  device_index %d to large\n", (int)device_index);

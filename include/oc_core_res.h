@@ -161,7 +161,7 @@ int oc_core_set_device_hwv(size_t device_index, int major, int minor,
  * @param ia the internal address
  * @return int error status, 0 = OK
  */
-int oc_core_set_device_ia(size_t device_index, int ia);
+int oc_core_set_device_ia(size_t device_index, uint32_t ia);
 
 /**
  * @brief sets and stores the internal address
@@ -170,7 +170,7 @@ int oc_core_set_device_ia(size_t device_index, int ia);
  * @param ia the internal address
  * @return int error status, 0 = OK
  */
-int oc_core_set_and_store_device_ia(size_t device_index, int ia);
+int oc_core_set_and_store_device_ia(size_t device_index, uint32_t ia);
 
 /**
  * @brief sets the hardware type (string)
@@ -215,25 +215,25 @@ int oc_core_set_device_hostname(size_t device_index, const char *host_name);
  * @param iid the KNX installation id
  * @return int error status, 0 = OK
  */
-int oc_core_set_device_iid(size_t device_index, uint32_t iid);
+int oc_core_set_device_iid(size_t device_index, uint64_t iid);
 
 /**
- * @brief sets the installation identifier (iid) (unsigned int) and store it
+ * @brief sets the installation identifier (iid) and store it
  *
  * @param device_index the device index
  * @param iid the KNX installation id
  * @return int error status, 0 = OK
  */
-int oc_core_set_and_store_device_iid(size_t device_index, uint32_t iid);
+int oc_core_set_and_store_device_iid(size_t device_index, uint64_t iid);
 
 /**
- * @brief sets the fabric identifier (fid) (unsigned int)
+ * @brief sets the fabric identifier (fid)
  *
  * @param device_index the device index
  * @param fid the fabric id
  * @return int error status, 0 = OK
  */
-int oc_core_set_device_fid(size_t device_index, uint32_t fid);
+int oc_core_set_device_fid(size_t device_index, uint64_t fid);
 
 /**
  * @brief retrieve the amount of devices
