@@ -89,9 +89,9 @@ typedef struct oc_pase_t
 typedef struct oc_group_object_notification_t
 {
   oc_string_t value; /**< generic value received. */
-  uint32_t sia;           /**< (source id) sender individual address */
+  uint32_t sia;      /**< (source id) sender individual address */
   oc_string_t st;    /**< Service type code (write=w, read=r, response=rp) */
-  uint32_t ga;    /**< group address */
+  uint32_t ga;       /**< group address */
 } oc_group_object_notification_t;
 
 /**
