@@ -78,20 +78,20 @@ typedef struct oc_pase_t
  * ```
  *
  * Key translation
- * | Json Key | Integer Value | type   |
- * | -------- | ------------- |--------|
- * | value    | 1             | object |
- * | sia      | 4             | int    |
- * | s        | 5             | object |
- * | st       | 6             | string |
- * | ga       | 7             | int    |
+ * | Json Key | Integer Value | type     |
+ * | -------- | ------------- |----------|
+ * | value    | 1             | object   |
+ * | sia      | 4             | uint32_t |
+ * | s        | 5             | object   |
+ * | st       | 6             | string   |
+ * | ga       | 7             | uint32_t |
  */
 typedef struct oc_group_object_notification_t
 {
   oc_string_t value; /**< generic value received. */
-  int sia;           /**< (source id) sender individual address */
+  uint32_t sia;           /**< (source id) sender individual address */
   oc_string_t st;    /**< Service type code (write=w, read=r, response=rp) */
-  int ga;            /**< group address */
+  uint32_t ga;    /**< group address */
 } oc_group_object_notification_t;
 
 /**
