@@ -428,9 +428,9 @@ char *oc_core_get_recipient_index_url_or_path(int index);
  * @brief retrieve the internal address of the recipient in the table
  *
  * @param index the index number in the recipient table
- * @return int -1 does not exit otherwise the ia
+ * @return uint32_t 0 does not exit otherwise the ia
  */
-int oc_core_get_recipient_ia(int index);
+uint32_t oc_core_get_recipient_ia(int index);
 
 /**
  * @brief return the size of the recipient table

@@ -584,7 +584,7 @@ oc_do_s_mode_read(int64_t group_address)
   int64_t iid = device->iid;
   uint32_t grpid = 0;
 
-  PRINT("oc_do_s_mode_read : ga=%d ia=%d, iid=%ld\n", (uint32_t)group_address,
+  PRINT("oc_do_s_mode_read : ga=%d ia=%d, iid=%lld\n", (uint32_t)group_address,
         sia_value, iid);
 
   // find the grpid that belongs to the group address
@@ -639,9 +639,9 @@ oc_do_s_mode_with_scope_and_check(int scope, char *resource_url, char *rp,
   // get the sender ia
   size_t device_index = 0;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
-  int sia_value = device->ia;
-  int iid = device->iid;
-  int group_address = -1;
+  uint32_t sia_value = device->ia;
+  uint64_t iid = device->iid;
+  uint32_t group_address = 0;
 
   // loop over all group addresses and issue the s-mode command
   int index = oc_core_find_group_object_table_url(resource_url);
@@ -676,7 +676,7 @@ oc_do_s_mode_with_scope_and_check(int scope, char *resource_url, char *rp,
         PRINT("      ga : %d\n", group_address);
         if (j == 0) {
           // issue the s-mode command, but only for the first ga entry
-          int grpid = oc_find_grpid_in_recipient_table((int)group_address);
+          uint32_t grpid = oc_find_grpid_in_recipient_table(group_address);
           if (grpid > 0) {
             oc_issue_s_mode(scope, sia_value, grpid, group_address, iid, rp,
                             buffer, value_size);
@@ -689,14 +689,14 @@ oc_do_s_mode_with_scope_and_check(int scope, char *resource_url, char *rp,
         // the recipient table contains the list of destinations that will
         // receive data. loop over the full recipient table and send a message
         // if the group is there
-        for (int j = 0; j < oc_core_get_recipient_table_size(); j++) {
+        for (int jr = 0; j < oc_core_get_recipient_table_size(); jr++) {
           bool found =
-            oc_core_check_recipient_index_on_group_address(j, group_address);
+            oc_core_check_recipient_index_on_group_address(jr, group_address);
           if (found) {
-            char *url = oc_core_get_recipient_index_url_or_path(j);
+            char *url = oc_core_get_recipient_index_url_or_path(jr);
             if (url) {
               PRINT(" broker send: %s\n", url);
-              int ia = oc_core_get_recipient_ia(j);
+              uint32_t ia = oc_core_get_recipient_ia(jr);
               if (ia > 0) {
                 // ia == 0 is reserved, so only send with ia > 0
                 oc_knx_client_do_broker_request(resource_url, ia, url, rp);

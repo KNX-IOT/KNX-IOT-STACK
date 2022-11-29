@@ -1272,11 +1272,11 @@ oc_core_check_recipient_index_on_group_address(int index,
   return false;
 }
 
-int
+uint32_t
 oc_core_get_recipient_ia(int index)
 {
   if (index >= GRT_MAX_ENTRIES) {
-    return -1;
+    return 0;
   }
 
   return g_grt[index].ia;
