@@ -569,8 +569,8 @@ oc_s_mode_notification_to_json(char *buffer, size_t buffer_size,
 void
 oc_reset_g_received_notification()
 {
-  g_received_notification.sia = -1;
-  g_received_notification.ga = -1;
+  g_received_notification.sia = 0;
+  g_received_notification.ga = 0;
   // g_received_notification.value =
 
   oc_free_string(&g_received_notification.st);
@@ -685,20 +685,20 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
 #ifdef TAGS_AS_STRINGS
           if (oc_string_len(object->name) == 3 &&
               memcmp(oc_string(object->name), "sia", 3) == 0) {
-            g_received_notification.sia = (int)object->value.integer;
+            g_received_notification.sia = (uint32_t)object->value.integer;
           }
           if (oc_string_len(object->name) == 2 &&
               memcmp(oc_string(object->name), "ga", 2) == 0) {
-            g_received_notification.ga = (int)object->value.integer;
+            g_received_notification.ga = (uint32_t)object->value.integer;
           }
 #endif
           // sia
           if (object->iname == 4) {
-            g_received_notification.sia = (int)object->value.integer;
+            g_received_notification.sia = (uint32_t)object->value.integer;
           }
           // ga
           if (object->iname == 7) {
-            g_received_notification.ga = (int)object->value.integer;
+            g_received_notification.ga = (uint32_t)object->value.integer;
           }
           if (object->iname == 1) {
             oc_free_string(&g_received_notification.value);

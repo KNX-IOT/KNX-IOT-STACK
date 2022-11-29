@@ -182,7 +182,7 @@ oc_core_find_group_object_table_index(uint32_t group_address)
       }
     }
   }
-  return 0;
+  return -1;
 }
 
 int
