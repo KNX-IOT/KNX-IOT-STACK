@@ -257,8 +257,8 @@ oc_core_dev_ia_get_handler(oc_request_t *request,
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device != NULL) {
     oc_rep_begin_root_object();
-    oc_rep_i_set_int(root, 12, (int64_t)device->ia);
-    oc_rep_i_set_int(root, 26, (int64_t)device->iid);
+    oc_rep_i_set_int(root, 12, device->ia);
+    oc_rep_i_set_int(root, 26, device->iid);
     if (device->fid > 0) {
       // only frame it when it is set...
       oc_rep_i_set_int(root, 25, (int64_t)device->fid);
@@ -310,8 +310,8 @@ oc_core_dev_ia_put_handler(oc_request_t *request,
       } else if (rep->iname == 26) {
         PRINT("  oc_core_dev_ia_put_handler received 26 (iid): %d\n",
               (int)rep->value.integer);
-        oc_core_set_device_iid(device_index, (int)rep->value.integer);
-        int temp = (int)rep->value.integer;
+        oc_core_set_device_iid(device_index, (uint64_t)rep->value.integer);
+        uint64_t temp = (uint64_t)rep->value.integer;
         oc_storage_write(KNX_STORAGE_IID, (uint8_t *)&temp, sizeof(temp));
         iid_set = true;
       }
@@ -486,7 +486,6 @@ oc_core_dev_iid_get_handler(oc_request_t *request,
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device != NULL) {
-    // cbor_encode_int(&g_encoder, device->iid);
     oc_rep_begin_root_object();
     oc_rep_i_set_int(root, 1, device->iid);
     oc_rep_end_root_object();
