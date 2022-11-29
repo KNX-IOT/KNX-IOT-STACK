@@ -628,7 +628,7 @@ get_dpa_353_52(oc_request_t *request, oc_interface_mask_t interfaces,
  */
 STATIC void
 put_dpa_352_51(oc_request_t *request, oc_interface_mask_t interfaces,
-                void *user_data)
+               void *user_data)
 {
   (void)interfaces;
   (void)user_data;
@@ -674,7 +674,7 @@ put_dpa_352_51(oc_request_t *request, oc_interface_mask_t interfaces,
  */
 STATIC void
 put_dpa_352_51_1(oc_request_t *request, oc_interface_mask_t interfaces,
-                  void *user_data)
+                 void *user_data)
 {
   (void)interfaces;
   (void)user_data;
@@ -722,7 +722,7 @@ put_dpa_352_51_1(oc_request_t *request, oc_interface_mask_t interfaces,
  */
 STATIC void
 put_dpa_352_52(oc_request_t *request, oc_interface_mask_t interfaces,
-                void *user_data)
+               void *user_data)
 {
   (void)interfaces;
   (void)user_data;
@@ -771,7 +771,7 @@ put_dpa_352_52(oc_request_t *request, oc_interface_mask_t interfaces,
  */
 STATIC void
 put_dpa_353_52(oc_request_t *request, oc_interface_mask_t interfaces,
-                void *user_data)
+               void *user_data)
 {
   (void)interfaces;
   (void)user_data;

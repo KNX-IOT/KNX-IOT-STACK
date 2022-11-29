@@ -819,14 +819,14 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
         // to be discussed:
         // get value, since the w only should be send if the value is updated
         // (e.g. different)
-        
-        //if (my_resource->put_handler.cb) {
+
+        // if (my_resource->put_handler.cb) {
         //  my_resource->put_handler.cb(&new_request, iface_mask, data);
 
-        //if (my_resource->post_handler.cb) {
+        // if (my_resource->post_handler.cb) {
         //  my_resource->post_handler.cb(&new_request, iface_mask, data);
         if (my_resource->put_handler.cb) {
-            my_resource->put_handler.cb(&new_request, iface_mask, data);
+          my_resource->put_handler.cb(&new_request, iface_mask, data);
           if ((cflags & OC_CFLAG_TRANSMISSION) > 0) {
             // Case 3) part 1
             // @sender : updated object value + cflags = t
