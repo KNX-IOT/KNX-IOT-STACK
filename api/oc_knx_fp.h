@@ -219,6 +219,14 @@ int oc_core_get_group_object_table_total_size();
 oc_group_object_table_t *oc_core_get_group_object_table_entry(int index);
 
 /**
+ * @brief find empty slot in group object table
+ *
+ * @param id the index
+ * @return the free index or -1 when no empty slots are available
+ */
+int find_empty_slot_in_group_object_table(int id);
+
+/**
  * @brief register the multicast addresses to listen to
  *
  * The addresses are formed from:
