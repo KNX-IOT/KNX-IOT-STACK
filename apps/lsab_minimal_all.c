@@ -283,7 +283,7 @@ get_o_1_1(oc_request_t *request, oc_interface_mask_t interfaces,
  */
 STATIC void
 put_o_1_1(oc_request_t *request, oc_interface_mask_t interfaces,
-           void *user_data)
+          void *user_data)
 {
   (void)interfaces;
   (void)user_data;
