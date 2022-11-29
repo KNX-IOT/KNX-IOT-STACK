@@ -190,7 +190,7 @@ oc_core_find_next_group_object_table_index(uint32_t group_address,
                                            int cur_index)
 {
   if (cur_index == -1) {
-    return 0;
+    return -1;
   }
 
   int i, j;
@@ -204,7 +204,7 @@ oc_core_find_next_group_object_table_index(uint32_t group_address,
       }
     }
   }
-  return 0;
+  return -1;
 }
 
 oc_string_t
