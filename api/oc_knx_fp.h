@@ -218,7 +218,6 @@ int oc_core_get_group_object_table_total_size();
  */
 oc_group_object_table_t *oc_core_get_group_object_table_entry(int index);
 
-
 /**
  * @brief find empty slot in group object table
  *
