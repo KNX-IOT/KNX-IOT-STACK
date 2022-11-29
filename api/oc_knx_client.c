@@ -689,7 +689,7 @@ oc_do_s_mode_with_scope_and_check(int scope, char *resource_url, char *rp,
         // the recipient table contains the list of destinations that will
         // receive data. loop over the full recipient table and send a message
         // if the group is there
-        for (int jr = 0; j < oc_core_get_recipient_table_size(); jr++) {
+        for (int jr = 0; jr < oc_core_get_recipient_table_size(); jr++) {
           bool found =
             oc_core_check_recipient_index_on_group_address(jr, group_address);
           if (found) {

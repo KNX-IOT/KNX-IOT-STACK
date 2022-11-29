@@ -298,7 +298,7 @@ get_o_1_1(oc_request_t *request, oc_interface_mask_t interfaces,
  *   - used interfaces
  *
  * URL Table
- * | resource url |  functional block/dpa  | GET | POST |
+ * | resource url |  functional block/dpa  | GET | PUT |
  * | ------------ | ---------------------- | ----| ---- |
  * | p/o_1_1      | urn:knx:dpa.421.61     | Yes | No  |
  */

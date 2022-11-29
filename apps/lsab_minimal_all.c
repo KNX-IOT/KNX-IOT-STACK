@@ -270,9 +270,9 @@ get_o_1_1(oc_request_t *request, oc_interface_mask_t interfaces,
 }
 
 /**
- * post method for "p/o_1_1" resource.
+ * Put method for "p/o_1_1" resource.
  * The function has as input the request body, which are the input values of the
- * POST method.
+ * PUT method.
  * The input values (as a set) are checked if all supplied values are correct.
  * If the input values are correct, they will be assigned to the global property
  * values. Resource Description:
@@ -282,13 +282,13 @@ get_o_1_1(oc_request_t *request, oc_interface_mask_t interfaces,
  * @param user_data the supplied user data.
  */
 STATIC void
-post_o_1_1(oc_request_t *request, oc_interface_mask_t interfaces,
-           void *user_data)
+put_o_1_1(oc_request_t *request, oc_interface_mask_t interfaces,
+          void *user_data)
 {
   (void)interfaces;
   (void)user_data;
   bool error_state = false;
-  PRINT("-- Begin post_dpa_417_61:\n");
+  PRINT("-- Begin put_dpa_417_61:\n");
 
   oc_rep_t *rep = NULL;
   // handle the different requests
@@ -299,10 +299,10 @@ post_o_1_1(oc_request_t *request, oc_interface_mask_t interfaces,
   while (rep != NULL) {
     if (rep->type == OC_REP_BOOL) {
       if (rep->iname == 1) {
-        PRINT("  post_dpa_417_61 received : %d\n", rep->value.boolean);
+        PRINT("  put_dpa_417_61 received : %d\n", rep->value.boolean);
         g_mystate = rep->value.boolean;
         oc_send_cbor_response(request, OC_STATUS_CHANGED);
-        PRINT("-- End post_dpa_417_61\n");
+        PRINT("-- End put_dpa_417_61\n");
         return;
       }
     }
@@ -310,7 +310,7 @@ post_o_1_1(oc_request_t *request, oc_interface_mask_t interfaces,
   }
 
   oc_send_response(request, OC_STATUS_BAD_REQUEST);
-  PRINT("-- End post_dpa_417_61\n");
+  PRINT("-- End put_dpa_417_61\n");
 }
 
 /**
@@ -325,7 +325,7 @@ post_o_1_1(oc_request_t *request, oc_interface_mask_t interfaces,
  *   - used interfaces
  *
  * URL Table
- * | resource url |  functional block/dpa  | GET | POST |
+ * | resource url |  functional block/dpa  | GET | PUT |
  * | ------------ | ---------------------- | ----| ---- |
  * | p/o_1_1      | urn:knx:dpa.417.61     | Yes | Yes  |
  */
@@ -353,8 +353,8 @@ register_resources(void)
   // oc_resource_set_observable(res_352, true);
   // set the GET handler
   oc_resource_set_request_handler(res_light, OC_GET, get_o_1_1, NULL);
-  // set the POST handler
-  oc_resource_set_request_handler(res_light, OC_POST, post_o_1_1, NULL);
+  // set the PUT handler
+  oc_resource_set_request_handler(res_light, OC_PUT, put_o_1_1, NULL);
   // register this resource,
   // this means that the resource will be listed in /.well-known/core
   oc_add_resource(res_light);

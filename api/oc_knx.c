@@ -609,7 +609,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
     // if so, then return with bad request
     oc_endpoint_t *origin = request->origin;
     if (origin != NULL) {
-      PRINT(".knx post : orgin of message:");
+      PRINT(".knx post : origin of message:");
       PRINTipaddr(*origin);
       PRINT("\n");
     }
@@ -647,7 +647,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
     case OC_REP_INT: {
       // sia
       if (rep->iname == 4) {
-        g_received_notification.sia = (int)rep->value.integer;
+        g_received_notification.sia = (uint32_t)rep->value.integer;
       }
     } break;
     case OC_REP_OBJECT: {
@@ -819,8 +819,14 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
         // to be discussed:
         // get value, since the w only should be send if the value is updated
         // (e.g. different)
-        if (my_resource->post_handler.cb) {
-          my_resource->post_handler.cb(&new_request, iface_mask, data);
+
+        // if (my_resource->put_handler.cb) {
+        //  my_resource->put_handler.cb(&new_request, iface_mask, data);
+
+        // if (my_resource->post_handler.cb) {
+        //  my_resource->post_handler.cb(&new_request, iface_mask, data);
+        if (my_resource->put_handler.cb) {
+          my_resource->put_handler.cb(&new_request, iface_mask, data);
           if ((cflags & OC_CFLAG_TRANSMISSION) > 0) {
             // Case 3) part 1
             // @sender : updated object value + cflags = t

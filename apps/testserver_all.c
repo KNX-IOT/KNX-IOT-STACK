@@ -40,12 +40,12 @@
  *   starts the stack, with the registered resources.
  *   can be compiled out with NO_MAIN
  *
- *  handlers for the implemented methods (get/post):
+ *  handlers for the implemented methods (get/put):
  *   - get_[path]
  *     function that is being called when a GET is called on [path]
  *     set the global variables in the output
- *   - post_[path]
- *     function that is being called when a POST is called on [path]
+ *   - put_[path]
+ *     function that is being called when a PUT is called on [path]
  *     updates the global variables
  *
  * ## stack specific defines
@@ -614,9 +614,9 @@ get_dpa_353_52(oc_request_t *request, oc_interface_mask_t interfaces,
 }
 
 /**
- * post method for "/p/a" resource.
+ * put method for "/p/a" resource.
  * The function has as input the request body, which are the input values of the
- * POST method.
+ * PUT method.
  * The input values (as a set) are checked if all supplied values are correct.
  * If the input values are correct, they will be assigned to the global property
  * values.
@@ -627,13 +627,13 @@ get_dpa_353_52(oc_request_t *request, oc_interface_mask_t interfaces,
  * @param user_data the supplied user data.
  */
 STATIC void
-post_dpa_352_51(oc_request_t *request, oc_interface_mask_t interfaces,
-                void *user_data)
+put_dpa_352_51(oc_request_t *request, oc_interface_mask_t interfaces,
+               void *user_data)
 {
   (void)interfaces;
   (void)user_data;
   bool error_state = false;
-  PRINT("-- Begin post_dpa_352_51:\n");
+  PRINT("-- Begin put_dpa_352_51:\n");
   oc_rep_t *rep = NULL;
   // handle the different requests
   if (oc_is_redirected_request(request)) {
@@ -644,10 +644,10 @@ post_dpa_352_51(oc_request_t *request, oc_interface_mask_t interfaces,
   while (rep != NULL) {
     if (rep->type == OC_REP_BOOL) {
       if (rep->iname == 1) {
-        PRINT("  post_dpa_352_51 received : %d\n", rep->value.boolean);
+        PRINT("  put_dpa_352_51 received : %d\n", rep->value.boolean);
         g_352_51_state = rep->value.boolean;
         oc_send_cbor_response(request, OC_STATUS_CHANGED);
-        PRINT("-- End post_dpa_352_51\n");
+        PRINT("-- End put_dpa_352_51\n");
         return;
       }
     }
@@ -656,13 +656,13 @@ post_dpa_352_51(oc_request_t *request, oc_interface_mask_t interfaces,
 
   PRINT("  Returning Error \n");
   oc_send_response(request, OC_STATUS_BAD_REQUEST);
-  PRINT("-- End post_dpa_352_51\n");
+  PRINT("-- End put_dpa_352_51\n");
 }
 
 /**
- * post method for "/p/a_1" resource.
+ * put method for "/p/a_1" resource.
  * The function has as input the request body, which are the input values of the
- * POST method.
+ * PUT method.
  * The input values (as a set) are checked if all supplied values are correct.
  * If the input values are correct, they will be assigned to the global property
  * values.
@@ -673,13 +673,13 @@ post_dpa_352_51(oc_request_t *request, oc_interface_mask_t interfaces,
  * @param user_data the supplied user data.
  */
 STATIC void
-post_dpa_352_51_1(oc_request_t *request, oc_interface_mask_t interfaces,
-                  void *user_data)
+put_dpa_352_51_1(oc_request_t *request, oc_interface_mask_t interfaces,
+                 void *user_data)
 {
   (void)interfaces;
   (void)user_data;
   bool error_state = false;
-  PRINT("-- Begin post_dpa_352_51_1:\n");
+  PRINT("-- Begin put_dpa_352_51_1:\n");
 
   oc_rep_t *rep = NULL;
   // handle the different requests
@@ -692,10 +692,10 @@ post_dpa_352_51_1(oc_request_t *request, oc_interface_mask_t interfaces,
   while (rep != NULL) {
     if (rep->type == OC_REP_BOOL) {
       if (rep->iname == 1) {
-        PRINT("  post_dpa_352_51_1 received : %d\n", rep->value.boolean);
+        PRINT("  put_dpa_352_51_1 received : %d\n", rep->value.boolean);
         g_352_51_1_state = rep->value.boolean;
         oc_send_cbor_response(request, OC_STATUS_CHANGED);
-        PRINT("-- End post_dpa_352_51_1\n");
+        PRINT("-- End put_dpa_352_51_1\n");
         return;
       }
     }
@@ -704,13 +704,13 @@ post_dpa_352_51_1(oc_request_t *request, oc_interface_mask_t interfaces,
 
   PRINT("  Returning Error \n");
   oc_send_response(request, OC_STATUS_BAD_REQUEST);
-  PRINT("-- End post_dpa_352_51_1\n");
+  PRINT("-- End put_dpa_352_51_1\n");
 }
 
 /**
- * post method for "/p/b" resource.
+ * put method for "/p/b" resource.
  * The function has as input the request body, which are the input values of the
- * POST method.
+ * PUT method.
  * The input values (as a set) are checked if all supplied values are correct.
  * If the input values are correct, they will be assigned to the global property
  * values.
@@ -721,12 +721,12 @@ post_dpa_352_51_1(oc_request_t *request, oc_interface_mask_t interfaces,
  * @param user_data the supplied user data.
  */
 STATIC void
-post_dpa_352_52(oc_request_t *request, oc_interface_mask_t interfaces,
-                void *user_data)
+put_dpa_352_52(oc_request_t *request, oc_interface_mask_t interfaces,
+               void *user_data)
 {
   (void)interfaces;
   (void)user_data;
-  PRINT("-- Begin post_dpa_352_52:\n");
+  PRINT("-- Begin put_dpa_352_52:\n");
 
   oc_rep_t *rep = NULL;
   // handle the different requests
@@ -739,10 +739,10 @@ post_dpa_352_52(oc_request_t *request, oc_interface_mask_t interfaces,
   while (rep != NULL) {
     if (rep->type == OC_REP_BOOL) {
       if (rep->iname == 1) {
-        PRINT("  post_dpa_352_52 received : %d\n", rep->value.boolean);
+        PRINT("  put_dpa_352_52 received : %d\n", rep->value.boolean);
         g_352_52_state = rep->value.boolean;
         oc_send_cbor_response(request, OC_STATUS_CHANGED);
-        PRINT("-- End post_dpa_352_52\n");
+        PRINT("-- End put_dpa_352_52\n");
         return;
       }
     }
@@ -753,13 +753,13 @@ post_dpa_352_52(oc_request_t *request, oc_interface_mask_t interfaces,
    * variables */
   PRINT("  Returning Error \n");
   oc_send_response(request, OC_STATUS_BAD_REQUEST);
-  PRINT("-- End post_dpa_352_52\n");
+  PRINT("-- End put_dpa_352_52\n");
 }
 
 /**
- * post method for "/p/b" resource.
+ * put method for "/p/b" resource.
  * The function has as input the request body, which are the input values of the
- * POST method.
+ * PUT method.
  * The input values (as a set) are checked if all supplied values are correct.
  * If the input values are correct, they will be assigned to the global property
  * values.
@@ -770,13 +770,13 @@ post_dpa_352_52(oc_request_t *request, oc_interface_mask_t interfaces,
  * @param user_data the supplied user data.
  */
 STATIC void
-post_dpa_353_52(oc_request_t *request, oc_interface_mask_t interfaces,
-                void *user_data)
+put_dpa_353_52(oc_request_t *request, oc_interface_mask_t interfaces,
+               void *user_data)
 {
   (void)interfaces;
   (void)user_data;
   oc_rep_t *rep = NULL;
-  PRINT("-- Begin post_dpa_353_52:\n");
+  PRINT("-- Begin put_dpa_353_52:\n");
 
   if (oc_is_redirected_request(request)) {
     PRINT("  S-MODE or /P\n");
@@ -785,17 +785,17 @@ post_dpa_353_52(oc_request_t *request, oc_interface_mask_t interfaces,
   while (rep != NULL) {
     if (rep->type == OC_REP_BOOL) {
       if (rep->iname == 1) {
-        PRINT("  post_dpa_353_52 received : %d\n", rep->value.boolean);
+        PRINT("  put_dpa_353_52 received : %d\n", rep->value.boolean);
         g_353_52_state = rep->value.boolean;
         oc_send_cbor_response(request, OC_STATUS_CHANGED);
-        PRINT("-- End post_dpa_353_52\n");
+        PRINT("-- End put_dpa_353_52\n");
         return;
       }
     }
     rep = rep->next;
   }
   oc_send_response(request, OC_STATUS_BAD_REQUEST);
-  PRINT("-- End post_dpa_353_52\n");
+  PRINT("-- End put_dpa_353_52\n");
 }
 
 /**
@@ -834,7 +834,7 @@ register_resources(void)
     an interrupt when something is read from the hardware. */
   /*oc_resource_set_observable(res_352, true); */
   oc_resource_set_request_handler(res_352, OC_GET, get_dpa_352_51, NULL);
-  oc_resource_set_request_handler(res_352, OC_POST, post_dpa_352_51, NULL);
+  oc_resource_set_request_handler(res_352, OC_PUT, put_dpa_352_51, NULL);
   oc_add_resource(res_352);
 
   oc_resource_t *res_352_1 = oc_new_resource("myname", "/p/a_1", 1, 0);
@@ -846,7 +846,7 @@ register_resources(void)
   oc_resource_set_function_block_instance(res_352_1, 1);
 
   oc_resource_set_request_handler(res_352_1, OC_GET, get_dpa_352_51_1, NULL);
-  oc_resource_set_request_handler(res_352_1, OC_POST, post_dpa_352_51_1, NULL);
+  oc_resource_set_request_handler(res_352_1, OC_PUT, put_dpa_352_51_1, NULL);
   oc_add_resource(res_352_1);
 
   PRINT("Register Resource with local path \"/p/b\"\n");
@@ -866,7 +866,7 @@ register_resources(void)
     an interrupt when something is read from the hardware. */
   /*oc_resource_set_observable(res_352, true); */
   oc_resource_set_request_handler(res_352b, OC_GET, get_dpa_352_52, NULL);
-  oc_resource_set_request_handler(res_352b, OC_POST, post_dpa_352_52, NULL);
+  oc_resource_set_request_handler(res_352b, OC_PUT, put_dpa_352_52, NULL);
   oc_add_resource(res_352b);
 
   PRINT("Register Resource with local path \"/p/c\"\n");
@@ -887,7 +887,7 @@ register_resources(void)
     an interrupt when something is read from the hardware. */
   /*oc_resource_set_observable(res_352, true); */
   oc_resource_set_request_handler(res_353, OC_GET, get_dpa_353_52, NULL);
-  oc_resource_set_request_handler(res_353, OC_POST, post_dpa_353_52, NULL);
+  oc_resource_set_request_handler(res_353, OC_PUT, put_dpa_353_52, NULL);
   oc_add_resource(res_353);
 }
 
@@ -1044,7 +1044,7 @@ issue_requests(void *data)
   oc_do_s_mode_with_scope(5, "/p/c", "w");
 
   PRINT("---------------> s_mode loop %d\n", g_counter);
-  if (g_counter == 10000) {
+  if (g_counter == 10) {
     PRINT("---------------> QUIT  %d\n", g_counter);
     exit(0);
   }
@@ -1220,7 +1220,7 @@ void
 issue_requests_oscore(void)
 {
 
-  PRINT("issue_requests_oscore");
+  PRINT("issue_requests_oscore\n");
   int index = 0;
   oc_auth_at_t access_token;
   memset(&access_token, 0, sizeof(access_token));
@@ -1268,7 +1268,7 @@ oc_event_callback_retval_t
 issue_s_mode_secure(void *data)
 {
 
-  PRINT("issue_s_mode_secure");
+  PRINT("issue_s_mode_secure\n");
 
   int index = 0;
 
@@ -1359,7 +1359,7 @@ main(int argc, char *argv[])
 {
   int init;
 
-  bool do_send_s_mode = false;
+  bool do_send_s_mode = true;
   bool do_send_oscore = false;
   bool do_test_myself = false;
   // false;
