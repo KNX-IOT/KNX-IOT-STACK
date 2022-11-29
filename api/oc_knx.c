@@ -996,17 +996,17 @@ oc_core_knx_ia_post_handler(oc_request_t *request,
         oc_storage_write(KNX_STORAGE_IA, (uint8_t *)&temp, sizeof(temp));
         ia_set = true;
       } else if (rep->iname == 25) {
-        PRINT("  oc_core_knx_ia_post_handler received 25 (fid): %d\n",
-              (int)rep->value.integer);
-        oc_core_set_device_fid(device_index, rep->value.integer);
-        int temp = (int)rep->value.integer;
+        PRINT("  oc_core_knx_ia_post_handler received 25 (fid): %lu\n",
+              rep->value.integer);
+        oc_core_set_device_fid(device_index, (uint64_t)rep->value.integer);
+        uint64_t temp = (uint64_t)rep->value.integer;
         oc_storage_write(KNX_STORAGE_FID, (uint8_t *)&temp, sizeof(temp));
         fid_set = true;
       } else if (rep->iname == 26) {
-        PRINT("  oc_core_knx_ia_post_handler received 26 (iid): %d\n",
-              (int)rep->value.integer);
-        oc_core_set_device_iid(device_index, (int)rep->value.integer);
-        int temp = (int)rep->value.integer;
+        PRINT("  oc_core_knx_ia_post_handler received 26 (iid): %lld\n",
+              rep->value.integer);
+        oc_core_set_device_iid(device_index, (uint64_t)rep->value.integer);
+        uint64_t temp = (uint64_t)rep->value.integer;
         oc_storage_write(KNX_STORAGE_IID, (uint8_t *)&temp, sizeof(temp));
         iid_set = true;
       }
