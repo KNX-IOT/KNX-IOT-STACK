@@ -1056,10 +1056,10 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
             g_grt[index].grpid = (uint32_t)object->value.integer;
           }
           if (object->iname == 26) {
-            g_grt[index].iid = (int)object->value.integer;
+            g_grt[index].iid = object->value.integer;
           }
           if (object->iname == 25) {
-            g_grt[index].fid = (int)object->value.integer;
+            g_grt[index].fid = object->value.integer;
           }
         } break;
 
