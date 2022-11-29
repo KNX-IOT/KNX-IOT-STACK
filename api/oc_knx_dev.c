@@ -445,12 +445,12 @@ oc_core_dev_iid_put_handler(oc_request_t *request,
   while (rep != NULL) {
     if (rep->type == OC_REP_INT) {
       if (rep->iname == 1) {
-        PRINT("  oc_core_dev_iid_put_handler received : %d\n",
-              (int)rep->value.integer);
-        oc_core_set_device_iid(device_index, (int)rep->value.integer);
+        PRINT("  oc_core_dev_iid_put_handler received : %lld\n",
+              rep->value.integer);
+        oc_core_set_device_iid(device_index, rep->value.integer);
         // make the value persistent
         oc_storage_write(KNX_STORAGE_IID, (uint8_t *)&rep->value.integer,
-                         sizeof(uint32_t));
+                         sizeof(uint64_t));
         oc_send_cbor_response(request, OC_STATUS_CHANGED);
 
         // do the run time installation
@@ -930,7 +930,7 @@ oc_knx_device_storage_read(size_t device_index)
   /* KNX_STORAGE_IID */
   temp_size =
     oc_storage_read(KNX_STORAGE_IID, (uint8_t *)&device->iid, sizeof(int64_t));
-  PRINT("  idd (storage) %lu\n", device->iid);
+  PRINT("  idd (storage) %llu\n", device->iid);
 
   /* KNX_STORAGE_PM */
   temp_size = oc_storage_read(KNX_STORAGE_PM, (uint8_t *)&pm, 1);
