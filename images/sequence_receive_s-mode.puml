@@ -20,7 +20,7 @@ Dev2 -> GOT : Get groupId's for receiving messages
 Dev2 <- GOT : GroupId's
 
 
-group per GroupID [internal POST]
+group per GroupID [internal PUT]
     Dev2 -> Resource :update [value]
 end
 
