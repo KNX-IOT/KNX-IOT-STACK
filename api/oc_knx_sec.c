@@ -1006,7 +1006,7 @@ oc_print_auth_at_entry(size_t device_index, int index)
         if (g_at_entries[index].ga_len > 0) {
           PRINT("    osc:ga        : [");
           for (int i = 0; i < g_at_entries[index].ga_len; i++) {
-            PRINT(" %lld", (int)g_at_entries[index].ga[i]);
+            PRINT(" %lld", g_at_entries[index].ga[i]);
           }
           PRINT(" ]\n");
         }
@@ -1295,7 +1295,7 @@ oc_core_set_at_table(size_t device_index, int index, oc_auth_at_t entry,
     g_at_entries[index].ga = NULL;
     // copy the array
     if (g_at_entries[index].ga_len > 0) {
-      int array_size = (int)g_at_entries[index].ga_len;
+      int array_size = g_at_entries[index].ga_len;
       g_at_entries[index].ga_len = (int)array_size;
       int64_t *new_array = (int64_t *)malloc(array_size * sizeof(uint64_t));
       if (new_array) {
