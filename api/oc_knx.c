@@ -1327,7 +1327,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
   PRINT("oc_core_knx_spake_post_handler valid_request: %d\n", valid_request);
   oc_indicate_separate_response(request, &spake_separate_rsp);
   // TODO missing pointer cast warning here
-  oc_set_delayed_callback((void*)valid_request,
+  oc_set_delayed_callback((void *)valid_request,
                           &oc_core_knx_spake_separate_post_handler, 0);
 }
 

@@ -64,10 +64,9 @@ static oc_spake_context_t g_spake_ctx;
 
 // ----------------------------------------------------------------------------
 
-static void oc_send_s_mode(oc_endpoint_t *endpoint, char *path, uint32_t sia_value,
-                           uint32_t group_address, char *rp,
-                           uint8_t *value_data,
-                           int value_size);
+static void oc_send_s_mode(oc_endpoint_t *endpoint, char *path,
+                           uint32_t sia_value, uint32_t group_address, char *rp,
+                           uint8_t *value_data, int value_size);
 
 static int oc_s_mode_get_resource_value(char *resource_url, char *rp,
                                         uint8_t *buf, int buf_size);
@@ -329,8 +328,8 @@ discovery_ia_cb(const char *payload, int len, oc_endpoint_t *endpoint,
 }
 
 int
-oc_knx_client_do_broker_request(char *resource_url, uint32_t ia, char *destination,
-                                char *rp)
+oc_knx_client_do_broker_request(char *resource_url, uint32_t ia,
+                                char *destination, char *rp)
 {
   char query[20];
   snprintf(query, 20, "if=urn:knx:ia.%d", ia);
