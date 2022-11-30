@@ -594,7 +594,7 @@ oc_endpoint_t oc_create_multicast_group_address(oc_endpoint_t in,
  * create the multicast address from group and scope with a supplied port number
  *\code{.unparsed}
  * FF3_:FD__:____:____:(8-f)___:____
- * FF35::30:<ULA-routing-prefix>::<group id>
+ * FF35:30:<ULA-routing-prefix>::<group id>
  *    | 5 == scope
  *    | 3 == scope
  * Multicast prefix: FF35:0030:  [4 bytes]
