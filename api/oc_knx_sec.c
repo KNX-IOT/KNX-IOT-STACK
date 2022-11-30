@@ -1006,7 +1006,7 @@ oc_print_auth_at_entry(size_t device_index, int index)
         if (g_at_entries[index].ga_len > 0) {
           PRINT("    osc:ga        : [");
           for (int i = 0; i < g_at_entries[index].ga_len; i++) {
-            PRINT(" %lld", g_at_entries[index].ga[i]);
+            PRINT(" %ld", g_at_entries[index].ga[i]);
           }
           PRINT(" ]\n");
         }
