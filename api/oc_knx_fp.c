@@ -2078,11 +2078,9 @@ oc_add_points_in_group_object_table_to_response(oc_request_t *request,
   return return_value;
 }
 
-
-
 oc_endpoint_t
 oc_create_multicast_group_address_with_port(oc_endpoint_t in, uint32_t group_nr,
-                                  int64_t iid, int scope, int port)
+                                            int64_t iid, int scope, int port)
 {
   // create the multicast address from group and scope
   // FF3_:FD__:____:____:(8-f)___:____
@@ -2114,12 +2112,14 @@ oc_create_multicast_group_address_with_port(oc_endpoint_t in, uint32_t group_nr,
   my_transport_flags += OSCORE;
 #endif
 
-  oc_make_ipv6_endpoint(group_mcast, my_transport_flags, port, 
-                        0xff, 0x30 + scope, 0, 0x30,    //  FF35::30:
-                        0xfd, ula_5, ula_4, ula_3, ula_2, ula_1, // FD11 : 2222 : 3333
-                        0, 0, // ::
+  oc_make_ipv6_endpoint(group_mcast, my_transport_flags, port, 0xff,
+                        0x30 + scope, 0, 0x30, //  FF35::30:
+                        0xfd, ula_5, ula_4, ula_3, ula_2,
+                        ula_1, // FD11 : 2222 : 3333
+                        0, 0,  // ::
                         byte_4, byte_3, byte_2, byte_1);
-  PRINT("  oc_create_multicast_group_address_with_port S=%d U=%ld G=%d B4=%d B3=%d B2=%d "
+  PRINT("  oc_create_multicast_group_address_with_port S=%d U=%ld G=%d B4=%d "
+        "B3=%d B2=%d "
         "B1=%d\n",
         scope, iid, group_nr, byte_4, byte_3, byte_2, byte_1);
   PRINT("  ");
@@ -2139,7 +2139,6 @@ oc_create_multicast_group_address(oc_endpoint_t in, uint32_t group_nr,
                                                      5683);
 }
 
-
 void
 subscribe_group_to_multicast_with_port(uint32_t group_nr, int64_t iid,
                                        int scope, int port)
@@ -2148,8 +2147,8 @@ subscribe_group_to_multicast_with_port(uint32_t group_nr, int64_t iid,
   oc_endpoint_t group_mcast;
   memset(&group_mcast, 0, sizeof(group_mcast));
 
-  group_mcast =
-    oc_create_multicast_group_address_with_port(group_mcast, group_nr, iid, scope, port);
+  group_mcast = oc_create_multicast_group_address_with_port(
+    group_mcast, group_nr, iid, scope, port);
 
   // subscribe
   oc_connectivity_subscribe_mcast_ipv6(&group_mcast);
@@ -2172,14 +2171,15 @@ subscribe_group_to_multicast(uint32_t group_nr, int64_t iid, int scope)
 }
 
 void
-unsubscribe_group_to_multicast_with_port(uint32_t group_nr, int64_t iid, int scope, int port)
+unsubscribe_group_to_multicast_with_port(uint32_t group_nr, int64_t iid,
+                                         int scope, int port)
 {
   // create the multi cast address from group and scope
   oc_endpoint_t group_mcast;
   memset(&group_mcast, 0, sizeof(group_mcast));
 
-  group_mcast =
-    oc_create_multicast_group_address_with_port(group_mcast, group_nr, iid, scope, port);
+  group_mcast = oc_create_multicast_group_address_with_port(
+    group_mcast, group_nr, iid, scope, port);
 
   // un subscribe
   oc_connectivity_unsubscribe_mcast_ipv6(&group_mcast);
@@ -2276,8 +2276,10 @@ oc_register_group_multicasts()
           oc_print_cflags(cflags);
 
           if (grpid > 0) {
-            subscribe_group_to_multicast_with_port(grpid, installation_id, 2, port);
-            subscribe_group_to_multicast_with_port(grpid, installation_id, 5, port);
+            subscribe_group_to_multicast_with_port(grpid, installation_id, 2,
+                                                   port);
+            subscribe_group_to_multicast_with_port(grpid, installation_id, 5,
+                                                   port);
           }
         }
       }
