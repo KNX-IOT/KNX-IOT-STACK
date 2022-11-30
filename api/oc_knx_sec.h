@@ -175,7 +175,7 @@ typedef struct oc_auth_at_t
 
   int ga_len;  /**< length of the group addresses (ga) in the scope */
   int64_t *ga; /**< (scope) array of group addresses, for the group objects in
-                  the scope */
+                  the scope, int64_t for framing arrays */
 } oc_auth_at_t;
 
 /**

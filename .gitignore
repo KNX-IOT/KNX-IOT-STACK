@@ -87,3 +87,4 @@ service/resource-directory/client/unittest/obj
 .clant-tidy
 
 build
+build_*

@@ -1009,7 +1009,7 @@ oc_core_knx_ia_post_handler(oc_request_t *request,
         oc_storage_write(KNX_STORAGE_FID, (uint8_t *)&temp, sizeof(temp));
         fid_set = true;
       } else if (rep->iname == 26) {
-        PRINT("  oc_core_knx_ia_post_handler received 26 (iid): %lld\n",
+        PRINT("  oc_core_knx_ia_post_handler received 26 (iid): %ld\n",
               rep->value.integer);
         oc_core_set_device_iid(device_index, (uint64_t)rep->value.integer);
         uint64_t temp = (uint64_t)rep->value.integer;
@@ -1327,7 +1327,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
   PRINT("oc_core_knx_spake_post_handler valid_request: %d\n", valid_request);
   oc_indicate_separate_response(request, &spake_separate_rsp);
   // TODO missing pointer cast warning here
-  oc_set_delayed_callback(valid_request,
+  oc_set_delayed_callback((void *)valid_request,
                           &oc_core_knx_spake_separate_post_handler, 0);
 }
 

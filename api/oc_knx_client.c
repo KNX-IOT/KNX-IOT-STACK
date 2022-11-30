@@ -37,7 +37,7 @@ typedef struct broker_s_mode_userdata_t
 {
   int ia;          /**< internal address of the destination */
   char path[20];   /**< the path on the device designated with ia */
-  int ga;          /**< group address to use */
+  uint32_t ga;     /**< group address to use */
   char rp_type[3]; /**< mode to send the message "w"  = 1  "r" = 2  "rp" = 3 */
   char resource_url[20]; /**< the url to pull the data from. */
 } broker_s_mode_userdata_t;
@@ -64,9 +64,9 @@ static oc_spake_context_t g_spake_ctx;
 
 // ----------------------------------------------------------------------------
 
-static void oc_send_s_mode(oc_endpoint_t *endpoint, char *path, int sia_value,
-                           int group_address, char *rp, uint8_t *value_data,
-                           int value_size);
+static void oc_send_s_mode(oc_endpoint_t *endpoint, char *path,
+                           uint32_t sia_value, uint32_t group_address, char *rp,
+                           uint8_t *value_data, int value_size);
 
 static int oc_s_mode_get_resource_value(char *resource_url, char *rp,
                                         uint8_t *buf, int buf_size);
@@ -302,7 +302,7 @@ discovery_ia_cb(const char *payload, int len, oc_endpoint_t *endpoint,
 
   size_t device_index = 0;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
-  int sender_ia = device->ia;
+  uint32_t sender_ia = device->ia;
 
   broker_s_mode_userdata_t *cb_data = (broker_s_mode_userdata_t *)user_data;
 
@@ -328,8 +328,8 @@ discovery_ia_cb(const char *payload, int len, oc_endpoint_t *endpoint,
 }
 
 int
-oc_knx_client_do_broker_request(char *resource_url, int ia, char *destination,
-                                char *rp)
+oc_knx_client_do_broker_request(char *resource_url, uint32_t ia,
+                                char *destination, char *rp)
 {
   char query[20];
   snprintf(query, 20, "if=urn:knx:ia.%d", ia);
@@ -350,6 +350,7 @@ oc_knx_client_do_broker_request(char *resource_url, int ia, char *destination,
     oc_do_wk_discovery_all(query, 5, discovery_ia_cb, cb_data);
   } else {
     OC_ERR("cb_data is NULL");
+    return -1;
   }
   return 0;
 }
@@ -439,8 +440,9 @@ oc_issue_s_mode(int scope, int sia_value, uint32_t grpid,
 }
 
 static void
-oc_send_s_mode(oc_endpoint_t *endpoint, char *path, int sia_value,
-               int group_address, char *rp, uint8_t *value_data, int value_size)
+oc_send_s_mode(oc_endpoint_t *endpoint, char *path, uint32_t sia_value,
+               uint32_t group_address, char *rp, uint8_t *value_data,
+               int value_size)
 {
   char token[8];
 
@@ -584,7 +586,7 @@ oc_do_s_mode_read(int64_t group_address)
   int64_t iid = device->iid;
   uint32_t grpid = 0;
 
-  PRINT("oc_do_s_mode_read : ga=%d ia=%d, iid=%lld\n", (uint32_t)group_address,
+  PRINT("oc_do_s_mode_read : ga=%d ia=%d, iid=%ld\n", (uint32_t)group_address,
         sia_value, iid);
 
   // find the grpid that belongs to the group address
