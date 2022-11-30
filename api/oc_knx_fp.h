@@ -576,6 +576,7 @@ void oc_free_knx_fp_resources(size_t device_index);
 
 /**
  * @brief create the group multi cast address
+ * using the default port 5683
  *
  * @param in the endpoint to adapt
  * @param group_nr the group number
@@ -588,8 +589,35 @@ oc_endpoint_t oc_create_multicast_group_address(oc_endpoint_t in,
                                                 int scope);
 
 /**
+ * @brief create the group multi cast address with port
+ *
+ * create the multicast address from group and scope with a supplied port number
+ *\code{.unparsed}
+ * FF3_:FD__:____:____:(8-f)___:____
+ * FF35::30:<ULA-routing-prefix>::<group id>
+ *    | 5 == scope
+ *    | 3 == scope
+ * Multicast prefix: FF35:0030:  [4 bytes]
+ * ULA routing prefix: FD11:2222:3333::  [6 bytes + 2 empty bytes]
+ * Group Identifier: 8000 : 0068 [4 bytes ]
+ *\endcode
+ *
+ * @param in the endpoint to adapt
+ * @param group_nr the group number
+ * @param iid the installation id
+ * @param scope the address scope
+ * @param port the port to be used
+ * @return oc_endpoint_t the modified endpoint
+ */
+oc_endpoint_t oc_create_multicast_group_address_with_port(oc_endpoint_t in,
+                                                          uint32_t group_nr,
+                                                          int64_t iid,
+                                                          int scope, int port);
+
+/**
  * @brief subscribe to a multicast address, defined by group number and
  * installation id
+ * using the default port 5683
  *
  * @see unsubscribe_group_to_multicast
  *
@@ -598,6 +626,20 @@ oc_endpoint_t oc_create_multicast_group_address(oc_endpoint_t in,
  * @param scope the address scope
  */
 void subscribe_group_to_multicast(uint32_t group_nr, int64_t iid, int scope);
+
+/**
+ * @brief subscribe to a multicast address, defined by group number and
+ * installation id
+ *
+ * @see unsubscribe_group_to_multicast_with_port
+ *
+ * @param group_nr the group number (address)
+ * @param iid the installation id
+ * @param scope the address scope
+ * @param port the port
+ */
+void subscribe_group_to_multicast_with_port(uint32_t group_nr, int64_t iid,
+                                            int scope, int port);
 
 /**
  * @brief unsubscribe to a multicast address, defined by group number and
@@ -610,6 +652,20 @@ void subscribe_group_to_multicast(uint32_t group_nr, int64_t iid, int scope);
  * @param scope the address scope
  */
 void unsubscribe_group_to_multicast(uint32_t group_nr, int64_t iid, int scope);
+
+/**
+ * @brief unsubscribe to a multicast address, defined by group number and
+ * installation id and port
+ *
+ * @see subscribe_group_to_multicast_with_port
+ *
+ * @param group_nr the group number (address)
+ * @param iid the installation id
+ * @param scope the address scope
+ * @param port the port
+ */
+void unsubscribe_group_to_multicast_with_port(uint32_t group_nr, int64_t iid,
+                                              int scope, int port);
 
 #ifdef __cplusplus
 }
