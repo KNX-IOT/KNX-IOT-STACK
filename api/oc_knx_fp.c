@@ -2078,14 +2078,20 @@ oc_add_points_in_group_object_table_to_response(oc_request_t *request,
   return return_value;
 }
 
+
+
 oc_endpoint_t
-oc_create_multicast_group_address(oc_endpoint_t in, uint32_t group_nr,
-                                  int64_t iid, int scope)
+oc_create_multicast_group_address_with_port(oc_endpoint_t in, uint32_t group_nr,
+                                  int64_t iid, int scope, int port)
 {
   // create the multicast address from group and scope
-  // FF35::30: <ULA-routing-prefix>::<group id>
+  // FF3_:FD__:____:____:(8-f)___:____
+  // FF35::30:<ULA-routing-prefix>::<group id>
   //    | 5 == scope
-  //   | 3 == multicast
+  //    | 3 == scope
+  // Multicast prefix: FF35:0030:  [4 bytes]
+  // ULA routing prefix: FD11:2222:3333::  [6 bytes + 2 empty bytes]
+  // Group Identifier: 8000 : 0068 [4 bytes ]
 
   // group number to the various bytes
   uint8_t byte_1 = (uint8_t)group_nr;
@@ -2098,6 +2104,7 @@ oc_create_multicast_group_address(oc_endpoint_t in, uint32_t group_nr,
   uint8_t ula_2 = (uint8_t)(iid >> 8);
   uint8_t ula_3 = (uint8_t)(iid >> 16);
   uint8_t ula_4 = (uint8_t)(iid >> 24);
+  uint8_t ula_5 = (uint8_t)(iid >> 32);
 
   int my_transport_flags = 0;
   my_transport_flags += IPV6;
@@ -2107,10 +2114,12 @@ oc_create_multicast_group_address(oc_endpoint_t in, uint32_t group_nr,
   my_transport_flags += OSCORE;
 #endif
 
-  oc_make_ipv6_endpoint(group_mcast, my_transport_flags, 5683, 0xff,
-                        0x30 + scope, ula_4, ula_3, ula_2, ula_1, 0, 0, 0, 0, 0,
-                        0, byte_4, byte_3, byte_2, byte_1);
-  PRINT("  oc_create_multicast_group_address S=%d U=%ld G=%d B4=%d B3=%d B2=%d "
+  oc_make_ipv6_endpoint(group_mcast, my_transport_flags, port, 
+                        0xff, 0x30 + scope, 0, 0x30,    //  FF35::30:
+                        0xfd, ula_5, ula_4, ula_3, ula_2, ula_1, // FD11 : 2222 : 3333
+                        0, 0, // ::
+                        byte_4, byte_3, byte_2, byte_1);
+  PRINT("  oc_create_multicast_group_address_with_port S=%d U=%ld G=%d B4=%d B3=%d B2=%d "
         "B1=%d\n",
         scope, iid, group_nr, byte_4, byte_3, byte_2, byte_1);
   PRINT("  ");
@@ -2120,6 +2129,30 @@ oc_create_multicast_group_address(oc_endpoint_t in, uint32_t group_nr,
   memcpy(&in, &group_mcast, sizeof(oc_endpoint_t));
 
   return in;
+}
+
+oc_endpoint_t
+oc_create_multicast_group_address(oc_endpoint_t in, uint32_t group_nr,
+                                  int64_t iid, int scope)
+{
+  return oc_create_multicast_group_address_with_port(in, group_nr, iid, scope,
+                                                     5683);
+}
+
+
+void
+subscribe_group_to_multicast_with_port(uint32_t group_nr, int64_t iid,
+                                       int scope, int port)
+{
+  // create the multi cast address from group and scope and port
+  oc_endpoint_t group_mcast;
+  memset(&group_mcast, 0, sizeof(group_mcast));
+
+  group_mcast =
+    oc_create_multicast_group_address_with_port(group_mcast, group_nr, iid, scope, port);
+
+  // subscribe
+  oc_connectivity_subscribe_mcast_ipv6(&group_mcast);
 }
 
 void
@@ -2136,6 +2169,20 @@ subscribe_group_to_multicast(uint32_t group_nr, int64_t iid, int scope)
 
   // subscribe
   oc_connectivity_subscribe_mcast_ipv6(&group_mcast);
+}
+
+void
+unsubscribe_group_to_multicast_with_port(uint32_t group_nr, int64_t iid, int scope, int port)
+{
+  // create the multi cast address from group and scope
+  oc_endpoint_t group_mcast;
+  memset(&group_mcast, 0, sizeof(group_mcast));
+
+  group_mcast =
+    oc_create_multicast_group_address_with_port(group_mcast, group_nr, iid, scope, port);
+
+  // un subscribe
+  oc_connectivity_unsubscribe_mcast_ipv6(&group_mcast);
 }
 
 void
@@ -2194,8 +2241,9 @@ oc_register_group_multicasts()
     return;
   }
   int64_t installation_id = device->iid;
+  int port = device->port;
 
-  PRINT("oc_register_group_multicasts\n");
+  PRINT("oc_register_group_multicasts: port %d \n", port);
 
   bool registered_pub = false;
   bool pub_entry = false;
@@ -2228,8 +2276,8 @@ oc_register_group_multicasts()
           oc_print_cflags(cflags);
 
           if (grpid > 0) {
-            subscribe_group_to_multicast(grpid, installation_id, 2);
-            subscribe_group_to_multicast(grpid, installation_id, 5);
+            subscribe_group_to_multicast_with_port(grpid, installation_id, 2, port);
+            subscribe_group_to_multicast_with_port(grpid, installation_id, 5, port);
           }
         }
       }
@@ -2252,8 +2300,10 @@ oc_register_group_multicasts()
             " oc_register_group_multicasts index=%d i=%d group: %d  cflags=",
             index, i, g_got[index].ga[i]);
           oc_print_cflags(cflags);
-          subscribe_group_to_multicast(g_got[index].ga[i], installation_id, 2);
-          subscribe_group_to_multicast(g_got[index].ga[i], installation_id, 5);
+          subscribe_group_to_multicast_with_port(g_got[index].ga[i],
+                                                 installation_id, 2, port);
+          subscribe_group_to_multicast_with_port(g_got[index].ga[i],
+                                                 installation_id, 5, port);
         }
       }
     }
