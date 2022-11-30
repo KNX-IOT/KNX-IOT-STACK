@@ -1277,7 +1277,7 @@ issue_s_mode_secure(void *data)
     memset(&access_token, 0, sizeof(access_token));
 
     access_token.profile = OC_PROFILE_COAP_OSCORE;
-    oc_core_set_at_table(0, index, access_token, false);
+    oc_core_set_at_table(0, index, access_token, true);
     oc_print_auth_at_entry(0, index);
 
     oc_new_string(&access_token.osc_id, "y1234567890AB",
@@ -1286,11 +1286,13 @@ issue_s_mode_secure(void *data)
     if (oc_string_is_hex_array(access_token.osc_id) == -1) {
       PRINT("not a valid hex-string: %s", oc_string(access_token.osc_id));
     }
+    char str_ms[14] = { '1', '2', '3', '4', '5', '\0',
+                     '6', '7', '8', '9', '10' };
 
     oc_new_string(&access_token.id, "1234", strlen("1234"));
     oc_new_string(&access_token.osc_contextid, "1234567890AB",
                   strlen("01234567890AB"));
-    oc_new_string(&access_token.osc_ms, (char *)"abcd0edf", strlen("abcd0edf"));
+    oc_new_string(&access_token.osc_ms, (char *)str_ms, 11);
     oc_new_string(&access_token.kid, "", 0);
     oc_new_string(&access_token.sub, "", 0);
     oc_new_string(&access_token.osc_alg, "", 0);
@@ -1298,7 +1300,7 @@ issue_s_mode_secure(void *data)
     int64_t ga_values[5] = { 1, 2, 3, 4, 5 };
     access_token.ga = ga_values;
     access_token.ga_len = 3;
-    oc_core_set_at_table(0, index, access_token, false);
+    oc_core_set_at_table(0, index, access_token, true);
     oc_print_auth_at_entry(0, index);
     oc_init_oscore(0);
 
@@ -1310,10 +1312,6 @@ issue_s_mode_secure(void *data)
   oc_issue_s_mode(2, 6, 1, 1, 16, "w", 0, 0);
 
   return OC_EVENT_CONTINUE;
-
-  // static void oc_issue_s_mode(int scope, int sia_value, int grpid,
-  //                            int group_address, int iid, char *rp,
-  //                            uint8_t *value_data, int value_size)
 }
 
 /**
