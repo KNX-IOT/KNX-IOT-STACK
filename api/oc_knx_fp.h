@@ -121,7 +121,7 @@ typedef struct oc_group_object_table_t
   oc_string_t href;       /**< contents of href*/
   oc_cflag_mask_t cflags; /**< contents of cflags as bitmap*/
   int ga_len;             /**< length of the array of ga identifiers*/
-  uint32_t *ga;           /**< array of integers*/
+  uint32_t *ga;           /**< array of group addresses (unsigned integers) */
 } oc_group_object_table_t;
 
 /**
@@ -183,7 +183,7 @@ typedef struct oc_group_rp_table_t
   oc_string_t url;  /**< contents of url */
   bool con;         /**< confirmed message, default = false*/
   uint32_t *ga;     /**< array of integers */
-  int ga_len;       /**< length of the array of ga identifiers */
+  int ga_len;       /**< length of the array of group addresses identifiers */
 } oc_group_rp_table_t;
 
 /**
