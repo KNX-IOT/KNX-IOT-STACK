@@ -125,7 +125,7 @@ oc_core_set_group_object_table(int index, oc_group_object_table_t entry)
                 oc_string_len(entry.href));
   /* copy the ga array */
   g_got[index].ga_len = entry.ga_len;
-  uint32_t *new_array = (uint32_t *)malloc(entry.ga_len * sizeof(int));
+  uint32_t *new_array = (uint32_t *)malloc(entry.ga_len * sizeof(uint32_t));
 
   if (new_array != NULL) {
     for (int i = 0; i < entry.ga_len; i++) {
@@ -478,7 +478,7 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
           }
           if (object->iname == 7) {
             int64_t *arr = oc_int_array(object->value.array);
-            int array_size = (uint32_t)oc_int_array_size(object->value.array);
+            int array_size = (int)oc_int_array_size(object->value.array);
             uint32_t *new_array =
               (uint32_t *)malloc(array_size * sizeof(uint32_t));
 
@@ -624,7 +624,7 @@ oc_create_fp_g_x_resource(int resource_idx, size_t device)
 #ifdef OC_PUBLISHER_TABLE
 
 int
-oc_core_find_publisher_table_index(int group_address)
+oc_core_find_publisher_table_index(uint32_t group_address)
 {
   int i, j;
   for (i = 0; i < GPT_MAX_ENTRIES; i++) {
@@ -742,10 +742,10 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
             g_gpt[index].grpid = (uint32_t)object->value.integer;
           }
           if (object->iname == 26) {
-            g_gpt[index].iid = (int)object->value.integer;
+            g_gpt[index].iid = object->value.integer;
           }
           if (object->iname == 25) {
-            g_gpt[index].fid = (int)object->value.integer;
+            g_gpt[index].fid = object->value.integer;
           }
         } break;
         case OC_REP_STRING: {
@@ -1080,7 +1080,8 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
             // g_got[index].id = object->value.integer;
             int64_t *arr = oc_int_array(object->value.array);
             int array_size = (int)oc_int_array_size(object->value.array);
-            uint32_t *new_array = (uint32_t *)malloc(array_size * sizeof(int));
+            uint32_t *new_array =
+              (uint32_t *)malloc(array_size * sizeof(uint32_t));
 
             for (int i = 0; i < array_size; i++) {
               new_array[i] = (uint32_t)arr[i];
@@ -1384,7 +1385,7 @@ oc_print_group_object_table_entry(int entry)
   oc_print_cflags(g_got[entry].cflags);
   PRINT("    ga (7)     : [");
   for (int i = 0; i < g_got[entry].ga_len; i++) {
-    PRINT(" %d", g_got[entry].ga[i]);
+    PRINT(" %u", g_got[entry].ga[i]);
   }
   PRINT(" ]\n");
 }
@@ -1580,7 +1581,7 @@ oc_print_group_rp_table_entry(int entry, char *Store,
   PRINT("    ia (12)    : %d\n", rp_table[entry].ia);
   PRINT("    iid (26)   : %ld\n", rp_table[entry].iid);
   PRINT("    fid (25)   : %ld\n", rp_table[entry].fid);
-  PRINT("    grpid (13) : %d\n", rp_table[entry].grpid);
+  PRINT("    grpid (13) : %u\n", rp_table[entry].grpid);
   if (oc_string_len(rp_table[entry].path) > 0) {
     PRINT("    path (112) : '%s'\n", oc_string_checked(rp_table[entry].path));
   }
@@ -1589,7 +1590,7 @@ oc_print_group_rp_table_entry(int entry, char *Store,
   }
   PRINT("    ga (7)     : [");
   for (int i = 0; i < rp_table[entry].ga_len; i++) {
-    PRINT(" %d", rp_table[entry].ga[i]);
+    PRINT(" %u", rp_table[entry].ga[i]);
   }
   PRINT(" ]\n");
 }
@@ -1867,7 +1868,7 @@ oc_core_add_rp_entry(int index, oc_group_rp_table_t *rp_table,
 
   // Copy group addresses
   rp_table[index].ga_len = entry.ga_len;
-  uint32_t *new_array = (uint32_t *)malloc(entry.ga_len * sizeof(int));
+  uint32_t *new_array = (uint32_t *)malloc(entry.ga_len * sizeof(uint32_t));
 
   if (new_array != NULL) {
     for (int i = 0; i < entry.ga_len; i++) {
