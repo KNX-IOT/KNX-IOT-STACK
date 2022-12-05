@@ -87,7 +87,7 @@ typedef struct oc_endpoint_t
   } addr, addr_local;
   int interface_index; /**< interface index */
   uint8_t priority;    /**< priority */
-  int group_id;        /**< group identifier, being used to find back the OSCORE
+  uint32_t group_id;        /**< group identifier, being used to find back the OSCORE
                           credential to be used for encryption        e.g. looping over
                           the        list of group addresses of the key */
 #ifdef OC_OSCORE

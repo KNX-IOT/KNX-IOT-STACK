@@ -1543,11 +1543,12 @@ void oc_stop_multicast(oc_client_response_t *response);
  * @param mcast the multicast address to be used
  * @param uri the uri to be used
  * @param query the query of uri
+ * @param created_token the token of the CoAP request
  * @return true
  * @return false
  */
 bool oc_init_multicast_update(oc_endpoint_t *mcast, const char *uri,
-                              const char *query);
+                              const char *query, char created_token[8]);
 
 /**
  * @brief initiate the multi-cast update
