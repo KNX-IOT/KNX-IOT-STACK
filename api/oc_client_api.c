@@ -257,8 +257,7 @@ do_multicast_update_error:
 }
 
 bool
-oc_init_multicast_update(oc_endpoint_t *mcast, const char *uri,
-                         const char *query)
+oc_init_multicast_update(oc_endpoint_t *mcast, const char *uri)
 {
   // oc_make_ipv6_endpoint(mcast, IPV6 | MULTICAST | SECURED, 5683, 0xff, 0x02,
   // 0,
