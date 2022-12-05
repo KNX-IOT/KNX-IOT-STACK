@@ -158,9 +158,9 @@ oc_oscore_find_context_by_group_id(size_t device, uint32_t group_id)
       for (int i = 0; i < my_entry->ga_len; i++) {
 
         uint32_t group_value = my_entry->ga[i];
-        PRINT("   oc_oscore_find_context_by_group_id : %d %d\n", group_id,
-              group_value);
-        if (group_id == (uint32_t)group_value) {
+        PRINT("   oc_oscore_find_context_by_group_id : find: %u value: %u\n",
+              group_id, group_value);
+        if (group_id == group_value) {
           return ctx;
         }
       }
@@ -221,7 +221,7 @@ oc_oscore_add_context(size_t device, const char *senderid,
   PRINT("  recipient %s\n", recipientid);
   PRINT("  desc      %s\n", desc);
   PRINT("  token_id  %s\n", token_id);
-  PRINT("  ssn       %d\n", (int)ssn);
+  PRINT("  ssn       %ld\n", ssn);
   PRINT("  ms      ");
   int length = strlen(mastersecret);
   for (int i = 0; i < length; i++) {
