@@ -426,7 +426,7 @@ oc_oscore_send_multicast_message(oc_message_t *message)
    *   Serialize OSCORE message to oc_message_t
    * Dispatch oc_message_t to IP layer
    */
-  uint64_t group_id = 0;
+  uint32_t group_id = 0;
 
   group_id = message->endpoint.group_id;
 
@@ -437,7 +437,7 @@ oc_oscore_send_multicast_message(oc_message_t *message)
 
   oc_oscore_context_t *oscore_ctx =
     oc_oscore_find_context_by_group_id(0, group_id);
-  PRINT("oc_oscore_send_multicast_message : groupid = %d\n", (int)group_id);
+  PRINT("oc_oscore_send_multicast_message : groupid = %u\n", group_id);
   if (oscore_ctx) {
     OC_DBG_OSCORE("#################################");
     OC_DBG_OSCORE("found group OSCORE context %s",

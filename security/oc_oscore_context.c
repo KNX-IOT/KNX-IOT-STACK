@@ -158,9 +158,9 @@ oc_oscore_find_context_by_group_id(size_t device, uint32_t group_id)
       for (int i = 0; i < my_entry->ga_len; i++) {
 
         uint32_t group_value = my_entry->ga[i];
-        PRINT("   oc_oscore_find_context_by_group_id : %d %d\n", group_id,
+        PRINT("   oc_oscore_find_context_by_group_id : find: %u value: %u\n", group_id,
               group_value);
-        if (group_id == (uint32_t)group_value) {
+        if (group_id == group_value) {
           return ctx;
         }
       }
