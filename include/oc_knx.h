@@ -249,7 +249,7 @@ void oc_knx_load_state(size_t device_index);
  * @brief reset the device
  * the reset value according to the specification:
  * - reset = 2 (Factory Reset) :
- *   - internal address (ia)
+ *   - individual address (ia)
  *   - host name (hname)
  *   - Installation ID (iid)
  *   - programming mode (pm)
@@ -259,7 +259,7 @@ void oc_knx_load_state(size_t device_index);
  *   - recipient object table
  *   - publisher object table
  * - reset = 3 (reset ia) :
- *   - internal address (ia)
+ *   - individual address (ia)
  * - reset = 7 (Factory Reset without IA):
  *   - group object table
  *   - recipient object table

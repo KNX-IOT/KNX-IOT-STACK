@@ -229,16 +229,16 @@ OC_PROCESS_THREAD(message_buffer_handler, ev, data)
       } else
 #endif /* !OC_OSCORE */
         if (message->endpoint.flags & DISCOVERY) {
-        OC_DBG("Outbound network event: multicast request");
-        oc_endpoint_print(&message->endpoint);
-        oc_send_discovery_request(message);
-        oc_message_unref(message);
-      } else {
-        OC_DBG("Outbound network event: unicast message");
-        oc_message_t *message = (oc_message_t *)data;
-        oc_send_buffer(message);
-        oc_message_unref(message);
-      }
+          OC_DBG("Outbound network event: multicast request");
+          oc_endpoint_print(&message->endpoint);
+          oc_send_discovery_request(message);
+          oc_message_unref(message);
+        } else {
+          OC_DBG("Outbound network event: unicast message");
+          oc_message_t *message = (oc_message_t *)data;
+          oc_send_buffer(message);
+          oc_message_unref(message);
+        }
     } else if (ev == oc_events[OUTBOUND_NETWORK_EVENT_ENCRYPTED]) {
       OC_DBG("Outbound network event:OUTBOUND_NETWORK_EVENT_ENCRYPTED");
       oc_message_t *message = (oc_message_t *)data;

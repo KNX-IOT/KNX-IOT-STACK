@@ -1165,34 +1165,34 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
        * the resource.
        */
       if (!oc_sec_check_acl(method, cur_resource, endpoint)) {
-      authorized = false;
-      // oc_ri_audit_log(method, cur_resource, endpoint);
-    } else
+        authorized = false;
+        // oc_ri_audit_log(method, cur_resource, endpoint);
+      } else
 #endif /* OC_SECURITY */
-    {
-      /* If cur_resource is a collection resource, invoke the framework's
-       * internal handler for collections.
-       */
-      /* If cur_resource is a non-collection resource, invoke
-       * its handler for the requested method. If it has not
-       * implemented that method, then return a 4.05 response.
-       */
-      if (method == OC_GET && cur_resource->get_handler.cb) {
-        cur_resource->get_handler.cb(&request_obj, iface_mask,
-                                     cur_resource->get_handler.user_data);
-      } else if (method == OC_POST && cur_resource->post_handler.cb) {
-        cur_resource->post_handler.cb(&request_obj, iface_mask,
-                                      cur_resource->post_handler.user_data);
-      } else if (method == OC_PUT && cur_resource->put_handler.cb) {
-        cur_resource->put_handler.cb(&request_obj, iface_mask,
-                                     cur_resource->put_handler.user_data);
-      } else if (method == OC_DELETE && cur_resource->delete_handler.cb) {
-        cur_resource->delete_handler.cb(&request_obj, iface_mask,
-                                        cur_resource->delete_handler.user_data);
-      } else {
-        method_impl = false;
+      {
+        /* If cur_resource is a collection resource, invoke the framework's
+         * internal handler for collections.
+         */
+        /* If cur_resource is a non-collection resource, invoke
+         * its handler for the requested method. If it has not
+         * implemented that method, then return a 4.05 response.
+         */
+        if (method == OC_GET && cur_resource->get_handler.cb) {
+          cur_resource->get_handler.cb(&request_obj, iface_mask,
+                                       cur_resource->get_handler.user_data);
+        } else if (method == OC_POST && cur_resource->post_handler.cb) {
+          cur_resource->post_handler.cb(&request_obj, iface_mask,
+                                        cur_resource->post_handler.user_data);
+        } else if (method == OC_PUT && cur_resource->put_handler.cb) {
+          cur_resource->put_handler.cb(&request_obj, iface_mask,
+                                       cur_resource->put_handler.user_data);
+        } else if (method == OC_DELETE && cur_resource->delete_handler.cb) {
+          cur_resource->delete_handler.cb(
+            &request_obj, iface_mask, cur_resource->delete_handler.user_data);
+        } else {
+          method_impl = false;
+        }
       }
-    }
   }
 
 #if defined(OC_BLOCK_WISE)
@@ -1338,59 +1338,59 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
   } else
 #endif /* OC_SERVER */
     if (response_buffer.code == OC_IGNORE) {
-    /* If the server-side logic chooses to reject a request, it sends
-     * below a response code of IGNORE, which results in the messaging
-     * layer freeing the CoAP transaction associated with the request.
-     */
-    coap_status_code = CLEAR_TRANSACTION;
-  } else {
+      /* If the server-side logic chooses to reject a request, it sends
+       * below a response code of IGNORE, which results in the messaging
+       * layer freeing the CoAP transaction associated with the request.
+       */
+      coap_status_code = CLEAR_TRANSACTION;
+    } else {
 #ifdef OC_SERVER
-    /* If the recently handled request was a PUT/POST, it conceivably
-     * altered the resource state, so attempt to notify all observers
-     * of that resource with the change.
-     */
-    if (cur_resource && (method == OC_PUT || method == OC_POST) &&
-        response_buffer.code < oc_status_code(OC_STATUS_BAD_REQUEST)) {
-      // check this with s-mode
-      if ((endpoint->flags & MULTICAST) == 0) {
-        // only handle observe when not doing multicast
-        PRINT(" adding callback\n");
-        oc_ri_add_timed_event_callback_ticks(
-          cur_resource, &oc_observe_notification_delayed, 0);
-      } else {
-        PRINT(" not adding callback\n");
+      /* If the recently handled request was a PUT/POST, it conceivably
+       * altered the resource state, so attempt to notify all observers
+       * of that resource with the change.
+       */
+      if (cur_resource && (method == OC_PUT || method == OC_POST) &&
+          response_buffer.code < oc_status_code(OC_STATUS_BAD_REQUEST)) {
+        // check this with s-mode
+        if ((endpoint->flags & MULTICAST) == 0) {
+          // only handle observe when not doing multicast
+          PRINT(" adding callback\n");
+          oc_ri_add_timed_event_callback_ticks(
+            cur_resource, &oc_observe_notification_delayed, 0);
+        } else {
+          PRINT(" not adding callback\n");
+        }
       }
-    }
 
 #endif /* OC_SERVER */
-    if (response_buffer.response_length > 0) {
+      if (response_buffer.response_length > 0) {
 #ifdef OC_BLOCK_WISE
-      (*response_state)->payload_size =
-        (uint32_t)response_buffer.response_length;
+        (*response_state)->payload_size =
+          (uint32_t)response_buffer.response_length;
 #else  /* OC_BLOCK_WISE */
       coap_set_payload(response, response_buffer.buffer,
                        response_buffer.response_length);
 #endif /* !OC_BLOCK_WISE */
-      if (response_buffer.content_format > 0) {
-        coap_set_header_content_format(response,
-                                       response_buffer.content_format);
+        if (response_buffer.content_format > 0) {
+          coap_set_header_content_format(response,
+                                         response_buffer.content_format);
+        }
       }
-    }
 
-    if (response_buffer.max_age > 0) {
-      coap_set_header_max_age(response, response_buffer.max_age);
-    }
+      if (response_buffer.max_age > 0) {
+        coap_set_header_max_age(response, response_buffer.max_age);
+      }
 
-    if (response_buffer.code ==
-        oc_status_code(OC_STATUS_REQUEST_ENTITY_TOO_LARGE)) {
-      coap_set_header_size1(response, OC_BLOCK_SIZE);
-    }
+      if (response_buffer.code ==
+          oc_status_code(OC_STATUS_REQUEST_ENTITY_TOO_LARGE)) {
+        coap_set_header_size1(response, OC_BLOCK_SIZE);
+      }
 
-    /* response_buffer.code at this point contains a valid CoAP status
-     *  code.
-     */
-    coap_set_status_code(response, response_buffer.code);
-  }
+      /* response_buffer.code at this point contains a valid CoAP status
+       *  code.
+       */
+      coap_set_status_code(response, response_buffer.code);
+    }
   return success;
 }
 

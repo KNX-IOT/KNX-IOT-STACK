@@ -132,48 +132,25 @@ int
 cmp_ok_at_loc(const char *file, int line, int a, const char *op, int b,
               const char *fmt, ...)
 {
-  int test =
-    eq(op, "||")
-      ? a || b
-      : eq(op, "&&")
-          ? a && b
-          : eq(op, "|")
-              ? a | b
-              : eq(op, "^")
-                  ? a ^ b
-                  : eq(op, "&")
-                      ? a & b
-                      : eq(op, "==")
-                          ? a == b
-                          : eq(op, "!=")
-                              ? a != b
-                              : eq(op, "<")
-                                  ? a < b
-                                  : eq(op, ">")
-                                      ? a > b
-                                      : eq(op, "<=")
-                                          ? a <= b
-                                          : eq(op, ">=")
-                                              ? a >= b
-                                              : eq(op, "<<")
-                                                  ? a << b
-                                                  : eq(op, ">>")
-                                                      ? a >> b
-                                                      : eq(op, "+")
-                                                          ? a + b
-                                                          : eq(op, "-")
-                                                              ? a - b
-                                                              : eq(op, "*")
-                                                                  ? a * b
-                                                                  : eq(op, "/")
-                                                                      ? a / b
-                                                                      : eq(op,
-                                                                           "%")
-                                                                          ? a %
-                                                                              b
-                                                                          : diag(
-                                                                              "unrecognized operator '%s'",
-                                                                              op);
+  int test = eq(op, "||")   ? a || b
+             : eq(op, "&&") ? a && b
+             : eq(op, "|")  ? a | b
+             : eq(op, "^")  ? a ^ b
+             : eq(op, "&")  ? a & b
+             : eq(op, "==") ? a == b
+             : eq(op, "!=") ? a != b
+             : eq(op, "<")  ? a < b
+             : eq(op, ">")  ? a > b
+             : eq(op, "<=") ? a <= b
+             : eq(op, ">=") ? a >= b
+             : eq(op, "<<") ? a << b
+             : eq(op, ">>") ? a >> b
+             : eq(op, "+")  ? a + b
+             : eq(op, "-")  ? a - b
+             : eq(op, "*")  ? a * b
+             : eq(op, "/")  ? a / b
+             : eq(op, "%")  ? a % b
+                            : diag("unrecognized operator '%s'", op);
   va_list args;
   va_start(args, fmt);
   vok_at_loc(file, line, test, fmt, args);
