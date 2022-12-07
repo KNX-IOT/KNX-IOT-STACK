@@ -426,18 +426,19 @@ oc_oscore_send_multicast_message(oc_message_t *message)
    *   Serialize OSCORE message to oc_message_t
    * Dispatch oc_message_t to IP layer
    */
-  uint32_t group_id = 0;
+  uint32_t group_address = 0;
 
-  group_id = message->endpoint.group_id;
-
-  if (group_id == 0) {
-    OC_ERR("group id == 0");
+  group_address = message->endpoint.group_address;
+  if (group_address == 0)
+  {
+    OC_ERR("group_address id == 0");
     return -1;
   }
 
   oc_oscore_context_t *oscore_ctx =
-    oc_oscore_find_context_by_group_id(0, group_id);
-  PRINT("oc_oscore_send_multicast_message : groupid = %u\n", group_id);
+    oc_oscore_find_context_by_group_address(0, group_address);
+  PRINT("oc_oscore_send_multicast_message : group_address = %u\n",
+        group_address);
   if (oscore_ctx) {
     OC_DBG_OSCORE("#################################");
     OC_DBG_OSCORE("found group OSCORE context %s",
@@ -612,8 +613,8 @@ oc_oscore_send_message(oc_message_t *msg)
   oscore_ctx = oc_oscore_find_context_by_serial_number(
     message->endpoint.device, message->endpoint.serial_number);
   if (oscore_ctx == NULL) {
-    oscore_ctx = oc_oscore_find_context_by_group_id(message->endpoint.device,
-                                                    message->endpoint.group_id);
+    oscore_ctx = oc_oscore_find_context_by_group_address(message->endpoint.device,
+                                                    message->endpoint.group_address);
   }
   if (oscore_ctx == NULL) {
     OC_ERR("oc_oscore_send_message: No OSCORE context found. ERROR");
@@ -622,7 +623,7 @@ oc_oscore_send_message(oc_message_t *msg)
   if (oscore_ctx) {
     OC_DBG_OSCORE("#################################");
     OC_DBG_OSCORE("found OSCORE context corresponding to the peer serial "
-                  "number or group_id id=%s",
+                  "number or group_address id=%s",
                   oscore_ctx->token_id);
     /* Is this is an inadvertent response to a secure multi cast message */
     if (msg->endpoint.flags & MULTICAST) {

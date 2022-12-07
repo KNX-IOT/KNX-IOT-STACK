@@ -145,7 +145,7 @@ oc_oscore_find_context_by_serial_number(size_t device, char *serial_number)
 }
 
 oc_oscore_context_t *
-oc_oscore_find_context_by_group_id(size_t device, uint32_t group_id)
+oc_oscore_find_context_by_group_address(size_t device, uint32_t group_address)
 {
   (void)device;
 
@@ -158,9 +158,10 @@ oc_oscore_find_context_by_group_id(size_t device, uint32_t group_id)
       for (int i = 0; i < my_entry->ga_len; i++) {
 
         uint32_t group_value = my_entry->ga[i];
-        PRINT("   oc_oscore_find_context_by_group_id : find: %u value: %u\n",
-              group_id, group_value);
-        if (group_id == group_value) {
+        PRINT(
+          "   oc_oscore_find_context_by_group_address : find: %u value: %u\n",
+          group_address,  group_value);
+        if (group_address == group_value) {
           return ctx;
         }
       }

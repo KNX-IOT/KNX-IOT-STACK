@@ -87,9 +87,10 @@ typedef struct oc_endpoint_t
   } addr, addr_local;
   int interface_index; /**< interface index */
   uint8_t priority;    /**< priority */
-  uint32_t group_id;   /**< group identifier, being used to find back the OSCORE
-                     credential to be used for encryption        e.g. looping over
-                     the        list of group addresses of the key */
+  uint32_t group_address; /**< group address,
+                          being used to find back the OSCORE
+                     credential to be used for encryption for s-mode messages
+                     e.g. looping over the list of group addresses of the key */
 #ifdef OC_OSCORE
   uint8_t piv[OSCORE_PIV_LEN]; /**< OSCORE partial iv */
   uint8_t piv_len;             /**< OSCORE partial iv length */
@@ -103,7 +104,7 @@ typedef struct oc_endpoint_t
 #define oc_make_ipv6_endpoint(__name__, __flags__, __port__, ...)              \
   oc_endpoint_t __name__ = { .flags = __flags__,                               \
                              .device = 0,                                      \
-                             .group_id = 0,                                    \
+                             .group_address = 0,                                    \
                              .addr.ipv6 = { .port = __port__,                  \
                                             .address = { __VA_ARGS__ } } }
 

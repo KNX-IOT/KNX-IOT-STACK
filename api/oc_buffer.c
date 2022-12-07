@@ -67,7 +67,7 @@ allocate_message(struct oc_memb *pool)
     message->ref_count = 1;
     message->endpoint.interface_index = -1;
     message->endpoint.device = 0;
-    message->endpoint.group_id = 0;
+    message->endpoint.group_address = 0;
 
     // OC_DBG("allocating message ref_count %d", message->ref_count);
     OC_DBG("message data: %p", message->data);
