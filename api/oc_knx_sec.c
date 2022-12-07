@@ -1056,7 +1056,12 @@ static void
 oc_at_dump_entry(size_t device_index, int entry)
 {
   (void)device_index;
+#ifdef OC_NO_STORAGE
+  (void)entry;
+  PRINT("no auth/at storage");
+#else
   char filename[20];
+
   snprintf(filename, 20, "%s_%d", AT_STORE, entry);
   uint8_t *buf = malloc(OC_MAX_APP_DATA_SIZE);
   if (!buf)
@@ -1100,6 +1105,7 @@ oc_at_dump_entry(size_t device_index, int entry)
     }
   }
   free(buf);
+#endif /* OC_NO_STORAGE */
 }
 
 static void
@@ -1399,9 +1405,7 @@ oc_oscore_set_auth(char *serial_number, char *context_id, uint8_t *shared_key,
     OC_ERR("no space left in auth/at");
   } else {
     oc_core_set_at_table((size_t)0, index, os_token, true);
-#ifndef OC_NO_STORAGE
     oc_at_dump_entry((size_t)0, index);
-#endif
     // add the oscore context...
     oc_init_oscore(0);
   }
