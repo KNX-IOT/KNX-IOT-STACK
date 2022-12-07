@@ -2126,7 +2126,7 @@ oc_create_multicast_group_address_with_port(oc_endpoint_t in, uint32_t group_nr,
   PRINT("  ");
   PRINTipaddr(group_mcast);
   PRINT("\n");
-  group_mcast.group_id = group_nr;
+  group_mcast.group_address = group_nr;
   memcpy(&in, &group_mcast, sizeof(oc_endpoint_t));
 
   return in;
