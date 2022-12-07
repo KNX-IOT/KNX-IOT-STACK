@@ -98,8 +98,8 @@ oc_oscore_context_t *oc_oscore_add_context(
 oc_oscore_context_t *oc_oscore_find_context_by_serial_number(
   size_t device, char *serial_number);
 
-oc_oscore_context_t *oc_oscore_find_context_by_group_id(size_t device,
-                                                        uint32_t group_id);
+oc_oscore_context_t *oc_oscore_find_context_by_group_address(size_t device,
+                                                        uint32_t group_address);
 
 oc_oscore_context_t *oc_oscore_find_context_by_kid(oc_oscore_context_t *ctx,
                                                    size_t device, uint8_t *kid,

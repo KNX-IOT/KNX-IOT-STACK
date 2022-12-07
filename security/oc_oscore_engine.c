@@ -436,7 +436,7 @@ oc_oscore_send_multicast_message(oc_message_t *message)
   }
 
   oc_oscore_context_t *oscore_ctx =
-    oc_oscore_find_context_by_group_adress(0, group_address);
+    oc_oscore_find_context_by_group_address(0, group_address);
   PRINT("oc_oscore_send_multicast_message : group_address = %u\n",
         group_address);
   if (oscore_ctx) {
