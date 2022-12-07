@@ -22,7 +22,7 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE,  so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       # Runs a set of commands using the runners shell
       - name: Build secured binaries
         run: |
@@ -39,7 +39,7 @@ jobs:
   unsecured:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Build unsecured binaries
         run: |
           # https://github.com/actions/checkout/issues/81
@@ -55,7 +55,7 @@ jobs:
   test_unsecured:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Run tests with security disabled
         run: |
           # https://github.com/actions/checkout/issues/81
@@ -75,7 +75,7 @@ jobs:
   test_secured:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Run tests with security enabled
         run: |
           # https://github.com/actions/checkout/issues/81
