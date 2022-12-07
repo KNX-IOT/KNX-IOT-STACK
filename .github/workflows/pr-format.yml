@@ -25,9 +25,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
-          path: iotivity-lite
+          path: knx_stack
           ref: ${{ fromJSON(steps.get_branch.outputs.data).repository.pullRequest.headRefName }}
 
       - name: add reaction
@@ -38,18 +38,18 @@ jobs:
 
       - name: Checkout Submodules
         run: |
-          git -C ${{ github.workspace }}/iotivity-lite submodule update --init --recursive
+          git -C ${{ github.workspace }}/knx_stack submodule update --init --recursive
 
       - name: build-docs
         run: |
           sudo apt-get update -y
-          sudo apt-get install clang-format-6.0
-          cmake -S ${{ github.workspace }}/iotivity-lite -B ${{ github.workspace }}/build-format
+          sudo apt-get install clang-format-13
+          cmake -S ${{ github.workspace }}/knx_stack -B ${{ github.workspace }}/build-format
           make -C ${{ github.workspace }}/build-format format
 
       - name: push-changes
         run: |
-          cd ${{ github.workspace }}/iotivity-lite
+          cd ${{ github.workspace }}/knx_stack
           git config --global user.name 'Cascoda Bot'
           git config --global user.email 'github@cascoda.com'
           git add .
