@@ -429,8 +429,7 @@ oc_oscore_send_multicast_message(oc_message_t *message)
   uint32_t group_address = 0;
 
   group_address = message->endpoint.group_address;
-  if (group_address == 0)
-  {
+  if (group_address == 0) {
     OC_ERR("group_address id == 0");
     return -1;
   }
@@ -613,8 +612,8 @@ oc_oscore_send_message(oc_message_t *msg)
   oscore_ctx = oc_oscore_find_context_by_serial_number(
     message->endpoint.device, message->endpoint.serial_number);
   if (oscore_ctx == NULL) {
-    oscore_ctx = oc_oscore_find_context_by_group_address(message->endpoint.device,
-                                                    message->endpoint.group_address);
+    oscore_ctx = oc_oscore_find_context_by_group_address(
+      message->endpoint.device, message->endpoint.group_address);
   }
   if (oscore_ctx == NULL) {
     OC_ERR("oc_oscore_send_message: No OSCORE context found. ERROR");

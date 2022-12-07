@@ -160,7 +160,7 @@ oc_oscore_find_context_by_group_address(size_t device, uint32_t group_address)
         uint32_t group_value = my_entry->ga[i];
         PRINT(
           "   oc_oscore_find_context_by_group_address : find: %u value: %u\n",
-          group_address,  group_value);
+          group_address, group_value);
         if (group_address == group_value) {
           return ctx;
         }

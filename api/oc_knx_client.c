@@ -432,8 +432,8 @@ oc_issue_s_mode(int scope, int sia_value, uint32_t grpid,
   memset(&group_mcast, 0, sizeof(group_mcast));
   group_mcast =
     oc_create_multicast_group_address(group_mcast, grpid, iid, scope);
-  // set the group_address to the group address, since this field is used to find the 
-  // oscore context id 
+  // set the group_address to the group address, since this field is used to
+  // find the oscore context id
   group_mcast.group_address = group_address;
 #endif
 
