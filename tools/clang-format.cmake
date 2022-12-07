@@ -8,7 +8,7 @@ list(FILTER knx-iot-stack_allsource EXCLUDE REGEX "deps/")
 # Find clang-format
 find_program(
 	CLANG_FORMAT_EXE
-	NAMES "clang-format-6.0"
+	NAMES "clang-format-13"
 	      "clang-format"
 	DOC "Path to clang-format executable"
 	)
@@ -24,8 +24,8 @@ execute_process(
 	)
 
 # version check
-if(NOT ${CLANG_VERSION} MATCHES "version 6\.0")
-	message(FATAL_ERROR "clang-format must be version 6.0")
+if(NOT ${CLANG_VERSION} MATCHES "version 13")
+	message(FATAL_ERROR "clang-format must be version 13")
 endif()
 
 # Run clang format
