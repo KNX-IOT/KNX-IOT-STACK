@@ -19,6 +19,8 @@
 #include "oc_discovery.h"
 #include "oc_core_res.h"
 #include <stdio.h>
+#define __STDC_FORMAT_MACROS
+#include <inttypes.h>
 
 #define TAGS_AS_STRINGS
 
@@ -2119,7 +2121,8 @@ oc_create_multicast_group_address_with_port(oc_endpoint_t in, uint32_t group_nr,
                         ula_1, // FD11 : 2222 : 3333
                         0, 0,  // ::
                         byte_4, byte_3, byte_2, byte_1);
-  PRINT("  oc_create_multicast_group_address_with_port S=%d iid=%ld G=%u B4=%d "
+  PRINT("  oc_create_multicast_group_address_with_port S=%d iid=%" PRIu64
+        " G=%u B4=%d "
         "B3=%d B2=%d "
         "B1=%d\n",
         scope, iid, group_nr, byte_4, byte_3, byte_2, byte_1);
