@@ -588,7 +588,7 @@ oc_do_s_mode_read(int64_t group_address)
   int64_t iid = device->iid;
   uint32_t grpid = 0;
 
-  PRINT("oc_do_s_mode_read : ga=%d ia=%d, iid=%ld\n", (uint32_t)group_address,
+  PRINT("oc_do_s_mode_read : ga=%u ia=%d, iid=%ld\n", (uint32_t)group_address,
         sia_value, iid);
 
   // find the grpid that belongs to the group address

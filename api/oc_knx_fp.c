@@ -2119,7 +2119,7 @@ oc_create_multicast_group_address_with_port(oc_endpoint_t in, uint32_t group_nr,
                         ula_1, // FD11 : 2222 : 3333
                         0, 0,  // ::
                         byte_4, byte_3, byte_2, byte_1);
-  PRINT("  oc_create_multicast_group_address_with_port S=%d U=%ld G=%d B4=%d "
+  PRINT("  oc_create_multicast_group_address_with_port S=%d iid=%ld G=%u B4=%d "
         "B3=%d B2=%d "
         "B1=%d\n",
         scope, iid, group_nr, byte_4, byte_3, byte_2, byte_1);
@@ -2271,7 +2271,7 @@ oc_register_group_multicasts()
           uint32_t grpid = oc_find_grpid_in_table(
             g_gpt, oc_core_get_publisher_table_size(), g_got[index].ga[i]);
 
-          PRINT(" oc_register_group_multicasts index=%d i=%d grpid: %d "
+          PRINT(" oc_register_group_multicasts index=%d i=%d grpid: %u "
                 "group_address: %d cflags=",
                 index, i, grpid, g_got[index].ga[i]);
           oc_print_cflags(cflags);
@@ -2300,7 +2300,7 @@ oc_register_group_multicasts()
 
         for (int i = 0; i < nr_entries; i++) {
           PRINT(
-            " oc_register_group_multicasts index=%d i=%d group: %d  cflags=",
+            " oc_register_group_multicasts index=%d i=%d group: %u  cflags=",
             index, i, g_got[index].ga[i]);
           oc_print_cflags(cflags);
           subscribe_group_to_multicast_with_port(g_got[index].ga[i],
