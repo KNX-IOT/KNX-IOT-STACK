@@ -1498,7 +1498,7 @@ oc_init_oscore_from_storage(size_t device_index, bool from_storage)
           oc_string(g_at_entries[i].osc_ms),
           oc_string(g_at_entries[i].osc_contextid), i, from_storage);
         if (ctx == NULL) {
-          OC_DBG_OSCORE("   fail...");
+          OC_ERR("  failed to load index= %d", i);
         }
       } else {
         OC_DBG_OSCORE("oc_init_oscore: no oscore context");
