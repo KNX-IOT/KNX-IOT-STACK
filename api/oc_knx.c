@@ -23,7 +23,7 @@
 #include "oc_knx_gm.h"
 #include "oc_knx_sec.h"
 #include "oc_main.h"
-#include "oc_rep.h" 
+#include "oc_rep.h"
 #include <stdio.h>
 #define __STDC_FORMAT_MACROS
 #include <inttypes.h>

@@ -591,8 +591,7 @@ oc_do_s_mode_read(int64_t group_address)
   uint32_t grpid = 0;
 
   PRINT("oc_do_s_mode_read : ga=%u ia=%d, iid=%" PRIu64 "\n",
-        (uint32_t)group_address,
-        sia_value, iid);
+        (uint32_t)group_address, sia_value, iid);
 
   // find the grpid that belongs to the group address
   grpid = oc_find_grpid_in_publisher_table(group_address);
