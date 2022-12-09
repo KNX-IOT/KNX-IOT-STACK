@@ -1581,8 +1581,8 @@ oc_print_group_rp_table_entry(int entry, char *Store,
   PRINT("  %s [%d] --> [%d]\n", Store, entry, rp_table[entry].ga_len);
   PRINT("    id (0)     : %d\n", rp_table[entry].id);
   PRINT("    ia (12)    : %d\n", rp_table[entry].ia);
-  PRINT("    iid (26)   : %ld\n", rp_table[entry].iid);
-  PRINT("    fid (25)   : %ld\n", rp_table[entry].fid);
+  PRINT("    iid (26)   : %" PRIu64 "\n", rp_table[entry].iid);
+  PRINT("    fid (25)   : %" PRIu64 "\n", rp_table[entry].fid);
   PRINT("    grpid (13) : %u\n", rp_table[entry].grpid);
   if (oc_string_len(rp_table[entry].path) > 0) {
     PRINT("    path (112) : '%s'\n", oc_string_checked(rp_table[entry].path));

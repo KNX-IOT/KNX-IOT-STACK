@@ -19,6 +19,8 @@
 #include "oc_discovery.h"
 #include "oc_core_res.h"
 #include <stdio.h>
+#define __STDC_FORMAT_MACROS
+#include <inttypes.h>
 #include "security/oc_oscore_context.h"
 #include "oc_knx.h"
 
@@ -1005,7 +1007,7 @@ oc_print_auth_at_entry(size_t device_index, int index)
         if (g_at_entries[index].ga_len > 0) {
           PRINT("    osc:ga        : [");
           for (int i = 0; i < g_at_entries[index].ga_len; i++) {
-            PRINT(" %ld", g_at_entries[index].ga[i]);
+            PRINT(" %" PRIu64 "", (uint64_t)g_at_entries[index].ga[i]);
           }
           PRINT(" ]\n");
         }
