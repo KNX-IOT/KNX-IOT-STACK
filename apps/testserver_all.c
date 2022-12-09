@@ -75,6 +75,8 @@
 #endif
 #include "port/oc_clock.h"
 #include <signal.h>
+#define __STDC_FORMAT_MACROS
+#include <inttypes.h>
 
 // test purpose only
 #include "api/oc_knx_dev.h"
@@ -1069,7 +1071,7 @@ issue_requests_s_mode_delayed(void *data)
   device->iid = 16;
 
   PRINT(" issue_requests_s_mode_delayed : ia = %d\n", device->ia);
-  PRINT(" issue_requests_s_mode_delayed : iid = %ld\n", device->iid);
+  PRINT(" issue_requests_s_mode_delayed : iid = %" PRIu64 "\n", device->iid);
 
   PRINT(" issue_requests_s_mode_delayed : config data\n");
   int ga_values[5] = { 1, 255, 256, 1024, 1024 * 256 };
