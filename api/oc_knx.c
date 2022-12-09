@@ -23,8 +23,10 @@
 #include "oc_knx_gm.h"
 #include "oc_knx_sec.h"
 #include "oc_main.h"
+#include "oc_rep.h" 
 #include <stdio.h>
-#include "oc_rep.h" // should not be needed
+#define __STDC_FORMAT_MACROS
+#include <inttypes.h>
 
 #include "port/dns-sd.h"
 
@@ -1002,15 +1004,15 @@ oc_core_knx_ia_post_handler(oc_request_t *request,
         oc_storage_write(KNX_STORAGE_IA, (uint8_t *)&temp, sizeof(temp));
         ia_set = true;
       } else if (rep->iname == 25) {
-        PRINT("  oc_core_knx_ia_post_handler received 25 (fid): %lu\n",
+        PRINT("  oc_core_knx_ia_post_handler received 25 (fid): %" PRIu64 "\n",
               rep->value.integer);
         oc_core_set_device_fid(device_index, (uint64_t)rep->value.integer);
         uint64_t temp = (uint64_t)rep->value.integer;
         oc_storage_write(KNX_STORAGE_FID, (uint8_t *)&temp, sizeof(temp));
         fid_set = true;
       } else if (rep->iname == 26) {
-        PRINT("  oc_core_knx_ia_post_handler received 26 (iid): %ld\n",
-              rep->value.integer);
+        PRINT("  oc_core_knx_ia_post_handler received 26 (iid): %" PRIu64 "\n",
+              (uint64_t)rep->value.integer);
         oc_core_set_device_iid(device_index, (uint64_t)rep->value.integer);
         uint64_t temp = (uint64_t)rep->value.integer;
         oc_storage_write(KNX_STORAGE_IID, (uint8_t *)&temp, sizeof(temp));
