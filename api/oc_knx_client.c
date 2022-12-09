@@ -24,6 +24,8 @@
 #include "oc_core_res.h"
 #include "oc_discovery.h"
 #include <stdio.h>
+#define __STDC_FORMAT_MACROS
+#include <inttypes.h>
 
 // ----------------------------------------------------------------------------
 
@@ -585,10 +587,11 @@ oc_do_s_mode_read(int64_t group_address)
   size_t device_index = 0;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   uint32_t sia_value = device->ia;
-  int64_t iid = device->iid;
+  uint64_t iid = device->iid;
   uint32_t grpid = 0;
 
-  PRINT("oc_do_s_mode_read : ga=%u ia=%d, iid=%ld\n", (uint32_t)group_address,
+  PRINT("oc_do_s_mode_read : ga=%u ia=%d, iid=%" PRIu64 "\n",
+        (uint32_t)group_address,
         sia_value, iid);
 
   // find the grpid that belongs to the group address
