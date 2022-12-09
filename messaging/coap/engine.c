@@ -50,6 +50,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#define __STDC_FORMAT_MACROS
+#include <inttypes.h>
 
 #include "api/oc_events.h"
 #include "api/oc_main.h"
@@ -468,8 +470,9 @@ coap_receive(oc_message_t *msg)
           OC_DBG("Echo timestamp difference %lu, threshold %d",
                  current_time - received_timestamp, OC_ECHO_FRESHNESS_TIME);
           if (current_time - received_timestamp > OC_ECHO_FRESHNESS_TIME) {
-            OC_ERR("Stale timestamp! Current time %lu, received time %lu",
-                   current_time, received_timestamp);
+            OC_ERR("Stale timestamp! Current time  %" PRIu64 ","
+                   " received time %" PRIu64 "",
+                   (uint64_t)current_time, (uint64_t)received_timestamp);
             OC_ERR("Dropping frame!");
             // message containing echo is stale, just drop it
             coap_clear_transaction(transaction);
