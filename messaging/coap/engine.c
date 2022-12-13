@@ -408,7 +408,8 @@ coap_receive(oc_message_t *msg)
         bool new_sender = true;
         for (int i = 0; i < OC_SEEN_SENDERS_SIZE; ++i) {
           if (memcmp(seen_senders[i].address, msg->endpoint.addr.ipv6.address,
-                     16) == 0 && seen_senders[i].port == msg->endpoint.addr.ipv6.port) {
+                     16) == 0 &&
+              seen_senders[i].port == msg->endpoint.addr.ipv6.port) {
             new_sender = false;
             break;
           }
@@ -441,7 +442,8 @@ coap_receive(oc_message_t *msg)
           oc_clock_time_t current_time = oc_clock_time();
 
           if (echo_len == 0) {
-            OC_DBG("Received request from new sender, sending Unauthorised with Echo Challenge...");
+            OC_DBG("Received request from new sender, sending Unauthorised "
+                   "with Echo Challenge...");
             coap_send_unauth_echo_response(
               message->type == COAP_TYPE_CON ? COAP_TYPE_ACK : COAP_TYPE_NON,
               message->mid, message->token, message->token_len,
@@ -451,8 +453,9 @@ coap_receive(oc_message_t *msg)
           } else if (echo_len != sizeof(oc_clock_time_t)) // KNX-IoT servers use
                                                           // 8-byte echo options
           {
-            OC_DBG("Received request with bad Echo size %d! Sending bad option...",
-                   (int)echo_len);
+            OC_DBG(
+              "Received request with bad Echo size %d! Sending bad option...",
+              (int)echo_len);
             coap_send_empty_response(
               message->type == COAP_TYPE_CON ? COAP_TYPE_ACK : COAP_TYPE_NON,
               message->mid, message->token, message->token_len, BAD_OPTION_4_02,
@@ -479,7 +482,8 @@ coap_receive(oc_message_t *msg)
             return 0;
           } else {
             // message received with fresh echo, add to seen senders list
-            OC_DBG("Included Echo is Fresh! Adding endpoint to seen senders list...");
+            OC_DBG("Included Echo is Fresh! Adding endpoint to seen senders "
+                   "list...");
             oc_ipv6_addr_t *entry_ptr = &seen_senders[seen_sender_idx];
             memcpy(entry_ptr, &msg->endpoint.addr.ipv6, sizeof(oc_ipv6_addr_t));
             seen_sender_idx = (seen_sender_idx + 1) % OC_SEEN_SENDERS_SIZE;
