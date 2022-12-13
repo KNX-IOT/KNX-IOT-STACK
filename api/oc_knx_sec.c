@@ -521,6 +521,8 @@ oc_core_auth_at_post_handler(oc_request_t *request,
               // make the deep copy
               if ((g_at_entries[index].ga_len > 0) &&
                   (&g_at_entries[index].ga != NULL)) {
+                // always set the group address scope, if there is 1 or more ga entries
+                g_at_entries[index].scope = OC_IF_G;
                 int64_t *cur_arr = g_at_entries[index].ga;
                 if (cur_arr) {
                   free(cur_arr);
