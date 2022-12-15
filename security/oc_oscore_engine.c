@@ -256,6 +256,7 @@ oc_oscore_recv_message(oc_message_t *message)
         if (check_if_replayed_request(oscore_ctx, piv, &message->endpoint,
                                       &message->mcast_dest)) {
           oscore_send_error(oscore_pkt, UNAUTHORIZED_4_01, &message->endpoint);
+          OC_ERR("***replayed request according to PIV***");
           goto oscore_recv_error;
         }
 
@@ -395,7 +396,10 @@ oc_oscore_recv_message(oc_message_t *message)
   /* Dispatch oc_message_t to the CoAP layer */
   if (oc_process_post(&coap_engine, oc_events[INBOUND_RI_EVENT], message) ==
       OC_PROCESS_ERR_FULL) {
-    goto oscore_recv_error;
+    {
+      OC_ERR("***Error dispatching decrypted CoAP message***");
+      goto oscore_recv_error;
+    }
   }
   return 0;
 
