@@ -71,7 +71,7 @@ oc_storage_config(const char *store)
   PRINT("\tNot Creating storage directory \n");
 #endif
 
-    return 0;
+  return 0;
 }
 
 long
