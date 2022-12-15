@@ -403,7 +403,6 @@ coap_receive(oc_message_t *msg)
       transaction =
         coap_new_transaction(response->mid, NULL, 0, &msg->endpoint);
       if (transaction) {
-        /*
         bool new_sender = true;
         for (int i = 0; i < OC_SEEN_SENDERS_SIZE; ++i) {
           if (memcmp(seen_senders[i].address, msg->endpoint.addr.ipv6.address,
@@ -413,10 +412,9 @@ coap_receive(oc_message_t *msg)
             break;
           }
         }
-        */
 
         // For debugging: trust all senders to turn off Unauthorised Echo requests
-        bool new_sender = false;
+        //bool new_sender = false;
 
         bool is_myself = false;
         //
