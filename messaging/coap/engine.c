@@ -364,7 +364,6 @@ coap_receive(oc_message_t *msg)
       }
       PRINT("  URL: %.*s", (int)message->uri_path_len, message->uri_path);
       PRINT("  QUERY: %.*s", (int)message->uri_query_len, message->uri_query);
-      PRINT("  Payload: %.*s", (int)message->payload_len, message->payload);
 #endif
       const char *href;
       size_t href_len = coap_get_header_uri_path(message, &href);
@@ -403,8 +402,8 @@ coap_receive(oc_message_t *msg)
       /* create transaction for response */
       transaction =
         coap_new_transaction(response->mid, NULL, 0, &msg->endpoint);
-
       if (transaction) {
+        /*
         bool new_sender = true;
         for (int i = 0; i < OC_SEEN_SENDERS_SIZE; ++i) {
           if (memcmp(seen_senders[i].address, msg->endpoint.addr.ipv6.address,
@@ -414,6 +413,10 @@ coap_receive(oc_message_t *msg)
             break;
           }
         }
+        */
+
+        // For debugging: trust all senders to turn off Unauthorised Echo requests
+        bool new_sender = false;
 
         bool is_myself = false;
         //
