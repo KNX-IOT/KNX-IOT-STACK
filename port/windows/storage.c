@@ -63,10 +63,15 @@ oc_storage_config(const char *store)
     temp_dir[dir_len - 1] = 0;
   }
 
+#ifdef OC_NO_STORAGE
   PRINT("\tCreating storage directory at %s\n", temp_dir);
   int retval = _mkdir(temp_dir);
+#
+#else
+  PRINT("\tNot Creating storage directory \n");
+#endif
 
-  return 0;
+    return 0;
 }
 
 long
