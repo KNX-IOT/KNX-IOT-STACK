@@ -421,18 +421,22 @@ coap_receive(oc_message_t *msg)
         // check if incoming message is from myself.
         // if so, then return with bad request
         oc_endpoint_t *my_ep = oc_connectivity_get_endpoints(0);
+
+        while (my_ep != NULL)
+        {
 #ifdef OC_DEBUG
-        if (my_ep != NULL) {
           PRINT("engine : myself:");
           PRINTipaddr(*my_ep);
           PRINT("\n");
-        }
 #endif /* OC_DEBUG */
-        if (oc_endpoint_compare_address(&msg->endpoint, my_ep) == 0) {
-          if (msg->endpoint.addr.ipv6.port == my_ep->addr.ipv6.port) {
-            OC_DBG(" same address and port: not handling message");
-            is_myself = true;
+          if (oc_endpoint_compare_address(&msg->endpoint, my_ep) == 0) {
+            if (msg->endpoint.addr.ipv6.port == my_ep->addr.ipv6.port) {
+              OC_DBG(" same address and port: not handling message");
+              is_myself = true;
+              break;
+            }
           }
+        my_ep = my_ep->next;
         }
 
         // server-side logic for handling responses with echo option
