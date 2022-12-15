@@ -535,7 +535,7 @@ void
 oc_create_knx_swu_a_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_swu_a_resource\n");
-  oc_core_populate_resource(resource_idx, device, "/a/swu", OC_IF_NONE,
+  oc_core_populate_resource(resource_idx, device, "/a/swu", OC_IF_SWU,
                             APPLICATION_CBOR, OC_DISCOVERABLE, 0,
                             oc_knx_swu_a_put_handler, oc_knx_swu_a_post_handler,
                             0, 1, ":dpt.file");
@@ -566,7 +566,7 @@ void
 oc_create_knx_swu_pkgbytes_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_swu_pkgbytes_resource\n");
-  oc_core_populate_resource(resource_idx, device, "/swu/bytes", OC_IF_NONE,
+  oc_core_populate_resource(resource_idx, device, "/swu/bytes", OC_IF_SWU,
                             APPLICATION_CBOR, OC_DISCOVERABLE,
                             oc_knx_swu_bytes_get_handler, 0, 0, 0, 1,
                             "urn:knx:dpt.value4UCount");
@@ -698,7 +698,7 @@ oc_create_knx_swu_resource(int resource_idx, size_t device)
   OC_DBG("oc_create_knx_swu_resource\n");
   //
   oc_core_populate_resource(
-    resource_idx, device, "/swu", OC_IF_NONE, APPLICATION_LINK_FORMAT,
+    resource_idx, device, "/swu", OC_IF_SWU, APPLICATION_LINK_FORMAT,
     OC_DISCOVERABLE, oc_core_knx_swu_get_handler, 0, 0, 0, 1, "urn:knx:fbswu");
 }
 
