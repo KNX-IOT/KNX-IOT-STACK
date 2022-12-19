@@ -206,13 +206,13 @@ coap_send_transaction(coap_transaction_t *t)
 
     // - client (PB) sends NON request, and then deletes the transaction
     // - server (SA) receives it, sends 4.01 Unauthorised w. Echo option
-    // - client (PB) receives 4.01 unauthorised, searches transactions 
+    // - client (PB) receives 4.01 unauthorised, searches transactions
     //   matching the token, but cannot find any as it was deleted by the
     //   line below!!
     //
     // So, do not clear the transaction here, but instead free this trans-
     // action in a delayed callback
-    //coap_clear_transaction(t);
+    // coap_clear_transaction(t);
   }
 }
 /*---------------------------------------------------------------------------*/
