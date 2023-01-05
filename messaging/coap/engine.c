@@ -434,6 +434,10 @@ coap_receive(oc_message_t *msg)
           }
         }
 
+        // temporary: disable requesting echos from peers by trusting
+        // every device
+        new_sender = false;
+
         // server-side logic for handling responses with echo option
         if (new_sender && msg->endpoint.flags & OSCORE_DECRYPTED &&
             is_myself == false) {
