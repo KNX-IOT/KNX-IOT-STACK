@@ -499,7 +499,6 @@ oc_knx_swu_a_put_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     my_cb->cb(device_index, block_offset, (uint8_t *)payload, len, my_cb->data);
   }
 
-  
   PRINT("  oc_knx_swu_a_put_handler : End\n");
   oc_send_json_response(request, OC_STATUS_OK);
 }

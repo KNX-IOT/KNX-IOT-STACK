@@ -979,7 +979,6 @@ swu_cb(size_t device, size_t offset, uint8_t *payload, size_t len, void *data)
   } else {
     PRINT(" swu_cb no file : %s \n", filename);
   }
-
 }
 
 /**
