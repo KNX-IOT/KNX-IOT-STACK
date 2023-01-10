@@ -96,7 +96,7 @@ oc_rep_get_encoded_payload_size(void)
 {
   size_t size = cbor_encoder_get_buffer_size(&g_encoder, g_buf);
   if (g_err == CborErrorOutOfMemory) {
-    OC_WRN("Insufficient memory: Increase OC_MAX_APP_DATA_SIZE to "
+    OC_ERR("Insufficient memory: Increase OC_MAX_APP_DATA_SIZE to "
            "accommodate a larger payload");
   }
   if (g_err != CborNoError)
