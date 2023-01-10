@@ -73,8 +73,11 @@ dispatch_coap_request(oc_content_format_t content, oc_content_format_t accept)
       request_buffer->ref_count = 0;
     }
 #else  /* OC_BLOCK_WISE_REQUEST */
-    coap_set_payload(request, transaction->message->data + COAP_MAX_HEADER_SIZE,
-                     payload_size);
+    if (payload_size > 0) {
+      coap_set_payload(request,
+                       transaction->message->data + COAP_MAX_HEADER_SIZE,
+                       payload_size);
+    }
 #endif /* !OC_BLOCK_WISE_REQUEST */
   }
 
