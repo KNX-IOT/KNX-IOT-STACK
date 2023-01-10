@@ -1035,7 +1035,7 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
 #endif /* OC_DYNAMIC_ALLOCATION */
   oc_rep_set_pool(&rep_objects);
 
-  if (payload_len > 0 && (cf == APPLICATION_CBOR || cf == APPLICATION_CBOR ||
+  if (payload_len > 0 && (cf == APPLICATION_CBOR ||
                           cf == APPLICATION_OSCORE)) {
     /* Attempt to parse request payload using tinyCBOR via oc_rep helper
      * functions. The result of this parse is a tree of oc_rep_t structures
