@@ -1061,7 +1061,7 @@ static void
 oc_at_dump_entry(size_t device_index, int entry)
 {
   (void)device_index;
-#ifdef OC_NO_STORAGE
+#ifndef OC_USE_STORAGE
   (void)entry;
   PRINT("no auth/at storage");
 #else
@@ -1110,7 +1110,7 @@ oc_at_dump_entry(size_t device_index, int entry)
     }
   }
   free(buf);
-#endif /* OC_NO_STORAGE */
+#endif /* OC_USE_STORAGE */
 }
 
 static void
