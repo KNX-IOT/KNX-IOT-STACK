@@ -682,7 +682,7 @@ coap_oscore_parse_options(void *packet, uint8_t *data, uint32_t data_len,
           coap_pkt->accept != APPLICATION_CBOR &&
           coap_pkt->accept != APPLICATION_OSCORE &&
           coap_pkt->accept != APPLICATION_LINK_FORMAT &&
-          coap_pkt->content_format != APPLICATION_OCTET_STREAM &&
+          coap_pkt->accept != APPLICATION_OCTET_STREAM &&
           coap_pkt->accept != APPLICATION_JSON &&
           coap_pkt->accept != APPLICATION_PKCS10 &&
           coap_pkt->accept != APPLICATION_PKCS7_CMC_RESPONSE &&
