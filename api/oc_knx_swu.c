@@ -464,6 +464,8 @@ oc_knx_swu_a_put_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   const uint8_t *payload = NULL;
   size_t len = 0;
 
+  PRINT("  oc_knx_swu_a_put_handler : Start\n");
+
   /* check if the accept header is CBOR-format */
   if (request->accept != APPLICATION_OCTET_STREAM) {
     request->response->response_buffer->code =
@@ -490,16 +492,14 @@ oc_knx_swu_a_put_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 
   bool berr =
     oc_get_request_payload_raw(request, &payload, &len, &content_format);
-  PRINT("      raw buffer ok: %d\n", berr);
-
-  char filebase[20];
-  sprintf((char *)&filebase, "block_%d", block_size);
+  PRINT("      raw buffer ok: %d len=%d\n", berr, len);
 
   oc_swu_t *my_cb = oc_get_swu_cb();
   if (my_cb && my_cb->cb) {
     my_cb->cb(device_index, block_offset, (uint8_t *)payload, len, my_cb->data);
   }
 
+  PRINT("  oc_knx_swu_a_put_handler : End\n");
   oc_send_json_response(request, OC_STATUS_OK);
 }
 

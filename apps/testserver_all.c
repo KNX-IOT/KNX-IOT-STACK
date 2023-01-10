@@ -963,15 +963,22 @@ void
 swu_cb(size_t device, size_t offset, uint8_t *payload, size_t len, void *data)
 {
   char *fname = (char *)data;
-  PRINT(" swu_cb %s block=%d size=%d \n", fname, (int)offset, (int)len);
+  char filename[] = "./downloaded.bin";
+  PRINT(" swu_cb %s block=%d size=%d \n", filename, (int)offset, (int)len);
 
-  FILE *fp = fopen(fname, "rw");
-  fseek(fp, offset, SEEK_SET);
-  size_t written = fwrite(payload, len, 1, fp);
-  if (written != len) {
-    PRINT(" swu_cb returned %d != %d (expected)\n", (int)written, (int)len);
+  return;
+
+  FILE *fp = fopen(filename, "rwb");
+  if (fp) {
+    fseek(fp, offset, SEEK_SET);
+    size_t written = fwrite(payload, len, 1, fp);
+    if (written != len) {
+      PRINT(" swu_cb returned %d != %d (expected)\n", (int)written, (int)len);
+    }
+    fclose(fp);
+  } else {
+    PRINT(" swu_cb no file : %s \n", filename);
   }
-  fclose(fp);
 }
 
 /**
@@ -1360,7 +1367,7 @@ main(int argc, char *argv[])
 {
   int init;
 
-  bool do_send_s_mode = true;
+  bool do_send_s_mode = false;
   bool do_send_oscore = false;
   bool do_test_myself = false;
   // false;
