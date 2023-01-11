@@ -1040,6 +1040,19 @@ oc_knx_device_in_programming_mode(size_t device_index)
 }
 
 void
+oc_knx_device_set_programming_mode(size_t device_index, bool programming_mode)
+{
+
+  if (device_index >= oc_core_get_num_devices()) {
+    PRINT("device_index %d too large\n", (int)device_index);
+    return;
+  }
+
+  oc_device_info_t *device = oc_core_get_device_info(device_index);
+  device->pm = programming_mode;
+}
+
+void
 oc_create_knx_device_resources(size_t device_index)
 {
   OC_DBG("oc_create_knx_device_resources");
