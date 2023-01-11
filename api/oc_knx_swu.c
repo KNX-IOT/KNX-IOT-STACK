@@ -144,7 +144,8 @@ oc_knx_swu_protocol_put_handler(oc_request_t *request,
     PRINT("  oc_knx_swu_protocol_put_handler received : %d\n",
           (int)rep->value.integer);
 
-    oc_send_cbor_response(request, OC_STATUS_OK);
+    // oc_send_cbor_response(request, OC_STATUS_OK);
+    oc_send_cbor_response_with_payload_size(request, OC_STATUS_CHANGED, 0);
     return;
   }
 
@@ -205,7 +206,8 @@ oc_knx_swu_maxdefer_put_handler(oc_request_t *request,
     g_swu_max_defer = (int)rep->value.integer;
     oc_storage_write(KNX_STORAGE_SWU_MAX_DEFER, (uint8_t *)&g_swu_max_defer,
                      sizeof(g_swu_max_defer));
-    oc_send_cbor_response(request, OC_STATUS_OK);
+    // oc_send_cbor_response(request, OC_STATUS_OK);
+    oc_send_cbor_response_with_payload_size(request, OC_STATUS_OK, 0);
     return;
   }
 
@@ -269,7 +271,8 @@ oc_knx_swu_method_put_handler(oc_request_t *request,
     g_swu_update_method = (int)rep->value.integer;
     oc_storage_write(KNX_STORAGE_SWU_METHOD, (uint8_t *)&g_swu_update_method,
                      sizeof(g_swu_update_method));
-    oc_send_cbor_response(request, OC_STATUS_OK);
+    // oc_send_cbor_response(request, OC_STATUS_OK);
+    oc_send_cbor_response_with_payload_size(request, OC_STATUS_OK, 0);
     return;
   }
 
@@ -397,8 +400,8 @@ oc_knx_swu_update_put_handler(oc_request_t *request,
   if ((rep != NULL) && (rep->type == OC_REP_INT)) {
     PRINT("  oc_knx_swu_update_put_handler received : %d\n",
           (int)rep->value.integer);
-
-    oc_send_cbor_response(request, OC_STATUS_OK);
+    oc_send_cbor_response_with_payload_size(request, OC_STATUS_OK, 0);
+    // oc_send_cbor_response(request, OC_STATUS_OK);
     return;
   }
 
@@ -609,7 +612,8 @@ oc_knx_swu_pkgqurl_put_handler(oc_request_t *request,
     PRINT("  oc_knx_swu_pkgqurl_put_handler received : %s\n",
           oc_string_checked(rep->value.string));
 
-    oc_send_cbor_response(request, OC_STATUS_OK);
+    // oc_send_cbor_response(request, OC_STATUS_OK);
+    oc_send_cbor_response_with_payload_size(request, OC_STATUS_OK, 0);
     return;
   }
 
