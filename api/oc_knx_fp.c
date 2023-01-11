@@ -1129,7 +1129,7 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   oc_knx_increase_fingerprint();
 
   PRINT("oc_core_fp_r_post_handler - end\n");
-  //oc_send_cbor_response(request, OC_STATUS_OK);
+  // oc_send_cbor_response(request, OC_STATUS_OK);
   oc_send_cbor_response_with_payload_size(request, OC_STATUS_CHANGED, 0);
 }
 

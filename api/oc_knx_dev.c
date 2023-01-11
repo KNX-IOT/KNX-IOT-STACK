@@ -333,7 +333,7 @@ oc_core_dev_ia_put_handler(oc_request_t *request,
       oc_init_datapoints_at_initialization();
     }
 
-    //oc_send_cbor_response(request, OC_STATUS_CHANGED);
+    // oc_send_cbor_response(request, OC_STATUS_CHANGED);
     oc_send_cbor_response_with_payload_size(request, OC_STATUS_CHANGED, 0);
   } else {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
@@ -383,7 +383,7 @@ oc_core_dev_hostname_put_handler(oc_request_t *request,
           my_hostname->cb(device_index, rep->value.string, my_hostname->data);
         }
 
-        //oc_send_cbor_response(request, OC_STATUS_OK);
+        // oc_send_cbor_response(request, OC_STATUS_OK);
         oc_send_cbor_response_with_payload_size(request, OC_STATUS_OK, 0);
         return;
       }
@@ -603,7 +603,7 @@ oc_core_dev_pm_put_handler(oc_request_t *request,
         PRINT("  oc_core_dev_pm_put_handler received : %d\n",
               (int)rep->value.boolean);
         device->pm = rep->value.boolean;
-        //oc_send_cbor_response(request, OC_STATUS_CHANGED);
+        // oc_send_cbor_response(request, OC_STATUS_CHANGED);
         oc_send_cbor_response_with_payload_size(request, OC_STATUS_CHANGED, 0);
 
         knx_publish_service(oc_string(device->serialnumber), device->iid,
@@ -733,7 +733,7 @@ oc_core_dev_sa_put_handler(oc_request_t *request,
     PRINT("  oc_core_dev_sa_put_handler received : %d\n",
           (int)rep->value.integer);
     device->sa = (int)rep->value.integer;
-    //oc_send_cbor_response(request, OC_STATUS_CHANGED);
+    // oc_send_cbor_response(request, OC_STATUS_CHANGED);
     oc_send_cbor_response_with_payload_size(request, OC_STATUS_CHANGED, 0);
     oc_storage_write(KNX_STORAGE_SA, (uint8_t *)&(rep->value.integer), 1);
     return;
@@ -806,7 +806,7 @@ oc_core_dev_da_put_handler(oc_request_t *request,
     PRINT("  oc_core_dev_da_put_handler received : %d\n",
           (int)rep->value.integer);
     device->da = (uint32_t)rep->value.integer;
-    //oc_send_cbor_response(request, OC_STATUS_CHANGED);
+    // oc_send_cbor_response(request, OC_STATUS_CHANGED);
     oc_send_cbor_response_with_payload_size(request, OC_STATUS_CHANGED, 0);
     oc_storage_write(KNX_STORAGE_DA, (uint8_t *)&(rep->value.integer), 1);
     return;
@@ -879,7 +879,7 @@ oc_core_dev_port_put_handler(oc_request_t *request,
     PRINT("  oc_core_dev_port_put_handler received : %d\n",
           (int)rep->value.integer);
     device->port = (uint32_t)rep->value.integer;
-    //oc_send_cbor_response(request, OC_STATUS_CHANGED);
+    // oc_send_cbor_response(request, OC_STATUS_CHANGED);
     oc_send_cbor_response_with_payload_size(request, OC_STATUS_CHANGED, 0);
     oc_storage_write(KNX_STORAGE_PORT, (uint8_t *)&(rep->value.integer), 1);
     return;

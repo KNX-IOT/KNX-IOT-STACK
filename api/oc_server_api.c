@@ -92,8 +92,8 @@ oc_send_cbor_response(oc_request_t *request, oc_status_t response_code)
 {
   if (request && request->response && request->response->response_buffer) {
     request->response->response_buffer->content_format = APPLICATION_CBOR;
-    if ((response_code == OC_STATUS_OK) || 
-      (response_code == OC_STATUS_CHANGED) ) {
+    if ((response_code == OC_STATUS_OK) ||
+        (response_code == OC_STATUS_CHANGED)) {
       request->response->response_buffer->response_length = response_length();
     } else {
       request->response->response_buffer->response_length = 0;
@@ -103,9 +103,10 @@ oc_send_cbor_response(oc_request_t *request, oc_status_t response_code)
   }
 }
 
-void oc_send_cbor_response_with_payload_size(oc_request_t *request,
-                                             oc_status_t response_code,
-                                             size_t payload_size)
+void
+oc_send_cbor_response_with_payload_size(oc_request_t *request,
+                                        oc_status_t response_code,
+                                        size_t payload_size)
 {
   if (request && request->response && request->response->response_buffer) {
     request->response->response_buffer->content_format = APPLICATION_CBOR;

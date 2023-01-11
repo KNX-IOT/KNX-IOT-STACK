@@ -206,7 +206,7 @@ oc_knx_swu_maxdefer_put_handler(oc_request_t *request,
     g_swu_max_defer = (int)rep->value.integer;
     oc_storage_write(KNX_STORAGE_SWU_MAX_DEFER, (uint8_t *)&g_swu_max_defer,
                      sizeof(g_swu_max_defer));
-    //oc_send_cbor_response(request, OC_STATUS_OK);
+    // oc_send_cbor_response(request, OC_STATUS_OK);
     oc_send_cbor_response_with_payload_size(request, OC_STATUS_OK, 0);
     return;
   }
@@ -401,7 +401,7 @@ oc_knx_swu_update_put_handler(oc_request_t *request,
     PRINT("  oc_knx_swu_update_put_handler received : %d\n",
           (int)rep->value.integer);
     oc_send_cbor_response_with_payload_size(request, OC_STATUS_OK, 0);
-    //oc_send_cbor_response(request, OC_STATUS_OK);
+    // oc_send_cbor_response(request, OC_STATUS_OK);
     return;
   }
 

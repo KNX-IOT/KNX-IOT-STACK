@@ -306,7 +306,7 @@ oc_core_a_sen_post_handler(oc_request_t *request,
     // renew the credentials.
     // note: this is optional for now
 
-   // oc_send_cbor_response(request, OC_STATUS_CHANGED);
+    // oc_send_cbor_response(request, OC_STATUS_CHANGED);
     oc_send_cbor_response_with_payload_size(request, OC_STATUS_CHANGED, 0);
     return;
   }
@@ -673,7 +673,7 @@ oc_core_auth_at_post_handler(oc_request_t *request,
   // add the oscore contexts by reinitializing all used oscore keys.
   oc_init_oscore_from_storage(device_index, false);
   PRINT("oc_core_auth_at_post_handler - end\n");
-  //oc_send_cbor_response(request, OC_STATUS_CHANGED);
+  // oc_send_cbor_response(request, OC_STATUS_CHANGED);
   oc_send_cbor_response_with_payload_size(request, OC_STATUS_CHANGED, 0);
 }
 

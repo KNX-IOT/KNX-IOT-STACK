@@ -948,7 +948,6 @@ void oc_send_response(oc_request_t *request, oc_status_t response_code);
  */
 void oc_send_cbor_response(oc_request_t *request, oc_status_t response_code);
 
-
 /**
  * @brief Called after the response to a GET, PUT, POST or DELETE call has been
  * prepared completed. will respond with CBOR.
@@ -964,7 +963,9 @@ void oc_send_cbor_response(oc_request_t *request, oc_status_t response_code);
  * @param response_code the status of the response
  * @param payload_size the payload size of the response
  */
-void oc_send_cbor_response_with_payload_size(oc_request_t *request, oc_status_t response_code, size_t payload_size);
+void oc_send_cbor_response_with_payload_size(oc_request_t *request,
+                                             oc_status_t response_code,
+                                             size_t payload_size);
 
 /**
  * @brief Called after the response to a GET, PUT, POST or DELETE call has been
