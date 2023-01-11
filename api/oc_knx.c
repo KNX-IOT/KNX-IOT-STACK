@@ -885,7 +885,8 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
     return;
   }
   // send the response
-  oc_send_cbor_response(request, OC_STATUS_OK);
+  //oc_send_cbor_response(request, OC_STATUS_OK);
+  oc_send_cbor_response_with_payload_size(request, OC_STATUS_OK, 0);
 }
 
 void
@@ -1036,8 +1037,8 @@ oc_core_knx_ia_post_handler(oc_request_t *request,
       knx_publish_service(oc_string(device->serialnumber), device->iid,
                           device->ia, device->pm);
     }
-
-    oc_send_cbor_response(request, OC_STATUS_CHANGED);
+    //oc_send_cbor_response(request, OC_STATUS_CHANGED);
+    oc_send_cbor_response_with_payload_size(request, OC_STATUS_CHANGED, 0);
   } else {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
   }
