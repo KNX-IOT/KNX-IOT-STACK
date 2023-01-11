@@ -92,6 +92,16 @@ void oc_knx_device_storage_reset(size_t device_index, int reset_mode);
  */
 bool oc_knx_device_in_programming_mode(size_t device_index);
 
+/**
+ * @brief function set the programming mode of the device to true or false
+ *
+ * @param device_index the device index
+ * @param programming_mode true to set the device in programming mode, false
+ * otherwise
+ */
+void oc_knx_device_set_programming_mode(size_t device_index,
+                                        bool programming_mode);
+
 #ifdef __cplusplus
 }
 #endif
