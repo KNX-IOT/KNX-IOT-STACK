@@ -347,7 +347,7 @@ coap_receive(oc_message_t *msg)
     /* handle requests */
     if (message->code >= COAP_GET && message->code <= COAP_DELETE) {
 
-#ifdef OC_DEBUG
+#ifdef OC_DEBUGx
       switch (message->code) {
       case COAP_GET:
         PRINT("  method: GET");
