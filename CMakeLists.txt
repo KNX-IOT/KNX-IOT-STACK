@@ -208,6 +208,11 @@ add_library(kisClientServer
     ${API_SOURCES}
 )
 target_compile_definitions(kisClientServer PUBLIC OC_CLIENT OC_SERVER)
+
+if (OC_USE_STORAGE)
+    target_compile_definitions(kisClientServer PUBLIC OC_USE_STORAGE)
+endif()
+
 target_link_libraries(kisClientServer PUBLIC
     kis-common
     mbedtls
