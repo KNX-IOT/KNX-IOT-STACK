@@ -48,8 +48,9 @@ increment_ssn_in_context(oc_oscore_context_t *ctx)
     memcpy(key_buf, OSCORE_STORAGE_PREFIX, OSCORE_STORAGE_PREFIX_LEN);
     memcpy(key_buf + OSCORE_STORAGE_PREFIX_LEN, ctx->sendid, ctx->sendid_len);
     key_buf[OSCORE_STORAGE_KEY_LEN - 1] = '\0';
-
+#ifdef OC_USE_STORAGE
     oc_storage_write(key_buf, (uint8_t *)&ctx->ssn, sizeof(ctx->ssn));
+#endif
   }
 }
 
