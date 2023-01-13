@@ -432,7 +432,7 @@ oc_oscore_send_multicast_message(oc_message_t *message)
   group_address = message->endpoint.group_address;
   if (group_address == 0) {
     OC_ERR("group_address id == 0");
-    return -1;
+    goto oscore_group_send_error;
   }
 
   oc_oscore_context_t *oscore_ctx =
