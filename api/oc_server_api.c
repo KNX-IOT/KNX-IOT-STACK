@@ -105,7 +105,7 @@ oc_send_cbor_response(oc_request_t *request, oc_status_t response_code)
 
 void
 oc_send_cbor_response_no_payload_size(oc_request_t *request,
-                                        oc_status_t response_code)
+                                      oc_status_t response_code)
 {
   oc_send_cbor_response_with_payload_size(request, response_code, 0);
 }
