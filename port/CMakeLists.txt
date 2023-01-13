@@ -27,6 +27,10 @@ if(UNIX OR WIN32)
         target_compile_definitions(kis-port INTERFACE OC_LOG_TO_FILE)
     endif()
 
+    if (OC_USE_STORAGE)
+        target_compile_definitions(kis-port PUBLIC OC_USE_STORAGE)
+    endif()
+
     target_include_directories(kis-port PUBLIC 
         ${PORT_DIR}
         ${PROJECT_SOURCE_DIR}
