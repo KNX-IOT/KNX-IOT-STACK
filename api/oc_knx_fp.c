@@ -511,7 +511,7 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   PRINT("oc_core_fp_g_post_handler status=%d - end\n", (int)status_ok);
   if (status_ok) {
     oc_knx_increase_fingerprint();
-    oc_send_cbor_response_with_payload_size(request, OC_STATUS_CHANGED, 0);
+    oc_send_cbor_response_no_payload_size(request, OC_STATUS_CHANGED);
     return;
   }
   oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
@@ -608,7 +608,7 @@ oc_core_fp_g_x_del_handler(oc_request_t *request,
   oc_dump_group_object_table_entry(index);
 
   PRINT("oc_core_fp_g_x_del_handler - end\n");
-  oc_send_cbor_response(request, OC_STATUS_DELETED);
+  oc_send_cbor_response_no_payload_size(request, OC_STATUS_DELETED);
 }
 
 void
@@ -819,7 +819,7 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   oc_knx_increase_fingerprint();
   PRINT("oc_core_fp_p_post_handler - end\n");
   // oc_send_cbor_response(request, OC_STATUS_OK);
-  oc_send_cbor_response_with_payload_size(request, OC_STATUS_CHANGED, 0);
+  oc_send_cbor_response_no_payload_size(request, OC_STATUS_CHANGED);
 }
 
 void
@@ -941,7 +941,7 @@ oc_core_fp_p_x_del_handler(oc_request_t *request,
   oc_knx_increase_fingerprint();
   PRINT("oc_core_fp_p_x_del_handler - end\n");
 
-  oc_send_cbor_response(request, OC_STATUS_DELETED);
+  oc_send_cbor_response_no_payload_size(request, OC_STATUS_DELETED);
 }
 
 void
@@ -1130,7 +1130,7 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 
   PRINT("oc_core_fp_r_post_handler - end\n");
   // oc_send_cbor_response(request, OC_STATUS_OK);
-  oc_send_cbor_response_with_payload_size(request, OC_STATUS_CHANGED, 0);
+  oc_send_cbor_response_no_payload_size(request, OC_STATUS_CHANGED);
 }
 
 void
@@ -1246,7 +1246,7 @@ oc_core_fp_r_x_del_handler(oc_request_t *request,
 
   PRINT("oc_core_fp_r_x_del_handler - end\n");
 
-  oc_send_cbor_response(request, OC_STATUS_OK);
+  oc_send_cbor_response_no_payload_size(request, OC_STATUS_DELETED);
 }
 
 void

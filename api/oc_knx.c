@@ -886,7 +886,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
   }
   // send the response
   // oc_send_cbor_response(request, OC_STATUS_OK);
-  oc_send_cbor_response_with_payload_size(request, OC_STATUS_OK, 0);
+  oc_send_cbor_response_no_payload_size(request, OC_STATUS_OK);
 }
 
 void
@@ -1038,7 +1038,7 @@ oc_core_knx_ia_post_handler(oc_request_t *request,
                           device->ia, device->pm);
     }
     // oc_send_cbor_response(request, OC_STATUS_CHANGED);
-    oc_send_cbor_response_with_payload_size(request, OC_STATUS_CHANGED, 0);
+    oc_send_cbor_response_no_payload_size(request, OC_STATUS_CHANGED);
   } else {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
   }

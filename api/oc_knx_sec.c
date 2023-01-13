@@ -307,7 +307,7 @@ oc_core_a_sen_post_handler(oc_request_t *request,
     // note: this is optional for now
 
     // oc_send_cbor_response(request, OC_STATUS_CHANGED);
-    oc_send_cbor_response_with_payload_size(request, OC_STATUS_CHANGED, 0);
+    oc_send_cbor_response_no_payload_size(request, OC_STATUS_CHANGED);
     return;
   }
   oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
@@ -674,7 +674,7 @@ oc_core_auth_at_post_handler(oc_request_t *request,
   oc_init_oscore_from_storage(device_index, false);
   PRINT("oc_core_auth_at_post_handler - end\n");
   // oc_send_cbor_response(request, OC_STATUS_CHANGED);
-  oc_send_cbor_response_with_payload_size(request, OC_STATUS_CHANGED, 0);
+  oc_send_cbor_response_no_payload_size(request, OC_STATUS_CHANGED);
 }
 
 static void
@@ -685,9 +685,18 @@ oc_core_auth_at_delete_handler(oc_request_t *request,
   (void)iface_mask;
   PRINT("oc_core_auth_at_delete_handler\n");
 
+  if (request->accept != APPLICATION_CBOR) {
+    request->response->response_buffer->code =
+      oc_status_code(OC_STATUS_BAD_REQUEST);
+    return;
+  }
+
   size_t device_index = request->resource->device;
 
   oc_delete_at_table(device_index);
+
+  PRINT("oc_core_auth_at_delete_handler - end\n");
+  oc_send_cbor_response_no_payload_size(request, OC_STATUS_DELETED);
 }
 
 void
@@ -907,7 +916,7 @@ oc_core_auth_at_x_delete_handler(oc_request_t *request,
   // remove the key by reinitializing all used oscore keys.
   oc_init_oscore_from_storage(device_index, false);
   PRINT("oc_core_auth_at_x_delete_handler - done\n");
-  oc_send_cbor_response(request, OC_STATUS_OK);
+  oc_send_cbor_response_no_payload_size(request, OC_STATUS_DELETED);
 }
 
 void
