@@ -79,7 +79,7 @@ typedef uint64_t oc_clock_time_t;
 #define OC_MAX_APP_DATA_SIZE (2048)
 
 /* Maximum number of concurrent requests */
-#define OC_MAX_NUM_CONCURRENT_REQUESTS (5)
+#define OC_MAX_NUM_CONCURRENT_REQUESTS (20)
 
 /* Maximum number of nodes in a payload tree structure */
 #define OC_MAX_NUM_REP_OBJECTS (150)
