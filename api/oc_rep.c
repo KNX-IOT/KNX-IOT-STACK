@@ -325,8 +325,10 @@ get_tagged_value:
       oc_parse_rep_value(&map, obj, err);
       if (*err != CborNoError)
         return;
-      (*obj)->next = NULL;
-      obj = &(*obj)->next;
+      if ((obj) && (*obj)){
+        (*obj)->next = NULL;
+        obj = &(*obj)->next;
+      }
       *err |= cbor_value_advance(&map);
     }
     cur->type = OC_REP_OBJECT;
@@ -435,7 +437,7 @@ get_tagged_value:
           *err |= CborErrorIllegalType;
           return;
         } else {
-          if ((*prev) != NULL) {
+          if (prev && (*prev) != NULL) {
             (*prev)->next = _alloc_rep();
             if ((*prev)->next == NULL) {
               *err = CborErrorOutOfMemory;
@@ -493,7 +495,9 @@ oc_parse_rep(const uint8_t *in_payload, int payload_size, oc_rep_t **out_rep)
       if (err != CborNoError)
         return err;
       err |= cbor_value_advance(&cur_value);
-      cur = &(*cur)->next;
+      if (*cur) {
+        cur = &(*cur)->next;
+      }
     }
   } else if (cbor_value_is_array(&root_value)) {
     *out_rep = 0;
@@ -511,11 +515,15 @@ oc_parse_rep(const uint8_t *in_payload, int payload_size, oc_rep_t **out_rep)
         if (err != CborNoError)
           return err;
         err |= cbor_value_advance(&cur_value);
-        (*kv)->next = 0;
-        kv = &(*kv)->next;
+        if ((kv) && (*kv)) {
+          (*kv)->next = 0;
+          kv = &(*kv)->next;
+        }
       }
       (*cur)->next = 0;
-      cur = &(*cur)->next;
+      if (*cur) {
+        cur = &(*cur)->next;
+      }
       if (err != CborNoError)
         return err;
       err |= cbor_value_advance(&map);
@@ -1379,15 +1387,21 @@ py_oc_rep_to_json(oc_rep_t *rep, char *buf, size_t buf_size, bool pretty_print)
     oc_rep_to_json_format(rep, buf, buf_size, tab, pretty_print);
   OC_JSON_UPDATE_BUFFER_AND_TOTAL;
 
-  char *found = strchr((const char *)my_buf, ':');
+  char *found = NULL;
+  if (my_buf) {
+    found = strchr((const char *)my_buf, ':');
+  }
   if (found != NULL) {
     // content is an object
     object = true;
     my_buf[0] = '{';
   } else {
     // check if the contents maybe an array
-    char *found = strchr((const char *)my_buf, ',');
-    if (found != NULL) {
+    char *found_comma = NULL;
+    if (my_buf) {
+      found_comma = strchr((const char *)my_buf, ',');
+    }
+    if (found_comma != NULL) {
       // content is an array
       object_array = true;
       my_buf[0] = '[';
