@@ -222,7 +222,7 @@ oc_oscore_add_context(size_t device, const char *senderid,
   PRINT("  recipient %s\n", recipientid);
   PRINT("  desc      %s\n", desc);
   PRINT("  token_id  %s\n", token_id);
-  PRINT("  ssn       %ld\n", ssn);
+  //PRINT("  ssn       %ld\n", ssn);
   PRINT("  ms      ");
   int length = strlen(mastersecret);
   for (int i = 0; i < length; i++) {
