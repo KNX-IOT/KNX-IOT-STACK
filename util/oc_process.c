@@ -332,8 +332,8 @@ oc_process_post(struct oc_process *p, oc_process_event_t ev,
     OC_PROCESS_NUMEVENTS <<= 1;
     // check this with s-mode
     struct event_data *new_event;
-    new_event = (struct event_data *)realloc(events, (OC_PROCESS_NUMEVENTS) *
-                                                    sizeof(struct event_data));
+    new_event = (struct event_data *)realloc(
+      events, (OC_PROCESS_NUMEVENTS) * sizeof(struct event_data));
     if (new_event == NULL) {
       free(events);
     }

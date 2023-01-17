@@ -79,7 +79,7 @@ OC_PROCESS(timed_callback_events, "OC timed callbacks");
 oc_event_callback_retval_t oc_remove_ping_handler(void *data);
 #endif /* OC_TCP */
 
-//extern int strncasecmp(const char *s1, const char *s2, size_t n);
+// extern int strncasecmp(const char *s1, const char *s2, size_t n);
 
 static unsigned int oc_coap_status_codes[__NUM_OC_STATUS_CODES__];
 

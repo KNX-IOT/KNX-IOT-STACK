@@ -495,7 +495,7 @@ oc_knx_swu_a_put_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 
   bool berr =
     oc_get_request_payload_raw(request, &payload, &len, &content_format);
-  //PRINT("      raw buffer ok: %d len=%d\n", berr, len);
+  // PRINT("      raw buffer ok: %d len=%d\n", berr, len);
 
   oc_swu_t *my_cb = oc_get_swu_cb();
   if (my_cb && my_cb->cb) {

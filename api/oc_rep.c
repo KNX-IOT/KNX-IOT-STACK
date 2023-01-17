@@ -325,7 +325,7 @@ get_tagged_value:
       oc_parse_rep_value(&map, obj, err);
       if (*err != CborNoError)
         return;
-      if ((obj) && (*obj)){
+      if ((obj) && (*obj)) {
         (*obj)->next = NULL;
         obj = &(*obj)->next;
       }

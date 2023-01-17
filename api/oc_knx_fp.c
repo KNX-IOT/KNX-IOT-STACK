@@ -1731,9 +1731,9 @@ oc_load_group_rp_table_entry(int entry, char *Store,
               free(rp_table[entry].ga);
             }
             PRINT("  ga size %d\n", array_size);
-            //if (rp_table[entry].ga) {
-            //  free(rp_table[entry].ga);
-            //}
+            // if (rp_table[entry].ga) {
+            //   free(rp_table[entry].ga);
+            // }
             rp_table[entry].ga = new_array;
           }
           break;
