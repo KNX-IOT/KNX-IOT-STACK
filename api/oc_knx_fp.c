@@ -126,16 +126,18 @@ oc_core_set_group_object_table(int index, oc_group_object_table_t entry)
   oc_new_string(&g_got[index].href, oc_string(entry.href),
                 oc_string_len(entry.href));
   /* copy the ga array */
-  g_got[index].ga_len = entry.ga_len;
+  g_got[index].ga_len = 0;
   uint32_t *new_array = (uint32_t *)malloc(entry.ga_len * sizeof(uint32_t));
 
-  if (new_array != NULL) {
+  if ((new_array != NULL) && (entry.ga_len > 0)) {
     for (int i = 0; i < entry.ga_len; i++) {
+#pragma warning(suppress : 6386)
       new_array[i] = entry.ga[i];
     }
     if (g_got[index].ga != 0) {
       free(g_got[index].ga);
     }
+    g_got[index].ga_len = entry.ga_len;
     g_got[index].ga = new_array;
   }
   return 0;
@@ -1481,8 +1483,9 @@ oc_load_group_object_table_entry(int entry)
             int array_size = (int)oc_int_array_size(rep->value.array);
             uint32_t *new_array =
               (uint32_t *)malloc(array_size * sizeof(uint32_t));
-            if (new_array) {
+            if ((new_array) && (array_size > 0)) {
               for (int i = 0; i < array_size; i++) {
+#pragma warning(suppress : 6386)
                 new_array[i] = (uint32_t)arr[i];
               }
               if (g_got[entry].ga != 0) {
@@ -1716,19 +1719,21 @@ oc_load_group_rp_table_entry(int entry, char *Store,
             int array_size = (int)oc_int_array_size(rep->value.array);
             uint32_t *new_array =
               (uint32_t *)malloc(array_size * sizeof(uint32_t));
-            if (new_array != 0) {
+            if ((new_array != NULL) && (array_size > 0)) {
               for (int i = 0; i < array_size; i++) {
+#pragma warning(suppress : 6386)
                 new_array[i] = (uint32_t)arr[i];
               }
+              // assign only when the new array is allocated correctly
+              rp_table[entry].ga_len = array_size;
             }
             if (rp_table[entry].ga != 0) {
               free(rp_table[entry].ga);
             }
             PRINT("  ga size %d\n", array_size);
-            rp_table[entry].ga_len = array_size;
-            if (rp_table[entry].ga) {
-              free(rp_table[entry].ga);
-            }
+            // if (rp_table[entry].ga) {
+            //   free(rp_table[entry].ga);
+            // }
             rp_table[entry].ga = new_array;
           }
           break;
@@ -1871,13 +1876,15 @@ oc_core_add_rp_entry(int index, oc_group_rp_table_t *rp_table,
   rp_table[index].grpid = entry.grpid;
 
   // Copy group addresses
-  rp_table[index].ga_len = entry.ga_len;
+  rp_table[index].ga_len = 0;
   uint32_t *new_array = (uint32_t *)malloc(entry.ga_len * sizeof(uint32_t));
-
-  if (new_array != NULL) {
+  if ((new_array != NULL) && (entry.ga_len > 0)) {
     for (int i = 0; i < entry.ga_len; i++) {
+#pragma warning(suppress : 6386)
       new_array[i] = entry.ga[i];
     }
+    // copy only when the allocation was done correctly
+    rp_table[index].ga_len = entry.ga_len;
     if (rp_table[index].ga != 0) {
       free(rp_table[index].ga);
     }

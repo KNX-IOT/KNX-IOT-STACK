@@ -156,7 +156,7 @@ exit_process(struct oc_process *p, struct oc_process *fromprocess)
     oc_process_list = oc_process_list->next;
   } else {
     for (q = oc_process_list; q != NULL; q = q->next) {
-      if (q->next == p) {
+      if (p && q->next == p) {
         q->next = p->next;
         break;
       }
@@ -331,8 +331,13 @@ oc_process_post(struct oc_process *p, oc_process_event_t ev,
 #ifdef OC_DYNAMIC_ALLOCATION
     OC_PROCESS_NUMEVENTS <<= 1;
     // check this with s-mode
-    events = (struct event_data *)realloc(events, (OC_PROCESS_NUMEVENTS) *
-                                                    sizeof(struct event_data));
+    struct event_data *new_event;
+    new_event = (struct event_data *)realloc(
+      events, (OC_PROCESS_NUMEVENTS) * sizeof(struct event_data));
+    if (new_event == NULL) {
+      free(events);
+    }
+    events = new_event;
     if (!events) {
       oc_abort("Insufficient memory");
     }
