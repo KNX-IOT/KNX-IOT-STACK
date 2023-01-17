@@ -76,7 +76,8 @@ _oc_memb_alloc(
     }
 
     if (i < m->num) {
-      ptr = (void *)((char *)m->mem + (i * m->size));
+      int offset = i * (int)m->size;
+      ptr = (void *)((char *)m->mem + offset);
       memset(ptr, 0, m->size);
     }
   }
