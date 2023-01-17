@@ -2,6 +2,7 @@
 // Copyright (c) 2017 Lynx Technology
 // Copyright (c) 2018 Intel Corporation
 // Copyright (c) 2019 Kistler Instrumente AG
+// Copyright (c) 2023 Cascoda Ltd.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -1195,7 +1196,7 @@ oc_send_discovery_request(oc_message_t *message)
       if (IN6_IS_ADDR_LINKLOCAL(&addr->sin6_addr)) {
         unsigned int hops = 1;
         if (setsockopt(dev->server_sock, IPPROTO_IPV6, IPV6_MULTICAST_HOPS,
-                       &hops, sizeof(hops)) == SOCKET_ERROR) {
+                       (char *)&hops, sizeof(hops)) == SOCKET_ERROR) {
           OC_ERR("setting socket option for default IPV6_MULTICAST_IF: %d",
                  WSAGetLastError());
           goto done;
@@ -1204,7 +1205,7 @@ oc_send_discovery_request(oc_message_t *message)
       } else {
         unsigned int hops = 255;
         if (setsockopt(dev->server_sock, IPPROTO_IPV6, IPV6_MULTICAST_HOPS,
-                       &hops, sizeof(hops)) == SOCKET_ERROR) {
+                       (char*)&hops, sizeof(hops)) == SOCKET_ERROR) {
           OC_ERR("setting socket option for default IPV6_MULTICAST_IF: %d",
                  WSAGetLastError());
           goto done;
