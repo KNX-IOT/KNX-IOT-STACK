@@ -1205,7 +1205,7 @@ oc_send_discovery_request(oc_message_t *message)
       } else {
         unsigned int hops = 255;
         if (setsockopt(dev->server_sock, IPPROTO_IPV6, IPV6_MULTICAST_HOPS,
-                       (char*)&hops, sizeof(hops)) == SOCKET_ERROR) {
+                       (char *)&hops, sizeof(hops)) == SOCKET_ERROR) {
           OC_ERR("setting socket option for default IPV6_MULTICAST_IF: %d",
                  WSAGetLastError());
           goto done;
