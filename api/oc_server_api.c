@@ -308,16 +308,11 @@ void
 oc_resource_bind_dpt(oc_resource_t *resource, const char *dpt)
 {
   if (resource) {
+    oc_free_string(&resource->dpt);
+    memset(&resource->dpt, 0, sizeof(oc_string_t));
     if (dpt) {
-      if (oc_string_len(resource->dpt)) {
-        oc_free_string(&resource->dpt);
-        memset(&resource->dpt, 0, sizeof(oc_string_t));
-      }
       oc_new_string(&resource->dpt, dpt, strlen(dpt));
-    } else {
-      memset(&resource->dpt, 0, sizeof(oc_string_t));
     }
-
   } else {
     OC_ERR("oc_resource_bind_dpt: resource is NULL");
   }
