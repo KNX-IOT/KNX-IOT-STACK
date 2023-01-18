@@ -1093,14 +1093,14 @@ oc_at_dump_entry(size_t device_index, int entry)
   oc_rep_i_set_int(root, 38, g_at_entries[entry].profile);
 
   oc_rep_i_set_byte_string(root, 840, oc_string(g_at_entries[entry].osc_id),
-                           oc_string_len(g_at_entries[entry].osc_contextid));
+                           oc_string_len(g_at_entries[entry].osc_id));
   oc_rep_i_set_byte_string(root, 842, oc_string(g_at_entries[entry].osc_ms),
                            oc_string_len(g_at_entries[entry].osc_ms));
   oc_rep_i_set_byte_string(root, 844, oc_string(g_at_entries[entry].osc_alg),
                            oc_string_len(g_at_entries[entry].osc_alg));
   oc_rep_i_set_byte_string(root, 846,
                            oc_string(g_at_entries[entry].osc_contextid),
-                           oc_string_len(g_at_entries[entry].osc_id));
+                           oc_string_len(g_at_entries[entry].osc_contextid));
   oc_rep_i_set_text_string(root, 82, oc_string(g_at_entries[entry].sub));
   oc_rep_i_set_text_string(root, 81, oc_string(g_at_entries[entry].kid));
 
