@@ -600,7 +600,8 @@ coap_oscore_parse_options(void *packet, uint8_t *data, uint32_t data_len,
       ++current_option;
     } else if (option_length == 14) {
       option_length += 255;
-      option_length += current_option[0] << 8;
+      uint64_t option_shift = current_option[0];
+      option_length += option_shift << 8;
       ++current_option;
       option_length += current_option[0];
       ++current_option;
