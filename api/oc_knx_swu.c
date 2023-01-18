@@ -457,6 +457,7 @@ oc_knx_swu_a_put_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 {
   (void)data;
   (void)iface_mask;
+  int binary_size = 0;
   int block_size = 0;
   int block_offset = 0;
   char *key = 0;
@@ -484,7 +485,11 @@ oc_knx_swu_a_put_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     if (strncmp(key, "ps", key_len) == 0) {
       block_size = atoi(value);
     }
+    if (strncmp(key, "pkgs", key_len) == 0) {
+      binary_size = atoi(value);
+    }
   }
+  PRINT("binary_size: %d\n", binary_size);
   PRINT("block_size: %d\n", block_size);
   PRINT("block_offset: %d\n", block_offset);
   // if (block_size == 0) {
@@ -499,7 +504,8 @@ oc_knx_swu_a_put_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 
   oc_swu_t *my_cb = oc_get_swu_cb();
   if (my_cb && my_cb->cb) {
-    my_cb->cb(device_index, block_offset, (uint8_t *)payload, len, my_cb->data);
+    my_cb->cb(device_index, binary_size, block_offset, (uint8_t *)payload, len,
+              my_cb->data);
   }
 
   PRINT("  oc_knx_swu_a_put_handler : End\n");
