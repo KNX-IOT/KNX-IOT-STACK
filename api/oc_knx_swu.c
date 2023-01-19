@@ -470,9 +470,13 @@ oc_knx_swu_a_put_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 
   static oc_separate_response_t s_delayed_response_swu;
 
-  PRINT("  oc_knx_swu_a_put_handler : Start\n");
+  oc_swu_t *my_cb = oc_get_swu_cb();
+  if (my_cb && my_cb->cb)
+    oc_indicate_separate_response(request, &s_delayed_response_swu);
+  else
+    (void)s_delayed_response_swu;
 
-  oc_indicate_separate_response(request, &s_delayed_response_swu);
+  PRINT("  oc_knx_swu_a_put_handler : Start\n");
 
   /* check if the accept header is CBOR-format */
   if (request->accept != APPLICATION_OCTET_STREAM) {
@@ -506,13 +510,11 @@ oc_knx_swu_a_put_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     oc_get_request_payload_raw(request, &payload, &len, &content_format);
   // PRINT("      raw buffer ok: %d len=%d\n", berr, len);
 
-  oc_swu_t *my_cb = oc_get_swu_cb();
   if (my_cb && my_cb->cb) {
     my_cb->cb(device_index, &s_delayed_response_swu, binary_size, block_offset,
               (uint8_t *)payload, len, my_cb->data);
   } else {
-    oc_set_separate_response_buffer(&s_delayed_response_swu);
-    oc_send_separate_response(&s_delayed_response_swu, OC_STATUS_CHANGED);
+    oc_send_json_response(request, OC_STATUS_OK);
   }
 
   PRINT("  oc_knx_swu_a_put_handler : End\n");
