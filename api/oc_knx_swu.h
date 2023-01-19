@@ -120,13 +120,17 @@ void oc_swu_set_result(oc_swu_result_t result);
  * Callback invoked by the stack to set the software
  *
  * @param[in] device the device index
+ * @param[in] response the instance of an internal struct that is used to track
+ *                     the state of the separate response
+ * @param[in] binary_size the full size of the binary
  * @param[in] block_offset the offset (in the file)
  * @param[in] block_data the block data
  * @param[in] block_len the size of the block_data
  * @param[in] data the user supplied data
  *
  */
-typedef void (*oc_swu_cb_t)(size_t device, size_t block_offset,
+typedef void (*oc_swu_cb_t)(size_t device, oc_separate_response_t *response,
+                            size_t binary_size, size_t block_offset,
                             uint8_t *block_data, size_t block_len, void *data);
 
 /**

@@ -960,25 +960,17 @@ hostname_cb(size_t device_index, oc_string_t host_name, void *data)
 
 /* separate files for each call to transport a block of data*/
 void
-swu_cb(size_t device, size_t offset, uint8_t *payload, size_t len, void *data)
+swu_cb(size_t device, oc_separate_response_t *response, size_t binary_size,
+       size_t offset, uint8_t *payload, size_t len, void *data)
 {
-  char *fname = (char *)data;
+  (void)response;
+  (void)binary_size;
   char filename[] = "./downloaded.bin";
   PRINT(" swu_cb %s block=%d size=%d \n", filename, (int)offset, (int)len);
 
-  return;
-
-  FILE *fp = fopen(filename, "rwb");
-  if (fp) {
-    fseek(fp, offset, SEEK_SET);
-    size_t written = fwrite(payload, len, 1, fp);
-    if (written != len) {
-      PRINT(" swu_cb returned %d != %d (expected)\n", (int)written, (int)len);
-    }
-    fclose(fp);
-  } else {
-    PRINT(" swu_cb no file : %s \n", filename);
-  }
+  FILE *write_ptr = fopen("downloaded_bin", "ab");
+  size_t r = fwrite(payload, sizeof(*payload), len, write_ptr);
+  fclose(write_ptr);
 }
 
 /**
