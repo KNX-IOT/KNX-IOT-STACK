@@ -218,7 +218,7 @@ void
 coap_clear_transaction(coap_transaction_t *t)
 {
   // to prevent double frees
-  oc_remove_delayed_callback(t, clear_transaction_cb);
+  //oc_remove_delayed_callback(t, clear_transaction_cb);
   if (t) {
     OC_DBG("Freeing transaction %u: %p", t->mid, (void *)t);
 
