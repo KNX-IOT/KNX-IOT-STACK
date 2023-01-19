@@ -416,7 +416,7 @@ static oc_event_callback_retval_t send_delayed_response(void *context)
 /**
  * @brief software update callback
  *
- * @param device_index the device index
+ * @param device the device index
  * @param response the instance of an internal struct that is used to track
  *      	         the state of the separate response
  * @param binary_size the full size of the binary
