@@ -963,7 +963,7 @@ void
 swu_cb(size_t device, oc_separate_response_t *response, size_t binary_size,
        size_t offset, uint8_t *payload, size_t len, void *data)
 {
-  (void)response;
+  (void)device;
   (void)binary_size;
   char filename[] = "./downloaded.bin";
   PRINT(" swu_cb %s block=%d size=%d \n", filename, (int)offset, (int)len);
@@ -971,6 +971,9 @@ swu_cb(size_t device, oc_separate_response_t *response, size_t binary_size,
   FILE *write_ptr = fopen("downloaded_bin", "ab");
   size_t r = fwrite(payload, sizeof(*payload), len, write_ptr);
   fclose(write_ptr);
+
+  oc_set_separate_response_buffer(response);
+  oc_send_separate_response(response, OC_STATUS_CHANGED);
 }
 
 /**

@@ -444,7 +444,6 @@ swu_cb(size_t device_index, oc_separate_response_t *response,
        void *data)
 {
   (void)device_index;
-  (void)response;
   (void)binary_size;
   char *fname = (char *)data;
   PRINT(" swu_cb %s block=%d size=%d \n", fname, (int)offset, (int)len);
@@ -456,6 +455,9 @@ swu_cb(size_t device_index, oc_separate_response_t *response,
     PRINT(" swu_cb returned %d != %d (expected)\n", (int)written, (int)len);
   }
   fclose(fp);
+
+  oc_set_separate_response_buffer(response);
+  oc_send_separate_response(response, OC_STATUS_CHANGED);
 }
 
 /**
