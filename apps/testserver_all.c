@@ -960,8 +960,11 @@ hostname_cb(size_t device_index, oc_string_t host_name, void *data)
 
 /* separate files for each call to transport a block of data*/
 void
-swu_cb(size_t device, size_t offset, uint8_t *payload, size_t len, void *data)
+swu_cb(size_t device, oc_separate_response_t *response, size_t binary_size,
+       size_t offset, uint8_t *payload, size_t len, void *data)
 {
+  (void)response;
+  (void)binary_size;
   char filename[] = "./downloaded.bin";
   PRINT(" swu_cb %s block=%d size=%d \n", filename, (int)offset, (int)len);
 
