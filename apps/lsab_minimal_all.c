@@ -430,16 +430,22 @@ hostname_cb(size_t device_index, oc_string_t host_name, void *data)
  * @brief software update callback
  *
  * @param device_index the device index
+ * @param response the instance of an internal struct that is used to track
+ *      	         the state of the separate response
+ * @param binary_size the full size of the binary
  * @param offset the offset of the image
  * @param payload the image data
  * @param len the length of the image data
  * @param data the user data
  */
 void
-swu_cb(size_t device_index, size_t offset, uint8_t *payload, size_t len,
+swu_cb(size_t device_index, oc_separate_response_t *response,
+       size_t binary_size, size_t offset, uint8_t *payload, size_t len,
        void *data)
 {
   (void)device_index;
+  (void)response;
+  (void)binary_size;
   char *fname = (char *)data;
   PRINT(" swu_cb %s block=%d size=%d \n", fname, (int)offset, (int)len);
 
