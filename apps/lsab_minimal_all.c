@@ -426,18 +426,16 @@ hostname_cb(size_t device_index, oc_string_t host_name, void *data)
   PRINT("-----host name ------- %s\n", oc_string_checked(host_name));
 }
 
-static oc_event_callback_retval_t send_delayed_response(void *context)
+static oc_event_callback_retval_t
+send_delayed_response(void *context)
 {
   oc_separate_response_t *response = (oc_separate_response_t *)context;
 
-  if (response->active)
-  {
+  if (response->active) {
     oc_set_separate_response_buffer(response);
     oc_send_separate_response(response, OC_STATUS_CHANGED);
     printf("Delayed response sent\n");
-  }
-  else
-  {
+  } else {
     printf("Delayed response NOT active\n");
   }
 
@@ -471,7 +469,6 @@ swu_cb(size_t device, oc_separate_response_t *response, size_t binary_size,
 
   oc_set_delayed_callback(response, &send_delayed_response, 0);
 }
-
 
 /**
  * @brief initializes the global variables

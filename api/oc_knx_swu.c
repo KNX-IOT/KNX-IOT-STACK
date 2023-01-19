@@ -478,7 +478,6 @@ oc_knx_swu_a_put_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 
   PRINT("  oc_knx_swu_a_put_handler : Start\n");
 
-
   /* check if the accept header is CBOR-format */
   if (request->accept != APPLICATION_OCTET_STREAM) {
     request->response->response_buffer->code =
