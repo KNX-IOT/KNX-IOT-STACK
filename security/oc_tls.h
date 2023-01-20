@@ -21,6 +21,7 @@
 #define OC_TLS_H
 
 #include "mbedtls/ssl.h"
+#include "mbedtls/x509_crt.h"
 #include "oc_uuid.h"
 #include "port/oc_connectivity.h"
 #include "util/oc_etimer.h"
