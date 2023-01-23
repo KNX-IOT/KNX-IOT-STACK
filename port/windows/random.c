@@ -21,10 +21,17 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
+static mbedtls_entropy_context entropy_ctx;
+static mbedtls_ctr_drbg_context ctr_drbg_ctx;
+
 void
 oc_random_init(void)
 {
   srand((unsigned)GetTickCount());
+  mbedtls_entropy_init(&entropy_ctx);
+  mbedtls_ctr_drbg_init(&ctr_drbg_ctx);
+  MBEDTLS_MPI_CHK(mbedtls_ctr_drbg_seed(&ctr_drbg_ctx, mbedtls_entropy_func,
+                                        &entropy_ctx, NULL, 0));
 }
 
 unsigned int
@@ -38,4 +45,12 @@ oc_random_value(void)
 void
 oc_random_destroy()
 {
+  mbedtls_ctr_drbg_free(&ctr_drbg_ctx);
+  mbedtls_entropy_free(&entropy_ctx);
 }
+
+mbedtls_ctr_drbg_context *oc_random_get_ctr_drbg_context()
+{
+  return &ctr_drbg_ctx;
+}
+
