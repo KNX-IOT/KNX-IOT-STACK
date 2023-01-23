@@ -33,8 +33,8 @@ oc_random_init(void)
 
   mbedtls_entropy_init(&entropy_ctx);
   mbedtls_ctr_drbg_init(&ctr_drbg_ctx);
-  MBEDTLS_MPI_CHK(mbedtls_ctr_drbg_seed(&ctr_drbg_ctx, mbedtls_entropy_func,
-                                        &entropy_ctx, NULL, 0));
+  mbedtls_ctr_drbg_seed(&ctr_drbg_ctx, mbedtls_entropy_func,
+                                        &entropy_ctx, NULL, 0);
 }
 
 unsigned int
