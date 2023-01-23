@@ -66,7 +66,7 @@ void oc_random_destroy(void);
 
 /**
  * @brief Get the mbedTLS platform RNG context
- * 
+ *
  */
 mbedtls_ctr_drbg_context *oc_random_get_ctr_drbg_context(void);
 

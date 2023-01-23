@@ -30,8 +30,8 @@ oc_random_init(void)
   srand((unsigned)GetTickCount());
   mbedtls_entropy_init(&entropy_ctx);
   mbedtls_ctr_drbg_init(&ctr_drbg_ctx);
-  mbedtls_ctr_drbg_seed(&ctr_drbg_ctx, mbedtls_entropy_func,
-                                        &entropy_ctx, NULL, 0);
+  mbedtls_ctr_drbg_seed(&ctr_drbg_ctx, mbedtls_entropy_func, &entropy_ctx, NULL,
+                        0);
 }
 
 unsigned int
@@ -49,8 +49,8 @@ oc_random_destroy()
   mbedtls_entropy_free(&entropy_ctx);
 }
 
-mbedtls_ctr_drbg_context *oc_random_get_ctr_drbg_context()
+mbedtls_ctr_drbg_context *
+oc_random_get_ctr_drbg_context()
 {
   return &ctr_drbg_ctx;
 }
-
