@@ -57,6 +57,7 @@ static oc_factory_presets_t factory_presets = { NULL, NULL };
 static oc_reset_t app_reset = { NULL, NULL };
 static oc_restart_t app_restart = { NULL, NULL };
 static oc_hostname_t app_hostname = { NULL, NULL };
+static oc_programming_mode_t app_programming_mode = { NULL, NULL };
 static oc_loadstate_t app_loadstate = { NULL, NULL };
 
 // -----------------------------------------------------------------------------
@@ -117,7 +118,20 @@ oc_get_hostname_cb(void)
 {
   return &app_hostname;
 }
+// -----------------------------------------------------------------------------
 
+void
+oc_set_programming_mode_cb(oc_programming_mode_cb_t cb, void *data)
+{
+  app_programming_mode.cb = cb;
+  app_programming_mode.data = data;
+}
+
+oc_programming_mode_t *
+oc_get_programming_mode_cb(void)
+{
+  return &app_programming_mode;
+}
 // -----------------------------------------------------------------------------
 
 void
