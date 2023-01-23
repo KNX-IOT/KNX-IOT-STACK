@@ -285,7 +285,7 @@ oc_main_init(const oc_handler_t *handler)
 #endif
 
 #ifdef OC_SECURITY
-//#ifdef OC_OSCORE
+  //#ifdef OC_OSCORE
 
   ret = oc_tls_init_context();
   if (ret < 0) {
@@ -293,7 +293,7 @@ oc_main_init(const oc_handler_t *handler)
     oc_shutdown_all_devices();
     goto err;
   }
-#endif 
+#endif
 
   for (size_t device = 0; device < oc_core_get_num_devices(); device++) {
     oc_knx_device_storage_read(device);
