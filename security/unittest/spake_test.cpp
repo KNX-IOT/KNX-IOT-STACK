@@ -28,6 +28,7 @@ class Spake2Plus : public ::testing::Test {
 protected:
   virtual void SetUp()
   {
+    oc_random_init();
     oc_spake_init();
     int ret = 0;
     // initialize entropy and drbg contexts
