@@ -414,6 +414,9 @@ void oc_set_hostname_cb(oc_hostname_cb_t cb, void *data);
 
 /**
  * Set the programming mode callback
+ * NOTE: It is the responsibility of this callback (if registered), to
+ * set the programming mode of the device via a call to
+ * oc_knx_device_set_programming_mode();
  *
  * @param[in] device the device index
  * @param[in] programming_mode whether to set the programming mode to true or
