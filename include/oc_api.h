@@ -413,6 +413,36 @@ typedef void (*oc_hostname_cb_t)(size_t device, oc_string_t host_name,
 void oc_set_hostname_cb(oc_hostname_cb_t cb, void *data);
 
 /**
+ * Set the programming mode callback
+ * NOTE: It is the responsibility of this callback (if registered), to
+ * set the programming mode of the device via a call to
+ * oc_knx_device_set_programming_mode();
+ *
+ * @param[in] device the device index
+ * @param[in] programming_mode whether to set the programming mode to true or
+ * false
+ * @param[in] data the user supplied data
+ *
+ */
+typedef void (*oc_programming_mode_cb_t)(size_t device, bool programming_mode,
+                                         void *data);
+
+/**
+ * Set the programming mode callback
+ *
+ * The programming mode callback is called by the stack to enable per-device
+ * setting of the programming mode on application level.
+ *
+ * @note oc_set_programming_mode_cb() must be called before oc_main_init().
+ *
+ * @param[in] cb oc_programming_mode_cb_t function pointer to be called
+ * @param[in] data context pointer that is passed to the
+ * oc_programming_mode_cb_t the pointer must be a valid pointer till after
+ * oc_main_init() call completes.
+ */
+void oc_set_programming_mode_cb(oc_programming_mode_cb_t cb, void *data);
+
+/**
  * Add an a device to the stack.
  *
  * This function is typically called as part of the stack initialization

@@ -95,7 +95,23 @@ typedef struct oc_hostname_t
  */
 oc_hostname_t *oc_get_hostname_cb(void);
 
-//-------------
+/**
+ * @brief The programming mode info
+ *
+ */
+typedef struct oc_programming_mode_t
+{
+  oc_programming_mode_cb_t cb; /**< the callback */
+  void *data;                  /**< the callback user data */
+} oc_programming_mode_t;
+
+/**
+ * @brief retrieve the programming mode info, e.g. the callback and callback
+ * data
+ *
+ * @return oc_programming_mode_t* the programming mode info
+ */
+oc_programming_mode_t *oc_get_programming_mode_cb(void);
 
 /**
  * @brief The lsm change info
