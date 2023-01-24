@@ -51,7 +51,7 @@ if(UNIX OR WIN32)
         #target_compile_definitions(kis-port PUBLIC OC_IPV4)
     endif()
 
-    target_link_libraries(kis-port PUBLIC kis-common)
+    target_link_libraries(kis-port PUBLIC kis-common mbedtls)
     
     if(UNIX)
         target_link_libraries(kis-port PUBLIC pthread m)
