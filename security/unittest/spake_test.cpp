@@ -6,6 +6,8 @@
 #include "mbedtls/hkdf.h"
 #include "mbedtls/pkcs5.h"
 
+#include "port/oc_random.h"
+
 extern "C" {
 #include "security/oc_spake2plus.h"
 
@@ -28,6 +30,7 @@ class Spake2Plus : public ::testing::Test {
 protected:
   virtual void SetUp()
   {
+    oc_random_init();
     oc_spake_init();
     int ret = 0;
     // initialize entropy and drbg contexts

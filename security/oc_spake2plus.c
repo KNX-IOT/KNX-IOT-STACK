@@ -25,9 +25,9 @@
 #include <assert.h>
 
 #include "oc_spake2plus.h"
+#include "port/oc_random.h"
 
-static mbedtls_entropy_context entropy_ctx;
-static mbedtls_ctr_drbg_context ctr_drbg_ctx;
+static mbedtls_ctr_drbg_context *ctr_drbg_ctx;
 static mbedtls_ecp_group grp;
 
 // clang-format off
@@ -64,13 +64,11 @@ oc_spake_init(void)
 {
   int ret = 0;
   // initialize entropy and drbg contexts
-  mbedtls_entropy_init(&entropy_ctx);
-  mbedtls_ctr_drbg_init(&ctr_drbg_ctx);
   mbedtls_ecp_group_init(&grp);
 
   MBEDTLS_MPI_CHK(mbedtls_ecp_group_load(&grp, MBEDTLS_ECP_DP_SECP256R1));
-  MBEDTLS_MPI_CHK(mbedtls_ctr_drbg_seed(&ctr_drbg_ctx, mbedtls_entropy_func,
-                                        &entropy_ctx, NULL, 0));
+
+  ctr_drbg_ctx = oc_random_get_ctr_drbg_context();
 cleanup:
   return ret;
 }
@@ -78,8 +76,6 @@ cleanup:
 int
 oc_spake_free(void)
 {
-  mbedtls_ctr_drbg_free(&ctr_drbg_ctx);
-  mbedtls_entropy_free(&entropy_ctx);
   mbedtls_ecp_group_free(&grp);
   return 0;
 }
@@ -205,10 +201,10 @@ oc_spake_parameter_exchange(uint8_t rnd[32], uint8_t salt[32], int *it)
   unsigned int it_seed;
   int ret;
 
-  MBEDTLS_MPI_CHK(mbedtls_ctr_drbg_random(&ctr_drbg_ctx, rnd, KNX_RNG_LEN));
-  MBEDTLS_MPI_CHK(mbedtls_ctr_drbg_random(&ctr_drbg_ctx, salt, KNX_SALT_LEN));
+  MBEDTLS_MPI_CHK(mbedtls_ctr_drbg_random(ctr_drbg_ctx, rnd, KNX_RNG_LEN));
+  MBEDTLS_MPI_CHK(mbedtls_ctr_drbg_random(ctr_drbg_ctx, salt, KNX_SALT_LEN));
   MBEDTLS_MPI_CHK(mbedtls_ctr_drbg_random(
-    &ctr_drbg_ctx, (unsigned char *)&it_seed, sizeof(it_seed)));
+    ctr_drbg_ctx, (unsigned char *)&it_seed, sizeof(it_seed)));
 
   *it = it_seed % (KNX_MAX_IT - KNX_MIN_IT) + KNX_MIN_IT;
 cleanup:
@@ -273,7 +269,7 @@ oc_spake_calc_w0_L(const char *pw, size_t len_salt, const uint8_t *salt, int it,
   mbedtls_mpi_init(&w1);
   MBEDTLS_MPI_CHK(oc_spake_calc_w0_w1(pw, len_salt, salt, it, w0, &w1));
   MBEDTLS_MPI_CHK(mbedtls_ecp_mul(&grp, L, &w1, &grp.G, mbedtls_ctr_drbg_random,
-                                  &ctr_drbg_ctx));
+                                  ctr_drbg_ctx));
 cleanup:
   mbedtls_mpi_free(&w1);
   return ret;
@@ -283,13 +279,13 @@ int
 oc_spake_gen_keypair(mbedtls_mpi *y, mbedtls_ecp_point *pub_y)
 {
   return mbedtls_ecp_gen_keypair(&grp, y, pub_y, mbedtls_ctr_drbg_random,
-                                 &ctr_drbg_ctx);
+                                 ctr_drbg_ctx);
 }
 
 int
 oc_gen_masterkey(uint8_t *array)
 {
-  return mbedtls_ctr_drbg_random(&ctr_drbg_ctx, array, OSCORE_KEY_LEN);
+  return mbedtls_ctr_drbg_random(ctr_drbg_ctx, array, OSCORE_KEY_LEN);
 }
 
 // generic formula for
@@ -363,7 +359,7 @@ calculate_JfKgL(mbedtls_ecp_point *J, const mbedtls_mpi *f,
 
   // J = f * (K_minus_g_L)
   MBEDTLS_MPI_CHK(mbedtls_ecp_mul(&grp, J, f, &K_minus_g_L,
-                                  mbedtls_ctr_drbg_random, &ctr_drbg_ctx));
+                                  mbedtls_ctr_drbg_random, ctr_drbg_ctx));
 
 cleanup:
   mbedtls_mpi_free(&negative_g);
@@ -439,7 +435,7 @@ calc_transcript_responder(spake_data_t *spake_data,
 
   // V = h*y*L, where L = w1*P
   MBEDTLS_MPI_CHK(mbedtls_ecp_mul(&grp, &V, &spake_data->y, &spake_data->L,
-                                  mbedtls_ctr_drbg_random, &ctr_drbg_ctx));
+                                  mbedtls_ctr_drbg_random, ctr_drbg_ctx));
 
   // calculate transcript
   // Context

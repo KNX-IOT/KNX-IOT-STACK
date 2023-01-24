@@ -38,6 +38,9 @@
 #ifndef OC_RANDOM_H
 #define OC_RANDOM_H
 
+#include "mbedtls/entropy.h"
+#include "mbedtls/ctr_drbg.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -60,6 +63,12 @@ unsigned int oc_random_value(void);
  *
  */
 void oc_random_destroy(void);
+
+/**
+ * @brief Get the mbedTLS platform RNG context
+ *
+ */
+mbedtls_ctr_drbg_context *oc_random_get_ctr_drbg_context(void);
 
 #ifdef __cplusplus
 }

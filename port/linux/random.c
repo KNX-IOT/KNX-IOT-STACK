@@ -23,11 +23,18 @@
 #include <unistd.h>
 
 static int urandom_fd;
+static mbedtls_entropy_context entropy_ctx;
+static mbedtls_ctr_drbg_context ctr_drbg_ctx;
 
 void
 oc_random_init(void)
 {
   urandom_fd = open("/dev/urandom", O_RDONLY);
+
+  mbedtls_entropy_init(&entropy_ctx);
+  mbedtls_ctr_drbg_init(&ctr_drbg_ctx);
+  mbedtls_ctr_drbg_seed(&ctr_drbg_ctx, mbedtls_entropy_func, &entropy_ctx, NULL,
+                        0);
 }
 
 unsigned int
@@ -46,4 +53,12 @@ void
 oc_random_destroy(void)
 {
   close(urandom_fd);
+  mbedtls_ctr_drbg_free(&ctr_drbg_ctx);
+  mbedtls_entropy_free(&entropy_ctx);
+}
+
+mbedtls_ctr_drbg_context *
+oc_random_get_ctr_drbg_context()
+{
+  return &ctr_drbg_ctx;
 }
