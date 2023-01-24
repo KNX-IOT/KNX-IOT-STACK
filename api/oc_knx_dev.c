@@ -597,12 +597,21 @@ oc_core_dev_pm_put_handler(oc_request_t *request,
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   oc_rep_t *rep = request->request_payload;
+  oc_programming_mode_t *my_cb = oc_get_programming_mode_cb();
+
   while (rep != NULL) {
     if (rep->type == OC_REP_BOOL) {
       if (rep->iname == 1) {
         PRINT("  oc_core_dev_pm_put_handler received : %d\n",
               (int)rep->value.boolean);
-        device->pm = rep->value.boolean;
+
+        // NOTE: It is the responsibility of the callback (if it exists)
+        // to set the programming mode, in this case
+        if (my_cb && my_cb->cb)
+          my_cb->cb(device_index, rep->value.boolean, my_cb->data);
+        else
+          device->pm = rep->value.boolean;
+
         // oc_send_cbor_response(request, OC_STATUS_CHANGED);
         oc_send_cbor_response_no_payload_size(request, OC_STATUS_CHANGED);
 
