@@ -6,6 +6,8 @@
 #include "mbedtls/hkdf.h"
 #include "mbedtls/pkcs5.h"
 
+#include "port/oc_random.h"
+
 extern "C" {
 #include "security/oc_spake2plus.h"
 

@@ -8,5 +8,5 @@ if(OC_OSCORE_ENABLED)
 		${PROJECT_SOURCE_DIR}/spake_test.cpp
 	)
 
-	target_link_libraries(securitytest kis-port kisClientServer gtest_main kisClientServer)
+	target_link_libraries(securitytest kis-port kisClientServer gtest_main kisClientServer knx-iot-stack-port)
 endif()
