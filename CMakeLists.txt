@@ -164,7 +164,7 @@ if(OC_DEBUG_ENABLED)
 endif()
 
 if(OC_DEBUG_OSCORE_ENABLED)
-    target_compile_definitions(kis_common INTERFACE OC_DEBUG_OSCORE)
+    target_compile_definitions(kis-common INTERFACE OC_DEBUG_OSCORE)
 endif()
 
 
