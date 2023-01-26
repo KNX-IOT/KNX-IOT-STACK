@@ -22,6 +22,7 @@ set(OC_PUBLISHER_TABLE_ENABLED ON CACHE BOOL "enable Publisher table")
 set(OC_OSCORE_ENABLED OFF CACHE BOOL "Enable oscore")
 set(OC_PKI_ENABLED OFF CACHE BOOL "Enable PKI security")
 set(OC_DEBUG_ENABLED OFF CACHE BOOL "Enable debug messages")
+set(OC_DEBUG_OSCORE_ENABLED OFF CACHE BOOL "Enable security debug messages")
 set(OC_LOG_TO_FILE_ENABLED OFF CACHE BOOL "redirect debug messages to file")
 set(CLANG_TIDY_ENABLED OFF CACHE BOOL "Enable clang-tidy analysis during compilation.")
 set(OC_USE_STORAGE ON CACHE BOOL "Persistent storage of data.")
@@ -160,6 +161,10 @@ endif()
 
 if(OC_DEBUG_ENABLED)
     target_compile_definitions(kis-common INTERFACE OC_DEBUG)
+endif()
+
+if(OC_DEBUG_OSCORE_ENABLED)
+    target_compile_definitions(kis_common INTERFACE OC_DEBUG_OSCORE)
 endif()
 
 

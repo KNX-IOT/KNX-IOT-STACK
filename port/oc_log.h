@@ -305,12 +305,19 @@ extern "C" {
 
 #define OC_ERR(...) OC_LOG("E", __VA_ARGS__)
 
+#ifdef OC_DEBUG_OSCORE
 #define OC_DBG_OSCORE(...) OC_LOG("OSCORE", __VA_ARGS__)
 #define OC_DBG_SPAKE(...) OC_LOG("SPAKE", __VA_ARGS__)
 #define OC_LOGbytes_OSCORE(bytes, length)                                      \
   OC_LOGbytes_internal("OSCORE", bytes, length)
 #define OC_LOGbytes_SPAKE(bytes, length)                                       \
   OC_LOGbytes_internal("SPAKE", bytes, length)
+#else
+#define OC_DBG_OSCORE(...)
+#define OC_DBG_SPAKE(...)
+#define OC_LOGbytes_OSCORE(bytes, length)
+#define OC_LOGbytes_SPAKE(bytes, length)
+#endif
 
 #ifdef __cplusplus
 }
