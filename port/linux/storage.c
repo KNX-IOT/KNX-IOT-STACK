@@ -33,6 +33,10 @@ static bool path_set = false;
 int
 oc_storage_config(const char *store)
 {
+
+#ifdef OC_USE_STORAGE
+  char temp_dir[60];
+#endif
   store_path_len = strlen(store);
   if (store_path_len >= STORE_PATH_SIZE)
     return -ENOENT;
@@ -40,6 +44,22 @@ oc_storage_config(const char *store)
   strncpy(store_path, store, store_path_len);
   store_path[store_path_len] = '\0';
   path_set = true;
+
+#ifdef OC_USE_STORAGE
+  strcpy(temp_dir, store);
+  if ((strlen(store) > 2) && (store[0] == '.') && (store[1] == '/')) {
+    strcpy(temp_dir, &store[2]);
+  }
+  int dir_len = strlen(temp_dir);
+  if (temp_dir[dir_len - 1] == '/') {
+    temp_dir[dir_len - 1] = 0;
+  }
+
+  PRINT("\tCreating storage directory at %s\n", temp_dir);
+  int retval = _mkdir(temp_dir);
+#else
+  PRINT("\tNot Creating storage directory \n");
+#endif
 
   return 0;
 }
