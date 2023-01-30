@@ -24,9 +24,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-#define _POSIX_SOURCE
+//#define _POSIX_SOURCE
 #include <sys/stat.h>
-#undef _POSIX_SOURCE
+//#undef _POSIX_SOURCE
 
 #define STORE_PATH_SIZE 64
 
