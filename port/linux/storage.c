@@ -16,6 +16,7 @@
 
 #include "oc_config.h"
 #include "port/oc_storage.h"
+#include "port/oc_log.h"
 
 #ifdef OC_STORAGE
 #include <errno.h>
