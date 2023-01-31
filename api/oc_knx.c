@@ -637,6 +637,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
     oc_send_cbor_response(request, OC_IGNORE);
     return;
   }
+
   oc_reset_g_received_notification();
 
   // get sender ip address
@@ -750,6 +751,12 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
   if (my_gw != NULL && my_gw->cb) {
     // call the gateway function
     my_gw->cb(device_index, ip_address, &g_received_notification, my_gw->data);
+  }
+
+  if (oc_is_device_in_runtime(device_index) == false) {
+    PRINT(" Device not in runtime state:%d - ignore message", device->lsm_s);
+    oc_send_cbor_response(request, OC_IGNORE);
+    return;
   }
 
   bool st_write = false;
