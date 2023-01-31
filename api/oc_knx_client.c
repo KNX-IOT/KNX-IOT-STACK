@@ -434,7 +434,7 @@ oc_issue_s_mode(int scope, int sia_value, uint32_t grpid,
   memset(&group_mcast, 0, sizeof(group_mcast));
   group_mcast =
     oc_create_multicast_group_address(group_mcast, grpid, iid, scope);
-#endif 
+#endif
   // set the group_address to the group address, since this field is used
   // to find the oscore context id
   group_mcast.group_address = group_address;
@@ -496,8 +496,8 @@ oc_send_s_mode(oc_endpoint_t *endpoint, char *path, uint32_t sia_value,
 
     PRINT("oc_send_s_mode: S-MODE Payload Size: %d\n",
           oc_rep_get_encoded_payload_size());
-     OC_LOGbytes_OSCORE(oc_rep_get_encoder_buf(),
-                        oc_rep_get_encoded_payload_size());
+    OC_LOGbytes_OSCORE(oc_rep_get_encoder_buf(),
+                       oc_rep_get_encoded_payload_size());
 
 #ifndef OC_OSCORE
     if (oc_do_post_ex(APPLICATION_CBOR, APPLICATION_CBOR)) {
@@ -631,7 +631,7 @@ oc_do_s_mode_with_scope_and_check(int scope, char *resource_url, char *rp,
     return;
   }
 
-  // get the device 
+  // get the device
   size_t device_index = 0;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device == NULL) {
@@ -641,8 +641,9 @@ oc_do_s_mode_with_scope_and_check(int scope, char *resource_url, char *rp,
 
   // check if the device is in "loaded state"
   if (oc_is_device_in_runtime(device_index) == false) {
-    PRINT(" oc_do_s_mode_with_scope_internal : device not in loaded state: %d\n",
-          device->lsm_s);
+    PRINT(
+      " oc_do_s_mode_with_scope_internal : device not in loaded state: %d\n",
+      device->lsm_s);
     return;
   }
 
