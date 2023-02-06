@@ -609,6 +609,16 @@ oc_oscore_send_message(oc_message_t *msg)
    * Dispatch oc_message_t to the (TLS or) network layer
    */
   oc_message_t *message = msg;
+
+  /* Is this is an inadvertent response to a secure multi cast message */
+  if (msg->endpoint.flags & MULTICAST) {
+    OC_DBG_OSCORE(
+      "### secure multicast requests do not elicit a response, discard "
+      "###");
+    oc_message_unref(msg);
+    return 0;
+  }
+
   oc_oscore_context_t *oscore_ctx = NULL;
   oscore_ctx = oc_oscore_find_context_by_serial_number(
     message->endpoint.device, message->endpoint.serial_number);
@@ -625,15 +635,6 @@ oc_oscore_send_message(oc_message_t *msg)
     OC_DBG_OSCORE("found OSCORE context corresponding to the peer serial "
                   "number or group_address id=%s",
                   oscore_ctx->token_id);
-    /* Is this is an inadvertent response to a secure multi cast message */
-    if (msg->endpoint.flags & MULTICAST) {
-      OC_DBG_OSCORE(
-        "### secure multicast requests do not elicit a response, discard "
-        "###");
-      oc_message_unref(msg);
-      return 0;
-    }
-
     /* Use sender key for encryption */
     uint8_t *key = oscore_ctx->sendkey;
 
