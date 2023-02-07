@@ -114,6 +114,13 @@ coap_new_transaction(uint16_t mid, uint8_t *token, uint8_t token_len,
   return t;
 }
 
+static oc_event_callback_retval_t
+clear_transaction_cb(void *transaction)
+{
+  coap_clear_transaction((coap_transaction_t *)transaction);
+  return OC_EVENT_DONE;
+}
+
 /*---------------------------------------------------------------------------*/
 void
 coap_send_transaction(coap_transaction_t *t)
@@ -203,14 +210,16 @@ coap_send_transaction(coap_transaction_t *t)
     oc_message_add_ref(t->message);
 
     coap_send_message(t->message);
-
-    coap_clear_transaction(t);
+    oc_set_delayed_callback(t, clear_transaction_cb, OC_MAX_TRANSMIT_SPAN);
   }
 }
 /*---------------------------------------------------------------------------*/
+
 void
 coap_clear_transaction(coap_transaction_t *t)
 {
+  // to prevent double frees
+  // oc_remove_delayed_callback(t, clear_transaction_cb);
   if (t) {
     OC_DBG("Freeing transaction %u: %p", t->mid, (void *)t);
 
