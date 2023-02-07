@@ -284,28 +284,8 @@ coap_receive(oc_message_t *msg)
 #ifdef OC_TCP
     if (!(msg->endpoint.flags & TCP))
 #endif /* OC_TCP */
-
-      // check if incoming message is from myself.
-      // if so, then silently drop it
-      oc_endpoint_t *my_ep = oc_connectivity_get_endpoints(0);
-    while (my_ep != NULL) {
-      if (oc_endpoint_compare_address(&msg->endpoint, my_ep) == 0) {
-        if (msg->endpoint.addr.ipv6.port == my_ep->addr.ipv6.port) {
-          OC_WRN("Received message has same IP address & port as one of my "
-                 "endpoints! Dropping...");
-          return COAP_NO_ERROR;
-        }
-      }
-      my_ep = my_ep->next;
-    }
-
     {
-      transaction =
-        coap_get_transaction_by_token(message->token, message->token_len);
-
-      if (transaction == NULL)
-        OC_WRN("Could not find transaction with token starting %02x %02x",
-               message->token[0], message->token[1]);
+      transaction = coap_get_transaction_by_mid(message->mid);
       if (transaction) {
 #ifdef OC_CLIENT
         uint8_t echo_value[COAP_ECHO_LEN];
@@ -319,8 +299,7 @@ coap_receive(oc_message_t *msg)
           coap_udp_parse_message(retransmitted_pkt, transaction->message->data,
                                  (uint16_t)transaction->message->length);
 
-          client_cb = oc_ri_find_client_cb_by_token(
-            retransmitted_pkt->token, retransmitted_pkt->token_len);
+          client_cb = oc_ri_find_client_cb_by_mid(retransmitted_pkt->mid);
           OC_DBG("Pointer to MID Client Callback: %p", client_cb);
 
           // copy the echo from the unauthorised response into the new request
@@ -340,19 +319,16 @@ coap_receive(oc_message_t *msg)
 
           // a little bit naughty - modify the old client callback to refer to
           // the new (retransmitted) packet
-          if (client_cb) {
-            client_cb->mid = retransmitted_pkt->mid;
-            client_cb->token_len = retransmitted_pkt->token_len;
-            memcpy(client_cb->token, retransmitted_pkt->token,
-                   client_cb->token_len);
-          }
+          client_cb->mid = retransmitted_pkt->mid;
+          client_cb->token_len = retransmitted_pkt->token_len;
+          memcpy(client_cb->token, retransmitted_pkt->token,
+                 client_cb->token_len);
 
           new_transaction->message = oc_internal_allocate_outgoing_message();
           new_transaction->message->endpoint = transaction->message->endpoint;
           new_transaction->message->length = coap_oscore_serialize_message(
             retransmitted_pkt, new_transaction->message->data, true, true,
             true);
-          // TODO why was this put here?
           if (new_transaction->message->length > 0) {
             coap_send_transaction(new_transaction);
           } else {
@@ -363,8 +339,7 @@ coap_receive(oc_message_t *msg)
         }
 #endif
 
-        if (message->type == COAP_TYPE_CON)
-          coap_clear_transaction(transaction);
+        coap_clear_transaction(transaction);
       }
       transaction = NULL;
     }
@@ -389,6 +364,7 @@ coap_receive(oc_message_t *msg)
       }
       PRINT("  URL: %.*s", (int)message->uri_path_len, message->uri_path);
       PRINT("  QUERY: %.*s", (int)message->uri_query_len, message->uri_query);
+      PRINT("  Payload: %.*s", (int)message->payload_len, message->payload);
 #endif
       const char *href;
       size_t href_len = coap_get_header_uri_path(message, &href);
@@ -405,7 +381,6 @@ coap_receive(oc_message_t *msg)
 #ifdef OC_REQUEST_HISTORY
           if (oc_coap_check_if_duplicate(message->mid,
                                          (uint8_t)msg->endpoint.device)) {
-            OC_DBG("Dropping duplicate request...\n");
             return 0;
           }
           history[idx] = message->mid;
@@ -426,8 +401,9 @@ coap_receive(oc_message_t *msg)
       }
 
       /* create transaction for response */
-      transaction = coap_new_transaction(response->mid, message->token,
-                                         message->token_len, &msg->endpoint);
+      transaction =
+        coap_new_transaction(response->mid, NULL, 0, &msg->endpoint);
+
       if (transaction) {
         bool new_sender = true;
         for (int i = 0; i < OC_SEEN_SENDERS_SIZE; ++i) {
@@ -439,18 +415,32 @@ coap_receive(oc_message_t *msg)
           }
         }
 
-        coap_message_type_t rsp_message_type;
-        uint16_t rsp_message_id;
-        if (message->type == COAP_TYPE_CON) {
-          rsp_message_type = COAP_TYPE_ACK;
-          rsp_message_id = message->mid;
-        } else {
-          rsp_message_type = COAP_TYPE_NON;
-          rsp_message_id = coap_get_mid();
+        bool is_myself = false;
+        //
+        // check if incoming message is from myself.
+        // if so, then return with bad request
+        oc_endpoint_t *my_ep = oc_connectivity_get_endpoints(0);
+#ifdef OC_DEBUG
+        if (my_ep != NULL) {
+          PRINT("engine : myself:");
+          PRINTipaddr(*my_ep);
+          PRINT("\n");
+        }
+#endif /* OC_DEBUG */
+        if (oc_endpoint_compare_address(&msg->endpoint, my_ep) == 0) {
+          if (msg->endpoint.addr.ipv6.port == my_ep->addr.ipv6.port) {
+            OC_DBG(" same address and port: not handling message");
+            is_myself = true;
+          }
         }
 
+        // temporary: disable requesting echos from peers by trusting
+        // every device
+        new_sender = false;
+
         // server-side logic for handling responses with echo option
-        if (new_sender && msg->endpoint.flags & OSCORE_DECRYPTED) {
+        if (new_sender && msg->endpoint.flags & OSCORE_DECRYPTED &&
+            is_myself == false) {
           uint8_t echo_value[COAP_ECHO_LEN];
           size_t echo_len = coap_get_header_echo(message, echo_value);
           oc_clock_time_t current_time = oc_clock_time();
@@ -459,9 +449,9 @@ coap_receive(oc_message_t *msg)
             OC_DBG("Received request from new sender, sending Unauthorised "
                    "with Echo Challenge...");
             coap_send_unauth_echo_response(
-              rsp_message_type, rsp_message_id, message->token,
-              message->token_len, (uint8_t *)&current_time,
-              sizeof(current_time), &msg->endpoint);
+              message->type == COAP_TYPE_CON ? COAP_TYPE_ACK : COAP_TYPE_NON,
+              message->mid, message->token, message->token_len,
+              (uint8_t *)&current_time, sizeof(current_time), &msg->endpoint);
             coap_clear_transaction(transaction);
             return UNAUTHORIZED_4_01;
           } else if (echo_len != sizeof(oc_clock_time_t)) // KNX-IoT servers use
@@ -470,9 +460,10 @@ coap_receive(oc_message_t *msg)
             OC_DBG(
               "Received request with bad Echo size %d! Sending bad option...",
               (int)echo_len);
-            coap_send_empty_response(rsp_message_type, rsp_message_id,
-                                     message->token, message->token_len,
-                                     BAD_OPTION_4_02, &msg->endpoint);
+            coap_send_empty_response(
+              message->type == COAP_TYPE_CON ? COAP_TYPE_ACK : COAP_TYPE_NON,
+              message->mid, message->token, message->token_len, BAD_OPTION_4_02,
+              &msg->endpoint);
             coap_clear_transaction(transaction);
             return BAD_OPTION_4_02;
           }
