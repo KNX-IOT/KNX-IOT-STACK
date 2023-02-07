@@ -292,8 +292,6 @@ oc_init_multicast_update(oc_endpoint_t *mcast, const char *uri,
     i += sizeof(r);
   }
 
-  coap_new_transaction(request->mid, request->token, request->token_len, mcast);
-
   coap_set_header_uri_path(request, uri, strlen(uri));
 
   if (query) {

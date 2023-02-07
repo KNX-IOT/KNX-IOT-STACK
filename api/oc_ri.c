@@ -1397,7 +1397,6 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
 static void
 free_client_cb(oc_client_cb_t *cb)
 {
-  OC_DBG("Freeing cb %p", cb);
   oc_list_remove(client_cbs, cb);
 #ifdef OC_BLOCK_WISE
   oc_blockwise_scrub_buffers_for_client_cb(cb);
@@ -1410,6 +1409,7 @@ free_client_cb(oc_client_cb_t *cb)
 oc_event_callback_retval_t
 oc_ri_remove_client_cb(void *data)
 {
+  OC_DBG("removing client %p", data);
   free_client_cb(data);
   return OC_EVENT_DONE;
 }
@@ -1735,7 +1735,6 @@ oc_ri_alloc_client_cb(const char *uri, oc_endpoint_t *endpoint,
                       void *user_data)
 {
   oc_client_cb_t *cb = oc_memb_alloc(&client_cbs_s);
-  OC_DBG("Allocating cb %p", cb);
   if (!cb) {
     OC_WRN("insufficient memory to add client callback");
     return cb;
