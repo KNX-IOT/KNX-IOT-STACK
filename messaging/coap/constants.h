@@ -56,13 +56,13 @@ extern "C" {
 
 #define COAP_DEFAULT_MAX_AGE 60
 
-#define COAP_RESPONSE_TIMEOUT (2)
+#define COAP_RESPONSE_TIMEOUT (5)
 #define COAP_RESPONSE_RANDOM_FACTOR (1.5)
 #define COAP_MAX_RETRANSMIT (4)
 
 /** COAP_RESPONSE_TIMEOUT * ((2 ** COAP_MAX_RETRANSMIT) - 1) *
  * COAP_RESPONSE_RANDOM_FACTOR */
-#define OC_MAX_TRANSMIT_SPAN (45)
+#define OC_MAX_TRANSMIT_SPAN (113)
 
 #define OC_MAX_LATENCY (100)
 #define OC_PROCESSING_DELAY COAP_RESPONSE_TIMEOUT
@@ -72,7 +72,7 @@ extern "C" {
 #define OC_NON_LIFETIME (OC_MAX_TRANSMIT_SPAN + OC_MAX_LATENCY)
 
 /** OC_MAX_TRANSMIT_SPAN + (2 * MAX_LATENCY) + PROCESSING_DELAY */
-#define OC_EXCHANGE_LIFETIME (247)
+#define OC_EXCHANGE_LIFETIME (318)
 
 #define COAP_HEADER_LEN                                                        \
   4 /* | version:0x03 type:0x0C tkl:0xF0 | code | mid:0x00FF | mid:0xFF00 | */
