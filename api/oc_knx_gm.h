@@ -162,6 +162,7 @@ void oc_load_group_mapping_table_entry(int entry);
 void oc_load_group_mapping_table();
 
 
+
 /**
  * Callback invoked for all s-mode communication
  * e.g. to be used to create a KNX-IOT to CLASSIC gateway

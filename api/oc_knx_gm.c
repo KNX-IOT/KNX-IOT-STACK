@@ -269,6 +269,53 @@ oc_load_group_mapping_table()
   }
 }
 
+void
+oc_free_group_mapping_table_entry(int entry, bool init)
+{
+  g_gm_entries[entry].id = -1;
+  if (init == false) {
+    free(g_gm_entries[entry].ga);
+  } // oscore
+  oc_free_string(&g_gm_entries[entry].groupKey);
+  oc_new_string(&g_gm_entries[entry].groupKey, "", 0);
+
+  g_gm_entries[entry].ga = NULL;
+  g_gm_entries[entry].ga_len = 0;
+}
+
+void
+oc_delete_group_mapping_table_entry(int entry)
+{
+  char filename[20];
+  snprintf(filename, 20, "%s_%d", GM_STORE, entry);
+  oc_storage_erase(filename);
+
+  oc_free_group_mapping_table_entry(entry, false);
+}
+
+void
+oc_delete_group_mapping_table()
+{
+  PRINT("Deleting Group Mapping Table from Persistent storage\n");
+  for (int i = 0; i < oc_core_get_group_mapping_table_size(); i++) {
+    oc_delete_group_mapping_table_entry(i);
+    oc_print_group_mapping_table_entry(i);
+  }
+}
+
+void
+oc_free_group_mapping_table()
+{
+  PRINT("Free Group Mapping Table\n");
+  for (int i = 0; i < oc_core_get_group_mapping_table_size(); i++) {
+    oc_free_group_mapping_table_entry(i, false);
+  }
+}
+
+
+
+// -----------------------------------------------------------------------------
+
 static void
 oc_core_fp_gm_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
                           void *data)
@@ -544,13 +591,19 @@ oc_core_fp_gm_x_del_handler(oc_request_t *request,
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
-
-  // todo 
-  // free the entries
-  g_gm_entries[value - 1].ga_len = 0;
-
+  int index = value - 1;
+    // free the entries
+  oc_free_string(&(g_gm_entries[index].groupKey));
+  if (g_gm_entries[index].ga_len > 0) {
+    uint64_t *cur_arr = g_gm_entries[index].ga;
+    if (cur_arr) {
+      free(cur_arr);
+    }
+    g_gm_entries[index].ga = NULL;
+  }
+  // set the indicator on zero
+  g_gm_entries[index].ga_len = 0;
   PRINT("oc_core_fp_gm_x_del_handler - end\n");
-
   oc_send_cbor_response(request, OC_STATUS_OK);
 }
 
@@ -574,10 +627,11 @@ oc_create_knx_gm_resources(size_t device_index)
   (void)device_index;
 #ifdef OC_GM_TABLE
   OC_DBG("oc_create_knx_gm_resources");
-
+  // creating the resources
   oc_create_fp_gm_resource(OC_KNX_FP_GM, device_index);
   oc_create_fp_gm_x_resource(OC_KNX_FP_GM_X, device_index);
-
+  // loading the previous state
+  oc_load_group_mapping_table();
 #endif /* OC_GM_TABLE */
 }
 
