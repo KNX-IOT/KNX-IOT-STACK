@@ -20,14 +20,18 @@
 #include "oc_discovery.h"
 #include "oc_core_res.h"
 #include <stdio.h>
+#define __STDC_FORMAT_MACROS
+#include <inttypes.h>
 
+// DEBUGGING
 //#define OC_GM_TABLE
 
 #ifndef G_GM_MAX_ENTRIES
 #define G_GM_MAX_ENTRIES 20
 #endif
 
-int oc_core_get_gm_table_size()
+int
+oc_core_get_group_mapping_table_size()
 {
 
 #ifdef OC_GM_TABLE
@@ -41,6 +45,8 @@ int oc_core_get_gm_table_size()
 /** the list of group mappings */
 #define GM_STORE "gm_store"
 
+#define GM_ENTRY_MAX_SIZE (1024)
+
 
 oc_group_mapping_table_t g_gm_entries[G_GM_MAX_ENTRIES];
 
@@ -48,9 +54,9 @@ oc_group_mapping_table_t g_gm_entries[G_GM_MAX_ENTRIES];
 // ----------------------------------------------------------------------------
 
 static int
-find_empty_gm_index()
+find_empty_group_mapping_index()
 {
-  for (int i = 0; i < oc_core_get_gm_table_size(); i++) {
+  for (int i = 0; i < oc_core_get_group_mapping_table_size(); i++) {
     if (g_gm_entries[i].ga_len == 0) {
       return i;
     }
@@ -59,10 +65,10 @@ find_empty_gm_index()
 }
 
 static int
-find_gm_index(int id)
+find_group_mapping_index(int id)
 {
   int len;
-  for (int i = 0; i < oc_core_get_gm_table_size(); i++) {
+  for (int i = 0; i < oc_core_get_group_mapping_table_size(); i++) {
     if (g_gm_entries[i].id == id) {
       return i;
     }
@@ -70,10 +76,10 @@ find_gm_index(int id)
   return -1;
 }
 
-int oc_core_set_gm_table(size_t device_index, int index,
+int oc_core_set_group_mapping_table(size_t device_index, int index,
                          oc_group_mapping_table_t entry, bool store)
 {
-  if (index > oc_core_get_gm_table_size()) {
+  if (index > oc_core_get_group_mapping_table_size()) {
     return -1;
   }
 
@@ -113,6 +119,155 @@ int oc_core_set_gm_table(size_t device_index, int index,
   return 0;
 }
 
+void
+oc_print_group_mapping_table_entry(int entry)
+{
+  if (g_gm_entries[entry].ga_len == 0) {
+    return;
+  }
+
+  PRINT("    id (0)         : %d\n", g_gm_entries[entry].id);
+  PRINT("    dataType (116) : %d\n", g_gm_entries[entry].dataType);
+  PRINT("    ga (7)        : [");
+  for (int i = 0; i < g_gm_entries[entry].ga_len; i++) {
+    PRINT(" %" PRIu64 "", (uint64_t) g_gm_entries[entry].ga[i]);
+  }
+  PRINT(" ]\n");
+  if (oc_string_len(g_gm_entries[entry].groupKey) > 0) {
+    PRINT("    groupKey        : ");
+    int length = (int)oc_string_len(g_gm_entries[entry].groupKey);
+    char *ms = oc_string(g_gm_entries[entry].groupKey);
+    for (int i = 0; i < length; i++) {
+      PRINT("%02x", (unsigned char)ms[i]);
+    }
+    PRINT("\n");
+    PRINT("    a (97)         : %d\n", g_gm_entries[entry].authentication);
+    PRINT("    c (99)         : %d\n", g_gm_entries[entry].confidentiality);
+  }
+}
+
+void
+oc_dump_group_mapping_table_entry(int entry)
+{
+  char filename[20];
+  snprintf(filename, 20, "%s_%d", GM_STORE, entry);
+
+  uint8_t *buf = malloc(OC_MAX_APP_DATA_SIZE);
+  if (!buf)
+    return;
+
+  oc_rep_new(buf, OC_MAX_APP_DATA_SIZE);
+  // write the data
+  oc_rep_begin_root_object();
+  // id 0
+  oc_rep_i_set_int(root, 0, g_gm_entries[entry].id);
+  // dataType
+  oc_rep_i_set_int(root, 116, g_gm_entries[entry].dataType);
+  // ga - 7
+  oc_rep_i_set_int_array(root, 7, g_gm_entries[entry].ga,
+                         g_gm_entries[entry].ga_len);
+  // security 
+  oc_rep_i_set_boolean(root, 97, g_gm_entries[entry].authentication);
+  oc_rep_i_set_boolean(root, 99, g_gm_entries[entry].confidentiality);
+  oc_rep_i_set_byte_string(root, 107, oc_string(g_gm_entries[entry].groupKey),
+                           oc_string_len(g_gm_entries[entry].groupKey));
+
+  oc_rep_end_root_object();
+
+  int size = oc_rep_get_encoded_payload_size();
+  if (size > 0) {
+    OC_DBG("oc_dump_group_mapping_table_entry: dumped current state [%s] [%d]: "
+           "size %d",
+           filename, entry, size);
+    long written_size = oc_storage_write(filename, buf, size);
+    if (written_size != (long)size) {
+      PRINT("oc_dump_group_mapping_table_entry: written %d != %d (towrite)\n",
+            (int)written_size, size);
+    }
+  }
+
+  free(buf);
+}
+
+void
+oc_load_group_mapping_table_entry(int entry)
+{
+  long ret = 0;
+  char filename[20];
+  snprintf(filename, 20, "%s_%d", GM_STORE, entry);
+
+  oc_rep_t *rep, *head;
+
+  uint8_t *buf = malloc(GM_ENTRY_MAX_SIZE);
+  if (!buf) {
+    return;
+  }
+
+  ret = oc_storage_read(filename, buf, GM_ENTRY_MAX_SIZE);
+  if (ret > 0) {
+    struct oc_memb rep_objects = { sizeof(oc_rep_t), 0, 0, 0, 0 };
+    oc_rep_set_pool(&rep_objects);
+    int err = oc_parse_rep(buf, ret, &rep);
+    head = rep;
+    if (err == 0) {
+      while (rep != NULL) {
+        switch (rep->type) {
+        case OC_REP_INT:
+          if (rep->iname == 0) {
+            g_gm_entries[entry].id = (int)rep->value.integer;
+          }
+          if (rep->iname == 116) {
+            g_gm_entries[entry].dataType = (int)rep->value.integer;
+          }
+          break;
+        case OC_REP_BOOL:
+          if (rep->iname == 97) {
+            g_gm_entries[entry].authentication = (int)rep->value.boolean;
+          }
+          if (rep->iname == 99) {
+            g_gm_entries[entry].confidentiality = (int)rep->value.boolean;
+          }
+          break;
+        case OC_REP_INT_ARRAY:
+          if (rep->iname == 7) {
+            int64_t *arr = oc_int_array(rep->value.array);
+            int array_size = (int)oc_int_array_size(rep->value.array);
+            uint64_t *new_array =
+              (uint64_t *)malloc(array_size * sizeof(uint64_t));
+            if ((new_array) && (array_size > 0)) {
+              for (int i = 0; i < array_size; i++) {
+#pragma warning(suppress : 6386)
+                new_array[i] = (uint32_t)arr[i];
+              }
+              if (g_gm_entries[entry].ga != 0) {
+                free(g_gm_entries[entry].ga);
+              }
+              PRINT("  ga size %d\n", array_size);
+              g_gm_entries[entry].ga_len = array_size;
+              g_gm_entries[entry].ga = new_array;
+            }
+          }
+          break;
+        default:
+          break;
+        }
+        rep = rep->next;
+      }
+    }
+    oc_free_rep(head);
+  }
+  free(buf);
+}
+
+void
+oc_load_group_mapping_table()
+{
+  PRINT("Loading Group Mapping Table from Persistent storage\n");
+  for (int i = 0; i < oc_core_get_group_mapping_table_size(); i++) {
+    oc_load_group_mapping_table_entry(i);
+    oc_print_group_mapping_table_entry(i);
+  }
+}
 
 static void
 oc_core_fp_gm_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
@@ -132,7 +287,7 @@ oc_core_fp_gm_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     return;
   }
   /* example entry: </fp/gm/1>;ct=60 (cbor)*/
-  for (i = 0; i < oc_core_get_gm_table_size(); i++) {
+  for (i = 0; i < oc_core_get_group_mapping_table_size(); i++) {
     if (i > 0) {
       length = oc_rep_add_line_to_buffer(",\n");
       response_length += length;
@@ -197,11 +352,11 @@ oc_core_fp_gm_post_handler(oc_request_t *request,
   // entry storage
   oc_group_mapping_table_t my_entry;
 
-  int index = find_gm_index(id);
+  int index = find_group_mapping_index(id);
   if (index != -1) {
     PRINT("   entry already exist! \n");
   } else {
-    index = find_empty_gm_index();
+    index = find_empty_group_mapping_index();
     if (index == -1) {
       PRINT("  no space left!\n");
       oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
@@ -264,6 +419,9 @@ oc_core_fp_gm_post_handler(oc_request_t *request,
          }
        } else if (s_object->type == OC_REP_OBJECT) {
          sec_object = s_object->value.object;
+         if (sec_object == NULL) {
+           continue;
+         }
          int sec_object_nr = sec_object->iname;
          while (sec_object) {
            if (sec_object->type == OC_REP_BOOL) {
@@ -321,7 +479,7 @@ oc_core_fp_gm_x_get_handler(oc_request_t *request,
   int value = oc_uri_get_wildcard_value_as_int(
     oc_string(request->resource->uri), oc_string_len(request->resource->uri),
     request->uri_path, request->uri_path_len);
-  if (value >= oc_core_get_gm_table_size()) {
+  if (value >= oc_core_get_group_mapping_table_size()) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -382,7 +540,7 @@ oc_core_fp_gm_x_del_handler(oc_request_t *request,
     oc_string(request->resource->uri), oc_string_len(request->resource->uri),
     request->uri_path, request->uri_path_len);
 
-  if (value >= oc_core_get_gm_table_size()) {
+  if (value >= oc_core_get_group_mapping_table_size()) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }

@@ -118,7 +118,7 @@ void oc_create_knx_gm_resources(size_t device_index);
  *
  * @return the allocated amount of entries of the group mapping at table
  */
-int oc_core_get_gm_table_size();
+int oc_core_get_group_mapping_table_size();
 
 /**
  * @brief set an entry in the group mapping table
@@ -130,9 +130,36 @@ int oc_core_get_gm_table_size();
  * @param store the store the entry to persistent storage
  * @return int 0 == successful
  */
-int oc_core_set_gm_table(size_t device_index, int index,
+int oc_core_set_group_mapping_table(size_t device_index, int index,
                          oc_group_mapping_table_t entry,
                          bool store);
+
+/**
+ * @brief print the entry in the Group Mapping Table
+ *
+ * @param entry the index of the entry in the Group Mapping Table
+ */
+void oc_print_group_mapping_table_entry(int entry);
+
+/**
+ * @brief dump the entry of the Group Mapping Table (to persistent) storage
+ *
+ * @param entry the index of the entry in the Group Mapping Table
+ */
+void oc_dump_group_mapping_table_entry(int entry);
+
+/**
+ * @brief load the entry of the Group Mapping Table (from persistent) storage
+ *
+ * @param entry the index of the entry in the Group Mapping Table
+ */
+void oc_load_group_mapping_table_entry(int entry);
+
+/**
+ * @brief load all entries of the Group Mapping Table (from persistent) storage
+ *
+ */
+void oc_load_group_mapping_table();
 
 
 /**
