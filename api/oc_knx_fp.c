@@ -64,8 +64,8 @@ int find_empty_slot_in_rp_table(int id, oc_group_rp_table_t *rp_table,
 
 // -----------------------------------------------------------------------------
 
-static int
-table_find_id_from_rep(oc_rep_t *object)
+int
+oc_table_find_id_from_rep(oc_rep_t *object)
 {
   int id = -1;
   while (object != NULL) {
@@ -73,7 +73,7 @@ table_find_id_from_rep(oc_rep_t *object)
     case OC_REP_INT: {
       if (oc_string_len(object->name) == 0 && object->iname == 0) {
         id = (int)object->value.integer;
-        PRINT(" table_find_id_from_rep id=%d \n", id);
+        PRINT(" oc_table_find_id_from_rep id=%d \n", id);
         return id;
       }
     } break;
@@ -84,7 +84,7 @@ table_find_id_from_rep(oc_rep_t *object)
     } /* switch */
     object = object->next;
   } /* while */
-  PRINT("  table_find_id_from_rep ERR: id=%d \n", id);
+  PRINT("  oc_table_find_id_from_rep ERR: id=%d \n", id);
   return id;
 }
 
@@ -428,7 +428,7 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 
       // find id and the storage index for this object
       oc_rep_t *object = rep->value.object;
-      id = table_find_id_from_rep(object);
+      id = oc_table_find_id_from_rep(object);
       if (id == -1) {
         OC_ERR("  ERROR id %d", index);
         oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
@@ -725,7 +725,7 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     case OC_REP_OBJECT: {
       /* find the storage index, e.g. for this object */
       oc_rep_t *object = rep->value.object;
-      id = table_find_id_from_rep(object);
+      id = oc_table_find_id_from_rep(object);
       index = find_empty_slot_in_rp_table(id, g_gpt,
                                           oc_core_get_publisher_table_size());
       if (index == -1) {
@@ -1034,7 +1034,7 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     case OC_REP_OBJECT: {
       // find the storage index, e.g. for this object
       oc_rep_t *object = rep->value.object;
-      id = table_find_id_from_rep(object);
+      id = oc_table_find_id_from_rep(object);
       if (id == -1) {
         OC_ERR("  ERROR id %d", index);
         oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);

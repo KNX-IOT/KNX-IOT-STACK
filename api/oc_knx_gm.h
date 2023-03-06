@@ -27,6 +27,81 @@
 extern "C" {
 #endif
 
+  
+/**
+  @defgroup doc_module_tag_iot_router IOT_ROUTER
+  Optional group of iot_router functions.
+
+  Currently implemented:
+  - /fp/gm
+  - /dev/xxx
+  - register a generic call back to route all s-mode
+  messages
+  @{
+*/
+
+
+  /**
+* @brief Group Object Table Resource (/fp/g)
+* The payload is an array of objects.
+* Example (JSON):
+* ```
+* [
+*    {
+*        "id": "1",
+*        "ga":[2305, 2401],
+*        "dataType" : 1
+*    },
+*    {
+*        "id": 2,
+*        "ga": [2306],
+*        "dataType": 5,
+*        "s": {
+*          "groupkey": "<key>"
+*          "secSettings": {
+*            "a": true,
+*            "c": true
+*          }
+*       }
+*     }
+* ]
+* ```
+*
+* Key translation
+* | Json Key | Integer Value |
+* | -------- | ------------- |
+* | id       | 0             |
+* | ga       | 7             |
+* | dataType | 116           |
+* | s        | 115 (s)       |
+* | groupKey | 107           |
+* | secSettings | 28         |
+* | a        | 97            |
+* | c        | 99            |
+*
+* The structure stores the information.
+* The structure will be used as an array.
+* There are function to find
+* - empty index in the array
+* - find the index with a specific id
+* - delete an index, e.g. delete the array entry of data (persistent)
+* - make the entry persistent
+* - free the data
+*/
+typedef struct oc_group_mapping_table_t
+{
+  int id;                 /**< (0) contents of id*/
+  int ga_len;             /**< length of the array of ga identifiers*/
+  uint64_t *ga;           /**< (7) array of group addresses (unsigned 64 bit integers) */
+  uint32_t dataType;      /**< (116) dataType */
+  oc_string_t groupKey;   /**< (s:107) groupKey */
+  bool authentication; /**< (s:28:97) a authentication applied (default true, if
+                          groupKey exists)*/
+  bool confidentiality; /**< (s:28:99) c confidentiality applied (default true,
+                           if groupKey exists) */
+} oc_group_mapping_table_t;
+
+
 /**
  * @brief Creation of the gm resources
  *
@@ -35,14 +110,30 @@ extern "C" {
  */
 void oc_create_knx_gm_resources(size_t device_index);
 
-/**
-  @defgroup doc_module_tag_gateway Gateway
-  Optional group of KNX-IOT to Classic gateway functions.
 
-  Currently implemented: register a generic call back to route all s-mode
-  messages
-  @{
-*/
+
+
+/**
+ * @brief returns the size (amount of total entries) of the fp / gm table
+ *
+ * @return the allocated amount of entries of the group mapping at table
+ */
+int oc_core_get_gm_table_size();
+
+/**
+ * @brief set an entry in the group mapping table
+ *
+ * Note: does not write to persistent storage
+ * @param device_index index of the device
+ * @param index the index in the table, will overwrite if something is there
+ * @param entry the group mapping entry
+ * @param store the store the entry to persistent storage
+ * @return int 0 == successful
+ */
+int oc_core_set_gm_table(size_t device_index, int index,
+                         oc_group_mapping_table_t entry,
+                         bool store);
+
 
 /**
  * Callback invoked for all s-mode communication
