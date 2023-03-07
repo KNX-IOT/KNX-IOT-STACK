@@ -35,11 +35,11 @@ int
 oc_core_get_group_mapping_table_size()
 {
 
-#ifndef OC_IOT_ROUTER
-  return 0;
-#endif 
-  xxx
+#ifdef OC_IOT_ROUTER
   return G_GM_MAX_ENTRIES;
+  xxxyy
+#endif 
+  return 0;
 }
 
 #ifdef OC_IOT_ROUTER
