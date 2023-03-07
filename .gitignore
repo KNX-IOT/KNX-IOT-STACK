@@ -2,26 +2,6 @@ out/*
 .vs/*
 CMakeSettings.json
 
-# pythonbindings
-pythonbinding/apps/**
-pythonbinding/CMakefiles/**
-pythonbinding/deps/**
-pythonbinding/port/**
-pythonbinding/.vs/**
-pythonbinding/__pycache__/**
-pythonbinding/kis-client.lib
-pythonbinding/kis-server.lib
-pythonbinding/kisClientServer.lib
-pythonbinding/kisCS*
-pythonbinding/Makefile
-pythonbinding/oc_python_export.h
-pythonbinding/cmake_install.cmake
-pythonbinding/CMakeCache.txt
-pythonbinding/DartConfiguration.tcl
-pythonbinding/CTestTestfile.cmake
-pythonbinding/application_scripts/ets*
-
-
 # dependend subprojects
 deps/gtest**
 deps/mbedtls**

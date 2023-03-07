@@ -25,7 +25,7 @@
 #include <inttypes.h>
 
 // DEBUGGING
-#define OC_GM_TABLE
+//#define OC_IOT_ROUTER
 
 #ifndef G_GM_MAX_ENTRIES
 #define G_GM_MAX_ENTRIES 20
@@ -35,13 +35,13 @@ int
 oc_core_get_group_mapping_table_size()
 {
 
-#ifdef OC_GM_TABLE
+#ifndef OC_IOT_ROUTER
   return 0;
 #endif 
   return G_GM_MAX_ENTRIES;
 }
 
-#ifdef OC_GM_TABLE
+#ifdef OC_IOT_ROUTER
 
 // ----------------------------------------------------------------------------
 
@@ -1268,7 +1268,7 @@ void
 oc_create_knx_iot_router_resources(size_t device_index)
 {
   (void)device_index;
-#ifdef OC_GM_TABLE
+#ifdef OC_IOT_ROUTER
   OC_DBG("oc_create_knx_gm_resources");
   // creating the resources
   oc_create_fp_gm_resource(OC_KNX_FP_GM, device_index);
@@ -1287,7 +1287,7 @@ oc_create_knx_iot_router_resources(size_t device_index)
   load_fra();
   load_mcast();
   load_key();
-#endif /* OC_GM_TABLE */
+#endif /* OC_IOT_ROUTER */
 }
 
 
@@ -1295,13 +1295,12 @@ void
 oc_delete_group_mapping_table()
 {
 
-#ifdef OC_GM_TABLE
+#ifdef OC_IOT_ROUTER
   PRINT("Deleting Group Mapping Table from Persistent storage\n");
   for (int i = 0; i < oc_core_get_group_mapping_table_size(); i++) {
     oc_delete_group_mapping_table_entry(i);
     oc_print_group_mapping_table_entry(i);
-#endif /* OC_GM_TABLE */
-  }
+#endif /* OC_IOT_ROUTER */
 }
 
 // -----------------------------------------------------------------------------

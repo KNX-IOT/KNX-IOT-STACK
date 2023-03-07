@@ -20,6 +20,7 @@ option(BUILD_TESTING "Build KNX tests" OFF)
 set(OC_DNS_SD_ENABLED OFF CACHE BOOL "Enable DNS SD")
 set(OC_PUBLISHER_TABLE_ENABLED ON CACHE BOOL "enable Publisher table")
 set(OC_OSCORE_ENABLED OFF CACHE BOOL "Enable oscore")
+set(OC_IOT_ROUTER_ENABLED OFF CACHE BOOL "Enable IoT Router code")
 set(OC_PKI_ENABLED OFF CACHE BOOL "Enable PKI security")
 set(OC_DEBUG_ENABLED OFF CACHE BOOL "Enable debug messages")
 set(OC_DEBUG_OSCORE_ENABLED OFF CACHE BOOL "Enable security debug messages")
@@ -158,6 +159,11 @@ if(OC_OSCORE_ENABLED)
    target_compile_definitions(kis-common INTERFACE KNX_MAX_IT=${KNX_SPAKE_MAX_IT})
 
 endif()
+
+if(OC_IOT_ROUTER_ENABLED)
+    target_compile_definitions(kis-common INTERFACE OC_DEBUG)
+endif()
+
 
 if(OC_DEBUG_ENABLED)
     target_compile_definitions(kis-common INTERFACE OC_DEBUG)
