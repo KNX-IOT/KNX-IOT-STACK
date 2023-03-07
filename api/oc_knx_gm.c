@@ -1301,6 +1301,7 @@ oc_delete_group_mapping_table()
   for (int i = 0; i < oc_core_get_group_mapping_table_size(); i++) {
     oc_delete_group_mapping_table_entry(i);
     oc_print_group_mapping_table_entry(i);
+  }
 #endif /* OC_IOT_ROUTER */
 }
 
