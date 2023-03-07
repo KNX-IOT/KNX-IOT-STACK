@@ -38,6 +38,7 @@ oc_core_get_group_mapping_table_size()
 #ifndef OC_IOT_ROUTER
   return 0;
 #endif 
+  xxx
   return G_GM_MAX_ENTRIES;
 }
 
@@ -1067,11 +1068,12 @@ oc_create_f_netip_ttl_resource(int resource_idx, size_t device)
 // -----------------------------------------------------------------------------
 
 
-int
+
+oc_string_t *
 oc_get_f_netip_mcast(size_t device_index)
 {
   (void)device_index;
-  return g_ttl;
+  return &g_mcast;
 }
 
 void dump_mcast(void)
@@ -1262,7 +1264,7 @@ oc_create_f_netip_resource(int resource_idx, size_t device)
 
 // -----------------------------------------------------------------------------
 
-#endif /* OC_GM_TABLE */
+#endif /* OC_IOT_ROUTER */
 
 void
 oc_create_knx_iot_router_resources(size_t device_index)

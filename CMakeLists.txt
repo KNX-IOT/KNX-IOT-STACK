@@ -157,11 +157,10 @@ if(OC_OSCORE_ENABLED)
    target_compile_definitions(kis-common INTERFACE OC_SPAKE)
    target_compile_definitions(kis-common INTERFACE KNX_MIN_IT=${KNX_SPAKE_MIN_IT})
    target_compile_definitions(kis-common INTERFACE KNX_MAX_IT=${KNX_SPAKE_MAX_IT})
-
 endif()
 
 if(OC_IOT_ROUTER_ENABLED)
-    target_compile_definitions(kis-common INTERFACE OC_DEBUG)
+    target_compile_definitions(kis-common INTERFACE OC_IOT_ROUTER)
 endif()
 
 

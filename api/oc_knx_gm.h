@@ -144,6 +144,48 @@ int oc_core_set_group_mapping_table(size_t device_index, int index,
  */
 void oc_load_group_mapping_table();
 
+#ifdef OC_IOT_ROUTER
+
+/**
+ * @brief retrieve the fra
+ *
+ * @param device_index index of the device
+ * @return the fra value
+ */
+int oc_get_f_netip_fra(size_t device_index);
+
+/**
+ * @brief retrieve the tol
+ *
+ * @param device_index index of the device
+ * @return the tol value
+ */
+int oc_get_f_netip_tol(size_t device_index);
+
+/**
+ * @brief retrieve the key
+ *
+ * @param device_index index of the device
+ * @return the key value
+ */
+oc_string_t *oc_get_f_netip_key(size_t device_index);
+
+/**
+ * @brief retrieve the ttl
+ *
+ * @param device_index index of the device
+ * @return the ttl value
+ */
+int oc_get_f_netip_ttl(size_t device_index);
+/**
+ * @brief retrieve the mcast
+ *
+ * @param device_index index of the device
+ * @return the mcast value
+ */
+oc_string_t *oc_get_f_netip_mcast(size_t device_index);
+#endif
+
 /**
  * Callback invoked for all s-mode communication
  * e.g. to be used to create a KNX-IOT to CLASSIC gateway
