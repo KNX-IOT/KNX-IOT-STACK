@@ -37,7 +37,6 @@ oc_core_get_group_mapping_table_size()
 
 #ifdef OC_IOT_ROUTER
   return G_GM_MAX_ENTRIES;
-  xxxyy
 #endif 
   return 0;
 }
@@ -46,11 +45,11 @@ oc_core_get_group_mapping_table_size()
 
 // ----------------------------------------------------------------------------
 
-static int g_fra = 0;
-static int g_tol = 0;
-static int g_ttl = 0;
-static oc_string_t g_key;
-static oc_string_t g_mcast;
+static int g_fra = 0;       // the IPv4 sync latency fraction.
+static int g_tol = 0;       // the IPv4 routing latency tolerance
+static int g_ttl = 0;       // The value defines how many routers a multicast message MAY pass until it gets discarded.
+static oc_string_t g_key;   // IPv4 routing backbone key.
+static oc_string_t g_mcast; // Current IPv4 routing multicast address.
 // key
 // ipv4 address
 

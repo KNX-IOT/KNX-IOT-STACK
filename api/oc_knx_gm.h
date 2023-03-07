@@ -14,9 +14,10 @@
 // limitations under the License.
 */
 /**
-  @brief knx iot router implementations
-  @file
-*/
+ *  @brief knx iot router implementation
+ *
+ * @file
+ */
 #ifndef OC_KNX_GM_INTERNAL_H
 #define OC_KNX_GM_INTERNAL_H
 
@@ -33,16 +34,22 @@ extern "C" {
   Optional group of iot_router functions.
 
   Currently implemented:
-  - /fp/gm
-  - /dev/xxx
+  - /fp/gm  resource
+  - /fp/gm/<entry>
+  - /f/netip listing:
+    - /p/netip/ttl
+    - /p/netip/tol
+    - /p/netip/mcast
+    - /p/netip/key
+    - /p/netip/fra
   - register a generic call back to route all s-mode
   messages
   @{
 */
 
 
-  /**
-* @brief Group Object Table Resource (/fp/g)
+/**
+* @brief Group Mapping Table Resource (/fp/gm)
 * The payload is an array of objects.
 * Example (JSON):
 * ```
@@ -147,15 +154,14 @@ void oc_load_group_mapping_table();
 #ifdef OC_IOT_ROUTER
 
 /**
- * @brief retrieve the fra
- *
+ * @brief retrieve the IPv4 sync latency fraction (fra).
  * @param device_index index of the device
  * @return the fra value
  */
 int oc_get_f_netip_fra(size_t device_index);
 
 /**
- * @brief retrieve the tol
+ * @brief retrieve the IPv4 routing latency tolerance (tol)
  *
  * @param device_index index of the device
  * @return the tol value
@@ -163,7 +169,7 @@ int oc_get_f_netip_fra(size_t device_index);
 int oc_get_f_netip_tol(size_t device_index);
 
 /**
- * @brief retrieve the key
+ * @brief retrieve the IPv4 routing backbone key
  *
  * @param device_index index of the device
  * @return the key value
@@ -171,14 +177,14 @@ int oc_get_f_netip_tol(size_t device_index);
 oc_string_t *oc_get_f_netip_key(size_t device_index);
 
 /**
- * @brief retrieve the ttl
+ * @brief retrieve the value defines how many routers a multicast message MAY pass until it gets discarded. (ttl)
  *
  * @param device_index index of the device
  * @return the ttl value
  */
 int oc_get_f_netip_ttl(size_t device_index);
 /**
- * @brief retrieve the mcast
+ * @brief retrieve the current IPv4 routing multicast address.(mcast)
  *
  * @param device_index index of the device
  * @return the mcast value
