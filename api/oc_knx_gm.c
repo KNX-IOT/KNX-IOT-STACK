@@ -15,6 +15,7 @@
  */
 
 #include "oc_api.h"
+#include "oc_ri.h"
 #include "api/oc_knx_gm.h"
 #include "api/oc_knx_fp.h"
 #include "oc_discovery.h"
@@ -24,7 +25,7 @@
 #include <inttypes.h>
 
 // DEBUGGING
-//#define OC_GM_TABLE
+#define OC_GM_TABLE
 
 #ifndef G_GM_MAX_ENTRIES
 #define G_GM_MAX_ENTRIES 20
@@ -42,12 +43,53 @@ oc_core_get_group_mapping_table_size()
 
 #ifdef OC_GM_TABLE
 
-/** the list of group mappings */
+// ----------------------------------------------------------------------------
+
+static int g_fra = 0;
+static int g_tol = 0;
+static int g_ttl = 0;
+static oc_string_t g_key;
+static oc_string_t g_mcast;
+// key
+// ipv4 address
+
+
+// ----------------------------------------------------------------------------
+
+/**
+ * @brief print the entry in the Group Mapping Table
+ *
+ * @param entry the index of the entry in the Group Mapping Table
+ */
+void oc_print_group_mapping_table_entry(int entry);
+
+/**
+ * @brief dump the entry of the Group Mapping Table (to persistent) storage
+ *
+ * @param entry the index of the entry in the Group Mapping Table
+ */
+void oc_dump_group_mapping_table_entry(int entry);
+
+/**
+ * @brief load the entry of the Group Mapping Table (from persistent) storage
+ *
+ * @param entry the index of the entry in the Group Mapping Table
+ */
+void oc_load_group_mapping_table_entry(int entry);
+
+
+/** the storage identifiers */
 #define GM_STORE "gm_store"
+#define GM_STORE_FRA "gm_store_fra"
+#define GM_STORE_TOL "gm_store_tol"
+#define GM_STORE_TTL "gm_store_ttl"
+#define GM_STORE_KEY "gm_store_key"
+#define GM_STORE_MCAST "gm_store_mcast"
 
 #define GM_ENTRY_MAX_SIZE (1024)
 
 
+/** the list of group mappings */
 oc_group_mapping_table_t g_gm_entries[G_GM_MAX_ENTRIES];
 
 
@@ -275,7 +317,8 @@ oc_free_group_mapping_table_entry(int entry, bool init)
   g_gm_entries[entry].id = -1;
   if (init == false) {
     free(g_gm_entries[entry].ga);
-  } // oscore
+  } 
+  // free key
   oc_free_string(&g_gm_entries[entry].groupKey);
   oc_new_string(&g_gm_entries[entry].groupKey, "", 0);
 
@@ -294,16 +337,6 @@ oc_delete_group_mapping_table_entry(int entry)
 }
 
 void
-oc_delete_group_mapping_table()
-{
-  PRINT("Deleting Group Mapping Table from Persistent storage\n");
-  for (int i = 0; i < oc_core_get_group_mapping_table_size(); i++) {
-    oc_delete_group_mapping_table_entry(i);
-    oc_print_group_mapping_table_entry(i);
-  }
-}
-
-void
 oc_free_group_mapping_table()
 {
   PRINT("Free Group Mapping Table\n");
@@ -311,8 +344,6 @@ oc_free_group_mapping_table()
     oc_free_group_mapping_table_entry(i, false);
   }
 }
-
-
 
 // -----------------------------------------------------------------------------
 
@@ -617,12 +648,624 @@ oc_create_fp_gm_x_resource(int resource_idx, size_t device)
                             oc_core_fp_gm_x_del_handler, 0, 1, "urn:knx:if.c");
 }
 
-#endif /* OC_GM_TABLE */
+// -----------------------------------------------------------------------------
+
+int
+oc_get_f_netip_fra(size_t device_index)
+{
+  (void) device_index;
+  return g_fra;
+}
+
+void
+dump_fra(void)
+{
+  oc_storage_write(GM_STORE_FRA, (uint8_t *)&g_fra, sizeof(g_fra));
+}
+
+void
+load_fra(void)
+{
+  int temp_size;
+
+  temp_size = oc_storage_read(GM_STORE_FRA, (uint8_t *)&g_fra, sizeof(g_fra));
+  //if (temp_size > 0) {
+  //  device->ia = ia;
+  //  PRINT("  ia (storage) %d\n", ia);
+  //}
+}
+
+static void
+oc_core_f_netip_fra_get_handler(oc_request_t *request,
+                                oc_interface_mask_t iface_mask, void *data)
+{
+  (void)data;
+  (void)iface_mask;
+  size_t response_length = 0;
+  int i;
+  int length = 0;
+  PRINT("oc_core_f_netip_fra_get_handler\n");
+
+  /* check if the accept header is cbor */
+  if (request->accept != APPLICATION_CBOR) {
+    request->response->response_buffer->code =
+      oc_status_code(OC_STATUS_BAD_REQUEST);
+    return;
+  }
+
+  size_t device_index = request->resource->device;
+  oc_device_info_t *device = oc_core_get_device_info(device_index);
+  if (device != NULL) {
+    oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
+    return;
+  }
+  // Content-Format: "application/cbor"
+  oc_rep_begin_root_object();
+  oc_rep_i_set_int(root, 1, g_fra);
+  oc_rep_end_root_object();
+  oc_send_cbor_response(request, OC_STATUS_OK);
+  PRINT("oc_core_f_netip_fra_get_handler - end\n");
+}
+
+static void
+oc_core_f_netip_fra_put_handler(oc_request_t *request,
+                                oc_interface_mask_t iface_mask, void *data)
+{
+  (void)data;
+  (void)iface_mask;
+  size_t response_length = 0;
+  int i;
+  int length = 0;
+  PRINT("oc_core_f_netip_fra_put_handler\n");
+
+  /* check if the accept header is cbor */
+  if (request->accept != APPLICATION_CBOR) {
+    request->response->response_buffer->code =
+      oc_status_code(OC_STATUS_BAD_REQUEST);
+    return;
+  }
+
+  size_t device_index = request->resource->device;
+  oc_device_info_t *device = oc_core_get_device_info(device_index);
+  if (device != NULL) {
+    oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
+    return;
+  }
+  oc_rep_t *rep = request->request_payload;
+  while (rep != NULL) {
+    if (rep->type == OC_REP_INT) {
+      if (rep->iname == 1) {
+        PRINT("  oc_core_f_netip_fra_put_handler received (fra) : %d\n",
+              (int)rep->value.integer);
+        g_fra = (int)rep->value.integer;
+        dump_fra();
+      } 
+    }
+    rep = rep->next;
+  }
+  PRINT("oc_core_f_netip_fra_put_handler - end\n");
+}
+
+void
+oc_create_f_netip_fra_resource(int resource_idx, size_t device)
+{
+  OC_DBG("oc_create_f_netip_fra_resource\n");
+  oc_core_populate_resource(
+    resource_idx, device, "/f/netip/fra", OC_IF_D, APPLICATION_CBOR,
+    OC_DISCOVERABLE, oc_core_f_netip_fra_get_handler,
+    oc_core_f_netip_fra_put_handler, 0, 0, 0, 2,
+   "urn:knx:dpa.11.96", "urn:knx:dpt.Scaling");
+}
 
 // -----------------------------------------------------------------------------
 
+int
+oc_get_f_netip_tol(size_t device_index)
+{
+  (void)device_index;
+  return g_tol;
+}
+
 void
-oc_create_knx_gm_resources(size_t device_index)
+dump_tol(void)
+{
+  oc_storage_write(GM_STORE_TOL, (uint8_t *)&g_tol, sizeof(g_tol));
+}
+
+void
+load_tol(void)
+{
+  int temp_size;
+
+  temp_size = oc_storage_read(GM_STORE_TOL, (uint8_t *)&g_tol, sizeof(g_tol));
+  // if (temp_size > 0) {
+  //  device->ia = ia;
+  //  PRINT("  ia (storage) %d\n", ia);
+  //}
+}
+
+static void
+oc_core_f_netip_tol_get_handler(oc_request_t *request,
+                                oc_interface_mask_t iface_mask, void *data)
+{
+  (void)data;
+  (void)iface_mask;
+  size_t response_length = 0;
+  int i;
+  int length = 0;
+  PRINT("oc_core_f_netip_tol_get_handler\n");
+
+  /* check if the accept header is cbor */
+  if (request->accept != APPLICATION_CBOR) {
+    request->response->response_buffer->code =
+      oc_status_code(OC_STATUS_BAD_REQUEST);
+    return;
+  }
+
+  size_t device_index = request->resource->device;
+  oc_device_info_t *device = oc_core_get_device_info(device_index);
+  if (device != NULL) {
+    oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
+    return;
+  }
+  // Content-Format: "application/cbor"
+  oc_rep_begin_root_object();
+  oc_rep_i_set_int(root, 1, g_tol);
+  oc_rep_end_root_object();
+  oc_send_cbor_response(request, OC_STATUS_OK);
+  PRINT("oc_core_f_netip_tol_get_handler - end\n");
+}
+
+static void
+oc_core_f_netip_tol_put_handler(oc_request_t *request,
+                                oc_interface_mask_t iface_mask, void *data)
+{
+  (void)data;
+  (void)iface_mask;
+  size_t response_length = 0;
+  int i;
+  int length = 0;
+  PRINT("oc_core_f_netip_tol_put_handler\n");
+
+  /* check if the accept header is cbor */
+  if (request->accept != APPLICATION_CBOR) {
+    request->response->response_buffer->code =
+      oc_status_code(OC_STATUS_BAD_REQUEST);
+    return;
+  }
+  size_t device_index = request->resource->device;
+  oc_device_info_t *device = oc_core_get_device_info(device_index);
+  if (device != NULL) {
+    oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
+    return;
+  }
+  oc_rep_t *rep = request->request_payload;
+  while (rep != NULL) {
+    if (rep->type == OC_REP_INT) {
+      if (rep->iname == 1) {
+        PRINT("  oc_core_f_netip_tol_put_handler received (tol) : %d\n",
+              (int)rep->value.integer);
+        g_tol = (int)rep->value.integer;
+        dump_tol();
+      }
+    }
+    rep = rep->next;
+  }
+
+  PRINT("oc_core_f_netip_tol_put_handler - end\n");
+}
+
+void
+oc_create_f_netip_tol_resource(int resource_idx, size_t device)
+{
+  OC_DBG("oc_create_f_netip_tol_resource\n");
+  oc_core_populate_resource(
+    resource_idx, device, "/f/netip/tol", OC_IF_D, APPLICATION_CBOR,
+    OC_DISCOVERABLE, oc_core_f_netip_tol_get_handler,
+    oc_core_f_netip_tol_put_handler, 0, 0, 0, 2, 
+    "urn:knx:dpa.11.95", "urn:knx:dpt.timePeriodMsec");
+}
+
+// -----------------------------------------------------------------------------
+
+oc_string_t*
+oc_get_f_netip_key(size_t device_index)
+{
+  (void)device_index;
+  return &g_key;
+}
+
+void
+dump_key(void)
+{
+  int key_size = oc_string_len(g_key);
+  oc_storage_write(GM_STORE_KEY, (uint8_t *)&key_size, sizeof(key_size));
+  oc_storage_write(GM_STORE_KEY, (uint8_t *)&g_key, sizeof(key_size));
+}
+
+void
+load_key(void)
+{
+  int temp_size;
+  int key_size;
+  char key_buffer[100];
+
+  temp_size =
+    oc_storage_read(GM_STORE_TOL, (uint8_t *)&key_size, sizeof(key_size));
+
+  if (key_size < 100) {
+    temp_size = oc_storage_read(GM_STORE_TOL, (uint8_t *)&key_buffer, key_size);
+    oc_new_string(&g_key, key_buffer, key_size);
+  } 
+}
+
+
+static void
+oc_core_f_netip_key_put_handler(oc_request_t *request,
+                                oc_interface_mask_t iface_mask, void *data)
+{
+  (void)data;
+  (void)iface_mask;
+  size_t response_length = 0;
+  int i;
+  int length = 0;
+  PRINT("oc_core_f_netip_key_put_handler\n");
+
+  /* check if the accept header is cbor */
+  if (request->accept != APPLICATION_CBOR) {
+    request->response->response_buffer->code =
+      oc_status_code(OC_STATUS_BAD_REQUEST);
+    return;
+  }
+
+  size_t device_index = request->resource->device;
+  oc_device_info_t *device = oc_core_get_device_info(device_index);
+  if (device != NULL) {
+    oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
+    return;
+  }
+  oc_rep_t *rep = request->request_payload;
+  while (rep != NULL) {
+    if (rep->type == OC_REP_BYTE_STRING) {
+      if (rep->iname == 1) {
+        oc_free_string(&(g_key));
+        oc_new_string(&g_key, oc_string(rep->value.string),
+                      oc_string_len(rep->value.string));
+        dump_key();
+      }
+    }
+    rep = rep->next;
+  }
+  PRINT("oc_core_f_netip_key_put_handler - end\n");
+}
+
+void
+oc_create_f_netip_key_resource(int resource_idx, size_t device)
+{
+  OC_DBG("oc_create_f_netip_key_resource\n");
+  // no GET handler
+  oc_core_populate_resource(
+    resource_idx, device, "/f/netip/key", OC_IF_D, APPLICATION_CBOR,
+    OC_DISCOVERABLE, 0,
+    oc_core_f_netip_key_put_handler, 0, 0, 0, 2,
+    "urn:knx:dpa.11.91", "urn:knx:dpt.varOctet");
+}
+
+// -----------------------------------------------------------------------------
+
+int
+oc_get_f_netip_ttl(size_t device_index)
+{
+  (void)device_index;
+  return g_ttl;
+}
+
+void
+dump_ttl(void)
+{
+  oc_storage_write(GM_STORE_TTL, (uint8_t *)&g_ttl, sizeof(g_ttl));
+}
+
+void
+load_ttl(void)
+{
+  int temp_size;
+
+  temp_size = oc_storage_read(GM_STORE_TTL, (uint8_t *)&g_ttl, sizeof(g_ttl));
+  // if (temp_size > 0) {
+  //  device->ia = ia;
+  //  PRINT("  ia (storage) %d\n", ia);
+  //}
+}
+
+
+static void
+oc_core_f_netip_ttl_get_handler(oc_request_t *request,
+                                  oc_interface_mask_t iface_mask, void *data)
+{
+  (void)data;
+  (void)iface_mask;
+  size_t response_length = 0;
+  int i;
+  int length = 0;
+  PRINT("oc_core_f_netip_ttl_get_handler\n");
+
+  /* check if the accept header is cbor */
+  if (request->accept != APPLICATION_CBOR) {
+    request->response->response_buffer->code =
+      oc_status_code(OC_STATUS_BAD_REQUEST);
+    return;
+  }
+
+  size_t device_index = request->resource->device;
+  oc_device_info_t *device = oc_core_get_device_info(device_index);
+  if (device != NULL) {
+    oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
+    return;
+  }
+  // Content-Format: "application/cbor"
+  oc_rep_begin_root_object();
+  oc_rep_i_set_int(root, 1, g_ttl);
+  oc_rep_end_root_object();
+  oc_send_cbor_response(request, OC_STATUS_OK);
+  PRINT("oc_core_f_netip_ttl_get_handler - end\n");
+}
+
+
+static void
+oc_core_f_netip_ttl_put_handler(oc_request_t *request,
+                                  oc_interface_mask_t iface_mask, void *data)
+{
+  (void)data;
+  (void)iface_mask;
+  size_t response_length = 0;
+  int i;
+  int length = 0;
+  PRINT("oc_core_f_netip_ttl_put_handler\n");
+
+  /* check if the accept header is cbor */
+  if (request->accept != APPLICATION_CBOR) {
+    request->response->response_buffer->code =
+      oc_status_code(OC_STATUS_BAD_REQUEST);
+    return;
+  }
+
+  size_t device_index = request->resource->device;
+  oc_device_info_t *device = oc_core_get_device_info(device_index);
+  if (device != NULL) {
+    oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
+    return;
+  }
+  oc_rep_t *rep = request->request_payload;
+  while (rep != NULL) {
+    if (rep->type == OC_REP_INT) {
+      if (rep->iname == 1) {
+        PRINT("  oc_core_f_netip_ttl_put_handler received (ttl) : %d\n",
+              (int)rep->value.integer);
+        g_ttl = (int)rep->value.integer;
+        dump_ttl();
+      }
+    }
+    rep = rep->next;
+  }
+
+  PRINT("oc_core_f_netip_ttl_put_handler - end\n");
+}
+
+void
+oc_create_f_netip_ttl_resource(int resource_idx, size_t device)
+{
+  OC_DBG("oc_create_f_netip_ttl_resource\n");
+  oc_core_populate_resource(resource_idx, device, "/f/netip/ttl", OC_IF_D,
+                            APPLICATION_CBOR, OC_DISCOVERABLE,
+                            oc_core_f_netip_ttl_get_handler, 
+                             oc_core_f_netip_ttl_put_handler, 0, 0, 0, 2,
+                            "urn:knx:dpa.11.67"
+                            ,"urn:knx:dpt.value1Ucount");
+}
+
+// -----------------------------------------------------------------------------
+
+
+int
+oc_get_f_netip_mcast(size_t device_index)
+{
+  (void)device_index;
+  return g_ttl;
+}
+
+void dump_mcast(void)
+{
+  int mcast_size = oc_string_len(g_mcast);
+  oc_storage_write(GM_STORE_MCAST, (uint8_t *)&mcast_size, sizeof(mcast_size));
+  oc_storage_write(GM_STORE_MCAST, (uint8_t *)&g_mcast, sizeof(mcast_size));
+}
+
+void
+load_mcast(void)
+{
+  int temp_size;
+  int mcast_size;
+  char mcast_buffer[100];
+
+  temp_size =
+    oc_storage_read(GM_STORE_MCAST, (uint8_t *)&mcast_size, sizeof(mcast_size));
+
+  if (mcast_size < 100) {
+    temp_size =
+      oc_storage_read(GM_STORE_MCAST, (uint8_t *)&mcast_buffer, mcast_size);
+    oc_new_string(&g_mcast, mcast_buffer, mcast_size);
+  } 
+}
+
+static void
+oc_core_f_netip_mcast_get_handler(oc_request_t *request,
+                            oc_interface_mask_t iface_mask, void *data)
+{
+  (void)data;
+  (void)iface_mask;
+  size_t response_length = 0;
+  int i;
+  int length = 0;
+  PRINT("oc_core_f_netip_mcast_get_handler\n");
+
+  /* check if the accept header is cbor */
+  if (request->accept != APPLICATION_CBOR) {
+    request->response->response_buffer->code =
+      oc_status_code(OC_STATUS_BAD_REQUEST);
+    return;
+  }
+
+  size_t device_index = request->resource->device;
+  oc_device_info_t *device = oc_core_get_device_info(device_index);
+  if (device != NULL) {
+    oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
+    return;
+  }
+  // Content-Format: "application/cbor"
+  oc_rep_begin_root_object();
+  oc_rep_i_set_byte_string(root, 1, oc_string(g_mcast), oc_string_len(g_mcast));
+  oc_rep_end_root_object();
+  oc_send_cbor_response(request, OC_STATUS_OK);
+
+  PRINT("oc_core_f_netip_mcast_get_handler - end\n");
+}
+
+static void
+oc_core_f_netip_mcast_put_handler(oc_request_t *request,
+                                  oc_interface_mask_t iface_mask, void *data)
+{
+  (void)data;
+  (void)iface_mask;
+  size_t response_length = 0;
+  int i;
+  int length = 0;
+  PRINT("oc_core_f_netip_mcast_put_handler\n");
+
+  /* check if the accept header is cbor */
+  if (request->accept != APPLICATION_CBOR) {
+    request->response->response_buffer->code =
+      oc_status_code(OC_STATUS_BAD_REQUEST);
+    return;
+  }
+  size_t device_index = request->resource->device;
+  oc_device_info_t *device = oc_core_get_device_info(device_index);
+  if (device != NULL) {
+    oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
+    return;
+  }
+  oc_rep_t *rep = request->request_payload;
+  while (rep != NULL) {
+    if (rep->type == OC_REP_BYTE_STRING) {
+      if (rep->iname == 1) {
+          oc_free_string(&(g_mcast));
+          oc_new_string(&g_mcast,
+                        oc_string(rep->value.string),
+                        oc_string_len(rep->value.string));
+        dump_mcast();
+      }
+    }
+    rep = rep->next;
+  }
+
+  PRINT("oc_core_f_netip_mcast_put_handler - end\n");
+}
+
+void
+oc_create_f_netip_mcast_resource(int resource_idx, size_t device)
+{
+  OC_DBG("oc_create_f_netip_mcast_resource\n");
+  oc_core_populate_resource(resource_idx, device, "/f/netip/mcast", OC_IF_D,
+                            APPLICATION_CBOR, OC_DISCOVERABLE, 
+                            oc_core_f_netip_mcast_get_handler,
+                            oc_core_f_netip_mcast_put_handler, 0, 0, 0, 2,
+                            "urn:knx:dpa.11.66","urn:knx:dpt.IPV4");
+}
+
+// -----------------------------------------------------------------------------
+
+static void
+oc_core_f_netip_get_handler(oc_request_t *request,
+                            oc_interface_mask_t iface_mask,
+                          void *data)
+{
+  (void)data;
+  (void)iface_mask;
+  size_t response_length = 0;
+  int i;
+  int length = 0;
+  PRINT("oc_core_f_netip_get_handler\n");
+
+  /* check if the accept header is link-format */
+  if (request->accept != APPLICATION_LINK_FORMAT) {
+    request->response->response_buffer->code =
+      oc_status_code(OC_STATUS_BAD_REQUEST);
+    return;
+  }
+  /* example entry: </f/netip/xxx>;ct=60 (cbor)*/
+
+  length = oc_rep_add_line_to_buffer("<f/netip/mcast>");
+  response_length += length;
+  length = oc_rep_add_line_to_buffer(";rt=\":dpa.11.66 :dpt.IPv4\"");
+  response_length += length;
+  length = oc_rep_add_line_to_buffer(";ct=60");
+  response_length += length;
+
+  length = oc_rep_add_line_to_buffer("<f/netip/ttl>");
+  response_length += length;
+  length = oc_rep_add_line_to_buffer(";rt=\":dpa.11.67 :dpt.value1Ucount\"");
+  response_length += length;
+  length = oc_rep_add_line_to_buffer(";ct=60");
+  response_length += length;
+
+  length = oc_rep_add_line_to_buffer("<f/netip/key>");
+  response_length += length;
+  length = oc_rep_add_line_to_buffer(";rt=\":dpa.11.91 :dpt.varOctet\"");
+  response_length += length;
+  length = oc_rep_add_line_to_buffer(";ct=60");
+  response_length += length;
+
+  length = oc_rep_add_line_to_buffer("<f/netip/tol>");
+  response_length += length;
+  length = oc_rep_add_line_to_buffer(";rt=\":dpa.11.95 :dpt.timePeriodMsec\"");
+  response_length += length;
+  length = oc_rep_add_line_to_buffer(";ct=60");
+  response_length += length;
+
+  length = oc_rep_add_line_to_buffer("<f/netip/fra>");
+  response_length += length;
+  length = oc_rep_add_line_to_buffer(";rt=\":dpa.11.96 :dpt.scaling\"");
+  response_length += length;
+  length = oc_rep_add_line_to_buffer(";ct=60");
+  response_length += length;
+
+  if (response_length > 0) {
+    oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
+  } else {
+    oc_send_linkformat_response(request, OC_STATUS_INTERNAL_SERVER_ERROR, 0);
+  }
+
+  PRINT("oc_core_f_netip_get_handler - end\n");
+}
+
+
+void
+oc_create_f_netip_resource(int resource_idx, size_t device)
+{
+  OC_DBG("oc_create_f_netip_resource\n");
+  oc_core_populate_resource(resource_idx, device, "/f/netip", OC_IF_D,
+                            APPLICATION_LINK_FORMAT, OC_DISCOVERABLE,
+                            oc_core_f_netip_get_handler, 0, 0,
+                            0, 0, 1, "urn:knx:fb.11");
+}
+
+
+// -----------------------------------------------------------------------------
+
+#endif /* OC_GM_TABLE */
+
+void
+oc_create_knx_iot_router_resources(size_t device_index)
 {
   (void)device_index;
 #ifdef OC_GM_TABLE
@@ -630,11 +1273,39 @@ oc_create_knx_gm_resources(size_t device_index)
   // creating the resources
   oc_create_fp_gm_resource(OC_KNX_FP_GM, device_index);
   oc_create_fp_gm_x_resource(OC_KNX_FP_GM_X, device_index);
+  oc_create_f_netip_resource(OC_KNX_F_NETIP, device_index);
+  oc_create_f_netip_mcast_resource(OC_KNX_P_NETIP_MCAST, device_index);
+  oc_create_f_netip_ttl_resource(OC_KNX_P_NETIP_TTL, device_index);
+  oc_create_f_netip_tol_resource(OC_KNX_P_NETIP_TOL, device_index);
+  oc_create_f_netip_key_resource(OC_KNX_P_NETIP_KEY, device_index);
+  oc_create_f_netip_fra_resource(OC_KNX_P_NETIP_FRA, device_index);
+
   // loading the previous state
   oc_load_group_mapping_table();
+  load_ttl();
+  load_tol();
+  load_fra();
+  load_mcast();
+  load_key();
 #endif /* OC_GM_TABLE */
 }
 
+
+void
+oc_delete_group_mapping_table()
+{
+
+#ifdef OC_GM_TABLE
+  PRINT("Deleting Group Mapping Table from Persistent storage\n");
+  for (int i = 0; i < oc_core_get_group_mapping_table_size(); i++) {
+    oc_delete_group_mapping_table_entry(i);
+    oc_print_group_mapping_table_entry(i);
+#endif /* OC_GM_TABLE */
+  }
+}
+
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 
 static oc_gateway_t app_gateway = { NULL, NULL };

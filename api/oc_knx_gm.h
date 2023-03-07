@@ -1,5 +1,5 @@
 /*
-// Copyright (c) 2021-2022 Cascoda Ltd
+// Copyright (c) 2021-2023 Cascoda Ltd
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 // limitations under the License.
 */
 /**
-  @brief knx /fp/gm resource implementations
+  @brief knx iot router implementations
   @file
 */
 #ifndef OC_KNX_GM_INTERNAL_H
@@ -72,12 +72,12 @@ extern "C" {
 * | -------- | ------------- |
 * | id       | 0             |
 * | ga       | 7             |
-* | dataType | 116           |
+* | dataType | 116 (t)       |
 * | s        | 115 (s)       |
 * | groupKey | 107           |
 * | secSettings | 28         |
-* | a        | 97            |
-* | c        | 99            |
+* | a        | 97 (a)        |
+* | c        | 99 (c)        |
 *
 * The structure stores the information.
 * The structure will be used as an array.
@@ -95,23 +95,26 @@ typedef struct oc_group_mapping_table_t
   uint64_t *ga;           /**< (7) array of group addresses (unsigned 64 bit integers) */
   uint32_t dataType;      /**< (116) dataType */
   oc_string_t groupKey;   /**< (s:107) groupKey */
-  bool authentication; /**< (s:28:97) a authentication applied (default true, if
+  bool authentication; /**< (115:28:97) a authentication applied (default true, if
                           groupKey exists)*/
-  bool confidentiality; /**< (s:28:99) c confidentiality applied (default true,
+  bool confidentiality; /**< (115:28:99) c confidentiality applied (default true,
                            if groupKey exists) */
 } oc_group_mapping_table_t;
 
 
 /**
- * @brief Creation of the gm resources
+ * @brief Creation of the knx iot router resources
  *
  * @param device_index index of the device to which the resource are to be
  * created
  */
-void oc_create_knx_gm_resources(size_t device_index);
+void oc_create_knx_iot_router_resources(size_t device_index);
 
-
-
+/**
+ * @brief delete all entries of the Group Mapping Table (from persistent) storage
+ *
+ */
+void oc_delete_group_mapping_table();
 
 /**
  * @brief returns the size (amount of total entries) of the fp / gm table
@@ -134,34 +137,12 @@ int oc_core_set_group_mapping_table(size_t device_index, int index,
                          oc_group_mapping_table_t entry,
                          bool store);
 
-/**
- * @brief print the entry in the Group Mapping Table
- *
- * @param entry the index of the entry in the Group Mapping Table
- */
-void oc_print_group_mapping_table_entry(int entry);
-
-/**
- * @brief dump the entry of the Group Mapping Table (to persistent) storage
- *
- * @param entry the index of the entry in the Group Mapping Table
- */
-void oc_dump_group_mapping_table_entry(int entry);
-
-/**
- * @brief load the entry of the Group Mapping Table (from persistent) storage
- *
- * @param entry the index of the entry in the Group Mapping Table
- */
-void oc_load_group_mapping_table_entry(int entry);
 
 /**
  * @brief load all entries of the Group Mapping Table (from persistent) storage
  *
  */
 void oc_load_group_mapping_table();
-
-
 
 /**
  * Callback invoked for all s-mode communication
