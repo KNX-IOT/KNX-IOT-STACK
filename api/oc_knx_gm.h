@@ -35,7 +35,7 @@ extern "C" {
 
   Currently implemented:
   - /fp/gm  resource
-  - /fp/gm/<entry>
+  - /fp/gm/[entry]
   - /f/netip listing:
     - /p/netip/ttl
     - /p/netip/tol
