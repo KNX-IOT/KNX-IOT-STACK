@@ -74,7 +74,7 @@ oc_get_f_netip_fra(size_t device_index)
 #ifdef OC_IOT_ROUTER
   return g_fra;
 #else
-  PRINT("OC_IOT_ROUTER not compiled in");
+  OC_WRN("OC_IOT_ROUTER not compiled in");
   return 0;
 #endif
 }
@@ -86,7 +86,7 @@ oc_get_f_netip_tol(size_t device_index)
 #ifdef OC_IOT_ROUTER
   return g_tol;
 #else
-  PRINT("OC_IOT_ROUTER not compiled in");
+  OC_WRN("OC_IOT_ROUTER not compiled in");
   return 0;
 #endif
 }
@@ -98,7 +98,7 @@ oc_get_f_netip_key(size_t device_index)
 #ifdef OC_IOT_ROUTER
   return &g_key;
 #else
-  PRINT("OC_IOT_ROUTER not compiled in");
+  OC_WRN("OC_IOT_ROUTER not compiled in");
   return NULL;
 #endif
 }
@@ -110,7 +110,7 @@ oc_get_f_netip_mcast(size_t device_index)
 #ifdef OC_IOT_ROUTER
   return &g_mcast;
 #else
-  PRINT("OC_IOT_ROUTER not compiled in");
+  OC_WRN("OC_IOT_ROUTER not compiled in");
   return NULL;
 #endif
 }
