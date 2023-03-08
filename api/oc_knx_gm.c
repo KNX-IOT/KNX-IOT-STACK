@@ -100,6 +100,7 @@ oc_get_f_netip_key(size_t device_index)
   return g_key;
 #else
   OC_WRN("OC_IOT_ROUTER not compiled in");
+  memset(&g_key, 0, sizeof(g_key));
   return g_key;
 #endif
 }
@@ -112,6 +113,7 @@ oc_get_f_netip_mcast(size_t device_index)
   return g_mcast;
 #else
   OC_WRN("OC_IOT_ROUTER not compiled in");
+  memset(&g_mcast, 0, sizeof(g_mcast));
   return g_mcast;
 #endif
 }
