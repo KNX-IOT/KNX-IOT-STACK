@@ -38,9 +38,10 @@ static int g_fra = 0; // the IPv4 sync latency fraction.
 static int g_tol = 0; // the IPv4 routing latency tolerance
 static int g_ttl = 0; // The value defines how many routers a multicast message
                       // MAY pass until it gets discarded.
+#endif
+
 static oc_string_t g_key;   // IPv4 routing backbone key.
 static oc_string_t g_mcast; // Current IPv4 routing multicast address.
-#endif
 
 int
 oc_core_get_group_mapping_table_size()
@@ -99,7 +100,7 @@ oc_get_f_netip_key(size_t device_index)
   return g_key;
 #else
   OC_WRN("OC_IOT_ROUTER not compiled in");
-  return NULL;
+  return g_key;
 #endif
 }
 
@@ -111,7 +112,7 @@ oc_get_f_netip_mcast(size_t device_index)
   return g_mcast;
 #else
   OC_WRN("OC_IOT_ROUTER not compiled in");
-  return NULL;
+  return g_mcast;
 #endif
 }
 
