@@ -160,8 +160,6 @@ oc_group_mapping_table_t *oc_get_group_mapping_entry(size_t device_index,
  */
 void oc_load_group_mapping_table();
 
-#ifdef OC_IOT_ROUTER
-
 /**
  * @brief retrieve the IPv4 sync latency fraction (fra).
  * @param device_index index of the device
@@ -199,7 +197,6 @@ int oc_get_f_netip_ttl(size_t device_index);
  * @return the mcast value
  */
 oc_string_t *oc_get_f_netip_mcast(size_t device_index);
-#endif
 
 /**
  * Callback invoked for all s-mode communication

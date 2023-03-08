@@ -31,6 +31,17 @@
 #define G_GM_MAX_ENTRIES 20
 #endif
 
+
+#ifdef OC_IOT_ROUTER
+// ----------------------------------------------------------------------------
+static int g_fra = 0; // the IPv4 sync latency fraction.
+static int g_tol = 0; // the IPv4 routing latency tolerance
+static int g_ttl = 0; // The value defines how many routers a multicast message
+                      // MAY pass until it gets discarded.
+static oc_string_t g_key;   // IPv4 routing backbone key.
+static oc_string_t g_mcast; // Current IPv4 routing multicast address.
+#endif
+
 int
 oc_core_get_group_mapping_table_size()
 {
@@ -41,18 +52,66 @@ oc_core_get_group_mapping_table_size()
   return 0;
 #endif
 }
+
+
+int
+oc_get_f_netip_ttl(size_t device_index)
+{
+  (void)device_index;
+
 #ifdef OC_IOT_ROUTER
+  return g_ttl;
+#else
+  return 0;
+#endif
+}
 
-// ----------------------------------------------------------------------------
+int
+oc_get_f_netip_fra(size_t device_index)
+{
+  (void)device_index;
+#ifdef OC_IOT_ROUTER
+  return g_fra;
+#else
+  return 0;
+#endif
+}
 
-static int g_fra = 0;       // the IPv4 sync latency fraction.
-static int g_tol = 0;       // the IPv4 routing latency tolerance
-static int g_ttl = 0;       // The value defines how many routers a multicast message MAY pass until it gets discarded.
-static oc_string_t g_key;   // IPv4 routing backbone key.
-static oc_string_t g_mcast; // Current IPv4 routing multicast address.
-// key
-// ipv4 address
+int
+oc_get_f_netip_tol(size_t device_index)
+{
+  (void)device_index;
+#ifdef OC_IOT_ROUTER
+  return g_tol;
+#else
+  return 0;
+#endif
+}
 
+oc_string_t *
+oc_get_f_netip_key(size_t device_index)
+{
+  (void)device_index;
+#ifdef OC_IOT_ROUTER
+  return &g_key;
+#else
+  return NULL;
+#endif
+}
+
+oc_string_t *
+oc_get_f_netip_mcast(size_t device_index)
+{
+  (void)device_index;
+#ifdef OC_IOT_ROUTER
+  return &g_mcast;
+#else
+  return NULL;
+#endif
+}
+
+
+#ifdef OC_IOT_ROUTER
 
 // ----------------------------------------------------------------------------
 
@@ -650,13 +709,6 @@ oc_create_fp_gm_x_resource(int resource_idx, size_t device)
 
 // -----------------------------------------------------------------------------
 
-int
-oc_get_f_netip_fra(size_t device_index)
-{
-  (void) device_index;
-  return g_fra;
-}
-
 void
 dump_fra(void)
 {
@@ -758,13 +810,6 @@ oc_create_f_netip_fra_resource(int resource_idx, size_t device)
 }
 
 // -----------------------------------------------------------------------------
-
-int
-oc_get_f_netip_tol(size_t device_index)
-{
-  (void)device_index;
-  return g_tol;
-}
 
 void
 dump_tol(void)
@@ -868,13 +913,6 @@ oc_create_f_netip_tol_resource(int resource_idx, size_t device)
 
 // -----------------------------------------------------------------------------
 
-oc_string_t*
-oc_get_f_netip_key(size_t device_index)
-{
-  (void)device_index;
-  return &g_key;
-}
-
 void
 dump_key(void)
 {
@@ -953,12 +991,6 @@ oc_create_f_netip_key_resource(int resource_idx, size_t device)
 
 // -----------------------------------------------------------------------------
 
-int
-oc_get_f_netip_ttl(size_t device_index)
-{
-  (void)device_index;
-  return g_ttl;
-}
 
 void
 dump_ttl(void)
@@ -1065,15 +1097,6 @@ oc_create_f_netip_ttl_resource(int resource_idx, size_t device)
 }
 
 // -----------------------------------------------------------------------------
-
-
-
-oc_string_t *
-oc_get_f_netip_mcast(size_t device_index)
-{
-  (void)device_index;
-  return &g_mcast;
-}
 
 void dump_mcast(void)
 {
