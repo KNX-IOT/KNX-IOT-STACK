@@ -41,27 +41,6 @@ oc_core_get_group_mapping_table_size()
   return 0;
 #endif
 }
-
-oc_group_mapping_table_t *
-oc_get_group_mapping_entry(size_t device_index, int index)
-{
-  (void)device_index;
-
-  if (index < 0) {
-    return NULL;
-  }
-  if (index >= oc_core_get_group_mapping_table_size()) {
-    return NULL;
-  }
-
-#ifdef OC_IOT_ROUTER
-  return &g_gm_entries[index];
-#else
-  return NULL;
-#endif
-}
-
-
 #ifdef OC_IOT_ROUTER
 
 // ----------------------------------------------------------------------------
@@ -1325,6 +1304,26 @@ oc_delete_group_mapping_table()
   }
 #endif /* OC_IOT_ROUTER */
 }
+
+oc_group_mapping_table_t *
+oc_get_group_mapping_entry(size_t device_index, int index)
+{
+  (void)device_index;
+
+  if (index < 0) {
+    return NULL;
+  }
+  if (index >= oc_core_get_group_mapping_table_size()) {
+    return NULL;
+  }
+
+#ifdef OC_IOT_ROUTER
+  return &g_gm_entries[index];
+#else
+  return NULL;
+#endif
+}
+
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
