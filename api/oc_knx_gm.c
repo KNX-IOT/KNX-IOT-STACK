@@ -810,11 +810,35 @@ void
 oc_create_f_netip_fra_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_f_netip_fra_resource\n");
-  oc_core_populate_resource(
-    resource_idx, device, "/f/netip/fra", OC_IF_D, APPLICATION_CBOR,
-    OC_DISCOVERABLE, oc_core_f_netip_fra_get_handler,
-    oc_core_f_netip_fra_put_handler, 0, 0, 0, 2,
-   "urn:knx:dpa.11.96", "urn:knx:dpt.Scaling");
+  oc_resource_t *res_ = oc_new_resource("netip_fra", "/f/netip/fra", 2, 0);
+  oc_resource_bind_resource_type(res, "urn:knx:dpa.11.96");
+  oc_resource_bind_resource_type(res, "urn:knx:dpt.Scaling");
+  oc_resource_bind_dpt(res_OnOff_1, "");
+  oc_resource_bind_content_type(res, APPLICATION_CBOR);
+  oc_resource_bind_resource_interface(res, OC_IF_D); /* if.d */
+  oc_resource_set_function_block_instance(res, 1);   /* instance 1 */
+  oc_resource_set_discoverable(res, true);
+  /* periodic observable
+     to be used when one wants to send an event per time slice
+     period is 1 second */
+  /* oc_resource_set_periodic_observable(res, 1); */
+  /* set observable
+     events are send when oc_notify_observers(oc_resource_t *resource) is
+    called. this function must be called when the value changes, preferable on
+    an interrupt when something is read from the hardware. */
+  oc_resource_set_observable(res, true);
+  oc_resource_set_request_handler(res, OC_GET,oc_core_f_netip_fra_get_handler,
+  //                                NULL);
+  oc_resource_set_request_handler(res, OC_PUT, oc_core_f_netip_fra_put_handler,
+                                  NULL);
+  oc_add_resource(res);
+
+
+  //oc_core_populate_resource(
+  //  resource_idx, device, "/f/netip/fra", OC_IF_D, APPLICATION_CBOR,
+  //  OC_DISCOVERABLE, oc_core_f_netip_fra_get_handler,
+  //  oc_core_f_netip_fra_put_handler, 0, 0, 0, 2,
+  // "urn:knx:dpa.11.96", "urn:knx:dpt.Scaling");
 }
 
 // -----------------------------------------------------------------------------
@@ -912,11 +936,35 @@ void
 oc_create_f_netip_tol_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_f_netip_tol_resource\n");
-  oc_core_populate_resource(
-    resource_idx, device, "/f/netip/tol", OC_IF_D, APPLICATION_CBOR,
-    OC_DISCOVERABLE, oc_core_f_netip_tol_get_handler,
-    oc_core_f_netip_tol_put_handler, 0, 0, 0, 2, 
-    "urn:knx:dpa.11.95", "urn:knx:dpt.timePeriodMsec");
+  oc_resource_t *res_ = oc_new_resource("netip_tol", "/f/netip/tol", 2, 0);
+  oc_resource_bind_resource_type(res, "urn:knx:dpa.11.95");
+  oc_resource_bind_resource_type(res, "urn:knx:dpt.timePeriodMsec");
+  oc_resource_bind_dpt(res_OnOff_1, "");
+  oc_resource_bind_content_type(res, APPLICATION_CBOR);
+  oc_resource_bind_resource_interface(res, OC_IF_D); /* if.d */
+  oc_resource_set_function_block_instance(res, 1);   /* instance 1 */
+  oc_resource_set_discoverable(res, true);
+  /* periodic observable
+     to be used when one wants to send an event per time slice
+     period is 1 second */
+  /* oc_resource_set_periodic_observable(res, 1); */
+  /* set observable
+     events are send when oc_notify_observers(oc_resource_t *resource) is
+    called. this function must be called when the value changes, preferable on
+    an interrupt when something is read from the hardware. */
+  oc_resource_set_observable(res, true);
+  oc_resource_set_request_handler(res, OC_GET,oc_core_f_netip_tol_get_handler,
+  //                                NULL);
+  oc_resource_set_request_handler(res, OC_PUT, oc_core_f_netip_tol_put_handler,
+                                  NULL);
+  oc_add_resource(res);
+
+
+  //oc_core_populate_resource(
+  //  resource_idx, device, "/f/netip/tol", OC_IF_D, APPLICATION_CBOR,
+  //  OC_DISCOVERABLE, oc_core_f_netip_tol_get_handler,
+  //  oc_core_f_netip_tol_put_handler, 0, 0, 0, 2, 
+  //  "urn:knx:dpa.11.95", "urn:knx:dpt.timePeriodMsec");
 }
 
 // -----------------------------------------------------------------------------
@@ -937,10 +985,10 @@ load_key(void)
   char key_buffer[100];
 
   temp_size =
-    oc_storage_read(GM_STORE_TOL, (uint8_t *)&key_size, sizeof(key_size));
+    oc_storage_read(GM_STORE_KEY, (uint8_t *)&key_size, sizeof(key_size));
 
   if (key_size < 100) {
-    temp_size = oc_storage_read(GM_STORE_TOL, (uint8_t *)&key_buffer, key_size);
+    temp_size = oc_storage_read(GM_STORE_KEY, (uint8_t *)&key_buffer, key_size);
     oc_new_string(&g_key, key_buffer, key_size);
   } 
 }
@@ -989,12 +1037,37 @@ void
 oc_create_f_netip_key_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_f_netip_key_resource\n");
+  oc_resource_t *res_ = oc_new_resource("netip_key", "/f/netip/key", 2, 0);
+  oc_resource_bind_resource_type(res, "urn:knx:dpa.11.91");
+  oc_resource_bind_resource_type(res, "urn:knx:dpt.varOctet");
+  oc_resource_bind_dpt(res_OnOff_1, "");
+  oc_resource_bind_content_type(res, APPLICATION_CBOR);
+  oc_resource_bind_resource_interface(res, OC_IF_D); /* if.d */
+  oc_resource_set_function_block_instance(res, 1);   /* instance 1 */
+  oc_resource_set_discoverable(res, true);
+  /* periodic observable
+     to be used when one wants to send an event per time slice
+     period is 1 second */
+  /* oc_resource_set_periodic_observable(res, 1); */
+  /* set observable
+     events are send when oc_notify_observers(oc_resource_t *resource) is
+    called. this function must be called when the value changes, preferable on
+    an interrupt when something is read from the hardware. */
+  oc_resource_set_observable(res, true);
   // no GET handler
-  oc_core_populate_resource(
-    resource_idx, device, "/f/netip/key", OC_IF_D, APPLICATION_CBOR,
-    OC_DISCOVERABLE, 0,
-    oc_core_f_netip_key_put_handler, 0, 0, 0, 2,
-    "urn:knx:dpa.11.91", "urn:knx:dpt.varOctet");
+  //oc_resource_set_request_handler(res, OC_GET, oc_core_f_netip_ttl_get_handler,
+  //                                NULL);
+  oc_resource_set_request_handler(res, OC_PUT, oc_core_f_netip_key_put_handler,
+                                  NULL);
+  oc_add_resource(res);
+
+
+  // no GET handler
+  //oc_core_populate_resource(
+  //  resource_idx, device, "/f/netip/key", OC_IF_D, APPLICATION_CBOR,
+  //  OC_DISCOVERABLE, 0,
+  //  oc_core_f_netip_key_put_handler, 0, 0, 0, 2,
+  //  "urn:knx:dpa.11.91", "urn:knx:dpt.varOctet");
 }
 
 // -----------------------------------------------------------------------------
@@ -1096,12 +1169,35 @@ void
 oc_create_f_netip_ttl_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_f_netip_ttl_resource\n");
-  oc_core_populate_resource(resource_idx, device, "/f/netip/ttl", OC_IF_D,
-                            APPLICATION_CBOR, OC_DISCOVERABLE,
-                            oc_core_f_netip_ttl_get_handler, 
-                             oc_core_f_netip_ttl_put_handler, 0, 0, 0, 2,
-                            "urn:knx:dpa.11.67"
-                            ,"urn:knx:dpt.value1Ucount");
+  oc_resource_t *res_ = oc_new_resource("netip_ttl", "/f/netip/ttl", 2, 0);
+  oc_resource_bind_resource_type(res, "urn:knx:dpa.11.67");
+  oc_resource_bind_resource_type(res, "urn:knx:dpt.value1Ucount");
+  oc_resource_bind_dpt(res_OnOff_1, "");
+  oc_resource_bind_content_type(res, APPLICATION_CBOR);
+  oc_resource_bind_resource_interface(res, OC_IF_D); /* if.d */
+  oc_resource_set_function_block_instance(res, 1);   /* instance 1 */
+  oc_resource_set_discoverable(res, true);
+  /* periodic observable
+     to be used when one wants to send an event per time slice
+     period is 1 second */
+  /* oc_resource_set_periodic_observable(res, 1); */
+  /* set observable
+     events are send when oc_notify_observers(oc_resource_t *resource) is
+    called. this function must be called when the value changes, preferable on
+    an interrupt when something is read from the hardware. */
+  oc_resource_set_observable(res, true);
+  oc_resource_set_request_handler(res, OC_GET, oc_core_f_netip_ttl_get_handler,
+                                  NULL);
+  oc_resource_set_request_handler(res, OC_PUT, oc_core_f_netip_ttl_put_handler,
+                                  NULL);
+  oc_add_resource(res);
+
+  //oc_core_populate_resource(resource_idx, device, "/f/netip/ttl", OC_IF_D,
+  //                          APPLICATION_CBOR, OC_DISCOVERABLE,
+  //                          oc_core_f_netip_ttl_get_handler, 
+  //                           oc_core_f_netip_ttl_put_handler, 0, 0, 0, 2,
+  //                          "urn:knx:dpa.11.67"
+  //                          ,"urn:knx:dpt.value1Ucount");
 }
 
 // -----------------------------------------------------------------------------
@@ -1207,11 +1303,34 @@ void
 oc_create_f_netip_mcast_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_f_netip_mcast_resource\n");
-  oc_core_populate_resource(resource_idx, device, "/f/netip/mcast", OC_IF_D,
-                            APPLICATION_CBOR, OC_DISCOVERABLE, 
-                            oc_core_f_netip_mcast_get_handler,
-                            oc_core_f_netip_mcast_put_handler, 0, 0, 0, 2,
-                            "urn:knx:dpa.11.66","urn:knx:dpt.IPV4");
+  oc_resource_t *res_ = oc_new_resource("netip_mcast", "/f/netip/mcast", 2, 0);
+  oc_resource_bind_resource_type(res, "urn:knx:dpa.11.66");
+  oc_resource_bind_resource_type(res, "urn:knx:dpt.IPV4");
+  oc_resource_bind_dpt(res_OnOff_1, "");
+  oc_resource_bind_content_type(res, APPLICATION_CBOR);
+  oc_resource_bind_resource_interface(res, OC_IF_D); /* if.d */
+  oc_resource_set_function_block_instance(res, 1);   /* instance 1 */
+  oc_resource_set_discoverable(res, true);
+  /* periodic observable
+     to be used when one wants to send an event per time slice
+     period is 1 second */
+  /* oc_resource_set_periodic_observable(res, 1); */
+  /* set observable
+     events are send when oc_notify_observers(oc_resource_t *resource) is
+    called. this function must be called when the value changes, preferable on
+    an interrupt when something is read from the hardware. */
+  oc_resource_set_observable(res, true);
+  oc_resource_set_request_handler(res, OC_GET,oc_core_f_netip_mcast_get_handler,
+  //                                NULL);
+  oc_resource_set_request_handler(res, OC_PUT, oc_core_f_netip_mcast_put_handler,
+                                  NULL);
+  oc_add_resource(res);
+
+ // oc_core_populate_resource(resource_idx, device, "/f/netip/mcast", OC_IF_D,
+ //                           APPLICATION_CBOR, OC_DISCOVERABLE, 
+ //                           oc_core_f_netip_mcast_get_handler,
+ //                           oc_core_f_netip_mcast_put_handler, 0, 0, 0, 2,
+ //                           "urn:knx:dpa.11.66","urn:knx:dpt.IPV4");
 }
 
 // -----------------------------------------------------------------------------
