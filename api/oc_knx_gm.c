@@ -91,7 +91,7 @@ oc_get_f_netip_tol(size_t device_index)
 #endif
 }
 
-oc_string_t *
+oc_string_t
 oc_get_f_netip_key(size_t device_index)
 {
   (void)device_index;
@@ -103,7 +103,7 @@ oc_get_f_netip_key(size_t device_index)
 #endif
 }
 
-oc_string_t *
+oc_string_t
 oc_get_f_netip_mcast(size_t device_index)
 {
   (void)device_index;
