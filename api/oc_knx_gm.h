@@ -144,6 +144,15 @@ int oc_core_set_group_mapping_table(size_t device_index, int index,
                          oc_group_mapping_table_t entry,
                          bool store);
 
+/**
+ * @brief retrieve group mapping entry
+ *
+ * @param device_index the device index
+ * @param index the index in the table
+ * @return oc_group_mapping_table_t* the group mapping entry
+ */
+oc_group_mapping_table_t *oc_get_group_mapping_entry(size_t device_index,
+                                                     int index);
 
 /**
  * @brief load all entries of the Group Mapping Table (from persistent) storage
