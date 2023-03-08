@@ -1335,6 +1335,8 @@ oc_create_f_netip_mcast_resource(int resource_idx, size_t device)
 
 // -----------------------------------------------------------------------------
 
+
+// to be removed
 static void
 oc_core_f_netip_get_handler(oc_request_t *request,
                             oc_interface_mask_t iface_mask,
@@ -1400,6 +1402,7 @@ oc_core_f_netip_get_handler(oc_request_t *request,
 }
 
 
+// to be removed
 void
 oc_create_f_netip_resource(int resource_idx, size_t device)
 {
@@ -1424,7 +1427,7 @@ oc_create_knx_iot_router_resources(size_t device_index)
   // creating the resources
   oc_create_fp_gm_resource(OC_KNX_FP_GM, device_index);
   oc_create_fp_gm_x_resource(OC_KNX_FP_GM_X, device_index);
-  oc_create_f_netip_resource(OC_KNX_F_NETIP, device_index);
+  //oc_create_f_netip_resource(OC_KNX_F_NETIP, device_index);
   oc_create_f_netip_mcast_resource(OC_KNX_P_NETIP_MCAST, device_index);
   oc_create_f_netip_ttl_resource(OC_KNX_P_NETIP_TTL, device_index);
   oc_create_f_netip_tol_resource(OC_KNX_P_NETIP_TOL, device_index);

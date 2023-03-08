@@ -287,12 +287,6 @@ typedef enum {
   OC_KNX_AUTH_AT_X,         /**< auth/at/X resources */
   OC_KNX_FP_GM,             /**< FP/GM */
   OC_KNX_FP_GM_X,           /**< FP/GM/X */
-  OC_KNX_F_NETIP,           /**< F/NETIP */
-  OC_KNX_P_NETIP_MCAST,     /**< P/NETIP/MCAST */
-  OC_KNX_P_NETIP_TTL,       /**< P/NETIP/TTL */
-  OC_KNX_P_NETIP_KEY,       /**< P/NETIP/Key */
-  OC_KNX_P_NETIP_TOL,       /**< P/NETIP/TOL */
-  OC_KNX_P_NETIP_FRA,       /**< P/NETIP/FRA */
   /* List of resources on a logical device: start */
   WELLKNOWNCORE /**< well-known/core resource */
   /* List of resources on a logical device: end */
