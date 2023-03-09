@@ -156,7 +156,6 @@ oc_core_fb_x_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   }
 
 #ifdef OC_IOT_ROUTER
-  static void
   const char *value;
   int value_len = oc_uri_get_wildcard_value_as_string(
     oc_string(request->resource->uri), oc_string_len(request->resource->uri),
