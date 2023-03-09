@@ -117,6 +117,8 @@ typedef struct oc_group_mapping_table_t
  */
 void oc_create_knx_iot_router_resources(size_t device_index);
 
+void oc_create_iot_router_functional_block(size_t device_index);
+
 /**
  * @brief delete all entries of the Group Mapping Table (from persistent) storage
  *

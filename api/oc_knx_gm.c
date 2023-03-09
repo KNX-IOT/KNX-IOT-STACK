@@ -1444,6 +1444,19 @@ oc_create_knx_iot_router_resources(size_t device_index)
 #endif /* OC_IOT_ROUTER */
 }
 
+void
+oc_create_iot_router_functional_block(size_t device_index)
+{
+  (void)device_index;
+#ifdef OC_IOT_ROUTER
+  oc_create_f_netip_mcast_resource(device_index);
+  oc_create_f_netip_ttl_resource(device_index);
+  oc_create_f_netip_tol_resource(device_index);
+  oc_create_f_netip_key_resource(device_index);
+  oc_create_f_netip_fra_resource(device_index);
+#endif /* OC_IOT_ROUTER */
+}
+
 
 void
 oc_delete_group_mapping_table()
