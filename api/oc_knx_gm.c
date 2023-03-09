@@ -810,10 +810,10 @@ void
 oc_create_f_netip_fra_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_f_netip_fra_resource\n");
-  oc_resource_t *res_ = oc_new_resource("netip_fra", "/f/netip/fra", 2, 0);
+  oc_resource_t *res = oc_new_resource("netip_fra", "/f/netip/fra", 2, 0);
   oc_resource_bind_resource_type(res, "urn:knx:dpa.11.96");
   oc_resource_bind_resource_type(res, "urn:knx:dpt.Scaling");
-  oc_resource_bind_dpt(res_OnOff_1, "");
+  oc_resource_bind_dpt(res, "");
   oc_resource_bind_content_type(res, APPLICATION_CBOR);
   oc_resource_bind_resource_interface(res, OC_IF_D); /* if.d */
   oc_resource_set_function_block_instance(res, 1);   /* instance 1 */
@@ -936,10 +936,10 @@ void
 oc_create_f_netip_tol_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_f_netip_tol_resource\n");
-  oc_resource_t *res_ = oc_new_resource("netip_tol", "/f/netip/tol", 2, 0);
+  oc_resource_t *res = oc_new_resource("netip_tol", "/f/netip/tol", 2, 0);
   oc_resource_bind_resource_type(res, "urn:knx:dpa.11.95");
   oc_resource_bind_resource_type(res, "urn:knx:dpt.timePeriodMsec");
-  oc_resource_bind_dpt(res_OnOff_1, "");
+  oc_resource_bind_dpt(res, "");
   oc_resource_bind_content_type(res, APPLICATION_CBOR);
   oc_resource_bind_resource_interface(res, OC_IF_D); /* if.d */
   oc_resource_set_function_block_instance(res, 1);   /* instance 1 */
@@ -1037,10 +1037,10 @@ void
 oc_create_f_netip_key_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_f_netip_key_resource\n");
-  oc_resource_t *res_ = oc_new_resource("netip_key", "/f/netip/key", 2, 0);
+  oc_resource_t *res = oc_new_resource("netip_key", "/f/netip/key", 2, 0);
   oc_resource_bind_resource_type(res, "urn:knx:dpa.11.91");
   oc_resource_bind_resource_type(res, "urn:knx:dpt.varOctet");
-  oc_resource_bind_dpt(res_OnOff_1, "");
+  oc_resource_bind_dpt(res, "");
   oc_resource_bind_content_type(res, APPLICATION_CBOR);
   oc_resource_bind_resource_interface(res, OC_IF_D); /* if.d */
   oc_resource_set_function_block_instance(res, 1);   /* instance 1 */
@@ -1169,10 +1169,10 @@ void
 oc_create_f_netip_ttl_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_f_netip_ttl_resource\n");
-  oc_resource_t *res_ = oc_new_resource("netip_ttl", "/f/netip/ttl", 2, 0);
+  oc_resource_t *res = oc_new_resource("netip_ttl", "/f/netip/ttl", 2, 0);
   oc_resource_bind_resource_type(res, "urn:knx:dpa.11.67");
   oc_resource_bind_resource_type(res, "urn:knx:dpt.value1Ucount");
-  oc_resource_bind_dpt(res_OnOff_1, "");
+  oc_resource_bind_dpt(res, "");
   oc_resource_bind_content_type(res, APPLICATION_CBOR);
   oc_resource_bind_resource_interface(res, OC_IF_D); /* if.d */
   oc_resource_set_function_block_instance(res, 1);   /* instance 1 */
@@ -1303,10 +1303,10 @@ void
 oc_create_f_netip_mcast_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_f_netip_mcast_resource\n");
-  oc_resource_t *res_ = oc_new_resource("netip_mcast", "/f/netip/mcast", 2, 0);
+  oc_resource_t *res = oc_new_resource("netip_mcast", "/f/netip/mcast", 2, 0);
   oc_resource_bind_resource_type(res, "urn:knx:dpa.11.66");
   oc_resource_bind_resource_type(res, "urn:knx:dpt.IPV4");
-  oc_resource_bind_dpt(res_OnOff_1, "");
+  oc_resource_bind_dpt(res, "");
   oc_resource_bind_content_type(res, APPLICATION_CBOR);
   oc_resource_bind_resource_interface(res, OC_IF_D); /* if.d */
   oc_resource_set_function_block_instance(res, 1);   /* instance 1 */
