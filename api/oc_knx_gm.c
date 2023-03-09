@@ -1428,11 +1428,11 @@ oc_create_knx_iot_router_resources(size_t device_index)
   oc_create_fp_gm_resource(OC_KNX_FP_GM, device_index);
   oc_create_fp_gm_x_resource(OC_KNX_FP_GM_X, device_index);
   //oc_create_f_netip_resource(OC_KNX_F_NETIP, device_index);
- // oc_create_f_netip_mcast_resource(OC_KNX_P_NETIP_MCAST, device_index);
-  //oc_create_f_netip_ttl_resource(OC_KNX_P_NETIP_TTL, device_index);
-  //oc_create_f_netip_tol_resource(OC_KNX_P_NETIP_TOL, device_index);
-  //oc_create_f_netip_key_resource(OC_KNX_P_NETIP_KEY, device_index);
-  //oc_create_f_netip_fra_resource(OC_KNX_P_NETIP_FRA, device_index);
+  oc_create_f_netip_mcast_resource(device_index);
+  oc_create_f_netip_ttl_resource(device_index);
+  oc_create_f_netip_tol_resource(device_index);
+  oc_create_f_netip_key_resource(device_index);
+  oc_create_f_netip_fra_resource(device_index);
 
   // loading the previous state
   oc_load_group_mapping_table();
