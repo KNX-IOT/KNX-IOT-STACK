@@ -828,7 +828,7 @@ oc_create_f_netip_fra_resource(int resource_idx, size_t device)
     an interrupt when something is read from the hardware. */
   oc_resource_set_observable(res, true);
   oc_resource_set_request_handler(res, OC_GET,oc_core_f_netip_fra_get_handler,
-  //                                NULL);
+                                  NULL);
   oc_resource_set_request_handler(res, OC_PUT, oc_core_f_netip_fra_put_handler,
                                   NULL);
   oc_add_resource(res);
@@ -954,7 +954,7 @@ oc_create_f_netip_tol_resource(int resource_idx, size_t device)
     an interrupt when something is read from the hardware. */
   oc_resource_set_observable(res, true);
   oc_resource_set_request_handler(res, OC_GET,oc_core_f_netip_tol_get_handler,
-  //                                NULL);
+                                  NULL);
   oc_resource_set_request_handler(res, OC_PUT, oc_core_f_netip_tol_put_handler,
                                   NULL);
   oc_add_resource(res);
@@ -1321,7 +1321,7 @@ oc_create_f_netip_mcast_resource(int resource_idx, size_t device)
     an interrupt when something is read from the hardware. */
   oc_resource_set_observable(res, true);
   oc_resource_set_request_handler(res, OC_GET,oc_core_f_netip_mcast_get_handler,
-  //                                NULL);
+                                  NULL);
   oc_resource_set_request_handler(res, OC_PUT, oc_core_f_netip_mcast_put_handler,
                                   NULL);
   oc_add_resource(res);
