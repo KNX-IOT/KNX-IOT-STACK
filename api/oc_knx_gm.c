@@ -806,8 +806,8 @@ oc_core_f_netip_fra_put_handler(oc_request_t *request,
   PRINT("oc_core_f_netip_fra_put_handler - end\n");
 }
 
-void
-oc_create_f_netip_fra_resource(int resource_idx, size_t device)
+static void
+oc_create_f_netip_fra_resource(size_t device)
 {
   OC_DBG("oc_create_f_netip_fra_resource\n");
   oc_resource_t *res = oc_new_resource("netip_fra", "/f/netip/fra", 2, 0);
@@ -932,8 +932,8 @@ oc_core_f_netip_tol_put_handler(oc_request_t *request,
   PRINT("oc_core_f_netip_tol_put_handler - end\n");
 }
 
-void
-oc_create_f_netip_tol_resource(int resource_idx, size_t device)
+static void
+oc_create_f_netip_tol_resource(size_t device)
 {
   OC_DBG("oc_create_f_netip_tol_resource\n");
   oc_resource_t *res = oc_new_resource("netip_tol", "/f/netip/tol", 2, 0);
@@ -1033,8 +1033,8 @@ oc_core_f_netip_key_put_handler(oc_request_t *request,
   PRINT("oc_core_f_netip_key_put_handler - end\n");
 }
 
-void
-oc_create_f_netip_key_resource(int resource_idx, size_t device)
+static void
+oc_create_f_netip_key_resource(size_t device)
 {
   OC_DBG("oc_create_f_netip_key_resource\n");
   oc_resource_t *res = oc_new_resource("netip_key", "/f/netip/key", 2, 0);
@@ -1165,8 +1165,8 @@ oc_core_f_netip_ttl_put_handler(oc_request_t *request,
   PRINT("oc_core_f_netip_ttl_put_handler - end\n");
 }
 
-void
-oc_create_f_netip_ttl_resource(int resource_idx, size_t device)
+static void
+oc_create_f_netip_ttl_resource(size_t device)
 {
   OC_DBG("oc_create_f_netip_ttl_resource\n");
   oc_resource_t *res = oc_new_resource("netip_ttl", "/f/netip/ttl", 2, 0);
@@ -1299,8 +1299,8 @@ oc_core_f_netip_mcast_put_handler(oc_request_t *request,
   PRINT("oc_core_f_netip_mcast_put_handler - end\n");
 }
 
-void
-oc_create_f_netip_mcast_resource(int resource_idx, size_t device)
+static void
+oc_create_f_netip_mcast_resource(size_t device)
 {
   OC_DBG("oc_create_f_netip_mcast_resource\n");
   oc_resource_t *res = oc_new_resource("netip_mcast", "/f/netip/mcast", 2, 0);
