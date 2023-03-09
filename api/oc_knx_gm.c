@@ -755,7 +755,7 @@ oc_core_f_netip_fra_get_handler(oc_request_t *request,
 
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
-  if (device != NULL) {
+  if (device == NULL) {
     oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
     return;
   }
@@ -787,7 +787,7 @@ oc_core_f_netip_fra_put_handler(oc_request_t *request,
 
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
-  if (device != NULL) {
+  if (device == NULL) {
     oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
     return;
   }
@@ -881,7 +881,7 @@ oc_core_f_netip_tol_get_handler(oc_request_t *request,
 
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
-  if (device != NULL) {
+  if (device == NULL) {
     oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
     return;
   }
@@ -912,7 +912,7 @@ oc_core_f_netip_tol_put_handler(oc_request_t *request,
   }
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
-  if (device != NULL) {
+  if (device == NULL) {
     oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
     return;
   }
@@ -1014,7 +1014,7 @@ oc_core_f_netip_key_put_handler(oc_request_t *request,
 
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
-  if (device != NULL) {
+  if (device == NULL) {
     oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
     return;
   }
@@ -1112,7 +1112,7 @@ oc_core_f_netip_ttl_get_handler(oc_request_t *request,
 
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
-  if (device != NULL) {
+  if (device == NULL) {
     oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
     return;
   }
@@ -1145,7 +1145,7 @@ oc_core_f_netip_ttl_put_handler(oc_request_t *request,
 
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
-  if (device != NULL) {
+  if (device == NULL) {
     oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
     return;
   }
@@ -1246,7 +1246,7 @@ oc_core_f_netip_mcast_get_handler(oc_request_t *request,
 
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
-  if (device != NULL) {
+  if (device == NULL) {
     oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
     return;
   }
@@ -1278,7 +1278,7 @@ oc_core_f_netip_mcast_put_handler(oc_request_t *request,
   }
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
-  if (device != NULL) {
+  if (device == NULL) {
     oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
     return;
   }
