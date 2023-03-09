@@ -987,7 +987,7 @@ load_key(void)
   temp_size =
     oc_storage_read(GM_STORE_KEY, (uint8_t *)&key_size, sizeof(key_size));
 
-  if (key_size < 100) {
+  if ((key_size > 0) && (key_size < 100)) {
     temp_size = oc_storage_read(GM_STORE_KEY, (uint8_t *)&key_buffer, key_size);
     oc_new_string(&g_key, key_buffer, key_size);
   } 
@@ -1219,7 +1219,7 @@ load_mcast(void)
   temp_size =
     oc_storage_read(GM_STORE_MCAST, (uint8_t *)&mcast_size, sizeof(mcast_size));
 
-  if (mcast_size < 100) {
+  if ((mcast_size > 0) && (mcast_size < 100)) {
     temp_size =
       oc_storage_read(GM_STORE_MCAST, (uint8_t *)&mcast_buffer, mcast_size);
     oc_new_string(&g_mcast, mcast_buffer, mcast_size);
