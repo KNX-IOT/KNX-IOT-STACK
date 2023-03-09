@@ -1336,70 +1336,6 @@ oc_create_f_netip_mcast_resource(size_t device)
 // -----------------------------------------------------------------------------
 
 
-// to be removed
-static void
-oc_core_f_netip_get_handler(oc_request_t *request,
-                            oc_interface_mask_t iface_mask,
-                          void *data)
-{
-  (void)data;
-  (void)iface_mask;
-  size_t response_length = 0;
-  int i;
-  int length = 0;
-  PRINT("oc_core_f_netip_get_handler\n");
-
-  /* check if the accept header is link-format */
-  if (request->accept != APPLICATION_LINK_FORMAT) {
-    request->response->response_buffer->code =
-      oc_status_code(OC_STATUS_BAD_REQUEST);
-    return;
-  }
-  /* example entry: </f/netip/xxx>;ct=60 (cbor)*/
-
-  length = oc_rep_add_line_to_buffer("<f/netip/mcast>");
-  response_length += length;
-  length = oc_rep_add_line_to_buffer(";rt=\":dpa.11.66 :dpt.IPv4\"");
-  response_length += length;
-  length = oc_rep_add_line_to_buffer(";ct=60");
-  response_length += length;
-
-  length = oc_rep_add_line_to_buffer("<f/netip/ttl>");
-  response_length += length;
-  length = oc_rep_add_line_to_buffer(";rt=\":dpa.11.67 :dpt.value1Ucount\"");
-  response_length += length;
-  length = oc_rep_add_line_to_buffer(";ct=60");
-  response_length += length;
-
-  length = oc_rep_add_line_to_buffer("<f/netip/key>");
-  response_length += length;
-  length = oc_rep_add_line_to_buffer(";rt=\":dpa.11.91 :dpt.varOctet\"");
-  response_length += length;
-  length = oc_rep_add_line_to_buffer(";ct=60");
-  response_length += length;
-
-  length = oc_rep_add_line_to_buffer("<f/netip/tol>");
-  response_length += length;
-  length = oc_rep_add_line_to_buffer(";rt=\":dpa.11.95 :dpt.timePeriodMsec\"");
-  response_length += length;
-  length = oc_rep_add_line_to_buffer(";ct=60");
-  response_length += length;
-
-  length = oc_rep_add_line_to_buffer("<f/netip/fra>");
-  response_length += length;
-  length = oc_rep_add_line_to_buffer(";rt=\":dpa.11.96 :dpt.scaling\"");
-  response_length += length;
-  length = oc_rep_add_line_to_buffer(";ct=60");
-  response_length += length;
-
-  if (response_length > 0) {
-    oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
-  } else {
-    oc_send_linkformat_response(request, OC_STATUS_INTERNAL_SERVER_ERROR, 0);
-  }
-
-  PRINT("oc_core_f_netip_get_handler - end\n");
-}
 
 
 // to be removed
@@ -1417,6 +1353,74 @@ oc_create_f_netip_resource(int resource_idx, size_t device)
 // -----------------------------------------------------------------------------
 
 #endif /* OC_IOT_ROUTER */
+
+
+// to be removed
+void
+oc_core_f_netip_get_handler(oc_request_t *request,
+                            oc_interface_mask_t iface_mask, void *data)
+{
+  (void)data;
+  (void)iface_mask;
+  size_t response_length = 0;
+  int i;
+  int length = 0;
+  PRINT("oc_core_f_netip_get_handler\n");
+
+  /* check if the accept header is link-format */
+  if (request->accept != APPLICATION_LINK_FORMAT) {
+    request->response->response_buffer->code =
+      oc_status_code(OC_STATUS_BAD_REQUEST);
+    return;
+  }
+  /* example entry: </f/netip/xxx>;ct=60 (cbor)*/
+
+#ifdef OC_IOT_ROUTER
+  length = oc_rep_add_line_to_buffer("</p/netip/mcast>");
+  response_length += length;
+  length = oc_rep_add_line_to_buffer(";rt=\":dpa.11.66 :dpt.IPv4\"");
+  response_length += length;
+  length = oc_rep_add_line_to_buffer(";ct=60");
+  response_length += length;
+
+  length = oc_rep_add_line_to_buffer("</p/netip/ttl>");
+  response_length += length;
+  length = oc_rep_add_line_to_buffer(";rt=\":dpa.11.67 :dpt.value1Ucount\"");
+  response_length += length;
+  length = oc_rep_add_line_to_buffer(";ct=60");
+  response_length += length;
+
+  length = oc_rep_add_line_to_buffer("</p/netip/key>");
+  response_length += length;
+  length = oc_rep_add_line_to_buffer(";rt=\":dpa.11.91 :dpt.varOctet\"");
+  response_length += length;
+  length = oc_rep_add_line_to_buffer(";ct=60");
+  response_length += length;
+
+  length = oc_rep_add_line_to_buffer("</p/netip/tol>");
+  response_length += length;
+  length = oc_rep_add_line_to_buffer(";rt=\":dpa.11.95 :dpt.timePeriodMsec\"");
+  response_length += length;
+  length = oc_rep_add_line_to_buffer(";ct=60");
+  response_length += length;
+
+  length = oc_rep_add_line_to_buffer("</p/netip/fra>");
+  response_length += length;
+  length = oc_rep_add_line_to_buffer(";rt=\":dpa.11.96 :dpt.scaling\"");
+  response_length += length;
+  length = oc_rep_add_line_to_buffer(";ct=60");
+  response_length += length;
+
+#endif /* OC_IOT_ROUTER */
+
+  if (response_length > 0) {
+    oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
+  } else {
+    oc_send_linkformat_response(request, OC_STATUS_INTERNAL_SERVER_ERROR, 0);
+  }
+
+  PRINT("oc_core_f_netip_get_handler - end\n");
+}
 
 void
 oc_create_knx_iot_router_resources(size_t device_index)

@@ -118,6 +118,8 @@ typedef struct oc_group_mapping_table_t
 void oc_create_knx_iot_router_resources(size_t device_index);
 
 void oc_create_iot_router_functional_block(size_t device_index);
+void oc_core_f_netip_get_handler(oc_request_t *request,
+                                 oc_interface_mask_t iface_mask, void *data);
 
 /**
  * @brief delete all entries of the Group Mapping Table (from persistent) storage

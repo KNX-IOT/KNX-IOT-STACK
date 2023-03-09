@@ -17,6 +17,7 @@
 #include "oc_api.h"
 #include "api/oc_knx_fb.h"
 #include "api/oc_knx_fp.h"
+#include "api/oc_knx_gm.h"
 
 #include "oc_core_res.h"
 #include "oc_discovery.h"
@@ -70,72 +71,6 @@ store_in_array(int value, int instance)
 
 // -----------------------------------------------------------------------------
 
-#ifdef OC_IOT_ROUTER
-
-static void
-oc_core_f_netip_get_handler(oc_request_t *request,
-                            oc_interface_mask_t iface_mask, void *data)
-{
-  (void)data;
-  (void)iface_mask;
-  size_t response_length = 0;
-  int i;
-  int length = 0;
-  PRINT("oc_core_f_netip_get_handler\n");
-
-  /* check if the accept header is link-format */
-  if (request->accept != APPLICATION_LINK_FORMAT) {
-    request->response->response_buffer->code =
-      oc_status_code(OC_STATUS_BAD_REQUEST);
-    return;
-  }
-  /* example entry: </f/netip/xxx>;ct=60 (cbor)*/
-
-  length = oc_rep_add_line_to_buffer("<f/netip/mcast>");
-  response_length += length;
-  length = oc_rep_add_line_to_buffer(";rt=\":dpa.11.66 :dpt.IPv4\"");
-  response_length += length;
-  length = oc_rep_add_line_to_buffer(";ct=60");
-  response_length += length;
-
-  length = oc_rep_add_line_to_buffer("<f/netip/ttl>");
-  response_length += length;
-  length = oc_rep_add_line_to_buffer(";rt=\":dpa.11.67 :dpt.value1Ucount\"");
-  response_length += length;
-  length = oc_rep_add_line_to_buffer(";ct=60");
-  response_length += length;
-
-  length = oc_rep_add_line_to_buffer("<f/netip/key>");
-  response_length += length;
-  length = oc_rep_add_line_to_buffer(";rt=\":dpa.11.91 :dpt.varOctet\"");
-  response_length += length;
-  length = oc_rep_add_line_to_buffer(";ct=60");
-  response_length += length;
-
-  length = oc_rep_add_line_to_buffer("<f/netip/tol>");
-  response_length += length;
-  length = oc_rep_add_line_to_buffer(";rt=\":dpa.11.95 :dpt.timePeriodMsec\"");
-  response_length += length;
-  length = oc_rep_add_line_to_buffer(";ct=60");
-  response_length += length;
-
-  length = oc_rep_add_line_to_buffer("<f/netip/fra>");
-  response_length += length;
-  length = oc_rep_add_line_to_buffer(";rt=\":dpa.11.96 :dpt.scaling\"");
-  response_length += length;
-  length = oc_rep_add_line_to_buffer(";ct=60");
-  response_length += length;
-
-  if (response_length > 0) {
-    oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
-  } else {
-    oc_send_linkformat_response(request, OC_STATUS_INTERNAL_SERVER_ERROR, 0);
-  }
-
-  PRINT("oc_core_f_netip_get_handler - end\n");
-}
-
-#endif /* OC_IOT_ROUTER */
 
 static void
 oc_core_fb_x_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
