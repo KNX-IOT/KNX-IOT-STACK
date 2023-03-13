@@ -753,12 +753,12 @@ oc_core_f_netip_fra_get_handler(oc_request_t *request,
     return;
   }
 
-  size_t device_index = request->resource->device;
-  oc_device_info_t *device = oc_core_get_device_info(device_index);
-  if (device == NULL) {
-    oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
-    return;
-  }
+  //size_t device_index = request->resource->device;
+  //oc_device_info_t *device = oc_core_get_device_info(device_index);
+  //if (device == NULL) {
+  //  oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
+  //  return;
+  //}
   // Content-Format: "application/cbor"
   oc_rep_begin_root_object();
   oc_rep_i_set_int(root, 1, g_fra);
@@ -879,12 +879,12 @@ oc_core_f_netip_tol_get_handler(oc_request_t *request,
     return;
   }
 
-  size_t device_index = request->resource->device;
-  oc_device_info_t *device = oc_core_get_device_info(device_index);
-  if (device == NULL) {
-    oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
-    return;
-  }
+  //size_t device_index = request->resource->device;
+  //oc_device_info_t *device = oc_core_get_device_info(device_index);
+  //if (device == NULL) {
+  //  oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
+  //  return;
+  //}
   // Content-Format: "application/cbor"
   oc_rep_begin_root_object();
   oc_rep_i_set_int(root, 1, g_tol);
@@ -1110,12 +1110,12 @@ oc_core_f_netip_ttl_get_handler(oc_request_t *request,
     return;
   }
 
-  size_t device_index = request->resource->device;
-  oc_device_info_t *device = oc_core_get_device_info(device_index);
-  if (device == NULL) {
-    oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
-    return;
-  }
+ // size_t device_index = request->resource->device;
+ // oc_device_info_t *device = oc_core_get_device_info(device_index);
+ // if (device == NULL) {
+ //   oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
+ //   return;
+ // }
   // Content-Format: "application/cbor"
   oc_rep_begin_root_object();
   oc_rep_i_set_int(root, 1, g_ttl);
@@ -1244,12 +1244,12 @@ oc_core_f_netip_mcast_get_handler(oc_request_t *request,
     return;
   }
 
-  size_t device_index = request->resource->device;
-  oc_device_info_t *device = oc_core_get_device_info(device_index);
-  if (device == NULL) {
-    oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
-    return;
-  }
+  //size_t device_index = request->resource->device;
+  //oc_device_info_t *device = oc_core_get_device_info(device_index);
+  //if (device == NULL) {
+  //  oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
+  //  return;
+  //}
   // Content-Format: "application/cbor"
   oc_rep_begin_root_object();
   oc_rep_i_set_byte_string(root, 1, oc_string(g_mcast), oc_string_len(g_mcast));
