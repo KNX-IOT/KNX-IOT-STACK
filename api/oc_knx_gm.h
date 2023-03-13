@@ -28,7 +28,6 @@
 extern "C" {
 #endif
 
-  
 /**
   @defgroup doc_module_tag_iot_router IOT_ROUTER
   Optional group of iot_router functions.
@@ -47,67 +46,65 @@ extern "C" {
   @{
 */
 
-
 /**
-* @brief Group Mapping Table Resource (/fp/gm)
-* The payload is an array of objects.
-* Example (JSON):
-* ```
-* [
-*    {
-*        "id": "1",
-*        "ga":[2305, 2401],
-*        "dataType" : 1
-*    },
-*    {
-*        "id": 2,
-*        "ga": [2306],
-*        "dataType": 5,
-*        "s": {
-*          "groupkey": "<key>"
-*          "secSettings": {
-*            "a": true,
-*            "c": true
-*          }
-*       }
-*     }
-* ]
-* ```
-*
-* Key translation
-* | Json Key | Integer Value |
-* | -------- | ------------- |
-* | id       | 0             |
-* | ga       | 7             |
-* | dataType | 116 (t)       |
-* | s        | 115 (s)       |
-* | groupKey | 107           |
-* | secSettings | 28         |
-* | a        | 97 (a)        |
-* | c        | 99 (c)        |
-*
-* The structure stores the information.
-* The structure will be used as an array.
-* There are function to find
-* - empty index in the array
-* - find the index with a specific id
-* - delete an index, e.g. delete the array entry of data (persistent)
-* - make the entry persistent
-* - free the data
-*/
+ * @brief Group Mapping Table Resource (/fp/gm)
+ * The payload is an array of objects.
+ * Example (JSON):
+ * ```
+ * [
+ *    {
+ *        "id": "1",
+ *        "ga":[2305, 2401],
+ *        "dataType" : 1
+ *    },
+ *    {
+ *        "id": 2,
+ *        "ga": [2306],
+ *        "dataType": 5,
+ *        "s": {
+ *          "groupkey": "<key>"
+ *          "secSettings": {
+ *            "a": true,
+ *            "c": true
+ *          }
+ *       }
+ *     }
+ * ]
+ * ```
+ *
+ * Key translation
+ * | Json Key | Integer Value |
+ * | -------- | ------------- |
+ * | id       | 0             |
+ * | ga       | 7             |
+ * | dataType | 116 (t)       |
+ * | s        | 115 (s)       |
+ * | groupKey | 107           |
+ * | secSettings | 28         |
+ * | a        | 97 (a)        |
+ * | c        | 99 (c)        |
+ *
+ * The structure stores the information.
+ * The structure will be used as an array.
+ * There are function to find
+ * - empty index in the array
+ * - find the index with a specific id
+ * - delete an index, e.g. delete the array entry of data (persistent)
+ * - make the entry persistent
+ * - free the data
+ */
 typedef struct oc_group_mapping_table_t
 {
-  int id;                 /**< (0) contents of id*/
-  int ga_len;             /**< length of the array of ga identifiers*/
-  uint64_t *ga;           /**< (7) array of group addresses (unsigned 64 bit integers) */
-  uint32_t dataType;      /**< (116) dataType */
-  oc_string_t groupKey;   /**< (s:107) groupKey */
-  bool authentication; /**< (115:28:97) a authentication applied (default true, if
-                          groupKey exists)*/
-  bool confidentiality; /**< (115:28:99) c confidentiality applied (default true,
-                           if groupKey exists) */
+  int id;       /**< (0) contents of id*/
+  int ga_len;   /**< length of the array of ga identifiers*/
+  uint64_t *ga; /**< (7) array of group addresses (unsigned 64 bit integers) */
+  uint32_t dataType;    /**< (116) dataType */
+  oc_string_t groupKey; /**< (s:107) groupKey */
+  bool authentication;  /**< (115:28:97) a authentication applied (default true,
+                           if  groupKey exists)*/
+  bool confidentiality; /**< (115:28:99) c confidentiality applied (default
+                           true, if groupKey exists) */
 } oc_group_mapping_table_t;
-
 
 /**
  * @brief Creation of the knx iot router resources
@@ -122,7 +119,8 @@ void oc_core_f_netip_get_handler(oc_request_t *request,
                                  oc_interface_mask_t iface_mask, void *data);
 
 /**
- * @brief delete all entries of the Group Mapping Table (from persistent) storage
+ * @brief delete all entries of the Group Mapping Table (from persistent)
+ * storage
  *
  */
 void oc_delete_group_mapping_table();
@@ -145,8 +143,7 @@ int oc_core_get_group_mapping_table_size();
  * @return int 0 == successful
  */
 int oc_core_set_group_mapping_table(size_t device_index, int index,
-                         oc_group_mapping_table_t entry,
-                         bool store);
+                                    oc_group_mapping_table_t entry, bool store);
 
 /**
  * @brief retrieve group mapping entry
@@ -188,7 +185,8 @@ int oc_get_f_netip_tol(size_t device_index);
 oc_string_t oc_get_f_netip_key(size_t device_index);
 
 /**
- * @brief retrieve the value defines how many routers a multicast message MAY pass until it gets discarded. (ttl)
+ * @brief retrieve the value defines how many routers a multicast message MAY
+ * pass until it gets discarded. (ttl)
  *
  * @param device_index index of the device
  * @return the ttl value

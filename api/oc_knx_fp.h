@@ -186,7 +186,6 @@ typedef struct oc_group_rp_table_t
   int ga_len;       /**< length of the array of group addresses identifiers */
 } oc_group_rp_table_t;
 
-
 /**
  * @brief find id (cbor key 0) in the response
  *
