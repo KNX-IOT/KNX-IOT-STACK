@@ -287,10 +287,6 @@ typedef enum {
   OC_KNX_AUTH_AT_X,         /**< auth/at/X resources */
   OC_KNX_FP_GM,             /**< FP/GM */
   OC_KNX_FP_GM_X,           /**< FP/GM/X */
-  OC_GM_MCAST,              /**< IOT Router MCAST */
-  OC_GM_BKEY,               /**< IOT Router IP Routing backbone key */
-  OC_GM_MTLL,               /**< IOT Router Multicast Time to live */
-  OC_GM_IP_LF,              /**< IOT router Latency fraction*/
   /* List of resources on a logical device: start */
   WELLKNOWNCORE /**< well-known/core resource */
   /* List of resources on a logical device: end */

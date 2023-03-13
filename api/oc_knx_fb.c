@@ -17,6 +17,7 @@
 #include "oc_api.h"
 #include "api/oc_knx_fb.h"
 #include "api/oc_knx_fp.h"
+#include "api/oc_knx_gm.h"
 
 #include "oc_core_res.h"
 #include "oc_discovery.h"
@@ -87,6 +88,17 @@ oc_core_fb_x_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
+
+#ifdef OC_IOT_ROUTER
+  const char *value;
+  int value_len = oc_uri_get_wildcard_value_as_string(
+    oc_string(request->resource->uri), oc_string_len(request->resource->uri),
+    request->uri_path, request->uri_path_len, &value);
+  if ((value_len == 5) && (strcmp(value, "netip") == 0)) {
+    oc_core_f_netip_get_handler(request, iface_mask, data);
+    return;
+  }
+#endif /* OC_IOT_ROUTER */
 
   // if instance is not set, it is instance 0
   int instance = 0;
@@ -180,12 +192,22 @@ oc_add_function_blocks_to_response(oc_request_t *request, size_t device_index,
     oc_string_array_t types = resource->types;
     for (i = 0; i < (int)oc_string_array_get_allocated_size(types); i++) {
       char *t = oc_string_array_get_item(types, i);
-      if ((strncmp(t, ":dpa", 4) == 0) ||
-          (strncmp(t, "urn:knx:dpa", 11) == 0)) {
-        int fp_int = get_fp_from_dp(t);
-        int instance = resource->fb_instance;
-        if ((fp_int > 0) && (is_in_g_array(fp_int, instance) == false)) {
-          store_in_array(fp_int, instance);
+      if ((strncmp(t, ":dpa.11.", 8) == 0) ||
+          (strncmp(t, "urn:knx:dpa.11.", 15) == 0)) {
+        /* specific functional block iot_router : /f/netip */
+        length = oc_rep_add_line_to_buffer("</f/netip>;rt=\"fb.11\"ct=40");
+        *response_length += length;
+        matches++;
+      } else {
+        /* regular functional block, framing by functional block numbers &
+         * instances*/
+        if ((strncmp(t, ":dpa", 4) == 0) ||
+            (strncmp(t, "urn:knx:dpa", 11) == 0)) {
+          int fp_int = get_fp_from_dp(t);
+          int instance = resource->fb_instance;
+          if ((fp_int > 0) && (is_in_g_array(fp_int, instance) == false)) {
+            store_in_array(fp_int, instance);
+          }
         }
       }
     }

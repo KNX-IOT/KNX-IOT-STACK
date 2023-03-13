@@ -1,5 +1,5 @@
 /*
-// Copyright (c) 2021-2022 Cascoda Ltd
+// Copyright (c) 2021-2023 Cascoda Ltd
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,9 +14,10 @@
 // limitations under the License.
 */
 /**
-  @brief knx /fp/gm resource implementations
-  @file
-*/
+ *  @brief knx iot router implementation
+ *
+ * @file
+ */
 #ifndef OC_KNX_GM_INTERNAL_H
 #define OC_KNX_GM_INTERNAL_H
 
@@ -28,21 +29,176 @@ extern "C" {
 #endif
 
 /**
- * @brief Creation of the gm resources
+  @defgroup doc_module_tag_iot_router IOT_ROUTER
+  Optional group of iot_router functions.
+
+  Currently implemented:
+  - /fp/gm  resource
+  - /fp/gm/[entry]
+  - /f/netip listing:
+    - /p/netip/ttl
+    - /p/netip/tol
+    - /p/netip/mcast
+    - /p/netip/key
+    - /p/netip/fra
+  - register a generic call back to route all s-mode
+  messages
+  @{
+*/
+
+/**
+ * @brief Group Mapping Table Resource (/fp/gm)
+ * The payload is an array of objects.
+ * Example (JSON):
+ * ```
+ * [
+ *    {
+ *        "id": "1",
+ *        "ga":[2305, 2401],
+ *        "dataType" : 1
+ *    },
+ *    {
+ *        "id": 2,
+ *        "ga": [2306],
+ *        "dataType": 5,
+ *        "s": {
+ *          "groupkey": "<key>"
+ *          "secSettings": {
+ *            "a": true,
+ *            "c": true
+ *          }
+ *       }
+ *     }
+ * ]
+ * ```
+ *
+ * Key translation
+ * | Json Key | Integer Value |
+ * | -------- | ------------- |
+ * | id       | 0             |
+ * | ga       | 7             |
+ * | dataType | 116 (t)       |
+ * | s        | 115 (s)       |
+ * | groupKey | 107           |
+ * | secSettings | 28         |
+ * | a        | 97 (a)        |
+ * | c        | 99 (c)        |
+ *
+ * The structure stores the information.
+ * The structure will be used as an array.
+ * There are function to find
+ * - empty index in the array
+ * - find the index with a specific id
+ * - delete an index, e.g. delete the array entry of data (persistent)
+ * - make the entry persistent
+ * - free the data
+ */
+typedef struct oc_group_mapping_table_t
+{
+  int id;       /**< (0) contents of id*/
+  int ga_len;   /**< length of the array of ga identifiers*/
+  uint64_t *ga; /**< (7) array of group addresses (unsigned 64 bit integers) */
+  uint32_t dataType;    /**< (116) dataType */
+  oc_string_t groupKey; /**< (s:107) groupKey */
+  bool authentication;  /**< (115:28:97) a authentication applied (default true,
+                           if  groupKey exists)*/
+  bool confidentiality; /**< (115:28:99) c confidentiality applied (default
+                           true, if groupKey exists) */
+} oc_group_mapping_table_t;
+
+/**
+ * @brief Creation of the knx iot router resources
  *
  * @param device_index index of the device to which the resource are to be
  * created
  */
-void oc_create_knx_gm_resources(size_t device_index);
+void oc_create_knx_iot_router_resources(size_t device_index);
+
+void oc_create_iot_router_functional_block(size_t device_index);
+void oc_core_f_netip_get_handler(oc_request_t *request,
+                                 oc_interface_mask_t iface_mask, void *data);
 
 /**
-  @defgroup doc_module_tag_gateway Gateway
-  Optional group of KNX-IOT to Classic gateway functions.
+ * @brief delete all entries of the Group Mapping Table (from persistent)
+ * storage
+ *
+ */
+void oc_delete_group_mapping_table();
 
-  Currently implemented: register a generic call back to route all s-mode
-  messages
-  @{
-*/
+/**
+ * @brief returns the size (amount of total entries) of the fp / gm table
+ *
+ * @return the allocated amount of entries of the group mapping at table
+ */
+int oc_core_get_group_mapping_table_size();
+
+/**
+ * @brief set an entry in the group mapping table
+ *
+ * Note: does not write to persistent storage
+ * @param device_index index of the device
+ * @param index the index in the table, will overwrite if something is there
+ * @param entry the group mapping entry
+ * @param store the store the entry to persistent storage
+ * @return int 0 == successful
+ */
+int oc_core_set_group_mapping_table(size_t device_index, int index,
+                                    oc_group_mapping_table_t entry, bool store);
+
+/**
+ * @brief retrieve group mapping entry
+ *
+ * @param device_index the device index
+ * @param index the index in the table
+ * @return oc_group_mapping_table_t* the group mapping entry
+ */
+oc_group_mapping_table_t *oc_get_group_mapping_entry(size_t device_index,
+                                                     int index);
+
+/**
+ * @brief load all entries of the Group Mapping Table (from persistent) storage
+ *
+ */
+void oc_load_group_mapping_table();
+
+/**
+ * @brief retrieve the IPv4 sync latency fraction (fra).
+ * @param device_index index of the device
+ * @return the fra value
+ */
+int oc_get_f_netip_fra(size_t device_index);
+
+/**
+ * @brief retrieve the IPv4 routing latency tolerance (tol)
+ *
+ * @param device_index index of the device
+ * @return the tol value
+ */
+int oc_get_f_netip_tol(size_t device_index);
+
+/**
+ * @brief retrieve the IPv4 routing backbone key
+ *
+ * @param device_index index of the device
+ * @return the key value
+ */
+oc_string_t oc_get_f_netip_key(size_t device_index);
+
+/**
+ * @brief retrieve the value defines how many routers a multicast message MAY
+ * pass until it gets discarded. (ttl)
+ *
+ * @param device_index index of the device
+ * @return the ttl value
+ */
+int oc_get_f_netip_ttl(size_t device_index);
+/**
+ * @brief retrieve the current IPv4 routing multicast address.(mcast)
+ *
+ * @param device_index index of the device
+ * @return the mcast value
+ */
+oc_string_t oc_get_f_netip_mcast(size_t device_index);
 
 /**
  * Callback invoked for all s-mode communication

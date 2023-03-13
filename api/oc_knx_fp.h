@@ -187,6 +187,13 @@ typedef struct oc_group_rp_table_t
 } oc_group_rp_table_t;
 
 /**
+ * @brief find id (cbor key 0) in the response
+ *
+ * @return int -1 : not found, > -1 : value found
+ */
+int oc_table_find_id_from_rep(oc_rep_t *object);
+
+/**
  * @brief set an entry in the group object table
  *
  * @param index the index where to add the entry

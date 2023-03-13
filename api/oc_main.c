@@ -33,6 +33,7 @@
 
 #include "oc_knx_dev.h"
 #include "oc_knx_fp.h"
+#include "oc_knx_gm.h"
 
 #ifdef OC_OSCORE
 #include "security/oc_tls.h"
@@ -330,7 +331,11 @@ oc_main_init(const oc_handler_t *handler)
   if (app_callbacks->register_resources) {
     app_callbacks->register_resources();
   }
-#endif
+
+#ifdef OC_IOT_ROUTER
+  oc_create_iot_router_functional_block(0);
+#endif /* OC_IOT_ROUTER */
+#endif /* OC_SERVER */
 
   OC_DBG("oc_main: stack initialized");
 
