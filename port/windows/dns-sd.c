@@ -15,6 +15,7 @@
 */
 
 #include "dns-sd.h"
+#include "ipadapter.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <process.h>
