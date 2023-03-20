@@ -190,14 +190,19 @@ oc_add_function_blocks_to_response(oc_request_t *request, size_t device_index,
     }
 
     oc_string_array_t types = resource->types;
+    bool netip_added = false;
     for (i = 0; i < (int)oc_string_array_get_allocated_size(types); i++) {
       char *t = oc_string_array_get_item(types, i);
       if ((strncmp(t, ":dpa.11.", 8) == 0) ||
           (strncmp(t, "urn:knx:dpa.11.", 15) == 0)) {
         /* specific functional block iot_router : /f/netip */
-        length = oc_rep_add_line_to_buffer("</f/netip>;rt=\"fb.11\"ct=40");
-        *response_length += length;
-        matches++;
+        if (netip_added == false) {
+          /* add only once */
+          length = oc_rep_add_line_to_buffer("</f/netip>;rt=\"fb.11\"ct=40");
+          *response_length += length;
+          matches++;
+          netip_added = true;
+        }
       } else {
         /* regular functional block, framing by functional block numbers &
          * instances*/
