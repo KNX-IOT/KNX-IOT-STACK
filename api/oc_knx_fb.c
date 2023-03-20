@@ -94,7 +94,7 @@ oc_core_fb_x_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   int value_len = oc_uri_get_wildcard_value_as_string(
     oc_string(request->resource->uri), oc_string_len(request->resource->uri),
     request->uri_path, request->uri_path_len, &value);
-  if ((value_len == 5) && (strcmp(value, "netip") == 0)) {
+  if ((value_len == 5) && (strncmp(value, "netip", 5) == 0)) {
     oc_core_f_netip_get_handler(request, iface_mask, data);
     return;
   }
@@ -190,14 +190,19 @@ oc_add_function_blocks_to_response(oc_request_t *request, size_t device_index,
     }
 
     oc_string_array_t types = resource->types;
+    bool netip_added = false;
     for (i = 0; i < (int)oc_string_array_get_allocated_size(types); i++) {
       char *t = oc_string_array_get_item(types, i);
       if ((strncmp(t, ":dpa.11.", 8) == 0) ||
           (strncmp(t, "urn:knx:dpa.11.", 15) == 0)) {
         /* specific functional block iot_router : /f/netip */
-        length = oc_rep_add_line_to_buffer("</f/netip>;rt=\"fb.11\"ct=40");
-        *response_length += length;
-        matches++;
+        if (netip_added == false) {
+          /* add only once */
+          length = oc_rep_add_line_to_buffer("</f/netip>;rt=\"fb.11\"ct=40");
+          *response_length += length;
+          matches++;
+          netip_added = true;
+        }
       } else {
         /* regular functional block, framing by functional block numbers &
          * instances*/
