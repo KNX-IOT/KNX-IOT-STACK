@@ -181,6 +181,7 @@ oc_add_function_blocks_to_response(oc_request_t *request, size_t device_index,
 
   // use global variable
   g_array_size = 0;
+  bool netip_added = false;
 
   oc_resource_t *resource = oc_ri_get_app_resources();
   for (; resource; resource = resource->next) {
@@ -190,7 +191,6 @@ oc_add_function_blocks_to_response(oc_request_t *request, size_t device_index,
     }
 
     oc_string_array_t types = resource->types;
-    bool netip_added = false;
     for (i = 0; i < (int)oc_string_array_get_allocated_size(types); i++) {
       char *t = oc_string_array_get_item(types, i);
       if ((strncmp(t, ":dpa.11.", 8) == 0) ||
