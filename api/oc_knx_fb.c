@@ -94,7 +94,7 @@ oc_core_fb_x_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   int value_len = oc_uri_get_wildcard_value_as_string(
     oc_string(request->resource->uri), oc_string_len(request->resource->uri),
     request->uri_path, request->uri_path_len, &value);
-  if ((value_len == 5) && (strcmp(value, "netip") == 0)) {
+  if ((value_len == 5) && (strncmp(value, "netip", 5) == 0)) {
     oc_core_f_netip_get_handler(request, iface_mask, data);
     return;
   }
