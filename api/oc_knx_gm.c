@@ -810,7 +810,7 @@ oc_create_f_netip_fra_resource(size_t device)
   oc_resource_bind_resource_type(res, "urn:knx:dpt.Scaling");
   oc_resource_bind_dpt(res, "");
   oc_resource_bind_content_type(res, APPLICATION_CBOR);
-  oc_resource_bind_resource_interface(res, OC_IF_D); /* if.d */
+  oc_resource_bind_resource_interface(res, OC_IF_D + OC_IF_P); /* if.d + if.p*/
   oc_resource_set_function_block_instance(res, 1);   /* instance 1 */
   oc_resource_set_discoverable(res, true);
   /* periodic observable
@@ -936,7 +936,7 @@ oc_create_f_netip_tol_resource(size_t device)
   oc_resource_bind_resource_type(res, "urn:knx:dpt.timePeriodMsec");
   oc_resource_bind_dpt(res, "");
   oc_resource_bind_content_type(res, APPLICATION_CBOR);
-  oc_resource_bind_resource_interface(res, OC_IF_D); /* if.d */
+  oc_resource_bind_resource_interface(res, OC_IF_D + OC_IF_P); /* if.d +  if.p*/
   oc_resource_set_function_block_instance(res, 1);   /* instance 1 */
   oc_resource_set_discoverable(res, true);
   /* periodic observable
@@ -1037,7 +1037,7 @@ oc_create_f_netip_key_resource(size_t device)
   oc_resource_bind_resource_type(res, "urn:knx:dpt.varOctet");
   oc_resource_bind_dpt(res, "");
   oc_resource_bind_content_type(res, APPLICATION_CBOR);
-  oc_resource_bind_resource_interface(res, OC_IF_D); /* if.d */
+  oc_resource_bind_resource_interface(res, OC_IF_D + OC_IF_P); /* if.d + if.p */
   oc_resource_set_function_block_instance(res, 1);   /* instance 1 */
   oc_resource_set_discoverable(res, true);
   /* periodic observable
@@ -1167,7 +1167,7 @@ oc_create_f_netip_ttl_resource(size_t device)
   oc_resource_bind_resource_type(res, "urn:knx:dpt.value1Ucount");
   oc_resource_bind_dpt(res, "");
   oc_resource_bind_content_type(res, APPLICATION_CBOR);
-  oc_resource_bind_resource_interface(res, OC_IF_D); /* if.d */
+  oc_resource_bind_resource_interface(res, OC_IF_D + OC_IF_P); /* if.d + if.p */
   oc_resource_set_function_block_instance(res, 1);   /* instance 1 */
   oc_resource_set_discoverable(res, true);
   /* periodic observable
@@ -1302,7 +1302,7 @@ oc_create_f_netip_mcast_resource(size_t device)
   oc_resource_bind_resource_type(res, "urn:knx:dpt.IPV4");
   oc_resource_bind_dpt(res, "");
   oc_resource_bind_content_type(res, APPLICATION_CBOR);
-  oc_resource_bind_resource_interface(res, OC_IF_D); /* if.d */
+  oc_resource_bind_resource_interface(res, OC_IF_D + OC_IF_P); /* if.d + if.p */
   oc_resource_set_function_block_instance(res, 1);   /* instance 1 */
   oc_resource_set_discoverable(res, true);
   /* periodic observable
