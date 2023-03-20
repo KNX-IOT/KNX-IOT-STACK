@@ -15,6 +15,7 @@
 */
 
 #include "dns-sd.h"
+#include "ipadapter.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <process.h>
@@ -22,7 +23,8 @@
 #include <Windows.h>
 
 intptr_t process_handle = 0;
-char subtypes[200];
+char subtypes[64];
+char prefixed_serial_no[64];
 static char port_str[7];
 
 int
@@ -41,21 +43,24 @@ knx_publish_service(char *serial_no, uint32_t iid, uint32_t ia, bool pm)
   uint16_t port = get_ip_context_for_device(0)->port;
   snprintf(port_str, sizeof(port), "%d", port);
 
-  char *ia0_subtype;
+  snprintf(prefixed_serial_no, sizeof(prefixed_serial_no), "knx-%s", serial_no);
+
+  char *pm_subtype;
   if (pm)
-    ia0_subtype = ",ia0";
+    pm_subtype = ",_pm";
   else
-    ia0_subtype = "";
+    pm_subtype = "";
 
   if (iid == 0 || ia == 0) {
-    sprintf(subtypes, "_knx._udp,_%s%s", serial_no, ia0_subtype);
-    process_handle = _spawnlp(_P_NOWAIT, "dns-sd", "dns-sd", "-R", serial_no,
-                              subtypes, "local", port_str, NULL);
+    sprintf(subtypes, "_knx._udp,_%s%s", serial_no, pm_subtype);
+    process_handle =
+      _spawnlp(_P_NOWAIT, "dns-sd", "dns-sd", "-R", prefixed_serial_no,
+               subtypes, "local", port_str, NULL);
   } else {
-    sprintf(subtypes, "_knx._udp,_%s,_ia%X-%X%s", serial_no, iid, ia,
-            ia0_subtype);
-    process_handle = _spawnlp(_P_NOWAIT, "dns-sd", "dns-sd", "-R", serial_no,
-                              subtypes, "local", port_str, NULL);
+    sprintf(subtypes, "_knx._udp,__ia%x-%x%s", iid, ia, pm_subtype);
+    process_handle =
+      _spawnlp(_P_NOWAIT, "dns-sd", "dns-sd", "-R", prefixed_serial_no,
+               subtypes, "local", port_str, NULL);
   }
 #endif /* OC_DNS_SD */
 
