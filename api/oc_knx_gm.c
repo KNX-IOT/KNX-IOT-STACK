@@ -1369,28 +1369,28 @@ oc_core_f_netip_get_handler(oc_request_t *request,
   response_length += length;
   length = oc_rep_add_line_to_buffer(";rt=\":dpa.11.66 :dpt.IPv4\"");
   response_length += length;
-  length = oc_rep_add_line_to_buffer(";ct=60");
+  length = oc_rep_add_line_to_buffer(";ct=60,\n");
   response_length += length;
 
   length = oc_rep_add_line_to_buffer("</p/netip/ttl>");
   response_length += length;
   length = oc_rep_add_line_to_buffer(";rt=\":dpa.11.67 :dpt.value1Ucount\"");
   response_length += length;
-  length = oc_rep_add_line_to_buffer(";ct=60");
+  length = oc_rep_add_line_to_buffer(";ct=60,\n");
   response_length += length;
 
   length = oc_rep_add_line_to_buffer("</p/netip/key>");
   response_length += length;
   length = oc_rep_add_line_to_buffer(";rt=\":dpa.11.91 :dpt.varOctet\"");
   response_length += length;
-  length = oc_rep_add_line_to_buffer(";ct=60");
+  length = oc_rep_add_line_to_buffer(";ct=60,\n");
   response_length += length;
 
   length = oc_rep_add_line_to_buffer("</p/netip/tol>");
   response_length += length;
   length = oc_rep_add_line_to_buffer(";rt=\":dpa.11.95 :dpt.timePeriodMsec\"");
   response_length += length;
-  length = oc_rep_add_line_to_buffer(";ct=60");
+  length = oc_rep_add_line_to_buffer(";ct=60,\n");
   response_length += length;
 
   length = oc_rep_add_line_to_buffer("</p/netip/fra>");
