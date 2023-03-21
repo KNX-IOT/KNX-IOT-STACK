@@ -198,7 +198,7 @@ oc_add_function_blocks_to_response(oc_request_t *request, size_t device_index,
         /* specific functional block iot_router : /f/netip */
         if (netip_added == false) {
           /* add only once */
-          length = oc_rep_add_line_to_buffer("</f/netip>;rt=\"fb.11\"ct=40");
+          length = oc_rep_add_line_to_buffer("</f/netip>;rt=\"fb.11\";ct=40");
           *response_length += length;
           matches++;
           netip_added = true;
