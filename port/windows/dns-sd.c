@@ -41,7 +41,7 @@ knx_publish_service(char *serial_no, uint32_t iid, uint32_t ia, bool pm)
   }
 
   uint16_t port = get_ip_context_for_device(0)->port;
-  snprintf(port_str, sizeof(port), "%d", port);
+  snprintf(port_str, sizeof(port_str), "%d", port);
 
   char *pm_subtype;
   if (pm)
