@@ -448,11 +448,12 @@ oc_core_fp_gm_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     response_length += length;
   }
 
-  if (response_length > 0) {
-    oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
-  } else {
-    oc_send_linkformat_response(request, OC_STATUS_INTERNAL_SERVER_ERROR, 0);
-  }
+  oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
+  // if (response_length > 0) {
+  //   oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
+  // } else {
+  //   oc_send_linkformat_response(request, OC_STATUS_INTERNAL_SERVER_ERROR, 0);
+  // }
 
   PRINT("oc_core_fp_gm_get_handler - end\n");
 }
