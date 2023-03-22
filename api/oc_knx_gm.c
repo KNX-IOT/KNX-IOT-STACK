@@ -597,9 +597,8 @@ oc_create_fp_gm_resource(int resource_idx, size_t device)
   OC_DBG("oc_create_fp_gm_resource\n");
   oc_core_populate_resource(
     resource_idx, device, "/fp/gm", OC_IF_C | OC_IF_B, APPLICATION_CBOR,
-    OC_DISCOVERABLE,
-    oc_core_fp_gm_get_handler, 0, oc_core_fp_gm_post_handler, 0, 0, 1,
-    "urn:knx:if.c");
+    OC_DISCOVERABLE, oc_core_fp_gm_get_handler, 0, oc_core_fp_gm_post_handler,
+    0, 0, 1, "urn:knx:if.c");
 }
 
 static void
