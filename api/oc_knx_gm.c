@@ -511,6 +511,7 @@ oc_core_fp_gm_post_handler(oc_request_t *request,
         }
       }
       PRINT("  storage index: %d (%d)\n", index, id);
+      g_gm_entries[index].id = id;
 
       // parse the response
       object = rep->value.object;
@@ -521,7 +522,7 @@ oc_core_fp_gm_post_handler(oc_request_t *request,
             int64_t *array = 0;
             size_t array_size = 0;
             // not making a deep copy
-            oc_rep_i_get_int_array(object, 9, &array, &array_size);
+            oc_rep_i_get_int_array(object, 7, &array, &array_size);
             if (array_size > 0) {
               // make the deep copy
               if ((g_gm_entries[index].ga_len > 0) &&
