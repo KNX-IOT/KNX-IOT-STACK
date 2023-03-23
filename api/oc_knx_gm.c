@@ -616,11 +616,9 @@ oc_core_fp_gm_post_handler(oc_request_t *request,
   }
 
   for (int i = 0; i < oc_core_get_group_mapping_table_size(); i++) {
-    if (g_gm_entries[i].ga_len == 0) {
-      // index not in use
-      break;
+    if (g_gm_entries[i].ga_len != 0) {
+      oc_dump_group_mapping_table_entry(i);
     }
-    oc_dump_group_mapping_table_entry(i);
   }
 
   request->response->response_buffer->content_format = APPLICATION_CBOR;
