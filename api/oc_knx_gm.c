@@ -558,7 +558,7 @@ oc_core_fp_gm_post_handler(oc_request_t *request,
           int s_object_nr = object->iname;
           PRINT("  s_object_nr %d\n", s_object_nr);
           while (s_object) {
-            if (s_object->type == OC_REP_STRING) {
+            if (s_object->type == OC_REP_BYTE_STRING) {
               if (s_object->iname == 107 && s_object_nr == 115) {
                 // groupkey (115(s)::107)
                 oc_free_string(&(g_gm_entries[index].groupKey));
@@ -571,7 +571,9 @@ oc_core_fp_gm_post_handler(oc_request_t *request,
               if (sec_object == NULL) {
                 continue;
               }
-              int sec_object_nr = sec_object->iname;
+              // get the number of the object which was the object in the
+              // s_object.
+              int sec_object_nr = s_object->iname;
               while (sec_object) {
                 if (sec_object->type == OC_REP_BOOL) {
                   if (sec_object->iname == 97 && s_object_nr == 115 &&
