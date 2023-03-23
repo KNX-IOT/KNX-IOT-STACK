@@ -324,6 +324,16 @@ oc_load_group_mapping_table_entry(int entry)
             g_gm_entries[entry].dataType = (int)rep->value.integer;
           }
           break;
+
+        case OC_REP_BYTE_STRING:
+          if (rep->iname == 107) {
+            // g_gm_entries[entry].authentication = (int)rep->value.boolean;
+            oc_free_string(&g_gm_entries[entry].key);
+            oc_new_string(&g_gm_entries[entry].key,
+                          oc_string(rep->value.string),
+                          oc_string_len(rep->value.string));
+          }
+          break;
         case OC_REP_BOOL:
           if (rep->iname == 97) {
             g_gm_entries[entry].authentication = (int)rep->value.boolean;
@@ -850,12 +860,6 @@ oc_create_f_netip_fra_resource(size_t device)
   oc_resource_set_request_handler(res, OC_PUT, oc_core_f_netip_fra_put_handler,
                                   NULL);
   oc_add_resource(res);
-
-  // oc_core_populate_resource(
-  //   resource_idx, device, "/f/netip/fra", OC_IF_D, APPLICATION_CBOR,
-  //   OC_DISCOVERABLE, oc_core_f_netip_fra_get_handler,
-  //   oc_core_f_netip_fra_put_handler, 0, 0, 0, 2,
-  //  "urn:knx:dpa.11.96", "urn:knx:dpt.Scaling");
 }
 
 // -----------------------------------------------------------------------------
@@ -976,12 +980,6 @@ oc_create_f_netip_tol_resource(size_t device)
   oc_resource_set_request_handler(res, OC_PUT, oc_core_f_netip_tol_put_handler,
                                   NULL);
   oc_add_resource(res);
-
-  // oc_core_populate_resource(
-  //   resource_idx, device, "/f/netip/tol", OC_IF_D, APPLICATION_CBOR,
-  //   OC_DISCOVERABLE, oc_core_f_netip_tol_get_handler,
-  //   oc_core_f_netip_tol_put_handler, 0, 0, 0, 2,
-  //   "urn:knx:dpa.11.95", "urn:knx:dpt.timePeriodMsec");
 }
 
 // -----------------------------------------------------------------------------
@@ -991,7 +989,7 @@ dump_key(void)
 {
   int key_size = oc_string_len(g_key);
   oc_storage_write(GM_STORE_KEY, (uint8_t *)&key_size, sizeof(key_size));
-  oc_storage_write(GM_STORE_KEY, (uint8_t *)&g_key, sizeof(key_size));
+  oc_storage_write(GM_STORE_KEY, (uint8_t *)&g_key, key_size);
 }
 
 void
@@ -1079,13 +1077,6 @@ oc_create_f_netip_key_resource(size_t device)
   oc_resource_set_request_handler(res, OC_PUT, oc_core_f_netip_key_put_handler,
                                   NULL);
   oc_add_resource(res);
-
-  // no GET handler
-  // oc_core_populate_resource(
-  //  resource_idx, device, "/f/netip/key", OC_IF_D, APPLICATION_CBOR,
-  //  OC_DISCOVERABLE, 0,
-  //  oc_core_f_netip_key_put_handler, 0, 0, 0, 2,
-  //  "urn:knx:dpa.11.91", "urn:knx:dpt.varOctet");
 }
 
 // -----------------------------------------------------------------------------
@@ -1223,7 +1214,7 @@ dump_mcast(void)
 {
   int mcast_size = oc_string_len(g_mcast);
   oc_storage_write(GM_STORE_MCAST, (uint8_t *)&mcast_size, sizeof(mcast_size));
-  oc_storage_write(GM_STORE_MCAST, (uint8_t *)&g_mcast, sizeof(mcast_size));
+  oc_storage_write(GM_STORE_MCAST, (uint8_t *)&g_mcast, mcast_size);
 }
 
 void
