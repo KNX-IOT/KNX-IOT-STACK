@@ -1003,7 +1003,7 @@ load_key(void)
   int temp_size;
   int key_size;
   char tempstring[100];
-  temp_size = oc_storage_read(GM_STORE_KEY, &tempstring, 99);
+  temp_size = oc_storage_read(GM_STORE_KEY, (uint8_t*)&tempstring, 99);
   if (temp_size > 1) {
     tempstring[temp_size] = 0;
     oc_new_string(&g_key, tempstring, temp_size);
@@ -1201,12 +1201,6 @@ oc_create_f_netip_ttl_resource(size_t device)
                                   NULL);
   oc_add_resource(res);
 
-  // oc_core_populate_resource(resource_idx, device, "/f/netip/ttl", OC_IF_D,
-  //                           APPLICATION_CBOR, OC_DISCOVERABLE,
-  //                           oc_core_f_netip_ttl_get_handler,
-  //                            oc_core_f_netip_ttl_put_handler, 0, 0, 0, 2,
-  //                           "urn:knx:dpa.11.67"
-  //                           ,"urn:knx:dpt.value1Ucount");
 }
 
 // -----------------------------------------------------------------------------
@@ -1217,7 +1211,7 @@ dump_mcast(void)
 {
   int key_size = oc_string_len(g_mcast);
   int written =
-    oc_storage_write(GM_STORE_MCAST, oc_string(g_g_mcastkey), key_size);
+    oc_storage_write(GM_STORE_MCAST, oc_string(g_mcastkey), key_size);
   if (written != key_size) {
     PRINT("dump_mcast %d %d\n", key_size, written);
   }
@@ -1229,7 +1223,7 @@ load_mcast(void)
   int temp_size;
   int key_size;
   char tempstring[100];
-  temp_size = oc_storage_read(GM_STORE_MCAST, &tempstring, 99);
+  temp_size = oc_storage_read(GM_STORE_MCAST, (uint8_t *)&tempstring, 99);
   if (temp_size > 1) {
     tempstring[temp_size] = 0;
     oc_new_string(&g_mcast, tempstring, temp_size);
@@ -1337,11 +1331,6 @@ oc_create_f_netip_mcast_resource(size_t device)
                                   oc_core_f_netip_mcast_put_handler, NULL);
   oc_add_resource(res);
 
-  // oc_core_populate_resource(resource_idx, device, "/f/netip/mcast", OC_IF_D,
-  //                           APPLICATION_CBOR, OC_DISCOVERABLE,
-  //                           oc_core_f_netip_mcast_get_handler,
-  //                           oc_core_f_netip_mcast_put_handler, 0, 0, 0, 2,
-  //                           "urn:knx:dpa.11.66","urn:knx:dpt.IPV4");
 }
 
 // -----------------------------------------------------------------------------
