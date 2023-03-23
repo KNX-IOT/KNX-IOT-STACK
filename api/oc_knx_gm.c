@@ -610,13 +610,15 @@ oc_core_fp_gm_post_handler(oc_request_t *request,
         }
         object = object->next;
       } // while (inner object)
-      // store the entry
-      if (id > 0 && index > 0) {
-        oc_dump_group_mapping_table_entry(index);
-      }
-    } // case
-    } // switch (over all objects)
+    }   // case
+    }   // switch (over all objects)
     rep = rep->next;
+  }
+
+  for (int i = 0; i < oc_core_get_group_mapping_table_size(); i++) {
+    if (g_gm_entries[i].ga_len != 0) {
+      oc_dump_group_mapping_table_entry(i);
+    }
   }
 
   request->response->response_buffer->content_format = APPLICATION_CBOR;
@@ -988,8 +990,11 @@ void
 dump_key(void)
 {
   int key_size = oc_string_len(g_key);
-  oc_storage_write(GM_STORE_KEY, (uint8_t *)&key_size, sizeof(key_size));
-  oc_storage_write(GM_STORE_KEY, (uint8_t *)&g_key, key_size);
+  // oc_storage_write(GM_STORE_KEY, (uint8_t *)&key_size, sizeof(key_size));
+  int written = oc_storage_write(GM_STORE_KEY, oc_string(g_key), key_size);
+  if (written != key_size) {
+    PRINT("dump_key %d %d\n", key_size, written);
+  }
 }
 
 void
@@ -997,14 +1002,11 @@ load_key(void)
 {
   int temp_size;
   int key_size;
-  char key_buffer[100];
-
-  temp_size =
-    oc_storage_read(GM_STORE_KEY, (uint8_t *)&key_size, sizeof(key_size));
-
-  if ((key_size > 0) && (key_size < 100)) {
-    temp_size = oc_storage_read(GM_STORE_KEY, (uint8_t *)&key_buffer, key_size);
-    oc_new_string(&g_key, key_buffer, key_size);
+  char tempstring[100];
+  temp_size = oc_storage_read(GM_STORE_KEY, (uint8_t *)&tempstring, 99);
+  if (temp_size > 1) {
+    tempstring[temp_size] = 0;
+    oc_new_string(&g_key, tempstring, temp_size);
   }
 }
 
@@ -1198,13 +1200,6 @@ oc_create_f_netip_ttl_resource(size_t device)
   oc_resource_set_request_handler(res, OC_PUT, oc_core_f_netip_ttl_put_handler,
                                   NULL);
   oc_add_resource(res);
-
-  // oc_core_populate_resource(resource_idx, device, "/f/netip/ttl", OC_IF_D,
-  //                           APPLICATION_CBOR, OC_DISCOVERABLE,
-  //                           oc_core_f_netip_ttl_get_handler,
-  //                            oc_core_f_netip_ttl_put_handler, 0, 0, 0, 2,
-  //                           "urn:knx:dpa.11.67"
-  //                           ,"urn:knx:dpt.value1Ucount");
 }
 
 // -----------------------------------------------------------------------------
@@ -1212,25 +1207,23 @@ oc_create_f_netip_ttl_resource(size_t device)
 void
 dump_mcast(void)
 {
-  int mcast_size = oc_string_len(g_mcast);
-  oc_storage_write(GM_STORE_MCAST, (uint8_t *)&mcast_size, sizeof(mcast_size));
-  oc_storage_write(GM_STORE_MCAST, (uint8_t *)&g_mcast, mcast_size);
+  int key_size = oc_string_len(g_mcast);
+  int written = oc_storage_write(GM_STORE_MCAST, oc_string(g_mcast), key_size);
+  if (written != key_size) {
+    PRINT("dump_mcast %d %d\n", key_size, written);
+  }
 }
 
 void
 load_mcast(void)
 {
   int temp_size;
-  int mcast_size;
-  char mcast_buffer[100];
-
-  temp_size =
-    oc_storage_read(GM_STORE_MCAST, (uint8_t *)&mcast_size, sizeof(mcast_size));
-
-  if ((mcast_size > 0) && (mcast_size < 100)) {
-    temp_size =
-      oc_storage_read(GM_STORE_MCAST, (uint8_t *)&mcast_buffer, mcast_size);
-    oc_new_string(&g_mcast, mcast_buffer, mcast_size);
+  int key_size;
+  char tempstring[100];
+  temp_size = oc_storage_read(GM_STORE_MCAST, (uint8_t *)&tempstring, 99);
+  if (temp_size > 1) {
+    tempstring[temp_size] = 0;
+    oc_new_string(&g_mcast, tempstring, temp_size);
   }
 }
 
@@ -1333,12 +1326,6 @@ oc_create_f_netip_mcast_resource(size_t device)
   oc_resource_set_request_handler(res, OC_PUT,
                                   oc_core_f_netip_mcast_put_handler, NULL);
   oc_add_resource(res);
-
-  // oc_core_populate_resource(resource_idx, device, "/f/netip/mcast", OC_IF_D,
-  //                           APPLICATION_CBOR, OC_DISCOVERABLE,
-  //                           oc_core_f_netip_mcast_get_handler,
-  //                           oc_core_f_netip_mcast_put_handler, 0, 0, 0, 2,
-  //                           "urn:knx:dpa.11.66","urn:knx:dpt.IPV4");
 }
 
 // -----------------------------------------------------------------------------
