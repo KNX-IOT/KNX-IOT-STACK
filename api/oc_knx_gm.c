@@ -328,8 +328,8 @@ oc_load_group_mapping_table_entry(int entry)
         case OC_REP_BYTE_STRING:
           if (rep->iname == 107) {
             // g_gm_entries[entry].authentication = (int)rep->value.boolean;
-            oc_free_string(&g_gm_entries[entry].key);
-            oc_new_string(&g_gm_entries[entry].key,
+            oc_free_string(&g_gm_entries[entry].groupKey);
+            oc_new_string(&g_gm_entries[entry].groupKey,
                           oc_string(rep->value.string),
                           oc_string_len(rep->value.string));
           }
