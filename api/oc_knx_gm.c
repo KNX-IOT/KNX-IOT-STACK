@@ -432,7 +432,7 @@ oc_core_fp_gm_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       // index not in use
       break;
     }
-    if length > 0) {
+    if (length > 0) {
       // add the comma for the previous entry
       // there is a next one.
       length = oc_rep_add_line_to_buffer(",\n");
