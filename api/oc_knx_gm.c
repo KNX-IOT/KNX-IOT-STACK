@@ -327,7 +327,7 @@ oc_load_group_mapping_table_entry(int entry)
 
         case OC_REP_BYTE_STRING:
           if (rep->iname == 107) {
-            //g_gm_entries[entry].authentication = (int)rep->value.boolean;
+            // g_gm_entries[entry].authentication = (int)rep->value.boolean;
             oc_free_string(&g_gm_entries[entry].key);
             oc_new_string(&g_gm_entries[entry].key,
                           oc_string(rep->value.string),
@@ -860,7 +860,6 @@ oc_create_f_netip_fra_resource(size_t device)
   oc_resource_set_request_handler(res, OC_PUT, oc_core_f_netip_fra_put_handler,
                                   NULL);
   oc_add_resource(res);
-
 }
 
 // -----------------------------------------------------------------------------
@@ -1078,7 +1077,6 @@ oc_create_f_netip_key_resource(size_t device)
   oc_resource_set_request_handler(res, OC_PUT, oc_core_f_netip_key_put_handler,
                                   NULL);
   oc_add_resource(res);
-
 }
 
 // -----------------------------------------------------------------------------
