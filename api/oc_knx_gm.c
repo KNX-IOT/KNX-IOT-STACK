@@ -988,8 +988,11 @@ void
 dump_key(void)
 {
   int key_size = oc_string_len(g_key);
-  oc_storage_write(GM_STORE_KEY, (uint8_t *)&key_size, sizeof(key_size));
-  oc_storage_write(GM_STORE_KEY, (uint8_t *)&g_key, key_size);
+  // oc_storage_write(GM_STORE_KEY, (uint8_t *)&key_size, sizeof(key_size));
+  int written = oc_storage_write(GM_STORE_KEY, oc_string(g_key), key_size);
+  if (written != key_size) {
+    PRINT("dump_key %d %d\n", key_size, written);
+  }
 }
 
 void
@@ -997,14 +1000,11 @@ load_key(void)
 {
   int temp_size;
   int key_size;
-  char key_buffer[100];
-
-  temp_size =
-    oc_storage_read(GM_STORE_KEY, (uint8_t *)&key_size, sizeof(key_size));
-
-  if ((key_size > 0) && (key_size < 100)) {
-    temp_size = oc_storage_read(GM_STORE_KEY, (uint8_t *)&key_buffer, key_size);
-    oc_new_string(&g_key, key_buffer, key_size);
+  char tempstring[100];
+  temp_size = oc_storage_read(GM_STORE_KEY, &tempstring, 99);
+  if (temp_size > 1) {
+    tempstring[temp_size] = 0;
+    oc_new_string(&g_key, tempstring, temp_size);
   }
 }
 
@@ -1209,30 +1209,31 @@ oc_create_f_netip_ttl_resource(size_t device)
 
 // -----------------------------------------------------------------------------
 
+
 void
 dump_mcast(void)
 {
-  int mcast_size = oc_string_len(g_mcast);
-  oc_storage_write(GM_STORE_MCAST, (uint8_t *)&mcast_size, sizeof(mcast_size));
-  oc_storage_write(GM_STORE_MCAST, (uint8_t *)&g_mcast, mcast_size);
+  int key_size = oc_string_len(g_mcast);
+  int written =
+    oc_storage_write(GM_STORE_MCAST, oc_string(g_g_mcastkey), key_size);
+  if (written != key_size) {
+    PRINT("dump_mcast %d %d\n", key_size, written);
+  }
 }
 
 void
 load_mcast(void)
 {
   int temp_size;
-  int mcast_size;
-  char mcast_buffer[100];
-
-  temp_size =
-    oc_storage_read(GM_STORE_MCAST, (uint8_t *)&mcast_size, sizeof(mcast_size));
-
-  if ((mcast_size > 0) && (mcast_size < 100)) {
-    temp_size =
-      oc_storage_read(GM_STORE_MCAST, (uint8_t *)&mcast_buffer, mcast_size);
-    oc_new_string(&g_mcast, mcast_buffer, mcast_size);
+  int key_size;
+  char tempstring[100];
+  temp_size = oc_storage_read(GM_STORE_MCAST, &tempstring, 99);
+  if (temp_size > 1) {
+    tempstring[temp_size] = 0;
+    oc_new_string(&g_mcast, tempstring, temp_size);
   }
 }
+
 
 static void
 oc_core_f_netip_mcast_get_handler(oc_request_t *request,
