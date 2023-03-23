@@ -455,6 +455,7 @@ oc_core_fp_gm_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   PRINT("oc_core_fp_gm_get_handler - end\n");
 }
 
+
 static void
 oc_core_fp_gm_post_handler(oc_request_t *request,
                            oc_interface_mask_t iface_mask, void *data)
@@ -465,6 +466,9 @@ oc_core_fp_gm_post_handler(oc_request_t *request,
   oc_rep_t *object = NULL;
   oc_rep_t *s_object = NULL;
   oc_rep_t *sec_object = NULL;
+  int id = -1;
+
+  PRINT("oc_core_fp_gm_post_handler\n");
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_CBOR) {
@@ -481,108 +485,121 @@ oc_core_fp_gm_post_handler(oc_request_t *request,
   }
   // find the id of the entry
   oc_rep_t *rep = request->request_payload;
-  int id = oc_table_find_id_from_rep(rep);
-  if (id < 0) {
-    OC_ERR(" not a valid id\n");
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
-    return;
-  }
-  // entry storage
-  oc_group_mapping_table_t my_entry;
 
-  int index = find_group_mapping_index(id);
-  if (index != -1) {
-    PRINT("   entry already exist! \n");
-  } else {
-    index = find_empty_group_mapping_index();
-    if (index == -1) {
-      PRINT("  no space left!\n");
-      oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
-      return;
-    }
-  }
-  PRINT("  storage index: %d (%d)\n", index, id);
+  while (rep != NULL) {
+    switch (rep->type) {
+    case OC_REP_OBJECT: {
+      // find the storage index, e.g. for this object
+      oc_rep_t *object = rep->value.object;
+      id = oc_table_find_id_from_rep(object);
+      if (id == -1) {
+        OC_ERR("  ERROR id %d", id);
+        oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+        return;
+      }
+      // entry storage
+      oc_group_mapping_table_t my_entry;
 
-  // parse the response
-  object = rep->value.object;
-  while (object != NULL) {
-    if (object->type == OC_REP_INT_ARRAY) {
-      // ga
-      if (object->iname == 7) {
-        int64_t *array = 0;
-        size_t array_size = 0;
-        // not making a deep copy
-        oc_rep_i_get_int_array(object, 9, &array, &array_size);
-        if (array_size > 0) {
-          // make the deep copy
-          if ((g_gm_entries[index].ga_len > 0) &&
-              (&g_gm_entries[index].ga != NULL)) {
-            int64_t *cur_arr = g_gm_entries[index].ga;
-            if (cur_arr) {
-              free(cur_arr);
-            }
-            g_gm_entries[index].ga = NULL;
-          }
-          g_gm_entries[index].ga_len = (int)array_size;
-          int64_t *new_array = (int64_t *)malloc(array_size * sizeof(uint64_t));
-          if (new_array) {
-            for (size_t i = 0; i < array_size; i++) {
-              new_array[i] = array[i];
-            }
-            g_gm_entries[index].ga = new_array;
-          } else {
-            OC_ERR("out of memory");
-          }
+      int index = find_group_mapping_index(id);
+      if (index != -1) {
+        PRINT("   entry already exist! \n");
+      } else {
+        index = find_empty_group_mapping_index();
+        if (index == -1) {
+          PRINT("  no space left!\n");
+          oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+          return;
         }
       }
-    } else if (object->type == OC_REP_INT) {
-      if (object->iname == 116) {
-        // dataType (116)
-        PRINT("   profile %d\n", (int)object->value.integer);
-        g_gm_entries[index].dataType = (int)object->value.integer;
-      }
-    } else if (object->type == OC_REP_OBJECT) {
-      // level of s
-      s_object = object->value.object;
-      int s_object_nr = object->iname;
-      PRINT("  s_object_nr %d\n", s_object_nr);
-      while (s_object) {
-        if (s_object->type == OC_REP_STRING) {
-          if (s_object->iname == 107 && s_object_nr == 115) {
-            // groupkey (115(s)::107)
-            oc_free_string(&(g_gm_entries[index].groupKey));
-            oc_new_string(&g_gm_entries[index].groupKey,
-                          oc_string(s_object->value.string),
-                          oc_string_len(s_object->value.string));
-          }
-        } else if (s_object->type == OC_REP_OBJECT) {
-          sec_object = s_object->value.object;
-          if (sec_object == NULL) {
-            continue;
-          }
-          int sec_object_nr = sec_object->iname;
-          while (sec_object) {
-            if (sec_object->type == OC_REP_BOOL) {
-              if (sec_object->iname == 97 && s_object_nr == 115 &&
-                  sec_object_nr == 28) {
-                // 115:28:97
-                g_gm_entries[index].authentication = s_object->value.boolean;
-              }
-              if (sec_object->iname == 99 && s_object_nr == 115 &&
-                  sec_object_nr == 28) {
-                // 115:28:97
-                g_gm_entries[index].confidentiality = s_object->value.boolean;
-              }
-            } /* type */
+      PRINT("  storage index: %d (%d)\n", index, id);
 
-            sec_object = sec_object->next;
+      // parse the response
+      object = rep->value.object;
+      while (object != NULL) {
+        if (object->type == OC_REP_INT_ARRAY) {
+          // ga
+          if (object->iname == 7) {
+            int64_t *array = 0;
+            size_t array_size = 0;
+            // not making a deep copy
+            oc_rep_i_get_int_array(object, 9, &array, &array_size);
+            if (array_size > 0) {
+              // make the deep copy
+              if ((g_gm_entries[index].ga_len > 0) &&
+                  (&g_gm_entries[index].ga != NULL)) {
+                int64_t *cur_arr = g_gm_entries[index].ga;
+                if (cur_arr) {
+                  free(cur_arr);
+                }
+                g_gm_entries[index].ga = NULL;
+              }
+              g_gm_entries[index].ga_len = (int)array_size;
+              int64_t *new_array =
+                (int64_t *)malloc(array_size * sizeof(uint64_t));
+              if (new_array) {
+                for (size_t i = 0; i < array_size; i++) {
+                  new_array[i] = array[i];
+                }
+                g_gm_entries[index].ga = new_array;
+              } else {
+                OC_ERR("out of memory");
+              }
+            }
+          }
+        } else if (object->type == OC_REP_INT) {
+          if (object->iname == 116) {
+            // dataType (116)
+            PRINT("   dataType %d\n", (int)object->value.integer);
+            g_gm_entries[index].dataType = (int)object->value.integer;
+          }
+        } else if (object->type == OC_REP_OBJECT) {
+          // level of s
+          s_object = object->value.object;
+          int s_object_nr = object->iname;
+          PRINT("  s_object_nr %d\n", s_object_nr);
+          while (s_object) {
+            if (s_object->type == OC_REP_STRING) {
+              if (s_object->iname == 107 && s_object_nr == 115) {
+                // groupkey (115(s)::107)
+                oc_free_string(&(g_gm_entries[index].groupKey));
+                oc_new_string(&g_gm_entries[index].groupKey,
+                              oc_string(s_object->value.string),
+                              oc_string_len(s_object->value.string));
+              }
+            } else if (s_object->type == OC_REP_OBJECT) {
+              sec_object = s_object->value.object;
+              if (sec_object == NULL) {
+                continue;
+              }
+              int sec_object_nr = sec_object->iname;
+              while (sec_object) {
+                if (sec_object->type == OC_REP_BOOL) {
+                  if (sec_object->iname == 97 && s_object_nr == 115 &&
+                      sec_object_nr == 28) {
+                    // 115:28:97
+                    g_gm_entries[index].authentication =
+                      s_object->value.boolean;
+                  }
+                  if (sec_object->iname == 99 && s_object_nr == 115 &&
+                      sec_object_nr == 28) {
+                    // 115:28:97
+                    g_gm_entries[index].confidentiality =
+                      s_object->value.boolean;
+                  }
+                } /* type */
+
+                sec_object = sec_object->next;
+              }
+            }
+            s_object = s_object->next;
           }
         }
-        s_object = s_object->next;
-      }
-    }
-    object = object->next;
-  } // while (inner object)
+        object = object->next;
+      } // while (inner object)
+    }   // case
+    }   // switch (over all objects)
+    rep = rep->next;
+  }
 
   request->response->response_buffer->content_format = APPLICATION_CBOR;
   request->response->response_buffer->code = oc_status_code(OC_STATUS_CHANGED);
