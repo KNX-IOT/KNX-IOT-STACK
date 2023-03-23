@@ -428,13 +428,15 @@ oc_core_fp_gm_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   }
   /* example entry: </fp/gm/1>;ct=60 (cbor)*/
   for (i = 0; i < oc_core_get_group_mapping_table_size(); i++) {
-    if (i > 0) {
-      length = oc_rep_add_line_to_buffer(",\n");
-      response_length += length;
-    }
     if (g_gm_entries[i].ga_len == 0) {
       // index not in use
       break;
+    }
+    if (response_length > 0) {
+      // add the comma for the previous entry
+      // there is a next one.
+      length = oc_rep_add_line_to_buffer(",\n");
+      response_length += length;
     }
 
     length = oc_rep_add_line_to_buffer("<fp/gm/");
@@ -598,8 +600,12 @@ oc_core_fp_gm_post_handler(oc_request_t *request,
         }
         object = object->next;
       } // while (inner object)
-    }   // case
-    }   // switch (over all objects)
+      // store the entry
+      if (id > 0 && index > 0) {
+        oc_dump_group_mapping_table_entry(index);
+      }
+    } // case
+    } // switch (over all objects)
     rep = rep->next;
   }
 
