@@ -610,13 +610,17 @@ oc_core_fp_gm_post_handler(oc_request_t *request,
         }
         object = object->next;
       } // while (inner object)
-      // store the entry
-      if (id > 0 && index > 0) {
-        oc_dump_group_mapping_table_entry(index);
-      }
     } // case
     } // switch (over all objects)
     rep = rep->next;
+  }
+
+  for (int i = 0; i < oc_core_get_group_mapping_table_size(); i++) {
+    if (g_gm_entries[i].ga_len == 0) {
+      // index not in use
+      break;
+    }
+    oc_dump_group_mapping_table_entry(i);
   }
 
   request->response->response_buffer->content_format = APPLICATION_CBOR;
