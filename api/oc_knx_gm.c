@@ -455,7 +455,6 @@ oc_core_fp_gm_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   PRINT("oc_core_fp_gm_get_handler - end\n");
 }
 
-
 static void
 oc_core_fp_gm_post_handler(oc_request_t *request,
                            oc_interface_mask_t iface_mask, void *data)
