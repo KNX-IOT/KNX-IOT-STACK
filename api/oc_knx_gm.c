@@ -610,8 +610,8 @@ oc_core_fp_gm_post_handler(oc_request_t *request,
         }
         object = object->next;
       } // while (inner object)
-    } // case
-    } // switch (over all objects)
+    }   // case
+    }   // switch (over all objects)
     rep = rep->next;
   }
 
@@ -1003,7 +1003,7 @@ load_key(void)
   int temp_size;
   int key_size;
   char tempstring[100];
-  temp_size = oc_storage_read(GM_STORE_KEY, (uint8_t*)&tempstring, 99);
+  temp_size = oc_storage_read(GM_STORE_KEY, (uint8_t *)&tempstring, 99);
   if (temp_size > 1) {
     tempstring[temp_size] = 0;
     oc_new_string(&g_key, tempstring, temp_size);
@@ -1200,18 +1200,15 @@ oc_create_f_netip_ttl_resource(size_t device)
   oc_resource_set_request_handler(res, OC_PUT, oc_core_f_netip_ttl_put_handler,
                                   NULL);
   oc_add_resource(res);
-
 }
 
 // -----------------------------------------------------------------------------
-
 
 void
 dump_mcast(void)
 {
   int key_size = oc_string_len(g_mcast);
-  int written =
-    oc_storage_write(GM_STORE_MCAST, oc_string(g_mcast), key_size);
+  int written = oc_storage_write(GM_STORE_MCAST, oc_string(g_mcast), key_size);
   if (written != key_size) {
     PRINT("dump_mcast %d %d\n", key_size, written);
   }
@@ -1229,7 +1226,6 @@ load_mcast(void)
     oc_new_string(&g_mcast, tempstring, temp_size);
   }
 }
-
 
 static void
 oc_core_f_netip_mcast_get_handler(oc_request_t *request,
@@ -1330,7 +1326,6 @@ oc_create_f_netip_mcast_resource(size_t device)
   oc_resource_set_request_handler(res, OC_PUT,
                                   oc_core_f_netip_mcast_put_handler, NULL);
   oc_add_resource(res);
-
 }
 
 // -----------------------------------------------------------------------------
