@@ -1211,7 +1211,7 @@ dump_mcast(void)
 {
   int key_size = oc_string_len(g_mcast);
   int written =
-    oc_storage_write(GM_STORE_MCAST, oc_string(g_mcastkey), key_size);
+    oc_storage_write(GM_STORE_MCAST, oc_string(g_mcast), key_size);
   if (written != key_size) {
     PRINT("dump_mcast %d %d\n", key_size, written);
   }
