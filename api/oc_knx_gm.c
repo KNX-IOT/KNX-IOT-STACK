@@ -449,7 +449,7 @@ oc_core_fp_gm_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       response_length += length;
     }
 
-    length = oc_rep_add_line_to_buffer("<fp/gm/");
+    length = oc_rep_add_line_to_buffer("</fp/gm/");
     response_length += length;
     char string[10];
     sprintf((char *)&string, "%d>;ct=60", i + 1);
