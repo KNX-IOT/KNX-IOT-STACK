@@ -676,13 +676,13 @@ oc_core_fp_gm_x_get_handler(oc_request_t *request,
                          g_gm_entries[index].ga_len);
   if (oc_string_len(g_gm_entries[index].groupKey) > 0) {
     // create s map (s)
-    oc_rep_i_set_key(&root_map, 115);
+    oc_rep_i_set_key(oc_rep_object(root), 115);
     oc_rep_start_object(oc_rep_object(root), s);
     // set groupKey (115:107)
     oc_rep_i_set_byte_string(s, 107, oc_string(g_gm_entries[index].groupKey),
                              oc_string_len(g_gm_entries[index].groupKey));
     // secSetting map (115:28)
-    oc_rep_i_set_key(&root_map, 28);
+    oc_rep_i_set_key(oc_rep_object(s), 28);
     oc_rep_start_object(oc_rep_object(s), secSettings);
     // add a (115:28:97)
     oc_rep_i_set_boolean(secSettings, 97, g_gm_entries[index].authentication);
