@@ -689,7 +689,6 @@ oc_core_fp_gm_x_get_handler(oc_request_t *request,
     // add c (115:28:99)
     oc_rep_i_set_boolean(secSettings, 99, g_gm_entries[index].confidentiality);
     oc_rep_end_object(oc_rep_object(s), secSettings);
-    cbor_encoder_close_container_checked(&root_map, &s_map);
     oc_rep_end_object(oc_rep_object(root), s);
   }
   oc_rep_end_root_object();
