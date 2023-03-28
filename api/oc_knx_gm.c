@@ -676,27 +676,23 @@ oc_core_fp_gm_x_get_handler(oc_request_t *request,
                          g_gm_entries[index].ga_len);
   if (oc_string_len(g_gm_entries[index].groupKey) > 0) {
     // create s map (s)
-    oc_rep_set_key(&root_map, "s");
-    CborEncoder s_map;
-    cbor_encoder_create_map(&root_map, &s_map, CborIndefiniteLength);
-    // set groupKey (107)
+    oc_rep_i_set_key(&root_map, 115);
+    oc_rep_start_object(oc_rep_object(my_object), s);
+    // set groupKey (115:107)
     oc_rep_i_set_byte_string(s, 107, oc_string(g_gm_entries[index].groupKey),
                              oc_string_len(g_gm_entries[index].groupKey));
-
-    // secSetting map (28)
+    // secSetting map (115:28)
     oc_rep_i_set_key(&root_map, 28);
-    CborEncoder secSettings_map;
-    cbor_encoder_create_map(&s_map, &secSettings_map, CborIndefiniteLength);
-    // add a
-    oc_rep_i_set_boolean(secSettings, 0, g_gm_entries[index].authentication);
-    // add c
-    oc_rep_i_set_boolean(secSettings, 0, g_gm_entries[index].confidentiality);
-    cbor_encoder_close_container_checked(&s_map, &secSettings_map);
+    oc_rep_start_object(oc_rep_object(s), secSettings);
+    // add a (115:28:97)
+    oc_rep_i_set_boolean(secSettings, 97, g_gm_entries[index].authentication);
+    // add c (115:28:99)
+    oc_rep_i_set_boolean(secSettings, 99, g_gm_entries[index].confidentiality);
+    oc_rep_end_object(oc_rep_object(s), secSettings);
     cbor_encoder_close_container_checked(&root_map, &s_map);
+    oc_rep_end_object(oc_rep_object(my_object), s);
   }
-
   oc_rep_end_root_object();
-
   oc_send_cbor_response(request, OC_STATUS_OK);
   return;
 }
