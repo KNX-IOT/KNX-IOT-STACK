@@ -159,6 +159,7 @@ coap_send_unauth_echo_response(coap_message_type_t type, uint16_t mid,
   OC_DBG("CoAP send Unauthorised Echo Response message: mid=%u", mid);
   coap_packet_t msg[1]; // empty response
   coap_udp_init_message(msg, type, UNAUTHORIZED_4_01, mid);
+  OC_WRN("CoAP send Unauthorised Echo Response message: mid=%u", mid);
   oc_message_t *message = oc_internal_allocate_outgoing_message();
   if (message) {
     memcpy(&message->endpoint, endpoint, sizeof(*endpoint));
@@ -293,7 +294,7 @@ coap_receive(oc_message_t *msg)
         if (message->code == UNAUTHORIZED_4_01 && echo_len != 0) {
           // Received Unauthorised response - retransmit request,
           // but include Echo header included in this response
-          OC_DBG("Received Unauthorised Response with Echo option");
+          OC_WRN("Received Unauthorised Response with Echo option");
           OC_DBG("Retransmitting with included Echo...");
           coap_packet_t retransmitted_pkt[1];
           coap_udp_parse_message(retransmitted_pkt, transaction->message->data,
@@ -453,6 +454,7 @@ coap_receive(oc_message_t *msg)
               message->mid, message->token, message->token_len,
               (uint8_t *)&current_time, sizeof(current_time), &msg->endpoint);
             coap_clear_transaction(transaction);
+            OC_ERR("CoAP send Unauthorised Echo Response message with ECHO");
             return UNAUTHORIZED_4_01;
           } else if (echo_len != sizeof(oc_clock_time_t)) // KNX-IoT servers use
                                                           // 8-byte echo options
