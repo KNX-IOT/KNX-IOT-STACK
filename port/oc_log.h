@@ -297,13 +297,15 @@ extern "C" {
 #else
 // #define OC_LOG(...)
 #define OC_DBG(...)
-#define OC_WRN(...)
+//#define OC_WRN(...)
 //#define OC_ERR(...)
 #define OC_LOGipaddr(endpoint)
 #define OC_LOGbytes(bytes, length)
 #endif
 
+// always do OC_ERR and OC_WRN logs
 #define OC_ERR(...) OC_LOG("E", __VA_ARGS__)
+#define OC_WRN(...) OC_LOG("W", __VA_ARGS__)
 
 #ifdef OC_DEBUG_OSCORE
 #define OC_DBG_OSCORE(...) OC_LOG("OSCORE", __VA_ARGS__)
