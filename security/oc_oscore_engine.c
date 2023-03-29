@@ -224,7 +224,8 @@ oc_oscore_recv_message(oc_message_t *message)
     }
 
     if (!oscore_ctx) {
-      OC_ERR("***could not find matching OSCORE context, returning UNAUTHORIZED***");
+      OC_ERR(
+        "***could not find matching OSCORE context, returning UNAUTHORIZED***");
       oscore_send_error(oscore_pkt, UNAUTHORIZED_4_01, &message->endpoint);
       goto oscore_recv_error;
     }

@@ -1744,7 +1744,7 @@ oc_knx_sec_check_acl(oc_method_t method, oc_resource_t *resource,
     return true;
   }
   OC_ERR("oc_knx_sec_check_acl: method %s NOT allowed on %s\n",
-        get_method_name(method), oc_string_checked(resource->uri));
+         get_method_name(method), oc_string_checked(resource->uri));
 
   return false;
 }
