@@ -1,5 +1,5 @@
 /*
- // Copyright (c) 2021-2022 Cascoda Ltd
+ // Copyright (c) 2021-2023 Cascoda Ltd
  //
  // Licensed under the Apache License, Version 2.0 (the "License");
  // you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 #include "oc_api.h"
 #include "api/oc_knx_dev.h"
 #include "api/oc_knx_fp.h"
+#include "api/oc_knx_gm.h"
 #include "api/oc_knx_sec.h"
 #include "api/oc_main.h"
 #include "port/dns-sd.h"
@@ -1010,6 +1011,7 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
 
     oc_delete_group_object_table();
     oc_delete_group_rp_table();
+    oc_delete_group_mapping_table();
 
     oc_delete_at_table(device_index);
   } else if (reset_mode == 3) {
@@ -1032,6 +1034,7 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
         */
     oc_delete_group_object_table();
     oc_delete_group_rp_table();
+    oc_delete_group_mapping_table();
     // load state: unloaded
     oc_knx_lsm_set_state(device_index, LSM_S_UNLOADED);
   }
