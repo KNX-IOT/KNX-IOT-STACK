@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 3.15)
 project(knx-iot-stack) 
-
+ 
 if(CMAKE_COMPILER_IS_GNUCC AND UNIX)
     add_compile_options(-fPIC)
 endif()
@@ -27,6 +27,7 @@ set(OC_DEBUG_OSCORE_ENABLED OFF CACHE BOOL "Enable security debug messages")
 set(OC_LOG_TO_FILE_ENABLED OFF CACHE BOOL "redirect debug messages to file")
 set(CLANG_TIDY_ENABLED OFF CACHE BOOL "Enable clang-tidy analysis during compilation.")
 set(OC_USE_STORAGE ON CACHE BOOL "Persistent storage of data.")
+set(OC_USE_MULTICAST_SCOPE_2 OFF CACHE BOOL "devices send also group multicast events with scope2.")
 
 set(KNX_BUILTIN_MBEDTLS ON CACHE BOOL "Use built-in mbedTLS, as opposed to external lib from different project")
 set(KNX_BUILTIN_TINYCBOR ON CACHE BOOL "Use built-in TinyCBOR, as opposed to external lib from different project")
@@ -221,6 +222,10 @@ target_compile_definitions(kisClientServer PUBLIC OC_CLIENT OC_SERVER)
 
 if (OC_USE_STORAGE)
     target_compile_definitions(kisClientServer PUBLIC OC_USE_STORAGE)
+endif()
+
+if (OC_USE_MULTICAST_SCOPE_2)
+    target_compile_definitions(kisClientServer PUBLIC OC_USE_MULTICAST_SCOPE_2)
 endif()
 
 target_link_libraries(kisClientServer PUBLIC
