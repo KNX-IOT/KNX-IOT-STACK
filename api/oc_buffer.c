@@ -249,7 +249,7 @@ OC_PROCESS_THREAD(message_buffer_handler, ev, data)
   OC_PROCESS_END();
 }
 
-oc_message_t *oc_get_incoming_message_with_ptr(void* data){
+oc_message_t *oc_get_incoming_message_with_ptr(uint8_t* data){
   struct oc_memb *pool = &oc_incoming_buffers;
   for(size_t i = 0; i < pool->num; ++i)
   {
