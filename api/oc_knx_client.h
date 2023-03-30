@@ -16,6 +16,11 @@
 /**
   @brief client code for the device (s-mode)
   @file
+
+  compile flag:
+  - OC_USE_MULTICAST_SCOPE_2
+    also sends the multicast group events with scope =2
+    this is needed when the devices are running on the same PC
 */
 #ifndef OC_KNX_CLIENT_INTERNAL_H
 #define OC_KNX_CLIENT_INTERNAL_H

@@ -841,6 +841,9 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
             // @sender : updated object value + cflags = t
             // Sent : -st w, sending association(1st assigned ga)
             PRINT("  (case3) (W-WRITE) sending WRITE due to TRANSMIT flag \n");
+#ifdef OC_USE_MULTICAST_SCOPE_2
+            oc_do_s_mode_with_scope(2, oc_string(myurl), "w");
+#endif
             oc_do_s_mode_with_scope(5, oc_string(myurl), "w");
           }
         }
@@ -859,6 +862,9 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
             // Case 3) part 2
             // @sender : updated object value + cflags = t
             // Sent : -st w, sending association(1st assigned ga)
+#ifdef OC_USE_MULTICAST_SCOPE_2
+            oc_do_s_mode_with_scope(2, oc_string(myurl), "w");
+#endif
             oc_do_s_mode_with_scope(5, oc_string(myurl), "w");
           }
         }
@@ -872,6 +878,9 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
         // Sent: -st rp, sending association (1st assigned ga)
         // specifically: do not check the transmission flag
         PRINT("   (case3) (RP-UPDATE) sending RP due to READ flag \n");
+#ifdef OC_USE_MULTICAST_SCOPE_2 oc_do_s_mode_with_scope(
+          2, oc_string(myurl), "w");
+#endif
         oc_do_s_mode_with_scope_no_check(5, oc_string(myurl), "rp");
       }
     }
