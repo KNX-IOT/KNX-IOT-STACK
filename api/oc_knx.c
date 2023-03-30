@@ -881,7 +881,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
 #ifdef OC_USE_MULTICAST_SCOPE_2
         oc_do_s_mode_with_scope(2, oc_string(myurl), "w");
 #endif
-          oc_do_s_mode_with_scope_no_check(5, oc_string(myurl), "rp");
+        oc_do_s_mode_with_scope_no_check(5, oc_string(myurl), "rp");
       }
     }
     // get the next index in the table to get the url from.
