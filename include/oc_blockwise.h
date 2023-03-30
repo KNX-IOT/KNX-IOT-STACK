@@ -272,7 +272,7 @@ void oc_blockwise_scrub_buffers_for_client_cb(void *cb);
  * @param data pointer suspected to be inside a blockwise buffer
  * @return oc_blockwise_request_state_t* the blockwise state that contains the data, or NULL if not found
  */
-oc_blockwise_request_state_t *oc_get_request_buffer_with_ptr(uint8_t* data);
+oc_blockwise_state_t *oc_get_request_buffer_with_ptr(uint8_t* data);
 
 #ifdef __cplusplus
 }
