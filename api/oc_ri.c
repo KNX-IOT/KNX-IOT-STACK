@@ -1195,7 +1195,8 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
   }
 
 #if defined(OC_BLOCK_WISE)
-  (*request_state)->ref_count--;
+  if (*request_state)
+    (*request_state)->ref_count--;
   oc_blockwise_scrub_buffers(false);
 #endif
 
