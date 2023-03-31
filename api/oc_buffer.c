@@ -248,3 +248,23 @@ OC_PROCESS_THREAD(message_buffer_handler, ev, data)
   }
   OC_PROCESS_END();
 }
+
+oc_message_t *
+oc_get_incoming_message_with_ptr(uint8_t *data)
+{
+  struct oc_memb *pool = &oc_incoming_buffers;
+  for (size_t i = 0; i < pool->num; ++i) {
+    // unused block, should not contain data of a valid message
+    if (pool->count[i] <= 0)
+      continue;
+
+    int offset = i * (int)pool->size;
+    oc_message_t *msg = (oc_message_t *)((char *)pool->mem + offset);
+
+    if (msg->data <= data && data < msg->data + msg->length) {
+      // data lies within msg, so we return it
+      return msg;
+    }
+  }
+  return NULL;
+}
