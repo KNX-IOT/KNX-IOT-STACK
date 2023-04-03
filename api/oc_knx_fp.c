@@ -622,7 +622,7 @@ oc_core_fp_g_x_del_handler(oc_request_t *request,
 
   // make the deletion persistent
   oc_dump_group_object_table_entry(index);
-  // update the finger print 
+  // update the finger print
   oc_knx_increase_fingerprint();
 
   PRINT("oc_core_fp_g_x_del_handler - end\n");
