@@ -477,6 +477,7 @@ oc_core_fp_gm_post_handler(oc_request_t *request,
   oc_rep_t *object = NULL;
   oc_rep_t *s_object = NULL;
   oc_rep_t *sec_object = NULL;
+  oc_status_t return_status = OC_STATUS_BAD_REQUEST;
   int id = -1;
 
   PRINT("oc_core_fp_gm_post_handler\n");
@@ -514,6 +515,7 @@ oc_core_fp_gm_post_handler(oc_request_t *request,
       int index = find_group_mapping_index(id);
       if (index != -1) {
         PRINT("   entry already exist! \n");
+        return_status = OC_STATUS_CHANGED;
       } else {
         index = find_empty_group_mapping_index();
         if (index == -1) {
@@ -521,6 +523,7 @@ oc_core_fp_gm_post_handler(oc_request_t *request,
           oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
           return;
         }
+        return_status = OC_STATUS_CREATED;
       }
       PRINT("  storage index: %d (%d)\n", index, id);
       g_gm_entries[index].id = id;
@@ -555,6 +558,7 @@ oc_core_fp_gm_post_handler(oc_request_t *request,
                 g_gm_entries[index].ga = new_array;
               } else {
                 OC_ERR("out of memory");
+                return_status = OC_STATUS_INTERNAL_SERVER_ERROR;
               }
             }
           }
@@ -622,7 +626,7 @@ oc_core_fp_gm_post_handler(oc_request_t *request,
   }
 
   request->response->response_buffer->content_format = APPLICATION_CBOR;
-  request->response->response_buffer->code = oc_status_code(OC_STATUS_CHANGED);
+  request->response->response_buffer->code = oc_status_code(return_status);
   request->response->response_buffer->response_length = response_length;
 }
 

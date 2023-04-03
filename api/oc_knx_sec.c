@@ -453,6 +453,7 @@ oc_core_auth_at_post_handler(oc_request_t *request,
   oc_rep_t *object = NULL;
   oc_rep_t *subobject = NULL;
   oc_rep_t *oscobject = NULL;
+  oc_status_t return_status = OC_STATUS_BAD_REQUEST;
   int index = -1;
   PRINT("oc_core_auth_at_post_handler\n");
 
@@ -479,8 +480,10 @@ oc_core_auth_at_post_handler(oc_request_t *request,
       index = find_index_from_at(at);
       if (index != -1) {
         PRINT("   entry already exist! \n");
+        return_status = OC_STATUS_CHANGED;
       } else {
         index = find_empty_at_index();
+        return_status = OC_STATUS_CREATED;
         if (index == -1) {
           PRINT("  no space left!\n");
           oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
@@ -673,8 +676,7 @@ oc_core_auth_at_post_handler(oc_request_t *request,
   // add the oscore contexts by reinitializing all used oscore keys.
   oc_init_oscore_from_storage(device_index, false);
   PRINT("oc_core_auth_at_post_handler - end\n");
-  // oc_send_cbor_response(request, OC_STATUS_CHANGED);
-  oc_send_cbor_response_no_payload_size(request, OC_STATUS_CHANGED);
+  oc_send_cbor_response_no_payload_size(request, return_status);
 }
 
 static void
