@@ -562,7 +562,7 @@ oc_core_fp_g_x_get_handler(oc_request_t *request,
     request->uri_path, request->uri_path_len);
   int index = oc_core_find_index_in_group_object_table_from_id(id);
   PRINT("  id=%d index = %d\n", id, index);
-  if (index >= GOT_MAX_ENTRIES) {
+  if (index == -1) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -886,7 +886,7 @@ oc_core_fp_p_x_get_handler(oc_request_t *request,
     id, g_gpt, oc_core_get_publisher_table_size());
   PRINT("  id:%d index = %d\n", id, index);
 
-  if (index >= oc_core_get_publisher_table_size()) {
+  if (index == -1) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -1212,7 +1212,7 @@ oc_core_fp_r_x_get_handler(oc_request_t *request,
 
   PRINT("  id:%d index = %d\n", id, index);
 
-  if (index >= GRT_MAX_ENTRIES) {
+  if (index == -1) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
