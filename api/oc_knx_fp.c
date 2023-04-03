@@ -399,6 +399,7 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   (void)data;
   (void)iface_mask;
   bool status_ok = true;
+  oc_status_t return_status = OC_STATUS_BAD_REQUEST;
 
   PRINT("oc_core_fp_g_post_handler\n");
 
@@ -433,6 +434,14 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
         OC_ERR("  ERROR id %d", index);
         oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
         return;
+      }
+      index = oc_core_find_index_in_group_object_table_from_id(id);
+      if (index != -1) {
+        // index already in use, so it will be changed
+        return_status = OC_STATUS_CHANGED;
+      } else {
+        // no index, so we will create one
+        return_status = OC_STATUS_CREATED;
       }
       index = find_empty_slot_in_group_object_table(id);
       if (index == -1) {
@@ -485,15 +494,19 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
             int array_size = (int)oc_int_array_size(object->value.array);
             uint32_t *new_array =
               (uint32_t *)malloc(array_size * sizeof(uint32_t));
-
-            for (int i = 0; i < array_size; i++) {
-              new_array[i] = (uint32_t)arr[i];
+            if (new_array) {
+              for (int i = 0; i < array_size; i++) {
+                new_array[i] = (uint32_t)arr[i];
+              }
+              if (g_got[index].ga != 0) {
+                free(g_got[index].ga);
+              }
+              g_got[index].ga_len = array_size;
+              g_got[index].ga = new_array;
+            } else {
+              OC_ERR("out of memory");
+              return_status = OC_STATUS_INTERNAL_SERVER_ERROR;
             }
-            if (g_got[index].ga != 0) {
-              free(g_got[index].ga);
-            }
-            g_got[index].ga_len = array_size;
-            g_got[index].ga = new_array;
           }
         } break;
         default:
@@ -513,7 +526,7 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   PRINT("oc_core_fp_g_post_handler status=%d - end\n", (int)status_ok);
   if (status_ok) {
     oc_knx_increase_fingerprint();
-    oc_send_cbor_response_no_payload_size(request, OC_STATUS_CHANGED);
+    oc_send_cbor_response_no_payload_size(request, return_status);
     return;
   }
   oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
@@ -603,11 +616,14 @@ oc_core_fp_g_x_del_handler(oc_request_t *request,
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
+
   // delete the entry
   oc_delete_group_object_table_entry(index);
 
   // make the deletion persistent
   oc_dump_group_object_table_entry(index);
+  // update the finger print
+  oc_knx_increase_fingerprint();
 
   PRINT("oc_core_fp_g_x_del_handler - end\n");
   oc_send_cbor_response_no_payload_size(request, OC_STATUS_DELETED);
@@ -705,6 +721,7 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 {
   (void)data;
   (void)iface_mask;
+  oc_status_t return_status = OC_STATUS_BAD_REQUEST;
 
   PRINT("oc_core_fp_p_post_handler\n");
 
@@ -726,6 +743,15 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       /* find the storage index, e.g. for this object */
       oc_rep_t *object = rep->value.object;
       id = oc_table_find_id_from_rep(object);
+      index = oc_core_find_index_in_rp_table_from_id(
+        id, g_gpt, oc_core_get_publisher_table_size());
+      if (index != -1) {
+        // index already in use, so it will be changed
+        return_status = OC_STATUS_CHANGED;
+      } else {
+        // no index, so we will create one
+        return_status = OC_STATUS_CREATED;
+      }
       index = find_empty_slot_in_rp_table(id, g_gpt,
                                           oc_core_get_publisher_table_size());
       if (index == -1) {
@@ -771,15 +797,19 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
             int array_size = (int)oc_int_array_size(object->value.array);
             uint32_t *new_array =
               (uint32_t *)malloc(array_size * sizeof(uint32_t));
-
-            for (int i = 0; i < array_size; i++) {
-              new_array[i] = (uint32_t)arr[i];
+            if (new_array) {
+              for (int i = 0; i < array_size; i++) {
+                new_array[i] = (uint32_t)arr[i];
+              }
+              if (g_gpt[index].ga != 0) {
+                free(g_gpt[index].ga);
+              }
+              g_gpt[index].ga_len = array_size;
+              g_gpt[index].ga = new_array;
+            } else {
+              OC_ERR("out of memory");
+              return_status = OC_STATUS_INTERNAL_SERVER_ERROR;
             }
-            if (g_gpt[index].ga != 0) {
-              free(g_gpt[index].ga);
-            }
-            g_gpt[index].ga_len = array_size;
-            g_gpt[index].ga = new_array;
           }
         } break;
         case OC_REP_NIL:
@@ -939,7 +969,6 @@ oc_core_fp_p_x_del_handler(oc_request_t *request,
   // make the change persistent
   oc_dump_group_rp_table_entry(index, GPT_STORE, g_gpt,
                                oc_core_get_publisher_table_size());
-
   oc_knx_increase_fingerprint();
   PRINT("oc_core_fp_p_x_del_handler - end\n");
 
@@ -1015,6 +1044,7 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 {
   (void)data;
   (void)iface_mask;
+  oc_status_t return_status = OC_STATUS_BAD_REQUEST;
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_CBOR) {
@@ -1040,7 +1070,17 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
         oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
         return;
       }
-      index = find_empty_slot_in_rp_table(id, g_grt, GRT_MAX_ENTRIES);
+      index = oc_core_find_index_in_rp_table_from_id(
+        id, g_grt, oc_core_get_recipient_table_size());
+      if (index != -1) {
+        // index already in use, so it will be changed
+        return_status = OC_STATUS_CHANGED;
+      } else {
+        // no index, so we will create one
+        return_status = OC_STATUS_CREATED;
+      }
+      index = find_empty_slot_in_rp_table(id, g_grt,
+                                          oc_core_get_recipient_table_size());
       if (index == -1) {
         OC_ERR("  ERROR index %d", index);
         oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
@@ -1087,15 +1127,19 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
             int array_size = (int)oc_int_array_size(object->value.array);
             uint32_t *new_array =
               (uint32_t *)malloc(array_size * sizeof(uint32_t));
-
-            for (int i = 0; i < array_size; i++) {
-              new_array[i] = (uint32_t)arr[i];
+            if (new_array) {
+              for (int i = 0; i < array_size; i++) {
+                new_array[i] = (uint32_t)arr[i];
+              }
+              if (g_grt[index].ga != 0) {
+                free(g_grt[index].ga);
+              }
+              g_grt[index].ga_len = array_size;
+              g_grt[index].ga = new_array;
+            } else {
+              OC_ERR("out of memory");
+              return_status = OC_STATUS_INTERNAL_SERVER_ERROR;
             }
-            if (g_grt[index].ga != 0) {
-              free(g_grt[index].ga);
-            }
-            g_grt[index].ga_len = array_size;
-            g_grt[index].ga = new_array;
           }
         } break;
         case OC_REP_NIL:
@@ -1243,7 +1287,6 @@ oc_core_fp_r_x_del_handler(oc_request_t *request,
 
   // make the change persistent
   oc_dump_group_rp_table_entry(index, GRT_STORE, g_grt, GRT_MAX_ENTRIES);
-
   oc_knx_increase_fingerprint();
 
   PRINT("oc_core_fp_r_x_del_handler - end\n");
