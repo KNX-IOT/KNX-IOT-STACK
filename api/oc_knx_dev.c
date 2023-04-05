@@ -689,6 +689,16 @@ oc_create_dev_dev_resource(int resource_idx, size_t device)
 }
 
 // -----------------------------------------------------------------------------
+/*
+  Each KNX IoT device, i.e.a Router or an end device,
+  SHALL have a unique KNX Individual Address in a network.The KNX Individual
+  Address is a 2 octet value that consist of an 8 bit Subnetwork
+  Address(see “dev / sa”) and
+  an 8 bit Device Address(see “dev / da”)
+  octet 0 == subnetwork
+  octet 1 == device address
+  Example: Subnetwork Address: 0, Device Address: 1 = 0x0001
+*/
 
 static void
 oc_core_dev_sa_get_handler(oc_request_t *request,
@@ -708,7 +718,8 @@ oc_core_dev_sa_get_handler(oc_request_t *request,
   if (device != NULL) {
     // cbor_encode_int(&g_encoder, device->sa);
     oc_rep_begin_root_object();
-    oc_rep_i_set_int(root, 1, device->sa);
+    uint8_t sa = (uint8_t) (device->ia) >> 8;
+    oc_rep_i_set_int(root, 1, sa);
     oc_rep_end_root_object();
 
     oc_send_cbor_response(request, OC_STATUS_OK);
@@ -758,7 +769,7 @@ oc_create_dev_sa_resource(int resource_idx, size_t device)
   OC_DBG("oc_create_dev_sa_resource\n");
   oc_core_populate_resource(
     resource_idx, device, "/dev/sa", OC_IF_P, APPLICATION_CBOR, OC_DISCOVERABLE,
-    oc_core_dev_sa_get_handler, oc_core_dev_sa_put_handler, 0, 0, 2,
+    oc_core_dev_sa_get_handler, 0, 0, 0, 2,
     "urn:knx:dpa.0.57", "urn:knx:dpt.value1Ucount");
 }
 
@@ -782,7 +793,9 @@ oc_core_dev_da_get_handler(oc_request_t *request,
   if (device != NULL) {
     // cbor_encode_int(&g_encoder, device->da);
     oc_rep_begin_root_object();
-    oc_rep_i_set_int(root, 1, device->da);
+
+    uint8_t da = (uint8_t)(device->ia);
+    oc_rep_i_set_int(root, 1, da);
     oc_rep_end_root_object();
     oc_send_cbor_response(request, OC_STATUS_OK);
     return;
@@ -831,7 +844,7 @@ oc_create_dev_da_resource(int resource_idx, size_t device)
   OC_DBG("oc_create_dev_da_resource\n");
   oc_core_populate_resource(
     resource_idx, device, "/dev/da", OC_IF_P, APPLICATION_CBOR, OC_DISCOVERABLE,
-    oc_core_dev_da_get_handler, oc_core_dev_da_put_handler, 0, 0, 2,
+    oc_core_dev_da_get_handler, 0, 0, 0, 2,
     "urn:knx:dpa.0.58", "urn:knx:dpt.value1Ucount");
 }
 
