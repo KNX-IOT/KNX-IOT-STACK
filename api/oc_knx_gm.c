@@ -1425,6 +1425,9 @@ oc_core_f_netip_get_handler(oc_request_t *request,
       length = oc_frame_integer(5);
       response_length += length;
     }
+    oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
+    return;
+  }
 
     length = oc_rep_add_line_to_buffer("</p/netip/mcast>");
     response_length += length;
@@ -1549,4 +1552,7 @@ oc_core_f_netip_get_handler(oc_request_t *request,
     return 0;
   }
 
-  oc_gateway_t *oc_get_gateway_cb(void) { return &app_gateway; }
+  oc_gateway_t *oc_get_gateway_cb(void) 
+  { 
+    return &app_gateway;
+  }
