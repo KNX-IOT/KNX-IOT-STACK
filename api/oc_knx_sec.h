@@ -256,6 +256,17 @@ void oc_print_auth_at_entry(size_t device_index, int index);
 void oc_delete_at_table(size_t device_index);
 
 /**
+ * @brief reset the /auth/at table
+ * will be used in reset of the device
+ *erase_code:
+ * - 2 : reset all entries (using oc_delete_at_table())
+ * - 7 : reset all entries without scope = "if.sec"
+ * @param device_index the device index
+ * @param erase_code the erase code
+ */
+void oc_reset_at_table(size_t device_index, int erase_code);
+
+/**
  * @brief delete the /auth/at table entry
  *
  * @param device_index the device index

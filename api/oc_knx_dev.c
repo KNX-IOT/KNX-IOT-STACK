@@ -753,8 +753,8 @@ oc_core_dev_sa_put_handler(oc_request_t *request,
   if ((rep != NULL) && (rep->type == OC_REP_INT)) {
     PRINT("  oc_core_dev_sa_put_handler received : %d\n",
           (int)rep->value.integer);
-    device->sa = (int)rep->value.integer;
-    // oc_send_cbor_response(request, OC_STATUS_CHANGED);
+    // device->sa = (int)rep->value.integer;
+    //  oc_send_cbor_response(request, OC_STATUS_CHANGED);
     oc_send_cbor_response_no_payload_size(request, OC_STATUS_CHANGED);
     oc_storage_write(KNX_STORAGE_SA, (uint8_t *)&(rep->value.integer), 1);
     return;
@@ -828,8 +828,8 @@ oc_core_dev_da_put_handler(oc_request_t *request,
   if ((rep != NULL) && (rep->type == OC_REP_INT)) {
     PRINT("  oc_core_dev_da_put_handler received : %d\n",
           (int)rep->value.integer);
-    device->da = (uint32_t)rep->value.integer;
-    // oc_send_cbor_response(request, OC_STATUS_CHANGED);
+    // device->da = (uint32_t)rep->value.integer;
+    //  oc_send_cbor_response(request, OC_STATUS_CHANGED);
     oc_send_cbor_response_no_payload_size(request, OC_STATUS_CHANGED);
     oc_storage_write(KNX_STORAGE_DA, (uint8_t *)&(rep->value.integer), 1);
     return;
@@ -972,14 +972,16 @@ oc_knx_device_storage_read(size_t device_index)
   }
 
   /* KNX_STORAGE_SA */
-  temp_size =
-    oc_storage_read(KNX_STORAGE_SA, (uint8_t *)&device->sa, sizeof(uint32_t));
-  PRINT("  sa (storage) %d\n", device->sa);
+  // temp_size =
+  //   oc_storage_read(KNX_STORAGE_SA, (uint8_t *)&device->sa,
+  //   sizeof(uint32_t));
+  // PRINT("  sa (storage) %d\n", device->sa);
 
   /* KNX_STORAGE_DA */
-  temp_size =
-    oc_storage_read(KNX_STORAGE_DA, (uint8_t *)&device->da, sizeof(uint32_t));
-  PRINT("  da (storage) %d\n", device->da);
+  // temp_size =
+  //   oc_storage_read(KNX_STORAGE_DA, (uint8_t *)&device->da,
+  //   sizeof(uint32_t));
+  // PRINT("  da (storage) %d\n", device->da);
 }
 
 void
@@ -1016,8 +1018,8 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
     // set the other data to null
     device->ia = zero;
     device->iid = zero;
-    device->sa = zero;
-    device->da = zero;
+    // device->sa = zero;
+    // device->da = zero;
     device->port = port;
     oc_free_string(&device->hostname);
     oc_new_string(&device->hostname, "", strlen(""));
@@ -1025,8 +1027,8 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
     oc_delete_group_object_table();
     oc_delete_group_rp_table();
     oc_delete_group_mapping_table();
-
     oc_delete_at_table(device_index);
+
   } else if (reset_mode == 3) {
     /*  ResetIA The IA shall be reset to the medium
       specific default IA when this A_Restart is executed.Channel Number
@@ -1048,6 +1050,7 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
     oc_delete_group_object_table();
     oc_delete_group_rp_table();
     oc_delete_group_mapping_table();
+    oc_reset_at_table(device_index, reset_mode);
     // load state: unloaded
     oc_knx_lsm_set_state(device_index, LSM_S_UNLOADED);
   }
