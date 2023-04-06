@@ -400,7 +400,6 @@ find_access_token_from_payload(oc_rep_t *object)
   return index;
 }
 
-
 int
 oc_core_get_at_table_size()
 {
@@ -1323,7 +1322,6 @@ oc_at_load_entry(int entry)
   }
   free(buf);
 }
-
 
 int
 oc_core_set_at_table(size_t device_index, int index, oc_auth_at_t entry,
