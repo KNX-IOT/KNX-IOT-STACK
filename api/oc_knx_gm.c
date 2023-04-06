@@ -426,7 +426,7 @@ oc_core_find_nr_used_in_group_mapping_table()
       counter++;
     }
   }
-  return counter
+  return counter;
 }
 
 // -----------------------------------------------------------------------------
