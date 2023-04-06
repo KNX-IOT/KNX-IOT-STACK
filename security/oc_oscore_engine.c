@@ -224,7 +224,8 @@ oc_oscore_recv_message(oc_message_t *message)
     }
 
     if (!oscore_ctx) {
-      OC_ERR("***could not find matching OSCORE context***");
+      OC_ERR(
+        "***could not find matching OSCORE context, returning UNAUTHORIZED***");
       oscore_send_error(oscore_pkt, UNAUTHORIZED_4_01, &message->endpoint);
       goto oscore_recv_error;
     }
@@ -251,11 +252,15 @@ oc_oscore_recv_message(oc_message_t *message)
         /* Check if this is a repeat request and discard */
         uint64_t piv = 0;
         oscore_read_piv(oscore_pkt->piv, oscore_pkt->piv_len, &piv);
+        /*
+        // enable this again when the echo option is finished
         if (check_if_replayed_request(oscore_ctx, piv, &message->endpoint,
                                       &message->mcast_dest)) {
+          OC_ERR("REPLAY: returning UNAUTHORIZED");
           oscore_send_error(oscore_pkt, UNAUTHORIZED_4_01, &message->endpoint);
           goto oscore_recv_error;
         }
+        */
 
         /* Compose AAD using received piv and context->recvid */
         oc_oscore_compose_AAD(oscore_ctx->recvid, oscore_ctx->recvid_len,

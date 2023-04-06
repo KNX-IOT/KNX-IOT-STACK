@@ -324,6 +324,16 @@ oc_load_group_mapping_table_entry(int entry)
             g_gm_entries[entry].dataType = (int)rep->value.integer;
           }
           break;
+
+        case OC_REP_BYTE_STRING:
+          if (rep->iname == 107) {
+            // g_gm_entries[entry].authentication = (int)rep->value.boolean;
+            oc_free_string(&g_gm_entries[entry].groupKey);
+            oc_new_string(&g_gm_entries[entry].groupKey,
+                          oc_string(rep->value.string),
+                          oc_string_len(rep->value.string));
+          }
+          break;
         case OC_REP_BOOL:
           if (rep->iname == 97) {
             g_gm_entries[entry].authentication = (int)rep->value.boolean;
@@ -428,31 +438,31 @@ oc_core_fp_gm_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   }
   /* example entry: </fp/gm/1>;ct=60 (cbor)*/
   for (i = 0; i < oc_core_get_group_mapping_table_size(); i++) {
-    if (i > 0) {
-      length = oc_rep_add_line_to_buffer(",\n");
-      response_length += length;
-    }
     if (g_gm_entries[i].ga_len == 0) {
       // index not in use
       break;
     }
+    if (response_length > 0) {
+      // add the comma for the previous entry
+      // there is a next one.
+      length = oc_rep_add_line_to_buffer(",\n");
+      response_length += length;
+    }
 
-    length = oc_rep_add_line_to_buffer("<fp/gm/");
+    length = oc_rep_add_line_to_buffer("</fp/gm/");
     response_length += length;
     char string[10];
-    sprintf((char *)&string, "%d", i + 1);
+    sprintf((char *)&string, "%d>;ct=60", i + 1);
     length = oc_rep_add_line_to_buffer(string);
     response_length += length;
-
-    length = oc_rep_add_line_to_buffer(";ct=60");
-    response_length += length;
   }
 
-  if (response_length > 0) {
-    oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
-  } else {
-    oc_send_linkformat_response(request, OC_STATUS_INTERNAL_SERVER_ERROR, 0);
-  }
+  oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
+  // if (response_length > 0) {
+  //   oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
+  // } else {
+  //   oc_send_linkformat_response(request, OC_STATUS_INTERNAL_SERVER_ERROR, 0);
+  // }
 
   PRINT("oc_core_fp_gm_get_handler - end\n");
 }
@@ -467,6 +477,10 @@ oc_core_fp_gm_post_handler(oc_request_t *request,
   oc_rep_t *object = NULL;
   oc_rep_t *s_object = NULL;
   oc_rep_t *sec_object = NULL;
+  oc_status_t return_status = OC_STATUS_BAD_REQUEST;
+  int id = -1;
+
+  PRINT("oc_core_fp_gm_post_handler\n");
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_CBOR) {
@@ -483,111 +497,136 @@ oc_core_fp_gm_post_handler(oc_request_t *request,
   }
   // find the id of the entry
   oc_rep_t *rep = request->request_payload;
-  int id = oc_table_find_id_from_rep(rep);
-  if (id < 0) {
-    OC_ERR(" not a valid id\n");
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
-    return;
-  }
-  // entry storage
-  oc_group_mapping_table_t my_entry;
 
-  int index = find_group_mapping_index(id);
-  if (index != -1) {
-    PRINT("   entry already exist! \n");
-  } else {
-    index = find_empty_group_mapping_index();
-    if (index == -1) {
-      PRINT("  no space left!\n");
-      oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
-      return;
-    }
-  }
-  PRINT("  storage index: %d (%d)\n", index, id);
+  while (rep != NULL) {
+    switch (rep->type) {
+    case OC_REP_OBJECT: {
+      // find the storage index, e.g. for this object
+      oc_rep_t *object = rep->value.object;
+      id = oc_table_find_id_from_rep(object);
+      if (id == -1) {
+        OC_ERR("  ERROR id %d", id);
+        oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+        return;
+      }
+      // entry storage
+      oc_group_mapping_table_t my_entry;
 
-  // parse the response
-  object = rep->value.object;
-  while (object != NULL) {
-    if (object->type == OC_REP_INT_ARRAY) {
-      // ga
-      if (object->iname == 7) {
-        int64_t *array = 0;
-        size_t array_size = 0;
-        // not making a deep copy
-        oc_rep_i_get_int_array(object, 9, &array, &array_size);
-        if (array_size > 0) {
-          // make the deep copy
-          if ((g_gm_entries[index].ga_len > 0) &&
-              (&g_gm_entries[index].ga != NULL)) {
-            int64_t *cur_arr = g_gm_entries[index].ga;
-            if (cur_arr) {
-              free(cur_arr);
+      int index = find_group_mapping_index(id);
+      if (index != -1) {
+        PRINT("   entry already exist! \n");
+        return_status = OC_STATUS_CHANGED;
+      } else {
+        index = find_empty_group_mapping_index();
+        if (index == -1) {
+          PRINT("  no space left!\n");
+          oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+          return;
+        }
+        return_status = OC_STATUS_CREATED;
+      }
+      PRINT("  storage index: %d (%d)\n", index, id);
+      g_gm_entries[index].id = id;
+
+      // parse the response
+      object = rep->value.object;
+      while (object != NULL) {
+        if (object->type == OC_REP_INT_ARRAY) {
+          // ga
+          if (object->iname == 7) {
+            int64_t *array = 0;
+            size_t array_size = 0;
+            // not making a deep copy
+            oc_rep_i_get_int_array(object, 7, &array, &array_size);
+            if (array_size > 0) {
+              // make the deep copy
+              if ((g_gm_entries[index].ga_len > 0) &&
+                  (&g_gm_entries[index].ga != NULL)) {
+                int64_t *cur_arr = g_gm_entries[index].ga;
+                if (cur_arr) {
+                  free(cur_arr);
+                }
+                g_gm_entries[index].ga = NULL;
+              }
+              g_gm_entries[index].ga_len = (int)array_size;
+              int64_t *new_array =
+                (int64_t *)malloc(array_size * sizeof(uint64_t));
+              if (new_array) {
+                for (size_t i = 0; i < array_size; i++) {
+                  new_array[i] = array[i];
+                }
+                g_gm_entries[index].ga = new_array;
+              } else {
+                OC_ERR("out of memory");
+                return_status = OC_STATUS_INTERNAL_SERVER_ERROR;
+              }
             }
-            g_gm_entries[index].ga = NULL;
           }
-          g_gm_entries[index].ga_len = (int)array_size;
-          int64_t *new_array = (int64_t *)malloc(array_size * sizeof(uint64_t));
-          if (new_array) {
-            for (size_t i = 0; i < array_size; i++) {
-              new_array[i] = array[i];
+        } else if (object->type == OC_REP_INT) {
+          if (object->iname == 116) {
+            // dataType (116)
+            PRINT("   dataType %d\n", (int)object->value.integer);
+            g_gm_entries[index].dataType = (int)object->value.integer;
+          }
+        } else if (object->type == OC_REP_OBJECT) {
+          // level of s
+          s_object = object->value.object;
+          int s_object_nr = object->iname;
+          PRINT("  s_object_nr %d\n", s_object_nr);
+          while (s_object) {
+            if (s_object->type == OC_REP_BYTE_STRING) {
+              if (s_object->iname == 107 && s_object_nr == 115) {
+                // groupkey (115(s)::107)
+                oc_free_string(&(g_gm_entries[index].groupKey));
+                oc_new_string(&g_gm_entries[index].groupKey,
+                              oc_string(s_object->value.string),
+                              oc_string_len(s_object->value.string));
+              }
+            } else if (s_object->type == OC_REP_OBJECT) {
+              sec_object = s_object->value.object;
+              if (sec_object == NULL) {
+                continue;
+              }
+              // get the number of the object which was the object in the
+              // s_object.
+              int sec_object_nr = s_object->iname;
+              while (sec_object) {
+                if (sec_object->type == OC_REP_BOOL) {
+                  if (sec_object->iname == 97 && s_object_nr == 115 &&
+                      sec_object_nr == 28) {
+                    // 115:28:97
+                    g_gm_entries[index].authentication =
+                      s_object->value.boolean;
+                  }
+                  if (sec_object->iname == 99 && s_object_nr == 115 &&
+                      sec_object_nr == 28) {
+                    // 115:28:97
+                    g_gm_entries[index].confidentiality =
+                      s_object->value.boolean;
+                  }
+                } /* type */
+
+                sec_object = sec_object->next;
+              }
             }
-            g_gm_entries[index].ga = new_array;
-          } else {
-            OC_ERR("out of memory");
+            s_object = s_object->next;
           }
         }
-      }
-    } else if (object->type == OC_REP_INT) {
-      if (object->iname == 116) {
-        // dataType (116)
-        PRINT("   profile %d\n", (int)object->value.integer);
-        g_gm_entries[index].dataType = (int)object->value.integer;
-      }
-    } else if (object->type == OC_REP_OBJECT) {
-      // level of s
-      s_object = object->value.object;
-      int s_object_nr = object->iname;
-      PRINT("  s_object_nr %d\n", s_object_nr);
-      while (s_object) {
-        if (s_object->type == OC_REP_STRING) {
-          if (s_object->iname == 107 && s_object_nr == 115) {
-            // groupkey (115(s)::107)
-            oc_free_string(&(g_gm_entries[index].groupKey));
-            oc_new_string(&g_gm_entries[index].groupKey,
-                          oc_string(s_object->value.string),
-                          oc_string_len(s_object->value.string));
-          }
-        } else if (s_object->type == OC_REP_OBJECT) {
-          sec_object = s_object->value.object;
-          if (sec_object == NULL) {
-            continue;
-          }
-          int sec_object_nr = sec_object->iname;
-          while (sec_object) {
-            if (sec_object->type == OC_REP_BOOL) {
-              if (sec_object->iname == 97 && s_object_nr == 115 &&
-                  sec_object_nr == 28) {
-                // 115:28:97
-                g_gm_entries[index].authentication = s_object->value.boolean;
-              }
-              if (sec_object->iname == 99 && s_object_nr == 115 &&
-                  sec_object_nr == 28) {
-                // 115:28:97
-                g_gm_entries[index].confidentiality = s_object->value.boolean;
-              }
-            } /* type */
+        object = object->next;
+      } // while (inner object)
+    }   // case
+    }   // switch (over all objects)
+    rep = rep->next;
+  }
 
-            sec_object = sec_object->next;
-          }
-        }
-        s_object = s_object->next;
-      }
+  for (int i = 0; i < oc_core_get_group_mapping_table_size(); i++) {
+    if (g_gm_entries[i].ga_len != 0) {
+      oc_dump_group_mapping_table_entry(i);
     }
-    object = object->next;
-  } // while (inner object)
+  }
 
   request->response->response_buffer->content_format = APPLICATION_CBOR;
-  request->response->response_buffer->code = oc_status_code(OC_STATUS_CHANGED);
+  request->response->response_buffer->code = oc_status_code(return_status);
   request->response->response_buffer->response_length = response_length;
 }
 
@@ -596,9 +635,9 @@ oc_create_fp_gm_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_fp_gm_resource\n");
   oc_core_populate_resource(
-    resource_idx, device, "/fp/gm", OC_IF_D, APPLICATION_CBOR, OC_DISCOVERABLE,
-    oc_core_fp_gm_get_handler, oc_core_fp_gm_post_handler, 0, 0, 0, 1,
-    "urn:knx:if.c");
+    resource_idx, device, "/fp/gm", OC_IF_C | OC_IF_B, APPLICATION_CBOR,
+    OC_DISCOVERABLE, oc_core_fp_gm_get_handler, 0, oc_core_fp_gm_post_handler,
+    0, 0, 1, "urn:knx:if.c");
 }
 
 static void
@@ -641,27 +680,22 @@ oc_core_fp_gm_x_get_handler(oc_request_t *request,
                          g_gm_entries[index].ga_len);
   if (oc_string_len(g_gm_entries[index].groupKey) > 0) {
     // create s map (s)
-    oc_rep_set_key(&root_map, "s");
-    CborEncoder s_map;
-    cbor_encoder_create_map(&root_map, &s_map, CborIndefiniteLength);
-    // set groupKey (107)
+    oc_rep_i_set_key(oc_rep_object(root), 115);
+    oc_rep_start_object(oc_rep_object(root), s);
+    // set groupKey (115:107)
     oc_rep_i_set_byte_string(s, 107, oc_string(g_gm_entries[index].groupKey),
                              oc_string_len(g_gm_entries[index].groupKey));
-
-    // secSetting map (28)
-    oc_rep_i_set_key(&root_map, 28);
-    CborEncoder secSettings_map;
-    cbor_encoder_create_map(&s_map, &secSettings_map, CborIndefiniteLength);
-    // add a
-    oc_rep_i_set_boolean(secSettings, 0, g_gm_entries[index].authentication);
-    // add c
-    oc_rep_i_set_boolean(secSettings, 0, g_gm_entries[index].confidentiality);
-    cbor_encoder_close_container_checked(&s_map, &secSettings_map);
-    cbor_encoder_close_container_checked(&root_map, &s_map);
+    // secSetting map (115:28)
+    oc_rep_i_set_key(oc_rep_object(s), 28);
+    oc_rep_start_object(oc_rep_object(s), secSettings);
+    // add a (115:28:97)
+    oc_rep_i_set_boolean(secSettings, 97, g_gm_entries[index].authentication);
+    // add c (115:28:99)
+    oc_rep_i_set_boolean(secSettings, 99, g_gm_entries[index].confidentiality);
+    oc_rep_end_object(oc_rep_object(s), secSettings);
+    oc_rep_end_object(oc_rep_object(root), s);
   }
-
   oc_rep_end_root_object();
-
   oc_send_cbor_response(request, OC_STATUS_OK);
   return;
 }
@@ -810,8 +844,8 @@ oc_create_f_netip_fra_resource(size_t device)
   oc_resource_bind_resource_type(res, "urn:knx:dpt.Scaling");
   oc_resource_bind_dpt(res, "");
   oc_resource_bind_content_type(res, APPLICATION_CBOR);
-  oc_resource_bind_resource_interface(res, OC_IF_D); /* if.d */
-  oc_resource_set_function_block_instance(res, 1);   /* instance 1 */
+  oc_resource_bind_resource_interface(res, OC_IF_D + OC_IF_P); /* if.d + if.p*/
+  oc_resource_set_function_block_instance(res, 1);             /* instance 1 */
   oc_resource_set_discoverable(res, true);
   /* periodic observable
      to be used when one wants to send an event per time slice
@@ -827,12 +861,6 @@ oc_create_f_netip_fra_resource(size_t device)
   oc_resource_set_request_handler(res, OC_PUT, oc_core_f_netip_fra_put_handler,
                                   NULL);
   oc_add_resource(res);
-
-  // oc_core_populate_resource(
-  //   resource_idx, device, "/f/netip/fra", OC_IF_D, APPLICATION_CBOR,
-  //   OC_DISCOVERABLE, oc_core_f_netip_fra_get_handler,
-  //   oc_core_f_netip_fra_put_handler, 0, 0, 0, 2,
-  //  "urn:knx:dpa.11.96", "urn:knx:dpt.Scaling");
 }
 
 // -----------------------------------------------------------------------------
@@ -936,8 +964,8 @@ oc_create_f_netip_tol_resource(size_t device)
   oc_resource_bind_resource_type(res, "urn:knx:dpt.timePeriodMsec");
   oc_resource_bind_dpt(res, "");
   oc_resource_bind_content_type(res, APPLICATION_CBOR);
-  oc_resource_bind_resource_interface(res, OC_IF_D); /* if.d */
-  oc_resource_set_function_block_instance(res, 1);   /* instance 1 */
+  oc_resource_bind_resource_interface(res, OC_IF_D + OC_IF_P); /* if.d +  if.p*/
+  oc_resource_set_function_block_instance(res, 1);             /* instance 1 */
   oc_resource_set_discoverable(res, true);
   /* periodic observable
      to be used when one wants to send an event per time slice
@@ -953,12 +981,6 @@ oc_create_f_netip_tol_resource(size_t device)
   oc_resource_set_request_handler(res, OC_PUT, oc_core_f_netip_tol_put_handler,
                                   NULL);
   oc_add_resource(res);
-
-  // oc_core_populate_resource(
-  //   resource_idx, device, "/f/netip/tol", OC_IF_D, APPLICATION_CBOR,
-  //   OC_DISCOVERABLE, oc_core_f_netip_tol_get_handler,
-  //   oc_core_f_netip_tol_put_handler, 0, 0, 0, 2,
-  //   "urn:knx:dpa.11.95", "urn:knx:dpt.timePeriodMsec");
 }
 
 // -----------------------------------------------------------------------------
@@ -967,8 +989,11 @@ void
 dump_key(void)
 {
   int key_size = oc_string_len(g_key);
-  oc_storage_write(GM_STORE_KEY, (uint8_t *)&key_size, sizeof(key_size));
-  oc_storage_write(GM_STORE_KEY, (uint8_t *)&g_key, sizeof(key_size));
+  // oc_storage_write(GM_STORE_KEY, (uint8_t *)&key_size, sizeof(key_size));
+  int written = oc_storage_write(GM_STORE_KEY, oc_string(g_key), key_size);
+  if (written != key_size) {
+    PRINT("dump_key %d %d\n", key_size, written);
+  }
 }
 
 void
@@ -976,14 +1001,11 @@ load_key(void)
 {
   int temp_size;
   int key_size;
-  char key_buffer[100];
-
-  temp_size =
-    oc_storage_read(GM_STORE_KEY, (uint8_t *)&key_size, sizeof(key_size));
-
-  if ((key_size > 0) && (key_size < 100)) {
-    temp_size = oc_storage_read(GM_STORE_KEY, (uint8_t *)&key_buffer, key_size);
-    oc_new_string(&g_key, key_buffer, key_size);
+  char tempstring[100];
+  temp_size = oc_storage_read(GM_STORE_KEY, (uint8_t *)&tempstring, 99);
+  if (temp_size > 1) {
+    tempstring[temp_size] = 0;
+    oc_new_string(&g_key, tempstring, temp_size);
   }
 }
 
@@ -1037,8 +1059,8 @@ oc_create_f_netip_key_resource(size_t device)
   oc_resource_bind_resource_type(res, "urn:knx:dpt.varOctet");
   oc_resource_bind_dpt(res, "");
   oc_resource_bind_content_type(res, APPLICATION_CBOR);
-  oc_resource_bind_resource_interface(res, OC_IF_D); /* if.d */
-  oc_resource_set_function_block_instance(res, 1);   /* instance 1 */
+  oc_resource_bind_resource_interface(res, OC_IF_D + OC_IF_P); /* if.d + if.p */
+  oc_resource_set_function_block_instance(res, 1);             /* instance 1 */
   oc_resource_set_discoverable(res, true);
   /* periodic observable
      to be used when one wants to send an event per time slice
@@ -1056,13 +1078,6 @@ oc_create_f_netip_key_resource(size_t device)
   oc_resource_set_request_handler(res, OC_PUT, oc_core_f_netip_key_put_handler,
                                   NULL);
   oc_add_resource(res);
-
-  // no GET handler
-  // oc_core_populate_resource(
-  //  resource_idx, device, "/f/netip/key", OC_IF_D, APPLICATION_CBOR,
-  //  OC_DISCOVERABLE, 0,
-  //  oc_core_f_netip_key_put_handler, 0, 0, 0, 2,
-  //  "urn:knx:dpa.11.91", "urn:knx:dpt.varOctet");
 }
 
 // -----------------------------------------------------------------------------
@@ -1167,8 +1182,8 @@ oc_create_f_netip_ttl_resource(size_t device)
   oc_resource_bind_resource_type(res, "urn:knx:dpt.value1Ucount");
   oc_resource_bind_dpt(res, "");
   oc_resource_bind_content_type(res, APPLICATION_CBOR);
-  oc_resource_bind_resource_interface(res, OC_IF_D); /* if.d */
-  oc_resource_set_function_block_instance(res, 1);   /* instance 1 */
+  oc_resource_bind_resource_interface(res, OC_IF_D + OC_IF_P); /* if.d + if.p */
+  oc_resource_set_function_block_instance(res, 1);             /* instance 1 */
   oc_resource_set_discoverable(res, true);
   /* periodic observable
      to be used when one wants to send an event per time slice
@@ -1184,13 +1199,6 @@ oc_create_f_netip_ttl_resource(size_t device)
   oc_resource_set_request_handler(res, OC_PUT, oc_core_f_netip_ttl_put_handler,
                                   NULL);
   oc_add_resource(res);
-
-  // oc_core_populate_resource(resource_idx, device, "/f/netip/ttl", OC_IF_D,
-  //                           APPLICATION_CBOR, OC_DISCOVERABLE,
-  //                           oc_core_f_netip_ttl_get_handler,
-  //                            oc_core_f_netip_ttl_put_handler, 0, 0, 0, 2,
-  //                           "urn:knx:dpa.11.67"
-  //                           ,"urn:knx:dpt.value1Ucount");
 }
 
 // -----------------------------------------------------------------------------
@@ -1198,25 +1206,23 @@ oc_create_f_netip_ttl_resource(size_t device)
 void
 dump_mcast(void)
 {
-  int mcast_size = oc_string_len(g_mcast);
-  oc_storage_write(GM_STORE_MCAST, (uint8_t *)&mcast_size, sizeof(mcast_size));
-  oc_storage_write(GM_STORE_MCAST, (uint8_t *)&g_mcast, sizeof(mcast_size));
+  int key_size = oc_string_len(g_mcast);
+  int written = oc_storage_write(GM_STORE_MCAST, oc_string(g_mcast), key_size);
+  if (written != key_size) {
+    PRINT("dump_mcast %d %d\n", key_size, written);
+  }
 }
 
 void
 load_mcast(void)
 {
   int temp_size;
-  int mcast_size;
-  char mcast_buffer[100];
-
-  temp_size =
-    oc_storage_read(GM_STORE_MCAST, (uint8_t *)&mcast_size, sizeof(mcast_size));
-
-  if ((mcast_size > 0) && (mcast_size < 100)) {
-    temp_size =
-      oc_storage_read(GM_STORE_MCAST, (uint8_t *)&mcast_buffer, mcast_size);
-    oc_new_string(&g_mcast, mcast_buffer, mcast_size);
+  int key_size;
+  char tempstring[100];
+  temp_size = oc_storage_read(GM_STORE_MCAST, (uint8_t *)&tempstring, 99);
+  if (temp_size > 1) {
+    tempstring[temp_size] = 0;
+    oc_new_string(&g_mcast, tempstring, temp_size);
   }
 }
 
@@ -1302,8 +1308,8 @@ oc_create_f_netip_mcast_resource(size_t device)
   oc_resource_bind_resource_type(res, "urn:knx:dpt.IPV4");
   oc_resource_bind_dpt(res, "");
   oc_resource_bind_content_type(res, APPLICATION_CBOR);
-  oc_resource_bind_resource_interface(res, OC_IF_D); /* if.d */
-  oc_resource_set_function_block_instance(res, 1);   /* instance 1 */
+  oc_resource_bind_resource_interface(res, OC_IF_D + OC_IF_P); /* if.d + if.p */
+  oc_resource_set_function_block_instance(res, 1);             /* instance 1 */
   oc_resource_set_discoverable(res, true);
   /* periodic observable
      to be used when one wants to send an event per time slice
@@ -1319,12 +1325,6 @@ oc_create_f_netip_mcast_resource(size_t device)
   oc_resource_set_request_handler(res, OC_PUT,
                                   oc_core_f_netip_mcast_put_handler, NULL);
   oc_add_resource(res);
-
-  // oc_core_populate_resource(resource_idx, device, "/f/netip/mcast", OC_IF_D,
-  //                           APPLICATION_CBOR, OC_DISCOVERABLE,
-  //                           oc_core_f_netip_mcast_get_handler,
-  //                           oc_core_f_netip_mcast_put_handler, 0, 0, 0, 2,
-  //                           "urn:knx:dpa.11.66","urn:knx:dpt.IPV4");
 }
 
 // -----------------------------------------------------------------------------
@@ -1369,28 +1369,28 @@ oc_core_f_netip_get_handler(oc_request_t *request,
   response_length += length;
   length = oc_rep_add_line_to_buffer(";rt=\":dpa.11.66 :dpt.IPv4\"");
   response_length += length;
-  length = oc_rep_add_line_to_buffer(";ct=60");
+  length = oc_rep_add_line_to_buffer(";ct=60,\n");
   response_length += length;
 
   length = oc_rep_add_line_to_buffer("</p/netip/ttl>");
   response_length += length;
   length = oc_rep_add_line_to_buffer(";rt=\":dpa.11.67 :dpt.value1Ucount\"");
   response_length += length;
-  length = oc_rep_add_line_to_buffer(";ct=60");
+  length = oc_rep_add_line_to_buffer(";ct=60,\n");
   response_length += length;
 
   length = oc_rep_add_line_to_buffer("</p/netip/key>");
   response_length += length;
   length = oc_rep_add_line_to_buffer(";rt=\":dpa.11.91 :dpt.varOctet\"");
   response_length += length;
-  length = oc_rep_add_line_to_buffer(";ct=60");
+  length = oc_rep_add_line_to_buffer(";ct=60,\n");
   response_length += length;
 
   length = oc_rep_add_line_to_buffer("</p/netip/tol>");
   response_length += length;
   length = oc_rep_add_line_to_buffer(";rt=\":dpa.11.95 :dpt.timePeriodMsec\"");
   response_length += length;
-  length = oc_rep_add_line_to_buffer(";ct=60");
+  length = oc_rep_add_line_to_buffer(";ct=60,\n");
   response_length += length;
 
   length = oc_rep_add_line_to_buffer("</p/netip/fra>");
@@ -1420,14 +1420,8 @@ oc_create_knx_iot_router_resources(size_t device_index)
   // creating the resources
   oc_create_fp_gm_resource(OC_KNX_FP_GM, device_index);
   oc_create_fp_gm_x_resource(OC_KNX_FP_GM_X, device_index);
-  // oc_create_f_netip_resource(OC_KNX_F_NETIP, device_index);
-  oc_create_f_netip_mcast_resource(device_index);
-  oc_create_f_netip_ttl_resource(device_index);
-  oc_create_f_netip_tol_resource(device_index);
-  oc_create_f_netip_key_resource(device_index);
-  oc_create_f_netip_fra_resource(device_index);
 
-  // loading the previous state
+  // loading the stored state
   oc_load_group_mapping_table();
   load_ttl();
   load_tol();

@@ -112,10 +112,15 @@ typedef void (*oc_memb_buffers_avail_callback_t)(int);
 
 struct oc_memb
 {
+  /** Size of each memory block contained within mem (e.g. sizeof(mem[0])) */
   unsigned short size;
+  /** Number of memory blocks held within the mem array */
   unsigned short num;
+  /** Array of reference counts to memory blocks */
   char *count;
+  /** Array of memory blocks */
   void *mem;
+  /** Called when the number of available buffers changes */
   oc_memb_buffers_avail_callback_t buffers_avail_cb;
 };
 

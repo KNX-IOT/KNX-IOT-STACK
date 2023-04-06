@@ -76,8 +76,6 @@ typedef struct oc_device_info_t
   oc_knx_version_info_t fwv; /**< fwv firmware version number */
   oc_string_t hwt;           /**< knx hardware type */
   oc_string_t model;         /**< knx model */
-  uint32_t sa;               /**< sub address */
-  uint32_t da;               /**< device address */
   oc_string_t hostname;      /**< knx host name */
   uint64_t fid;              /**< knx fabric id */
   uint32_t ia;               /**< knx ia Device individual address */

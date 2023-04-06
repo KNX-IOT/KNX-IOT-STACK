@@ -1195,8 +1195,7 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
   }
 
 #if defined(OC_BLOCK_WISE)
-  oc_blockwise_free_request_buffer(*request_state);
-  *request_state = NULL;
+  oc_blockwise_scrub_buffers(false);
 #endif
 
   if (request_obj.request_payload) {
@@ -1238,6 +1237,7 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
      * access the resource. A 4.01 response is sent.
      */
     response_buffer.response_length = 0;
+    OC_ERR("ocir: subject not authorized");
     response_buffer.code = oc_status_code(OC_STATUS_UNAUTHORIZED);
   } else {
     success = true;

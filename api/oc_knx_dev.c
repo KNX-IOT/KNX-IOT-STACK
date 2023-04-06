@@ -1,5 +1,5 @@
 /*
- // Copyright (c) 2021-2022 Cascoda Ltd
+ // Copyright (c) 2021-2023 Cascoda Ltd
  //
  // Licensed under the Apache License, Version 2.0 (the "License");
  // you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 #include "oc_api.h"
 #include "api/oc_knx_dev.h"
 #include "api/oc_knx_fp.h"
+#include "api/oc_knx_gm.h"
 #include "api/oc_knx_sec.h"
 #include "api/oc_main.h"
 #include "port/dns-sd.h"
@@ -29,8 +30,6 @@
 
 #define KNX_STORAGE_HOSTNAME "dev_knx_hostname"
 #define KNX_STORAGE_PM "dev_knx_pm"
-#define KNX_STORAGE_SA "dev_knx_sa"
-#define KNX_STORAGE_DA "dev_knx_da"
 #define KNX_STORAGE_PORT "dev_knx_port"
 
 static void
@@ -688,6 +687,16 @@ oc_create_dev_dev_resource(int resource_idx, size_t device)
 }
 
 // -----------------------------------------------------------------------------
+/*
+  Each KNX IoT device, i.e.a Router or an end device,
+  SHALL have a unique KNX Individual Address in a network.The KNX Individual
+  Address is a 2 octet value that consist of an 8 bit Subnetwork
+  Address(see “dev / sa”) and
+  an 8 bit Device Address(see “dev / da”)
+  octet 0 == subnetwork
+  octet 1 == device address
+  Example: Subnetwork Address: 0, Device Address: 1 = 0x0001
+*/
 
 static void
 oc_core_dev_sa_get_handler(oc_request_t *request,
@@ -705,46 +714,12 @@ oc_core_dev_sa_get_handler(oc_request_t *request,
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device != NULL) {
-    // cbor_encode_int(&g_encoder, device->sa);
     oc_rep_begin_root_object();
-    oc_rep_i_set_int(root, 1, device->sa);
+    uint8_t sa = (uint8_t)((device->ia) >> 8);
+    oc_rep_i_set_int(root, 1, sa);
     oc_rep_end_root_object();
 
     oc_send_cbor_response(request, OC_STATUS_OK);
-    return;
-  }
-
-  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
-}
-
-static void
-oc_core_dev_sa_put_handler(oc_request_t *request,
-                           oc_interface_mask_t iface_mask, void *data)
-{
-  (void)data;
-  (void)iface_mask;
-
-  /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
-    return;
-  }
-
-  size_t device_index = request->resource->device;
-  oc_device_info_t *device = oc_core_get_device_info(device_index);
-  oc_rep_t *rep = request->request_payload;
-  // debugging
-  if (rep != NULL) {
-    PRINT("  oc_core_dev_sa_put_handler type: %d\n", rep->type);
-  }
-
-  if ((rep != NULL) && (rep->type == OC_REP_INT)) {
-    PRINT("  oc_core_dev_sa_put_handler received : %d\n",
-          (int)rep->value.integer);
-    device->sa = (int)rep->value.integer;
-    // oc_send_cbor_response(request, OC_STATUS_CHANGED);
-    oc_send_cbor_response_no_payload_size(request, OC_STATUS_CHANGED);
-    oc_storage_write(KNX_STORAGE_SA, (uint8_t *)&(rep->value.integer), 1);
     return;
   }
 
@@ -755,10 +730,10 @@ void
 oc_create_dev_sa_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_dev_sa_resource\n");
-  oc_core_populate_resource(
-    resource_idx, device, "/dev/sa", OC_IF_P, APPLICATION_CBOR, OC_DISCOVERABLE,
-    oc_core_dev_sa_get_handler, oc_core_dev_sa_put_handler, 0, 0, 2,
-    "urn:knx:dpa.0.57", "urn:knx:dpt.value1Ucount");
+  oc_core_populate_resource(resource_idx, device, "/dev/sa", OC_IF_P,
+                            APPLICATION_CBOR, OC_DISCOVERABLE,
+                            oc_core_dev_sa_get_handler, 0, 0, 0, 2,
+                            "urn:knx:dpa.0.57", "urn:knx:dpt.value1Ucount");
 }
 
 // -----------------------------------------------------------------------------
@@ -779,45 +754,12 @@ oc_core_dev_da_get_handler(oc_request_t *request,
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device != NULL) {
-    // cbor_encode_int(&g_encoder, device->da);
     oc_rep_begin_root_object();
-    oc_rep_i_set_int(root, 1, device->da);
+
+    uint8_t da = (uint8_t)(device->ia);
+    oc_rep_i_set_int(root, 1, da);
     oc_rep_end_root_object();
     oc_send_cbor_response(request, OC_STATUS_OK);
-    return;
-  }
-
-  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
-}
-
-static void
-oc_core_dev_da_put_handler(oc_request_t *request,
-                           oc_interface_mask_t iface_mask, void *data)
-{
-  (void)data;
-  (void)iface_mask;
-
-  /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
-    return;
-  }
-
-  size_t device_index = request->resource->device;
-  oc_device_info_t *device = oc_core_get_device_info(device_index);
-  oc_rep_t *rep = request->request_payload;
-  // debugging
-  if (rep != NULL) {
-    PRINT("  oc_core_dev_da_put_handler type: %d\n", rep->type);
-  }
-
-  if ((rep != NULL) && (rep->type == OC_REP_INT)) {
-    PRINT("  oc_core_dev_da_put_handler received : %d\n",
-          (int)rep->value.integer);
-    device->da = (uint32_t)rep->value.integer;
-    // oc_send_cbor_response(request, OC_STATUS_CHANGED);
-    oc_send_cbor_response_no_payload_size(request, OC_STATUS_CHANGED);
-    oc_storage_write(KNX_STORAGE_DA, (uint8_t *)&(rep->value.integer), 1);
     return;
   }
 
@@ -828,10 +770,10 @@ void
 oc_create_dev_da_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_dev_da_resource\n");
-  oc_core_populate_resource(
-    resource_idx, device, "/dev/da", OC_IF_P, APPLICATION_CBOR, OC_DISCOVERABLE,
-    oc_core_dev_da_get_handler, oc_core_dev_da_put_handler, 0, 0, 2,
-    "urn:knx:dpa.0.58", "urn:knx:dpt.value1Ucount");
+  oc_core_populate_resource(resource_idx, device, "/dev/da", OC_IF_P,
+                            APPLICATION_CBOR, OC_DISCOVERABLE,
+                            oc_core_dev_da_get_handler, 0, 0, 0, 2,
+                            "urn:knx:dpa.0.58", "urn:knx:dpt.value1Ucount");
 }
 
 // -----------------------------------------------------------------------------
@@ -956,16 +898,6 @@ oc_knx_device_storage_read(size_t device_index)
     device->pm = pm;
     PRINT("  pm (storage) %d\n", device->pm);
   }
-
-  /* KNX_STORAGE_SA */
-  temp_size =
-    oc_storage_read(KNX_STORAGE_SA, (uint8_t *)&device->sa, sizeof(uint32_t));
-  PRINT("  sa (storage) %d\n", device->sa);
-
-  /* KNX_STORAGE_DA */
-  temp_size =
-    oc_storage_read(KNX_STORAGE_DA, (uint8_t *)&device->da, sizeof(uint32_t));
-  PRINT("  da (storage) %d\n", device->da);
 }
 
 void
@@ -982,6 +914,13 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
           (int)device_index);
     return;
   }
+
+  oc_device_info_t *device = oc_core_get_device_info(device_index);
+  if (device == NULL) {
+    OC_ERR("oc_knx_device_storage_reset: device is NULL\n");
+    return;
+  }
+
   if (reset_mode == 2) {
     /* With erase code 2 (Factory Reset to default state),
      all addressing information and security configuration data SHALL be reset
@@ -990,33 +929,34 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
     oc_storage_erase(KNX_STORAGE_IA);
     oc_storage_erase(KNX_STORAGE_IID);
     oc_storage_erase(KNX_STORAGE_PM);
-    oc_storage_erase(KNX_STORAGE_SA);
-    oc_storage_erase(KNX_STORAGE_DA);
     uint32_t port =
       5683; // TODO: should be using all coap nodes define from the stack
     oc_storage_write(KNX_STORAGE_PORT, (char *)&port, sizeof(uint32_t));
     oc_storage_erase(KNX_STORAGE_HOSTNAME);
     // load state: unloaded, and programming mode is true
     oc_knx_lsm_set_state(device_index, LSM_S_UNLOADED);
-    oc_device_info_t *device = oc_core_get_device_info(device_index);
     // set the other data to null
     device->ia = zero;
     device->iid = zero;
-    device->sa = zero;
-    device->da = zero;
     device->port = port;
     oc_free_string(&device->hostname);
     oc_new_string(&device->hostname, "", strlen(""));
 
     oc_delete_group_object_table();
     oc_delete_group_rp_table();
-
+    oc_delete_group_mapping_table();
     oc_delete_at_table(device_index);
+    oc_knx_device_set_programming_mode(device_index, false);
+
   } else if (reset_mode == 3) {
     /*  ResetIA The IA shall be reset to the medium
       specific default IA when this A_Restart is executed.Channel Number
       : Fixed : 00h */
     oc_storage_erase(KNX_STORAGE_IA);
+    // set the ia to zero
+    device->ia = zero;
+    // not sure if the programming mode needs to be reset
+    oc_knx_device_set_programming_mode(device_index, false);
     oc_device_info_t *device = oc_core_get_device_info(device_index);
     device->ia = zero;
 
@@ -1032,6 +972,10 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
         */
     oc_delete_group_object_table();
     oc_delete_group_rp_table();
+    oc_delete_group_mapping_table();
+    oc_reset_at_table(device_index, reset_mode);
+
+    oc_knx_device_set_programming_mode(device_index, false);
     // load state: unloaded
     oc_knx_lsm_set_state(device_index, LSM_S_UNLOADED);
   }

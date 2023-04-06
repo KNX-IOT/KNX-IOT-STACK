@@ -453,6 +453,7 @@ oc_core_auth_at_post_handler(oc_request_t *request,
   oc_rep_t *object = NULL;
   oc_rep_t *subobject = NULL;
   oc_rep_t *oscobject = NULL;
+  oc_status_t return_status = OC_STATUS_BAD_REQUEST;
   int index = -1;
   PRINT("oc_core_auth_at_post_handler\n");
 
@@ -479,8 +480,10 @@ oc_core_auth_at_post_handler(oc_request_t *request,
       index = find_index_from_at(at);
       if (index != -1) {
         PRINT("   entry already exist! \n");
+        return_status = OC_STATUS_CHANGED;
       } else {
         index = find_empty_at_index();
+        return_status = OC_STATUS_CREATED;
         if (index == -1) {
           PRINT("  no space left!\n");
           oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
@@ -673,8 +676,7 @@ oc_core_auth_at_post_handler(oc_request_t *request,
   // add the oscore contexts by reinitializing all used oscore keys.
   oc_init_oscore_from_storage(device_index, false);
   PRINT("oc_core_auth_at_post_handler - end\n");
-  // oc_send_cbor_response(request, OC_STATUS_CHANGED);
-  oc_send_cbor_response_no_payload_size(request, OC_STATUS_CHANGED);
+  oc_send_cbor_response_no_payload_size(request, return_status);
 }
 
 static void
@@ -1028,6 +1030,19 @@ oc_print_auth_at_entry(size_t device_index, int index)
       }
     }
   }
+}
+
+oc_interface_mask_t
+oc_at_get_interface_mask(size_t device_index, int index)
+{
+  (void)device_index;
+  if (index < 0) {
+    return OC_IF_NONE;
+  }
+  if (index > oc_core_get_at_table_size() - 1) {
+    return OC_IF_NONE;
+  }
+  return g_at_entries[index].scope;
 }
 
 int
@@ -1389,6 +1404,31 @@ oc_delete_at_table(size_t device_index)
 #endif
 }
 
+void
+oc_reset_at_table(size_t device_index, int erase_code)
+{
+  PRINT("Reset AT Object Table: %d\n", erase_code);
+
+  if (erase_code == 2) {
+    oc_delete_at_table(device_index);
+  } else if (erase_code == 7) {
+    // reset the entries that are not "if.sec"
+    oc_interface_mask_t scope = OC_IF_NONE;
+    for (int i = 0; i < G_AT_MAX_ENTRIES; i++) {
+      scope = oc_at_get_interface_mask(device_index, i);
+      if ((scope & OC_IF_SEC) > 0) {
+        // reset the entries that are not "if.sec"
+        oc_at_delete_entry(device_index, i);
+        oc_print_auth_at_entry(device_index, i);
+      }
+    }
+#ifdef OC_OSCORE
+    // create the oscore contexts that still remain
+    oc_init_oscore_from_storage(device_index, true);
+#endif
+  }
+}
+
 // ----------------------------------------------------------------------------
 
 void
@@ -1743,8 +1783,8 @@ oc_knx_sec_check_acl(oc_method_t method, oc_resource_t *resource,
   if (method_allowed(method, resource, endpoint) == true) {
     return true;
   }
-  PRINT("oc_knx_sec_check_acl: method %s NOT allowed on %s\n",
-        get_method_name(method), oc_string_checked(resource->uri));
+  OC_ERR("oc_knx_sec_check_acl: method %s NOT allowed on %s\n",
+         get_method_name(method), oc_string_checked(resource->uri));
 
   return false;
 }
