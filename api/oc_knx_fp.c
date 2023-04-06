@@ -19,6 +19,7 @@
 #include "oc_discovery.h"
 #include "oc_core_res.h"
 #include "oc_helpers.h"
+#include "oc_knx_helpers.h"
 #include <stdio.h>
 #define __STDC_FORMAT_MACROS
 #include <inttypes.h>
