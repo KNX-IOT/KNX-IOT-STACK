@@ -399,6 +399,25 @@ find_access_token_from_payload(oc_rep_t *object)
   return index;
 }
 
+
+int
+oc_core_get_at_table_size()
+{
+  return G_AT_MAX_ENTRIES;
+}
+
+int
+oc_core_find_nr_used_in_auth_at_table()
+{
+  int counter = 0;
+  for (int i = 0; i < oc_core_get_at_table_size(); i++) {
+    if (oc_string_len(g_at_entries[i].id) == 0) {
+      counter++;
+    }
+  }
+  return counter;
+}
+
 // ----------------------------------------------------------------------------
 
 static void
@@ -410,6 +429,8 @@ oc_core_auth_at_get_handler(oc_request_t *request,
   size_t response_length = 0;
   int i;
   int length = 0;
+  bool ps_exists;
+  bool total_exists;
   PRINT("oc_core_auth_at_get_handler\n");
 
   /* check if the accept header is link-format */
@@ -418,6 +439,30 @@ oc_core_auth_at_get_handler(oc_request_t *request,
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
+
+  // handle query parameters: l=ps l=total
+  if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
+    // example : < / fp / r / ? l = total>; total = 22; ps = 5
+
+    length = oc_frame_query_l("/auth/at", ps_exists, total_exists);
+    response_length += length;
+    if (ps_exists) {
+      length = oc_rep_add_line_to_buffer(";ps=");
+      response_length += length;
+      length = oc_frame_integer(oc_core_get_at_table_size());
+      response_length += length;
+    }
+    if (total_exists) {
+      length = oc_rep_add_line_to_buffer(";total=");
+      response_length += length;
+      length = oc_frame_integer(oc_core_find_nr_used_in_auth_at_table());
+      response_length += length;
+    }
+
+    oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
+    return;
+  }
+
   /* example entry: </auth/at/token-id>;ct=50 */
   for (i = 0; i < G_AT_MAX_ENTRIES; i++) {
     if (oc_string_len(g_at_entries[i].id) > 0) {
@@ -1278,11 +1323,6 @@ oc_at_load_entry(int entry)
   free(buf);
 }
 
-int
-oc_core_get_at_table_size()
-{
-  return G_AT_MAX_ENTRIES;
-}
 
 int
 oc_core_set_at_table(size_t device_index, int index, oc_auth_at_t entry,
