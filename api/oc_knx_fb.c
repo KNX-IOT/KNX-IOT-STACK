@@ -72,12 +72,12 @@ store_in_array(int value, int instance)
 }
 
 // -----------------------------------------------------------------------------
-static int 
+static int
 oc_core_count_dp_in_fb(size_t device_index, int instance, int fb_value)
 {
   int counter = 0;
   int i;
-  
+
   oc_resource_t *resource = oc_ri_get_app_resources();
   for (; resource; resource = resource->next) {
     if (resource->device != device_index ||
@@ -160,7 +160,8 @@ oc_core_fb_x_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     if (ps_exists) {
       length = oc_rep_add_line_to_buffer(";ps=");
       response_length += length;
-      length = oc_frame_integer(oc_core_count_dp_in_fb(device_index, instance, fb_value));
+      length = oc_frame_integer(
+        oc_core_count_dp_in_fb(device_index, instance, fb_value));
       response_length += length;
     }
     if (total_exists) {
@@ -175,7 +176,8 @@ oc_core_fb_x_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     return;
   }
 
-  // do the actual creation of the payload, e.g. the data points per functional block instance
+  // do the actual creation of the payload, e.g. the data points per functional
+  // block instance
   oc_resource_t *resource = oc_ri_get_app_resources();
   for (; resource; resource = resource->next) {
     if (resource->device != device_index ||
@@ -237,7 +239,6 @@ oc_count_functional_blocks(oc_request_t *request, size_t device_index)
     return g_nr_functional_blocks;
   }
 
-
   oc_resource_t *resource = oc_ri_get_app_resources();
   for (; resource; resource = resource->next) {
     if (resource->device != device_index ||
@@ -273,7 +274,6 @@ oc_count_functional_blocks(oc_request_t *request, size_t device_index)
   g_nr_functional_blocks = counter;
   return g_nr_functional_blocks;
 }
-
 
 bool
 oc_add_function_blocks_to_response(oc_request_t *request, size_t device_index,
@@ -422,8 +422,6 @@ oc_core_fb_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
     return;
   }
-
-
 
   bool added = oc_add_function_blocks_to_response(request, device_index,
                                                   &response_length, matches);
