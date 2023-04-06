@@ -30,8 +30,6 @@
 
 #define KNX_STORAGE_HOSTNAME "dev_knx_hostname"
 #define KNX_STORAGE_PM "dev_knx_pm"
-#define KNX_STORAGE_SA "dev_knx_sa"
-#define KNX_STORAGE_DA "dev_knx_da"
 #define KNX_STORAGE_PORT "dev_knx_port"
 
 static void
@@ -716,47 +714,12 @@ oc_core_dev_sa_get_handler(oc_request_t *request,
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device != NULL) {
-    // cbor_encode_int(&g_encoder, device->sa);
     oc_rep_begin_root_object();
-    uint8_t sa = (uint8_t)(device->ia) >> 8;
+    uint8_t sa = (uint8_t)((device->ia) >> 8);
     oc_rep_i_set_int(root, 1, sa);
     oc_rep_end_root_object();
 
     oc_send_cbor_response(request, OC_STATUS_OK);
-    return;
-  }
-
-  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
-}
-
-static void
-oc_core_dev_sa_put_handler(oc_request_t *request,
-                           oc_interface_mask_t iface_mask, void *data)
-{
-  (void)data;
-  (void)iface_mask;
-
-  /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
-    return;
-  }
-
-  size_t device_index = request->resource->device;
-  oc_device_info_t *device = oc_core_get_device_info(device_index);
-  oc_rep_t *rep = request->request_payload;
-  // debugging
-  if (rep != NULL) {
-    PRINT("  oc_core_dev_sa_put_handler type: %d\n", rep->type);
-  }
-
-  if ((rep != NULL) && (rep->type == OC_REP_INT)) {
-    PRINT("  oc_core_dev_sa_put_handler received : %d\n",
-          (int)rep->value.integer);
-    // device->sa = (int)rep->value.integer;
-    //  oc_send_cbor_response(request, OC_STATUS_CHANGED);
-    oc_send_cbor_response_no_payload_size(request, OC_STATUS_CHANGED);
-    oc_storage_write(KNX_STORAGE_SA, (uint8_t *)&(rep->value.integer), 1);
     return;
   }
 
@@ -791,47 +754,12 @@ oc_core_dev_da_get_handler(oc_request_t *request,
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device != NULL) {
-    // cbor_encode_int(&g_encoder, device->da);
     oc_rep_begin_root_object();
 
     uint8_t da = (uint8_t)(device->ia);
     oc_rep_i_set_int(root, 1, da);
     oc_rep_end_root_object();
     oc_send_cbor_response(request, OC_STATUS_OK);
-    return;
-  }
-
-  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
-}
-
-static void
-oc_core_dev_da_put_handler(oc_request_t *request,
-                           oc_interface_mask_t iface_mask, void *data)
-{
-  (void)data;
-  (void)iface_mask;
-
-  /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
-    return;
-  }
-
-  size_t device_index = request->resource->device;
-  oc_device_info_t *device = oc_core_get_device_info(device_index);
-  oc_rep_t *rep = request->request_payload;
-  // debugging
-  if (rep != NULL) {
-    PRINT("  oc_core_dev_da_put_handler type: %d\n", rep->type);
-  }
-
-  if ((rep != NULL) && (rep->type == OC_REP_INT)) {
-    PRINT("  oc_core_dev_da_put_handler received : %d\n",
-          (int)rep->value.integer);
-    // device->da = (uint32_t)rep->value.integer;
-    //  oc_send_cbor_response(request, OC_STATUS_CHANGED);
-    oc_send_cbor_response_no_payload_size(request, OC_STATUS_CHANGED);
-    oc_storage_write(KNX_STORAGE_DA, (uint8_t *)&(rep->value.integer), 1);
     return;
   }
 
@@ -970,18 +898,6 @@ oc_knx_device_storage_read(size_t device_index)
     device->pm = pm;
     PRINT("  pm (storage) %d\n", device->pm);
   }
-
-  /* KNX_STORAGE_SA */
-  // temp_size =
-  //   oc_storage_read(KNX_STORAGE_SA, (uint8_t *)&device->sa,
-  //   sizeof(uint32_t));
-  // PRINT("  sa (storage) %d\n", device->sa);
-
-  /* KNX_STORAGE_DA */
-  // temp_size =
-  //   oc_storage_read(KNX_STORAGE_DA, (uint8_t *)&device->da,
-  //   sizeof(uint32_t));
-  // PRINT("  da (storage) %d\n", device->da);
 }
 
 void
@@ -1006,8 +922,6 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
     oc_storage_erase(KNX_STORAGE_IA);
     oc_storage_erase(KNX_STORAGE_IID);
     oc_storage_erase(KNX_STORAGE_PM);
-    oc_storage_erase(KNX_STORAGE_SA);
-    oc_storage_erase(KNX_STORAGE_DA);
     uint32_t port =
       5683; // TODO: should be using all coap nodes define from the stack
     oc_storage_write(KNX_STORAGE_PORT, (char *)&port, sizeof(uint32_t));
@@ -1018,8 +932,6 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
     // set the other data to null
     device->ia = zero;
     device->iid = zero;
-    // device->sa = zero;
-    // device->da = zero;
     device->port = port;
     oc_free_string(&device->hostname);
     oc_new_string(&device->hostname, "", strlen(""));
