@@ -1426,134 +1426,127 @@ oc_core_f_netip_get_handler(oc_request_t *request,
       response_length += length;
     }
 
-  length = oc_rep_add_line_to_buffer("</p/netip/mcast>");
-  response_length += length;
-  length = oc_rep_add_line_to_buffer(";rt=\":dpa.11.66 :dpt.IPv4\"");
-  response_length += length;
-  length = oc_rep_add_line_to_buffer(";ct=60,\n");
-  response_length += length;
+    length = oc_rep_add_line_to_buffer("</p/netip/mcast>");
+    response_length += length;
+    length = oc_rep_add_line_to_buffer(";rt=\":dpa.11.66 :dpt.IPv4\"");
+    response_length += length;
+    length = oc_rep_add_line_to_buffer(";ct=60,\n");
+    response_length += length;
 
-  length = oc_rep_add_line_to_buffer("</p/netip/ttl>");
-  response_length += length;
-  length = oc_rep_add_line_to_buffer(";rt=\":dpa.11.67 :dpt.value1Ucount\"");
-  response_length += length;
-  length = oc_rep_add_line_to_buffer(";ct=60,\n");
-  response_length += length;
+    length = oc_rep_add_line_to_buffer("</p/netip/ttl>");
+    response_length += length;
+    length = oc_rep_add_line_to_buffer(";rt=\":dpa.11.67 :dpt.value1Ucount\"");
+    response_length += length;
+    length = oc_rep_add_line_to_buffer(";ct=60,\n");
+    response_length += length;
 
-  length = oc_rep_add_line_to_buffer("</p/netip/key>");
-  response_length += length;
-  length = oc_rep_add_line_to_buffer(";rt=\":dpa.11.91 :dpt.varOctet\"");
-  response_length += length;
-  length = oc_rep_add_line_to_buffer(";ct=60,\n");
-  response_length += length;
+    length = oc_rep_add_line_to_buffer("</p/netip/key>");
+    response_length += length;
+    length = oc_rep_add_line_to_buffer(";rt=\":dpa.11.91 :dpt.varOctet\"");
+    response_length += length;
+    length = oc_rep_add_line_to_buffer(";ct=60,\n");
+    response_length += length;
 
-  length = oc_rep_add_line_to_buffer("</p/netip/tol>");
-  response_length += length;
-  length = oc_rep_add_line_to_buffer(";rt=\":dpa.11.95 :dpt.timePeriodMsec\"");
-  response_length += length;
-  length = oc_rep_add_line_to_buffer(";ct=60,\n");
-  response_length += length;
+    length = oc_rep_add_line_to_buffer("</p/netip/tol>");
+    response_length += length;
+    length =
+      oc_rep_add_line_to_buffer(";rt=\":dpa.11.95 :dpt.timePeriodMsec\"");
+    response_length += length;
+    length = oc_rep_add_line_to_buffer(";ct=60,\n");
+    response_length += length;
 
-  length = oc_rep_add_line_to_buffer("</p/netip/fra>");
-  response_length += length;
-  length = oc_rep_add_line_to_buffer(";rt=\":dpa.11.96 :dpt.scaling\"");
-  response_length += length;
-  length = oc_rep_add_line_to_buffer(";ct=60");
-  response_length += length;
+    length = oc_rep_add_line_to_buffer("</p/netip/fra>");
+    response_length += length;
+    length = oc_rep_add_line_to_buffer(";rt=\":dpa.11.96 :dpt.scaling\"");
+    response_length += length;
+    length = oc_rep_add_line_to_buffer(";ct=60");
+    response_length += length;
 
 #endif /* OC_IOT_ROUTER */
 
-  if (response_length > 0) {
-    oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
-  } else {
-    oc_send_linkformat_response(request, OC_STATUS_INTERNAL_SERVER_ERROR, 0);
+    if (response_length > 0) {
+      oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
+    } else {
+      oc_send_linkformat_response(request, OC_STATUS_INTERNAL_SERVER_ERROR, 0);
+    }
+
+    PRINT("oc_core_f_netip_get_handler - end\n");
   }
 
-  PRINT("oc_core_f_netip_get_handler - end\n");
-}
-
-void
-oc_create_knx_iot_router_resources(size_t device_index)
-{
-  (void)device_index;
+  void oc_create_knx_iot_router_resources(size_t device_index)
+  {
+    (void)device_index;
 #ifdef OC_IOT_ROUTER
-  OC_DBG("oc_create_knx_gm_resources");
-  // creating the resources
-  oc_create_fp_gm_resource(OC_KNX_FP_GM, device_index);
-  oc_create_fp_gm_x_resource(OC_KNX_FP_GM_X, device_index);
+    OC_DBG("oc_create_knx_gm_resources");
+    // creating the resources
+    oc_create_fp_gm_resource(OC_KNX_FP_GM, device_index);
+    oc_create_fp_gm_x_resource(OC_KNX_FP_GM_X, device_index);
 
-  // loading the stored state
-  oc_load_group_mapping_table();
-  load_ttl();
-  load_tol();
-  load_fra();
-  load_mcast();
-  load_key();
+    // loading the stored state
+    oc_load_group_mapping_table();
+    load_ttl();
+    load_tol();
+    load_fra();
+    load_mcast();
+    load_key();
 #endif /* OC_IOT_ROUTER */
-}
+  }
 
-void
-oc_create_iot_router_functional_block(size_t device_index)
-{
-  (void)device_index;
+  void oc_create_iot_router_functional_block(size_t device_index)
+  {
+    (void)device_index;
 #ifdef OC_IOT_ROUTER
-  oc_create_f_netip_mcast_resource(device_index);
-  oc_create_f_netip_ttl_resource(device_index);
-  oc_create_f_netip_tol_resource(device_index);
-  oc_create_f_netip_key_resource(device_index);
-  oc_create_f_netip_fra_resource(device_index);
+    oc_create_f_netip_mcast_resource(device_index);
+    oc_create_f_netip_ttl_resource(device_index);
+    oc_create_f_netip_tol_resource(device_index);
+    oc_create_f_netip_key_resource(device_index);
+    oc_create_f_netip_fra_resource(device_index);
 #endif /* OC_IOT_ROUTER */
-}
+  }
 
-void
-oc_delete_group_mapping_table()
-{
+  void oc_delete_group_mapping_table()
+  {
 
 #ifdef OC_IOT_ROUTER
-  PRINT("Deleting Group Mapping Table from Persistent storage\n");
-  for (int i = 0; i < oc_core_get_group_mapping_table_size(); i++) {
-    oc_delete_group_mapping_table_entry(i);
-    oc_print_group_mapping_table_entry(i);
-  }
+    PRINT("Deleting Group Mapping Table from Persistent storage\n");
+    for (int i = 0; i < oc_core_get_group_mapping_table_size(); i++) {
+      oc_delete_group_mapping_table_entry(i);
+      oc_print_group_mapping_table_entry(i);
+    }
 #endif /* OC_IOT_ROUTER */
-}
-
-oc_group_mapping_table_t *
-oc_get_group_mapping_entry(size_t device_index, int index)
-{
-  (void)device_index;
-
-  if (index < 0) {
-    return NULL;
   }
-  if (index >= oc_core_get_group_mapping_table_size()) {
-    return NULL;
-  }
+
+  oc_group_mapping_table_t *oc_get_group_mapping_entry(size_t device_index,
+                                                       int index)
+  {
+    (void)device_index;
+
+    if (index < 0) {
+      return NULL;
+    }
+    if (index >= oc_core_get_group_mapping_table_size()) {
+      return NULL;
+    }
 
 #ifdef OC_IOT_ROUTER
-  return &g_gm_entries[index];
+    return &g_gm_entries[index];
 #else
   return NULL;
 #endif
-}
+  }
 
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
+  // -----------------------------------------------------------------------------
+  // -----------------------------------------------------------------------------
+  // -----------------------------------------------------------------------------
 
-static oc_gateway_t app_gateway = { NULL, NULL };
+  static oc_gateway_t app_gateway = { NULL, NULL };
 
-int
-oc_set_gateway_cb(oc_gateway_s_mode_cb_t cb, void *data)
-{
-  app_gateway.cb = cb;
-  app_gateway.data = data;
+  int oc_set_gateway_cb(oc_gateway_s_mode_cb_t cb, void *data)
+  {
+    app_gateway.cb = cb;
+    app_gateway.data = data;
 
-  return 0;
-}
+    return 0;
+  }
 
-oc_gateway_t *
-oc_get_gateway_cb(void)
-{
-  return &app_gateway;
-}
+  oc_gateway_t *oc_get_gateway_cb(void) { return &app_gateway; }
