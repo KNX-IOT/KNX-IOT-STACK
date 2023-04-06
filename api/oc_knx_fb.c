@@ -18,6 +18,7 @@
 #include "api/oc_knx_fb.h"
 #include "api/oc_knx_fp.h"
 #include "api/oc_knx_gm.h"
+#include "oc_knx_helpers.h"
 
 #include "oc_core_res.h"
 #include "oc_discovery.h"
@@ -28,6 +29,7 @@
 #define ARRAY_SIZE 50 // upto 50 data points in a functional block
 int g_int_array[2][ARRAY_SIZE];
 int g_array_size = 0;
+static int g_nr_functional_blocks = 0;
 
 int
 get_fp_from_dp(char *dpt)
@@ -70,6 +72,33 @@ store_in_array(int value, int instance)
 }
 
 // -----------------------------------------------------------------------------
+static int 
+oc_core_count_dp_in_fb(size_t device_index, int instance, int fb_value)
+{
+  int counter = 0;
+  int i;
+  
+  oc_resource_t *resource = oc_ri_get_app_resources();
+  for (; resource; resource = resource->next) {
+    if (resource->device != device_index ||
+        !(resource->properties & OC_DISCOVERABLE)) {
+      continue;
+    }
+    int instance_resource = resource->fb_instance;
+    oc_string_array_t types = resource->types;
+    for (i = 0; i < (int)oc_string_array_get_allocated_size(types); i++) {
+      char *t = oc_string_array_get_item(types, i);
+      if ((strncmp(t, ":dpa", 4) == 0) ||
+          (strncmp(t, "urn:knx:dpa", 11) == 0)) {
+        int fp_int = get_fp_from_dp(t);
+        if (fp_int == fb_value && instance_resource == instance) {
+          counter++;
+        }
+      }
+    }
+  }
+  return counter;
+}
 
 static void
 oc_core_fb_x_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
@@ -80,6 +109,9 @@ oc_core_fb_x_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   size_t response_length = 0;
   int i;
   int matches = 0;
+  int length;
+  bool ps_exists;
+  bool total_exists;
   PRINT("oc_core_fb_x_get_handler\n");
 
   /* check if the accept header is link-format */
@@ -117,9 +149,33 @@ oc_core_fb_x_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       request->uri_path, request->uri_path_len);
   }
   PRINT("  instance: %d\n", instance);
-
   size_t device_index = request->resource->device;
 
+  // handle query parameters: l=ps l=total
+  if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
+    // example : < / fp / r / ? l = total>; total = 22; ps = 5
+
+    length = oc_frame_query_l("/fp/gm", ps_exists, total_exists);
+    response_length += length;
+    if (ps_exists) {
+      length = oc_rep_add_line_to_buffer(";ps=");
+      response_length += length;
+      length = oc_frame_integer(oc_core_count_dp_in_fb(device_index, instance, fb_value));
+      response_length += length;
+    }
+    if (total_exists) {
+      length = oc_rep_add_line_to_buffer(";total=");
+      response_length += length;
+      length = oc_frame_integer(
+        oc_core_count_dp_in_fb(device_index, instance, fb_value));
+      response_length += length;
+    }
+
+    oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
+    return;
+  }
+
+  // do the actual creation of the payload, e.g. the data points per functional block instance
   oc_resource_t *resource = oc_ri_get_app_resources();
   for (; resource; resource = resource->next) {
     if (resource->device != device_index ||
@@ -170,6 +226,55 @@ oc_create_fb_x_resource(int resource_idx, size_t device)
 
 // -----------------------------------------------------------------------------
 
+int
+oc_count_functional_blocks(oc_request_t *request, size_t device_index)
+{
+  int counter = 0;
+  int i;
+  bool netip_added = false;
+
+  if (g_nr_functional_blocks > 0) {
+    return g_nr_functional_blocks;
+  }
+
+
+  oc_resource_t *resource = oc_ri_get_app_resources();
+  for (; resource; resource = resource->next) {
+    if (resource->device != device_index ||
+        !(resource->properties & OC_DISCOVERABLE)) {
+      continue;
+    }
+
+    oc_string_array_t types = resource->types;
+    for (i = 0; i < (int)oc_string_array_get_allocated_size(types); i++) {
+      char *t = oc_string_array_get_item(types, i);
+      if ((strncmp(t, ":dpa.11.", 8) == 0) ||
+          (strncmp(t, "urn:knx:dpa.11.", 15) == 0)) {
+        /* specific functional block iot_router : /f/netip */
+        if (netip_added == false) {
+          /* add only once */
+          counter++;
+          netip_added = true;
+        }
+      } else {
+        /* regular functional block, framing by functional block numbers &
+         * instances*/
+        if ((strncmp(t, ":dpa", 4) == 0) ||
+            (strncmp(t, "urn:knx:dpa", 11) == 0)) {
+          int fp_int = get_fp_from_dp(t);
+          int instance = resource->fb_instance;
+          if ((fp_int > 0) && (is_in_g_array(fp_int, instance) == false)) {
+            counter++;
+          }
+        }
+      }
+    }
+  }
+  g_nr_functional_blocks = counter;
+  return g_nr_functional_blocks;
+}
+
+
 bool
 oc_add_function_blocks_to_response(oc_request_t *request, size_t device_index,
                                    size_t *response_length, int matches)
@@ -178,6 +283,7 @@ oc_add_function_blocks_to_response(oc_request_t *request, size_t device_index,
   int length = 0;
   char number[24];
   int i;
+  int counter = 0;
 
   // use global variable
   g_array_size = 0;
@@ -202,6 +308,7 @@ oc_add_function_blocks_to_response(oc_request_t *request, size_t device_index,
           *response_length += length;
           matches++;
           netip_added = true;
+          counter++;
         }
       } else {
         /* regular functional block, framing by functional block numbers &
@@ -212,6 +319,7 @@ oc_add_function_blocks_to_response(oc_request_t *request, size_t device_index,
           int instance = resource->fb_instance;
           if ((fp_int > 0) && (is_in_g_array(fp_int, instance) == false)) {
             store_in_array(fp_int, instance);
+            counter++;
           }
         }
       }
@@ -256,6 +364,11 @@ oc_add_function_blocks_to_response(oc_request_t *request, size_t device_index,
 
   if (matches > 0) {
     return true;
+
+    if (g_nr_functional_blocks == 0) {
+      // store the counter so that we only have to do this once
+      g_nr_functional_blocks = counter;
+    }
   }
 
   return false;
@@ -271,7 +384,10 @@ oc_core_fb_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   (void)data;
   (void)iface_mask;
   size_t response_length = 0;
+  int length;
   int matches = 0;
+  bool ps_exists;
+  bool total_exists;
 
   PRINT("oc_core_fb_get_handler\n");
 
@@ -283,6 +399,31 @@ oc_core_fb_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   }
 
   size_t device_index = request->resource->device;
+
+  // handle query parameters: l=ps l=total
+  if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
+    // example : < / fp / r / ? l = total>; total = 22; ps = 5
+
+    length = oc_frame_query_l("/auth/at", ps_exists, total_exists);
+    response_length += length;
+    if (ps_exists) {
+      length = oc_rep_add_line_to_buffer(";ps=");
+      response_length += length;
+      length = oc_frame_integer(g_nr_functional_blocks);
+      response_length += length;
+    }
+    if (total_exists) {
+      length = oc_rep_add_line_to_buffer(";total=");
+      response_length += length;
+      length = oc_frame_integer(g_nr_functional_blocks);
+      response_length += length;
+    }
+
+    oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
+    return;
+  }
+
+
 
   bool added = oc_add_function_blocks_to_response(request, device_index,
                                                   &response_length, matches);
