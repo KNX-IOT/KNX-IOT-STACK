@@ -18,13 +18,14 @@
 #include "oc_knx_helpers.h"
 
 int
-check_if_query_l_exist(oc_request_t *request, bool *ps_exists, bool *total_exists)
+check_if_query_l_exist(oc_request_t *request, bool *ps_exists,
+                       bool *total_exists)
 {
   if (*ps_exists == NULL) {
-    //return 0;
+    // return 0;
   }
   if (*total_exists == NULL) {
-    //return 0;
+    // return 0;
   }
 
   *ps_exists = false;
@@ -56,7 +57,6 @@ check_if_query_l_exist(oc_request_t *request, bool *ps_exists, bool *total_exist
     } /* query l exists */
   }   /* query available */
 
-  
   if (*ps_exists == true) {
     return 1;
   }
@@ -67,7 +67,7 @@ check_if_query_l_exist(oc_request_t *request, bool *ps_exists, bool *total_exist
 }
 
 int
-oc_frame_query_l(char* url, bool ps_exists, bool total_exists)
+oc_frame_query_l(char *url, bool ps_exists, bool total_exists)
 {
   // example : < / fp / r / ? l = total>; total = 22; ps = 5
   int response_length = 0;
