@@ -914,6 +914,13 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
           (int)device_index);
     return;
   }
+
+  oc_device_info_t *device = oc_core_get_device_info(device_index);
+  if (device == NULL) {
+    OC_ERR("oc_knx_device_storage_reset: device is NULL\n");
+    return;
+  }
+
   if (reset_mode == 2) {
     /* With erase code 2 (Factory Reset to default state),
      all addressing information and security configuration data SHALL be reset
@@ -928,7 +935,6 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
     oc_storage_erase(KNX_STORAGE_HOSTNAME);
     // load state: unloaded, and programming mode is true
     oc_knx_lsm_set_state(device_index, LSM_S_UNLOADED);
-    oc_device_info_t *device = oc_core_get_device_info(device_index);
     // set the other data to null
     device->ia = zero;
     device->iid = zero;
@@ -940,12 +946,17 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
     oc_delete_group_rp_table();
     oc_delete_group_mapping_table();
     oc_delete_at_table(device_index);
+    oc_knx_device_set_programming_mode(device_index, false);
 
   } else if (reset_mode == 3) {
     /*  ResetIA The IA shall be reset to the medium
       specific default IA when this A_Restart is executed.Channel Number
       : Fixed : 00h */
     oc_storage_erase(KNX_STORAGE_IA);
+    // set the ia to zero
+    device->ia = zero;
+    // not sure if the programming mode needs to be reset
+    oc_knx_device_set_programming_mode(device_index, false);
     oc_device_info_t *device = oc_core_get_device_info(device_index);
     device->ia = zero;
 
@@ -963,6 +974,8 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
     oc_delete_group_rp_table();
     oc_delete_group_mapping_table();
     oc_reset_at_table(device_index, reset_mode);
+
+    oc_knx_device_set_programming_mode(device_index, false);
     // load state: unloaded
     oc_knx_lsm_set_state(device_index, LSM_S_UNLOADED);
   }
