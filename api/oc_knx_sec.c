@@ -1032,6 +1032,19 @@ oc_print_auth_at_entry(size_t device_index, int index)
   }
 }
 
+oc_interface_mask_t
+oc_at_get_interface_mask(size_t device_index, int index)
+{
+  (void)device_index;
+  if (index < 0) {
+    return OC_IF_NONE;
+  }
+  if (index > oc_core_get_at_table_size() - 1) {
+    return OC_IF_NONE;
+  }
+  return g_at_entries[index].scope;
+}
+
 int
 oc_at_delete_entry(size_t device_index, int index)
 {
@@ -1389,6 +1402,32 @@ oc_delete_at_table(size_t device_index)
 #ifdef OC_OSCORE
   oc_oscore_free_all_contexts();
 #endif
+}
+
+
+void
+oc_reset_at_table(size_t device_index, int erase_code)
+{
+  PRINT("Reset AT Object Table: %d\n", erase_code);
+  
+  if (erase_code == 2) {
+    oc_delete_at_table(device_index);
+  } else if (erase_code == 7) {
+    // reset the entries that are not "if.sec"
+    oc_interface_mask_t scope = OC_IF_NONE;
+    for (int i = 0; i < G_AT_MAX_ENTRIES; i++) {
+      scope = oc_at_get_interface_mask(device_index, i);
+      if ((scope & OC_IF_SEC) > 0) {
+        // reset the entries that are not "if.sec"
+        oc_at_delete_entry(device_index, i);
+        oc_print_auth_at_entry(device_index, i);
+      }
+    }
+#ifdef OC_OSCORE
+    // create the oscore contexts that still remain
+    oc_init_oscore_from_storage(device_index, true);
+#endif
+  }
 }
 
 // ----------------------------------------------------------------------------
