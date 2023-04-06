@@ -20,10 +20,8 @@
 #ifndef OC_KNX_HELPERS_H
 #define OC_KNX_HELPERS_H
 
-
 #include "oc_api.h"
 #include "oc_helpers.h"
-
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,20 +38,18 @@ extern "C" {
 int check_if_query_l_exist(oc_request_t *request, bool *ps_exists,
                            bool *total_exists);
 
-
 /**
  * @brief helper function to frame url part of query response:
  * <url?l=ps>
  * <url?l=total>
  * <url?l=ps;ps=total>
- * 
+ *
  * @param url the url to be framed
  * @param ps_exists frame ps
  * @param total_exists frame total
- * @return total bytes framed 
+ * @return total bytes framed
  */
 int oc_frame_query_l(char *url, bool ps_exists, bool total_exists);
-
 
 /**
  * @brief helper function to frame an integer in the response:
@@ -61,7 +57,6 @@ int oc_frame_query_l(char *url, bool ps_exists, bool total_exists);
  * @return total bytes framed
  */
 int oc_frame_integer(int value);
-
 
 #ifdef __cplusplus
 }

@@ -41,6 +41,14 @@ extern "C" {
  */
 int knx_publish_service(char *serial_no, uint32_t iid, uint32_t ia, bool pm);
 
+/**
+ * @brief Set the advertised sleep period within the mDNS service.
+ *
+ * @param sp The period, in milliseconds. A value of 0 removes the
+ * advertisement, signalling that the device is wakeful.
+ */
+void knx_service_sleep_period(uint32_t sp);
+
 #ifdef __cplusplus
 }
 #endif

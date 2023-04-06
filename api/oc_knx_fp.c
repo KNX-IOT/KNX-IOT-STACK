@@ -63,9 +63,8 @@ static int oc_core_find_index_in_rp_table_from_id(int id,
 int find_empty_slot_in_rp_table(int id, oc_group_rp_table_t *rp_table,
                                 int max_size);
 
-
 static int oc_core_find_used_nr_in_rp_table(oc_group_rp_table_t *rp_table,
-                                                  int max_size);
+                                            int max_size);
 
 // -----------------------------------------------------------------------------
 
@@ -188,7 +187,6 @@ oc_core_find_nr_used_in_group_object_table()
   }
   return counter;
 }
-
 
 int
 oc_core_find_group_object_table_index(uint32_t group_address)
@@ -341,8 +339,7 @@ oc_core_fp_g_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   }
 
   // handle query parameters: l=ps l=total
-  if (check_if_query_l_exist(request, &ps_exists,
-                             &total_exists)) {
+  if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
     // example : < / fp / r / ? l = total>; total = 22; ps = 5
 
     length = oc_frame_query_l("/fp/g", ps_exists, total_exists);
@@ -356,15 +353,13 @@ oc_core_fp_g_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     if (total_exists) {
       length = oc_rep_add_line_to_buffer(";total=");
       response_length += length;
-      length = oc_frame_integer(
-              oc_core_find_nr_used_in_group_object_table());
+      length = oc_frame_integer(oc_core_find_nr_used_in_group_object_table());
       response_length += length;
     }
 
     oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
     return;
   }
-
 
   /* example entry: </fp/g/1>;ct=60   (cbor)*/
   for (i = 0; i < GOT_MAX_ENTRIES; i++) {
@@ -747,8 +742,8 @@ oc_core_fp_p_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     if (total_exists) {
       length = oc_rep_add_line_to_buffer(";total=");
       response_length += length;
-      length = oc_frame_integer(
-        oc_core_find_used_nr_in_rp_table(g_gpt, oc_core_get_publisher_table_size()));
+      length = oc_frame_integer(oc_core_find_used_nr_in_rp_table(
+        g_gpt, oc_core_get_publisher_table_size()));
       response_length += length;
     }
 
@@ -1105,7 +1100,6 @@ oc_core_fp_r_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
     return;
   }
-
 
   /* example entry: </fp/r/1>;ct=60 (cbor) */
   for (i = 0; i < GRT_MAX_ENTRIES; i++) {
@@ -2004,8 +1998,8 @@ find_empty_slot_in_rp_table(int id, oc_group_rp_table_t *rp_table, int max_size)
   return -1;
 }
 
-static int oc_core_find_used_nr_in_rp_table(oc_group_rp_table_t *rp_table,
-                                       int max_size)
+static int
+oc_core_find_used_nr_in_rp_table(oc_group_rp_table_t *rp_table, int max_size)
 {
   int counter = 0;
   PRINT("Deleting Group Recipient Table from Persistent storage\n");
