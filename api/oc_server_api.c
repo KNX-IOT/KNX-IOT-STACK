@@ -69,6 +69,17 @@ oc_query_value_exists(oc_request_t *request, const char *key)
   return oc_ri_query_exists(request->query, request->query_len, key);
 }
 
+
+bool oc_query_values_available(oc_request_t *request)
+{
+  if (!request)
+    return false;
+  if (request->query_len > 0) {
+    return true;
+  }
+  return false;
+}
+
 static int
 response_length(void)
 {

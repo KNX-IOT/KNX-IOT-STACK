@@ -945,6 +945,17 @@ int oc_get_query_value(oc_request_t *request, const char *key, char **value);
 int oc_query_value_exists(oc_request_t *request, const char *key);
 
 /**
+ * Checks if a query parameter are available
+ *
+ * @param[in] request the oc_request_t that contains the query parameters
+ *
+ * @return
+ *  - False no queries available
+ *  - True queries available
+ */
+bool oc_query_values_available(oc_request_t *request);
+
+/**
  * Called after the response to a GET, PUT, POST or DELETE call has been
  * prepared completed, will respond with CBOR.
  *
