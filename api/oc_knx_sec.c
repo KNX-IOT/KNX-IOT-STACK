@@ -1,5 +1,5 @@
 /*
- // Copyright (c) 2021-2022 Cascoda Ltd
+ // Copyright (c) 2021-2023 Cascoda Ltd
  //
  // Licensed under the Apache License, Version 2.0 (the "License");
  // you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #include <inttypes.h>
 #include "security/oc_oscore_context.h"
 #include "oc_knx.h"
+#include "oc_knx_helpers.h"
 
 uint64_t g_oscore_replaywindow = 0;
 uint64_t g_oscore_osndelay = 0;
