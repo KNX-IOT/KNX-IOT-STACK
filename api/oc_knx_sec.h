@@ -266,7 +266,7 @@ void oc_delete_at_table(size_t device_index);
  */
 void oc_reset_at_table(size_t device_index, int erase_code);
 
-  /**
+/**
  * @brief delete the /auth/at table entry
  *
  * @param device_index the device index

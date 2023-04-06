@@ -1404,12 +1404,11 @@ oc_delete_at_table(size_t device_index)
 #endif
 }
 
-
 void
 oc_reset_at_table(size_t device_index, int erase_code)
 {
   PRINT("Reset AT Object Table: %d\n", erase_code);
-  
+
   if (erase_code == 2) {
     oc_delete_at_table(device_index);
   } else if (erase_code == 7) {
