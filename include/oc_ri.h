@@ -167,7 +167,8 @@ typedef struct oc_response_t
 
 /**
  * @brief interface masks
- * note that value =1 is not used.
+ * security access scopes defined as interfaces
+ * note that scope = 1 is not used.
  */
 typedef enum {
   OC_IF_NONE = 0,      /**< no interface defined */
@@ -192,8 +193,8 @@ typedef enum {
 /**
  * @brief Get the interface string object
  * Note: should be called with a single interface as mask only
- * @param mask the interface mask
- * @return const char* the interface as string
+ * @param mask the interface mask (access scope)
+ * @return const char* the interface as string e.g. "if.i"
  */
 const char *get_interface_string(oc_interface_mask_t mask);
 
@@ -201,7 +202,7 @@ const char *get_interface_string(oc_interface_mask_t mask);
  * @brief Get the method name object
  *
  * @param method the input method
- * @return const char* the method as string
+ * @return const char* the method as string e.g. "GET"
  */
 const char *get_method_name(oc_method_t method);
 
