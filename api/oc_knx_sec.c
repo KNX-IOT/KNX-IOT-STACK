@@ -1741,11 +1741,23 @@ oc_if_method_allowed_according_to_mask(oc_interface_mask_t iface_mask,
   return false;
 }
 
+bool
+oc_knx_contains_interface(oc_interface_mask_t calling_interfaces,
+                          oc_interface_mask_t resource_interfaces)
+{
+  if ((calling_interfaces & resource_interfaces) == 0) {
+    // one of the entries is matching
+    return false;
+  }
+  return true;
+}
+
 static bool
 method_allowed(oc_method_t method, oc_resource_t *resource,
                oc_endpoint_t *endpoint)
 {
   if (oc_is_resource_secure(method, resource) == false) {
+    // not a secure resource
     return true;
   }
   PRINT("method allowed flags:");
@@ -1764,52 +1776,28 @@ method_allowed(oc_method_t method, oc_resource_t *resource,
                   get_method_name(method), oc_string_checked(resource->uri));
     return false;
   }
-#endif
+  if (endpoint->aut_at_index > 0) {
+    // interface of the call, e.g. of the auth/at entry that was used to decrypt
+    // the message
+    oc_interface_mask_t calling_interfaces =
+      oc_at_get_interface_mask(0, endpoint->aut_at_index - 1);
+    // interfaces of the resource
+    oc_interface_mask_t resource_interfaces = resource->interfaces;
+    if (oc_knx_contains_interface(calling_interfaces, resource_interfaces)) {
+      PRINT("method_allowed : request :");
+      oc_print_interface(calling_interfaces);
+      PRINT("\n");
+      PRINT("method_allowed : resource :");
+      oc_print_interface(resource_interfaces);
+      PRINT("\n");
 
-  return oc_if_method_allowed_according_to_mask(resource->interfaces, method);
-}
-
-bool
-oc_knx_contains_interface(oc_interface_mask_t at_interface,
-                          oc_interface_mask_t resource_interface)
-{
-  int i;
-  oc_interface_mask_t new_mask;
-  oc_interface_mask_t at_mask;
-  oc_interface_mask_t resource_mask;
-  // PRINT("------ oc_knx_contains_interface  at  %d resource %d  \n",
-  // at_interface, resource_interface);
-  for (i = 1; i < OC_MAX_IF_MASKS + 1; i++) {
-    new_mask = 1 << i;
-    at_mask = at_interface & new_mask;
-    resource_mask = resource_interface & new_mask;
-    // PRINT("oc_knx_contains_interface  %d %d %d %d  \n", i, new_mask, at_mask,
-    //      resource_mask);
-    if ((at_mask != 0) && (at_mask == resource_mask)) {
-      return true;
+      return false;
     }
   }
 
-  return false;
-}
+#endif
 
-bool
-oc_knx_sec_check_interface(oc_resource_t *resource, oc_string_t *token)
-{
-  if (resource == NULL) {
-    return false;
-  }
-  if (token == NULL) {
-    return false;
-  }
-  oc_interface_mask_t resource_interfaces = resource->interfaces;
-  int index = find_index_from_at(token);
-  if (index < 0) {
-    return false;
-  }
-
-  return oc_knx_contains_interface(g_at_entries[index].scope,
-                                   resource_interfaces);
+  return oc_if_method_allowed_according_to_mask(resource->interfaces, method);
 }
 
 bool
