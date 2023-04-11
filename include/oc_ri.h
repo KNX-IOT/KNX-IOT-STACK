@@ -167,24 +167,24 @@ typedef struct oc_response_t
 
 /**
  * @brief interface masks
- *
+ * note that value =1 is not used.
  */
 typedef enum {
   OC_IF_NONE = 0,      /**< no interface defined */
-  OC_IF_I = 1 << 1,    /**< if.i */
-  OC_IF_O = 1 << 2,    /**< if.o */
-  OC_IF_G = 1 << 3,    /**< if.g.s.[ga] */
-  OC_IF_C = 1 << 4,    /**< if.c */
-  OC_IF_P = 1 << 5,    /**< if.p */
-  OC_IF_D = 1 << 6,    /**< if.d */
-  OC_IF_A = 1 << 7,    /**< if.a */
-  OC_IF_S = 1 << 8,    /**< if.s */
-  OC_IF_LI = 1 << 9,   /**< if.ll */
-  OC_IF_B = 1 << 10,   /**< if.b */
-  OC_IF_SEC = 1 << 11, /**< if.sec */
-  OC_IF_SWU = 1 << 12, /**< if.swu */
-  OC_IF_PM = 1 << 13,  /**< if.pm */
-  OC_IF_M = 1 << 14    /**< if.m (manufacturer) */
+  OC_IF_I = (1 << 1), /**< if.i  (2)*/
+  OC_IF_O = (1 << 2), /**< if.o (4)*/
+  OC_IF_G = (1 << 3), /**< if.g.s.[ga] (8) */
+  OC_IF_C = (1 << 4), /**< if.c (16) */
+  OC_IF_P = (1 << 5), /**< if.p (32)*/
+  OC_IF_D = (1 << 6), /**< if.d (64)*/
+  OC_IF_A = (1 << 7), /**< if.a (128)*/
+  OC_IF_S = (1 << 8), /**< if.s (256)*/
+  OC_IF_LI = (1 << 9), /**< if.ll (512)*/
+  OC_IF_B = (1 << 10),  /**< if.b (1024) */
+  OC_IF_SEC = (1 << 11), /**< if.sec (2048)*/
+  OC_IF_SWU = (1 << 12), /**< if.swu (4096)*/
+  OC_IF_PM = (1 << 13),  /**< if.pm (8192)*/
+  OC_IF_M = (1 << 14)    /**< if.m (manufacturer) (16384) */
 } oc_interface_mask_t;
 
 #define OC_MAX_IF_MASKS 14
