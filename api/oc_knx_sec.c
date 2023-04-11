@@ -1752,10 +1752,9 @@ oc_knx_contains_interface(oc_interface_mask_t calling_interfaces,
   return true;
 }
 
-
 static bool
-method_allowed(oc_method_t method, oc_resource_t* resource,
-  oc_endpoint_t* endpoint)
+method_allowed(oc_method_t method, oc_resource_t *resource,
+               oc_endpoint_t *endpoint)
 {
   if (oc_is_resource_secure(method, resource) == false) {
     // not a secure resource
@@ -1768,19 +1767,20 @@ method_allowed(oc_method_t method, oc_resource_t* resource,
     // not an OSCORE protected message, but OSCORE is enabled
     // so the is call is unprotected and should not go ahead
     OC_DBG_OSCORE("unprotected message, access denied for: %s [%s]",
-      get_method_name(method), oc_string_checked(resource->uri));
+                  get_method_name(method), oc_string_checked(resource->uri));
     return false;
   }
   if ((endpoint->flags & OSCORE_DECRYPTED) == 0) {
     // not an decrypted message
     OC_DBG_OSCORE("not a decrypted message, access denied for: %s [%s]",
-      get_method_name(method), oc_string_checked(resource->uri));
+                  get_method_name(method), oc_string_checked(resource->uri));
     return false;
   }
   if (endpoint->aut_at_index > 0) {
-    // interface of the call, e.g. of the auth/at entry that was used to decrypt the message
+    // interface of the call, e.g. of the auth/at entry that was used to decrypt
+    // the message
     oc_interface_mask_t calling_interfaces =
-      oc_at_get_interface_mask(0, endpoint->aut_at_index -1);
+      oc_at_get_interface_mask(0, endpoint->aut_at_index - 1);
     // interfaces of the resource
     oc_interface_mask_t resource_interfaces = resource->interfaces;
     if (oc_knx_contains_interface(calling_interfaces, resource_interfaces)) {
@@ -1790,11 +1790,10 @@ method_allowed(oc_method_t method, oc_resource_t* resource,
       PRINT("method_allowed : resource :");
       oc_print_interface(resource_interfaces);
       PRINT("\n");
-     
+
       return false;
     }
   }
-
 
 #endif
 

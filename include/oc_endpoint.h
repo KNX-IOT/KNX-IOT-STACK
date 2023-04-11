@@ -92,7 +92,7 @@ typedef struct oc_endpoint_t
                      credential to be used for encryption for s-mode messages
                      e.g. looping over the list of group addresses of the key */
 #ifdef OC_OSCORE
-  int32_t aut_at_index;       /**< auth at index +1 [1-max_indexes], 0 == error */
+  int32_t aut_at_index; /**< auth at index +1 [1-max_indexes], 0 == error */
   uint8_t piv[OSCORE_PIV_LEN]; /**< OSCORE partial iv */
   uint8_t piv_len;             /**< OSCORE partial iv length */
 #endif                         /* OC_OSCORE */
@@ -139,7 +139,6 @@ void oc_endpoint_set_serial_number(oc_endpoint_t *endpoint,
  * @param index the auth at index
  */
 void oc_endpoint_set_auth_at_index(oc_endpoint_t *endpoint, int32_t index);
-
 
 /**
  * @brief convert the endpoint to a human readable string (e.g.

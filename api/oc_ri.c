@@ -300,7 +300,6 @@ oc_get_interface_in_mask_in_string_array(oc_interface_mask_t iface_mask,
   return total_masks;
 }
 
-
 void
 oc_print_interface(oc_interface_mask_t iface_mask)
 {
@@ -345,7 +344,6 @@ oc_print_interface(oc_interface_mask_t iface_mask)
     PRINT("%s ", get_interface_string(OC_IF_PM));
   }
 }
-
 
 bool
 oc_ri_new_request_from_request(oc_request_t new_request, oc_request_t request,

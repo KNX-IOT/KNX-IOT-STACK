@@ -70,11 +70,10 @@ oc_endpoint_set_auth_at_index(oc_endpoint_t *endpoint, int32_t index)
 {
 #ifdef OC_OSCORE
   if (endpoint) {
-    endpoint->aut_at_index = index+1;
+    endpoint->aut_at_index = index + 1;
   }
 #endif /* OC_OSCORE */
 }
-
 
 #ifdef OC_IPV4
 static void
