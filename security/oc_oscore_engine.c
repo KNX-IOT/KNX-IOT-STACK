@@ -199,10 +199,11 @@ oc_oscore_recv_message(oc_message_t *message)
       if (oscore_ctx != NULL) {
         // copy the serial number as return token, so that the reply can find
         // the context again.
-        OC_DBG_OSCORE("--- setting endpoint serial number with found token");
-
+        OC_DBG_OSCORE("--- setting endpoint serial number with found token & index");
         oc_endpoint_set_serial_number(&message->endpoint,
                                       (char *)oscore_ctx->token_id);
+        oc_endpoint_set_auth_at_index(&message->endpoint,
+                                      (char *)oscore_ctx->auth_at_index);
         // oc_string_copy_from_char(&message->endpoint.serial_number,
         //                         (char *)oscore_ctx->token_id);
       }

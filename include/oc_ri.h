@@ -227,6 +227,14 @@ int oc_get_interface_in_mask_in_string_array(oc_interface_mask_t iface_mask,
                                              oc_string_array_t interface_array);
 
 /**
+ * @brief prints all interfaces in the mask to stdout
+ *
+ * @param iface_mask the interface mask
+ * names in
+ */
+void oc_print_interface(oc_interface_mask_t iface_mask);
+
+/**
  * @brief core resource numbers
  *
  */

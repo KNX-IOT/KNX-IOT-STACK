@@ -300,6 +300,53 @@ oc_get_interface_in_mask_in_string_array(oc_interface_mask_t iface_mask,
   return total_masks;
 }
 
+
+void
+oc_print_interface(oc_interface_mask_t iface_mask)
+{
+
+  if (iface_mask & OC_IF_I) {
+    PRINT("%s ", get_interface_string(OC_IF_I));
+  }
+  if (iface_mask & OC_IF_O) {
+    PRINT("%s ", get_interface_string(OC_IF_O));
+  }
+  if (iface_mask & OC_IF_G) {
+    PRINT("%s ", get_interface_string(OC_IF_G));
+  }
+  if (iface_mask & OC_IF_C) {
+    PRINT("%s ", get_interface_string(OC_IF_C));
+  }
+  if (iface_mask & OC_IF_P) {
+    PRINT("%s ", get_interface_string(OC_IF_P));
+  }
+  if (iface_mask & OC_IF_D) {
+    PRINT("%s ", get_interface_string(OC_IF_D));
+  }
+  if (iface_mask & OC_IF_A) {
+    PRINT("%s ", get_interface_string(OC_IF_A));
+  }
+  if (iface_mask & OC_IF_S) {
+    PRINT("%s ", get_interface_string(OC_IF_S));
+  }
+  if (iface_mask & OC_IF_LI) {
+    PRINT("%s ", get_interface_string(OC_IF_LI));
+  }
+  if (iface_mask & OC_IF_B) {
+    PRINT("%s ", get_interface_string(OC_IF_B));
+  }
+  if (iface_mask & OC_IF_SEC) {
+    PRINT("%s ", get_interface_string(OC_IF_SEC));
+  }
+  if (iface_mask & OC_IF_SWU) {
+    PRINT("%s ", get_interface_string(OC_IF_SWU));
+  }
+  if (iface_mask & OC_IF_PM) {
+    PRINT("%s ", get_interface_string(OC_IF_PM));
+  }
+}
+
+
 bool
 oc_ri_new_request_from_request(oc_request_t new_request, oc_request_t request,
                                oc_response_buffer_t response_buffer,

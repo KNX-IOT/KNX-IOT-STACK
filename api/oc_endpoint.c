@@ -65,6 +65,15 @@ oc_endpoint_set_serial_number(oc_endpoint_t *endpoint, char *serial_number)
   }
 }
 
+void
+oc_endpoint_set_auth_at_index(oc_endpoint_t *endpoint, int32_t index)
+{
+  if (endpoint) {
+    endpoint->aut_at_index = index+1;
+  }
+}
+
+
 #ifdef OC_IPV4
 static void
 oc_ipv4_endpoint_to_string(oc_endpoint_t *endpoint, oc_string_t *endpoint_str)
