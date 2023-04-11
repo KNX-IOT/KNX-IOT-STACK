@@ -21,11 +21,11 @@ int
 check_if_query_l_exist(oc_request_t *request, bool *ps_exists,
                        bool *total_exists)
 {
-  if (*ps_exists == NULL) {
-    // return 0;
+  if (ps_exists == NULL) {
+    return 0;
   }
-  if (*total_exists == NULL) {
-    // return 0;
+  if (total_exists == NULL) {
+    return 0;
   }
 
   *ps_exists = false;
