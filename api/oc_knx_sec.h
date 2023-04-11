@@ -322,6 +322,18 @@ void oc_init_oscore(size_t device_index);
 void oc_init_oscore_from_storage(size_t device_index, bool from_storage);
 
 /**
+ * @brief function to check if the at_interface is listed in the resource
+ * interfaces
+ *
+ * @param at_interface interface to be checked
+ * @param resource_interface list of interfaces.
+ * @return true one of the at_interface listed in resource_interface list
+ * @return false none of the at_interfaces listed in resource_interface list
+ */
+bool oc_knx_contains_interface(oc_interface_mask_t at_interface,
+                               oc_interface_mask_t resource_interface);
+
+/**
  * @brief is the method allowed according to the interface mask
  *
  * @param iface_mask the interface mask

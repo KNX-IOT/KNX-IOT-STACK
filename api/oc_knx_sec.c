@@ -1741,6 +1741,16 @@ oc_if_method_allowed_according_to_mask(oc_interface_mask_t iface_mask,
   return false;
 }
 
+bool
+oc_knx_contains_interface(oc_interface_mask_t scope_1,
+                          oc_interface_mask_t scope_1)
+{
+  if ((calling_interfaces & resource_interfaces) == 0) {
+    return false;
+  }
+  return true;
+}
+
 
 static bool
 method_allowed(oc_method_t method, oc_resource_t* resource,
@@ -1772,7 +1782,7 @@ method_allowed(oc_method_t method, oc_resource_t* resource,
       oc_at_get_interface_mask(0, endpoint->aut_at_index -1);
     // interfaces of the resource
     oc_interface_mask_t resource_interfaces = resource->interfaces;
-    if ((calling_interfaces & resource_interfaces) == 0) {
+    if (oc_knx_contains_interface(calling_interfaces, resource_interfaces)) {
       PRINT("method_allowed : request :");
       oc_print_interface(calling_interfaces);
       PRINT("\n");
