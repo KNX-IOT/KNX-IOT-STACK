@@ -37,7 +37,8 @@
 
 bool
 oc_add_resource_to_wk(oc_resource_t *resource, oc_request_t *request,
-                      size_t device_index, size_t *response_length, int matches, int truncate)
+                      size_t device_index, size_t *response_length, int matches,
+                      int truncate)
 {
   (void)device_index; /* variable not used */
   int length;
@@ -149,7 +150,8 @@ oc_add_resource_to_wk(oc_resource_t *resource, oc_request_t *request,
 
 bool
 oc_filter_resource(oc_resource_t *resource, oc_request_t *request,
-                   size_t device_index, size_t *response_length, int matches, int truncate)
+                   size_t device_index, size_t *response_length, int matches,
+                   int truncate)
 {
   (void)device_index; /* variable not used */
 

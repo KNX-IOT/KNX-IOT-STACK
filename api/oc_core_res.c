@@ -504,7 +504,7 @@ oc_core_populate_resource(int core_resource, size_t device_index,
 
 void
 oc_core_bind_dpt_resource(int core_resource, size_t device_index,
-                          const char *dpt )
+                          const char *dpt)
 {
   oc_resource_t *r = oc_core_get_resource_by_index(core_resource, device_index);
   if (!r) {

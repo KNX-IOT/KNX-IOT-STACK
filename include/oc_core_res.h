@@ -329,7 +329,6 @@ void oc_core_populate_resource(int core_resource, size_t device_index,
 void oc_core_bind_dpt_resource(int core_resource, size_t device_index,
                                const char *dpt);
 
-
 /**
  * @brief filter if the query parameters of the request contains the resource
  * (determined by resource type "rt")
