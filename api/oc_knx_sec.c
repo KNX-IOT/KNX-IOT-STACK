@@ -228,7 +228,7 @@ oc_core_knx_f_oscore_get_handler(oc_request_t *request,
        i++) {
     oc_resource_t *resource = oc_core_get_resource_by_index(i, device_index);
     if (oc_filter_resource(resource, request, device_index, &response_length,
-                           matches)) {
+                           matches, 1)) {
       matches++;
     }
   }
@@ -998,7 +998,7 @@ oc_core_knx_auth_get_handler(oc_request_t *request,
   for (i = (int)OC_KNX_A_SEN; i < (int)OC_KNX_AUTH; i++) {
     oc_resource_t *resource = oc_core_get_resource_by_index(i, device_index);
     if (oc_filter_resource(resource, request, device_index, &response_length,
-                           matches)) {
+                           matches, 1)) {
       matches++;
     }
   }

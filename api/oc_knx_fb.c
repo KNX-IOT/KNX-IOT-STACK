@@ -201,7 +201,7 @@ oc_core_fb_x_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     }
     if (frame_resource) {
       oc_add_resource_to_wk(resource, request, device_index, &response_length,
-                            matches);
+                            matches, 1);
       matches++;
     }
   }
@@ -304,7 +304,7 @@ oc_add_function_blocks_to_response(oc_request_t *request, size_t device_index,
         /* specific functional block iot_router : /f/netip */
         if (netip_added == false) {
           /* add only once */
-          length = oc_rep_add_line_to_buffer("</f/netip>;rt=\"fb.11\";ct=40");
+          length = oc_rep_add_line_to_buffer("</f/netip>;rt=\":fb.11\";ct=40");
           *response_length += length;
           matches++;
           netip_added = true;
@@ -350,7 +350,7 @@ oc_add_function_blocks_to_response(oc_request_t *request, size_t device_index,
 
     length = oc_rep_add_line_to_buffer("rt=\"");
     *response_length += length;
-    length = oc_rep_add_line_to_buffer("fb.");
+    length = oc_rep_add_line_to_buffer(":fb.");
     *response_length += length;
     snprintf(number, 5, "%d", g_int_array[0][i]);
     length = oc_rep_add_line_to_buffer(number);
