@@ -143,6 +143,15 @@ int oc_send_buffer(oc_message_t *message);
 oc_message_t *oc_get_incoming_message_with_ptr(uint8_t *data);
 
 /**
+ * @brief set the default (unicast) CoAp port to another value
+ *
+ * Note: must be called before oc_connectivity_init
+ * @param port  the port number to change
+ * @return int 0 = success
+ */
+int oc_connectivity_set_port(uint32_t port);
+
+/**
  * @brief initialize the connectivity (e.g. open sockets) for the device
  *
  * @param device the device index

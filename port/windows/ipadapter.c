@@ -1489,6 +1489,16 @@ handle_session_event_callback(const oc_endpoint_t *endpoint,
 }
 #endif /* OC_SESSION_EVENTS */
 
+static uint32_t g_unicast_port = COAP_PORT_UNSECURED;
+
+int
+oc_connectivity_set_port(uint32_t port)
+{
+  g_unicast_port = port;
+  return 0;
+}
+
+
 int
 oc_connectivity_init(size_t device)
 {
@@ -1514,7 +1524,7 @@ oc_connectivity_init(size_t device)
 
   struct sockaddr_in6 *m = (struct sockaddr_in6 *)&dev->mcast;
   m->sin6_family = AF_INET6;
-  m->sin6_port = htons(COAP_PORT_UNSECURED);
+  m->sin6_port = htons(g_unicast_port);
   m->sin6_addr = in6addr_any;
 
   struct sockaddr_in6 *l = (struct sockaddr_in6 *)&dev->server;
