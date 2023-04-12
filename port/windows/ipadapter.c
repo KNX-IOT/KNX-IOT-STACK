@@ -1498,7 +1498,6 @@ oc_connectivity_set_port(uint32_t port)
   return 0;
 }
 
-
 int
 oc_connectivity_init(size_t device)
 {
