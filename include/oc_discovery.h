@@ -43,12 +43,13 @@ void oc_create_discovery_resource(int resource_idx, size_t device);
  * @param device_index the device index on the request is being made
  * @param response_length the current response length
  * @param matches if there are already resources added to the response
+ * @param truncate 1 = do urn truncation; remove the urn part of the rt value
  * @return true resource added (as entry) to the response
  * @return false resource not added to the response
  */
 bool oc_filter_resource(oc_resource_t *resource, oc_request_t *request,
                         size_t device_index, size_t *response_length,
-                        int matches);
+                        int matches, int truncate);
 
 /**
  * @brief add the resource to the response in application link format
@@ -58,12 +59,13 @@ bool oc_filter_resource(oc_resource_t *resource, oc_request_t *request,
  * @param device_index the device index
  * @param response_length the response length (to be increased)
  * @param matches current matches
+ * @param truncate 1 = do urn truncation; remove the urn part of the rt value
  * @return true
  * @return false
  */
 bool oc_add_resource_to_wk(oc_resource_t *resource, oc_request_t *request,
                            size_t device_index, size_t *response_length,
-                           int matches);
+                           int matches, int truncate);
 
 #ifdef __cplusplus
 }

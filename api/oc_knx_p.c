@@ -39,7 +39,7 @@ oc_add_data_points_to_response(oc_request_t *request, size_t device_index,
     }
     // add the none discoverable resource that belongs to this device
     oc_add_resource_to_wk(resource, request, device_index, response_length,
-                          matches);
+                          matches, 1);
     matches++;
   }
 

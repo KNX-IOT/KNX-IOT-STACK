@@ -37,7 +37,7 @@
 
 bool
 oc_add_resource_to_wk(oc_resource_t *resource, oc_request_t *request,
-                      size_t device_index, size_t *response_length, int matches)
+                      size_t device_index, size_t *response_length, int matches, int truncate)
 {
   (void)device_index; /* variable not used */
   int length;
@@ -103,9 +103,21 @@ oc_add_resource_to_wk(oc_resource_t *resource, oc_request_t *request,
           length = oc_rep_add_line_to_buffer(" ");
           *response_length += length;
         }
-
-        length = oc_rep_add_line_size_to_buffer(t, (int)size);
-        *response_length += length;
+        if (truncate == 0) {
+          // full rt with urn
+          length = oc_rep_add_line_size_to_buffer(t, (int)size);
+          *response_length += length;
+        } else if (truncate == 1) {
+          // rt with urn removed
+          if (strncmp(t, "urn:knx", 7) == 0) {
+            length = oc_rep_add_line_size_to_buffer(&t[7], (int)size - 7);
+            *response_length += length;
+          } else {
+            // does not start with urn, so frame it all
+            length = oc_rep_add_line_size_to_buffer(t, (int)size);
+            *response_length += length;
+          }
+        }
       }
     }
 
@@ -137,7 +149,7 @@ oc_add_resource_to_wk(oc_resource_t *resource, oc_request_t *request,
 
 bool
 oc_filter_resource(oc_resource_t *resource, oc_request_t *request,
-                   size_t device_index, size_t *response_length, int matches)
+                   size_t device_index, size_t *response_length, int matches, int truncate)
 {
   (void)device_index; /* variable not used */
 
@@ -154,7 +166,7 @@ oc_filter_resource(oc_resource_t *resource, oc_request_t *request,
   }
 
   return oc_add_resource_to_wk(resource, request, device_index, response_length,
-                               matches);
+                               matches, truncate);
 }
 
 int
@@ -175,7 +187,7 @@ oc_process_resources(oc_request_t *request, size_t device_index,
       continue;
 
     if (oc_filter_resource(resource, request, device_index, response_length,
-                           matches)) {
+                           matches, 0)) {
       matches++;
     }
   }
@@ -376,14 +388,14 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   }
 
   oc_add_resource_to_wk(oc_core_get_resource_by_index(OC_DEV, device_index),
-                        request, device_index, &response_length, matches);
+                        request, device_index, &response_length, matches, 0);
 
   oc_add_resource_to_wk(
     oc_core_get_resource_by_index(OC_KNX_AUTH, device_index), request,
-    device_index, &response_length, matches);
+    device_index, &response_length, matches, 0);
 
   oc_add_resource_to_wk(oc_core_get_resource_by_index(OC_KNX_SWU, device_index),
-                        request, device_index, &response_length, matches);
+                        request, device_index, &response_length, matches, 0);
 
   // optional, not yet implemented
   // oc_add_resource_to_wk(oc_core_get_resource_by_index(OC_SUB, device_index),

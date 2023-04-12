@@ -502,6 +502,18 @@ oc_core_populate_resource(int core_resource, size_t device_index,
   r->delete_handler.cb = delete;
 }
 
+void
+oc_core_bind_dpt_resource(int core_resource, size_t device_index,
+                          const char *dpt )
+{
+  oc_resource_t *r = oc_core_get_resource_by_index(core_resource, device_index);
+  if (!r) {
+    return;
+  }
+
+  oc_resource_bind_dpt(r, dpt);
+}
+
 oc_device_info_t *
 oc_core_get_device_info(size_t device)
 {
