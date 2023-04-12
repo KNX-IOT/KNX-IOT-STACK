@@ -31,6 +31,7 @@
 #define KNX_STORAGE_HOSTNAME "dev_knx_hostname"
 #define KNX_STORAGE_PM "dev_knx_pm"
 #define KNX_STORAGE_PORT "dev_knx_port"
+#define KNX_STORAGE_MPORT "dev_knx_mport"
 
 static void
 oc_core_dev_sn_get_handler(oc_request_t *request,
@@ -794,7 +795,6 @@ oc_core_dev_port_get_handler(oc_request_t *request,
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device != NULL) {
-    // cbor_encode_int(&g_encoder, device->port);
     oc_rep_begin_root_object();
     oc_rep_i_set_int(root, 1, device->port);
     oc_rep_end_root_object();
@@ -830,7 +830,6 @@ oc_core_dev_port_put_handler(oc_request_t *request,
     PRINT("  oc_core_dev_port_put_handler received : %d\n",
           (int)rep->value.integer);
     device->port = (uint32_t)rep->value.integer;
-    // oc_send_cbor_response(request, OC_STATUS_CHANGED);
     oc_send_cbor_response_no_payload_size(request, OC_STATUS_CHANGED);
     oc_storage_write(KNX_STORAGE_PORT, (uint8_t *)&(rep->value.integer), 1);
     return;
@@ -847,6 +846,80 @@ oc_create_dev_port_resource(int resource_idx, size_t device)
     resource_idx, device, "/dev/port", OC_IF_P, APPLICATION_CBOR,
     OC_DISCOVERABLE, oc_core_dev_port_get_handler, oc_core_dev_port_put_handler,
     0, 0, 1, "urn:knx:dpt.value2Ucount");
+}
+
+// -----------------------------------------------------------------------------
+
+// -----------------------------------------------------------------------------
+
+static void
+oc_core_dev_mport_get_handler(oc_request_t *request,
+                              oc_interface_mask_t iface_mask, void *data)
+{
+  (void)data;
+  (void)iface_mask;
+
+  /* check if the accept header is CBOR-format */
+  if (request->accept != APPLICATION_CBOR) {
+    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    return;
+  }
+
+  size_t device_index = request->resource->device;
+  oc_device_info_t *device = oc_core_get_device_info(device_index);
+  if (device != NULL) {
+    oc_rep_begin_root_object();
+    oc_rep_i_set_int(root, 1, device->mport);
+    oc_rep_end_root_object();
+    oc_send_cbor_response(request, OC_STATUS_OK);
+    return;
+  }
+
+  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+}
+
+static void
+oc_core_dev_mport_put_handler(oc_request_t *request,
+                              oc_interface_mask_t iface_mask, void *data)
+{
+  (void)data;
+  (void)iface_mask;
+
+  /* check if the accept header is CBOR-format */
+  if (request->accept != APPLICATION_CBOR) {
+    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    return;
+  }
+
+  size_t device_index = request->resource->device;
+  oc_device_info_t *device = oc_core_get_device_info(device_index);
+  oc_rep_t *rep = request->request_payload;
+  // debugging
+  if (rep != NULL) {
+    PRINT("  oc_core_dev_mport_put_handler type: %d\n", rep->type);
+  }
+
+  if ((rep != NULL) && (rep->type == OC_REP_INT)) {
+    PRINT("  oc_core_dev_mport_put_handler received : %d\n",
+          (int)rep->value.integer);
+    device->mport = (uint32_t)rep->value.integer;
+    // oc_send_cbor_response(request, OC_STATUS_CHANGED);
+    oc_send_cbor_response_no_payload_size(request, OC_STATUS_CHANGED);
+    oc_storage_write(KNX_STORAGE_MPORT, (uint8_t *)&(rep->value.integer), 1);
+    return;
+  }
+
+  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+}
+
+void
+oc_create_dev_mport_resource(int resource_idx, size_t device)
+{
+  OC_DBG("oc_create_dev_mport_resource\n");
+  oc_core_populate_resource(
+    resource_idx, device, "/dev/mport", OC_IF_P, APPLICATION_CBOR,
+    OC_DISCOVERABLE, oc_core_dev_mport_get_handler,
+    oc_core_dev_mport_put_handler, 0, 0, 1, "urn:knx:dpt.value2Ucount");
 }
 
 // -----------------------------------------------------------------------------
@@ -929,9 +1002,10 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
     oc_storage_erase(KNX_STORAGE_IA);
     oc_storage_erase(KNX_STORAGE_IID);
     oc_storage_erase(KNX_STORAGE_PM);
-    uint32_t port =
-      5683; // TODO: should be using all coap nodes define from the stack
+    uint32_t port = 5683;  // unicast communication
+    uint32_t mport = 5683; // multicast communication
     oc_storage_write(KNX_STORAGE_PORT, (char *)&port, sizeof(uint32_t));
+    oc_storage_write(KNX_STORAGE_MPORT, (char *)&mport, sizeof(uint32_t));
     oc_storage_erase(KNX_STORAGE_HOSTNAME);
     // load state: unloaded, and programming mode is true
     oc_knx_lsm_set_state(device_index, LSM_S_UNLOADED);
@@ -939,6 +1013,7 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
     device->ia = zero;
     device->iid = zero;
     device->port = port;
+    device->mport = mport;
     oc_free_string(&device->hostname);
     oc_new_string(&device->hostname, "", strlen(""));
 
@@ -1030,6 +1105,7 @@ oc_create_knx_device_resources(size_t device_index)
   oc_create_dev_sa_resource(OC_DEV_SA, device_index);
   oc_create_dev_da_resource(OC_DEV_DA, device_index);
   oc_create_dev_port_resource(OC_DEV_PORT, device_index);
+  oc_create_dev_mport_resource(OC_DEV_MPORT, device_index);
   // should be last of the dev/xxx resources, it will list those.
   oc_create_dev_dev_resource(OC_DEV, device_index);
 }

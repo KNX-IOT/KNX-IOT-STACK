@@ -2407,9 +2407,9 @@ oc_register_group_multicasts()
     return;
   }
   int64_t installation_id = device->iid;
-  int port = device->port;
+  uint32_t port = device->mport;
 
-  PRINT("oc_register_group_multicasts: port %d \n", port);
+  PRINT("oc_register_group_multicasts: mport %d \n", port);
 
   bool registered_pub = false;
   bool pub_entry = false;

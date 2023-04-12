@@ -81,6 +81,7 @@ typedef struct oc_device_info_t
   uint32_t ia;               /**< knx ia Device individual address */
   uint64_t iid;              /**< knx iid (installation id) */
   uint32_t port;             /**< coap port number */
+  uint32_t mport;            /**< multicast port number */
   bool pm;                   /**< knx programming mode */
   oc_lsm_state_t lsm_s;      /**< knx lsm states */
   oc_core_add_device_cb_t add_device_cb; /**< callback when device is changed */
