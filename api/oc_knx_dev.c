@@ -880,7 +880,7 @@ oc_create_dev_port_resource(int resource_idx, size_t device)
 
 static void
 oc_core_dev_mport_get_handler(oc_request_t *request,
-                             oc_interface_mask_t iface_mask, void *data)
+                              oc_interface_mask_t iface_mask, void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -906,7 +906,7 @@ oc_core_dev_mport_get_handler(oc_request_t *request,
 
 static void
 oc_core_dev_mport_put_handler(oc_request_t *request,
-                             oc_interface_mask_t iface_mask, void *data)
+                              oc_interface_mask_t iface_mask, void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -945,7 +945,7 @@ oc_create_dev_mport_resource(int resource_idx, size_t device)
   oc_core_populate_resource(
     resource_idx, device, "/dev/mport", OC_IF_P, APPLICATION_CBOR,
     OC_DISCOVERABLE, oc_core_dev_mport_get_handler, oc_core_dev_mport_put_handler,
-    0, 0, 1, "urn:knx:dpt.value2Ucount");
+    0, 0, 0);
 
   oc_core_bind_dpt_resource(resource_idx, device, "urn:knx:dpt.value2Ucount");
 }
@@ -1030,7 +1030,7 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
     oc_storage_erase(KNX_STORAGE_IA);
     oc_storage_erase(KNX_STORAGE_IID);
     oc_storage_erase(KNX_STORAGE_PM);
-    uint32_t port = 5683; // unicast communication 
+    uint32_t port = 5683;  // unicast communication
     uint32_t mport = 5683; // multicast communication
     oc_storage_write(KNX_STORAGE_PORT, (char *)&port, sizeof(uint32_t));
     oc_storage_write(KNX_STORAGE_MPORT, (char *)&mport, sizeof(uint32_t));
