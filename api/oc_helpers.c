@@ -470,3 +470,15 @@ oc_uri_get_wildcard_value_as_string(const char *uri_resource, size_t uri_len,
 
   return -1;
 }
+
+char*
+oc_strnchr(char* string, char p, int size)
+{
+  int i;
+  for (i = 0; i < size; i++) {
+    if (string[i] == p) {
+      return &string[i];
+    }
+  }
+  return NULL;
+}
