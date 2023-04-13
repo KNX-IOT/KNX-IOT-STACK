@@ -500,9 +500,11 @@ int oc_get_sn_from_ep(const char* param, int param_len, char* sn, int sn_len, ui
       strncpy(sn, (char*)&param[10], param_len - 10);
     } else {
       int offset = blank - param;
+      int len = param_len - 10 - offset;
       PRINT("oc_get_sn_from_ep offset %d\n",  offset);
       PRINT("oc_get_sn_from_ep string: string at offset: '%s'\n", &param[offset + 1]);
-      strncpy(sn, &param[10], param_len - 10- offset);
+      PRINT("oc_get_sn_from_ep string: string at: %d '%.*s'\n", len, len, & param[10]);
+      strncpy(sn, &param[10], len);
       if (strncmp(&param[offset+1],"knx://ia.",9) == 0) {
         *ia = (uint32_t)strtol(&param[offset + 1 + 9], NULL, 16);
         error = 0;
