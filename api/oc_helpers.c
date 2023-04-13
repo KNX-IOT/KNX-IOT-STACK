@@ -483,7 +483,7 @@ oc_strnchr(char *string, char p, int size)
   return NULL;
 }
 
-int oc_get_sn_from_ep(char* param, int param_len, char* sn, int sn_len, uint32_t* ia )
+int oc_get_sn_from_ep(const char* param, int param_len, char* sn, int sn_len, uint32_t* ia )
 {
   int error = -1;
   strcpy(sn, "");
@@ -500,10 +500,10 @@ int oc_get_sn_from_ep(char* param, int param_len, char* sn, int sn_len, uint32_t
       strncpy(sn, (char*)&param[9], param_len - 9);
     } else {
       int offset = blank - param;
-      print("offset ",  offset);
+      printf("offset ",  offset);
       strncpy(sn, &param[9], param_len - 9- offset);
       if (strncmp(&param[offset+1],"knx://ia.",9) == 0) {
-        print("%s", &param[offset + 1]);
+        printf("%s", &param[offset + 1]);
         *ia = strtol(&param[offset + 1 + 9], NULL, 16);
         error = 0;
       }

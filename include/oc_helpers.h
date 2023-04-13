@@ -430,7 +430,7 @@ char *oc_strnchr(char *string, char p, int size);
  * @return 0 == ok
  * string
  */
-int oc_get_sn_from_ep(char *param, int param_len, char *sn, int sn_len,
+int oc_get_sn_from_ep(const char *param, int param_len, char *sn, int sn_len,
                       uint32_t* ia);
 
 /**
