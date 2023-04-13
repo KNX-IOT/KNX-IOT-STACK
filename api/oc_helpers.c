@@ -501,7 +501,7 @@ int oc_get_sn_from_ep(char* param, int param_len, char* sn, int sn_len, uint32_t
                 strncpy(sn, &param[9], param_len - 9- offset);
                 if (strncmp(&param[offset+1],"knx://ia.",9) == 0) {
                   //*ia = atoi(&param[offset+1+9]);
-                  *ia = strol(&param[offset + 1 + 9], NULL, 16);
+                  *ia = strtol(&param[offset + 1 + 9], NULL, 16);
                    error = 0;
                 }
             }
@@ -515,7 +515,7 @@ int oc_get_sn_from_ep(char* param, int param_len, char* sn, int sn_len, uint32_t
             } else {
                 int offset = blank - param;
                 //*ia = atoi(&param[9]);
-                *ia = strol(&param[9], NULL, 16);
+                *ia = strtol(&param[9], NULL, 16);
                 if (strncmp(&param[offset+1], "knx://sn.", 9) == 0) {
                   strncpy(sn, (char *)&param[9], param_len - 9 - offset);
                    error = 0;
