@@ -522,7 +522,7 @@ int oc_get_sn_from_ep(const char* param, int param_len, char* sn, int sn_len, ui
       int offset = blank - param;
       char *quote = oc_strnchr(&param[offset], '\"', param_len);
       int quote_len = quote - (&param[offset]);
-      int len_q = quote_len - 9;
+      int len_q = quote_len - 10;
       int len = param_len - offset - 9;
       if (len > len_q) {
         len = len_q;
