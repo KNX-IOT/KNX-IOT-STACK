@@ -181,8 +181,8 @@ TEST_F(TestLinkFormat, EP_SN1)
 TEST_F(TestLinkFormat, EP_SN2)
 {
   const char payload[] =
-    "\"knx://ia.20a knx://sn.123456ab\"";
-  int len = strlen(payload);
+    "\"knx://ia.20a knx://sn.123456ab\" ";
+  int len = strlen(payload)-1;
   char sn[30];
   uint32_t ia;
 

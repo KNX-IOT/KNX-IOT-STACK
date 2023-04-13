@@ -492,20 +492,20 @@ int oc_get_sn_from_ep(const char* param, int param_len, char* sn, int sn_len, ui
       return error;
   }
   if (strncmp(param,"\"knx://sn.",10) == 0) {
-    // spec 1.1
-    // <>; ep="knx://sn.<sn> knx://ia.<ia>"
+    // spec 1.1 ep= contents:
+    // "knx://sn.<sn> knx://ia.<ia>"
     char *blank = oc_strnchr(param, ' ', param_len);
     if (blank == NULL) {
       // the ia part is missing
       strncpy(sn, (char*)&param[10], param_len - 10);
     } else {
       int offset = blank - param;
-      int len = param_len - 9 - offset;  // 9 is 10 in [0, max]
-      PRINT("oc_get_sn_from_ep offset %d\n",  offset);
+      int len = offset-10;  // 9 is 10 in [0, max]
+      PRINT("oc_get_sn_from_ep offset %d param_len%d\n",  offset, param_len);
       PRINT("oc_get_sn_from_ep string: string at offset: '%s'\n", &param[offset + 1]);
       PRINT("oc_get_sn_from_ep string: string at: %d '%.*s'\n", len, len, & param[10]);
-      strncpy(sn, &param[9], len);
-      if (strncmp(&param[offset+1],"knx://ia.",9) == 0) {
+      strncpy(sn, &param[10], len);
+      if (strncmp(&param[offset+1],"knx://ia.", 9) == 0) {
         PRINT("oc_get_sn_from_ep string: string IA at: '%s'\n",
               &param[offset + 1 + 9]);
         *ia = (uint32_t)strtol(&param[offset + 1 + 9], NULL, 16);
@@ -513,17 +513,19 @@ int oc_get_sn_from_ep(const char* param, int param_len, char* sn, int sn_len, ui
       }
     }
   } else if (strncmp(param, "\"knx://ia.", 10) == 0) {
-    // spec 1.1
-    // <>; ep="knx://ia.<sn> knx://sn.<ia>"
+    // spec 1.1 ep= contents:
+    // "knx://ia.<sn> knx://sn.<ia>"
     char *blank = oc_strnchr(param, ' ', param_len);
     if (blank == NULL) {
       // the sn part is missing
       *ia = (uint32_t)strtol(&param[9], NULL, 16);
     } else {
       int offset = blank - param;
+      int len = param_len - offset - 10; // 9 is 10 in [0, max]
+      PRINT("oc_get_sn_from_ep 222 offset %d param_len%d %d \n", offset, param_len, len);
       *ia = (uint32_t)strtol(&param[9], NULL, 16);
       if (strncmp(&param[offset+1], "knx://sn.", 9) == 0) {
-        strncpy(sn, (char *)&param[9], param_len - 8 - offset);
+        strncpy(sn, (char *)&param[9], len);
         error = 0;
       }
     }
