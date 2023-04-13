@@ -192,15 +192,28 @@ TEST_F(TestLinkFormat, EP_SN2)
   EXPECT_EQ(0x20a, ia);
 }
 
-
 TEST_F(TestLinkFormat, EP_SN3)
 {
   const char payload[] =
-    "\"knx://ia.20a\"";
+    "\"knx://sn.123456ab\"";
   int len = strlen(payload);
   char sn[30];
   uint32_t ia;
 
   int error = oc_get_sn_from_ep(payload, len, sn, 29, &ia);
   EXPECT_EQ(-1, error);
+  check_string("123456ab", sn, strlen(sn));
+}
+
+TEST_F(TestLinkFormat, EP_SN4)
+{
+  const char payload[] =
+    "\"knx://ia.20b\"";
+  int len = strlen(payload);
+  char sn[30];
+  uint32_t ia;
+
+  int error = oc_get_sn_from_ep(payload, len, sn, 29, &ia);
+  EXPECT_EQ(-1, error);
+  EXPECT_EQ(0x20b, ia);
 }

@@ -497,11 +497,11 @@ int oc_get_sn_from_ep(const char* param, int param_len, char* sn, int sn_len, ui
     char *blank = oc_strnchr(param, ' ', param_len);
     if (blank == NULL) {
       // the ia part is missing
-      strncpy(sn, (char*)&param[10], param_len - 9);
+      strncpy(sn, (char*)&param[10], param_len - 10);
     } else {
       int offset = blank - param;
       PRINT("oc_get_sn_from_ep offset %d\n",  offset);
-      PRINT("oc_get_sn_from_ep string: %s\n", &param[offset + 1]);
+      PRINT("oc_get_sn_from_ep string: string at offset: '%s'\n", &param[offset + 1]);
       strncpy(sn, &param[10], param_len - 10- offset);
       if (strncmp(&param[offset+1],"knx://ia.",9) == 0) {
         *ia = (uint32_t)strtol(&param[offset + 1 + 9], NULL, 16);
