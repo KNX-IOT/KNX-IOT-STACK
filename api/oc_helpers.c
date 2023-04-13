@@ -527,13 +527,8 @@ int oc_get_sn_from_ep(const char* param, int param_len, char* sn, int sn_len, ui
       if (len > len_q) {
         len = len_q;
       }
-      PRINT("  %d len_q %d\n", len, len_q);
-      PRINT("oc_get_sn_from_ep 222 string: string ia : '%s'\n", &param[10]);
-      PRINT("oc_get_sn_from_ep 222 offset %d param_len%d %d \n", offset, param_len, len);
       *ia = (uint32_t)strtol(&param[10], NULL, 16);
       if (strncmp(&param[offset+1], "knx://sn.", 9) == 0) {
-        PRINT("oc_get_sn_from_ep 222 string: string sn : %d '%s'\n", len,
-              &param[offset + 1 + 9]);
         strncpy(sn, (char *)&param[offset + 1 + 9], len);
         error = 0;
       }
