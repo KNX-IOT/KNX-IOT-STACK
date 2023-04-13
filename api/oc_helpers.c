@@ -489,7 +489,7 @@ int oc_get_sn_from_ep(char* param, int param_len, char* sn, int sn_len, uint32_t
     if (param_len < 10) {
         return error;
     }
-    if (strncmp(param,'knx://sn.',9) == 0) {
+    if (strncmp(param,"knx://sn.",9) == 0) {
       // spec 1.1
       // <>; ep="knx://sn.<sn> knx://ia.<ia>"
       char *blank = oc_strnchr(param, ' ', param_len);
@@ -499,12 +499,13 @@ int oc_get_sn_from_ep(char* param, int param_len, char* sn, int sn_len, uint32_t
             } else {
                 int offset = blank - param;
                 strncpy(sn, &param[9], param_len - 9- offset);
-                if (strncmp(param[offset+1],'knx://ia.',9) == 0) {
-                   *ia = atoi(param[offset+1+9]);
+                if (strncmp(&param[offset+1],"knx://ia.",9) == 0) {
+                  //*ia = atoi(&param[offset+1+9]);
+                  *ia = strol(&param[offset + 1 + 9], NULL, 16);
                    error = 0;
                 }
             }
-    }else if (strncmp(param,'knx://ia.',9) == 0) {
+    }else if (strncmp(param, "knx://ia.", 9) == 0) {
       // spec 1.1
       // <>; ep="knx://ia.<sn> knx://sn.<ia>"
       char *blank = oc_strnchr(param, ' ', param_len);
@@ -513,8 +514,9 @@ int oc_get_sn_from_ep(char* param, int param_len, char* sn, int sn_len, uint32_t
                 ia = atoi(&param[9]);
             } else {
                 int offset = blank - param;
-                *ia = atoi(&param[9]);
-                if (strncmp(param[offset+1],'knx://sn.',9) == 0) {
+                //*ia = atoi(&param[9]);
+                *ia = strol(&param[9], NULL, 16);
+                if (strncmp(&param[offset+1], "knx://sn.", 9) == 0) {
                   strncpy(sn, (char *)&param[9], param_len - 9 - offset);
                    error = 0;
                 }
