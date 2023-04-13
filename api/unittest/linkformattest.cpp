@@ -161,3 +161,46 @@ TEST_F(TestLinkFormat, LF_zero)
   nr_entries = oc_lf_number_of_entries(payload, 0);
   EXPECT_EQ(0, nr_entries);
 }
+
+
+TEST_F(TestLFPayload, SN1)
+{
+  const char payload[] =
+    "ep=\"knx://sn.123456ab knx://ia.20a\"";
+  int len = strlen(payload);
+  char sn[30];
+  int ia;
+
+  int error = oc_get_sn_from_ep(payload, len, sn, 29, &ia);
+  EXPECT_EQ(0, error);
+  check_string("123456ab", sn, strlen(sn));
+  EXPECT_EQ(0x20a, ia);
+}
+
+
+TEST_F(TestLFPayload, SN2)
+{
+  const char payload[] =
+    "ep=\"knx://ia.20a knx://sn.123456ab\"";
+  int len = strlen(payload);
+  char sn[30];
+  int ia;
+
+  int error = oc_get_sn_from_ep(payload, len, sn, 29, &ia);
+  EXPECT_EQ(0, error);
+  check_string("123456ab", sn, strlen(sn));
+  EXPECT_EQ(0x20a, ia);
+}
+
+
+TEST_F(TestLFPayload, SN2)
+{
+  const char payload[] =
+    "ep=\"knx://ia.20a\"";
+  int len = strlen(payload);
+  char sn[30];
+  int ia;
+
+  int error = oc_get_sn_from_ep(payload, len, sn, 29, &ia);
+  EXPECT_EQ(-1, error);
+}

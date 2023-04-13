@@ -418,6 +418,21 @@ int oc_uri_get_wildcard_value_as_string(const char *uri_resource,
  */
 char *oc_strnchr(char *string, char p, int size);
 
+
+/**
+ * @brief retrieves the serial number and individual address from the ep parameter
+ *
+ * @param param the string to be searched
+ * @param param_len the length of the parameter
+ * @param sn the sn for storage
+ * @param sn_len the length of the sn for storage
+ * @param ia the individual address
+ * @return 0 == ok
+ * string
+ */
+int oc_get_sn_from_ep(char *param, int param_len, char *sn, int sn_len,
+                      uint32_t ia);
+
 /**
  * @brief copy string from char*
  *
