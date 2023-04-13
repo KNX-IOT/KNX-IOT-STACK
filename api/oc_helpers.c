@@ -472,7 +472,7 @@ oc_uri_get_wildcard_value_as_string(const char *uri_resource, size_t uri_len,
 }
 
 char *
-oc_strnchr(char *string, char p, int size)
+oc_strnchr(const char *string, char p, int size)
 {
   int i;
   for (i = 0; i < size; i++) {
@@ -501,7 +501,7 @@ int oc_get_sn_from_ep(const char* param, int param_len, char* sn, int sn_len, ui
     } else {
       int offset = blank - param;
       PRINT("oc_get_sn_from_ep offset %d\n",  offset);
-      PRINT("oc_get_sn_from_ep string: %\n", &param[offset + 1]);
+      PRINT("oc_get_sn_from_ep string: %s\n", &param[offset + 1]);
       strncpy(sn, &param[9], param_len - 9- offset);
       if (strncmp(&param[offset+1],"knx://ia.",9) == 0) {
         *ia = strtol(&param[offset + 1 + 9], NULL, 16);
