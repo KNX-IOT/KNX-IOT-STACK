@@ -204,7 +204,7 @@ oc_oscore_recv_message(oc_message_t *message)
         oc_endpoint_set_serial_number(&message->endpoint,
                                       (char *)oscore_ctx->token_id);
         oc_endpoint_set_auth_at_index(&message->endpoint,
-                                      (char *)oscore_ctx->auth_at_index);
+                                      (int32_t)oscore_ctx->auth_at_index);
         // oc_string_copy_from_char(&message->endpoint.serial_number,
         //                         (char *)oscore_ctx->token_id);
       }
