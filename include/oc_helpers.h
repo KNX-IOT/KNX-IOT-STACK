@@ -431,7 +431,7 @@ char *oc_strnchr(char *string, char p, int size);
  * string
  */
 int oc_get_sn_from_ep(char *param, int param_len, char *sn, int sn_len,
-                      uint32_t ia);
+                      uint32_t* ia);
 
 /**
  * @brief copy string from char*
