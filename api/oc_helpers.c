@@ -496,8 +496,8 @@ int oc_get_sn_from_ep(const char* param, int param_len, char* sn, int sn_len, ui
     // "knx://sn.<sn> knx://ia.<ia>"
     char *blank = oc_strnchr(param, ' ', param_len);
     if (blank == NULL) {
-      // the ia part is missing
-      strncpy(sn, (char*)&param[10], param_len - 10);
+      // the ia part is missing, so lenght -10 and 1 less to adjust for quot
+      strncpy(sn, (char*)&param[10], param_len - 11);
     } else {
       int offset = blank - param;
       int len = offset-10;
@@ -514,12 +514,12 @@ int oc_get_sn_from_ep(const char* param, int param_len, char* sn, int sn_len, ui
     if (blank == NULL) {
       // the sn part is missing
       PRINT("oc_get_sn_from_ep 222 string: string ia : '%s'\n",
-            &param[9]);
+            &param[10]);
       *ia = (uint32_t)strtol(&param[10], NULL, 16);
     } else {
       int offset = blank - param;
-      int len = param_len - offset - 10; // 9 is 10 in [0, max]
-      PRINT("oc_get_sn_from_ep 222 string: string ia : '%s'\n", &param[9]);
+      int len = param_len - offset - 9;
+      PRINT("oc_get_sn_from_ep 222 string: string ia : '%s'\n", &param[10]);
       PRINT("oc_get_sn_from_ep 222 offset %d param_len%d %d \n", offset, param_len, len);
       *ia = (uint32_t)strtol(&param[10], NULL, 16);
       if (strncmp(&param[offset+1], "knx://sn.", 9) == 0) {
