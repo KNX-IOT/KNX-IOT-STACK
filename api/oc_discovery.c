@@ -358,6 +358,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   /* handle serial number*/
   if (ep_request != 0 && ep_len > 11 &&
       strncmp(ep_request, "urn:knx:sn.", 11) == 0) {
+    /* old style can be removed later*/
     /* request for all devices via serial number wild card*/
     char *ep_serialnumber = ep_request + 11;
     bool frame_ep = false;
@@ -375,6 +376,38 @@ oc_wkcore_discovery_handler(oc_request_t *request,
       int size = oc_rep_add_line_to_buffer("<>;ep=\"urn:knx:sn.");
       response_length = response_length + size;
       size = oc_rep_add_line_to_buffer(oc_string(device->serialnumber));
+      response_length = response_length + size;
+      size = oc_rep_add_line_to_buffer("\"");
+      response_length = response_length + size;
+      matches = 1;
+    }
+  }
+
+  if (ep_request != 0 && ep_len > 11 &&
+      strncmp(ep_request, "knx://sn.", 9) == 0) {
+    /* new style release 1.1 */
+    /* request for all devices via serial number wild card*/
+    char *ep_serialnumber = ep_request + 9;
+    bool frame_ep = false;
+
+    if (strncmp(ep_serialnumber, "*", 1) == 0) {
+      /* matches wild card*/
+      frame_ep = true;
+    }
+    if (strncmp(oc_string(device->serialnumber), ep_serialnumber,
+                strlen(oc_string(device->serialnumber))) == 0) {
+      frame_ep = true;
+    }
+    if (frame_ep) {
+      /* return <>; ep="urn:knx:sn.<serial-number>"*/
+      int size = oc_rep_add_line_to_buffer("<>;ep=\"knx://sn.");
+      response_length = response_length + size;
+      size = oc_rep_add_line_to_buffer(oc_string(device->serialnumber));
+      response_length = response_length + size;
+      int size = oc_rep_add_line_to_buffer(" knx://ia.");
+      char ia_hex[20];
+      snprintf(ia_hex, "%x", device->ia);
+      size = oc_rep_add_line_to_buffer(ia_hex);
       response_length = response_length + size;
       size = oc_rep_add_line_to_buffer("\"");
       response_length = response_length + size;
