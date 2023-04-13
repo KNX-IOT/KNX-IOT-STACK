@@ -500,14 +500,9 @@ int oc_get_sn_from_ep(const char* param, int param_len, char* sn, int sn_len, ui
       strncpy(sn, (char*)&param[10], param_len - 10);
     } else {
       int offset = blank - param;
-      int len = offset-10;  // 9 is 10 in [0, max]
-      PRINT("oc_get_sn_from_ep offset %d param_len%d\n",  offset, param_len);
-      PRINT("oc_get_sn_from_ep string: string at offset: '%s'\n", &param[offset + 1]);
-      PRINT("oc_get_sn_from_ep string: string at: %d '%.*s'\n", len, len, & param[10]);
+      int len = offset-10;
       strncpy(sn, &param[10], len);
       if (strncmp(&param[offset+1],"knx://ia.", 9) == 0) {
-        PRINT("oc_get_sn_from_ep string: string IA at: '%s'\n",
-              &param[offset + 1 + 9]);
         *ia = (uint32_t)strtol(&param[offset + 1 + 9], NULL, 16);
         error = 0;
       }
@@ -518,14 +513,17 @@ int oc_get_sn_from_ep(const char* param, int param_len, char* sn, int sn_len, ui
     char *blank = oc_strnchr(param, ' ', param_len);
     if (blank == NULL) {
       // the sn part is missing
-      *ia = (uint32_t)strtol(&param[9], NULL, 16);
+      PRINT("oc_get_sn_from_ep 222 string: string ia : '%s'\n",
+            &param[9]);
+      *ia = (uint32_t)strtol(&param[10], NULL, 16);
     } else {
       int offset = blank - param;
       int len = param_len - offset - 10; // 9 is 10 in [0, max]
+      PRINT("oc_get_sn_from_ep 222 string: string ia : '%s'\n", &param[9]);
       PRINT("oc_get_sn_from_ep 222 offset %d param_len%d %d \n", offset, param_len, len);
-      *ia = (uint32_t)strtol(&param[9], NULL, 16);
+      *ia = (uint32_t)strtol(&param[10], NULL, 16);
       if (strncmp(&param[offset+1], "knx://sn.", 9) == 0) {
-        strncpy(sn, (char *)&param[9], len);
+        strncpy(sn, (char *)&param[offset + 1+9], len);
         error = 0;
       }
     }
