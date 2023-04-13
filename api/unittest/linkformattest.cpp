@@ -163,13 +163,13 @@ TEST_F(TestLinkFormat, LF_zero)
 }
 
 
-TEST_F(TestLFPayload, SN1)
+TEST_F(TestLinkFormat, EP_SN1)
 {
   const char payload[] =
     "ep=\"knx://sn.123456ab knx://ia.20a\"";
   int len = strlen(payload);
   char sn[30];
-  int ia;
+  uint32_t ia;
 
   int error = oc_get_sn_from_ep(payload, len, sn, 29, &ia);
   EXPECT_EQ(0, error);
@@ -178,13 +178,13 @@ TEST_F(TestLFPayload, SN1)
 }
 
 
-TEST_F(TestLFPayload, SN2)
+TEST_F(TestLinkFormat, EP_SN2)
 {
   const char payload[] =
     "ep=\"knx://ia.20a knx://sn.123456ab\"";
   int len = strlen(payload);
   char sn[30];
-  int ia;
+  uint32_t ia;
 
   int error = oc_get_sn_from_ep(payload, len, sn, 29, &ia);
   EXPECT_EQ(0, error);
@@ -193,13 +193,13 @@ TEST_F(TestLFPayload, SN2)
 }
 
 
-TEST_F(TestLFPayload, SN2)
+TEST_F(TestLinkFormat, EP_SN3)
 {
   const char payload[] =
     "ep=\"knx://ia.20a\"";
   int len = strlen(payload);
   char sn[30];
-  int ia;
+  uint32_t ia;
 
   int error = oc_get_sn_from_ep(payload, len, sn, 29, &ia);
   EXPECT_EQ(-1, error);
