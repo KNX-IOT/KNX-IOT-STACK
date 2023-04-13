@@ -518,7 +518,12 @@ int oc_get_sn_from_ep(const char* param, int param_len, char* sn, int sn_len, ui
       *ia = (uint32_t)strtol(&param[10], NULL, 16);
     } else {
       int offset = blank - param;
+      char *quote = oc_strnchr(&param[offset], ' ', param_len);
+      int quote_len = quote - (&param[offset]);
       int len = param_len - offset - 9;
+      if (len > quote_len) {
+        len = quote_len;
+      }
       PRINT("oc_get_sn_from_ep 222 string: string ia : '%s'\n", &param[10]);
       PRINT("oc_get_sn_from_ep 222 offset %d param_len%d %d \n", offset, param_len, len);
       *ia = (uint32_t)strtol(&param[10], NULL, 16);
