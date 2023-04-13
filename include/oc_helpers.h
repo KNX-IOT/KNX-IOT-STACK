@@ -408,6 +408,17 @@ int oc_uri_get_wildcard_value_as_string(const char *uri_resource,
                                         size_t invoked_len, const char **value);
 
 /**
+ * @brief search a string (non null terminated) for a character
+ *
+ * @param string the string to be searched
+ * @param p the character to be found
+ * @param size the size of the string
+ * @return NULL = not found, other wise position in string
+ * string
+ */
+char *oc_strnchr(char *string, char p, int size);
+
+/**
  * @brief copy string from char*
  *
  * @param string1 the oc_string to copy to
