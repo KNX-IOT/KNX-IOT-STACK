@@ -491,33 +491,33 @@ int oc_get_sn_from_ep(const char* param, int param_len, char* sn, int sn_len, ui
   if (param_len < 10) {
       return error;
   }
-  if (strncmp(param,"knx://sn.",9) == 0) {
+  if (strncmp(param,"\"knx://sn.",10) == 0) {
     // spec 1.1
     // <>; ep="knx://sn.<sn> knx://ia.<ia>"
     char *blank = oc_strnchr(param, ' ', param_len);
     if (blank == NULL) {
       // the ia part is missing
-      strncpy(sn, (char*)&param[9], param_len - 9);
+      strncpy(sn, (char*)&param[10], param_len - 9);
     } else {
       int offset = blank - param;
       PRINT("oc_get_sn_from_ep offset %d\n",  offset);
       PRINT("oc_get_sn_from_ep string: %s\n", &param[offset + 1]);
-      strncpy(sn, &param[9], param_len - 9- offset);
+      strncpy(sn, &param[10], param_len - 10- offset);
       if (strncmp(&param[offset+1],"knx://ia.",9) == 0) {
         *ia = (uint32_t)strtol(&param[offset + 1 + 9], NULL, 16);
         error = 0;
       }
     }
-  } else if (strncmp(param, "knx://ia.", 9) == 0) {
+  } else if (strncmp(param, "\"knx://ia.", 10) == 0) {
     // spec 1.1
     // <>; ep="knx://ia.<sn> knx://sn.<ia>"
     char *blank = oc_strnchr(param, ' ', param_len);
     if (blank == NULL) {
       // the sn part is missing
-      *ia = (uint32_t)strtol(&param[9], NULL, 16);
+      *ia = (uint32_t)strtol(&param[10], NULL, 16);
     } else {
       int offset = blank - param;
-      *ia = (uint32_t)strtol(&param[9], NULL, 16);
+      *ia = (uint32_t)strtol(&param[10], NULL, 16);
       if (strncmp(&param[offset+1], "knx://sn.", 9) == 0) {
         strncpy(sn, (char *)&param[9], param_len - 9 - offset);
         error = 0;
