@@ -162,11 +162,9 @@ TEST_F(TestLinkFormat, LF_zero)
   EXPECT_EQ(0, nr_entries);
 }
 
-
 TEST_F(TestLinkFormat, EP_SN1)
 {
-  const char payload[] =
-    "\"knx://sn.123456ab knx://ia.20a\"";
+  const char payload[] = "\"knx://sn.123456ab knx://ia.20a\"";
   int len = strlen(payload);
   char sn[30];
   uint32_t ia;
@@ -177,11 +175,9 @@ TEST_F(TestLinkFormat, EP_SN1)
   EXPECT_EQ(0x20a, ia);
 }
 
-
 TEST_F(TestLinkFormat, EP_SN2)
 {
-  const char payload[] =
-    "\"knx://sn.1234569999 knx://ia.20a\"";
+  const char payload[] = "\"knx://sn.1234569999 knx://ia.20a\"";
   int len = strlen(payload);
   char sn[30];
   uint32_t ia;
@@ -194,9 +190,8 @@ TEST_F(TestLinkFormat, EP_SN2)
 
 TEST_F(TestLinkFormat, EP_SN3)
 {
-  const char payload[] =
-    "\"knx://ia.20a knx://sn.123456ab\" ";
-  int len = strlen(payload)-1;
+  const char payload[] = "\"knx://ia.20a knx://sn.123456ab\" ";
+  int len = strlen(payload) - 1;
   char sn[30];
   uint32_t ia;
 
@@ -208,9 +203,8 @@ TEST_F(TestLinkFormat, EP_SN3)
 
 TEST_F(TestLinkFormat, EP_SN4)
 {
-  const char payload[] =
-    "\"knx://ia.2a knx://sn.123456ab333\"";
-  int len = strlen(payload)-1;
+  const char payload[] = "\"knx://ia.2a knx://sn.123456ab333\"";
+  int len = strlen(payload) - 1;
   char sn[30];
   uint32_t ia;
 
@@ -220,11 +214,9 @@ TEST_F(TestLinkFormat, EP_SN4)
   EXPECT_EQ(0x2a, ia);
 }
 
-
 TEST_F(TestLinkFormat, EP_SN5)
 {
-  const char payload[] =
-    "\"knx://sn.123456ab\"";
+  const char payload[] = "\"knx://sn.123456ab\"";
   int len = strlen(payload);
   char sn[30];
   uint32_t ia;
@@ -236,8 +228,7 @@ TEST_F(TestLinkFormat, EP_SN5)
 
 TEST_F(TestLinkFormat, EP_SN6)
 {
-  const char payload[] =
-    "\"knx://ia.20b\"";
+  const char payload[] = "\"knx://ia.20b\"";
   int len = strlen(payload);
   char sn[30];
   uint32_t ia;

@@ -483,26 +483,28 @@ oc_strnchr(const char *string, char p, int size)
   return NULL;
 }
 
-int oc_get_sn_from_ep(const char* param, int param_len, char* sn, int sn_len, uint32_t* ia )
+int
+oc_get_sn_from_ep(const char *param, int param_len, char *sn, int sn_len,
+                  uint32_t *ia)
 {
   int error = -1;
   memset(sn, 0, 30);
   *ia = 0;
   if (param_len < 10) {
-      return error;
+    return error;
   }
-  if (strncmp(param,"\"knx://sn.",10) == 0) {
+  if (strncmp(param, "\"knx://sn.", 10) == 0) {
     // spec 1.1 ep= contents:
     // "knx://sn.<sn> knx://ia.<ia>"
     char *blank = oc_strnchr(param, ' ', param_len);
     if (blank == NULL) {
       // the ia part is missing, so length -10 and 1 less to adjust for quot
-      strncpy(sn, (char*)&param[10], param_len - 11);
+      strncpy(sn, (char *)&param[10], param_len - 11);
     } else {
       int offset = blank - param;
-      int len = offset-10;
+      int len = offset - 10;
       strncpy(sn, &param[10], len);
-      if (strncmp(&param[offset+1],"knx://ia.", 9) == 0) {
+      if (strncmp(&param[offset + 1], "knx://ia.", 9) == 0) {
         // read from hex
         *ia = (uint32_t)strtol(&param[offset + 1 + 9], NULL, 16);
         error = 0;
@@ -514,8 +516,7 @@ int oc_get_sn_from_ep(const char* param, int param_len, char* sn, int sn_len, ui
     char *blank = oc_strnchr(param, ' ', param_len);
     if (blank == NULL) {
       // the sn part is missing
-      PRINT("oc_get_sn_from_ep 222 string: string ia : '%s'\n",
-            &param[10]);
+      PRINT("oc_get_sn_from_ep 222 string: string ia : '%s'\n", &param[10]);
       // read from hex
       *ia = (uint32_t)strtol(&param[10], NULL, 16);
     } else {
@@ -528,7 +529,7 @@ int oc_get_sn_from_ep(const char* param, int param_len, char* sn, int sn_len, ui
         len = len_q;
       }
       *ia = (uint32_t)strtol(&param[10], NULL, 16);
-      if (strncmp(&param[offset+1], "knx://sn.", 9) == 0) {
+      if (strncmp(&param[offset + 1], "knx://sn.", 9) == 0) {
         strncpy(sn, (char *)&param[offset + 1 + 9], len);
         error = 0;
       }
