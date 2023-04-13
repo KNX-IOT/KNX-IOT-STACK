@@ -166,7 +166,7 @@ TEST_F(TestLinkFormat, LF_zero)
 TEST_F(TestLinkFormat, EP_SN1)
 {
   const char payload[] =
-    "ep=\"knx://sn.123456ab knx://ia.20a\"";
+    "\"knx://sn.123456ab knx://ia.20a\"";
   int len = strlen(payload);
   char sn[30];
   uint32_t ia;
@@ -181,7 +181,7 @@ TEST_F(TestLinkFormat, EP_SN1)
 TEST_F(TestLinkFormat, EP_SN2)
 {
   const char payload[] =
-    "ep=\"knx://ia.20a knx://sn.123456ab\"";
+    "\"knx://ia.20a knx://sn.123456ab\"";
   int len = strlen(payload);
   char sn[30];
   uint32_t ia;
@@ -196,7 +196,7 @@ TEST_F(TestLinkFormat, EP_SN2)
 TEST_F(TestLinkFormat, EP_SN3)
 {
   const char payload[] =
-    "ep=\"knx://ia.20a\"";
+    "\"knx://ia.20a\"";
   int len = strlen(payload);
   char sn[30];
   uint32_t ia;
