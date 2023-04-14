@@ -1749,8 +1749,8 @@ oc_knx_contains_interface(oc_interface_mask_t calling_interfaces,
     // one of the entries is matching
     return true;
   }
-  OC_WARN("oc_knx_contains_interface: false: calling:%d resource:%d",
-          calling_interfaces, resource_interfaces);
+  //OC_WRN("oc_knx_contains_interface: false: calling:%d resource:%d",
+  //        calling_interfaces, resource_interfaces);
   return false;
 }
 
