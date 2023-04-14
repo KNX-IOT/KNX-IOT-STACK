@@ -231,4 +231,55 @@ TEST_F(TestOcRi, RIinterface_securitycheck)
   retval = oc_knx_contains_interface(OC_IF_I,
                                      OC_IF_I);
   EXPECT_EQ(retval, true);
+  
+  retval = oc_knx_contains_interface(OC_IF_I,
+                                     OC_IF_I| OC_IF_O);
+  EXPECT_EQ(retval, true);
+
+  retval = oc_knx_contains_interface(OC_IF_I,
+                                     OC_IF_I| OC_IF_O |OC_IF_C |OC_IF_P | 
+                                     OC_IF_D | OC_IF_A | OC_IF_S | OC_IF_LI | 
+                                     OC_IF_B| OC_IF_SEC | OC_IF_SWU);
+  EXPECT_EQ(retval, true);
+  
+  retval = oc_knx_contains_interface(OC_IF_SEC,
+                                     OC_IF_I| OC_IF_O |OC_IF_C |OC_IF_P | 
+                                     OC_IF_D | OC_IF_A | OC_IF_S | OC_IF_LI | 
+                                     OC_IF_B| OC_IF_SEC | OC_IF_SWU);
+  EXPECT_EQ(retval, true);
+
+
+  retval = oc_knx_contains_interface(OC_IF_SEC | OC_IF_I,
+                                     OC_IF_I| OC_IF_O |OC_IF_C |OC_IF_P | 
+                                     OC_IF_D | OC_IF_A | OC_IF_S | OC_IF_LI | 
+                                     OC_IF_B| OC_IF_SEC | OC_IF_SWU);
+  EXPECT_EQ(retval, true);
+
+
+  retval = oc_knx_contains_interface(OC_IF_I| OC_IF_O |OC_IF_C |OC_IF_P | 
+                                     OC_IF_D | OC_IF_A | OC_IF_S | OC_IF_LI | 
+                                     OC_IF_B| OC_IF_SEC | OC_IF_SWU,
+                                     OC_IF_I| OC_IF_O |OC_IF_C |OC_IF_P | 
+                                     OC_IF_D | OC_IF_A | OC_IF_S | OC_IF_LI | 
+                                     OC_IF_B| OC_IF_SEC | OC_IF_SWU);
+  EXPECT_EQ(retval, true);
+  
+  retval = oc_knx_contains_interface(OC_IF_NONE,
+                                     OC_IF_I| OC_IF_O |OC_IF_C |OC_IF_P | 
+                                     OC_IF_D | OC_IF_A | OC_IF_S | OC_IF_LI | 
+                                     OC_IF_B| OC_IF_SEC | OC_IF_SWU);
+  EXPECT_EQ(retval, false);
+  
+  retval = oc_knx_contains_interface(OC_IF_SEC,
+                                     OC_IF_I| OC_IF_O |OC_IF_C |OC_IF_P | 
+                                     OC_IF_D | OC_IF_A | OC_IF_S | OC_IF_LI | 
+                                     OC_IF_B| OC_IF_SWU);
+  EXPECT_EQ(retval, false);
+  
+  retval = oc_knx_contains_interface(OC_IF_SWU | OC_IF_SEC,
+                                     OC_IF_I| OC_IF_O |OC_IF_C |OC_IF_P | 
+                                     OC_IF_D | OC_IF_A | OC_IF_S | OC_IF_LI | 
+                                     OC_IF_B);
+  EXPECT_EQ(retval, false);
+  
 }
