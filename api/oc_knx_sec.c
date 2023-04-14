@@ -1749,6 +1749,8 @@ oc_knx_contains_interface(oc_interface_mask_t calling_interfaces,
     // one of the entries is matching
     return true;
   }
+  OC_WARN("oc_knx_contains_interface: false: calling:%d resource:%d",
+          calling_interfaces, resource_interfaces);
   return false;
 }
 
@@ -1783,11 +1785,11 @@ method_allowed(oc_method_t method, oc_resource_t *resource,
       oc_at_get_interface_mask(0, endpoint->aut_at_index - 1);
     // interfaces of the resource
     oc_interface_mask_t resource_interfaces = resource->interfaces;
-    if (oc_knx_contains_interface(calling_interfaces, resource_interfaces)) {
-      PRINT("method_allowed : not allowed: request  : ");
+    if (oc_knx_contains_interface(calling_interfaces, resource_interfaces) == false) {
+      PRINT("method_allowed : not allowed: request  %d : ", calling_interfaces);
       oc_print_interface(calling_interfaces);
       PRINT("\n");
-      PRINT("method_allowed : not allowed: resource : ");
+      PRINT("method_allowed : not allowed: resource %d : ", resource_interfaces);
       oc_print_interface(resource_interfaces);
       PRINT("\n");
 
