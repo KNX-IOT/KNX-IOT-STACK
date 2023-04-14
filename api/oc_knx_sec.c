@@ -1747,9 +1747,9 @@ oc_knx_contains_interface(oc_interface_mask_t calling_interfaces,
 {
   if ((calling_interfaces & resource_interfaces) > 0) {
     // one of the entries is matching
-    return false;
+    return true;
   }
-  return true;
+  return false;
 }
 
 static bool
