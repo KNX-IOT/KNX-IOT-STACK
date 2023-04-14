@@ -749,8 +749,9 @@ oc_core_auth_at_delete_handler(oc_request_t *request,
 void
 oc_create_auth_at_resource(int resource_idx, size_t device)
 {
-  oc_core_populate_resource(resource_idx, device, "/auth/at",
-                            OC_IF_B | OC_IF_SEC, APPLICATION_LINK_FORMAT,
+  oc_core_populate_resource(resource_idx, device, "/auth/at", 
+                            OC_IF_LI | OC_IF_B | OC_IF_SEC,
+                            APPLICATION_LINK_FORMAT,
                             OC_DISCOVERABLE, oc_core_auth_at_get_handler, 0,
                             oc_core_auth_at_post_handler,
                             oc_core_auth_at_delete_handler, 1, "dpt.a[n]");
