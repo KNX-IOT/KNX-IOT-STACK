@@ -1745,11 +1745,11 @@ bool
 oc_knx_contains_interface(oc_interface_mask_t calling_interfaces,
                           oc_interface_mask_t resource_interfaces)
 {
-  if ((calling_interfaces & resource_interfaces) == 0) {
+  if ((calling_interfaces & resource_interfaces) > 0) {
     // one of the entries is matching
-    return false;
+    return true;
   }
-  return true;
+  return false;
 }
 
 static bool
@@ -1784,10 +1784,10 @@ method_allowed(oc_method_t method, oc_resource_t *resource,
     // interfaces of the resource
     oc_interface_mask_t resource_interfaces = resource->interfaces;
     if (oc_knx_contains_interface(calling_interfaces, resource_interfaces)) {
-      PRINT("method_allowed : request :");
+      PRINT("method_allowed : not allowed: request  : ");
       oc_print_interface(calling_interfaces);
       PRINT("\n");
-      PRINT("method_allowed : resource :");
+      PRINT("method_allowed : not allowed: resource : ");
       oc_print_interface(resource_interfaces);
       PRINT("\n");
 
