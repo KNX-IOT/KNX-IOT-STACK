@@ -26,7 +26,7 @@
 #include "oc_api.h"
 #include "oc_helpers.h"
 #include "oc_ri.h"
-#include "oc_knx_sec.h"
+#include "api/oc_knx_sec.h"
 #include "port/linux/oc_config.h"
 
 #define RESOURCE_URI "/LightResourceURI"
