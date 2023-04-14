@@ -26,6 +26,7 @@
 #include "oc_api.h"
 #include "oc_helpers.h"
 #include "oc_ri.h"
+#include "oc_knx_sec.h"
 #include "port/linux/oc_config.h"
 
 #define RESOURCE_URI "/LightResourceURI"
@@ -221,4 +222,13 @@ TEST_F(TestOcRi, RIinterfacestring_P)
 
   interface = get_interface_string(OC_IF_PM);
   EXPECT_STREQ("if.pm", interface);
+}
+
+
+TEST_F(TestOcRi, RIinterface_securitycheck)
+{
+  bool retval= false;
+  retval = oc_knx_contains_interface(OC_IF_I,
+                                     OC_IF_I);
+  EXPECT_EQ(retval, true);
 }
