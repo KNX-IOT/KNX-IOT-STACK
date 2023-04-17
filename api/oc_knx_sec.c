@@ -559,6 +559,7 @@ oc_core_auth_at_post_handler(oc_request_t *request,
               interfaces = interfaces + if_mask;
             }
             g_at_entries[index].scope = interfaces;
+            scope_updated = true;
           }
         } else if (object->type == OC_REP_INT_ARRAY) {
           // scope
@@ -572,9 +573,6 @@ oc_core_auth_at_post_handler(oc_request_t *request,
               // make the deep copy
               if ((g_at_entries[index].ga_len > 0) &&
                   (&g_at_entries[index].ga != NULL)) {
-                // always set the group address scope, if there is 1 or more ga
-                // entries
-                g_at_entries[index].scope = OC_IF_G;
                 int64_t *cur_arr = g_at_entries[index].ga;
                 if (cur_arr) {
                   free(cur_arr);
@@ -582,6 +580,9 @@ oc_core_auth_at_post_handler(oc_request_t *request,
                 g_at_entries[index].ga = NULL;
               }
               g_at_entries[index].ga_len = (int)array_size;
+              // always set the group address scope, if there is 1 or more ga
+              // entries
+              g_at_entries[index].scope = OC_IF_G;
               int64_t *new_array =
                 (int64_t *)malloc(array_size * sizeof(uint64_t));
               if (new_array) {
@@ -593,7 +594,6 @@ oc_core_auth_at_post_handler(oc_request_t *request,
                 OC_ERR("out of memory");
               }
             }
-            scope_updated = true;
           }
         } else if (object->type == OC_REP_STRING) {
           if (object->iname == 2) {
