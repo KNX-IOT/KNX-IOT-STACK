@@ -202,7 +202,6 @@ oc_total_interface_in_mask(oc_interface_mask_t iface_mask)
     total_masks++;
   }
   if (iface_mask & OC_IF_G) {
-    // TODO note: this must be extended with a number...
     total_masks++;
   }
   if (iface_mask & OC_IF_C) {
