@@ -499,6 +499,8 @@ oc_core_auth_at_post_handler(oc_request_t *request,
   oc_rep_t *subobject = NULL;
   oc_rep_t *oscobject = NULL;
   oc_status_t return_status = OC_STATUS_BAD_REQUEST;
+  bool scope_updated = false;
+  bool other_updated = false;
   int index = -1;
   PRINT("oc_core_auth_at_post_handler\n");
 
@@ -591,6 +593,7 @@ oc_core_auth_at_post_handler(oc_request_t *request,
                 OC_ERR("out of memory");
               }
             }
+            scope_updated = true;
           }
         } else if (object->type == OC_REP_STRING) {
           if (object->iname == 2) {
@@ -647,6 +650,7 @@ oc_core_auth_at_post_handler(oc_request_t *request,
                     oc_new_string(&g_at_entries[index].osc_ms,
                                   oc_string(oscobject->value.string),
                                   oc_string_len(oscobject->value.string));
+                    other_updated = true;
                   }
                   if (oscobject->iname == 4 && subobject_nr == 8 &&
                       oscobject_nr == 4) {
@@ -655,6 +659,7 @@ oc_core_auth_at_post_handler(oc_request_t *request,
                     oc_new_string(&g_at_entries[index].osc_alg,
                                   oc_string(oscobject->value.string),
                                   oc_string_len(oscobject->value.string));
+                    other_updated = true;
                   }
                   if (oscobject->iname == 6 && subobject_nr == 8 &&
                       oscobject_nr == 4) {
@@ -663,6 +668,7 @@ oc_core_auth_at_post_handler(oc_request_t *request,
                     oc_new_string(&g_at_entries[index].osc_contextid,
                                   oc_string(oscobject->value.string),
                                   oc_string_len(oscobject->value.string));
+                    other_updated = true;
                   }
                 } else if (oscobject->type == OC_REP_BYTE_STRING) {
                   // byte string, e.g. tolerating 0 in the data
@@ -673,6 +679,7 @@ oc_core_auth_at_post_handler(oc_request_t *request,
                     oc_new_string(&g_at_entries[index].osc_id,
                                   oc_string(oscobject->value.string),
                                   oc_string_len(oscobject->value.string));
+                    other_updated = true;
                   }
                   if (oscobject->iname == 2 && subobject_nr == 8 &&
                       oscobject_nr == 4) {
@@ -681,6 +688,7 @@ oc_core_auth_at_post_handler(oc_request_t *request,
                     oc_new_string(&g_at_entries[index].osc_ms,
                                   oc_string(oscobject->value.string),
                                   oc_string_len(oscobject->value.string));
+                    other_updated = true;
                   }
                   if (oscobject->iname == 4 && subobject_nr == 8 &&
                       oscobject_nr == 4) {
@@ -689,6 +697,7 @@ oc_core_auth_at_post_handler(oc_request_t *request,
                     oc_new_string(&g_at_entries[index].osc_alg,
                                   oc_string(oscobject->value.string),
                                   oc_string_len(oscobject->value.string));
+                    other_updated = true;
                   }
                   if (oscobject->iname == 6 && subobject_nr == 8 &&
                       oscobject_nr == 4) {
@@ -697,6 +706,7 @@ oc_core_auth_at_post_handler(oc_request_t *request,
                     oc_new_string(&g_at_entries[index].osc_contextid,
                                   oc_string(oscobject->value.string),
                                   oc_string_len(oscobject->value.string));
+                    other_updated = true;
                   }
                 } /* type */
 
@@ -719,7 +729,15 @@ oc_core_auth_at_post_handler(oc_request_t *request,
 
   PRINT("oc_core_auth_at_post_handler - activating oscore context\n");
   // add the oscore contexts by reinitializing all used oscore keys.
-  oc_init_oscore_from_storage(device_index, false);
+  // do not update the oscore when:
+  // - update of the scope contents only
+  if ((return_status == OC_STATUS_CHANGED) && (other_updated == false) &&
+      (scope_updated == true)) {
+    OC_WRN("update scope only");
+  } else {
+    // update the oscore context
+    oc_init_oscore_from_storage(device_index, false);
+  }
   PRINT("oc_core_auth_at_post_handler - end\n");
   oc_send_cbor_response_no_payload_size(request, return_status);
 }
