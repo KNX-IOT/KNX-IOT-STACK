@@ -559,6 +559,7 @@ oc_core_auth_at_post_handler(oc_request_t *request,
               interfaces = interfaces + if_mask;
             }
             g_at_entries[index].scope = interfaces;
+            scope_updated = true;
           }
         } else if (object->type == OC_REP_INT_ARRAY) {
           // scope
@@ -593,7 +594,6 @@ oc_core_auth_at_post_handler(oc_request_t *request,
                 OC_ERR("out of memory");
               }
             }
-            scope_updated = true;
           }
         } else if (object->type == OC_REP_STRING) {
           if (object->iname == 2) {
