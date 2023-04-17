@@ -165,12 +165,14 @@ typedef struct oc_auth_at_t
   oc_string_t osc_id;        /**< (18:4:0) oscore cnf:osc:id */
   oc_string_t osc_version;   /**< (18:4:1) oscore cnf:osc:version (optional) */
   oc_string_t osc_ms;        /**< (18:4:2) oscore cnf:osc:ms */
-  oc_string_t osc_hkdf;      /**< (18:4:3) oscore cnf:osc:hkdf (optional) */
-  oc_string_t osc_alg;       /**< (18:4:4) oscore cnf:osc:alg */
+  uint8_t osc_hkdf;          /**< (18:4:3) oscore cnf:osc:hkdf (optional) (decimal value)*/
+  uint8_t osc_alg;           /**< (18:4:4) oscore cnf:osc:alg default: decimal value 10*/
   oc_string_t
     osc_salt; /**< (18:4:5) oscore cnf:osc:salt (optional) empty string */
   oc_string_t
     osc_contextid; /**< (18:4:6) oscore cnf:osc:contextid (optional) */
+  oc_string_t
+    osc_recipientid; /**< (18:4:7) oscore cnf:osc:recipientid (optional) */
   int nbf;         /**< token not valid before (optional) */
 
   int ga_len;  /**< length of the group addresses (ga) in the scope */
