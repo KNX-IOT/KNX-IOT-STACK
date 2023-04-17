@@ -929,7 +929,7 @@ oc_ri_get_interface_mask(char *iface, size_t if_len)
     iface_mask |= OC_IF_I;
   if (4 == if_len && strncmp(iface, "if.o", if_len) == 0)
     iface_mask |= OC_IF_O;
-  if (if_len > 8 && strncmp(iface, "if.g.s.", if_len) == 0)
+  if (6 == if_len && strncmp(iface, "if.g.s", if_len) == 0)
     iface_mask |= OC_IF_G;
   if (4 == if_len && strncmp(iface, "if.c", if_len) == 0)
     iface_mask |= OC_IF_C;
