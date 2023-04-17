@@ -731,8 +731,7 @@ oc_core_auth_at_post_handler(oc_request_t *request,
   // add the oscore contexts by reinitializing all used oscore keys.
   // do not update the oscore when:
   // - update of the scope contents only
-  if ((return_status == OC_STATUS_CHANGED) &&
-      (other_updated == false) &&
+  if ((return_status == OC_STATUS_CHANGED) && (other_updated == false) &&
       (scope_updated == true)) {
     OC_WRN("update scope only");
   } else {
