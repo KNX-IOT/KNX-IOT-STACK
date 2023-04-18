@@ -699,8 +699,13 @@ oc_oscore_send_message(oc_message_t *msg)
       // oscore_store_piv(0, piv, &piv_len);
       // OC_DBG_OSCORE("---using SSN as Partial IV: %lu", oscore_ctx->ssn);
       OC_LOGbytes_OSCORE(piv, piv_len);
-      /* Increment SSN */
-      increment_ssn_in_context(oscore_ctx);
+
+      /* Increment SSN for the original request, retransmissions use the same
+       * SSN */
+      coap_transaction_t *transaction =
+        coap_get_transaction_by_token(coap_pkt->token, coap_pkt->token_len);
+      if (transaction->retrans_counter == 0)
+        increment_ssn_in_context(oscore_ctx);
 
 #ifdef OC_CLIENT
       if (coap_pkt->code >= OC_GET && coap_pkt->code <= OC_DELETE) {
@@ -746,6 +751,8 @@ oc_oscore_send_message(oc_message_t *msg)
         msg->endpoint.piv_len = piv_len;
       }
     } else {
+      /* We are dealing with a response */
+
       /* Request was not protected by OSCORE */
       if (message->endpoint.piv_len == 0) {
         OC_DBG("request was not protected by OSCORE");
@@ -760,8 +767,12 @@ oc_oscore_send_message(oc_message_t *msg)
       OC_LOGbytes_OSCORE(piv, piv_len);
       OC_DBG_OSCORE("---");
 
-      /* Increment SSN */
-      increment_ssn_in_context(oscore_ctx);
+      /* Increment SSN for the original request, retransmissions use the same
+       * SSN */
+      coap_transaction_t *transaction =
+        coap_get_transaction_by_token(coap_pkt->token, coap_pkt->token_len);
+      if (transaction->retrans_counter == 0)
+        increment_ssn_in_context(oscore_ctx);
 
       /* Compute nonce using partial IV and context->sendid */
       oc_oscore_AEAD_nonce(oscore_ctx->sendid, oscore_ctx->sendid_len, piv,
