@@ -326,6 +326,24 @@ int oc_conv_hex_string_to_byte_array(const char *hex_str, size_t hex_str_len,
 int oc_string_is_hex_array(oc_string_t hex_string);
 
 /**
+ * @brief prints the input as hex string
+ *
+ * @param[in] hex_string the input string to be printed
+ * @return int printed amount of %x
+ */
+int oc_string_print_hex(oc_string_t hex_string);
+
+/**
+ * @brief prints the input as hex string
+ *
+ * @param[in] string the input string to be printed
+ * @param[in] str_len the length of the input string
+ * @return int printed amount of %x
+ */
+int oc_char_print_hex(const char* str, int str_len);
+
+
+/**
  * @brief checks if the uri contains a wildcard (e.g. "*")
  *
  * @param uri The URI to be checked.

@@ -1060,25 +1060,24 @@ oc_print_auth_at_entry(size_t device_index, int index)
       }
       if (g_at_entries[index].profile == OC_PROFILE_COAP_OSCORE) {
         if (oc_string_len(g_at_entries[index].osc_ms) > 0) {
-          PRINT("    osc:ms        : ");
-          int length = (int)oc_string_len(g_at_entries[index].osc_ms);
-          char *ms = oc_string(g_at_entries[index].osc_ms);
-          for (int i = 0; i < length; i++) {
-            PRINT("%02x", (unsigned char)ms[i]);
-          }
+          PRINT("    osc:ms     (h): ");
+          oc_string_print_hex(g_at_entries[index].osc_ms);
           PRINT("\n");
         }
         if (oc_string_len(g_at_entries[index].osc_contextid) > 0) {
-          PRINT("    osc:contextid : %s\n",
-                oc_string_checked(g_at_entries[index].osc_contextid));
+          PRINT("    osc:contextid (h): ");
+          oc_string_print_hex(g_at_entries[index].osc_contextid);
+          PRINT("\n");
         }
         if (oc_string_len(g_at_entries[index].osc_id) > 0) {
-          PRINT("    osc:id        : %s\n",
-                oc_string_checked(g_at_entries[index].osc_id));
+          PRINT("    osc:id    (h) : ");
+          oc_string_print_hex(g_at_entries[index].osc_id);
+          PRINT("\n");
         }
         if (oc_string_len(g_at_entries[index].osc_rid) > 0) {
-          PRINT("    osc:rid       : %s\n",
-                oc_string_checked(g_at_entries[index].osc_rid));
+          PRINT("    osc:rid   (h) : ");
+          oc_string_print_hex(g_at_entries[index].osc_rid);
+          PRINT("\n");
         }
         if (g_at_entries[index].ga_len > 0) {
           PRINT("    osc:ga        : [");

@@ -347,6 +347,22 @@ oc_string_is_hex_array(oc_string_t hex_string)
 }
 
 int
+oc_string_print_hex(oc_string_t hex_string)
+{
+  char *str = oc_string(hex_string);
+  int length = oc_string_len(hex_string); 
+  return oc_char_print_hex(str, length);
+}
+
+int oc_char_print_hex(const char *str, int str_len)
+{
+  for (int i = 0; i < str_len; i++) {
+    PRINT("%02x", (unsigned char)str[i]);
+  }
+  return str_len;
+}
+
+int
 oc_string_copy(oc_string_t *string1, oc_string_t string2)
 {
   oc_free_string(string1);
