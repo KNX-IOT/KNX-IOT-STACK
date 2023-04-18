@@ -1130,7 +1130,7 @@ coap_oscore_serialize_message(void *packet, uint8_t *buffer, bool inner,
   }
 
   /* empty packet, don't need to do more stuff */
-  if (outer && !coap_pkt->code) {
+  if (outer && !coap_pkt->code && coap_pkt->token_len == 0) {
     OC_DBG("Done serializing empty message at %p-", coap_pkt->buffer);
     return token_location;
   } else if (outer) {
