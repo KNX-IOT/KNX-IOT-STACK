@@ -217,7 +217,7 @@ oc_oscore_compose_AAD(uint8_t *kid, uint8_t kid_len, uint8_t *piv,
   err |= cbor_encoder_create_array(&e, &a, 3);
   /* "Encrypt0" for a COSE_Encrypt0 message */
   err |= cbor_encode_text_string(&a, "Encrypt0", 8);
-  /* No protected arrtibutes: so empty map (RFC 8152 Section 5.3) */
+  /* No protected attributes: so empty map (RFC 8152 Section 5.3) */
   err |= cbor_encode_byte_string(&a, NULL, 0);
   /* external_aad: encode aad_array as a bstr */
   err |= cbor_encode_byte_string(&a, aad_array, aad_array_len);

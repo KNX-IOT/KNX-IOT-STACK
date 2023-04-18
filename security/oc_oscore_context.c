@@ -1,6 +1,6 @@
 /*
 // Copyright (c) 2020 Intel Corporation
-// Copyright (c) 2022 Cascoda Ltd.
+// Copyright (c) 2022-2023 Cascoda Ltd.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -239,9 +239,6 @@ oc_oscore_context_t *
 
   PRINT("  device    : %d\n", (int)device);
   PRINT("  desc      : %s\n", desc);
-  PRINT("  sid (hex) : %s\n", senderid);
-  PRINT("  rid (hex) : %s\n", recipientid);
-  PRINT("  ctx (hex) : %s\n", osc_ctx);
   PRINT("  index     : %d\n", auth_at_index);
 
   /* To prevent SSN reuse, bump to higher value that could've been previously
@@ -256,44 +253,52 @@ oc_oscore_context_t *
   }
   size_t id_len = OSCORE_CTXID_LEN;
 
-  if (senderid) {
-    if (oc_conv_hex_string_to_byte_array(senderid, senderid_size,
-                                         ctx->sendid, &id_len) < 0) {
-      goto add_oscore_context_error;
-    }
-    ctx->sendid_len = (uint8_t)id_len;
+  if (senderid && senderid_size > 0) {
+    //if (oc_conv_hex_string_to_byte_array(senderid, senderid_size,
+    //                                     ctx->sendid, &id_len) < 0) {
+    //  goto add_oscore_context_error;
+    //}
+    memcpy(ctx->sendid, senderid, senderid_size);
+    // explicit token
+    memcpy(ctx->token_id, senderid, senderid_size);
+    ctx->sendid_len = (uint8_t)senderid_size;
+  } else {
+    OC_ERR("senderid == NULL");
+    goto add_oscore_context_error;
   }
   PRINT("SendID (%d):", ctx->sendid_len);
   OC_LOGbytes_OSCORE(ctx->sendid, ctx->sendid_len);
 
   id_len = OSCORE_CTXID_LEN;
 
-  if (recipientid) {
-    if (oc_conv_hex_string_to_byte_array(recipientid, recipientid_size,
-                                         ctx->recvid, &id_len) < 0) {
-      goto add_oscore_context_error;
-    }
-    ctx->recvid_len = (uint8_t)id_len;
+  if (recipientid && recipientid_size > 0) {
+    //if (oc_conv_hex_string_to_byte_array(recipientid, recipientid_size,
+    //                                     ctx->recvid, &id_len) < 0) {
+    //  goto add_oscore_context_error;
+    //}
+    memcpy(ctx->recvid, recipientid, recipientid_size);
+    ctx->recvid_len = (uint8_t)recipientid_size;
+  } else {
+    OC_ERR("recipientid == NULL");
+    goto add_oscore_context_error;
   }
   PRINT("RecvID (%d):", ctx->recvid_len);
   OC_LOGbytes_OSCORE(ctx->recvid, ctx->recvid_len);
 
-  
   if (osc_ctx && osc_ctx_size > 0) {
-    if (oc_conv_hex_string_to_byte_array(osc_ctx, osc_ctx_size, ctx->idctx,
-                                         &id_len) < 0) {
-      goto add_oscore_context_error;
-    }
-    ctx->idctx_len = (uint8_t)id_len;
+    //if (oc_conv_hex_string_to_byte_array(osc_ctx, osc_ctx_size, ctx->idctx,
+    //                                     &id_len) < 0) {
+    //  goto add_oscore_context_error;
+    //}
+    memcpy(ctx->idctx, osc_ctx, osc_ctx_size);
+    ctx->idctx_len = (uint8_t)osc_ctx_size;
   }
   PRINT("OSC CTX (%d):", ctx->idctx_len);
   OC_LOGbytes_OSCORE(ctx->idctx, ctx->idctx_len);
 
   if (mastersecret) {
-    strncpy((char *)&ctx->master_secret, mastersecret, mastersecret_size);
+    memcpy((char *)&ctx->master_secret, mastersecret, mastersecret_size);
   }
-
-  // oc_sec_cred_t *cred = (oc_sec_cred_t *)cred_entry;
 
   OC_DBG_OSCORE("### Reading OSCORE context ###");
   if (senderid) {

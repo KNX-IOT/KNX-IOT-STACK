@@ -160,7 +160,7 @@ char *oc_at_profile_to_string(oc_at_profile_t at_profile);
  */
 typedef struct oc_auth_at_t
 {
-  oc_string_t id;            /**< (0) auth/at/<id>, encoding: HEX */
+  oc_string_t id;            /**< (0) auth/at/{id}, encoding: HEX */
   oc_interface_mask_t scope; /**< (9) the scope (interfaces) */
   oc_at_profile_t profile;   /**< (38) "coap_oscore" or "coap_dtls", only oscore implemented*/
   oc_string_t aud;           /**< (13) audience (for out going requests) */

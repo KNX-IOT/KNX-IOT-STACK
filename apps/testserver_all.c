@@ -1301,10 +1301,6 @@ issue_s_mode_secure(void *data)
 
     oc_new_string(&access_token.osc_id, "y1234567890AB",
                   strlen("01234567890AB"));
-
-    if (oc_string_is_hex_array(access_token.osc_id) == -1) {
-      PRINT("not a valid hex-string: %s", oc_string(access_token.osc_id));
-    }
     char str_ms[14] = {
       '1', '2', '3', '4', '5', '\0', '6', '7', '8', '9', '1'
     };
