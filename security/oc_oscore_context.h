@@ -92,8 +92,11 @@ void oc_oscore_free_context(oc_oscore_context_t *ctx);
 void oc_oscore_free_all_contexts();
 
 oc_oscore_context_t *oc_oscore_add_context(
-  size_t device, const char *senderid, const char *recipientid, uint64_t ssn,
-  const char *desc, const char *mastersecret, const char *token_id,
+  size_t device, const char *senderid, int senderid_size, 
+  const char *recipientid, int recipientid_size,
+  uint64_t ssn, const char *desc, 
+  const char *mastersecret, int mastersecret_size, 
+  const char *token_id, int token_id_size,
   int auth_at_index, bool from_storage);
 
 oc_oscore_context_t *oc_oscore_find_context_by_serial_number(
