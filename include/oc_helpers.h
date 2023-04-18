@@ -336,7 +336,7 @@ int oc_string_print_hex(oc_string_t hex_string);
 /**
  * @brief prints the input as hex string
  *
- * @param[in] string the input string to be printed
+ * @param[in] str the input string to be printed
  * @param[in] str_len the length of the input string
  * @return int printed amount of %x
  */
