@@ -249,7 +249,7 @@ oc_oscore_context_t *
   oc_char_print_hex(recipientid, recipientid_size);
   PRINT("\n");
   PRINT("  ctx size  : %d\n", osc_ctx_size);
-  PRINT("  ms size   : %d\ ", mastersecret_size);
+  PRINT("  ms size   : %d ", mastersecret_size);
   oc_char_print_hex(mastersecret, mastersecret_size);
   PRINT("\n");
 

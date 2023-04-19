@@ -1142,6 +1142,8 @@ oc_at_delete_entry(size_t device_index, int index)
   return 0;
 }
 
+// Note: storage of the fields is done via the cbor keys in the hierarchy
+// so tag : 842  8.4.2 ==> "cnf":"osc":"ms"
 static void
 oc_at_dump_entry(size_t device_index, int entry)
 {
