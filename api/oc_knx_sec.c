@@ -640,7 +640,7 @@ oc_core_auth_at_post_handler(oc_request_t *request,
                     // not storing it: we only support value 10 at the moment.
                     // g_at_entries[index].osc_alg = (int)object->value.integer;
                     if ((int)object->value.integer != 10) {
-                      OC_ERR("algoritm is not 10 : %d",
+                      OC_ERR("algorithm is not 10 : %d",
                              (int)object->value.integer);
                       return_status = OC_STATUS_BAD_REQUEST;
                     }
@@ -1759,8 +1759,6 @@ oc_knx_contains_interface(oc_interface_mask_t calling_interfaces,
     // one of the entries is matching
     return true;
   }
-  // OC_WRN("oc_knx_contains_interface: false: calling:%d resource:%d",
-  //         calling_interfaces, resource_interfaces);
   return false;
 }
 
@@ -1804,6 +1802,8 @@ method_allowed(oc_method_t method, oc_resource_t *resource,
             resource_interfaces);
       oc_print_interface(resource_interfaces);
       PRINT("\n");
+      OC_WRN(" resource %s call denied: %d  %d", oc_string(resource->uri), 
+          calling_interfaces, resource_interfaces);
 
       return false;
     }
@@ -1824,7 +1824,7 @@ oc_knx_sec_check_acl(oc_method_t method, oc_resource_t *resource,
   if (method_allowed(method, resource, endpoint) == true) {
     return true;
   }
-  OC_ERR("oc_knx_sec_check_acl: method %s NOT allowed on %s\n",
+  OC_WRN("oc_knx_sec_check_acl: method %s NOT allowed on %s\n",
          get_method_name(method), oc_string_checked(resource->uri));
 
   return false;

@@ -98,3 +98,37 @@ oc_frame_integer(int value)
   snprintf((char *)&string, 9, "%d", value);
   return oc_rep_add_line_to_buffer(string);
 }
+
+
+// makes a number from two ascii hexa characters
+int
+ahex2int(char a, char b)
+{
+
+  a = (a <= '9') ? a - '0' : (a & 0x7) + 9;
+  b = (b <= '9') ? b - '0' : (b & 0x7) + 9;
+
+  return (a << 4) + b;
+}
+
+int oc_knx_serial_number_to_array(char *sn_string, ser_num my_serialNumber)
+{
+  int i = 0;
+  int sn_len = strlen(sn_string);
+  // make sure everything is reset to zero..
+  memset(my_serialNumber, 0, 6);
+
+  if (sn_len >= 12) {
+      my_serialNumber[5] = ahex2int(sn_string[10], sn_string[11]);
+      my_serialNumber[4] = ahex2int(sn_string[8], sn_string[9]);
+      my_serialNumber[3] = ahex2int(sn_string[6], sn_string[7]);
+      my_serialNumber[2] = ahex2int(sn_string[4], sn_string[5]);
+      my_serialNumber[1] = ahex2int(sn_string[2], sn_string[3]);
+      my_serialNumber[0] = ahex2int(sn_string[0], sn_string[1]);
+    } else {
+    for (i = 0; i < (sn_len / 2); i++) {
+        my_serialNumber[i] = ahex2int(sn_string[i*2], sn_string[(i*2) +1]);
+      }
+  }
+  return 0;
+}

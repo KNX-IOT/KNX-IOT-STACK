@@ -222,6 +222,7 @@ oc_oscore_context_t *
     OC_ERR("master secret size is != 16 : %d", mastersecret_size);
     return NULL;
   }
+  /*
   if (senderid_size > 7) {
     OC_ERR("senderid_size > 7 = %d", senderid_size);
     return NULL;
@@ -234,6 +235,7 @@ oc_oscore_context_t *
     OC_ERR("osc_ctx_size > 7 = %d", osc_ctx_size);
     return NULL;
   }
+  */
 
   ctx->device = device;
   ctx->ssn = ssn;
