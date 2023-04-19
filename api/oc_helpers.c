@@ -378,6 +378,15 @@ oc_string_copy_from_char(oc_string_t *string1, const char *string2)
   return 0;
 }
 
+int oc_string_copy_from_char_with_size(oc_string_t *string1,
+                                       const char *string2, size_t string2_len)
+{
+  oc_free_string(string1);
+  oc_new_string(string1, string2, string2_len);
+  return 0;
+}
+
+
 int
 oc_string_cmp(oc_string_t string1, oc_string_t string2)
 {
@@ -493,7 +502,7 @@ oc_strnchr(const char *string, char p, int size)
   int i;
   for (i = 0; i < size; i++) {
     if (string[i] == p) {
-      return &string[i];
+      return (char*)&string[i];
     }
   }
   return NULL;

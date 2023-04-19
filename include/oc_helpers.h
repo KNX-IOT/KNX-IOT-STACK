@@ -460,6 +460,18 @@ int oc_get_sn_from_ep(const char *param, int param_len, char *sn, int sn_len,
  */
 int oc_string_copy_from_char(oc_string_t *string1, const char *string2);
 
+
+/**
+ * @brief copy string from char*
+ *
+ * @param string1 the oc_string to copy to
+ * @param string2 the char* to copy from
+ * @param string2_len the length of string2
+ * @return int 0 == success
+ */
+int oc_string_copy_from_char_with_size(oc_string_t *string1,
+                                       const char *string2, size_t string2_len);
+
 /**
  * @brief copy oc_string
  *

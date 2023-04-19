@@ -47,12 +47,34 @@ bool oc_set_spake_response_cb(oc_spake_cb_t my_func);
 /**
  * @brief initiate the spake handshake
  *
+ * NOTE: DEPRECATED
+ * 
  * @param endpoint the endpoint of the device to be used
  * @param password the spake password to be used
  * @param oscore_id optional OSCORE id for the handshake. Set to NULL if unused
  * @return int success full start up of the handshake
  */
-int oc_initiate_spake(oc_endpoint_t *endpoint, char *password, char *oscore_id);
+int oc_initiate_spake(oc_endpoint_t *endpoint, char *password,
+                                     char *oscore_id);
+
+
+/**
+ * @brief initiate the spake handshake
+ *
+ * NOTE: After the success full handshake the OSCORE context should have:
+ * - SID : serial number as byte array
+ * - RID : the recipient ID as given input
+ * 
+ * @param endpoint the endpoint of the device to be used
+ * @param password the spake password to be used
+ * @param recipient_id the recipient ID id for the resulting OSCORE context
+ * @param recipient_id_len length of the recipient ID
+ * @return int success full start up of the handshake
+ */
+int oc_initiate_spake_parameter_request(oc_endpoint_t *endpoint, char *password,
+                                        char *recipient_id,
+                                        size_t recipient_id_len);
+
 
 typedef void (*oc_s_mode_response_cb_t)(char *url, oc_rep_t *rep,
                                         oc_rep_t *rep_value);

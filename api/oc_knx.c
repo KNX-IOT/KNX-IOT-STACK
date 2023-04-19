@@ -1372,8 +1372,8 @@ oc_core_knx_spake_separate_post_handler(void *req_p)
 #endif /* OC_SPAKE */
     oc_rep_begin_root_object();
     // id (0)
-    oc_rep_i_set_byte_string(root, SPAKE_ID, oc_cast(g_pase.id, uint8_t),
-                             oc_byte_string_len(g_pase.id));
+    //oc_rep_i_set_byte_string(root, SPAKE_ID, oc_cast(g_pase.id, uint8_t),
+    //                         oc_byte_string_len(g_pase.id));
     // rnd (15)
     oc_rep_i_set_byte_string(root, SPAKE_RND, g_pase.rnd, 32);
     // pbkdf2
@@ -1479,6 +1479,7 @@ oc_core_knx_spake_separate_post_handler(void *req_p)
     // knx does not have multiple devices per instance (for now), so hardcode
     // the use of the first device
     oc_device_info_t *device = oc_core_get_device_info(0);
+    // serial number should be supplied as byte array
     oc_oscore_set_auth(oc_string(device->serialnumber), oc_string(g_pase.id),
                        shared_key, (int)shared_key_len);
 
