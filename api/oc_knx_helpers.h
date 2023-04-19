@@ -64,8 +64,9 @@ int oc_frame_integer(int value);
 /**
  * @brief helper function to convert the string serial number to 6 bytes
  * see: 3.30 Datapoint Type DPT_SerNum
- * @param value the input string (e.g. serial number in hex (string)
- * @return array of 6 bytes
+ * @param sn_string the input string (e.g. serial number in hex (string)
+ * @param my_serialNumber the converted hex string to bytes
+ * @return 0 == success
  */
 int oc_knx_serial_number_to_array(char *sn_string, ser_num my_serialNumber);
 
