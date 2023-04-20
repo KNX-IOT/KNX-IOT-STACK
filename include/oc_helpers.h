@@ -362,7 +362,7 @@ int oc_char_print_hex(const char* str, int str_len);
  * @param[in] str_len the length of the input string
  * @return int printed amount of %x
  */
-oc_char_println_hex(const char *str, int str_len);
+int oc_char_println_hex(const char *str, int str_len);
 
   /**
  * @brief checks if the uri contains a wildcard (e.g. "*")
