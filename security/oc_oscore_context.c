@@ -132,14 +132,18 @@ oc_oscore_find_context_by_oscore_id(size_t device, char *oscore_id, size_t oscor
     return NULL;
   }
 
-  if (strlen(oscore_id_len) == 0) {
+  if (oscore_id_len == 0) {
+    OC_ERR("oscore_id_len == 0\n");
+    return NULL;
+  }
+  if (oscore_id == NULL)
+    {
     OC_ERR("oscore_id NULL\n");
     return NULL;
   }
+
   PRINT("oc_oscore_find_context_by_oscore_id:");
   oc_char_println_hex(oscore_id, oscore_id_len);
-  //oc_string_println_hex()
-  //  serial_number);
 
   oc_oscore_context_t *ctx = (oc_oscore_context_t *)oc_list_head(contexts);
   while (ctx != NULL) {

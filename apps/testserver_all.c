@@ -183,7 +183,7 @@ app_init(void)
     - base path (/)
     - the serial number
   */
-  ret |= oc_add_device("my_name", "1.0.0", "//", "000005", NULL, NULL);
+  ret |= oc_add_device("my_name", "1.0.0", "//", "123456789012", NULL, NULL);
   oc_device_info_t *device = oc_core_get_device_info(0);
   /* set the hardware version*/
   oc_core_set_device_hwv(0, 5, 6, 7);
@@ -1205,7 +1205,7 @@ discovery_cb(const char *payload, int len, oc_endpoint_t *endpoint,
   int uri_len;
   const char *param;
   int param_len;
-  char *my_serialnum = "000005";
+  char *my_serialnum = "123456789012";
 
   PRINT("[C]DISCOVERY: %.*s\n", len, payload);
   int nr_entries = oc_lf_number_of_entries(payload, len);
@@ -1226,7 +1226,7 @@ discovery_cb(const char *payload, int len, oc_endpoint_t *endpoint,
   oc_endpoint_copy(&g_endpoint, endpoint);
 
   oc_set_spake_response_cb(spake_cb);
-  oc_initiate_spake(endpoint, "LETTUCE", my_serialnum);
+  oc_initiate_spake(endpoint, "LETTUCE", "abcdef");
 
   PRINT("[C] DISCOVERY- END\n");
   return OC_STOP_DISCOVERY;
@@ -1271,7 +1271,7 @@ issue_requests_oscore(void)
   oc_print_auth_at_entry(0, index);
 
   // first step is discover myself..
-  oc_do_wk_discovery_all("ep=urn:knx:sn.000005", 2, discovery_cb, NULL);
+  oc_do_wk_discovery_all("ep=urn:knx:sn.123456789012", 2, discovery_cb, NULL);
 }
 
 void oc_issue_s_mode(int scope, int sia_value, uint32_t grpid,
@@ -1339,10 +1339,12 @@ issue_spake(void *data)
 {
 
   PRINT("issue_spake\n");
-  oc_endpoint_t *my_ep = oc_connectivity_get_endpoints(0);
+  //oc_endpoint_t *my_ep = oc_connectivity_get_endpoints(0);
 
-  int index = 0;
-  oc_initiate_spake(my_ep, "LETTUCE", "ABCD");
+   oc_do_wk_discovery_all("ep=urn:knx:sn.123456789012", 2, discovery_cb, NULL);
+
+  //int index = 0;
+  //oc_initiate_spake(my_ep, "LETTUCE", "ABCD");
 
 
   return OC_EVENT_DONE;

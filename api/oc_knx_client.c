@@ -138,7 +138,9 @@ do_credential_verification(oc_client_response_t *data)
 
   oc_print_rep_as_json(data->payload, true);
 
-  uint8_t *pB_bytes, *cB_bytes;
+  uint8_t *pB_bytes = NULL;
+  uint8_t* *cB_bytes= NULL;
+
   oc_rep_t *rep = data->payload;
   while (rep != NULL) {
     if (rep->type == OC_REP_BYTE_STRING) {
