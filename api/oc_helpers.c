@@ -338,10 +338,14 @@ int oc_conv_hex_string_to_oc_string(const char *hex_str, size_t hex_str_len,
 {
   size_t size = (hex_str_len / 2);
 
-  oc_free_string(&out);
-  oc_alloc_string(&out, size);
+  oc_free_string(out);
+  oc_alloc_string(out, size);
   char *ptr = oc_string(*out); 
   int return_value;
+
+  PRINT("oc_conv_hex_string_to_oc_string : input %.*s", hex_str_len, hex_str);
+  //oc_string_print_hex(*out);
+  //PRINT("\n");
   
   return_value =  oc_conv_hex_string_to_byte_array(hex_str, hex_str_len,
                                           ptr, &size);

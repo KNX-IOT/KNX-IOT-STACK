@@ -1185,7 +1185,7 @@ spake_cb(int error, char *sn, char *oscore_id, uint8_t *secret, int secret_size)
   PRINT("  spake_cb: enable OSCORE encryption\n");
 
   // oc_endpoint_copy(&g_endpoint, endpoint);
-  //oc_endpoint_set_serial_number(&g_endpoint, sn);
+  oc_endpoint_set_oscore_id_from_str(&g_endpoint, sn);
 
   //PRINT("  spake_cb: ep serial %s\n", g_endpoint.serial_number);
 #endif
@@ -1220,7 +1220,7 @@ discovery_cb(const char *payload, int len, oc_endpoint_t *endpoint,
   PRINT("  [C] disable OSCORE encryption\n");
   PRINTipaddr_flags(*endpoint);
   PRINTipaddr(*endpoint);
-  //oc_endpoint_set_serial_number(endpoint, my_serialnum);
+  oc_endpoint_set_oscore_id_from_str(endpoint, my_serialnum);
 
   // copy the endpoint so that we know it in the spake2plus callback
   oc_endpoint_copy(&g_endpoint, endpoint);
@@ -1330,6 +1330,23 @@ issue_s_mode_secure(void *data)
   return OC_EVENT_CONTINUE;
 }
 
+
+/**
+ * test of decoding a message to myself
+ */
+oc_event_callback_retval_t
+issue_spake(void *data)
+{
+
+  PRINT("issue_spake\n");
+  oc_endpoint_t *my_ep = oc_connectivity_get_endpoints(0);
+
+  int index = 0;
+  oc_initiate_spake(my_ep, "LETTUCE", "ABCD");
+
+
+  return OC_EVENT_DONE;
+}
 /**
  * set a multicast s-mode message as delayed callback
  */
@@ -1339,6 +1356,25 @@ issue_requests_s_mode(void)
   PRINT(" issue_requests_s_mode\n");
   // oc_set_delayed_callback(NULL, issue_requests_s_mode_delayed, 2);
   oc_set_delayed_callback(NULL, issue_s_mode_secure, 2);
+}
+
+
+/**
+ * set a multicast s-mode message as delayed callback
+ */
+void
+schedule_spake(void)
+{
+  PRINT(" schedule_spake\n");
+  oc_endpoint_t *my_ep = oc_connectivity_get_endpoints(0);
+
+  if (my_ep != NULL) {
+    PRINTipaddr(*my_ep);
+    PRINT("\n");
+    // my_ep = my_ep->next;
+  }
+
+  oc_set_delayed_callback(my_ep, issue_spake, 2);
 }
 
 /**
@@ -1473,13 +1509,17 @@ main(int argc, char *argv[])
   if (do_send_oscore) {
     handler.requests_entry = issue_requests_oscore;
   }
+  if (do_send_oscore) {
+    handler.requests_entry = issue_requests_oscore;
+  }
+
 #endif
 
 #ifdef OC_CLIENT
   // if (do_test_myself) {
   //  handler.requests_entry = issue_s_mode_secure;
   //}
-  oc_set_delayed_callback(NULL, issue_s_mode_secure, 2);
+  //oc_set_delayed_callback(NULL, schedule_spake, 2);
 #endif
 
   char *fname = "myswu_app";
@@ -1511,6 +1551,9 @@ main(int argc, char *argv[])
 
   PRINT("Server \"testserver_all\" running (polling), waiting on incoming "
         "connections.\n\n\n");
+
+  oc_set_delayed_callback(NULL, schedule_spake, 2);
+
 
 #ifdef WIN32
   /* windows specific loop */
