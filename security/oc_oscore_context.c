@@ -220,7 +220,8 @@ oc_oscore_context_t *
                         const char *osc_ctx, int osc_ctx_size,
                         int auth_at_index, bool from_storage)
 {
-  PRINT("-----oc_oscore_add_context--SID:%.*s\n", senderid_size, senderid);
+  PRINT("-----oc_oscore_add_context--SID:");
+  oc_char_println_hex(senderid, senderid_size);
   oc_oscore_context_t *ctx = (oc_oscore_context_t *)oc_memb_alloc(&ctx_s);
 
   if (!ctx) {
