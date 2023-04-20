@@ -201,8 +201,9 @@ oc_oscore_recv_message(oc_message_t *message)
         // the context again.
         OC_DBG_OSCORE(
           "--- setting endpoint serial number with found token & index");
-        oc_endpoint_set_serial_number(&message->endpoint,
-                                      (char *)oscore_ctx->token_id);
+
+        //oc_endpoint_set_serial_number(&message->endpoint,
+        //                              (char *)oscore_ctx->token_id);
         oc_endpoint_set_auth_at_index(&message->endpoint,
                                       (int32_t)oscore_ctx->auth_at_index);
         // oc_string_copy_from_char(&message->endpoint.serial_number,
@@ -627,8 +628,9 @@ oc_oscore_send_message(oc_message_t *msg)
   }
 
   oc_oscore_context_t *oscore_ctx = NULL;
-  oscore_ctx = oc_oscore_find_context_by_serial_number(
-    message->endpoint.device, message->endpoint.serial_number);
+  oscore_ctx = oc_oscore_find_context_by_oscore_id(
+    message->endpoint.device, oc_string(message->endpoint.oscore_id),
+    oc_string_len(message->endpoint.oscore_id));
   if (oscore_ctx == NULL) {
     oscore_ctx = oc_oscore_find_context_by_group_address(
       message->endpoint.device, message->endpoint.group_address);

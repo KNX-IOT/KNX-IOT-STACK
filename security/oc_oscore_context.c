@@ -66,7 +66,8 @@ oc_oscore_find_context_by_token_mid(size_t device, uint8_t *token,
                                     uint8_t *request_piv_len, bool tcp)
 {
   (void)device;
-  char *serial_number = NULL;
+  char *oscore_id = NULL;
+  int oscore_id_len = 0;
 #ifdef OC_CLIENT
   /* Search for client cb by token */
   oc_client_cb_t *cb = oc_ri_find_client_cb_by_token(token, token_len);
@@ -74,7 +75,8 @@ oc_oscore_find_context_by_token_mid(size_t device, uint8_t *token,
   if (cb) {
     *request_piv = cb->piv;
     *request_piv_len = cb->piv_len;
-    serial_number = cb->endpoint.serial_number;
+    oscore_id = oc_string(cb->endpoint.oscore_id);
+    oscore_id_len = oc_string_len(cb->endpoint.oscore_id);
   } else {
 #endif /* OC_CLIENT */
     /* Search transactions by token and mid */
@@ -90,15 +92,17 @@ oc_oscore_find_context_by_token_mid(size_t device, uint8_t *token,
     }
     *request_piv = t->message->endpoint.piv;
     *request_piv_len = t->message->endpoint.piv_len;
-    serial_number = t->message->endpoint.serial_number;
+    //serial_number = t->message->endpoint.serial_number;
+    oscore_id = oc_string(t->message->endpoint.oscore_id);
+    oscore_id_len = oc_string_len(t->message->endpoint.oscore_id);
 #ifdef OC_CLIENT
   }
 #endif /* OC_CLIENT */
   oc_oscore_context_t *ctx = (oc_oscore_context_t *)oc_list_head(contexts);
 
-  if (serial_number == NULL) {
+  if (oscore_id_len == 0) {
     OC_ERR(
-      "***could not find matching OSCORE context: serial number is NULL***");
+      "***could not find matching OSCORE context: oscore_id is NULL***");
     return NULL;
   }
 
@@ -109,7 +113,7 @@ oc_oscore_find_context_by_token_mid(size_t device, uint8_t *token,
     //    return ctx;
     //   }
     char *ctx_serial_number = ctx->token_id;
-    if (strncmp(serial_number, ctx_serial_number, 16) == 0) {
+    if (memcmp(oscore_id, ctx_serial_number, oscore_id_len) == 0) {
       PRINT("  FOUND\n");
       return ctx;
     }
@@ -119,20 +123,28 @@ oc_oscore_find_context_by_token_mid(size_t device, uint8_t *token,
 }
 
 oc_oscore_context_t *
-oc_oscore_find_context_by_serial_number(size_t device, char *serial_number)
+oc_oscore_find_context_by_oscore_id(size_t device, char *oscore_id, size_t oscore_id_len)
 {
   (void)device;
 
-  if (strlen(serial_number) == 0) {
-    OC_ERR("SERIAL number NULL\n");
+  if (oscore_id_len > 16) {
+    OC_ERR("oscore_id longer than 16: %d\n", oscore_id_len);
     return NULL;
   }
-  PRINT("oc_oscore_find_context_by_serial_number '%s'\n", serial_number);
+
+  if (strlen(oscore_id_len) == 0) {
+    OC_ERR("oscore_id NULL\n");
+    return NULL;
+  }
+  PRINT("oc_oscore_find_context_by_oscore_id:");
+  oc_char_println_hex(oscore_id, oscore_id_len);
+  //oc_string_println_hex()
+  //  serial_number);
 
   oc_oscore_context_t *ctx = (oc_oscore_context_t *)oc_list_head(contexts);
   while (ctx != NULL) {
     char *ctx_serial_number = ctx->token_id;
-    if (strncmp(serial_number, ctx_serial_number, 16) == 0) {
+    if (memcmp(oscore_id, ctx_serial_number, 16) == 0) {
       PRINT("  FOUND\n");
       OC_DBG_OSCORE("    Common IV:");
       OC_LOGbytes_OSCORE(ctx->commoniv, OSCORE_COMMON_IV_LEN);

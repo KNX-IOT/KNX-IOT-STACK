@@ -348,6 +348,14 @@ int oc_string_is_hex_array(oc_string_t hex_string);
 int oc_string_print_hex(oc_string_t hex_string);
 
 /**
+ * @brief prints the input as hex string with newline (\n) at the end.
+ *
+ * @param[in] hex_string the input string to be printed
+ * @return int printed amount of %x
+ */
+int oc_string_println_hex(oc_string_t hex_string);
+
+/**
  * @brief prints the input as hex string
  *
  * @param[in] str the input string to be printed

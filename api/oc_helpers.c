@@ -375,6 +375,14 @@ oc_string_print_hex(oc_string_t hex_string)
   return oc_char_print_hex(str, length);
 }
 
+int 
+oc_string_println_hex(oc_string_t hex_string) 
+{
+  int retval = oc_string_print_hex(hex_string);
+  PRINT("\n");
+  return retval;
+}
+
 int oc_char_print_hex(const char *str, int str_len)
 {
   for (int i = 0; i < str_len; i++) {

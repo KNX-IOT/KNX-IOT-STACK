@@ -284,10 +284,11 @@ oc_initiate_spake_parameter_request(oc_endpoint_t *endpoint, char *password,
 
   strncpy((char *)&g_spake_ctx.spake_password, password, MAX_PASSWORD_LEN);
 
+  oc_string_copy(&g_spake_ctx.serial_number, endpoint->oscore_id);
   
-  oc_conv_hex_string_to_oc_string(endpoint->serial_number,
-                                      strlen(endpoint->serial_number),
-                                      &(g_spake_ctx.serial_number));
+  //oc_conv_hex_string_to_oc_string(endpoint->oscore_id,
+  //                                strlen(endpoint->oscore_id),
+  //                                    &(g_spake_ctx.serial_number));
   //oc_string_copy_from_char(&g_spake_ctx.serial_number, endpoint->serial_number);
 
   if (oc_do_post_ex(APPLICATION_CBOR, APPLICATION_CBOR)) {
@@ -328,9 +329,11 @@ oc_initiate_spake(oc_endpoint_t *endpoint, char *password, char *recipient_id)
 
   // password : still a string
   strncpy((char *)&g_spake_ctx.spake_password, password, MAX_PASSWORD_LEN);
+  oc_string_copy(&g_spake_ctx.serial_number, endpoint->oscore_id);
+
   // serial number in endpoint is a string, so it needs to be converted before going into the spake
-  oc_conv_hex_string_to_oc_string(endpoint->serial_number, strlen(endpoint->serial_number),
-                                  &g_spake_ctx.serial_number);
+  //oc_conv_hex_string_to_oc_string(endpoint->serial_number, strlen(endpoint->serial_number),
+  //                                &g_spake_ctx.serial_number);
   //oc_string_copy_from_char(&g_spake_ctx.serial_number, endpoint->serial_number);
 
   if (oc_do_post_ex(APPLICATION_CBOR, APPLICATION_CBOR)) {
