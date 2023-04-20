@@ -377,7 +377,7 @@ int
 oc_string_print_hex(oc_string_t hex_string)
 {
   char *str = oc_string(hex_string);
-  int length = oc_string_len(hex_string); 
+  int length = oc_byte_string_len(hex_string); 
   return oc_char_print_hex(str, length);
 }
 

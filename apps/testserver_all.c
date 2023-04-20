@@ -1171,8 +1171,8 @@ response_get_pm(oc_client_response_t *data)
 
   call_counter++;
 
-  oc_do_get_ex("/dev/pm", &g_endpoint, NULL, response_get_pm, HIGH_QOS,
-               APPLICATION_CBOR, APPLICATION_CBOR, NULL);
+  //oc_do_get_ex("/dev/pm", &g_endpoint, NULL, response_get_pm, HIGH_QOS,
+  //             APPLICATION_CBOR, APPLICATION_CBOR, NULL);
 }
 
 void
@@ -1334,7 +1334,7 @@ issue_s_mode_secure(void *data)
 /**
  * test of decoding a message to myself
  */
-oc_event_callback_retval_t
+static oc_event_callback_retval_t
 issue_spake(void *data)
 {
 
@@ -1358,25 +1358,6 @@ issue_requests_s_mode(void)
   PRINT(" issue_requests_s_mode\n");
   // oc_set_delayed_callback(NULL, issue_requests_s_mode_delayed, 2);
   oc_set_delayed_callback(NULL, issue_s_mode_secure, 2);
-}
-
-
-/**
- * set a multicast s-mode message as delayed callback
- */
-void
-schedule_spake(void)
-{
-  PRINT(" schedule_spake\n");
-  oc_endpoint_t *my_ep = oc_connectivity_get_endpoints(0);
-
-  if (my_ep != NULL) {
-    PRINTipaddr(*my_ep);
-    PRINT("\n");
-    // my_ep = my_ep->next;
-  }
-
-  oc_set_delayed_callback(my_ep, issue_spake, 2);
 }
 
 /**
@@ -1554,7 +1535,7 @@ main(int argc, char *argv[])
   PRINT("Server \"testserver_all\" running (polling), waiting on incoming "
         "connections.\n\n\n");
 
-  oc_set_delayed_callback(NULL, schedule_spake, 2);
+ oc_set_delayed_callback(NULL, issue_spake, 2);
 
 
 #ifdef WIN32

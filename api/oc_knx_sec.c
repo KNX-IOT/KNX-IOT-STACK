@@ -1594,12 +1594,14 @@ oc_init_oscore_from_storage(size_t device_index, bool from_storage)
         // one context: for sending and receiving.
         oc_oscore_context_t *ctx = oc_oscore_add_context(
           device_index, 
-          oc_string(g_at_entries[i].osc_id), oc_string_len(g_at_entries[i].osc_id),
-          oc_string(g_at_entries[i].osc_rid), oc_string_len(g_at_entries[i].osc_rid), 
+          oc_string(g_at_entries[i].osc_id), oc_byte_string_len(g_at_entries[i].osc_id),
+          oc_string(g_at_entries[i].osc_rid),
+          oc_byte_string_len(g_at_entries[i].osc_rid), 
           ssn, "desc",
-          oc_string(g_at_entries[i].osc_ms), oc_string_len(g_at_entries[i].osc_ms),
+          oc_string(g_at_entries[i].osc_ms),
+          oc_byte_string_len(g_at_entries[i].osc_ms),
           oc_string(g_at_entries[i].osc_contextid),
-          oc_string_len(g_at_entries[i].osc_contextid), i, from_storage);
+          oc_byte_string_len(g_at_entries[i].osc_contextid), i, from_storage);
         if (ctx == NULL) {
           OC_ERR("  failed to load index= %d", i);
         }
