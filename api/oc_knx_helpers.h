@@ -27,9 +27,6 @@
 extern "C" {
 #endif
 
-typedef char ser_num[6];
-
-
 /**
  * @brief helper function to check if query parameter l exists
  *
@@ -60,15 +57,6 @@ int oc_frame_query_l(char *url, bool ps_exists, bool total_exists);
  * @return total bytes framed
  */
 int oc_frame_integer(int value);
-
-/**
- * @brief helper function to convert the string serial number to 6 bytes
- * see: 3.30 Datapoint Type DPT_SerNum
- * @param sn_string the input string (e.g. serial number in hex (string)
- * @param my_serialNumber the converted hex string to bytes
- * @return 0 == success
- */
-int oc_knx_serial_number_to_array(char *sn_string, ser_num my_serialNumber);
 
 #ifdef __cplusplus
 }

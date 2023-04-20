@@ -69,7 +69,7 @@ enum transport_flags {
   OSCORE_ENCRYPTED = 1 << 9, /**< OSCORE encrypted message */
 };
 
-#define SERIAL_NUM_SIZE (20)
+#define SERIAL_NUM_SIZE (12) /**< binary: 6 bytes: in hex: 12 bytes*/
 /**
  * @brief the endpoint information
  *
@@ -80,7 +80,7 @@ typedef struct oc_endpoint_t
   size_t device;                           /**< device index */
   enum transport_flags flags;              /**< the transport flags */
   char serial_number[SERIAL_NUM_SIZE + 1]; /**< serial number of the device to
-                                            talk to */
+                                            talk to (as string)*/
   union dev_addr {
     oc_ipv6_addr_t ipv6; /**< ipv6 address */
     oc_ipv4_addr_t ipv4; /**< ipv4 address */

@@ -47,15 +47,15 @@ bool oc_set_spake_response_cb(oc_spake_cb_t my_func);
 /**
  * @brief initiate the spake handshake
  *
- * NOTE: DEPRECATED
+ * NOTE: recipient id in HEX string
  * 
  * @param endpoint the endpoint of the device to be used
  * @param password the spake password to be used
- * @param oscore_id optional OSCORE id for the handshake. Set to NULL if unused
+ * @param recipient_id the recipient id (HEX string)
  * @return int success full start up of the handshake
  */
 int oc_initiate_spake(oc_endpoint_t *endpoint, char *password,
-                                     char *oscore_id);
+                      char *recipient_id);
 
 
 /**
@@ -67,8 +67,8 @@ int oc_initiate_spake(oc_endpoint_t *endpoint, char *password,
  * 
  * @param endpoint the endpoint of the device to be used
  * @param password the spake password to be used
- * @param recipient_id the recipient ID id for the resulting OSCORE context
- * @param recipient_id_len length of the recipient ID
+ * @param recipient_id the recipient ID id for the resulting OSCORE context (byte string)
+ * @param recipient_id_len length of the recipient ID byte string
  * @return int success full start up of the handshake
  */
 int oc_initiate_spake_parameter_request(oc_endpoint_t *endpoint, char *password,

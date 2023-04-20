@@ -333,6 +333,27 @@ oc_conv_hex_string_to_byte_array(const char *hex_str, size_t hex_str_len,
   return 0;
 }
 
+int oc_conv_hex_string_to_oc_string(const char *hex_str, size_t hex_str_len,
+                                    oc_string_t *out)
+{
+  size_t size = (hex_str_len / 2);
+
+  oc_free_string(&out);
+  oc_alloc_string(&out, size);
+  char *ptr = oc_string(*out); 
+  int return_value;
+  
+  return_value =  oc_conv_hex_string_to_byte_array(hex_str, hex_str_len,
+                                          ptr, &size);
+
+  PRINT("oc_conv_hex_string_to_oc_string :");
+  oc_string_print_hex(*out);
+  PRINT("\n");
+
+  return return_value;
+}
+
+
 int
 oc_string_is_hex_array(oc_string_t hex_string)
 {
@@ -360,6 +381,15 @@ int oc_char_print_hex(const char *str, int str_len)
     PRINT("%02x", (unsigned char)str[i]);
   }
   return str_len;
+}
+
+int
+oc_char_println_hex(const char *str, int str_len)
+{
+  int retval;
+  retval = oc_char_print_hex(str, str_len);
+  PRINT("\n");
+  return retval;
 }
 
 int

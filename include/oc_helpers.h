@@ -295,6 +295,8 @@ void _oc_alloc_string_array(
 /**
  * @brief convert array to hex
  *
+ * Note: hex_str is pre allocated with hex_str_len
+ * 
  * @param[in] array the array of bytes
  * @param[in] array_len length of the array
  * @param hex_str data as hex
@@ -315,6 +317,18 @@ int oc_conv_byte_array_to_hex_string(const uint8_t *array, size_t array_len,
  */
 int oc_conv_hex_string_to_byte_array(const char *hex_str, size_t hex_str_len,
                                      uint8_t *array, size_t *array_len);
+
+/**
+ * @brief convert hex string to oc_string byte array
+ *
+ * @param[in] hex_str hex string input
+ * @param[in] hex_str_len size of the hex string
+ * @param out oc_string as byte array output 
+ * @return int 0 success
+ */
+int oc_conv_hex_string_to_oc_string(const char *hex_str, size_t hex_str_len,
+                                      oc_string_t* out);
+
 
 /**
  * @brief checks if the input is an array containing hex values
@@ -341,9 +355,16 @@ int oc_string_print_hex(oc_string_t hex_string);
  * @return int printed amount of %x
  */
 int oc_char_print_hex(const char* str, int str_len);
-
-
 /**
+ * @brief prints the input as hex string with newline (\n) at the end.
+ *
+ * @param[in] str the input string to be printed
+ * @param[in] str_len the length of the input string
+ * @return int printed amount of %x
+ */
+oc_char_println_hex(const char *str, int str_len);
+
+  /**
  * @brief checks if the uri contains a wildcard (e.g. "*")
  *
  * @param uri The URI to be checked.

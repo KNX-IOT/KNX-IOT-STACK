@@ -43,14 +43,12 @@ oc_oscore_find_context_by_kid(oc_oscore_context_t *ctx, size_t device,
 
   PRINT("oc_oscore_find_context_by_kid : dev=%d\n  kid:(%d) :", (int)device,
         kid_len);
-  oc_char_print_hex((char *)(kid), kid_len);
-  PRINT("\n");
+  oc_char_println_hex((char *)(kid), kid_len);
 
   while (ctx != NULL) {
 
     PRINT("  ---> recvid:");
-    oc_char_print_hex((char *)(ctx->recvid), ctx->recvid_len);
-    PRINT("\n");
+    oc_char_println_hex((char *)(ctx->recvid), ctx->recvid_len);
 
     if (kid_len == ctx->recvid_len && memcmp(kid, ctx->recvid, kid_len) == 0) {
       PRINT("  FOUND\n");
@@ -222,7 +220,7 @@ oc_oscore_context_t *
     OC_ERR("master secret size is != 16 : %d", mastersecret_size);
     return NULL;
   }
-  /*
+
   if (senderid_size > 7) {
     OC_ERR("senderid_size > 7 = %d", senderid_size);
     return NULL;
@@ -235,7 +233,6 @@ oc_oscore_context_t *
     OC_ERR("osc_ctx_size > 7 = %d", osc_ctx_size);
     return NULL;
   }
-  */
 
   ctx->device = device;
   ctx->ssn = ssn;
@@ -245,15 +242,12 @@ oc_oscore_context_t *
   PRINT("  desc      : %s\n", desc);
   PRINT("  index     : %d\n", auth_at_index);
   PRINT("  sid size  : %d ", senderid_size);
-  oc_char_print_hex(senderid, senderid_size);
-  PRINT("\n");
+  oc_char_println_hex(senderid, senderid_size);
   PRINT("  rid size  : %d ", recipientid_size);
-  oc_char_print_hex(recipientid, recipientid_size);
-  PRINT("\n");
+  oc_char_println_hex(recipientid, recipientid_size);
   PRINT("  ctx size  : %d\n", osc_ctx_size);
   PRINT("  ms size   : %d ", mastersecret_size);
-  oc_char_print_hex(mastersecret, mastersecret_size);
-  PRINT("\n");
+  oc_char_println_hex(mastersecret, mastersecret_size);
 
   /* To prevent SSN reuse, bump to higher value that could've been previously
    * used, accounting for any failed writes to nonvolatile storage.
