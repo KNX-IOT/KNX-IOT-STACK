@@ -280,7 +280,8 @@ oc_initiate_spake_parameter_request(oc_endpoint_t *endpoint, char* serial_number
   oc_rep_begin_root_object();
 
   oc_rep_i_set_byte_string(root, 0, recipient_id, recipient_id_len);
-  oc_string_copy_from_char_with_size(&g_spake_ctx.recipient_id, recipient_id,
+  oc_byte_string_copy_from_char_with_size(&g_spake_ctx.recipient_id,
+                                          recipient_id,
                                      recipient_id_len);
   
   oc_rep_i_set_byte_string(root, 15, rnd, 32);
@@ -307,6 +308,10 @@ int
 oc_initiate_spake(oc_endpoint_t *endpoint, char *password, char *recipient_id)
 {
   int return_value = -1;
+
+  // sort this one out later..
+  return return_value;
+
 
 #ifndef OC_SPAKE
   (void)endpoint;
