@@ -31,7 +31,18 @@
 extern "C" {
 #endif
 
-typedef void (*oc_spake_cb_t)(int error, char *serial_number, char *oscore_id,
+/**
+ * @brief the spake response callback type
+ * e.g. function prototype that is called when the spake handshake is finished
+ *
+ * @param error 0 = ok
+ * @param serial_number the serial number of the device on the other side
+ * @param oscore_id the oscore identifier (bytes)
+ * @param oscore_id_size the size in bytes of the oscore identifier
+ * @param secret the negotiated secret (bytes)
+ * @param secret_size the size in bytes of the secret
+ */
+typedef void (*oc_spake_cb_t)(int error, char *serial_number, char *oscore_id, int oscore_id_size,
                               uint8_t *secret, int secret_size);
 
 /**
@@ -66,12 +77,15 @@ int oc_initiate_spake(oc_endpoint_t *endpoint, char *password,
  * - RID : the recipient ID as given input
  * 
  * @param endpoint the endpoint of the device to be used
+ * @param serial_number the serial number of the device, to put back in the callback
  * @param password the spake password to be used
  * @param recipient_id the recipient ID id for the resulting OSCORE context (byte string)
  * @param recipient_id_len length of the recipient ID byte string
  * @return int success full start up of the handshake
  */
-int oc_initiate_spake_parameter_request(oc_endpoint_t *endpoint, char *password,
+int oc_initiate_spake_parameter_request(oc_endpoint_t *endpoint,
+                                        char *serial_number,
+                                        char *password,
                                         char *recipient_id,
                                         size_t recipient_id_len);
 

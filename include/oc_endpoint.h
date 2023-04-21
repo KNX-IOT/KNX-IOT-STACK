@@ -80,6 +80,8 @@ typedef struct oc_endpoint_t
   size_t device;                /**< device index */
   enum transport_flags flags;   /**< the transport flags */
   oc_string_t oscore_id;        /**< OSCORE context (binary), e.g. binary serial number*/
+  char *serial_number[SERIAL_NUM_SIZE+1]; /**< The serial number (as client) for
+                                           the device on the other side*/
   union dev_addr {
     oc_ipv6_addr_t ipv6;     /**< ipv6 address */
     oc_ipv4_addr_t ipv4;     /**< ipv4 address */
@@ -128,8 +130,8 @@ void oc_free_endpoint(oc_endpoint_t *endpoint);
  * @param endpoint the end point
  * @param serial_number the device serial number
  */
-//void oc_endpoint_set_serial_number(oc_endpoint_t *endpoint,
-//                                   char *serial_number);
+void oc_endpoint_set_serial_number(oc_endpoint_t *endpoint,
+                                   char *serial_number);
 
 /**
  * @brief set the OSCORE identifier

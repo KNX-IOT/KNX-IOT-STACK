@@ -230,11 +230,14 @@ int oc_core_find_at_entry_empty_slot(size_t device_index);
  * with spake2plus with (e.g. client side), not also to be used as SID
  * This value is in HEX
  * @param clientrecipient_id the clientrecipient_id (delivered during the handshake)
- * This value is in HEX
+ *  This value is in HEX
+ * @param clientrecipient_id_size the size of the clientrecipient_id
  * @param shared_key the master key after SPAKE2 handshake
  * @param shared_key_size the key size
  */
-void oc_oscore_set_auth(char *serial_number, char *clientrecipient_id,
+void oc_oscore_set_auth(char *serial_number, 
+                        char *clientrecipient_id,
+                        int clientrecipient_id_size,
                         uint8_t *shared_key, int shared_key_size);
 
 /**

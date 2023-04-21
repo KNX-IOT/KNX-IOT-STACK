@@ -1479,8 +1479,10 @@ oc_core_knx_spake_separate_post_handler(void *req_p)
     // knx does not have multiple devices per instance (for now), so hardcode
     // the use of the first device
     oc_device_info_t *device = oc_core_get_device_info(0);
-    // serial number should be supplied as byte array
-    oc_oscore_set_auth(oc_string(device->serialnumber), oc_string(g_pase.id),
+    // serial number should be supplied as string array
+    oc_oscore_set_auth(oc_string(device->serialnumber), 
+                      oc_string(g_pase.id),
+                       oc_byte_string_len(g_pase.id),
                        shared_key, (int)shared_key_len);
 
     // empty payload

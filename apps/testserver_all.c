@@ -127,6 +127,9 @@ volatile int quit = 0;         /**< stop variable, used by handle_signal */
 bool g_reset = false;
 int call_counter = 0;
 
+
+#define MY_SERIAL_NUMBER "123456789012"
+
 /**
  * @brief callback for the smode response
  * testing purpose
@@ -1176,7 +1179,7 @@ response_get_pm(oc_client_response_t *data)
 }
 
 void
-spake_cb(int error, char *sn, char *oscore_id, uint8_t *secret, int secret_size)
+spake_cb(int error, char *sn, char *oscore_id, int oscore_id_size, uint8_t *secret, int secret_size)
 {
   PRINT("spake CB: invoke PM with encryption!!!!!\n");
 #ifdef OC_OSCORE
@@ -1184,8 +1187,11 @@ spake_cb(int error, char *sn, char *oscore_id, uint8_t *secret, int secret_size)
   g_endpoint.flags += OSCORE;
   PRINT("  spake_cb: enable OSCORE encryption\n");
 
+  PRINT("  spake_cb SN %s\n", sn);
+
   // oc_endpoint_copy(&g_endpoint, endpoint);
   oc_endpoint_set_oscore_id_from_str(&g_endpoint, sn);
+  
 
   //PRINT("  spake_cb: ep serial %s\n", g_endpoint.serial_number);
 #endif
@@ -1221,12 +1227,15 @@ discovery_cb(const char *payload, int len, oc_endpoint_t *endpoint,
   PRINTipaddr_flags(*endpoint);
   PRINTipaddr(*endpoint);
   oc_endpoint_set_oscore_id_from_str(endpoint, my_serialnum);
+  oc_string_println_hex(endpoint->oscore_id);
 
   // copy the endpoint so that we know it in the spake2plus callback
   oc_endpoint_copy(&g_endpoint, endpoint);
 
   oc_set_spake_response_cb(spake_cb);
-  oc_initiate_spake(endpoint, "LETTUCE", "abcdef");
+  //oc_initiate_spake(endpoint, "LETTUCE", "abcdef");
+  oc_initiate_spake_parameter_request(endpoint, my_serialnum, "LETTUCE",
+                                      "abcdef", strlen("abcdef"));
 
   PRINT("[C] DISCOVERY- END\n");
   return OC_STOP_DISCOVERY;
@@ -1341,7 +1350,8 @@ issue_spake(void *data)
   PRINT("issue_spake\n");
   //oc_endpoint_t *my_ep = oc_connectivity_get_endpoints(0);
 
-   oc_do_wk_discovery_all("ep=urn:knx:sn.123456789012", 2, discovery_cb, NULL);
+   oc_do_wk_discovery_all("ep=urn:knx:sn.123456789012", 2,
+                         discovery_cb, NULL);
 
   //int index = 0;
   //oc_initiate_spake(my_ep, "LETTUCE", "ABCD");

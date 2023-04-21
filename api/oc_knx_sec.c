@@ -1060,24 +1060,20 @@ oc_print_auth_at_entry(size_t device_index, int index)
       }
       if (g_at_entries[index].profile == OC_PROFILE_COAP_OSCORE) {
         if (oc_string_len(g_at_entries[index].osc_ms) > 0) {
-          PRINT("    osc:ms     (h): ");
-          oc_string_print_hex(g_at_entries[index].osc_ms);
-          PRINT("\n");
+          PRINT("    osc:ms    (h) : ");
+          oc_string_println_hex(g_at_entries[index].osc_ms);
         }
         if (oc_string_len(g_at_entries[index].osc_contextid) > 0) {
-          PRINT("    osc:contextid (h): ");
-          oc_string_print_hex(g_at_entries[index].osc_contextid);
-          PRINT("\n");
+          PRINT("    osc:ctx_id (h): ");
+          oc_string_println_hex(g_at_entries[index].osc_contextid);
         }
         if (oc_string_len(g_at_entries[index].osc_id) > 0) {
           PRINT("    osc:id    (h) : ");
-          oc_string_print_hex(g_at_entries[index].osc_id);
-          PRINT("\n");
+          oc_string_println_hex(g_at_entries[index].osc_id);
         }
         if (oc_string_len(g_at_entries[index].osc_rid) > 0) {
           PRINT("    osc:rid   (h) : ");
-          oc_string_print_hex(g_at_entries[index].osc_rid);
-          PRINT("\n");
+          oc_string_println_hex(g_at_entries[index].osc_rid);
         }
         if (g_at_entries[index].ga_len > 0) {
           PRINT("    osc:ga        : [");
@@ -1168,15 +1164,15 @@ oc_at_dump_entry(size_t device_index, int entry)
   oc_rep_i_set_int(root, 9, g_at_entries[entry].scope);
   oc_rep_i_set_int(root, 38, g_at_entries[entry].profile);
   oc_rep_i_set_byte_string(root, 842, oc_string(g_at_entries[entry].osc_ms),
-                           oc_string_len(g_at_entries[entry].osc_ms));
+                           oc_byte_string_len(g_at_entries[entry].osc_ms));
   oc_rep_i_set_byte_string(root, 846,
                            oc_string(g_at_entries[entry].osc_contextid),
-                           oc_string_len(g_at_entries[entry].osc_contextid));
+                           oc_byte_string_len(g_at_entries[entry].osc_contextid));
   oc_rep_i_set_byte_string(root, 847,
                            oc_string(g_at_entries[entry].osc_rid),
-                           oc_string_len(g_at_entries[entry].osc_rid));
+                           oc_byte_string_len(g_at_entries[entry].osc_rid));
   oc_rep_i_set_byte_string(root, 840, oc_string(g_at_entries[entry].osc_id),
-                           oc_string_len(g_at_entries[entry].osc_id));
+                           oc_byte_string_len(g_at_entries[entry].osc_id));
   oc_rep_i_set_text_string(root, 82, oc_string(g_at_entries[entry].sub));
   oc_rep_i_set_text_string(root, 81, oc_string(g_at_entries[entry].kid));
 
@@ -1273,17 +1269,30 @@ oc_at_load_entry(int entry)
           }
           break;
         case OC_REP_BYTE_STRING:
+          if (rep->iname == 840) {
+            oc_free_string(&g_at_entries[entry].osc_id);
+            oc_new_string(&g_at_entries[entry].osc_id,
+                          oc_string(rep->value.string),
+                          oc_byte_string_len(rep->value.string));
+          }
           if (rep->iname == 842) {
             oc_free_string(&g_at_entries[entry].osc_ms);
             oc_new_string(&g_at_entries[entry].osc_ms,
                           oc_string(rep->value.string),
-                          oc_string_len(rep->value.string));
+                          oc_byte_string_len(rep->value.string));
           }
           if (rep->iname == 846) {
             oc_free_string(&g_at_entries[entry].osc_contextid);
             oc_new_string(&g_at_entries[entry].osc_contextid,
                           oc_string(rep->value.string),
-                          oc_string_len(rep->value.string));
+                          oc_byte_string_len(rep->value.string));
+          }
+
+          if (rep->iname == 847) {
+            oc_free_string(&g_at_entries[entry].osc_rid);
+            oc_new_string(&g_at_entries[entry].osc_rid,
+                          oc_string(rep->value.string),
+                          oc_byte_string_len(rep->value.string));
           }
           break;
         case OC_REP_INT_ARRAY:
@@ -1478,14 +1487,16 @@ oc_reset_at_table(size_t device_index, int erase_code)
 // ----------------------------------------------------------------------------
 
 void
-oc_oscore_set_auth(char *serial_number, char *client_recipientid, uint8_t *shared_key,
-                   int shared_key_size)
+oc_oscore_set_auth(char *serial_number, char *client_recipientid, int client_recipientid_size,
+                   uint8_t *shared_key, int shared_key_size)
 {
   // create the token & store in at tables at position 0
   // note there should be no entries.. if there is an entry then overwrite
   // it..
-  PRINT("oc_oscore_set_auth sn (sid):%s rid:%s\n", serial_number,
-        client_recipientid);
+  PRINT("oc_oscore_set_auth sn :%s\n", serial_number);
+  PRINT("oc_oscore_set_auth rid :");
+  //MY_SERIAL_NUMBER
+  oc_char_println_hex(client_recipientid, client_recipientid_size);
 
   oc_auth_at_t spake_entry;
   memset(&spake_entry, 0, sizeof(spake_entry));
@@ -1496,8 +1507,14 @@ oc_oscore_set_auth(char *serial_number, char *client_recipientid, uint8_t *share
   oc_new_string(&spake_entry.osc_ms, (char *)shared_key, shared_key_size);
   // no context id
   oc_new_string(&spake_entry.osc_rid, client_recipientid,
-                strlen(client_recipientid));
-  oc_new_string(&spake_entry.osc_id, serial_number, strlen(serial_number));
+                client_recipientid_size);
+  oc_conv_hex_string_to_oc_string(serial_number, strlen(serial_number),
+                                  &spake_entry.osc_id);
+  
+  PRINT("  osc_id (hex) from serial number: ");
+  oc_string_println_hex(spake_entry.osc_id);
+
+  //oc_new_string(&spake_entry.osc_id, serial_number, strlen(serial_number));
 
   int index = oc_core_find_at_entry_with_context_id(0, serial_number);
   if (index == -1) {
@@ -1596,12 +1613,12 @@ oc_init_oscore_from_storage(size_t device_index, bool from_storage)
           device_index, 
           oc_string(g_at_entries[i].osc_id), oc_byte_string_len(g_at_entries[i].osc_id),
           oc_string(g_at_entries[i].osc_rid),
-          oc_byte_string_len(g_at_entries[i].osc_rid), 
+          oc_string_len(g_at_entries[i].osc_rid), 
           ssn, "desc",
           oc_string(g_at_entries[i].osc_ms),
-          oc_byte_string_len(g_at_entries[i].osc_ms),
+          oc_string_len(g_at_entries[i].osc_ms),
           oc_string(g_at_entries[i].osc_contextid),
-          oc_byte_string_len(g_at_entries[i].osc_contextid), i, from_storage);
+          oc_string_len(g_at_entries[i].osc_contextid), i, from_storage);
         if (ctx == NULL) {
           OC_ERR("  failed to load index= %d", i);
         }

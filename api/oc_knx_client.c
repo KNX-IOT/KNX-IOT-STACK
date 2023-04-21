@@ -48,9 +48,9 @@ typedef struct broker_s_mode_userdata_t
 typedef struct oc_spake_context_t
 {
   char spake_password[MAX_PASSWORD_LEN]; /**< spake password */
-  oc_string_t serial_number;             /**< the serial number of the device (byte string)*/
-  oc_string_t recipient_id;             /**< the recipient id used (byte string) */
-  char oscore_id[MAX_PASSWORD_LEN];      /**< the oscore_id for the device */
+  oc_string_t serial_number;             /**< the serial number of the device string */
+  oc_string_t recipient_id;              /**< the recipient id used (byte string) */
+  oc_string_t oscore_id;                 /**< the oscore id used (byte string) */
 } oc_spake_context_t;
 
 // ----------------------------------------------------------------------------
@@ -83,9 +83,10 @@ static void
 update_tokens(uint8_t *secret, int secret_size)
 {
   PRINT("update_tokens: \n");
-
+  // TODO:
   oc_oscore_set_auth(oc_string(g_spake_ctx.serial_number),
-                     g_spake_ctx.oscore_id, secret, secret_size);
+                     oc_string(g_spake_ctx.oscore_id), oc_byte_string_len(g_spake_ctx.oscore_id),
+                    secret, secret_size);
 }
 
 static void
@@ -115,7 +116,8 @@ finish_spake_handshake(oc_client_response_t *data)
   mbedtls_ecp_point_free(&pubA);
 
   if (m_spake_cb) {
-    m_spake_cb(0, oc_string(g_spake_ctx.serial_number), g_spake_ctx.oscore_id,
+    m_spake_cb(0, oc_string(g_spake_ctx.serial_number), 
+      oc_string(g_spake_ctx.oscore_id), oc_byte_string_len(g_spake_ctx.oscore_id),
                shared_key, shared_key_len);
   }
 }
@@ -260,7 +262,8 @@ do_credential_exchange(oc_client_response_t *data)
 
 
 int
-oc_initiate_spake_parameter_request(oc_endpoint_t *endpoint, char *password,
+oc_initiate_spake_parameter_request(oc_endpoint_t *endpoint, char* serial_number, 
+                                    char *password,
                                     char *recipient_id, size_t recipient_id_len)
 {
   int return_value = -1;
@@ -286,7 +289,7 @@ oc_initiate_spake_parameter_request(oc_endpoint_t *endpoint, char *password,
 
   strncpy((char *)&g_spake_ctx.spake_password, password, MAX_PASSWORD_LEN);
 
-  oc_string_copy(&g_spake_ctx.serial_number, endpoint->oscore_id);
+  oc_string_copy_from_char(&g_spake_ctx.serial_number, serial_number);
   
   //oc_conv_hex_string_to_oc_string(endpoint->oscore_id,
   //                                strlen(endpoint->oscore_id),

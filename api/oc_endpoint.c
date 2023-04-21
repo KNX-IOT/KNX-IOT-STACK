@@ -57,7 +57,6 @@ oc_free_endpoint(oc_endpoint_t *endpoint)
   }
 }
 
-/*
 void
 oc_endpoint_set_serial_number(oc_endpoint_t *endpoint, char *serial_number)
 {
@@ -65,7 +64,6 @@ oc_endpoint_set_serial_number(oc_endpoint_t *endpoint, char *serial_number)
    strncpy((char *)&endpoint->serial_number, serial_number, SERIAL_NUM_SIZE);
  }
 }
-*/
 
 void
 oc_endpoint_set_oscore_id_from_str(oc_endpoint_t *endpoint,
