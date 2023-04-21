@@ -246,8 +246,8 @@ handle_signal(int signal)
 }
 
 void
-my_spake_cb(int error, char *sn, char *oscore_id, uint8_t *secret,
-            int secret_size)
+my_spake_cb(int error, char *sn, char *oscore_id, int oscore_id_size,
+            uint8_t *secret, int secret_size)
 {
   PRINT("my_spake_cb: SPAKE2+ Handshake Finished! %s\n", oscore_id);
   PRINT("my_spake_cb: code: %d\n", error);
