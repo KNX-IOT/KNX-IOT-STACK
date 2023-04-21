@@ -83,9 +83,8 @@ static void
 update_tokens(uint8_t *secret, int secret_size)
 {
   PRINT("update_tokens: \n");
-  // TODO:
-  oc_oscore_set_auth(oc_string(g_spake_ctx.serial_number),
-                     oc_string(g_spake_ctx.oscore_id), oc_byte_string_len(g_spake_ctx.oscore_id),
+  oc_oscore_set_auth(oc_string(g_spake_ctx.serial_number), oc_string(g_spake_ctx.recipient_id),
+    oc_byte_string_len(g_spake_ctx.recipient_id),
                     secret, secret_size);
 }
 
