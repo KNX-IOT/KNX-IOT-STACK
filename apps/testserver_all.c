@@ -1188,6 +1188,8 @@ spake_cb(int error, char *sn, char *oscore_id, int oscore_id_size, uint8_t *secr
   PRINT("  spake_cb: enable OSCORE encryption\n");
 
   PRINT("  spake_cb SN %s\n", sn);
+  PRINT("  spake_cb id size %d\n", oscore_id_size);
+  PRINT("  spake_cb ms size %d\n", secret_size);
 
   // oc_endpoint_copy(&g_endpoint, endpoint);
   oc_endpoint_set_oscore_id_from_str(&g_endpoint, sn);
@@ -1235,7 +1237,7 @@ discovery_cb(const char *payload, int len, oc_endpoint_t *endpoint,
   oc_set_spake_response_cb(spake_cb);
   //oc_initiate_spake(endpoint, "LETTUCE", "abcdef");
   oc_initiate_spake_parameter_request(endpoint, my_serialnum, "LETTUCE",
-                                      "abcdef", strlen("abcdef"));
+                                      "abcde", strlen("abcde"));
 
   PRINT("[C] DISCOVERY- END\n");
   return OC_STOP_DISCOVERY;

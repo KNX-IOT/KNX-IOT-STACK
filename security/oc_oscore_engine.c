@@ -630,7 +630,7 @@ oc_oscore_send_message(oc_message_t *msg)
   oc_oscore_context_t *oscore_ctx = NULL;
   oscore_ctx = oc_oscore_find_context_by_oscore_id(
     message->endpoint.device, oc_string(message->endpoint.oscore_id),
-    oc_string_len(message->endpoint.oscore_id));
+    oc_byte_string_len(message->endpoint.oscore_id));
   if (oscore_ctx == NULL) {
     oscore_ctx = oc_oscore_find_context_by_group_address(
       message->endpoint.device, message->endpoint.group_address);

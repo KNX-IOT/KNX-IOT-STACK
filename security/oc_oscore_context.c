@@ -126,6 +126,7 @@ oc_oscore_context_t *
 oc_oscore_find_context_by_oscore_id(size_t device, char *oscore_id, size_t oscore_id_len)
 {
   (void)device;
+  int cmp_len = 16;
 
   if (oscore_id_len > 16) {
     OC_ERR("oscore_id longer than 16: %d\n", oscore_id_len);
@@ -141,6 +142,9 @@ oc_oscore_find_context_by_oscore_id(size_t device, char *oscore_id, size_t oscor
     OC_ERR("oscore_id NULL\n");
     return NULL;
   }
+  if (oscore_id_len < 16) {
+    cmp_len = oscore_id_len;
+  }
 
   PRINT("oc_oscore_find_context_by_oscore_id:");
   oc_char_println_hex(oscore_id, oscore_id_len);
@@ -148,7 +152,7 @@ oc_oscore_find_context_by_oscore_id(size_t device, char *oscore_id, size_t oscor
   oc_oscore_context_t *ctx = (oc_oscore_context_t *)oc_list_head(contexts);
   while (ctx != NULL) {
     char *ctx_serial_number = ctx->token_id;
-    if (memcmp(oscore_id, ctx_serial_number, 16) == 0) {
+    if (memcmp(oscore_id, ctx_serial_number, cmp_len) == 0) {
       PRINT("  FOUND\n");
       OC_DBG_OSCORE("    Common IV:");
       OC_LOGbytes_OSCORE(ctx->commoniv, OSCORE_COMMON_IV_LEN);

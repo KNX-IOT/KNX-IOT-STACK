@@ -1062,7 +1062,7 @@ oc_print_auth_at_entry(size_t device_index, int index)
       }
       if (g_at_entries[index].profile == OC_PROFILE_COAP_OSCORE) {
         if (oc_string_len(g_at_entries[index].osc_ms) > 0) {
-          PRINT("    osc:ms    (h) : (%d) ", oc_byte_string_len(g_at_entries[index].osc_ms));
+          PRINT("    osc:ms    (h) : (%d) ", (int)oc_byte_string_len(g_at_entries[index].osc_ms));
           oc_string_println_hex(g_at_entries[index].osc_ms);
         }
         if (oc_string_len(g_at_entries[index].osc_contextid) > 0) {
@@ -1071,11 +1071,11 @@ oc_print_auth_at_entry(size_t device_index, int index)
           oc_string_println_hex(g_at_entries[index].osc_contextid);
         }
         if (oc_string_len(g_at_entries[index].osc_id) > 0) {
-          PRINT("    osc:id    (h) : (%d) ", oc_byte_string_len(g_at_entries[index].osc_id));
+          PRINT("    osc:id    (h) : (%d) ", (int)oc_byte_string_len(g_at_entries[index].osc_id));
           oc_string_println_hex(g_at_entries[index].osc_id);
         }
         if (oc_string_len(g_at_entries[index].osc_rid) > 0) {
-          PRINT("    osc:rid   (h) : (%d) ", oc_byte_string_len(g_at_entries[index].osc_rid));
+          PRINT("    osc:rid   (h) : (%d) ", (int)oc_byte_string_len(g_at_entries[index].osc_rid));
           oc_string_println_hex(g_at_entries[index].osc_rid);
         }
         if (g_at_entries[index].ga_len > 0) {
@@ -1381,7 +1381,7 @@ oc_core_set_at_table(size_t device_index, int index, oc_auth_at_t entry,
     }
   }
   // activate the credentials
-  OC_DBG_OSCORE("oc_core_set_at_table: activating oscore credentials");
+  OC_DBG_OSCORE("oc_core_set_at_table: activating OSCORE credentials");
   oc_init_oscore_from_storage(device_index, false);
 
   return 0;
@@ -1473,7 +1473,7 @@ oc_oscore_set_auth(char *serial_number, char *client_recipientid, int client_rec
   // note there should be no entries.. if there is an entry then overwrite
   // it..
   PRINT("oc_oscore_set_auth sn :%s\n", serial_number);
-  PRINT("oc_oscore_set_auth rid :");
+  PRINT("oc_oscore_set_auth rid : (%d) ", client_recipientid_size);
   oc_char_println_hex(client_recipientid, client_recipientid_size);
   PRINT("oc_oscore_set_auth ms : (%d) ", shared_key_size);
   oc_char_println_hex(shared_key, shared_key_size);
@@ -1591,7 +1591,7 @@ oc_init_oscore_from_storage(size_t device_index, bool from_storage)
           device_index, 
           oc_string(g_at_entries[i].osc_id), oc_byte_string_len(g_at_entries[i].osc_id),
           oc_string(g_at_entries[i].osc_rid),
-          oc_string_len(g_at_entries[i].osc_rid), 
+          oc_byte_string_len(g_at_entries[i].osc_rid), 
           ssn, "desc",
           oc_string(g_at_entries[i].osc_ms),
           oc_byte_string_len(g_at_entries[i].osc_ms),
