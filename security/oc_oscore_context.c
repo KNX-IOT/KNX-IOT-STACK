@@ -51,7 +51,7 @@ oc_oscore_find_context_by_kid(oc_oscore_context_t *ctx, size_t device,
     oc_char_println_hex((char *)(ctx->sendid), ctx->sendid_len);
 
     if (kid_len == ctx->sendid_len && memcmp(kid, ctx->sendid, kid_len) == 0) {
-      PRINT("  FOUND\n");
+      PRINT("  FOUND  auth/at index: %d\n", ctx->auth_at_index);
       return ctx;
     }
     ctx = ctx->next;
@@ -114,7 +114,7 @@ oc_oscore_find_context_by_token_mid(size_t device, uint8_t *token,
     //   }
     char *ctx_serial_number = ctx->token_id;
     if (memcmp(oscore_id, ctx_serial_number, oscore_id_len) == 0) {
-      PRINT("  FOUND\n");
+      PRINT("  FOUND auth/at index: %d\n", ctx->auth_at_index);
       return ctx;
     }
     ctx = ctx->next;
@@ -153,7 +153,7 @@ oc_oscore_find_context_by_oscore_id(size_t device, char *oscore_id, size_t oscor
   while (ctx != NULL) {
     char *ctx_serial_number = ctx->token_id;
     if (memcmp(oscore_id, ctx_serial_number, cmp_len) == 0) {
-      PRINT("  FOUND\n");
+      PRINT("  FOUND auth/at index: %d\n", ctx->auth_at_index);
       OC_DBG_OSCORE("    Common IV:");
       OC_LOGbytes_OSCORE(ctx->commoniv, OSCORE_COMMON_IV_LEN);
       return ctx;
@@ -195,7 +195,7 @@ oc_oscore_find_context_by_rid(size_t device, char *rid,
   while (ctx != NULL) {
     char *ctx_recvid = ctx->recvid;
     if (memcmp(rid, ctx_recvid, cmp_len) == 0) {
-      PRINT("  FOUND\n");
+      PRINT("  FOUND auth/at index: %d\n", ctx->auth_at_index);
       OC_DBG_OSCORE("    Common IV:");
       OC_LOGbytes_OSCORE(ctx->commoniv, OSCORE_COMMON_IV_LEN);
       return ctx;
@@ -278,22 +278,24 @@ oc_oscore_context_t *
     OC_ERR("No sender or recipient ID or Master secret");
     return NULL;
   }
-  if (mastersecret_size != 16)
+  if (mastersecret_size != OSCORE_IDCTX_LEN)
     {
-    OC_ERR("master secret size is != 16 : %d", mastersecret_size);
+    OC_ERR("master secret size is != %d : %d",
+           OSCORE_IDCTX_LEN, mastersecret_size);
     return NULL;
   }
 
-  if (senderid_size > 7) {
-    OC_ERR("senderid_size > 7 = %d", senderid_size);
+  if (senderid_size > OSCORE_CTXID_LEN) {
+    OC_ERR("senderid_size > %d = %d", OSCORE_CTXID_LEN, senderid_size);
     return NULL;
   }
-  if (recipientid_size > 7) {
-    OC_ERR("recipientid_size > 7 = %d", recipientid_size);
+  if (recipientid_size > OSCORE_CTXID_LEN) {
+    OC_ERR("recipientid_size > %d = %d",
+           OSCORE_CTXID_LEN, recipientid_size);
     return NULL;
   }
-  if (osc_ctx_size > 7) {
-    OC_ERR("osc_ctx_size > 7 = %d", osc_ctx_size);
+  if (osc_ctx_size > OSCORE_IDCTX_LEN) {
+    OC_ERR("osc_ctx_size > %d = %d", OSCORE_IDCTX_LEN, osc_ctx_size);
     return NULL;
   }
 
@@ -385,6 +387,7 @@ oc_oscore_context_t *
     OC_DBG_OSCORE("### derived Sender key ###");
   }
   PRINT("SEND_KEY:");
+  oc_char_println_hex(ctx->sendkey, OSCORE_KEY_LEN);
   OC_LOGbytes_OSCORE(ctx->sendkey, OSCORE_KEY_LEN);
 
   if (recipientid) {
@@ -400,6 +403,7 @@ oc_oscore_context_t *
     OC_DBG_OSCORE("### derived Recipient key ###");
   }
   PRINT("RCV_KEY:");
+  oc_char_println_hex(ctx->recvkey, OSCORE_KEY_LEN);
   OC_LOGbytes_OSCORE(ctx->recvkey, OSCORE_KEY_LEN);
 
   OC_DBG_OSCORE("### \t\tderiving Common IV ###");
@@ -411,6 +415,7 @@ oc_oscore_context_t *
     goto add_oscore_context_error;
   }
   PRINT("IV:");
+  oc_char_println_hex(ctx->commoniv, OSCORE_COMMON_IV_LEN);
   OC_LOGbytes_OSCORE(ctx->commoniv, OSCORE_COMMON_IV_LEN);
   OC_DBG_OSCORE("### derived Common IV ###");
 
