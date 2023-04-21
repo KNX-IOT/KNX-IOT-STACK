@@ -92,11 +92,18 @@ typedef struct oc_mmem oc_handle_t, oc_string_t, oc_array_t, oc_string_array_t,
 #define oc_alloc_string(ocstring, size) _oc_alloc_string((ocstring), (size))
 
 /**
- * @brief create new string from string (not null terminated)
+ * @brief create new string from string (null terminated)
  *
  */
 #define oc_new_string(ocstring, str, str_len)                                  \
   _oc_new_string(ocstring, str, str_len)
+
+/**
+ * @brief create new (byte) string from string (not null terminated)
+ *
+ */
+#define oc_new_byte_string(ocstring, str, str_len)                                  \
+  _oc_new_byte_string(ocstring, str, str_len)
 
 /**
  * @brief free ocstring
@@ -229,6 +236,20 @@ void _oc_new_string(
   const char *func,
 #endif
   oc_string_t *ocstring, const char *str, size_t str_len);
+
+/**
+ * @brief new oc_string byte from string
+ *
+ * @param ocstring the ocstring to be allocated
+ * @param str not terminated string
+ * @param str_len size of the string to be copied
+ */
+void _oc_new_byte_string(
+#ifdef OC_MEMORY_TRACE
+  const char *func,
+#endif
+  oc_string_t *ocstring, const char *str, size_t str_len);
+
 
 /**
  * @brief allocate oc_string

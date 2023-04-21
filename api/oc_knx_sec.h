@@ -167,16 +167,16 @@ typedef struct oc_auth_at_t
   oc_string_t sub;           /**< (2) DTLS (not used) 2 sub */
   oc_string_t kid;           /**< (8:2) DTLS (not used)  cnf:kid*/
   oc_string_t osc_version;   /**< (18:4:1) OSCORE cnf:osc:version (optional) */
-  oc_string_t osc_ms;        /**< (18:4:2) OSCORE cnf:osc:ms */
+  oc_string_t osc_ms;        /**< (18:4:2) OSCORE cnf:osc:ms (byte string) */
   uint8_t osc_hkdf;          /**< (18:4:3) OSCORE cnf:osc:hkdf (optional-not used) (decimal value)*/
   uint8_t osc_alg;           /**< (18:4:4) OSCORE cnf:osc:alg (optional- not used) default: decimal value 10*/
   oc_string_t
     osc_salt; /**< (18:4:5) OSCORE cnf:osc:salt (optional) empty string */
   oc_string_t
     osc_contextid; 
-  /**< (18:4:6) OSCORE cnf:osc:contextid (optional) */
-  oc_string_t osc_id; /**< (18:4:0) OSCORE cnf:osc:id  (used as SID & KID) */
-  oc_string_t osc_rid; /**< (18:4:7) OSCORE cnf:osc:rid (recipient ID) */
+  /**< (18:4:6) OSCORE cnf:osc:contextid (optional) (byte string) */
+  oc_string_t osc_id; /**< (18:4:0) OSCORE cnf:osc:id  (used as SID & KID) (byte string) */
+  oc_string_t osc_rid; /**< (18:4:7) OSCORE cnf:osc:rid (recipient ID) (byte string) */
   int nbf;         /**< token not valid before (optional) */
   int ga_len;  /**< length of the group addresses (ga) in the scope */
   int64_t *ga; /**< (scope) array of group addresses, for the group objects in

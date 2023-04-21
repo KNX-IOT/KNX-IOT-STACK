@@ -78,6 +78,22 @@ _oc_new_string(
 }
 
 void
+_oc_new_byte_string(
+#ifdef OC_MEMORY_TRACE
+  const char *func,
+#endif
+  oc_string_t *ocstring, const char *str, size_t str_len)
+{
+  oc_malloc(
+#ifdef OC_MEMORY_TRACE
+    func,
+#endif
+    ocstring, str_len, BYTE_POOL);
+  memcpy(oc_string(*ocstring), (const uint8_t *)str, str_len);
+  //memcpy(oc_string(*ocstring) + str_len, (const uint8_t *)"", 1);
+}
+
+void
 _oc_alloc_string(
 #ifdef OC_MEMORY_TRACE
   const char *func,
