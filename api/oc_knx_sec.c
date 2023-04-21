@@ -1045,7 +1045,7 @@ oc_print_auth_at_entry(size_t device_index, int index)
     if (oc_string_len(g_at_entries[index].id) > 0) {
 
       PRINT("  at index: %d\n", index);
-      PRINT("    id (0)        : %s\n",
+      PRINT("    id (0)        : '%s'\n",
             oc_string_checked(g_at_entries[index].id));
       PRINT("    scope (9)     : %d\n", g_at_entries[index].scope);
       PRINT("    profile (38)  : %d (%s)\n", g_at_entries[index].profile,
@@ -1067,7 +1067,7 @@ oc_print_auth_at_entry(size_t device_index, int index)
         }
         if (oc_string_len(g_at_entries[index].osc_contextid) > 0) {
           PRINT("    osc:ctx_id (h): (%d) ",
-                oc_byte_string_len(g_at_entries[index].osc_contextid));
+                (int)oc_byte_string_len(g_at_entries[index].osc_contextid));
           oc_string_println_hex(g_at_entries[index].osc_contextid);
         }
         if (oc_string_len(g_at_entries[index].osc_id) > 0) {
