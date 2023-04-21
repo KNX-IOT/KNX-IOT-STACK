@@ -512,8 +512,9 @@ int oc_string_copy_from_char(oc_string_t *string1, const char *string2);
 
 
 /**
- * @brief copy string from char*
+ * @brief copy string from char* 
  *
+ * Note: adds a null terminator
  * @param string1 the oc_string to copy to
  * @param string2 the char* to copy from
  * @param string2_len the length of string2
@@ -522,7 +523,22 @@ int oc_string_copy_from_char(oc_string_t *string1, const char *string2);
 int oc_string_copy_from_char_with_size(oc_string_t *string1,
                                        const char *string2, size_t string2_len);
 
+
+
 /**
+ * @brief copy byte string from char*
+ *
+ * Note: does NOT add a null terminator
+ * @param string1 the oc_string to copy to
+ * @param string2 the char* to copy from
+ * @param string2_len the length of string2
+ * @return int 0 == success
+ */
+int oc_byte_string_copy_from_char_with_size(oc_string_t *string1,
+                                            const char *string2,
+                                            size_t string2_len);
+
+  /**
  * @brief copy oc_string
  *
  * @param string1 the oc_string to copy to
