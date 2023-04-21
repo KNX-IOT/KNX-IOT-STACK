@@ -32,7 +32,7 @@
 OC_LIST(contexts);
 OC_MEMB(ctx_s, oc_oscore_context_t, 20);
 
-// checking against receiver...
+// checking against sender
 oc_oscore_context_t *
 oc_oscore_find_context_by_kid(oc_oscore_context_t *ctx, size_t device,
                               uint8_t *kid, uint8_t kid_len)
@@ -47,10 +47,10 @@ oc_oscore_find_context_by_kid(oc_oscore_context_t *ctx, size_t device,
 
   while (ctx != NULL) {
 
-    PRINT("  ---> recvid:");
-    oc_char_println_hex((char *)(ctx->recvid), ctx->recvid_len);
+    PRINT("  ---> sendid:");
+    oc_char_println_hex((char *)(ctx->sendid), ctx->sendid_len);
 
-    if (kid_len == ctx->recvid_len && memcmp(kid, ctx->recvid, kid_len) == 0) {
+    if (kid_len == ctx->sendid_len && memcmp(kid, ctx->sendid, kid_len) == 0) {
       PRINT("  FOUND\n");
       return ctx;
     }
@@ -153,6 +153,50 @@ oc_oscore_find_context_by_oscore_id(size_t device, char *oscore_id, size_t oscor
   while (ctx != NULL) {
     char *ctx_serial_number = ctx->token_id;
     if (memcmp(oscore_id, ctx_serial_number, cmp_len) == 0) {
+      PRINT("  FOUND\n");
+      OC_DBG_OSCORE("    Common IV:");
+      OC_LOGbytes_OSCORE(ctx->commoniv, OSCORE_COMMON_IV_LEN);
+      return ctx;
+    }
+    ctx = ctx->next;
+  }
+  PRINT("  NOT FOUND\n");
+  return ctx;
+}
+
+
+
+oc_oscore_context_t *
+oc_oscore_find_context_by_rid(size_t device, char *rid,
+                                    size_t rid_len)
+{
+  (void)device;
+  int cmp_len = 16;
+
+  if (rid_len > 16) {
+    OC_ERR("rid longer than 16: %d\n", rid_len);
+    return NULL;
+  }
+
+  if (rid_len == 0) {
+    OC_ERR("rid == 0\n");
+    return NULL;
+  }
+  if (rid == NULL) {
+    OC_ERR("rid NULL\n");
+    return NULL;
+  }
+  if (rid_len < 16) {
+    cmp_len = rid_len;
+  }
+
+  PRINT("oc_oscore_find_context_by_rid:");
+  oc_char_println_hex(rid, rid_len);
+
+  oc_oscore_context_t *ctx = (oc_oscore_context_t *)oc_list_head(contexts);
+  while (ctx != NULL) {
+    char *ctx_recvid = ctx->recvid;
+    if (memcmp(rid, ctx_recvid, cmp_len) == 0) {
       PRINT("  FOUND\n");
       OC_DBG_OSCORE("    Common IV:");
       OC_LOGbytes_OSCORE(ctx->commoniv, OSCORE_COMMON_IV_LEN);
