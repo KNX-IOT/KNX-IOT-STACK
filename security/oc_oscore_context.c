@@ -164,8 +164,6 @@ oc_oscore_find_context_by_oscore_id(size_t device, char *oscore_id, size_t oscor
   return ctx;
 }
 
-
-
 oc_oscore_context_t *
 oc_oscore_find_context_by_rid(size_t device, char *rid,
                                     size_t rid_len)
