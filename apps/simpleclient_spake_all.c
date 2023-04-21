@@ -249,7 +249,7 @@ void
 my_spake_cb(int error, char *sn, char *oscore_id, int oscore_id_size,
             uint8_t *secret, int secret_size)
 {
-  PRINT("my_spake_cb: SPAKE2+ Handshake Finished! %s\n", oscore_id);
+  PRINT("my_spake_cb: SPAKE2+ Handshake Finished! %s\n", sn);
   PRINT("my_spake_cb: code: %d\n", error);
   PRINT("my_spake_cb: Shared Secret: ");
   for (int i = 0; i < secret_size; i++) {
