@@ -1388,12 +1388,12 @@ oc_core_set_at_table(size_t device_index, int index, oc_auth_at_t entry,
 }
 
 int
-oc_core_find_at_entry_with_context_id(size_t device_index, char *context_id)
+oc_core_find_at_entry_with_id(size_t device_index, char *id)
 {
   for (int i = 0; i < G_AT_MAX_ENTRIES; i++) {
     if ((oc_string_len(g_at_entries[i].id) > 0) &&
-        (strncmp(oc_string(g_at_entries[i].id), context_id,
-                 strlen(context_id)) == 0)) {
+        (strncmp(oc_string(g_at_entries[i].id), id,
+                 strlen(id)) == 0)) {
       return i;
     }
   }
@@ -1480,7 +1480,8 @@ oc_oscore_set_auth(char *serial_number, char *client_recipientid, int client_rec
 
   oc_auth_at_t spake_entry;
   memset(&spake_entry, 0, sizeof(spake_entry));
-  oc_new_byte_string(&spake_entry.id, serial_number, strlen(serial_number));
+  // this is the index in the table, so it is the full string
+  oc_new_string(&spake_entry.id, serial_number, strlen(serial_number));
   spake_entry.ga_len = 0;
   spake_entry.profile = OC_PROFILE_COAP_OSCORE;
   spake_entry.scope = OC_IF_SEC | OC_IF_D | OC_IF_P;
@@ -1494,7 +1495,7 @@ oc_oscore_set_auth(char *serial_number, char *client_recipientid, int client_rec
   PRINT("  osc_id (hex) from serial number: ");
   oc_string_println_hex(spake_entry.osc_id);
 
-  int index = oc_core_find_at_entry_with_context_id(0, serial_number);
+  int index = oc_core_find_at_entry_with_id(0, serial_number);
   if (index == -1) {
     index = oc_core_find_at_entry_empty_slot(0);
   }
