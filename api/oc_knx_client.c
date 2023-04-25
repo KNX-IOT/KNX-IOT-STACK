@@ -226,7 +226,7 @@ do_credential_exchange(oc_client_response_t *data)
         inner_rep = inner_rep->next;
       }
     }
-    // OSCORE context
+    // oscore context
     if (rep->type == OC_REP_BYTE_STRING && rep->iname == 0) {
       strncpy((char *)&g_spake_ctx.oscore_id, oc_string(rep->value.string),
               MAX_PASSWORD_LEN);
@@ -329,9 +329,9 @@ oc_initiate_spake(oc_endpoint_t *endpoint, char *password, char *recipient_id)
     oc_conv_hex_string_to_oc_string(recipient_id, strlen(recipient_id),
                                     &g_spake_ctx.recipient_id);
     oc_rep_i_set_byte_string(root, 0, oc_string(g_spake_ctx.recipient_id),
-                               oc_string_len(g_spake_ctx.recipient_id));
+                               oc_byte_string_len(g_spake_ctx.recipient_id));
     //oc_rep_i_set_byte_string(root, 0, oscore_id, strlen(oscore_id));
-    strncpy((char *)&g_spake_ctx.recipient_id, recipient_id, MAX_PASSWORD_LEN);
+    //strncpy((char *)&g_spake_ctx.recipient_id, recipient_id, MAX_PASSWORD_LEN);
   }
   oc_rep_i_set_byte_string(root, 15, rnd, 32);
   oc_rep_end_root_object();

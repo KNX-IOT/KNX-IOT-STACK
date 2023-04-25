@@ -1236,8 +1236,23 @@ discovery_cb(const char *payload, int len, oc_endpoint_t *endpoint,
 
   oc_set_spake_response_cb(spake_cb);
   //oc_initiate_spake(endpoint, "LETTUCE", "abcdef");
-  oc_initiate_spake_parameter_request(endpoint, my_serialnum, "LETTUCE",
-                                      "abcde", strlen("abcde"));
+
+  // for testing the receive key must be the same, since we are talking to the same device.
+  // so it depends on who wil store the oscore context first.. with SID and RID.
+  uint8_t array[30] ;
+  size_t array_size = 30;
+
+  memset(array, 9, 30);
+
+   oc_conv_hex_string_to_byte_array(
+    MY_SERIAL_NUMBER, strlen(MY_SERIAL_NUMBER) ,
+                                       array, &array_size);
+
+
+  PRINT("-------<RID  %s  %d     ", MY_SERIAL_NUMBER, (int)array_size);
+   oc_char_println_hex(array, array_size);
+  oc_initiate_spake_parameter_request(endpoint, my_serialnum, "LETTUCE", array,
+                                       array_size);
 
   PRINT("[C] DISCOVERY- END\n");
   return OC_STOP_DISCOVERY;

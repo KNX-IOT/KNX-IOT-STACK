@@ -47,10 +47,10 @@ oc_oscore_find_context_by_kid(oc_oscore_context_t *ctx, size_t device,
 
   while (ctx != NULL) {
 
-    PRINT("  ---> sendid:");
-    oc_char_println_hex((char *)(ctx->sendid), ctx->sendid_len);
+    PRINT("  ---> recvid:");
+    oc_char_println_hex((char *)(ctx->recvid), ctx->recvid_len);
 
-    if (kid_len == ctx->sendid_len && memcmp(kid, ctx->sendid, kid_len) == 0) {
+    if (kid_len == ctx->recvid_len && memcmp(kid, ctx->recvid, kid_len) == 0) {
       PRINT("  FOUND  auth/at index: %d\n", ctx->auth_at_index);
       return ctx;
     }
