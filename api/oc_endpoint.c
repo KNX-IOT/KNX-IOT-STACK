@@ -1,6 +1,6 @@
 /*
 // Copyright (c) 2017 Intel Corporation
-// Copyright (c) 2022 Cascoda Ltd.
+// Copyright (c) 2022-2023 Cascoda Ltd.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -60,9 +60,17 @@ oc_free_endpoint(oc_endpoint_t *endpoint)
 void
 oc_endpoint_set_serial_number(oc_endpoint_t *endpoint, char *serial_number)
 {
-  if (endpoint) {
-    strncpy((char *)&endpoint->serial_number, serial_number, SERIAL_NUM_SIZE);
-  }
+ if (endpoint) {
+   strncpy((char *)&endpoint->serial_number, serial_number, SERIAL_NUM_SIZE);
+ }
+}
+
+void
+oc_endpoint_set_oscore_id_from_str(oc_endpoint_t *endpoint,
+                                        char *oscore_id)
+{
+  oc_conv_hex_string_to_oc_string(oscore_id, strlen(oscore_id),
+                                  &endpoint->oscore_id);
 }
 
 void

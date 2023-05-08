@@ -1,6 +1,6 @@
 /*
 // Copyright (c) 2016 Intel Corporation
-// Copyright (c) 2021 Cascoda Ltd.
+// Copyright (c) 2021-2023 Cascoda Ltd.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -443,6 +443,33 @@ int oc_get_sn_from_ep(const char *param, int param_len, char *sn, int sn_len,
 int oc_string_copy_from_char(oc_string_t *string1, const char *string2);
 
 /**
+ * @brief copy string from char* 
+ *
+ * Note: adds a null terminator
+ * @param string1 the oc_string to copy to
+ * @param string2 the char* to copy from
+ * @param string2_len the length of string2
+ * @return int 0 == success
+ */
+int oc_string_copy_from_char_with_size(oc_string_t *string1,
+                                       const char *string2, size_t string2_len);
+
+
+
+/**
+ * @brief copy byte string from char*
+ *
+ * Note: does NOT add a null terminator
+ * @param string1 the oc_string to copy to
+ * @param string2 the char* to copy from
+ * @param string2_len the length of string2
+ * @return int 0 == success
+ */
+int oc_byte_string_copy_from_char_with_size(oc_string_t *string1,
+                                            const char *string2,
+                                            size_t string2_len);
+
+  /**
  * @brief copy oc_string
  *
  * @param string1 the oc_string to copy to
