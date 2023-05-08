@@ -1,6 +1,6 @@
 /*
 // Copyright (c) 2016 Intel Corporation
-// Copyright (c) 2021-2023 Cascoda Ltd.
+// Copyright (c) 2021 Cascoda Ltd.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -92,11 +92,18 @@ typedef struct oc_mmem oc_handle_t, oc_string_t, oc_array_t, oc_string_array_t,
 #define oc_alloc_string(ocstring, size) _oc_alloc_string((ocstring), (size))
 
 /**
- * @brief create new string from string (not null terminated)
+ * @brief create new string from string (null terminated)
  *
  */
 #define oc_new_string(ocstring, str, str_len)                                  \
   _oc_new_string(ocstring, str, str_len)
+
+/**
+ * @brief create new (byte) string from string (not null terminated)
+ *
+ */
+#define oc_new_byte_string(ocstring, str, str_len)                                  \
+  _oc_new_byte_string(ocstring, str, str_len)
 
 /**
  * @brief free ocstring
@@ -231,6 +238,20 @@ void _oc_new_string(
   oc_string_t *ocstring, const char *str, size_t str_len);
 
 /**
+ * @brief new oc_string byte from string
+ *
+ * @param ocstring the ocstring to be allocated
+ * @param str not terminated string
+ * @param str_len size of the string to be copied
+ */
+void _oc_new_byte_string(
+#ifdef OC_MEMORY_TRACE
+  const char *func,
+#endif
+  oc_string_t *ocstring, const char *str, size_t str_len);
+
+
+/**
  * @brief allocate oc_string
  *
  * @param ocstring the ocstring to be allocated
@@ -295,6 +316,8 @@ void _oc_alloc_string_array(
 /**
  * @brief convert array to hex
  *
+ * Note: hex_str is pre allocated with hex_str_len
+ * 
  * @param[in] array the array of bytes
  * @param[in] array_len length of the array
  * @param hex_str data as hex
@@ -317,6 +340,18 @@ int oc_conv_hex_string_to_byte_array(const char *hex_str, size_t hex_str_len,
                                      uint8_t *array, size_t *array_len);
 
 /**
+ * @brief convert hex string to oc_string byte array
+ *
+ * @param[in] hex_str hex string input
+ * @param[in] hex_str_len size of the hex string
+ * @param out oc_string as byte array output 
+ * @return int 0 success
+ */
+int oc_conv_hex_string_to_oc_string(const char *hex_str, size_t hex_str_len,
+                                      oc_string_t* out);
+
+
+/**
  * @brief checks if the input is an array containing hex values
  * e.g. [0-9,A-F,a-f]
  *
@@ -326,6 +361,39 @@ int oc_conv_hex_string_to_byte_array(const char *hex_str, size_t hex_str_len,
 int oc_string_is_hex_array(oc_string_t hex_string);
 
 /**
+ * @brief prints the input as hex string
+ *
+ * @param[in] hex_string the input string to be printed
+ * @return int printed amount of %x
+ */
+int oc_string_print_hex(oc_string_t hex_string);
+
+/**
+ * @brief prints the input as hex string with newline (\n) at the end.
+ *
+ * @param[in] hex_string the input string to be printed
+ * @return int printed amount of %x
+ */
+int oc_string_println_hex(oc_string_t hex_string);
+
+/**
+ * @brief prints the input as hex string
+ *
+ * @param[in] str the input string to be printed
+ * @param[in] str_len the length of the input string
+ * @return int printed amount of %x
+ */
+int oc_char_print_hex(const char* str, int str_len);
+/**
+ * @brief prints the input as hex string with newline (\n) at the end.
+ *
+ * @param[in] str the input string to be printed
+ * @param[in] str_len the length of the input string
+ * @return int printed amount of %x
+ */
+int oc_char_println_hex(const char *str, int str_len);
+
+  /**
  * @brief checks if the uri contains a wildcard (e.g. "*")
  *
  * @param uri The URI to be checked.
@@ -441,6 +509,7 @@ int oc_get_sn_from_ep(const char *param, int param_len, char *sn, int sn_len,
  * @return int 0 == success
  */
 int oc_string_copy_from_char(oc_string_t *string1, const char *string2);
+
 
 /**
  * @brief copy string from char* 
