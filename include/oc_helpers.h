@@ -99,6 +99,13 @@ typedef struct oc_mmem oc_handle_t, oc_string_t, oc_array_t, oc_string_array_t,
   _oc_new_string(ocstring, str, str_len)
 
 /**
+ * @brief create new (byte) string from string (not null terminated)
+ *
+ */
+#define oc_new_byte_string(ocstring, str, str_len)                             \
+  _oc_new_byte_string(ocstring, str, str_len)
+
+/**
  * @brief free ocstring
  *
  */
