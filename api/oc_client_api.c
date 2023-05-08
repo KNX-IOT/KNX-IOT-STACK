@@ -413,12 +413,12 @@ oc_do_get_ex_secured(const char *uri, oc_endpoint_t *endpoint,
 
   endpoint->flags += OSCORE;
   PRINT("  enable OSCORE encryption\n");
-  
+
   oc_endpoint_set_serial_number(endpoint, (char *)token);
   oc_endpoint_set_oscore_id_from_str(endpoint, (char *)token);
 
   PRINT("  ep oscore_id:");
-  oc_string_println_hex( endpoint->oscore_id);
+  oc_string_println_hex(endpoint->oscore_id);
 
   oc_client_cb_t *cb = oc_ri_alloc_client_cb(uri, endpoint, OC_GET, query,
                                              client_handler, qos, user_data);
