@@ -1187,7 +1187,7 @@ spake_cb(int error, char *sn, char *oscore_id, uint8_t *secret, int secret_size)
   // oc_endpoint_copy(&g_endpoint, endpoint);
   oc_endpoint_set_serial_number(&g_endpoint, sn);
 
-  //PRINT("  spake_cb: ep serial %s\n", g_endpoint.serial_number);
+  PRINT("  spake_cb: ep serial %s\n", g_endpoint.serial_number);
 #endif
   PRINT("spake CB\n");
   oc_do_get_ex("/dev/pm", &g_endpoint, NULL, response_get_pm, HIGH_QOS,
