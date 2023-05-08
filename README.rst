@@ -132,7 +132,7 @@ Build instructions
 
 Grab source and dependencies from GitHub using:
 
-``git clone --recursive https://github.com/KNX-IOT/KNX-IOT_STACK.git``
+``git clone --recursive https://github.com/KNX-IOT/KNX-IOT-STACK.git``
 
 or use GitLab:
 
