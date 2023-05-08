@@ -92,7 +92,7 @@ typedef struct oc_mmem oc_handle_t, oc_string_t, oc_array_t, oc_string_array_t,
 #define oc_alloc_string(ocstring, size) _oc_alloc_string((ocstring), (size))
 
 /**
- * @brief create new string from string (not null terminated)
+ * @brief create new string from string (null terminated)
  *
  */
 #define oc_new_string(ocstring, str, str_len)                                  \
