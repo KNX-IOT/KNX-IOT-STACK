@@ -1,5 +1,5 @@
 /*
-// Copyright (c) 2021 Cascoda Ltd
+// Copyright (c) 2021-2023 Cascoda Ltd
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -56,7 +56,7 @@ extern "C" {
  */
 typedef struct oc_pase_t
 {
-  oc_string_t id;   /**< oscore id */
+  oc_string_t id;   /**< recipient id */
   uint8_t salt[32]; /**< salt */
   uint8_t pa[65];   /**< pa */
   uint8_t pb[65];   /**< pb */

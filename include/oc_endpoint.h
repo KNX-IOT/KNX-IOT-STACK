@@ -1,5 +1,6 @@
 /*
 // Copyright (c) 2017, 2020 Intel Corporation
+// Copyright (c) 2023 Cascoda Ltd.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -69,25 +70,26 @@ enum transport_flags {
   OSCORE_ENCRYPTED = 1 << 9, /**< OSCORE encrypted message */
 };
 
-#define SERIAL_NUM_SIZE (20)
+#define SERIAL_NUM_SIZE (12) /**< binary: 6 bytes: in hex: 12 bytes*/
 /**
  * @brief the endpoint information
  *
  */
 typedef struct oc_endpoint_t
 {
-  struct oc_endpoint_t *next;              /**< pointer to the next structure */
-  size_t device;                           /**< device index */
-  enum transport_flags flags;              /**< the transport flags */
-  char serial_number[SERIAL_NUM_SIZE + 1]; /**< serial number of the device to
-                                            talk to */
+  struct oc_endpoint_t *next;   /**< pointer to the next structure */
+  size_t device;                /**< device index */
+  enum transport_flags flags;   /**< the transport flags */
+  oc_string_t oscore_id;        /**< OSCORE context (binary), e.g. binary serial number*/
+  char *serial_number[SERIAL_NUM_SIZE+1]; /**< The serial number (as client) for
+                                           the device on the other side*/
   union dev_addr {
-    oc_ipv6_addr_t ipv6; /**< ipv6 address */
-    oc_ipv4_addr_t ipv4; /**< ipv4 address */
+    oc_ipv6_addr_t ipv6;     /**< ipv6 address */
+    oc_ipv4_addr_t ipv4;     /**< ipv4 address */
   } addr, addr_local;
-  int interface_index;    /**< interface index */
-  uint8_t priority;       /**< priority */
-  uint32_t group_address; /**< group address,
+  int interface_index;       /**< interface index */
+  uint8_t priority;          /**< priority */
+  uint32_t group_address;    /**< group address,
                           being used to find back the OSCORE
                      credential to be used for encryption for s-mode messages
                      e.g. looping over the list of group addresses of the key */
@@ -123,7 +125,7 @@ oc_endpoint_t *oc_new_endpoint(void);
  */
 void oc_free_endpoint(oc_endpoint_t *endpoint);
 
-/**
+/*
  * @brief set device serial number for the endpoint, e.g. the one to talk too
  *
  * @param endpoint the end point
@@ -131,6 +133,15 @@ void oc_free_endpoint(oc_endpoint_t *endpoint);
  */
 void oc_endpoint_set_serial_number(oc_endpoint_t *endpoint,
                                    char *serial_number);
+
+/**
+ * @brief set the OSCORE identifier
+ *
+ * @param endpoint the end point
+ * @param oscore_str_id the OSCORE id (as string in hex) to use for encryption/decryption
+ */
+void oc_endpoint_set_oscore_id_from_str(oc_endpoint_t *endpoint,
+                                   char *oscore_str_id);
 
 /**
  * @brief set auth at index for the endpoint, e.g. the used security context
