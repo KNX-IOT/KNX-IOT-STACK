@@ -80,7 +80,7 @@ typedef struct oc_endpoint_t
   size_t device;                /**< device index */
   enum transport_flags flags;   /**< the transport flags */
   oc_string_t oscore_id;        /**< OSCORE context (binary), e.g. binary serial number*/
-  char *serial_number[SERIAL_NUM_SIZE+1]; /**< The serial number (as client) for
+  char serial_number[SERIAL_NUM_SIZE+1]; /**< The serial number (as client) for
                                            the device on the other side*/
   union dev_addr {
     oc_ipv6_addr_t ipv6;     /**< ipv6 address */
