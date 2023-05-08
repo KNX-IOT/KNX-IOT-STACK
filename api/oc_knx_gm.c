@@ -728,9 +728,11 @@ oc_core_fp_gm_x_get_handler(oc_request_t *request,
     oc_rep_i_set_key(oc_rep_object(s), 28);
     oc_rep_start_object(oc_rep_object(s), secSettings);
     // add a (115:28:97)
-    oc_rep_i_set_boolean(secSettings, 97, (bool)g_gm_entries[index].authentication);
+    oc_rep_i_set_boolean(secSettings, 97,
+                         (bool)g_gm_entries[index].authentication);
     // add c (115:28:99)
-    oc_rep_i_set_boolean(secSettings, 99, (bool)g_gm_entries[index].confidentiality);
+    oc_rep_i_set_boolean(secSettings, 99,
+                         (bool)g_gm_entries[index].confidentiality);
     oc_rep_end_object(oc_rep_object(s), secSettings);
     oc_rep_end_object(oc_rep_object(root), s);
   }
