@@ -160,6 +160,8 @@ oc_oscore_recv_message(oc_message_t *message)
     oc_oscore_context_t *oscore_ctx = NULL;
     // message->endpoint.flags |= SECURED;
     message->endpoint.flags += OSCORE;
+    uint8_t *key = NULL;
+    int key_len = 0;
 
     coap_packet_t oscore_pkt[1];
 
@@ -201,12 +203,16 @@ oc_oscore_recv_message(oc_message_t *message)
         // the context again.
         OC_DBG_OSCORE(
           "--- setting endpoint serial number with found token & index");
-        oc_endpoint_set_serial_number(&message->endpoint,
-                                      (char *)oscore_ctx->token_id);
+
+        //oc_endpoint_set_serial_number(&message->endpoint,
+        //                              (char *)oscore_ctx->token_id);
         oc_endpoint_set_auth_at_index(&message->endpoint,
                                       (int32_t)oscore_ctx->auth_at_index);
         // oc_string_copy_from_char(&message->endpoint.serial_number,
         //                         (char *)oscore_ctx->token_id);
+
+        //PRINT("using send key!!\n");
+        //key = oscore_ctx->sendkey;
       }
     } else {
       /* If message is response */
@@ -232,20 +238,11 @@ oc_oscore_recv_message(oc_message_t *message)
       goto oscore_recv_error;
     }
 
-    // oc_sec_cred_t *c = (oc_sec_cred_t *)oscore_ctx->cred;
-    // if (!(message->endpoint.flags & MULTICAST) &&
-    //    c->credtype != OC_CREDTYPE_OSCORE) {
-    //  OC_ERR("***unicast message protected using group OSCORE context; "
-    //         "silently ignore***");
-    //  goto oscore_recv_error;
-    //}
-
-    /* Copy "subjectuuid" of cred with OSCORE context to oc_endpoint_t */
-    // oc_sec_cred_t *oscore_cred = (oc_sec_cred_t *)oscore_ctx->cred;
-    // memcpy(message->endpoint.di.id, oscore_cred->subjectuuid.id, 16);
-
     /* Use recipient key for decryption */
-    uint8_t *key = oscore_ctx->recvkey;
+    //if (key == NULL) {
+    //  PRINT("using receive key!!\n");
+      key = oscore_ctx->recvkey;
+    //}
 
     /* If received Partial IV in message */
     if (oscore_pkt->piv_len > 0) {
@@ -627,8 +624,9 @@ oc_oscore_send_message(oc_message_t *msg)
   }
 
   oc_oscore_context_t *oscore_ctx = NULL;
-  oscore_ctx = oc_oscore_find_context_by_serial_number(
-    message->endpoint.device, message->endpoint.serial_number);
+  oscore_ctx = oc_oscore_find_context_by_oscore_id(
+    message->endpoint.device, oc_string(message->endpoint.oscore_id),
+    oc_byte_string_len(message->endpoint.oscore_id));
   if (oscore_ctx == NULL) {
     oscore_ctx = oc_oscore_find_context_by_group_address(
       message->endpoint.device, message->endpoint.group_address);
@@ -704,7 +702,7 @@ oc_oscore_send_message(oc_message_t *msg)
        * SSN */
       coap_transaction_t *transaction =
         coap_get_transaction_by_token(coap_pkt->token, coap_pkt->token_len);
-      if (transaction->retrans_counter == 0)
+      if (transaction && transaction->retrans_counter == 0)
         increment_ssn_in_context(oscore_ctx);
 
 #ifdef OC_CLIENT
