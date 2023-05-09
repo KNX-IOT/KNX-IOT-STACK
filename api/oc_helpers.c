@@ -380,6 +380,15 @@ oc_string_is_hex_array(oc_string_t hex_string)
 }
 
 int
+oc_char_print_hex(const char *str, int str_len)
+{
+  for (int i = 0; i < str_len; i++) {
+    PRINT("%02x", (unsigned char)str[i]);
+  }
+  return str_len;
+}
+
+int
 oc_string_print_hex(oc_string_t hex_string)
 {
   char *str = oc_string(hex_string);
@@ -393,15 +402,6 @@ oc_string_println_hex(oc_string_t hex_string)
   int retval = oc_string_print_hex(hex_string);
   PRINT("\n");
   return retval;
-}
-
-int
-oc_char_print_hex(const char *str, int str_len)
-{
-  for (int i = 0; i < str_len; i++) {
-    PRINT("%02x", (unsigned char)str[i]);
-  }
-  return str_len;
 }
 
 int
