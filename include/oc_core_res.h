@@ -163,21 +163,18 @@ int oc_core_set_device_hwv(size_t device_index, int major, int minor,
  * @param patch the zzz number of xxx.yyy.zzz
  * @return int  error status, 0 = OK
  */
-int oc_core_set_device_ap(size_t device_index, int major, int minor,
-                          int patch);
+int oc_core_set_device_ap(size_t device_index, int major, int minor, int patch);
 
-  /**
-   * @brief sets the manufacturer id
-   *
-   * @param device_index the device index
-   * @param mid the manufacturer id
-   * @return int error status, 0 = OK
-   */
-  int
-  oc_core_set_device_mid(size_t device_index, uint32_t mid);
+/**
+ * @brief sets the manufacturer id
+ *
+ * @param device_index the device index
+ * @param mid the manufacturer id
+ * @return int error status, 0 = OK
+ */
+int oc_core_set_device_mid(size_t device_index, uint32_t mid);
 
-
-  /**
+/**
  * @brief sets the internal address
  *
  * @param device_index the device index
@@ -186,7 +183,7 @@ int oc_core_set_device_ap(size_t device_index, int major, int minor,
  */
 int oc_core_set_device_ia(size_t device_index, uint32_t ia);
 
- /**
+/**
  * @brief sets the manufacturer id
  *
  * @param device_index the device index
