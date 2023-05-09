@@ -950,7 +950,7 @@ oc_create_dev_mport_resource(int resource_idx, size_t device)
 
 static void
 oc_core_ap_x_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
-                       void *data)
+                         void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -993,8 +993,8 @@ oc_create_ap_x_resource(int resource_idx, size_t device)
 // -----------------------------------------------------------------------------
 
 static void
-oc_core_ap_get_handler(oc_request_t *request,
-                              oc_interface_mask_t iface_mask, void *data)
+oc_core_ap_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
+                       void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -1010,12 +1010,12 @@ oc_core_ap_get_handler(oc_request_t *request,
 
   size_t device_index = request->resource->device;
 
-  //for (i = (int)OC_APP_X; i < (int)OC_APP_X; i++) {
-    oc_resource_t *resource = oc_core_get_resource_by_index(i, OC_APP_X);
-    if (oc_filter_resource(resource, request, device_index, &response_length,
-                           matches, 1)) {
-      matches++;
-    }
+  // for (i = (int)OC_APP_X; i < (int)OC_APP_X; i++) {
+  oc_resource_t *resource = oc_core_get_resource_by_index(i, OC_APP_X);
+  if (oc_filter_resource(resource, request, device_index, &response_length,
+                         matches, 1)) {
+    matches++;
+  }
   //}
 
   if (matches > 0) {
@@ -1024,10 +1024,8 @@ oc_core_ap_get_handler(oc_request_t *request,
     oc_send_linkformat_response(request, OC_STATUS_INTERNAL_SERVER_ERROR, 0);
   }
 
-
   oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
 }
-
 
 void
 oc_create_ap_resource(int resource_idx, size_t device)
@@ -1035,8 +1033,7 @@ oc_create_ap_resource(int resource_idx, size_t device)
   OC_DBG("oc_create_ap_resource\n");
   oc_core_populate_resource(resource_idx, device, "/ap", OC_IF_P,
                             APPLICATION_LINK_FORMAT, OC_DISCOVERABLE,
-                            oc_core_ap_get_handler,
-                            0, 0, 0, 0);
+                            oc_core_ap_get_handler, 0, 0, 0, 0);
 
   oc_core_bind_dpt_resource(resource_idx, device, "urn:knx:dpt.value2Ucount");
 }
@@ -1045,7 +1042,7 @@ oc_create_ap_resource(int resource_idx, size_t device)
 
 static void
 oc_core_dev_mid_get_handler(oc_request_t *request,
-                           oc_interface_mask_t iface_mask, void *data)
+                            oc_interface_mask_t iface_mask, void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -1079,7 +1076,6 @@ oc_create_dev_mid_resource(int resource_idx, size_t device)
 
   oc_core_bind_dpt_resource(resource_idx, device, "urn:knx:dpt.value2Ucount");
 }
-
 
 // -----------------------------------------------------------------------------
 void

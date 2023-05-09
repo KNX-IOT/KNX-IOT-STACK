@@ -273,8 +273,8 @@ oc_core_set_device_ap(size_t device_index, int major, int minor, int minor2)
   return 0;
 }
 
-
-int oc_core_set_device_mid(size_t device_index, uint32_t mid)
+int
+oc_core_set_device_mid(size_t device_index, uint32_t mid)
 {
   if (device_index >= (int)oc_core_get_num_devices()) {
     OC_ERR("device_index %d to large\n", (int)device_index);

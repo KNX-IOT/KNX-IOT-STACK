@@ -102,8 +102,6 @@ bool oc_knx_device_in_programming_mode(size_t device_index);
 void oc_knx_device_set_programming_mode(size_t device_index,
                                         bool programming_mode);
 
-
-
 #ifdef __cplusplus
 }
 #endif
