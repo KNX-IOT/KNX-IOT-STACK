@@ -404,7 +404,6 @@ oc_string_println_hex(oc_string_t hex_string)
   return retval;
 }
 
-
 int
 oc_char_println_hex(const char *str, int str_len)
 {
