@@ -948,6 +948,136 @@ oc_create_dev_mport_resource(int resource_idx, size_t device)
 
 // -----------------------------------------------------------------------------
 
+static void
+oc_core_ap_x_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
+                         void *data)
+{
+  (void)data;
+  (void)iface_mask;
+
+  /* check if the accept header is CBOR-format */
+  if (request->accept != APPLICATION_CBOR) {
+    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    return;
+  }
+
+  size_t device_index = request->resource->device;
+  oc_device_info_t *device = oc_core_get_device_info(device_index);
+  if (device != NULL) {
+    // Content-Format: "application/cbor"
+    // Payload: [ 1, 2, 3 ]
+    uint64_t array[3];
+    array[0] = device->ap.major;
+    array[1] = device->ap.minor;
+    array[2] = device->ap.patch;
+    oc_rep_begin_root_object();
+    oc_rep_i_set_int_array(root, 1, array, 3);
+    oc_rep_end_root_object();
+    oc_send_cbor_response(request, OC_STATUS_OK);
+    return;
+  }
+
+  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+}
+
+void
+oc_create_ap_x_resource(int resource_idx, size_t device)
+{
+  OC_DBG("oc_create_ap_x_resource\n");
+  oc_core_populate_resource(resource_idx, device, "/ap/1", OC_IF_P,
+                            APPLICATION_CBOR, OC_DISCOVERABLE,
+                            oc_core_ap_x_get_handler, 0, 0, 0, 0);
+
+  oc_core_bind_dpt_resource(resource_idx, device, "urn:knx:dpt.value2Ucount");
+}
+// -----------------------------------------------------------------------------
+
+static void
+oc_core_ap_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
+                       void *data)
+{
+  (void)data;
+  (void)iface_mask;
+  size_t response_length = 0;
+  int i;
+  int matches = 0;
+
+  /* check if the accept header is link-format */
+  if (request->accept != APPLICATION_LINK_FORMAT) {
+    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    return;
+  }
+
+  size_t device_index = request->resource->device;
+
+  // for (i = (int)OC_APP_X; i < (int)OC_APP_X; i++) {
+  oc_resource_t *resource = oc_core_get_resource_by_index(i, OC_APP_X);
+  if (oc_filter_resource(resource, request, device_index, &response_length,
+                         matches, 1)) {
+    matches++;
+  }
+  //}
+
+  if (matches > 0) {
+    oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
+  } else {
+    oc_send_linkformat_response(request, OC_STATUS_INTERNAL_SERVER_ERROR, 0);
+  }
+
+  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+}
+
+void
+oc_create_ap_resource(int resource_idx, size_t device)
+{
+  OC_DBG("oc_create_ap_resource\n");
+  oc_core_populate_resource(resource_idx, device, "/ap", OC_IF_P,
+                            APPLICATION_LINK_FORMAT, OC_DISCOVERABLE,
+                            oc_core_ap_get_handler, 0, 0, 0, 0);
+
+  oc_core_bind_dpt_resource(resource_idx, device, "urn:knx:dpt.value2Ucount");
+}
+
+// -----------------------------------------------------------------------------
+
+static void
+oc_core_dev_mid_get_handler(oc_request_t *request,
+                            oc_interface_mask_t iface_mask, void *data)
+{
+  (void)data;
+  (void)iface_mask;
+
+  /* check if the accept header is CBOR-format */
+  if (request->accept != APPLICATION_CBOR) {
+    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    return;
+  }
+
+  size_t device_index = request->resource->device;
+  oc_device_info_t *device = oc_core_get_device_info(device_index);
+  if (device != NULL) {
+    oc_rep_begin_root_object();
+    oc_rep_i_set_int(root, 1, device->mid);
+    oc_rep_end_root_object();
+    oc_send_cbor_response(request, OC_STATUS_OK);
+    return;
+  }
+
+  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+}
+
+void
+oc_create_dev_mid_resource(int resource_idx, size_t device)
+{
+  OC_DBG("oc_create_dev_mid_resource\n");
+  oc_core_populate_resource(resource_idx, device, "/dev/mid", OC_IF_P,
+                            APPLICATION_CBOR, OC_DISCOVERABLE,
+                            oc_core_dev_mid_get_handler, 0, 0, 0, 0);
+
+  oc_core_bind_dpt_resource(resource_idx, device, "urn:knx:dpt.value2Ucount");
+}
+
+// -----------------------------------------------------------------------------
 void
 oc_knx_device_storage_read(size_t device_index)
 {
@@ -1130,6 +1260,9 @@ oc_create_knx_device_resources(size_t device_index)
   oc_create_dev_da_resource(OC_DEV_DA, device_index);
   oc_create_dev_port_resource(OC_DEV_PORT, device_index);
   oc_create_dev_mport_resource(OC_DEV_MPORT, device_index);
+  oc_create_dev_mid_resource(OC_DEV_MID, device_index);
+  oc_create_ap_resource(OC_APP, device_index);
+  oc_create_ap_x_resource(OC_APP_X, device_index);
   // should be last of the dev/xxx resources, it will list those.
   oc_create_dev_dev_resource(OC_DEV, device_index);
 }
