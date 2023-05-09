@@ -322,6 +322,16 @@ int oc_conv_byte_array_to_hex_string(const uint8_t *array, size_t array_len,
  */
 int oc_conv_hex_string_to_byte_array(const char *hex_str, size_t hex_str_len,
                                      uint8_t *array, size_t *array_len);
+/**
+ * @brief convert hex string to oc_string
+ *
+ * @param[in] hex_str hex string input
+ * @param[in] hex_str_len size of the hex string
+ * @param out the allocated oc_string
+ * @return int 0 success
+ */
+int oc_conv_hex_string_to_oc_string(const char *hex_str, size_t hex_str_len,
+                                    oc_string_t *out);
 
 /**
  * @brief checks if the input is an array containing hex values
