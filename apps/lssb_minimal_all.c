@@ -169,6 +169,12 @@ app_init(void)
   /* set the model */
   oc_core_set_device_model(0, "my model");
 
+  /* set the application info*/
+  oc_core_set_device_ap(0, 1, 0, 0);
+
+  /* set the manufacturer info*/
+  oc_core_set_device_mid(0, 12);
+
   oc_set_s_mode_response_cb(oc_add_s_mode_response_cb);
 
 #ifdef OC_SPAKE
