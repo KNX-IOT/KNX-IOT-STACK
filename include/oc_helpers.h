@@ -250,7 +250,6 @@ void _oc_new_byte_string(
 #endif
   oc_string_t *ocstring, const char *str, size_t str_len);
 
-
 /**
  * @brief allocate oc_string
  *
