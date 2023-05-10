@@ -1009,7 +1009,7 @@ oc_core_ap_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   }
 
   size_t device_index = request->resource->device;
-
+  i = device_index;
   // for (i = (int)OC_APP_X; i < (int)OC_APP_X; i++) {
   oc_resource_t *resource = oc_core_get_resource_by_index(i, OC_APP_X);
   if (oc_filter_resource(resource, request, device_index, &response_length,

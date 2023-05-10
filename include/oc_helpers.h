@@ -228,10 +228,23 @@ bool _oc_byte_string_array_add_item(oc_string_array_t *ocstringarray,
  * @brief new oc_string from string
  *
  * @param ocstring the ocstring to be allocated
- * @param str not terminated string
+ * @param str terminated string
  * @param str_len size of the string to be copied
  */
 void _oc_new_string(
+#ifdef OC_MEMORY_TRACE
+  const char *func,
+#endif
+  oc_string_t *ocstring, const char *str, size_t str_len);
+
+/**
+ * @brief new oc_string from string
+ *
+ * @param ocstring the ocstring to be allocated
+ * @param str not terminated string
+ * @param str_len size of the string to be copied
+ */
+void _oc_new_byte_string(
 #ifdef OC_MEMORY_TRACE
   const char *func,
 #endif
