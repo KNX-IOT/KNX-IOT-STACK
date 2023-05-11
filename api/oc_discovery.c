@@ -58,7 +58,8 @@ oc_add_resource_to_wk(oc_resource_t *resource, oc_request_t *request,
 
   length = oc_rep_add_line_to_buffer("<");
   *response_length += length;
-
+  /*
+  // code to frame the used IP address
   oc_endpoint_t *eps = oc_connectivity_get_endpoints(request->resource->device);
   oc_string_t ep, uri;
   memset(&uri, 0, sizeof(oc_string_t));
@@ -68,7 +69,7 @@ oc_add_resource_to_wk(oc_resource_t *resource, oc_request_t *request,
     if (eps->flags & SECURED) {
 #else
     if ((eps->flags & SECURED) == 0) {
-#endif /* OC_SECURITY */
+#endif // OC_SECURITY
       if (oc_endpoint_to_string(eps, &ep) == 0) {
         length = oc_rep_add_line_to_buffer(oc_string(ep));
         *response_length += length;
@@ -78,6 +79,7 @@ oc_add_resource_to_wk(oc_resource_t *resource, oc_request_t *request,
     }
     eps = eps->next;
   }
+ */
 
   length = oc_rep_add_line_to_buffer(oc_string(resource->uri));
   *response_length += length;
