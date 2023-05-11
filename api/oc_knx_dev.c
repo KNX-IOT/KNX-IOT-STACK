@@ -1009,22 +1009,19 @@ oc_core_ap_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   }
 
   size_t device_index = request->resource->device;
-  i = device_index;
-  // for (i = (int)OC_APP_X; i < (int)OC_APP_X; i++) {
-  oc_resource_t *resource = oc_core_get_resource_by_index(i, OC_APP_X);
-  if (oc_filter_resource(resource, request, device_index, &response_length,
-                         matches, 1)) {
-    matches++;
+  oc_resource_t *resource =
+    oc_core_get_resource_by_index(OC_APP_X, device_index);
+  if (resource) {
+    PRINT("URL %s\n", oc_string(resource->uri));
+    oc_add_resource_to_wk(resource, request, device_index, &response_length,
+                          matches, true);
   }
-  //}
-
-  if (matches > 0) {
+  if (response_length > 0) {
     oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
+    return;
   } else {
     oc_send_linkformat_response(request, OC_STATUS_INTERNAL_SERVER_ERROR, 0);
   }
-
-  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
 }
 
 void
