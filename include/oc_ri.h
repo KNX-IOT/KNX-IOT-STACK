@@ -257,7 +257,7 @@ typedef enum {
   OC_DEV_MPORT,             /**< /dev/mport the multicast port number */
   OC_DEV_MID,               /**< /dev/mid the manufacturer id */
   OC_DEV,                   /**< core link */
-  OC_APP,                   /**< application id (list( */
+  OC_APP,                   /**< application id (list) */
   OC_APP_X,                 /**< application id entry */
   OC_KNX_SPAKE,             /**< spake */
   OC_KNX_IDEVID,            /**< IDevID */
