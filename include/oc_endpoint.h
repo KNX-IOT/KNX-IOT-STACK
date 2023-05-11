@@ -23,9 +23,8 @@
 
 #include "oc_helpers.h"
 #include "oc_uuid.h"
-#ifdef OC_OSCORE
+
 #include "messaging/coap/oscore_constants.h"
-#endif /* OC_OSCORE */
 
 #ifdef __cplusplus
 extern "C" {
