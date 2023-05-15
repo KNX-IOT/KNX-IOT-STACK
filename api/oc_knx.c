@@ -1309,7 +1309,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     // this gets overwritten if the ID is present in the
     // request payload handled below
     oc_free_string(&g_pase.id);
-    oc_new_string(&g_pase.id, "responderkey", strlen("responderkey"));
+    oc_new_byte_string(&g_pase.id, "responderkey", strlen("responderkey"));
   }
   // handle input
   while (rep != NULL) {
@@ -1331,7 +1331,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
         // if the ID is present, overwrite the default
         oc_free_string(&g_pase.id);
         oc_new_byte_string(&g_pase.id, oc_string(rep->value.string),
-                      oc_byte_string_len(rep->value.string));
+                      oc_string_len(rep->value.string));
         PRINT("==> CLIENT RECEIVES %d\n", (int)oc_byte_string_len(rep->value.string));
       }
     } break;
