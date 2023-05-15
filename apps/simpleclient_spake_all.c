@@ -154,13 +154,17 @@ get_dev_pm(oc_client_response_t *data)
     }
   }
 }
+void callback(oc_client_response_t *rsp)
+{
+  return;
+}
 
 oc_event_callback_retval_t
 do_pm(void *ep)
 {
   oc_endpoint_t *endpoint = ep;
   endpoint->flags |= SECURED | OSCORE;
-  oc_do_get("/dev/pm", endpoint, NULL, NULL, HIGH_QOS, NULL);
+  oc_do_get("/dev/pm", endpoint, NULL, callback, HIGH_QOS, NULL);
   return OC_EVENT_CONTINUE;
 }
 
@@ -203,6 +207,8 @@ discovery(const char *payload, int len, oc_endpoint_t *endpoint,
   }
 
   memcpy(&the_endpoint, endpoint, sizeof(the_endpoint));
+  char sernum[6] = {0x00, 0xfa, 0x10, 0x01, 0x07, 0x01};
+  oc_new_string(&the_endpoint.oscore_id, sernum, 6);
 
   // do parameter exchange
   oc_initiate_spake_parameter_request(endpoint, "00FA10010701", "LETTUCE",
