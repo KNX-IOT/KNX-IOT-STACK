@@ -144,7 +144,8 @@ oc_core_knx_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_JSON &&
-      request->accept != APPLICATION_CBOR) {
+      request->accept != APPLICATION_CBOR &&
+      request->accept != CONTENT_NONE) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
@@ -394,7 +395,7 @@ oc_core_knx_lsm_get_handler(oc_request_t *request,
   PRINT("oc_core_knx_lsm_get_handler\n");
 
   /* check if the accept header is cbor-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
@@ -426,7 +427,7 @@ oc_core_knx_lsm_post_handler(oc_request_t *request,
   oc_rep_t *rep = NULL;
 
   /* check if the accept header is cbor-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
@@ -510,7 +511,7 @@ oc_core_knx_knx_get_handler(oc_request_t *request,
   PRINT("oc_core_knx_knx_get_handler\n");
 
   /* check if the accept header is cbor-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
@@ -601,7 +602,8 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_CBOR &&
-      request->accept != APPLICATION_OSCORE) {
+      request->accept != APPLICATION_OSCORE &&
+      request->accept != CONTENT_NONE) {
     request->response->response_buffer->code = oc_status_code(OC_IGNORE);
     return;
   }
@@ -931,7 +933,7 @@ oc_core_knx_fingerprint_get_handler(oc_request_t *request,
   PRINT("oc_core_knx_fingerprint_get_handler\n");
 
   /* check if the accept header is cbor-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
@@ -965,7 +967,7 @@ oc_core_knx_ia_get_handler(oc_request_t *request,
   PRINT("oc_core_knx_ia_get_handler\n");
 
   /* check if the accept header is cbor-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
@@ -1000,7 +1002,7 @@ oc_core_knx_ia_post_handler(oc_request_t *request,
   bool fid_set = false;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -1078,7 +1080,7 @@ oc_core_knx_osn_get_handler(oc_request_t *request,
   PRINT("oc_core_knx_osn_get_handler\n");
 
   /* check if the accept header is cbor-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
@@ -1114,7 +1116,7 @@ oc_core_knx_ldevid_get_handler(oc_request_t *request,
   PRINT("oc_core_knx_ldevid_get_handler\n");
 
   /* check if the accept header is cbor-format */
-  if (request->accept != APPLICATION_PKCS7_CMC_REQUEST) {
+  if (oc_check_accept_header(request, APPLICATION_PKCS7_CMC_REQUEST) == false) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
@@ -1155,7 +1157,7 @@ oc_core_knx_idevid_get_handler(oc_request_t *request,
   PRINT("oc_core_knx_idevid_get_handler\n");
 
   /* check if the accept header is cbor-format */
-  if (request->accept != APPLICATION_PKCS7_CMC_REQUEST) {
+  if (oc_check_accept_header(request, APPLICATION_PKCS7_CMC_REQUEST) == false) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
@@ -1247,12 +1249,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
   PRINT("oc_core_knx_spake_post_handler\n");
 
   /* check if the accept header is cbor-format */
-  if (request->accept != APPLICATION_CBOR) {
-    request->response->response_buffer->code =
-      oc_status_code(OC_STATUS_BAD_REQUEST);
-    return;
-  }
-  if (request->content_format != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
