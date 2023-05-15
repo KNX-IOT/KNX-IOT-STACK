@@ -32,6 +32,9 @@
 #define KNX_STORAGE_PM "dev_knx_pm"
 #define KNX_STORAGE_PORT "dev_knx_port"
 #define KNX_STORAGE_MPORT "dev_knx_mport"
+#define KNX_STORAGE_AP_MAJOR "knx_ap_maj"
+#define KNX_STORAGE_AP_MINOR "knx_ap_min"
+#define KNX_STORAGE_AP_PATCH "knx_ap_p"
 
 static void
 oc_core_dev_sn_get_handler(oc_request_t *request,
@@ -948,6 +951,53 @@ oc_create_dev_mport_resource(int resource_idx, size_t device)
 }
 
 // -----------------------------------------------------------------------------
+static int
+oc_core_dump_ap(int device_index)
+{
+  // KNX_STORAGE_AP
+  oc_device_info_t *device = oc_core_get_device_info(device_index);
+  if (device != NULL) {
+    int32_t value = device->ap.major;
+    oc_storage_write(KNX_STORAGE_AP_MAJOR, (uint8_t*)&value, sizeof(value));
+    value = device->ap.minor;
+    oc_storage_write(KNX_STORAGE_AP_MINOR, (uint8_t *)&value, sizeof(value));
+    value = device->ap.patch;
+    oc_storage_write(KNX_STORAGE_AP_PATCH, (uint8_t *)&value, sizeof(value));
+    return 0;
+  }
+  return -1;
+}
+
+static int
+oc_core_read_ap(int device_index)
+{
+  // KNX_STORAGE_AP
+  oc_device_info_t *device = oc_core_get_device_info(device_index);
+  if (device != NULL) {
+    int32_t value;
+    long temp_size;
+
+    temp_size =
+      oc_storage_read(KNX_STORAGE_AP_MAJOR, (uint8_t *)&value, sizeof(value));
+    if (temp_size > 0) {
+      device->ap.major = value;
+    }
+    temp_size =
+      oc_storage_read(KNX_STORAGE_AP_MINOR, (uint8_t *)&value, sizeof(value));
+    if (temp_size > 0) {
+      device->ap.minor = value;
+    }
+    temp_size =
+      oc_storage_read(KNX_STORAGE_AP_PATCH, (uint8_t *)&value, sizeof(value));
+    if (temp_size > 0) {
+      device->ap.patch = value;
+    }
+    return 0;
+  }
+  return -1;
+
+}
+
 
 static void
 oc_core_ap_x_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
@@ -981,13 +1031,56 @@ oc_core_ap_x_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
 }
 
+static void
+oc_core_ap_x_put_handler(oc_request_t *request,
+                             oc_interface_mask_t iface_mask, void *data)
+{
+  (void)data;
+  (void)iface_mask;
+
+  /* check if the accept header is CBOR-format */
+  if (request->accept != APPLICATION_CBOR) {
+    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    return;
+  }
+
+  size_t device_index = request->resource->device;
+  oc_device_info_t *device = oc_core_get_device_info(device_index);
+  oc_rep_t *rep = request->request_payload;
+  // debugging
+  if (rep != NULL) {
+    PRINT("  oc_core_ap_x_put_handler type: %d\n", rep->type);
+  }
+
+  if ((rep != NULL) && (rep->type == OC_REP_INT_ARRAY)) {
+    int64_t *arr = oc_int_array(rep->value.array);
+    int array_size = (int)oc_int_array_size(rep->value.array);
+    if (array_size != 3) {
+      oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+      return;
+    }
+    device->ap.major = (int)arr[0];
+    device->ap.minor = (int)arr[1];
+    device->ap.patch = (int)arr[2];
+
+    // write to persistent storage
+    oc_core_dump_ap(device_index);
+
+    oc_send_cbor_response_no_payload_size(request, OC_STATUS_CHANGED);
+    return;
+  }
+
+  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+}
+
 void
 oc_create_ap_x_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_ap_x_resource\n");
   oc_core_populate_resource(
     resource_idx, device, "/ap/1", OC_IF_P, APPLICATION_CBOR, OC_DISCOVERABLE,
-    oc_core_ap_x_get_handler, 0, 0, 0, 1, "urn:knx:dpa.3.13");
+                            oc_core_ap_x_get_handler, oc_core_ap_x_put_handler,
+                            0, 0, 1, "urn:knx:dpa.3.13");
 
   oc_core_bind_dpt_resource(resource_idx, device, "urn:knx:dpt.programVersion");
 }
@@ -1124,6 +1217,8 @@ oc_knx_device_storage_read(size_t device_index)
     device->pm = pm;
     PRINT("  pm (storage) %d\n", device->pm);
   }
+
+  oc_core_read_ap(device_index);
 }
 
 void
