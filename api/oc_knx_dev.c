@@ -647,10 +647,10 @@ void
 oc_create_dev_pm_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_dev_pm_resource\n");
-  oc_core_populate_resource(resource_idx, device, "/dev/pm", OC_IF_P,
-                            APPLICATION_CBOR, OC_DISCOVERABLE,
-                            oc_core_dev_pm_get_handler,
-                            oc_core_dev_pm_put_handler, 0, 0, 1, "urn:knx:dpa.0.54");
+  oc_core_populate_resource(
+    resource_idx, device, "/dev/pm", OC_IF_P, APPLICATION_CBOR, OC_DISCOVERABLE,
+    oc_core_dev_pm_get_handler, oc_core_dev_pm_put_handler, 0, 0, 1,
+    "urn:knx:dpa.0.54");
 
   oc_core_bind_dpt_resource(resource_idx, device, "urn:knx:dpt.binaryValue");
 }
@@ -749,9 +749,10 @@ void
 oc_create_dev_sa_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_dev_sa_resource\n");
-  oc_core_populate_resource(
-    resource_idx, device, "/dev/sna", OC_IF_P, APPLICATION_CBOR, OC_DISCOVERABLE,
-    oc_core_dev_sa_get_handler, 0, 0, 0, 1, "urn:knx:dpa.0.57");
+  oc_core_populate_resource(resource_idx, device, "/dev/sna", OC_IF_P,
+                            APPLICATION_CBOR, OC_DISCOVERABLE,
+                            oc_core_dev_sa_get_handler, 0, 0, 0, 1,
+                            "urn:knx:dpa.0.57");
 
   oc_core_bind_dpt_resource(resource_idx, device, "urn:knx:dpt.value1Ucount");
 }
@@ -984,9 +985,9 @@ void
 oc_create_ap_x_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_ap_x_resource\n");
-  oc_core_populate_resource(resource_idx, device, "/ap/1", OC_IF_P,
-                            APPLICATION_CBOR, OC_DISCOVERABLE,
-                            oc_core_ap_x_get_handler, 0, 0, 0, 1, "urn:knx:dpa.3.13");
+  oc_core_populate_resource(
+    resource_idx, device, "/ap/1", OC_IF_P, APPLICATION_CBOR, OC_DISCOVERABLE,
+    oc_core_ap_x_get_handler, 0, 0, 0, 1, "urn:knx:dpa.3.13");
 
   oc_core_bind_dpt_resource(resource_idx, device, "urn:knx:dpt.programVersion");
 }
@@ -1069,7 +1070,8 @@ oc_create_dev_mid_resource(int resource_idx, size_t device)
   OC_DBG("oc_create_dev_mid_resource\n");
   oc_core_populate_resource(resource_idx, device, "/dev/mid", OC_IF_P,
                             APPLICATION_CBOR, OC_DISCOVERABLE,
-                            oc_core_dev_mid_get_handler, 0, 0, 0, 1, "urn:knx:dpa.0.12");
+                            oc_core_dev_mid_get_handler, 0, 0, 0, 1,
+                            "urn:knx:dpa.0.12");
 
   oc_core_bind_dpt_resource(resource_idx, device, "urn:knx:dpt.value2Ucount");
 }
