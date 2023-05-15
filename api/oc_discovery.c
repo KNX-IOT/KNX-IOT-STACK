@@ -211,7 +211,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
 
   /* check if the accept header is link-format */
   if (request->accept != APPLICATION_LINK_FORMAT &&
-      request->accept != APPLICATION_JSON) {
+      request->accept != APPLICATION_JSON && request->accept != CONTENT_NONE) {
     /* handle bad request..
     note below layer ignores this message if it is a multi cast request */
     request->response->response_buffer->code =

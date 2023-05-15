@@ -140,7 +140,8 @@ typedef enum {
   APPLICATION_OSCORE = 10001,             /**< application/oscore */
   APPLICATION_VND_OMA_LWM2M_TLV = 11542,  /**< application/vnd.oma.lwm2m+tlv */
   APPLICATION_VND_OMA_LWM2M_JSON = 11543, /**< application/vnd.oma.lwm2m+json */
-  APPLICATION_VND_OMA_LWM2M_CBOR = 11544  /**< application/vnd.oma.lwm2m+cbor */
+  APPLICATION_VND_OMA_LWM2M_CBOR = 11544, /**< application/vnd.oma.lwm2m+cbor */
+  CONTENT_NONE = 99999                    /**< no content format */
 } oc_content_format_t;
 
 /**
@@ -480,6 +481,16 @@ void oc_ri_remove_timed_event_callback(void *cb_data,
  * @return int the CoAP status code
  */
 int oc_status_code(oc_status_t key);
+
+/**
+ * @brief checks if the accept header is correct
+ * note that if the accept header is not there, this check is a pass
+ * @param request the request
+ * @param accept the content type of the resource
+ * @return true content type is ok
+ * @return false content type is not ok
+ */
+bool oc_check_accept_header(oc_request_t *request, oc_content_format_t accept);
 
 /**
  * @brief retrieve the resource by uri and device index

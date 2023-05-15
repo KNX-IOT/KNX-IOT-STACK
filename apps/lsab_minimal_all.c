@@ -196,7 +196,7 @@ get_o_1_1(oc_request_t *request, oc_interface_mask_t interfaces,
 
   PRINT("-- Begin get_dpa_417_61: interface %d\n", interfaces);
   /* check if the accept header is CBOR */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     oc_send_response(request, OC_STATUS_BAD_OPTION);
     return;
   }

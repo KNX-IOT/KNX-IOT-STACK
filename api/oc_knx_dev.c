@@ -44,7 +44,7 @@ oc_core_dev_sn_get_handler(oc_request_t *request,
   (void)iface_mask;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -88,7 +88,7 @@ oc_core_dev_hwv_get_handler(oc_request_t *request,
   (void)iface_mask;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -133,7 +133,7 @@ oc_core_dev_fwv_get_handler(oc_request_t *request,
   (void)iface_mask;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -181,7 +181,7 @@ oc_core_dev_hwt_get_handler(oc_request_t *request,
   (void)iface_mask;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -221,7 +221,7 @@ oc_core_dev_model_get_handler(oc_request_t *request,
   (void)iface_mask;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -260,7 +260,7 @@ oc_core_dev_ia_get_handler(oc_request_t *request,
   (void)iface_mask;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     OC_ERR("invalid request");
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
@@ -296,7 +296,7 @@ oc_core_dev_ia_put_handler(oc_request_t *request,
   bool fid_set = false;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -373,7 +373,7 @@ oc_core_dev_hostname_put_handler(oc_request_t *request,
   (void)iface_mask;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -415,7 +415,7 @@ oc_core_dev_hostname_get_handler(oc_request_t *request,
   (void)iface_mask;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -455,7 +455,7 @@ oc_core_dev_iid_put_handler(oc_request_t *request,
   (void)iface_mask;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -499,7 +499,7 @@ oc_core_dev_iid_get_handler(oc_request_t *request,
   (void)iface_mask;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -540,7 +540,7 @@ oc_core_dev_ipv6_get_handler(oc_request_t *request,
   (void)iface_mask;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -579,7 +579,7 @@ oc_core_dev_pm_get_handler(oc_request_t *request,
   (void)iface_mask;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -608,7 +608,7 @@ oc_core_dev_pm_put_handler(oc_request_t *request,
   (void)iface_mask;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -672,7 +672,7 @@ oc_core_dev_dev_get_handler(oc_request_t *request,
   PRINT("oc_core_dev_dev_get_handler\n");
 
   /* check if the accept header is link-format */
-  if (request->accept != APPLICATION_LINK_FORMAT) {
+  if (oc_check_accept_header(request, APPLICATION_LINK_FORMAT) == false) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
@@ -728,7 +728,7 @@ oc_core_dev_sa_get_handler(oc_request_t *request,
   (void)iface_mask;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -770,7 +770,7 @@ oc_core_dev_da_get_handler(oc_request_t *request,
   (void)iface_mask;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -811,7 +811,7 @@ oc_core_dev_port_get_handler(oc_request_t *request,
   (void)iface_mask;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -837,7 +837,7 @@ oc_core_dev_port_put_handler(oc_request_t *request,
   (void)iface_mask;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -886,7 +886,7 @@ oc_core_dev_mport_get_handler(oc_request_t *request,
   (void)iface_mask;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -912,7 +912,7 @@ oc_core_dev_mport_put_handler(oc_request_t *request,
   (void)iface_mask;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -1005,7 +1005,7 @@ oc_core_ap_x_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   (void)iface_mask;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -1037,7 +1037,7 @@ oc_core_ap_x_put_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   (void)iface_mask;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -1095,7 +1095,7 @@ oc_core_ap_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   int matches = 0;
 
   /* check if the accept header is link-format */
-  if (request->accept != APPLICATION_LINK_FORMAT) {
+  if (oc_check_accept_header(request, APPLICATION_LINK_FORMAT) == false) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -1137,7 +1137,7 @@ oc_core_dev_mid_get_handler(oc_request_t *request,
   (void)iface_mask;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
