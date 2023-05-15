@@ -127,7 +127,6 @@ volatile int quit = 0;         /**< stop variable, used by handle_signal */
 bool g_reset = false;
 int call_counter = 0;
 
-
 #define MY_SERIAL_NUMBER "123456789012"
 
 /**
@@ -1174,12 +1173,13 @@ response_get_pm(oc_client_response_t *data)
 
   call_counter++;
 
-  //oc_do_get_ex("/dev/pm", &g_endpoint, NULL, response_get_pm, HIGH_QOS,
-  //             APPLICATION_CBOR, APPLICATION_CBOR, NULL);
+  // oc_do_get_ex("/dev/pm", &g_endpoint, NULL, response_get_pm, HIGH_QOS,
+  //              APPLICATION_CBOR, APPLICATION_CBOR, NULL);
 }
 
 void
-spake_cb(int error, char *sn, char *oscore_id, int oscore_id_size, uint8_t *secret, int secret_size)
+spake_cb(int error, char *sn, char *oscore_id, int oscore_id_size,
+         uint8_t *secret, int secret_size)
 {
   PRINT("spake CB: invoke PM with encryption!!!!!\n");
 #ifdef OC_OSCORE
@@ -1193,9 +1193,8 @@ spake_cb(int error, char *sn, char *oscore_id, int oscore_id_size, uint8_t *secr
 
   // oc_endpoint_copy(&g_endpoint, endpoint);
   oc_endpoint_set_oscore_id_from_str(&g_endpoint, sn);
-  
 
-  //PRINT("  spake_cb: ep serial %s\n", g_endpoint.serial_number);
+  // PRINT("  spake_cb: ep serial %s\n", g_endpoint.serial_number);
 #endif
   PRINT("spake CB\n");
   oc_do_get_ex("/dev/pm", &g_endpoint, NULL, response_get_pm, HIGH_QOS,
@@ -1235,24 +1234,23 @@ discovery_cb(const char *payload, int len, oc_endpoint_t *endpoint,
   oc_endpoint_copy(&g_endpoint, endpoint);
 
   oc_set_spake_response_cb(spake_cb);
-  //oc_initiate_spake(endpoint, "LETTUCE", "abcdef");
+  // oc_initiate_spake(endpoint, "LETTUCE", "abcdef");
 
-  // for testing the receive key must be the same, since we are talking to the same device.
-  // so it depends on who wil store the oscore context first.. with SID and RID.
-  uint8_t array[30] ;
+  // for testing the receive key must be the same, since we are talking to the
+  // same device. so it depends on who wil store the oscore context first.. with
+  // SID and RID.
+  uint8_t array[30];
   size_t array_size = 30;
 
   memset(array, 9, 30);
 
-   oc_conv_hex_string_to_byte_array(
-    MY_SERIAL_NUMBER, strlen(MY_SERIAL_NUMBER) ,
-                                       array, &array_size);
-
+  oc_conv_hex_string_to_byte_array(MY_SERIAL_NUMBER, strlen(MY_SERIAL_NUMBER),
+                                   array, &array_size);
 
   PRINT("-------<RID  %s  %d     ", MY_SERIAL_NUMBER, (int)array_size);
-   oc_char_println_hex(array, array_size);
+  oc_char_println_hex(array, array_size);
   oc_initiate_spake_parameter_request(endpoint, my_serialnum, "LETTUCE", array,
-                                       array_size);
+                                      array_size);
 
   PRINT("[C] DISCOVERY- END\n");
   return OC_STOP_DISCOVERY;
@@ -1280,7 +1278,7 @@ issue_requests_oscore(void)
   oc_new_string(&access_token.osc_ms, (char *)"ABCDE", 5);
   oc_new_string(&access_token.kid, "", 0);
   oc_new_string(&access_token.sub, "", 0);
-  //oc_new_string(&access_token.osc_alg, "", 0);
+  // oc_new_string(&access_token.osc_alg, "", 0);
   access_token.profile = OC_PROFILE_COAP_OSCORE;
   int64_t ga_values[5] = { 1, 2, 3, 4, 5 };
   access_token.ga = ga_values;
@@ -1337,7 +1335,7 @@ issue_s_mode_secure(void *data)
     oc_new_string(&access_token.osc_ms, (char *)str_ms, 11);
     oc_new_string(&access_token.kid, "", 0);
     oc_new_string(&access_token.sub, "", 0);
-    //oc_new_string(&access_token.osc_alg, "", 0);
+    // oc_new_string(&access_token.osc_alg, "", 0);
     access_token.profile = OC_PROFILE_COAP_OSCORE;
     int64_t ga_values[5] = { 1, 2, 3, 4, 5 };
     access_token.ga = ga_values;
@@ -1356,7 +1354,6 @@ issue_s_mode_secure(void *data)
   return OC_EVENT_CONTINUE;
 }
 
-
 /**
  * test of decoding a message to myself
  */
@@ -1365,14 +1362,12 @@ issue_spake(void *data)
 {
 
   PRINT("issue_spake\n");
-  //oc_endpoint_t *my_ep = oc_connectivity_get_endpoints(0);
+  // oc_endpoint_t *my_ep = oc_connectivity_get_endpoints(0);
 
-   oc_do_wk_discovery_all("ep=urn:knx:sn.123456789012", 2,
-                         discovery_cb, NULL);
+  oc_do_wk_discovery_all("ep=urn:knx:sn.123456789012", 2, discovery_cb, NULL);
 
-  //int index = 0;
-  //oc_initiate_spake(my_ep, "LETTUCE", "ABCD");
-
+  // int index = 0;
+  // oc_initiate_spake(my_ep, "LETTUCE", "ABCD");
 
   return OC_EVENT_DONE;
 }
@@ -1529,7 +1524,7 @@ main(int argc, char *argv[])
   // if (do_test_myself) {
   //  handler.requests_entry = issue_s_mode_secure;
   //}
-  //oc_set_delayed_callback(NULL, schedule_spake, 2);
+  // oc_set_delayed_callback(NULL, schedule_spake, 2);
 #endif
 
   char *fname = "myswu_app";
@@ -1562,8 +1557,7 @@ main(int argc, char *argv[])
   PRINT("Server \"testserver_all\" running (polling), waiting on incoming "
         "connections.\n\n\n");
 
- oc_set_delayed_callback(NULL, issue_spake, 2);
-
+  oc_set_delayed_callback(NULL, issue_spake, 2);
 
 #ifdef WIN32
   /* windows specific loop */

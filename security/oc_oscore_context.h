@@ -61,7 +61,8 @@ typedef struct oc_oscore_context_t
   struct oc_oscore_context_t
     *next; /**< pointer to the next, NULL if there is not any */
   /* Provisioned parameters */
-  int auth_at_index;                       /**< index of the auth AT table +1, so index = 0 is invalid */
+  int auth_at_index; /**< index of the auth AT table +1, so index = 0 is invalid
+                      */
   uint8_t
     token_id[OSCORE_IDCTX_LEN]; /**< Note: the serial number of the device */
   uint8_t master_secret[OSCORE_IDCTX_LEN]; /**< OSCORE master secret [bytes ]*/
@@ -76,8 +77,8 @@ typedef struct oc_oscore_context_t
   oc_string_t desc;                        /**< description */
   /* Derived parameters */
   /* 128-bit keys */
-  uint8_t sendkey[OSCORE_KEY_LEN];        /**< derived sender key */
-  uint8_t recvkey[OSCORE_KEY_LEN];        /**< derived recipient key */
+  uint8_t sendkey[OSCORE_KEY_LEN]; /**< derived sender key */
+  uint8_t recvkey[OSCORE_KEY_LEN]; /**< derived recipient key */
   /* Common IV */
   uint8_t commoniv[OSCORE_COMMON_IV_LEN];
   /* Replay Window */
@@ -88,21 +89,22 @@ typedef struct oc_oscore_context_t
 
 /**
  * @brief creates an OSCORE data
- * 
+ *
  * @param id the OSCORE identifier
  * @param id_len the length of the OSCORE identifier
  * @param id_ctx the OSCORE context identifier
  * @param id_ctx_len the length of the OSCORE context identifier
  * @param type  the type of context
- * 
+ *
  * @param secret the OSCORE master secret
  * @param secret_len the length of the OSCORE master secret
  * @param salt the salt to be used
  * @param salt_len the length of the salt
  * @param param the parameters
  * @param param_len the length of the parameters
- * 
- * @return true parameters derived (installed, e.g. can be used for encryption/decryption)
+ *
+ * @return true parameters derived (installed, e.g. can be used for
+ * encryption/decryption)
  * @return false parameters NOT derived (NOT installed)
  */
 int oc_oscore_context_derive_param(const uint8_t *id, uint8_t id_len,
@@ -121,12 +123,13 @@ void oc_oscore_free_context(oc_oscore_context_t *ctx);
 void oc_oscore_free_all_contexts();
 
 /**
- * @brief creates an OSCORE context (e.g. the internal structure for encoding/decoding)
- * 
+ * @brief creates an OSCORE context (e.g. the internal structure for
+ encoding/decoding)
+ *
  * Note: OSCORE context is also a field.
  *
  * @param device the device index
- * 
+ *
  * @param senderid the SID
  * @param senderid_size the length of SID
  * @param recipientid the RID
@@ -146,12 +149,10 @@ void oc_oscore_free_all_contexts();
  * @return false parameters NOT derived (NOT installed)
  */
 oc_oscore_context_t *oc_oscore_add_context(
-  size_t device, const char *senderid, int senderid_size, 
-  const char *recipientid, int recipientid_size,
-  uint64_t ssn, const char *desc, 
-  const char *mastersecret, int mastersecret_size, 
-  const char *token_id, int token_id_size,
-  int auth_at_index, bool from_storage);
+  size_t device, const char *senderid, int senderid_size,
+  const char *recipientid, int recipientid_size, uint64_t ssn, const char *desc,
+  const char *mastersecret, int mastersecret_size, const char *token_id,
+  int token_id_size, int auth_at_index, bool from_storage);
 
 oc_oscore_context_t *oc_oscore_find_context_by_serial_number(
   size_t device, char *serial_number);

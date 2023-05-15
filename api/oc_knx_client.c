@@ -32,7 +32,7 @@
 #define COAP_PORT (5683)
 #define MAX_SECRET_LEN (32)
 #define MAX_PASSWORD_LEN (30)
-#define MAX_SERIAL_NUMBER_LEN (7)  // serial number in bytes
+#define MAX_SERIAL_NUMBER_LEN (7) // serial number in bytes
 
 // ----------------------------------------------------------------------------
 
@@ -48,9 +48,9 @@ typedef struct broker_s_mode_userdata_t
 typedef struct oc_spake_context_t
 {
   char spake_password[MAX_PASSWORD_LEN]; /**< spake password */
-  oc_string_t serial_number;             /**< the serial number of the device string */
-  oc_string_t recipient_id;              /**< the recipient id used (byte string) */
-  oc_string_t oscore_id;                 /**< the oscore id used (byte string) */
+  oc_string_t serial_number; /**< the serial number of the device string */
+  oc_string_t recipient_id;  /**< the recipient id used (byte string) */
+  oc_string_t oscore_id;     /**< the oscore id used (byte string) */
 } oc_spake_context_t;
 
 // ----------------------------------------------------------------------------
@@ -83,9 +83,9 @@ static void
 update_tokens(uint8_t *secret, int secret_size)
 {
   PRINT("update_tokens: \n");
-  oc_oscore_set_auth(oc_string(g_spake_ctx.serial_number), oc_string(g_spake_ctx.recipient_id),
-    oc_byte_string_len(g_spake_ctx.recipient_id),
-                    secret, secret_size);
+  oc_oscore_set_auth(
+    oc_string(g_spake_ctx.serial_number), oc_string(g_spake_ctx.recipient_id),
+    oc_byte_string_len(g_spake_ctx.recipient_id), secret, secret_size);
 }
 
 static void
@@ -115,9 +115,9 @@ finish_spake_handshake(oc_client_response_t *data)
   mbedtls_ecp_point_free(&pubA);
 
   if (m_spake_cb) {
-    m_spake_cb(0, oc_string(g_spake_ctx.serial_number), 
-      oc_string(g_spake_ctx.oscore_id), oc_byte_string_len(g_spake_ctx.oscore_id),
-               shared_key, shared_key_len);
+    m_spake_cb(
+      0, oc_string(g_spake_ctx.serial_number), oc_string(g_spake_ctx.oscore_id),
+      oc_byte_string_len(g_spake_ctx.oscore_id), shared_key, shared_key_len);
   }
 }
 
@@ -140,7 +140,7 @@ do_credential_verification(oc_client_response_t *data)
   oc_print_rep_as_json(data->payload, true);
 
   uint8_t *pB_bytes = NULL;
-  uint8_t* *cB_bytes= NULL;
+  uint8_t **cB_bytes = NULL;
 
   oc_rep_t *rep = data->payload;
   while (rep != NULL) {
@@ -259,10 +259,9 @@ do_credential_exchange(oc_client_response_t *data)
 
 #endif /* OC_SPAKE */
 
-
 int
-oc_initiate_spake_parameter_request(oc_endpoint_t *endpoint, char* serial_number, 
-                                    char *password,
+oc_initiate_spake_parameter_request(oc_endpoint_t *endpoint,
+                                    char *serial_number, char *password,
                                     char *recipient_id, size_t recipient_id_len)
 {
   int return_value = -1;
@@ -281,20 +280,20 @@ oc_initiate_spake_parameter_request(oc_endpoint_t *endpoint, char* serial_number
 
   oc_rep_i_set_byte_string(root, 0, recipient_id, recipient_id_len);
   oc_byte_string_copy_from_char_with_size(&g_spake_ctx.recipient_id,
-                                          recipient_id,
-                                     recipient_id_len);
-  
+                                          recipient_id, recipient_id_len);
+
   oc_rep_i_set_byte_string(root, 15, rnd, 32);
   oc_rep_end_root_object();
 
   strncpy((char *)&g_spake_ctx.spake_password, password, MAX_PASSWORD_LEN);
 
   oc_string_copy_from_char(&g_spake_ctx.serial_number, serial_number);
-  
-  //oc_conv_hex_string_to_oc_string(endpoint->oscore_id,
-  //                                strlen(endpoint->oscore_id),
-  //                                    &(g_spake_ctx.serial_number));
-  //oc_string_copy_from_char(&g_spake_ctx.serial_number, endpoint->serial_number);
+
+  // oc_conv_hex_string_to_oc_string(endpoint->oscore_id,
+  //                                 strlen(endpoint->oscore_id),
+  //                                     &(g_spake_ctx.serial_number));
+  // oc_string_copy_from_char(&g_spake_ctx.serial_number,
+  // endpoint->serial_number);
 
   if (oc_do_post_ex(APPLICATION_CBOR, APPLICATION_CBOR)) {
     return_value = 0;
@@ -312,7 +311,6 @@ oc_initiate_spake(oc_endpoint_t *endpoint, char *password, char *recipient_id)
   // sort this one out later..
   return return_value;
 
-
 #ifndef OC_SPAKE
   (void)endpoint;
 #else /* OC_SPAKE*/
@@ -329,9 +327,10 @@ oc_initiate_spake(oc_endpoint_t *endpoint, char *password, char *recipient_id)
     oc_conv_hex_string_to_oc_string(recipient_id, strlen(recipient_id),
                                     &g_spake_ctx.recipient_id);
     oc_rep_i_set_byte_string(root, 0, oc_string(g_spake_ctx.recipient_id),
-                               oc_byte_string_len(g_spake_ctx.recipient_id));
-    //oc_rep_i_set_byte_string(root, 0, oscore_id, strlen(oscore_id));
-    //strncpy((char *)&g_spake_ctx.recipient_id, recipient_id, MAX_PASSWORD_LEN);
+                             oc_byte_string_len(g_spake_ctx.recipient_id));
+    // oc_rep_i_set_byte_string(root, 0, oscore_id, strlen(oscore_id));
+    // strncpy((char *)&g_spake_ctx.recipient_id, recipient_id,
+    // MAX_PASSWORD_LEN);
   }
   oc_rep_i_set_byte_string(root, 15, rnd, 32);
   oc_rep_end_root_object();
@@ -340,10 +339,13 @@ oc_initiate_spake(oc_endpoint_t *endpoint, char *password, char *recipient_id)
   strncpy((char *)&g_spake_ctx.spake_password, password, MAX_PASSWORD_LEN);
   oc_string_copy(&g_spake_ctx.serial_number, endpoint->oscore_id);
 
-  // serial number in endpoint is a string, so it needs to be converted before going into the spake
-  //oc_conv_hex_string_to_oc_string(endpoint->serial_number, strlen(endpoint->serial_number),
+  // serial number in endpoint is a string, so it needs to be converted before
+  // going into the spake
+  // oc_conv_hex_string_to_oc_string(endpoint->serial_number,
+  // strlen(endpoint->serial_number),
   //                                &g_spake_ctx.serial_number);
-  //oc_string_copy_from_char(&g_spake_ctx.serial_number, endpoint->serial_number);
+  // oc_string_copy_from_char(&g_spake_ctx.serial_number,
+  // endpoint->serial_number);
 
   if (oc_do_post_ex(APPLICATION_CBOR, APPLICATION_CBOR)) {
     return_value = 0;

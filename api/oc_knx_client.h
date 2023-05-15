@@ -42,8 +42,9 @@ extern "C" {
  * @param secret the negotiated secret (bytes)
  * @param secret_size the size in bytes of the secret
  */
-typedef void (*oc_spake_cb_t)(int error, char *serial_number, char *oscore_id, int oscore_id_size,
-                              uint8_t *secret, int secret_size);
+typedef void (*oc_spake_cb_t)(int error, char *serial_number, char *oscore_id,
+                              int oscore_id_size, uint8_t *secret,
+                              int secret_size);
 
 /**
  * @brief set the spake response callback
@@ -59,7 +60,7 @@ bool oc_set_spake_response_cb(oc_spake_cb_t my_func);
  * @brief initiate the spake handshake
  *
  * NOTE: recipient id in HEX string
- * 
+ *
  * @param endpoint the endpoint of the device to be used
  * @param password the spake password to be used
  * @param recipient_id the recipient id (HEX string)
@@ -68,27 +69,26 @@ bool oc_set_spake_response_cb(oc_spake_cb_t my_func);
 int oc_initiate_spake(oc_endpoint_t *endpoint, char *password,
                       char *recipient_id);
 
-
 /**
  * @brief initiate the spake handshake
  *
  * NOTE: After the success full handshake the OSCORE context should have:
  * - SID : serial number as byte array
  * - RID : the recipient ID as given input
- * 
+ *
  * @param endpoint the endpoint of the device to be used
- * @param serial_number the serial number of the device, to put back in the callback
+ * @param serial_number the serial number of the device, to put back in the
+ * callback
  * @param password the spake password to be used
- * @param recipient_id the recipient ID id for the resulting OSCORE context (byte string)
+ * @param recipient_id the recipient ID id for the resulting OSCORE context
+ * (byte string)
  * @param recipient_id_len length of the recipient ID byte string
  * @return int success full start up of the handshake
  */
 int oc_initiate_spake_parameter_request(oc_endpoint_t *endpoint,
-                                        char *serial_number,
-                                        char *password,
+                                        char *serial_number, char *password,
                                         char *recipient_id,
                                         size_t recipient_id_len);
-
 
 typedef void (*oc_s_mode_response_cb_t)(char *url, oc_rep_t *rep,
                                         oc_rep_t *rep_value);

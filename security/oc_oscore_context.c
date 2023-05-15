@@ -92,7 +92,7 @@ oc_oscore_find_context_by_token_mid(size_t device, uint8_t *token,
     }
     *request_piv = t->message->endpoint.piv;
     *request_piv_len = t->message->endpoint.piv_len;
-    //serial_number = t->message->endpoint.serial_number;
+    // serial_number = t->message->endpoint.serial_number;
     oscore_id = oc_string(t->message->endpoint.oscore_id);
     oscore_id_len = oc_string_len(t->message->endpoint.oscore_id);
 #ifdef OC_CLIENT
@@ -101,8 +101,7 @@ oc_oscore_find_context_by_token_mid(size_t device, uint8_t *token,
   oc_oscore_context_t *ctx = (oc_oscore_context_t *)oc_list_head(contexts);
 
   if (oscore_id_len == 0) {
-    OC_ERR(
-      "***could not find matching OSCORE context: oscore_id is NULL***");
+    OC_ERR("***could not find matching OSCORE context: oscore_id is NULL***");
     return NULL;
   }
 
@@ -123,7 +122,8 @@ oc_oscore_find_context_by_token_mid(size_t device, uint8_t *token,
 }
 
 oc_oscore_context_t *
-oc_oscore_find_context_by_oscore_id(size_t device, char *oscore_id, size_t oscore_id_len)
+oc_oscore_find_context_by_oscore_id(size_t device, char *oscore_id,
+                                    size_t oscore_id_len)
 {
   (void)device;
   int cmp_len = 16;
@@ -137,8 +137,7 @@ oc_oscore_find_context_by_oscore_id(size_t device, char *oscore_id, size_t oscor
     OC_ERR("oscore_id_len == 0\n");
     return NULL;
   }
-  if (oscore_id == NULL)
-    {
+  if (oscore_id == NULL) {
     OC_ERR("oscore_id NULL\n");
     return NULL;
   }
@@ -165,8 +164,7 @@ oc_oscore_find_context_by_oscore_id(size_t device, char *oscore_id, size_t oscor
 }
 
 oc_oscore_context_t *
-oc_oscore_find_context_by_rid(size_t device, char *rid,
-                                    size_t rid_len)
+oc_oscore_find_context_by_rid(size_t device, char *rid, size_t rid_len)
 {
   (void)device;
   int cmp_len = 16;
@@ -258,13 +256,11 @@ oc_oscore_free_context(oc_oscore_context_t *ctx)
 }
 
 oc_oscore_context_t *
-  oc_oscore_add_context(size_t device,
-                        const char *senderid, int senderid_size,
-                        const char *recipientid, int recipientid_size,
-                        uint64_t ssn, const char *desc,
-                        const char *mastersecret, int mastersecret_size,
-                        const char *osc_ctx, int osc_ctx_size,
-                        int auth_at_index, bool from_storage)
+oc_oscore_add_context(size_t device, const char *senderid, int senderid_size,
+                      const char *recipientid, int recipientid_size,
+                      uint64_t ssn, const char *desc, const char *mastersecret,
+                      int mastersecret_size, const char *osc_ctx,
+                      int osc_ctx_size, int auth_at_index, bool from_storage)
 {
   PRINT("-----oc_oscore_add_context--SID:");
   oc_char_println_hex(senderid, senderid_size);
@@ -278,10 +274,9 @@ oc_oscore_context_t *
     OC_ERR("No sender or recipient ID or Master secret");
     return NULL;
   }
-  if (mastersecret_size != OSCORE_IDCTX_LEN)
-    {
-    OC_ERR("master secret size is != %d : %d",
-           OSCORE_IDCTX_LEN, mastersecret_size);
+  if (mastersecret_size != OSCORE_IDCTX_LEN) {
+    OC_ERR("master secret size is != %d : %d", OSCORE_IDCTX_LEN,
+           mastersecret_size);
     return NULL;
   }
 
@@ -290,8 +285,7 @@ oc_oscore_context_t *
     return NULL;
   }
   if (recipientid_size > OSCORE_CTXID_LEN) {
-    OC_ERR("recipientid_size > %d = %d",
-           OSCORE_CTXID_LEN, recipientid_size);
+    OC_ERR("recipientid_size > %d = %d", OSCORE_CTXID_LEN, recipientid_size);
     return NULL;
   }
   if (osc_ctx_size > OSCORE_IDCTX_LEN) {
@@ -327,10 +321,10 @@ oc_oscore_context_t *
   size_t id_len = OSCORE_CTXID_LEN;
 
   if (senderid && senderid_size > 0) {
-    //if (oc_conv_hex_string_to_byte_array(senderid, senderid_size,
-    //                                     ctx->sendid, &id_len) < 0) {
-    //  goto add_oscore_context_error;
-    //}
+    // if (oc_conv_hex_string_to_byte_array(senderid, senderid_size,
+    //                                      ctx->sendid, &id_len) < 0) {
+    //   goto add_oscore_context_error;
+    // }
     memcpy(ctx->sendid, senderid, senderid_size);
     // explicit token
     memcpy(ctx->token_id, senderid, senderid_size);
@@ -345,10 +339,10 @@ oc_oscore_context_t *
   id_len = OSCORE_CTXID_LEN;
 
   if (recipientid && recipientid_size > 0) {
-    //if (oc_conv_hex_string_to_byte_array(recipientid, recipientid_size,
-    //                                     ctx->recvid, &id_len) < 0) {
-    //  goto add_oscore_context_error;
-    //}
+    // if (oc_conv_hex_string_to_byte_array(recipientid, recipientid_size,
+    //                                      ctx->recvid, &id_len) < 0) {
+    //   goto add_oscore_context_error;
+    // }
     memcpy(ctx->recvid, recipientid, recipientid_size);
     ctx->recvid_len = (uint8_t)recipientid_size;
   } else {
@@ -359,10 +353,10 @@ oc_oscore_context_t *
   OC_LOGbytes_OSCORE(ctx->recvid, ctx->recvid_len);
 
   if (osc_ctx && osc_ctx_size > 0) {
-    //if (oc_conv_hex_string_to_byte_array(osc_ctx, osc_ctx_size, ctx->idctx,
-    //                                     &id_len) < 0) {
-    //  goto add_oscore_context_error;
-    //}
+    // if (oc_conv_hex_string_to_byte_array(osc_ctx, osc_ctx_size, ctx->idctx,
+    //                                      &id_len) < 0) {
+    //   goto add_oscore_context_error;
+    // }
     memcpy(ctx->idctx, osc_ctx, osc_ctx_size);
     ctx->idctx_len = (uint8_t)osc_ctx_size;
   }
@@ -407,10 +401,9 @@ oc_oscore_context_t *
   OC_LOGbytes_OSCORE(ctx->recvkey, OSCORE_KEY_LEN);
 
   OC_DBG_OSCORE("### \t\tderiving Common IV ###");
-  if (oc_oscore_context_derive_param(NULL, 0, ctx->idctx, ctx->idctx_len, "IV",
-                                     (uint8_t *)mastersecret,
-        mastersecret_size, NULL, 0,
-                                     ctx->commoniv, OSCORE_COMMON_IV_LEN) < 0) {
+  if (oc_oscore_context_derive_param(
+        NULL, 0, ctx->idctx, ctx->idctx_len, "IV", (uint8_t *)mastersecret,
+        mastersecret_size, NULL, 0, ctx->commoniv, OSCORE_COMMON_IV_LEN) < 0) {
     OC_ERR("*** error deriving Common IV ###");
     goto add_oscore_context_error;
   }

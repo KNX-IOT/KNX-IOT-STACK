@@ -90,7 +90,7 @@ _oc_new_byte_string(
 #endif
     ocstring, str_len, BYTE_POOL);
   memcpy(oc_string(*ocstring), (const uint8_t *)str, str_len);
-  //memcpy(oc_string(*ocstring) + str_len, (const uint8_t *)"", 1);
+  // memcpy(oc_string(*ocstring) + str_len, (const uint8_t *)"", 1);
 }
 
 void
@@ -349,21 +349,22 @@ oc_conv_hex_string_to_byte_array(const char *hex_str, size_t hex_str_len,
   return 0;
 }
 
-int oc_conv_hex_string_to_oc_string(const char *hex_str, size_t hex_str_len,
-                                    oc_string_t *out)
+int
+oc_conv_hex_string_to_oc_string(const char *hex_str, size_t hex_str_len,
+                                oc_string_t *out)
 {
   size_t size_bytes = (hex_str_len / 2);
 
   oc_free_string(out);
   oc_alloc_string(out, size_bytes);
-  char *ptr = oc_string(*out); 
+  char *ptr = oc_string(*out);
   int return_value;
-  
-  return_value =  oc_conv_hex_string_to_byte_array(hex_str, hex_str_len, ptr, &size_bytes);
+
+  return_value =
+    oc_conv_hex_string_to_byte_array(hex_str, hex_str_len, ptr, &size_bytes);
 
   return return_value;
 }
-
 
 int
 oc_string_is_hex_array(oc_string_t hex_string)
@@ -382,19 +383,20 @@ int
 oc_string_print_hex(oc_string_t hex_string)
 {
   char *str = oc_string(hex_string);
-  int length = oc_byte_string_len(hex_string); 
+  int length = oc_byte_string_len(hex_string);
   return oc_char_print_hex(str, length);
 }
 
-int 
-oc_string_println_hex(oc_string_t hex_string) 
+int
+oc_string_println_hex(oc_string_t hex_string)
 {
   int retval = oc_string_print_hex(hex_string);
   PRINT("\n");
   return retval;
 }
 
-int oc_char_print_hex(const char *str, int str_len)
+int
+oc_char_print_hex(const char *str, int str_len)
 {
   for (int i = 0; i < str_len; i++) {
     PRINT("%02x", (unsigned char)str[i]);
@@ -427,8 +429,9 @@ oc_string_copy_from_char(oc_string_t *string1, const char *string2)
   return 0;
 }
 
-int oc_string_copy_from_char_with_size(oc_string_t *string1,
-                                       const char *string2, size_t string2_len)
+int
+oc_string_copy_from_char_with_size(oc_string_t *string1, const char *string2,
+                                   size_t string2_len)
 {
   oc_free_string(string1);
   oc_new_string(string1, string2, string2_len);
@@ -436,14 +439,13 @@ int oc_string_copy_from_char_with_size(oc_string_t *string1,
 }
 
 int
-oc_byte_string_copy_from_char_with_size(oc_string_t *string1, const char *string2,
-                                   size_t string2_len)
+oc_byte_string_copy_from_char_with_size(oc_string_t *string1,
+                                        const char *string2, size_t string2_len)
 {
   oc_free_string(string1);
   oc_new_byte_string(string1, string2, string2_len);
   return 0;
 }
-
 
 int
 oc_string_cmp(oc_string_t string1, oc_string_t string2)
@@ -560,7 +562,7 @@ oc_strnchr(const char *string, char p, int size)
   int i;
   for (i = 0; i < size; i++) {
     if (string[i] == p) {
-      return (char*)&string[i];
+      return (char *)&string[i];
     }
   }
   return NULL;

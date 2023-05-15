@@ -143,8 +143,8 @@ char *oc_at_profile_to_string(oc_at_profile_t at_profile);
  * | version   | 18:4:1 | uint        | OSCORE Version | 1          |
  * | hkdf      | 18:4:3 | integer     | HKDF value | HKDF SHA-256  (-10) |
  * | alg       | 18:4:4 | integer     | AEAD Algorithm | AES-CCM-16-64-128 (10)|
- * | salt      | 18:4:5 | byte string | Master Salt    | Default empty byte string |
- * | contextId | 18:4:6 | byte string | OSCORE ID Context value | omit  |
+ * | salt      | 18:4:5 | byte string | Master Salt    | Default empty byte
+ *string | | contextId | 18:4:6 | byte string | OSCORE ID Context value | omit |
  * | osc_rid   | 18:4:7 | byte string | OSCORE RID     | -  |
  * | osc_id    | 18:4:0 | byte string | OSCORE SID     | -  |
  *
@@ -162,22 +162,26 @@ typedef struct oc_auth_at_t
 {
   oc_string_t id;            /**< (0) auth/at/{id}, encoding: HEX */
   oc_interface_mask_t scope; /**< (9) the scope (interfaces) */
-  oc_at_profile_t profile;   /**< (38) "coap_oscore" or "coap_dtls", only oscore implemented*/
-  oc_string_t aud;           /**< (13) audience (for out going requests) */
-  oc_string_t sub;           /**< (2) DTLS (not used) 2 sub */
-  oc_string_t kid;           /**< (8:2) DTLS (not used)  cnf:kid*/
-  oc_string_t osc_version;   /**< (18:4:1) OSCORE cnf:osc:version (optional) */
-  oc_string_t osc_ms;        /**< (18:4:2) OSCORE cnf:osc:ms (byte string) */
-  uint8_t osc_hkdf;          /**< (18:4:3) OSCORE cnf:osc:hkdf (optional-not used) (decimal value)*/
-  uint8_t osc_alg;           /**< (18:4:4) OSCORE cnf:osc:alg (optional- not used) default: decimal value 10*/
+  oc_at_profile_t
+    profile; /**< (38) "coap_oscore" or "coap_dtls", only oscore implemented*/
+  oc_string_t aud;         /**< (13) audience (for out going requests) */
+  oc_string_t sub;         /**< (2) DTLS (not used) 2 sub */
+  oc_string_t kid;         /**< (8:2) DTLS (not used)  cnf:kid*/
+  oc_string_t osc_version; /**< (18:4:1) OSCORE cnf:osc:version (optional) */
+  oc_string_t osc_ms;      /**< (18:4:2) OSCORE cnf:osc:ms (byte string) */
+  uint8_t osc_hkdf;        /**< (18:4:3) OSCORE cnf:osc:hkdf (optional-not used)
+                              (decimal value)*/
+  uint8_t osc_alg;         /**< (18:4:4) OSCORE cnf:osc:alg (optional- not used)
+                              default: decimal value 10*/
   oc_string_t
     osc_salt; /**< (18:4:5) OSCORE cnf:osc:salt (optional) empty string */
-  oc_string_t
-    osc_contextid; 
+  oc_string_t osc_contextid;
   /**< (18:4:6) OSCORE cnf:osc:contextid (optional) (byte string) */
-  oc_string_t osc_id; /**< (18:4:0) OSCORE cnf:osc:id  (used as SID & KID) (byte string) */
-  oc_string_t osc_rid; /**< (18:4:7) OSCORE cnf:osc:rid (recipient ID) (byte string) */
-  int nbf;         /**< token not valid before (optional) */
+  oc_string_t osc_id; /**< (18:4:0) OSCORE cnf:osc:id  (used as SID & KID) (byte
+                         string) */
+  oc_string_t
+    osc_rid;   /**< (18:4:7) OSCORE cnf:osc:rid (recipient ID) (byte string) */
+  int nbf;     /**< token not valid before (optional) */
   int ga_len;  /**< length of the group addresses (ga) in the scope */
   int64_t *ga; /**< (scope) array of group addresses, for the group objects in
                   the scope, int64_t for framing arrays */
@@ -229,16 +233,15 @@ int oc_core_find_at_entry_empty_slot(size_t device_index);
  * @param serial_number the serial_number of the device that has been negotiated
  * with spake2plus with (e.g. client side), not also to be used as SID
  * This value is in HEX
- * @param clientrecipient_id the clientrecipient_id (delivered during the handshake)
- *  This value is in HEX
+ * @param clientrecipient_id the clientrecipient_id (delivered during the
+ * handshake) This value is in HEX
  * @param clientrecipient_id_size the size of the clientrecipient_id
  * @param shared_key the master key after SPAKE2 handshake
  * @param shared_key_size the key size
  */
-void oc_oscore_set_auth(char *serial_number, 
-                        char *clientrecipient_id,
-                        int clientrecipient_id_size,
-                        uint8_t *shared_key, int shared_key_size);
+void oc_oscore_set_auth(char *serial_number, char *clientrecipient_id,
+                        int clientrecipient_id_size, uint8_t *shared_key,
+                        int shared_key_size);
 
 /**
  * @brief retrieve auth at entry

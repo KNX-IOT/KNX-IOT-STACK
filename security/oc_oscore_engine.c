@@ -204,15 +204,15 @@ oc_oscore_recv_message(oc_message_t *message)
         OC_DBG_OSCORE(
           "--- setting endpoint serial number with found token & index");
 
-        //oc_endpoint_set_serial_number(&message->endpoint,
-        //                              (char *)oscore_ctx->token_id);
+        // oc_endpoint_set_serial_number(&message->endpoint,
+        //                               (char *)oscore_ctx->token_id);
         oc_endpoint_set_auth_at_index(&message->endpoint,
                                       (int32_t)oscore_ctx->auth_at_index);
         // oc_string_copy_from_char(&message->endpoint.serial_number,
         //                         (char *)oscore_ctx->token_id);
 
-        //PRINT("using send key!!\n");
-        //key = oscore_ctx->sendkey;
+        // PRINT("using send key!!\n");
+        // key = oscore_ctx->sendkey;
       }
     } else {
       /* If message is response */
@@ -239,9 +239,9 @@ oc_oscore_recv_message(oc_message_t *message)
     }
 
     /* Use recipient key for decryption */
-    //if (key == NULL) {
-    //  PRINT("using receive key!!\n");
-      key = oscore_ctx->recvkey;
+    // if (key == NULL) {
+    //   PRINT("using receive key!!\n");
+    key = oscore_ctx->recvkey;
     //}
 
     /* If received Partial IV in message */

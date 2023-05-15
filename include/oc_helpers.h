@@ -102,7 +102,7 @@ typedef struct oc_mmem oc_handle_t, oc_string_t, oc_array_t, oc_string_array_t,
  * @brief create new (byte) string from string (not null terminated)
  *
  */
-#define oc_new_byte_string(ocstring, str, str_len)                                  \
+#define oc_new_byte_string(ocstring, str, str_len)                             \
   _oc_new_byte_string(ocstring, str, str_len)
 
 /**
@@ -250,7 +250,6 @@ void _oc_new_byte_string(
 #endif
   oc_string_t *ocstring, const char *str, size_t str_len);
 
-
 /**
  * @brief allocate oc_string
  *
@@ -317,7 +316,7 @@ void _oc_alloc_string_array(
  * @brief convert array to hex
  *
  * Note: hex_str is pre allocated with hex_str_len
- * 
+ *
  * @param[in] array the array of bytes
  * @param[in] array_len length of the array
  * @param hex_str data as hex
@@ -344,12 +343,11 @@ int oc_conv_hex_string_to_byte_array(const char *hex_str, size_t hex_str_len,
  *
  * @param[in] hex_str hex string input
  * @param[in] hex_str_len size of the hex string
- * @param out oc_string as byte array output 
+ * @param out oc_string as byte array output
  * @return int 0 success
  */
 int oc_conv_hex_string_to_oc_string(const char *hex_str, size_t hex_str_len,
-                                      oc_string_t* out);
-
+                                    oc_string_t *out);
 
 /**
  * @brief checks if the input is an array containing hex values
@@ -383,7 +381,7 @@ int oc_string_println_hex(oc_string_t hex_string);
  * @param[in] str_len the length of the input string
  * @return int printed amount of %x
  */
-int oc_char_print_hex(const char* str, int str_len);
+int oc_char_print_hex(const char *str, int str_len);
 /**
  * @brief prints the input as hex string with newline (\n) at the end.
  *
@@ -393,7 +391,7 @@ int oc_char_print_hex(const char* str, int str_len);
  */
 int oc_char_println_hex(const char *str, int str_len);
 
-  /**
+/**
  * @brief checks if the uri contains a wildcard (e.g. "*")
  *
  * @param uri The URI to be checked.
@@ -510,9 +508,8 @@ int oc_get_sn_from_ep(const char *param, int param_len, char *sn, int sn_len,
  */
 int oc_string_copy_from_char(oc_string_t *string1, const char *string2);
 
-
 /**
- * @brief copy string from char* 
+ * @brief copy string from char*
  *
  * Note: adds a null terminator
  * @param string1 the oc_string to copy to
@@ -522,8 +519,6 @@ int oc_string_copy_from_char(oc_string_t *string1, const char *string2);
  */
 int oc_string_copy_from_char_with_size(oc_string_t *string1,
                                        const char *string2, size_t string2_len);
-
-
 
 /**
  * @brief copy byte string from char*
@@ -538,7 +533,7 @@ int oc_byte_string_copy_from_char_with_size(oc_string_t *string1,
                                             const char *string2,
                                             size_t string2_len);
 
-  /**
+/**
  * @brief copy oc_string
  *
  * @param string1 the oc_string to copy to
