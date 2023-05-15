@@ -771,7 +771,7 @@ oc_create_auth_at_resource(int resource_idx, size_t device)
     resource_idx, device, "/auth/at", OC_IF_LI | OC_IF_B | OC_IF_SEC,
     APPLICATION_LINK_FORMAT, OC_DISCOVERABLE, oc_core_auth_at_get_handler, 0,
     oc_core_auth_at_post_handler, oc_core_auth_at_delete_handler, 1,
-    "dpt.a[n]");
+    "urn:knx:fb.at");
 }
 
 // ----------------------------------------------------------------------------
@@ -1505,9 +1505,9 @@ oc_oscore_set_auth(char *serial_number, char *context_id, uint8_t *shared_key,
   os_token.scope = OC_IF_SEC | OC_IF_D | OC_IF_P;
   oc_new_string(&os_token.osc_ms, (char *)shared_key, shared_key_size);
   // TODO this is the default, when no context_id is supplied
-  // oc_new_string(&os_token.osc_id, "responderkey", strlen("responderkey"));
-  oc_new_string(&os_token.osc_id, context_id, strlen(context_id));
-  oc_new_string(&os_token.osc_contextid, context_id, strlen(context_id));
+  // oc_new_string(&os_token.osc_id, "rkey", strlen("rkey"));
+  oc_new_byte_string(&os_token.osc_id, context_id, strlen(context_id));
+  oc_new_byte_string(&os_token.osc_contextid, context_id, strlen(context_id));
   oc_new_string(&os_token.sub, "", strlen(""));
 
   int index = oc_core_find_at_entry_with_context_id(0, context_id);

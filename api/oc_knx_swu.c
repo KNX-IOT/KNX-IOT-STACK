@@ -736,7 +736,7 @@ oc_create_knx_swu_resource(int resource_idx, size_t device)
   //
   oc_core_populate_resource(
     resource_idx, device, "/swu", OC_IF_SWU | OC_IF_LI, APPLICATION_LINK_FORMAT,
-    OC_DISCOVERABLE, oc_core_knx_swu_get_handler, 0, 0, 0, 1, "urn:knx:fbswu");
+    OC_DISCOVERABLE, oc_core_knx_swu_get_handler, 0, 0, 0, 1, "urn:knx:fb.swu");
 }
 
 void
