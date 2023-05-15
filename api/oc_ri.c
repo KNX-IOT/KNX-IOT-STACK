@@ -402,7 +402,6 @@ oc_check_accept_header(oc_request_t *request, oc_content_format_t accept)
   return false;
 }
 
-
 int
 oc_status_code(oc_status_t key)
 {

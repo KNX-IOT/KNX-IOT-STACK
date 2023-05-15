@@ -492,7 +492,7 @@ int oc_status_code(oc_status_t key);
  */
 bool oc_check_accept_header(oc_request_t *request, oc_content_format_t accept);
 
-  /**
+/**
  * @brief retrieve the resource by uri and device index
  *
  * @param uri the uri of the resource

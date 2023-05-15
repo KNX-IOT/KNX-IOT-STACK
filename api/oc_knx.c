@@ -144,8 +144,7 @@ oc_core_knx_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 
   /* check if the accept header is cbor-format */
   if (request->accept != APPLICATION_JSON &&
-      request->accept != APPLICATION_CBOR &&
-      request->accept != CONTENT_NONE) {
+      request->accept != APPLICATION_CBOR && request->accept != CONTENT_NONE) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
