@@ -155,6 +155,16 @@ get_dev_pm(oc_client_response_t *data)
   }
 }
 
+oc_event_callback_retval_t do_pm(void *ep)
+{
+  oc_endpoint_t *endpoint = ep;
+  endpoint->flags |= SECURED | OSCORE;
+  oc_do_get("/dev/pm", endpoint, NULL, NULL, HIGH_QOS, NULL);
+  return OC_EVENT_CONTINUE;
+}
+
+oc_endpoint_t the_endpoint;
+
 static oc_discovery_flags_t
 discovery(const char *payload, int len, oc_endpoint_t *endpoint,
           void *user_data)
@@ -191,12 +201,18 @@ discovery(const char *payload, int len, oc_endpoint_t *endpoint,
     PRINT(" DISCOVERY CT %.*s\n", param_len, param);
   }
 
+  memcpy(&the_endpoint, endpoint, sizeof(the_endpoint));
+
   // do parameter exchange
-  oc_initiate_spake(endpoint, "LETTUCE", NULL);
+  oc_initiate_spake_parameter_request(endpoint, "00FA10010701", "LETTUCE", "rcpids", strlen("rcpids"));
+
+  oc_set_delayed_callback(&the_endpoint, do_pm, 10);
 
   PRINT(" DISCOVERY- END\n");
   return OC_STOP_DISCOVERY;
 }
+
+
 
 /* do normal discovery */
 static void
