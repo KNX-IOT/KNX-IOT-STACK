@@ -631,6 +631,15 @@ oc_oscore_send_message(oc_message_t *msg)
     oscore_ctx = oc_oscore_find_context_by_group_address(
       message->endpoint.device, message->endpoint.group_address);
   }
+  /*
+  // TODO add another search for the oscore context lower down, once you have
+  // the token from the CoAP packet type
+  if (oscore_ctx == NULL) {
+    oscore_ctx = oc_oscore_find_context_by_token_mid(
+      message->endpoint.device, message->data
+    )
+  }
+  */
   if (oscore_ctx == NULL) {
     OC_ERR("oc_oscore_send_message: No OSCORE context found. ERROR");
   }

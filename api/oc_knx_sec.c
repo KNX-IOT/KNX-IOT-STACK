@@ -1473,23 +1473,23 @@ oc_reset_at_table(size_t device_index, int erase_code)
 // ----------------------------------------------------------------------------
 
 void
-oc_oscore_set_auth(char *serial_number, char *client_recipientid,
+oc_oscore_set_auth_mac(char *serial_number, int serial_number_size, char *client_recipientid,
                    int client_recipientid_size, uint8_t *shared_key,
                    int shared_key_size)
 {
   // create the token & store in at tables at position 0
   // note there should be no entries.. if there is an entry then overwrite
   // it..
-  PRINT("oc_oscore_set_auth sn :%s\n", serial_number);
-  PRINT("oc_oscore_set_auth rid : (%d) ", client_recipientid_size);
+  PRINT("oc_oscore_set_auth_mac sn :%s\n", serial_number);
+  PRINT("oc_oscore_set_auth_mac rid : (%d) ", client_recipientid_size);
   oc_char_println_hex(client_recipientid, client_recipientid_size);
-  PRINT("oc_oscore_set_auth ms : (%d) ", shared_key_size);
+  PRINT("oc_oscore_set_auth_mac ms : (%d) ", shared_key_size);
   oc_char_println_hex(shared_key, shared_key_size);
 
   oc_auth_at_t spake_entry;
   memset(&spake_entry, 0, sizeof(spake_entry));
   // this is the index in the table, so it is the full string
-  oc_new_string(&spake_entry.id, serial_number, strlen(serial_number));
+  oc_new_string(&spake_entry.id, serial_number, serial_number_size);
   spake_entry.ga_len = 0;
   spake_entry.profile = OC_PROFILE_COAP_OSCORE;
   spake_entry.scope = OC_IF_SEC | OC_IF_D | OC_IF_P;
@@ -1497,8 +1497,53 @@ oc_oscore_set_auth(char *serial_number, char *client_recipientid,
   // no context id
   oc_new_byte_string(&spake_entry.osc_rid, client_recipientid,
                      client_recipientid_size);
-  oc_conv_hex_string_to_oc_string(serial_number, strlen(serial_number),
+  oc_conv_hex_string_to_oc_string(serial_number, serial_number_size,
                                   &spake_entry.osc_id);
+
+  PRINT("  osc_id (hex) from serial number: ");
+  oc_string_println_hex(spake_entry.osc_id);
+
+  int index = oc_core_find_at_entry_with_id(0, serial_number);
+  if (index == -1) {
+    index = oc_core_find_at_entry_empty_slot(0);
+  }
+  if (index == -1) {
+    OC_ERR("no space left in auth/at");
+  } else {
+    oc_core_set_at_table((size_t)0, index, spake_entry, true);
+    oc_at_dump_entry((size_t)0, index);
+    // add the oscore context...
+    oc_init_oscore(0);
+  }
+}
+
+// This looks very similar to oc_oscore_set_auth_mac, but has some very particular differences.
+// The key identifier is the same as before (serial number), but the sender & receiver IDs are swapped.
+// Here, the sender ID is client_recipientid, referring to the MAC. And the receiver ID is the serial number.
+void
+oc_oscore_set_auth_device(char *serial_number, int serial_number_size, char *client_recipientid,
+                   int client_recipientid_size, uint8_t *shared_key,
+                   int shared_key_size)
+{
+  PRINT("oc_oscore_set_auth_device sn :%s\n", serial_number);
+  PRINT("oc_oscore_set_auth_device rid : (%d) ", client_recipientid_size);
+  oc_char_println_hex(client_recipientid, client_recipientid_size);
+  PRINT("oc_oscore_set_auth_device ms : (%d) ", shared_key_size);
+  oc_char_println_hex(shared_key, shared_key_size);
+
+  oc_auth_at_t spake_entry;
+  memset(&spake_entry, 0, sizeof(spake_entry));
+  // this is the index in the table, so it is the full string
+  oc_new_string(&spake_entry.id, serial_number, serial_number_size);
+  spake_entry.ga_len = 0;
+  spake_entry.profile = OC_PROFILE_COAP_OSCORE;
+  spake_entry.scope = OC_IF_SEC | OC_IF_D | OC_IF_P;
+  oc_new_byte_string(&spake_entry.osc_ms, (char *)shared_key, shared_key_size);
+  // no context id
+  oc_new_byte_string(&spake_entry.osc_id, client_recipientid,
+                     client_recipientid_size);
+  oc_conv_hex_string_to_oc_string(serial_number, serial_number_size,
+                                  &spake_entry.osc_rid);
 
   PRINT("  osc_id (hex) from serial number: ");
   oc_string_println_hex(spake_entry.osc_id);
@@ -1586,8 +1631,7 @@ oc_init_oscore_from_storage(size_t device_index, bool from_storage)
   oc_oscore_free_all_contexts();
 
   OC_DBG_OSCORE(
-    "oc_init_oscore adding OSCORE context, using context id for sender & "
-    "receiver");
+    "oc_init_oscore adding OSCORE context...");
   for (i = 0; i < G_AT_MAX_ENTRIES; i++) {
 
     if (oc_string_len(g_at_entries[i].id) > 0) {
