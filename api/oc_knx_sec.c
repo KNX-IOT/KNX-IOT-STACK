@@ -1506,8 +1506,8 @@ oc_oscore_set_auth(char *serial_number, char *context_id, uint8_t *shared_key,
   oc_new_string(&os_token.osc_ms, (char *)shared_key, shared_key_size);
   // TODO this is the default, when no context_id is supplied
   // oc_new_string(&os_token.osc_id, "rkey", strlen("rkey"));
-  oc_new_byte_string(&os_token.osc_id, context_id, strlen(context_id));
-  oc_new_byte_string(&os_token.osc_contextid, context_id, strlen(context_id));
+  oc_new_string(&os_token.osc_id, context_id, strlen(context_id));
+  oc_new_string(&os_token.osc_contextid, context_id, strlen(context_id));
   oc_new_string(&os_token.sub, "", strlen(""));
 
   int index = oc_core_find_at_entry_with_context_id(0, context_id);
