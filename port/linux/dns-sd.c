@@ -25,7 +25,7 @@
 #include "ipadapter.h"
 
 static pid_t avahi_pid = 0;
-//static char serial_no_hostname[64];
+// static char serial_no_hostname[64];
 static char serial_no_subtype[64];
 static char installation_subtype[64];
 static char port_str[7];
@@ -57,8 +57,7 @@ knx_publish_service(char *serial_no, uint32_t iid, uint32_t ia, bool pm)
              serial_no);
 
     char *installation_format_string = "--subtype=_ia%x-%x._sub._knx._udp";
-    snprintf(installation_subtype, sizeof(installation_subtype),
-             ia, iid);
+    snprintf(installation_subtype, sizeof(installation_subtype), ia, iid);
 
     char *pm_subtype;
     if (pm)
@@ -71,13 +70,13 @@ knx_publish_service(char *serial_no, uint32_t iid, uint32_t ia, bool pm)
 
     int error;
     error = execlp("avahi-publish-service", "avahi-publish-service",
-                   installation_subtype,  // installation & ia (sub type)
-                   serial_format_string,  // serial number (sub type)
-                   pm_subtype,  // programming mode (sub type)
-                   serial_no,   // service name = serial number
-                   "_knx._udp", // service type
-                   port_str,    // port
-                  (char *)NULL);
+                   installation_subtype, // installation & ia (sub type)
+                   serial_format_string, // serial number (sub type)
+                   pm_subtype,           // programming mode (sub type)
+                   serial_no,            // service name = serial number
+                   "_knx._udp",          // service type
+                   port_str,             // port
+                   (char *)NULL);
 
     if (error == -1) {
       OC_ERR("Failed to execute avahi-publish-service: %s", strerror(errno));
