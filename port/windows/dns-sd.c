@@ -51,7 +51,7 @@ knx_publish_service(char *serial_no, uint32_t iid, uint32_t ia, bool pm)
     pm_subtype = "";
 
   snprintf(subtypes, 63, "_knx._udp,__ia%x-%x%s,_%s", iid, ia, pm_subtype,
-          serial_no);
+           serial_no);
   process_handle = _spawnlp(_P_NOWAIT, "dns-sd", "dns-sd", "-R", serial_no,
                             subtypes, "local", port_str, sp_text_record, NULL);
 #endif /* OC_DNS_SD */
