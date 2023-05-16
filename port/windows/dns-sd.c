@@ -21,6 +21,7 @@
 #include <process.h>
 #include <string.h>
 #include <Windows.h>
+#include <inttypes.h>
 
 intptr_t process_handle = 0;
 char subtypes[64];
@@ -29,7 +30,7 @@ static char port_str[7];
 static char sp_text_record[16] = "";
 
 int
-knx_publish_service(char *serial_no, uint32_t iid, uint32_t ia, bool pm)
+knx_publish_service(char *serial_no, uint64_t iid, uint32_t ia, bool pm)
 {
   (void)serial_no;
   (void)iid;
@@ -37,23 +38,29 @@ knx_publish_service(char *serial_no, uint32_t iid, uint32_t ia, bool pm)
   (void)pm;
 
 #ifdef OC_DNS_SD
+  char serial_no_lower[20];
   if (process_handle != 0) {
     TerminateProcess((HANDLE)process_handle, 0);
   }
 
+  // make sure that the serial number is lower case
+  strcpy(serial_no_lower, serial_no);
+  strlwr(serial_no_lower);
+
   uint16_t port = get_ip_context_for_device(0)->port;
   snprintf(port_str, sizeof(port_str), "%d", port);
-
   char *pm_subtype;
   if (pm)
     pm_subtype = ",_pm";
   else
     pm_subtype = "";
 
-  snprintf(subtypes, 63, "_knx._udp,__ia%x-%x%s,_%s", iid, ia, pm_subtype,
-           serial_no);
-  process_handle = _spawnlp(_P_NOWAIT, "dns-sd", "dns-sd", "-R", serial_no,
-                            subtypes, "local", port_str, sp_text_record, NULL);
+  snprintf(subtypes, 63, "_knx._udp,_ia%" PRIx64 "-%x%s,_%s", iid, ia,
+           pm_subtype, serial_no_lower);
+
+  process_handle =
+    _spawnlp(_P_NOWAIT, "dns-sd", "dns-sd", "-R", serial_no_lower, subtypes,
+             "local", port_str, sp_text_record, NULL);
 #endif /* OC_DNS_SD */
 
   return 0;

@@ -31,7 +31,7 @@ static char installation_subtype[64];
 static char port_str[7];
 
 int
-knx_publish_service(char *serial_no, uint32_t iid, uint32_t ia, bool pm)
+knx_publish_service(char *serial_no, uint64_t iid, uint32_t ia, bool pm)
 {
   (void)serial_no;
   (void)iid;
