@@ -1091,10 +1091,30 @@ oc_core_ap_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   size_t response_length = 0;
   int i;
   int matches = 0;
+  int length = 0;
+  bool ps_exists;
+  bool total_exists;
 
   /* check if the accept header is link-format */
   if (oc_check_accept_header(request, APPLICATION_LINK_FORMAT) == false) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    return;
+  }
+
+  // handle query parameters: l=ps l=total
+  if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
+    // example : < /ap > l = total>;total=22;ps=5
+    length = oc_frame_query_l("/ap", ps_exists, total_exists);
+    response_length += length;
+    if (ps_exists) {
+      length = oc_rep_add_line_to_buffer(";ps=1");
+      response_length += length;
+    }
+    if (total_exists) {
+      length = oc_rep_add_line_to_buffer(";total=1");
+      response_length += length;
+    }
+    oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
     return;
   }
 
