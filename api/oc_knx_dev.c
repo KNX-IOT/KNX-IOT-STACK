@@ -1073,7 +1073,7 @@ void
 oc_create_ap_x_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_ap_x_resource\n");
-  oc_core_populate_resource(resource_idx, device, "/ap/1", OC_IF_P,
+  oc_core_populate_resource(resource_idx, device, "/ap/pv", OC_IF_P,
                             APPLICATION_CBOR, OC_DISCOVERABLE,
                             oc_core_ap_x_get_handler, oc_core_ap_x_put_handler,
                             0, 0, 1, "urn:knx:dpa.3.13");
