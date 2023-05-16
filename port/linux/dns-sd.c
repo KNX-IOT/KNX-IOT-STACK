@@ -57,7 +57,7 @@ knx_publish_service(char *serial_no, uint32_t iid, uint32_t ia, bool pm)
              serial_no);
 
     char *installation_format_string = "--subtype=_ia%x-%x._sub._knx._udp";
-    snprintf(installation_subtype, sizeof(installation_subtype), serial_format_string,
+    snprintf(installation_subtype, sizeof(installation_subtype),
              ia, iid);
 
     char *pm_subtype;
