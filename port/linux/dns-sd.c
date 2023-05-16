@@ -52,7 +52,7 @@ knx_publish_service(char *serial_no, uint32_t iid, uint32_t ia, bool pm)
     // we are in the child thread - execute Avahi
     // Set up the subtype for the serial number
     // --subtype=_01CAFE1234._sub._knx._udp
-    char *installation_format_string = "--subtype="__ia%x-%x._sub._knx._udp";
+    char *installation_format_string = "--subtype=_ia%x-%x._sub._knx._udp";
     snprintf(installation_subtype, sizeof(installation_subtype), serial_format_string,
              ia, iid);
 
