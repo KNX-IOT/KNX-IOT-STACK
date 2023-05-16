@@ -73,8 +73,11 @@ oc_oscore_find_context_by_token_mid(size_t device, uint8_t *token,
   oc_client_cb_t *cb = oc_ri_find_client_cb_by_token(token, token_len);
 
   if (cb) {
-    *request_piv = cb->piv;
-    *request_piv_len = cb->piv_len;
+    if (request_piv && request_piv_len)
+    {
+      *request_piv = cb->piv;
+      *request_piv_len = cb->piv_len;
+    }
     oscore_id = oc_string(cb->endpoint.oscore_id);
     oscore_id_len = oc_string_len(cb->endpoint.oscore_id);
   } else {
@@ -90,8 +93,11 @@ oc_oscore_find_context_by_token_mid(size_t device, uint8_t *token,
         return NULL;
       }
     }
-    *request_piv = t->message->endpoint.piv;
-    *request_piv_len = t->message->endpoint.piv_len;
+    if (request_piv && request_piv_len)
+    {
+      *request_piv = t->message->endpoint.piv;
+      *request_piv_len = t->message->endpoint.piv_len;
+    }
     // serial_number = t->message->endpoint.serial_number;
     oscore_id = oc_string(t->message->endpoint.oscore_id);
     oscore_id_len = oc_string_len(t->message->endpoint.oscore_id);

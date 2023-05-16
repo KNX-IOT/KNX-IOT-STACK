@@ -623,6 +623,7 @@ oc_oscore_send_message(oc_message_t *msg)
     return 0;
   }
 
+  // Search for OSCORE context using addressing information
   oc_oscore_context_t *oscore_ctx = NULL;
   oscore_ctx = oc_oscore_find_context_by_oscore_id(
     message->endpoint.device, oc_string(message->endpoint.oscore_id),
@@ -631,17 +632,54 @@ oc_oscore_send_message(oc_message_t *msg)
     oscore_ctx = oc_oscore_find_context_by_group_address(
       message->endpoint.device, message->endpoint.group_address);
   }
-  /*
-  // TODO add another search for the oscore context lower down, once you have
-  // the token from the CoAP packet type
+
+  /* Clone incoming oc_message_t (*msg) from CoAP layer */
+  message = oc_internal_allocate_outgoing_message();
+  message->length = msg->length;
+  memcpy(message->data, msg->data, msg->length);
+  memcpy(&message->endpoint, &msg->endpoint, sizeof(oc_endpoint_t));
+
+  bool msg_valid = false;
+  if (msg->ref_count > 1) {
+    msg_valid = true;
+  }
+
+  oc_message_unref(msg);
+
+  OC_DBG_OSCORE("### parse CoAP message ###");
+  /* Parse CoAP message */
+  coap_packet_t coap_pkt[1];
+  coap_status_t code = 0;
+#ifdef OC_TCP
+  if (message->endpoint.flags & TCP) {
+    code = coap_tcp_parse_message(coap_pkt, message->data,
+                                  (uint32_t)message->length);
+  } else
+#endif /* OC_TCP */
+  {
+    code = coap_udp_parse_message(coap_pkt, message->data,
+                                  (uint16_t)message->length);
+  }
+
+  if (code != COAP_NO_ERROR) {
+    OC_ERR("***error parsing CoAP packet***");
+    goto oscore_send_error;
+  }
+
+  OC_DBG_OSCORE("### parsed CoAP message ###");
+
+  // Search for context using transaction data
   if (oscore_ctx == NULL) {
     oscore_ctx = oc_oscore_find_context_by_token_mid(
-      message->endpoint.device, message->data
-    )
-  }
-  */
-  if (oscore_ctx == NULL) {
+      message->endpoint.device, coap_pkt->token, coap_pkt->token_len, coap_pkt->mid,
+      NULL, NULL, false);
+ }
+  // We haven't found a context, so we free the message we just created
+  if (oscore_ctx == NULL)
+  {
+    oc_message_unref(message);
     OC_ERR("oc_oscore_send_message: No OSCORE context found. ERROR");
+    goto oscore_send_error;
   }
 
   if (oscore_ctx) {
@@ -652,40 +690,6 @@ oc_oscore_send_message(oc_message_t *msg)
     /* Use sender key for encryption */
     uint8_t *key = oscore_ctx->sendkey;
 
-    /* Clone incoming oc_message_t (*msg) from CoAP layer */
-    message = oc_internal_allocate_outgoing_message();
-    message->length = msg->length;
-    memcpy(message->data, msg->data, msg->length);
-    memcpy(&message->endpoint, &msg->endpoint, sizeof(oc_endpoint_t));
-
-    bool msg_valid = false;
-    if (msg->ref_count > 1) {
-      msg_valid = true;
-    }
-
-    oc_message_unref(msg);
-
-    OC_DBG_OSCORE("### parse CoAP message ###");
-    /* Parse CoAP message */
-    coap_packet_t coap_pkt[1];
-    coap_status_t code = 0;
-#ifdef OC_TCP
-    if (message->endpoint.flags & TCP) {
-      code = coap_tcp_parse_message(coap_pkt, message->data,
-                                    (uint32_t)message->length);
-    } else
-#endif /* OC_TCP */
-    {
-      code = coap_udp_parse_message(coap_pkt, message->data,
-                                    (uint16_t)message->length);
-    }
-
-    if (code != COAP_NO_ERROR) {
-      OC_ERR("***error parsing CoAP packet***");
-      goto oscore_send_error;
-    }
-
-    OC_DBG_OSCORE("### parsed CoAP message ###");
 
     uint8_t piv[OSCORE_PIV_LEN], piv_len = 0, kid[OSCORE_CTXID_LEN],
                                  kid_len = 0, nonce[OSCORE_AEAD_NONCE_LEN],
