@@ -349,17 +349,6 @@ int oc_conv_hex_string_to_oc_string(const char *hex_str, size_t hex_str_len,
                                     oc_string_t *out);
 
 /**
- * @brief convert hex string to oc_string byte array
- *
- * @param[in] hex_str hex string input
- * @param[in] hex_str_len size of the hex string
- * @param out oc_string as byte array output
- * @return int 0 success
- */
-int oc_conv_hex_string_to_oc_string(const char *hex_str, size_t hex_str_len,
-                                    oc_string_t *out);
-
-/**
  * @brief checks if the input is an array containing hex values
  * e.g. [0-9,A-F,a-f]
  *
