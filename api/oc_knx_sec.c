@@ -1473,9 +1473,9 @@ oc_reset_at_table(size_t device_index, int erase_code)
 // ----------------------------------------------------------------------------
 
 void
-oc_oscore_set_auth_mac(char *serial_number, int serial_number_size, char *client_recipientid,
-                   int client_recipientid_size, uint8_t *shared_key,
-                   int shared_key_size)
+oc_oscore_set_auth_mac(char *serial_number, int serial_number_size,
+                       char *client_recipientid, int client_recipientid_size,
+                       uint8_t *shared_key, int shared_key_size)
 {
   // create the token & store in at tables at position 0
   // note there should be no entries.. if there is an entry then overwrite
@@ -1517,13 +1517,15 @@ oc_oscore_set_auth_mac(char *serial_number, int serial_number_size, char *client
   }
 }
 
-// This looks very similar to oc_oscore_set_auth_mac, but has some very particular differences.
-// The key identifier is the same as before (serial number), but the sender & receiver IDs are swapped.
-// Here, the sender ID is client_recipientid, referring to the MAC. And the receiver ID is the serial number.
+// This looks very similar to oc_oscore_set_auth_mac, but has some very
+// particular differences. The key identifier is the same as before (serial
+// number), but the sender & receiver IDs are swapped. Here, the sender ID is
+// client_recipientid, referring to the MAC. And the receiver ID is the serial
+// number.
 void
-oc_oscore_set_auth_device(char *serial_number, int serial_number_size, char *client_recipientid,
-                   int client_recipientid_size, uint8_t *shared_key,
-                   int shared_key_size)
+oc_oscore_set_auth_device(char *serial_number, int serial_number_size,
+                          char *client_recipientid, int client_recipientid_size,
+                          uint8_t *shared_key, int shared_key_size)
 {
   PRINT("oc_oscore_set_auth_device sn :%s\n", serial_number);
   PRINT("oc_oscore_set_auth_device rid : (%d) ", client_recipientid_size);
@@ -1630,8 +1632,7 @@ oc_init_oscore_from_storage(size_t device_index, bool from_storage)
   // deleting all contexts!!
   oc_oscore_free_all_contexts();
 
-  OC_DBG_OSCORE(
-    "oc_init_oscore adding OSCORE context...");
+  OC_DBG_OSCORE("oc_init_oscore adding OSCORE context...");
   for (i = 0; i < G_AT_MAX_ENTRIES; i++) {
 
     if (oc_string_len(g_at_entries[i].id) > 0) {

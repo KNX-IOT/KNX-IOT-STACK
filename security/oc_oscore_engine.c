@@ -632,11 +632,10 @@ oc_oscore_send_message(oc_message_t *msg)
   // get auth_at table entry at index
   oc_auth_at_t *entry = oc_get_auth_at_entry(message->endpoint.device, index);
   // if found, get the corresponding context
-  if (entry)
-  {
+  if (entry) {
     OC_DBG_OSCORE("### Found auth at entry, getting context ###");
-    oscore_ctx = oc_oscore_find_context_by_kid(NULL,
-      message->endpoint.device, oc_string(entry->osc_rid),
+    oscore_ctx = oc_oscore_find_context_by_kid(
+      NULL, message->endpoint.device, oc_string(entry->osc_rid),
       oc_byte_string_len(entry->osc_rid));
   }
 
@@ -684,12 +683,11 @@ oc_oscore_send_message(oc_message_t *msg)
   // Search for context using transaction data
   if (oscore_ctx == NULL) {
     oscore_ctx = oc_oscore_find_context_by_token_mid(
-      message->endpoint.device, coap_pkt->token, coap_pkt->token_len, coap_pkt->mid,
-      NULL, NULL, false);
- }
+      message->endpoint.device, coap_pkt->token, coap_pkt->token_len,
+      coap_pkt->mid, NULL, NULL, false);
+  }
   // We haven't found a context, so we free the message we just created
-  if (oscore_ctx == NULL)
-  {
+  if (oscore_ctx == NULL) {
     oc_message_unref(message);
     OC_ERR("oc_oscore_send_message: No OSCORE context found. ERROR");
     goto oscore_send_error;
@@ -702,7 +700,6 @@ oc_oscore_send_message(oc_message_t *msg)
                   oscore_ctx->token_id);
     /* Use sender key for encryption */
     uint8_t *key = oscore_ctx->sendkey;
-
 
     uint8_t piv[OSCORE_PIV_LEN], piv_len = 0, kid[OSCORE_CTXID_LEN],
                                  kid_len = 0, nonce[OSCORE_AEAD_NONCE_LEN],

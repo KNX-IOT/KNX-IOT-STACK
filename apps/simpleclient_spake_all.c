@@ -154,7 +154,8 @@ get_dev_pm(oc_client_response_t *data)
     }
   }
 }
-void callback(oc_client_response_t *rsp)
+void
+callback(oc_client_response_t *rsp)
 {
   return;
 }
@@ -207,7 +208,7 @@ discovery(const char *payload, int len, oc_endpoint_t *endpoint,
   }
 
   memcpy(&the_endpoint, endpoint, sizeof(the_endpoint));
-  char sernum[6] = {0x00, 0xfa, 0x10, 0x01, 0x07, 0x01};
+  char sernum[6] = { 0x00, 0xfa, 0x10, 0x01, 0x07, 0x01 };
   oc_new_string(&the_endpoint.oscore_id, sernum, 6);
 
   // do parameter exchange

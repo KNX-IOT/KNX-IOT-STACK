@@ -73,8 +73,7 @@ oc_oscore_find_context_by_token_mid(size_t device, uint8_t *token,
   oc_client_cb_t *cb = oc_ri_find_client_cb_by_token(token, token_len);
 
   if (cb) {
-    if (request_piv && request_piv_len)
-    {
+    if (request_piv && request_piv_len) {
       *request_piv = cb->piv;
       *request_piv_len = cb->piv_len;
     }
@@ -93,8 +92,7 @@ oc_oscore_find_context_by_token_mid(size_t device, uint8_t *token,
         return NULL;
       }
     }
-    if (request_piv && request_piv_len)
-    {
+    if (request_piv && request_piv_len) {
       *request_piv = t->message->endpoint.piv;
       *request_piv_len = t->message->endpoint.piv_len;
     }
