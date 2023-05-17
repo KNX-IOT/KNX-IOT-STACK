@@ -436,8 +436,14 @@ oc_core_add_device(const char *name, const char *version, const char *base,
 
   /* Construct device resource */
   // int properties = OC_DISCOVERABLE;
-  oc_new_string(&oc_device_info[device_count].serialnumber, serialnumber,
-                strlen(serialnumber));
+
+  // make sure that the serial number used is in lower case
+  char serial_lower[20];
+  strncpy(serial_lower, serialnumber, 19);
+  oc_char_convert_to_lower(serial_lower);
+
+  oc_new_string(&oc_device_info[device_count].serialnumber, serial_lower,
+                strlen(serial_lower));
   oc_device_info[device_count].add_device_cb = add_device_cb;
 
   oc_create_discovery_resource(WELLKNOWNCORE, device_count);

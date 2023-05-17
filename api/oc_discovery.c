@@ -34,6 +34,7 @@
 #ifdef OC_OSCORE
 #include "security/oc_tls.h"
 #endif
+#include <inttypes.h>
 
 bool
 oc_add_resource_to_wk(oc_resource_t *resource, oc_request_t *request,
@@ -199,6 +200,31 @@ oc_process_resources(oc_request_t *request, size_t device_index,
   return matches;
 }
 
+static int
+frame_sn(char *serial_number, uint64_t iid, uint32_t ia)
+{
+  int framed_bytes;
+  int response_length = 0;
+
+  framed_bytes = oc_rep_add_line_to_buffer("<>;ep=\"knx://sn.");
+  response_length = response_length + framed_bytes;
+  framed_bytes = oc_rep_add_line_to_buffer(serial_number);
+  response_length = response_length + framed_bytes;
+
+  framed_bytes = oc_rep_add_line_to_buffer(" knx://ia.");
+  char text_hex[20];
+  snprintf(text_hex, 19, "%" PRIx64 "", iid);
+  framed_bytes = oc_rep_add_line_to_buffer(text_hex);
+  response_length = response_length + framed_bytes;
+
+  snprintf(text_hex, 19, ".%x", ia);
+  framed_bytes = oc_rep_add_line_to_buffer(text_hex);
+  response_length = response_length + framed_bytes;
+  framed_bytes = oc_rep_add_line_to_buffer("\"");
+  response_length = response_length + framed_bytes;
+  return response_length;
+}
+
 static void
 oc_wkcore_discovery_handler(oc_request_t *request,
                             oc_interface_mask_t iface_mask, void *data)
@@ -300,12 +326,17 @@ oc_wkcore_discovery_handler(oc_request_t *request,
          the ep=urn:knx:sn.* and if=urn:knx:if.pm concatenation. since that only
          needs to respond when the device is in programming mode
       */
-      framed_bytes = oc_rep_add_line_to_buffer("<>;ep=\"urn:knx:sn.");
-      response_length = response_length + framed_bytes;
-      framed_bytes = oc_rep_add_line_to_buffer(oc_string(device->serialnumber));
-      response_length = response_length + framed_bytes;
-      framed_bytes = oc_rep_add_line_to_buffer("\"");
-      response_length = response_length + framed_bytes;
+      // framed_bytes = oc_rep_add_line_to_buffer("<>;ep=\"urn:knx:sn.");
+      // response_length = response_length + framed_bytes;
+      // framed_bytes =
+      // oc_rep_add_line_to_buffer(oc_string(device->serialnumber));
+      // response_length = response_length + framed_bytes;
+      // framed_bytes = oc_rep_add_line_to_buffer("\"");
+      // response_length = response_length + framed_bytes;
+      // matches = 1;
+
+      response_length =
+        frame_sn(oc_string(device->serialnumber), device->iid, device->ia);
       matches = 1;
 
       request->response->response_buffer->response_length = response_length;
@@ -328,7 +359,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
     return;
   }
 
-  /* handle individual address */
+  /* handle individual address, spec 1.0 */
   if (if_request != 0 && if_len > 11 &&
       strncmp(if_request, "urn:knx:ia.", 11) == 0) {
     char *if_ia_s = if_request + 11;
@@ -357,6 +388,33 @@ oc_wkcore_discovery_handler(oc_request_t *request,
       // PRINT(" oc_wkcore_discovery_handler IA HANDLING: IGNORE\n");
       request->response->response_buffer->code = OC_IGNORE;
       return;
+    }
+  }
+
+  /* handle individual address, spec 1.1 */
+  if (ep_request != 0 && ep_len > 9 &&
+      strncmp(ep_request, "knx://ia.", 9) == 0) {
+    bool frame_ep = false;
+    /* new style release 1.1 */
+    /* request for all devices via serial number wild card*/
+    char *ep_ia = ep_request + 9;
+    uint32_t ia = atoi(ep_ia);
+    if (ia == device->ia) {
+      // ia is the same
+      // now do the extra work to check the iid
+      // do this with string compare, otherwise we have to create an uint64 from
+      // string
+      int iid_str_len = ep_len - 10;
+      char *iid_str = oc_strnchr(&ep_request[10], '.', iid_str_len);
+      if (iid_str) {
+        char iid_dev[20];
+        snprintf(iid_dev, 19, "%" PRIx64 "", device->iid);
+        if (strncmp(iid_dev, iid_str + 1, iid_str_len - 1) == 0) {
+          response_length = response_length =
+            frame_sn(oc_string(device->serialnumber), device->iid, device->ia);
+          matches = 1;
+        }
+      }
     }
   }
 
@@ -404,18 +462,8 @@ oc_wkcore_discovery_handler(oc_request_t *request,
       frame_ep = true;
     }
     if (frame_ep) {
-      /* return <>; ep="urn:knx:sn.<serial-number>"*/
-      framed_bytes = oc_rep_add_line_to_buffer("<>;ep=\"knx://sn.");
-      response_length = response_length + framed_bytes;
-      framed_bytes = oc_rep_add_line_to_buffer(oc_string(device->serialnumber));
-      response_length = response_length + framed_bytes;
-      framed_bytes = oc_rep_add_line_to_buffer(" knx://ia.");
-      char ia_hex[20];
-      snprintf(ia_hex, 19, "%x", device->ia);
-      framed_bytes = oc_rep_add_line_to_buffer(ia_hex);
-      response_length = response_length + framed_bytes;
-      framed_bytes = oc_rep_add_line_to_buffer("\"");
-      response_length = response_length + framed_bytes;
+      response_length = response_length =
+        frame_sn(oc_string(device->serialnumber), device->iid, device->ia);
       matches = 1;
     }
   }

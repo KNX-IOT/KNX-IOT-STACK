@@ -364,6 +364,14 @@ int oc_string_is_hex_array(oc_string_t hex_string);
 int oc_string_println_hex(oc_string_t hex_string);
 
 /**
+ * @brief converts the input string to lower case
+ *
+ * @param[in] string the input string that gets converted
+ * @return int 0 success
+ */
+int oc_char_convert_to_lower(char *string);
+
+/**
  * @brief prints the string as hex
  *
  * @param[in] hex_string the input string to be checked
