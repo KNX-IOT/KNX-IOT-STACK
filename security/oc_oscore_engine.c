@@ -32,6 +32,8 @@
 #include "util/oc_process.h"
 #include "oc_knx.h"
 
+#include "api/oc_knx_sec.h"
+
 OC_PROCESS(oc_oscore_handler, "OSCORE Process");
 
 static void
@@ -623,11 +625,22 @@ oc_oscore_send_message(oc_message_t *msg)
     return 0;
   }
 
-  // Search for OSCORE context using addressing information
   oc_oscore_context_t *oscore_ctx = NULL;
-  oscore_ctx = oc_oscore_find_context_by_oscore_id(
-    message->endpoint.device, oc_string(message->endpoint.oscore_id),
-    oc_byte_string_len(message->endpoint.oscore_id));
+  // most common case for unicast: we just get the cached index
+  int index = message->endpoint.auth_at_index - 1;
+
+  // get auth_at table entry at index
+  oc_auth_at_t *entry = oc_get_auth_at_entry(message->endpoint.device, index);
+  // if found, get the corresponding context
+  if (entry)
+  {
+    OC_DBG_OSCORE("### Found auth at entry, getting context ###");
+    oscore_ctx = oc_oscore_find_context_by_kid(NULL,
+      message->endpoint.device, oc_string(entry->osc_rid),
+      oc_byte_string_len(entry->osc_rid));
+  }
+
+  // Search for OSCORE context using addressing information
   if (oscore_ctx == NULL) {
     oscore_ctx = oc_oscore_find_context_by_group_address(
       message->endpoint.device, message->endpoint.group_address);
@@ -782,7 +795,7 @@ oc_oscore_send_message(oc_message_t *msg)
        * SSN */
       coap_transaction_t *transaction =
         coap_get_transaction_by_token(coap_pkt->token, coap_pkt->token_len);
-      if (transaction->retrans_counter == 0)
+      if (transaction && transaction->retrans_counter == 0)
         increment_ssn_in_context(oscore_ctx);
 
       /* Compute nonce using partial IV and context->sendid */

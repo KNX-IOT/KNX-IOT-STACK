@@ -1835,11 +1835,11 @@ method_allowed(oc_method_t method, oc_resource_t *resource,
                   get_method_name(method), oc_string_checked(resource->uri));
     return false;
   }
-  if (endpoint->aut_at_index > 0) {
+  if (endpoint->auth_at_index > 0) {
     // interface of the call, e.g. of the auth/at entry that was used to decrypt
     // the message
     oc_interface_mask_t calling_interfaces =
-      oc_at_get_interface_mask(0, endpoint->aut_at_index - 1);
+      oc_at_get_interface_mask(0, endpoint->auth_at_index - 1);
     // interfaces of the resource
     oc_interface_mask_t resource_interfaces = resource->interfaces;
     if (oc_knx_contains_interface(calling_interfaces, resource_interfaces) ==
