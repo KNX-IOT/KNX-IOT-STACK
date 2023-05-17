@@ -51,11 +51,11 @@ knx_publish_service(char *serial_no, uint64_t iid, uint32_t ia, bool pm)
 
   if (avahi_pid == 0) {
     // we are in the child thread - execute Avahi
-    
+
     // make sure that the serial number is used in lower case
-    strncpy(serial_no_lowercase,serial_no,19);
+    strncpy(serial_no_lowercase, serial_no, 19);
     strlwr(serial_no_lowercase);
-    
+
     // Set up the subtype for the serial number
     // --subtype=_01cafe1234._sub._knx._udp
     char *serial_format_string = "--subtype=_%s._sub._knx._udp";
