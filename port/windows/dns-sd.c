@@ -38,14 +38,9 @@ knx_publish_service(char *serial_no, uint64_t iid, uint32_t ia, bool pm)
   (void)pm;
 
 #ifdef OC_DNS_SD
-  char serial_no_lower[20];
   if (process_handle != 0) {
     TerminateProcess((HANDLE)process_handle, 0);
   }
-
-  // make sure that the serial number is lower case
-  strcpy(serial_no_lower, serial_no);
-  strlwr(serial_no_lower);
 
   uint16_t port = get_ip_context_for_device(0)->port;
   snprintf(port_str, sizeof(port_str), "%d", port);
@@ -56,7 +51,7 @@ knx_publish_service(char *serial_no, uint64_t iid, uint32_t ia, bool pm)
     pm_subtype = "";
 
   snprintf(subtypes, 63, "_knx._udp,_ia%" PRIx64 "-%x%s,_%s", iid, ia,
-           pm_subtype, serial_no_lower);
+           pm_subtype, serial_no);
 
   process_handle =
     _spawnlp(_P_NOWAIT, "dns-sd", "dns-sd", "-R", serial_no_lower, subtypes,

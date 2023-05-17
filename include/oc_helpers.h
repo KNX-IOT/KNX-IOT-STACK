@@ -385,7 +385,15 @@ int oc_string_print_hex(oc_string_t hex_string);
 int oc_string_println_hex(oc_string_t hex_string);
 
 /**
- * @brief prints the input as hex string
+ * @brief converts the input string to lower case
+ *
+ * @param[in] string the input string that gets converted
+ * @return int 0 success
+ */
+int oc_char_convert_to_lower(char *string);
+
+/**
+ * @brief prints the string as hex
  *
  * @param[in] str the input string to be printed
  * @param[in] str_len the length of the input string
