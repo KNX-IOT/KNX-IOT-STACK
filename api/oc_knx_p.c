@@ -62,8 +62,8 @@ oc_core_p_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   size_t response_length = 0;
   int matches = 0;
   int length = 0;
-  bool ps_exists=false;
-  bool total_exists=false;
+  bool ps_exists = false;
+  bool total_exists = false;
 
   PRINT("oc_core_p_get_handler\n");
 
