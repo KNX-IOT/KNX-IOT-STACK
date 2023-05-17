@@ -150,6 +150,12 @@ app_init(void)
   /* set the hardware type*/
   oc_core_set_device_hwt(0, "Pi");
 
+  /* set the application info*/
+  oc_core_set_device_ap(0, 1, 0, 0);
+
+  /* set the manufacturer info*/
+  oc_core_set_device_mid(0, 12);
+
   /* set the model */
   oc_core_set_device_model(0, "Cascoda Actuator");
 
@@ -190,7 +196,7 @@ get_o_1_1(oc_request_t *request, oc_interface_mask_t interfaces,
 
   PRINT("-- Begin get_dpa_417_61: interface %d\n", interfaces);
   /* check if the accept header is CBOR */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     oc_send_response(request, OC_STATUS_BAD_OPTION);
     return;
   }

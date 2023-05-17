@@ -58,7 +58,8 @@ oc_add_resource_to_wk(oc_resource_t *resource, oc_request_t *request,
 
   length = oc_rep_add_line_to_buffer("<");
   *response_length += length;
-
+  /*
+  // code to frame the used IP address
   oc_endpoint_t *eps = oc_connectivity_get_endpoints(request->resource->device);
   oc_string_t ep, uri;
   memset(&uri, 0, sizeof(oc_string_t));
@@ -68,7 +69,7 @@ oc_add_resource_to_wk(oc_resource_t *resource, oc_request_t *request,
     if (eps->flags & SECURED) {
 #else
     if ((eps->flags & SECURED) == 0) {
-#endif /* OC_SECURITY */
+#endif // OC_SECURITY
       if (oc_endpoint_to_string(eps, &ep) == 0) {
         length = oc_rep_add_line_to_buffer(oc_string(ep));
         *response_length += length;
@@ -78,6 +79,7 @@ oc_add_resource_to_wk(oc_resource_t *resource, oc_request_t *request,
     }
     eps = eps->next;
   }
+ */
 
   length = oc_rep_add_line_to_buffer(oc_string(resource->uri));
   *response_length += length;
@@ -209,7 +211,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
 
   /* check if the accept header is link-format */
   if (request->accept != APPLICATION_LINK_FORMAT &&
-      request->accept != APPLICATION_JSON) {
+      request->accept != APPLICATION_JSON && request->accept != CONTENT_NONE) {
     /* handle bad request..
     note below layer ignores this message if it is a multi cast request */
     request->response->response_buffer->code =
@@ -358,7 +360,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
     }
   }
 
-  /* handle serial number*/
+  /* handle serial number spec 1.0 */
   if (ep_request != 0 && ep_len > 11 &&
       strncmp(ep_request, "urn:knx:sn.", 11) == 0) {
     /* old style can be removed later*/
@@ -385,8 +387,8 @@ oc_wkcore_discovery_handler(oc_request_t *request,
       matches = 1;
     }
   }
-
-  if (ep_request != 0 && ep_len > 11 &&
+  /* handle serial number spec 1.1 */
+  if (ep_request != 0 && ep_len > 9 &&
       strncmp(ep_request, "knx://sn.", 9) == 0) {
     /* new style release 1.1 */
     /* request for all devices via serial number wild card*/

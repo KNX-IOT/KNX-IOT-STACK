@@ -39,7 +39,7 @@ extern "C" {
  * @param pm True if the device is in Programming Mode, false otherwise.
  * @return int 0 on success, -1 on error.
  */
-int knx_publish_service(char *serial_no, uint32_t iid, uint32_t ia, bool pm);
+int knx_publish_service(char *serial_no, uint64_t iid, uint32_t ia, bool pm);
 
 /**
  * @brief Set the advertised sleep period within the mDNS service.

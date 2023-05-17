@@ -32,6 +32,9 @@
 #define KNX_STORAGE_PM "dev_knx_pm"
 #define KNX_STORAGE_PORT "dev_knx_port"
 #define KNX_STORAGE_MPORT "dev_knx_mport"
+#define KNX_STORAGE_AP_MAJOR "knx_ap_maj"
+#define KNX_STORAGE_AP_MINOR "knx_ap_min"
+#define KNX_STORAGE_AP_PATCH "knx_ap_p"
 
 static void
 oc_core_dev_sn_get_handler(oc_request_t *request,
@@ -41,7 +44,7 @@ oc_core_dev_sn_get_handler(oc_request_t *request,
   (void)iface_mask;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -85,7 +88,7 @@ oc_core_dev_hwv_get_handler(oc_request_t *request,
   (void)iface_mask;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -130,7 +133,7 @@ oc_core_dev_fwv_get_handler(oc_request_t *request,
   (void)iface_mask;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -178,7 +181,7 @@ oc_core_dev_hwt_get_handler(oc_request_t *request,
   (void)iface_mask;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -218,7 +221,7 @@ oc_core_dev_model_get_handler(oc_request_t *request,
   (void)iface_mask;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -257,7 +260,7 @@ oc_core_dev_ia_get_handler(oc_request_t *request,
   (void)iface_mask;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     OC_ERR("invalid request");
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
@@ -293,7 +296,7 @@ oc_core_dev_ia_put_handler(oc_request_t *request,
   bool fid_set = false;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -370,7 +373,7 @@ oc_core_dev_hostname_put_handler(oc_request_t *request,
   (void)iface_mask;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -412,7 +415,7 @@ oc_core_dev_hostname_get_handler(oc_request_t *request,
   (void)iface_mask;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -452,7 +455,7 @@ oc_core_dev_iid_put_handler(oc_request_t *request,
   (void)iface_mask;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -496,7 +499,7 @@ oc_core_dev_iid_get_handler(oc_request_t *request,
   (void)iface_mask;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -537,7 +540,7 @@ oc_core_dev_ipv6_get_handler(oc_request_t *request,
   (void)iface_mask;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -576,7 +579,7 @@ oc_core_dev_pm_get_handler(oc_request_t *request,
   (void)iface_mask;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -605,7 +608,7 @@ oc_core_dev_pm_put_handler(oc_request_t *request,
   (void)iface_mask;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -647,10 +650,10 @@ void
 oc_create_dev_pm_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_dev_pm_resource\n");
-  oc_core_populate_resource(resource_idx, device, "/dev/pm", OC_IF_P,
-                            APPLICATION_CBOR, OC_DISCOVERABLE,
-                            oc_core_dev_pm_get_handler,
-                            oc_core_dev_pm_put_handler, 0, 0, 1, ":dpa.0.54");
+  oc_core_populate_resource(
+    resource_idx, device, "/dev/pm", OC_IF_P, APPLICATION_CBOR, OC_DISCOVERABLE,
+    oc_core_dev_pm_get_handler, oc_core_dev_pm_put_handler, 0, 0, 1,
+    "urn:knx:dpa.0.54");
 
   oc_core_bind_dpt_resource(resource_idx, device, "urn:knx:dpt.binaryValue");
 }
@@ -669,7 +672,7 @@ oc_core_dev_dev_get_handler(oc_request_t *request,
   PRINT("oc_core_dev_dev_get_handler\n");
 
   /* check if the accept header is link-format */
-  if (request->accept != APPLICATION_LINK_FORMAT) {
+  if (oc_check_accept_header(request, APPLICATION_LINK_FORMAT) == false) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
@@ -725,7 +728,7 @@ oc_core_dev_sa_get_handler(oc_request_t *request,
   (void)iface_mask;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -749,9 +752,10 @@ void
 oc_create_dev_sa_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_dev_sa_resource\n");
-  oc_core_populate_resource(
-    resource_idx, device, "/dev/sa", OC_IF_P, APPLICATION_CBOR, OC_DISCOVERABLE,
-    oc_core_dev_sa_get_handler, 0, 0, 0, 1, "urn:knx:dpa.0.57");
+  oc_core_populate_resource(resource_idx, device, "/dev/sna", OC_IF_P,
+                            APPLICATION_CBOR, OC_DISCOVERABLE,
+                            oc_core_dev_sa_get_handler, 0, 0, 0, 1,
+                            "urn:knx:dpa.0.57");
 
   oc_core_bind_dpt_resource(resource_idx, device, "urn:knx:dpt.value1Ucount");
 }
@@ -766,7 +770,7 @@ oc_core_dev_da_get_handler(oc_request_t *request,
   (void)iface_mask;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -807,7 +811,7 @@ oc_core_dev_port_get_handler(oc_request_t *request,
   (void)iface_mask;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -833,7 +837,7 @@ oc_core_dev_port_put_handler(oc_request_t *request,
   (void)iface_mask;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -864,8 +868,7 @@ oc_create_dev_port_resource(int resource_idx, size_t device)
   OC_DBG("oc_create_dev_port_resource\n");
   oc_core_populate_resource(resource_idx, device, "/dev/port", OC_IF_P,
                             APPLICATION_CBOR, OC_DISCOVERABLE,
-                            oc_core_dev_port_get_handler,
-                            oc_core_dev_port_put_handler, 0, 0, 0);
+                            oc_core_dev_port_get_handler, 0, 0, 0, 0);
 
   oc_core_bind_dpt_resource(resource_idx, device, "urn:knx:dpt.value2Ucount");
 }
@@ -882,7 +885,7 @@ oc_core_dev_mport_get_handler(oc_request_t *request,
   (void)iface_mask;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -908,7 +911,7 @@ oc_core_dev_mport_put_handler(oc_request_t *request,
   (void)iface_mask;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -940,14 +943,249 @@ oc_create_dev_mport_resource(int resource_idx, size_t device)
   OC_DBG("oc_create_dev_mport_resource\n");
   oc_core_populate_resource(resource_idx, device, "/dev/mport", OC_IF_P,
                             APPLICATION_CBOR, OC_DISCOVERABLE,
-                            oc_core_dev_mport_get_handler,
-                            oc_core_dev_mport_put_handler, 0, 0, 0);
+                            oc_core_dev_mport_get_handler, 0, 0, 0, 0);
+
+  oc_core_bind_dpt_resource(resource_idx, device, "urn:knx:dpt.value2Ucount");
+}
+
+// -----------------------------------------------------------------------------
+static int
+oc_core_dump_ap(int device_index)
+{
+  // KNX_STORAGE_AP
+  oc_device_info_t *device = oc_core_get_device_info(device_index);
+  if (device != NULL) {
+    int32_t value = device->ap.major;
+    oc_storage_write(KNX_STORAGE_AP_MAJOR, (uint8_t *)&value, sizeof(value));
+    value = device->ap.minor;
+    oc_storage_write(KNX_STORAGE_AP_MINOR, (uint8_t *)&value, sizeof(value));
+    value = device->ap.patch;
+    oc_storage_write(KNX_STORAGE_AP_PATCH, (uint8_t *)&value, sizeof(value));
+    return 0;
+  }
+  return -1;
+}
+
+static int
+oc_core_read_ap(int device_index)
+{
+  // KNX_STORAGE_AP
+  oc_device_info_t *device = oc_core_get_device_info(device_index);
+  if (device != NULL) {
+    int32_t value;
+    long temp_size;
+
+    temp_size =
+      oc_storage_read(KNX_STORAGE_AP_MAJOR, (uint8_t *)&value, sizeof(value));
+    if (temp_size > 0) {
+      device->ap.major = value;
+    }
+    temp_size =
+      oc_storage_read(KNX_STORAGE_AP_MINOR, (uint8_t *)&value, sizeof(value));
+    if (temp_size > 0) {
+      device->ap.minor = value;
+    }
+    temp_size =
+      oc_storage_read(KNX_STORAGE_AP_PATCH, (uint8_t *)&value, sizeof(value));
+    if (temp_size > 0) {
+      device->ap.patch = value;
+    }
+    return 0;
+  }
+  return -1;
+}
+
+static void
+oc_core_ap_x_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
+                         void *data)
+{
+  (void)data;
+  (void)iface_mask;
+
+  /* check if the accept header is CBOR-format */
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
+    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    return;
+  }
+
+  size_t device_index = request->resource->device;
+  oc_device_info_t *device = oc_core_get_device_info(device_index);
+  if (device != NULL) {
+    // Content-Format: "application/cbor"
+    // Payload: [ 1, 2, 3 ]
+    uint64_t array[3];
+    array[0] = device->ap.major;
+    array[1] = device->ap.minor;
+    array[2] = device->ap.patch;
+    oc_rep_begin_root_object();
+    oc_rep_i_set_int_array(root, 1, array, 3);
+    oc_rep_end_root_object();
+    oc_send_cbor_response(request, OC_STATUS_OK);
+    return;
+  }
+
+  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+}
+
+static void
+oc_core_ap_x_put_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
+                         void *data)
+{
+  (void)data;
+  (void)iface_mask;
+
+  /* check if the accept header is CBOR-format */
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
+    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    return;
+  }
+
+  size_t device_index = request->resource->device;
+  oc_device_info_t *device = oc_core_get_device_info(device_index);
+  oc_rep_t *rep = request->request_payload;
+  // debugging
+  if (rep != NULL) {
+    PRINT("  oc_core_ap_x_put_handler type: %d\n", rep->type);
+  }
+
+  if ((rep != NULL) && (rep->type == OC_REP_INT_ARRAY)) {
+    int64_t *arr = oc_int_array(rep->value.array);
+    int array_size = (int)oc_int_array_size(rep->value.array);
+    if (array_size != 3) {
+      oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+      return;
+    }
+    device->ap.major = (int)arr[0];
+    device->ap.minor = (int)arr[1];
+    device->ap.patch = (int)arr[2];
+
+    // write to persistent storage
+    oc_core_dump_ap(device_index);
+
+    oc_send_cbor_response_no_payload_size(request, OC_STATUS_CHANGED);
+    return;
+  }
+
+  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+}
+
+void
+oc_create_ap_x_resource(int resource_idx, size_t device)
+{
+  OC_DBG("oc_create_ap_x_resource\n");
+  oc_core_populate_resource(resource_idx, device, "/ap/pv", OC_IF_P,
+                            APPLICATION_CBOR, OC_DISCOVERABLE,
+                            oc_core_ap_x_get_handler, oc_core_ap_x_put_handler,
+                            0, 0, 1, "urn:knx:dpa.3.13");
+
+  oc_core_bind_dpt_resource(resource_idx, device, "urn:knx:dpt.programVersion");
+}
+// -----------------------------------------------------------------------------
+
+static void
+oc_core_ap_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
+                       void *data)
+{
+  (void)data;
+  (void)iface_mask;
+  size_t response_length = 0;
+  int i;
+  int matches = 0;
+  int length = 0;
+  bool ps_exists;
+  bool total_exists;
+
+  /* check if the accept header is link-format */
+  if (oc_check_accept_header(request, APPLICATION_LINK_FORMAT) == false) {
+    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    return;
+  }
+
+  // handle query parameters: l=ps l=total
+  if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
+    // example : < /ap > l = total>;total=22;ps=5
+    length = oc_frame_query_l("/ap", ps_exists, total_exists);
+    response_length += length;
+    if (ps_exists) {
+      length = oc_rep_add_line_to_buffer(";ps=1");
+      response_length += length;
+    }
+    if (total_exists) {
+      length = oc_rep_add_line_to_buffer(";total=1");
+      response_length += length;
+    }
+    oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
+    return;
+  }
+
+  size_t device_index = request->resource->device;
+  oc_resource_t *resource =
+    oc_core_get_resource_by_index(OC_APP_X, device_index);
+  if (resource) {
+    PRINT("URL %s\n", oc_string(resource->uri));
+    oc_add_resource_to_wk(resource, request, device_index, &response_length,
+                          matches, true);
+  }
+  if (response_length > 0) {
+    oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
+    return;
+  } else {
+    oc_send_linkformat_response(request, OC_STATUS_INTERNAL_SERVER_ERROR, 0);
+  }
+}
+
+void
+oc_create_ap_resource(int resource_idx, size_t device)
+{
+  OC_DBG("oc_create_ap_resource\n");
+  oc_core_populate_resource(resource_idx, device, "/ap", OC_IF_P,
+                            APPLICATION_LINK_FORMAT, OC_DISCOVERABLE,
+                            oc_core_ap_get_handler, 0, 0, 0, 1, "urn:knx:fb.3");
 
   oc_core_bind_dpt_resource(resource_idx, device, "urn:knx:dpt.value2Ucount");
 }
 
 // -----------------------------------------------------------------------------
 
+static void
+oc_core_dev_mid_get_handler(oc_request_t *request,
+                            oc_interface_mask_t iface_mask, void *data)
+{
+  (void)data;
+  (void)iface_mask;
+
+  /* check if the accept header is CBOR-format */
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
+    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    return;
+  }
+
+  size_t device_index = request->resource->device;
+  oc_device_info_t *device = oc_core_get_device_info(device_index);
+  if (device != NULL) {
+    oc_rep_begin_root_object();
+    oc_rep_i_set_int(root, 1, device->mid);
+    oc_rep_end_root_object();
+    oc_send_cbor_response(request, OC_STATUS_OK);
+    return;
+  }
+
+  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+}
+
+void
+oc_create_dev_mid_resource(int resource_idx, size_t device)
+{
+  OC_DBG("oc_create_dev_mid_resource\n");
+  oc_core_populate_resource(resource_idx, device, "/dev/mid", OC_IF_P,
+                            APPLICATION_CBOR, OC_DISCOVERABLE,
+                            oc_core_dev_mid_get_handler, 0, 0, 0, 1,
+                            "urn:knx:dpa.0.12");
+
+  oc_core_bind_dpt_resource(resource_idx, device, "urn:knx:dpt.value2Ucount");
+}
+
+// -----------------------------------------------------------------------------
 void
 oc_knx_device_storage_read(size_t device_index)
 {
@@ -995,6 +1233,8 @@ oc_knx_device_storage_read(size_t device_index)
     device->pm = pm;
     PRINT("  pm (storage) %d\n", device->pm);
   }
+
+  oc_core_read_ap(device_index);
 }
 
 void
@@ -1130,6 +1370,9 @@ oc_create_knx_device_resources(size_t device_index)
   oc_create_dev_da_resource(OC_DEV_DA, device_index);
   oc_create_dev_port_resource(OC_DEV_PORT, device_index);
   oc_create_dev_mport_resource(OC_DEV_MPORT, device_index);
+  oc_create_dev_mid_resource(OC_DEV_MID, device_index);
+  oc_create_ap_resource(OC_APP, device_index);
+  oc_create_ap_x_resource(OC_APP_X, device_index);
   // should be last of the dev/xxx resources, it will list those.
   oc_create_dev_dev_resource(OC_DEV, device_index);
 }

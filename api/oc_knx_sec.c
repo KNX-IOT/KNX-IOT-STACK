@@ -80,7 +80,7 @@ oc_core_knx_f_oscore_osndelay_get_handler(oc_request_t *request,
   PRINT("oc_core_knx_f_oscore_osndelay_get_handler\n");
 
   /* check if the accept header is cbor-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
@@ -103,7 +103,7 @@ oc_core_knx_p_oscore_osndelay_put_handler(oc_request_t *request,
   (void)iface_mask;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -147,7 +147,7 @@ oc_core_knx_p_oscore_replwdo_get_handler(oc_request_t *request,
   (void)iface_mask;
 
   /* check if the accept header is cbor-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
@@ -170,7 +170,7 @@ oc_core_knx_p_oscore_replwdo_put_handler(oc_request_t *request,
   (void)iface_mask;
 
   /* check if the accept header is CBOR-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -216,7 +216,7 @@ oc_core_knx_f_oscore_get_handler(oc_request_t *request,
   int matches = 0;
 
   /* check if the accept header is cbor-format */
-  if (request->accept != APPLICATION_LINK_FORMAT) {
+  if (oc_check_accept_header(request, APPLICATION_LINK_FORMAT) == false) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
@@ -280,7 +280,7 @@ oc_core_a_sen_post_handler(oc_request_t *request,
   int cmd = 0;
 
   /* check if the accept header is cbor-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -434,7 +434,7 @@ oc_core_auth_at_get_handler(oc_request_t *request,
   PRINT("oc_core_auth_at_get_handler\n");
 
   /* check if the accept header is link-format */
-  if (request->accept != APPLICATION_LINK_FORMAT) {
+  if (oc_check_accept_header(request, APPLICATION_LINK_FORMAT) == false) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
@@ -505,7 +505,7 @@ oc_core_auth_at_post_handler(oc_request_t *request,
   PRINT("oc_core_auth_at_post_handler\n");
 
   /* check if the accept header is cbor-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -748,7 +748,7 @@ oc_core_auth_at_delete_handler(oc_request_t *request,
   (void)iface_mask;
   PRINT("oc_core_auth_at_delete_handler\n");
 
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
@@ -769,7 +769,7 @@ oc_create_auth_at_resource(int resource_idx, size_t device)
     resource_idx, device, "/auth/at", OC_IF_LI | OC_IF_B | OC_IF_SEC,
     APPLICATION_LINK_FORMAT, OC_DISCOVERABLE, oc_core_auth_at_get_handler, 0,
     oc_core_auth_at_post_handler, oc_core_auth_at_delete_handler, 1,
-    "dpt.a[n]");
+    "urn:knx:fb.at");
 }
 
 // ----------------------------------------------------------------------------
@@ -794,7 +794,7 @@ oc_core_auth_at_x_get_handler(oc_request_t *request,
   (void)iface_mask;
 
   /* check if the accept header is cbor-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -916,7 +916,7 @@ oc_core_auth_at_x_post_handler(oc_request_t *request,
   oc_rep_t *rep = NULL;
   int cmd = 0;
   /* check if the accept header is cbor-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -953,7 +953,7 @@ oc_core_auth_at_x_delete_handler(oc_request_t *request,
   const char *value;
   int value_len = -1;
   /* check if the accept header is cbor-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
@@ -1013,7 +1013,7 @@ oc_core_knx_auth_get_handler(oc_request_t *request,
   int i;
   int matches = 0;
   /* check if the accept header is cbor-format */
-  if (request->accept != APPLICATION_LINK_FORMAT) {
+  if (oc_check_accept_header(request, APPLICATION_LINK_FORMAT) == false) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;

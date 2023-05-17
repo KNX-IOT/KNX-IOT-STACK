@@ -260,6 +260,31 @@ oc_core_set_device_hwv(size_t device_index, int major, int minor, int minor2)
 }
 
 int
+oc_core_set_device_ap(size_t device_index, int major, int minor, int minor2)
+{
+  if (device_index >= (int)oc_core_get_num_devices()) {
+    OC_ERR("device_index %d to large\n", (int)device_index);
+    return -1;
+  }
+
+  oc_device_info[device_index].ap.major = major;
+  oc_device_info[device_index].ap.minor = minor;
+  oc_device_info[device_index].ap.patch = minor2;
+  return 0;
+}
+
+int
+oc_core_set_device_mid(size_t device_index, uint32_t mid)
+{
+  if (device_index >= (int)oc_core_get_num_devices()) {
+    OC_ERR("device_index %d to large\n", (int)device_index);
+    return -1;
+  }
+  oc_device_info[device_index].mid = mid;
+  return 0;
+}
+
+int
 oc_core_set_device_ia(size_t device_index, uint32_t ia)
 {
   if (device_index >= (int)oc_core_get_num_devices()) {

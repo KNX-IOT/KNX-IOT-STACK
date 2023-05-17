@@ -333,7 +333,7 @@ oc_core_fp_g_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   PRINT("oc_core_fp_g_get_handler\n");
 
   /* check if the accept header is link-format */
-  if (request->accept != APPLICATION_LINK_FORMAT) {
+  if (oc_check_accept_header(request, APPLICATION_LINK_FORMAT) == false) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
@@ -446,7 +446,7 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   PRINT("oc_core_fp_g_post_handler\n");
 
   /* check if the accept header is cbor-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
@@ -593,7 +593,7 @@ oc_core_fp_g_x_get_handler(oc_request_t *request,
   PRINT("oc_core_fp_g_x_get_handler\n");
 
   /* check if the accept header is link-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
@@ -722,7 +722,7 @@ oc_core_fp_p_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   PRINT("oc_core_fp_p_get_handler\n");
 
   /* check if the accept header is link-format */
-  if (request->accept != APPLICATION_LINK_FORMAT) {
+  if (oc_check_accept_header(request, APPLICATION_LINK_FORMAT) == false) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
@@ -795,7 +795,7 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   PRINT("oc_core_fp_p_post_handler\n");
 
   /* check if the accept header is cbor-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
@@ -942,7 +942,7 @@ oc_core_fp_p_x_get_handler(oc_request_t *request,
   PRINT("oc_core_fp_p_x_get_handler\n");
 
   /* check if the accept header is link-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
@@ -1072,7 +1072,7 @@ oc_core_fp_r_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   PRINT("oc_core_fp_r_get_handler\n");
 
   /* check if the accept header is link-format */
-  if (request->accept != APPLICATION_LINK_FORMAT) {
+  if (oc_check_accept_header(request, APPLICATION_LINK_FORMAT) == false) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
@@ -1143,7 +1143,7 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   oc_status_t return_status = OC_STATUS_BAD_REQUEST;
 
   /* check if the accept header is cbor-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
@@ -1294,7 +1294,7 @@ oc_core_fp_r_x_get_handler(oc_request_t *request,
   PRINT("oc_core_fp_r_x_get_handler\n");
 
   /* check if the accept header is link-format */
-  if (request->accept != APPLICATION_CBOR) {
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;

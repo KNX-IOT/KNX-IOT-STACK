@@ -73,10 +73,12 @@ typedef struct oc_device_info_t
 {
   oc_string_t serialnumber;  /**< knx serial number */
   oc_knx_version_info_t hwv; /**< knx hardware version */
-  oc_knx_version_info_t fwv; /**< fwv firmware version number */
+  oc_knx_version_info_t fwv; /**< fwv firmware version */
+  oc_knx_version_info_t ap;  /**< fwv application version */
   oc_string_t hwt;           /**< knx hardware type */
   oc_string_t model;         /**< knx model */
   oc_string_t hostname;      /**< knx host name */
+  uint32_t mid;              /**< knx manufactorer ID */
   uint64_t fid;              /**< knx fabric id */
   uint32_t ia;               /**< knx ia Device individual address */
   uint64_t iid;              /**< knx iid (installation id) */
@@ -152,6 +154,25 @@ int oc_core_set_device_fwv(size_t device_index, int major, int minor,
  */
 int oc_core_set_device_hwv(size_t device_index, int major, int minor,
                            int patch);
+/**
+ * @brief sets the application version number
+ *
+ * @param device_index the device index
+ * @param major the xxx number of xxx.yyy.zzz
+ * @param minor the yyy number of xxx.yyy.zz
+ * @param patch the zzz number of xxx.yyy.zzz
+ * @return int  error status, 0 = OK
+ */
+int oc_core_set_device_ap(size_t device_index, int major, int minor, int patch);
+
+/**
+ * @brief sets the manufacturer id
+ *
+ * @param device_index the device index
+ * @param mid the manufacturer id
+ * @return int error status, 0 = OK
+ */
+int oc_core_set_device_mid(size_t device_index, uint32_t mid);
 
 /**
  * @brief sets the internal address
@@ -161,6 +182,16 @@ int oc_core_set_device_hwv(size_t device_index, int major, int minor,
  * @return int error status, 0 = OK
  */
 int oc_core_set_device_ia(size_t device_index, uint32_t ia);
+
+/**
+ * @brief sets the manufacturer id
+ *
+ * @param device_index the device index
+ * @param mid  the manufacturer id
+ *
+ * @return int error status, 0 = OK
+ */
+int oc_core_set_mid(size_t device_index, int32_t mid);
 
 /**
  * @brief sets and stores the internal address

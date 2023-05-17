@@ -390,6 +390,18 @@ oc_ri_is_app_resource_valid(oc_resource_t *resource)
 }
 #endif
 
+bool
+oc_check_accept_header(oc_request_t *request, oc_content_format_t accept)
+{
+  if (request->accept == accept) {
+    return true;
+  }
+  if (request->accept == CONTENT_NONE) {
+    return true;
+  }
+  return false;
+}
+
 int
 oc_status_code(oc_status_t key)
 {
@@ -1032,7 +1044,7 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
 
   /* Read the accept CoAP option in the request */
   oc_content_format_t accept = 0;
-  unsigned int accept_i = 0;
+  unsigned int accept_i = CONTENT_NONE;
   coap_get_header_accept(request, &accept_i);
   accept = (oc_content_format_t)accept_i;
 

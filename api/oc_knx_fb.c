@@ -115,7 +115,7 @@ oc_core_fb_x_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   PRINT("oc_core_fb_x_get_handler\n");
 
   /* check if the accept header is link-format */
-  if (request->accept != APPLICATION_LINK_FORMAT) {
+  if (oc_check_accept_header(request, APPLICATION_LINK_FORMAT) == false) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
@@ -392,7 +392,7 @@ oc_core_fb_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   PRINT("oc_core_fb_get_handler\n");
 
   /* check if the accept header is link-format */
-  if (request->accept != APPLICATION_LINK_FORMAT) {
+  if (oc_check_accept_header(request, APPLICATION_LINK_FORMAT) == false) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
