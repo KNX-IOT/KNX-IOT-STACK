@@ -27,6 +27,7 @@
 static pid_t avahi_pid = 0;
 // static char serial_no_hostname[64];
 static char serial_no_subtype[64];
+static char serial_no_lowercase[20];
 static char installation_subtype[64];
 static char port_str[7];
 
@@ -50,11 +51,16 @@ knx_publish_service(char *serial_no, uint64_t iid, uint32_t ia, bool pm)
 
   if (avahi_pid == 0) {
     // we are in the child thread - execute Avahi
+
+    // make sure that the serial number is used in lower case
+    strncpy(serial_no_lowercase, serial_no, 19);
+    strlwr(serial_no_lowercase);
+
     // Set up the subtype for the serial number
-    // --subtype=_01CAFE1234._sub._knx._udp
+    // --subtype=_01cafe1234._sub._knx._udp
     char *serial_format_string = "--subtype=_%s._sub._knx._udp";
     snprintf(serial_no_subtype, sizeof(serial_no_subtype), serial_format_string,
-             serial_no);
+             serial_no_lowercase);
 
     char *installation_format_string = "--subtype=_ia%x-%x._sub._knx._udp";
     snprintf(installation_subtype, sizeof(installation_subtype), ia, iid);
