@@ -360,7 +360,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
     }
   }
 
-  /* handle serial number*/
+  /* handle serial number spec 1.0 */
   if (ep_request != 0 && ep_len > 11 &&
       strncmp(ep_request, "urn:knx:sn.", 11) == 0) {
     /* old style can be removed later*/
@@ -387,8 +387,8 @@ oc_wkcore_discovery_handler(oc_request_t *request,
       matches = 1;
     }
   }
-
-  if (ep_request != 0 && ep_len > 11 &&
+  /* handle serial number spec 1.1 */
+  if (ep_request != 0 && ep_len > 9 &&
       strncmp(ep_request, "knx://sn.", 9) == 0) {
     /* new style release 1.1 */
     /* request for all devices via serial number wild card*/
