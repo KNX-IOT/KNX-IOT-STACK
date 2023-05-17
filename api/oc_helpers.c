@@ -568,6 +568,13 @@ oc_strnchr(const char *string, char p, int size)
   return NULL;
 }
 
+int oc_char_convert_to_lower(char *str)
+{
+  for (; *str; ++str)
+    *str = tolower(*str);
+  return 0;
+}
+
 int
 oc_get_sn_from_ep(const char *param, int param_len, char *sn, int sn_len,
                   uint32_t *ia)
