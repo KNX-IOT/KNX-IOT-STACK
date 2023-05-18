@@ -70,7 +70,7 @@ int
 oc_endpoint_set_oscore_id_from_str(oc_endpoint_t *endpoint, char *oscore_id)
 {
   return oc_conv_hex_string_to_oc_string(oscore_id, strlen(oscore_id),
-                                  &endpoint->oscore_id);
+                                         &endpoint->oscore_id);
 }
 
 int

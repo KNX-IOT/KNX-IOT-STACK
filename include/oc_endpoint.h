@@ -1,5 +1,5 @@
 /*
-// Copyright (c) 2017, 2020 Intel Corporation 
+// Copyright (c) 2017, 2020 Intel Corporation
 // Copyright (c) 2023 Cascoda Ltd
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -130,8 +130,7 @@ void oc_free_endpoint(oc_endpoint_t *endpoint);
  * @param serial_number the device serial number
  * @return int 0 success
  */
-int oc_endpoint_set_serial_number(oc_endpoint_t *endpoint,
-                                   char *serial_number);
+int oc_endpoint_set_serial_number(oc_endpoint_t *endpoint, char *serial_number);
 
 /**
  * @brief set the OSCORE identifier (SID)
@@ -142,7 +141,7 @@ int oc_endpoint_set_serial_number(oc_endpoint_t *endpoint,
  * @return int 0 success
  */
 int oc_endpoint_set_oscore_id_from_str(oc_endpoint_t *endpoint,
-                                        char *oscore_str_id);
+                                       char *oscore_str_id);
 
 /**
  * @brief set the OSCORE identifier (SID)
@@ -154,7 +153,7 @@ int oc_endpoint_set_oscore_id_from_str(oc_endpoint_t *endpoint,
  * @return int 0 success
  */
 int oc_endpoint_set_oscore_id(oc_endpoint_t *endpoint, char *oscore_id,
-                               int oscore_id_len);
+                              int oscore_id_len);
 
 /**
  * @brief set auth at index for the endpoint, e.g. the used security context
