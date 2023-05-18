@@ -1,5 +1,5 @@
 /*
-// Copyright (c) 2022 Cascoda Ltd
+// Copyright (c) 2022-2023 Cascoda Ltd
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -59,7 +59,7 @@ bool oc_set_spake_response_cb(oc_spake_cb_t my_func);
 /**
  * @brief initiate the spake handshake
  *
- * NOTE: recipient id in HEX string
+ * NOTE: recipient id in HEX string (e.g. null terminated)
  *
  * @param endpoint the endpoint of the device to be used
  * @param password the spake password to be used
