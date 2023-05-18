@@ -1,6 +1,6 @@
 /*
 // Copyright (c) 2016 Intel Corporation
-// Copyright (c) 2021 Cascoda Ltd.
+// Copyright (c) 2021-2023 Cascoda Ltd.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -416,7 +416,6 @@ oc_do_get_ex_secured(const char *uri, oc_endpoint_t *endpoint,
 
   // oc_endpoint_set_serial_number(endpoint, (char *)token);
   oc_endpoint_set_oscore_id_from_str(endpoint, (char *)token);
-
   PRINT("  ep oscore_id:");
   oc_string_println_hex(endpoint->oscore_id);
 
