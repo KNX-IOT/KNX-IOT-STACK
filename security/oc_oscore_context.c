@@ -133,7 +133,7 @@ oc_oscore_find_context_by_oscore_id(size_t device, char *oscore_id,
   int cmp_len = 16;
 
   if (oscore_id_len > 16) {
-    OC_ERR("oscore_id longer than 16: %d\n", oscore_id_len);
+    OC_ERR("oscore_id longer than 16: %d\n", (int)oscore_id_len);
     return NULL;
   }
 
@@ -174,7 +174,7 @@ oc_oscore_find_context_by_rid(size_t device, char *rid, size_t rid_len)
   int cmp_len = 16;
 
   if (rid_len > 16) {
-    OC_ERR("rid longer than 16: %d\n", rid_len);
+    OC_ERR("rid longer than 16: %d\n", (int)rid_len);
     return NULL;
   }
 
