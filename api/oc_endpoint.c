@@ -73,7 +73,8 @@ oc_endpoint_set_oscore_id_from_str(oc_endpoint_t *endpoint, char *oscore_id)
 }
 
 void
-oc_endpoint_set_oscore_id(oc_endpoint_t *endpoint, char *oscore_id, int oscore_id_len)
+oc_endpoint_set_oscore_id(oc_endpoint_t *endpoint, char *oscore_id,
+                          int oscore_id_len)
 {
   oc_free_string(&endpoint->oscore_id);
   oc_new_byte_string(&endpoint->oscore_id, oscore_id, oscore_id_len);

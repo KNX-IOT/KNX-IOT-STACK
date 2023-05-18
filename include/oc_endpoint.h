@@ -152,7 +152,7 @@ void oc_endpoint_set_oscore_id_from_str(oc_endpoint_t *endpoint,
 void oc_endpoint_set_oscore_id(oc_endpoint_t *endpoint, char *oscore_id,
                                int oscore_id_len);
 
-  /**
+/**
  * @brief set auth at index for the endpoint, e.g. the used security context
  *
  * @param endpoint the end point
