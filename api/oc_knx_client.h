@@ -78,7 +78,7 @@ int oc_initiate_spake(oc_endpoint_t *endpoint, char *password,
  *
  * @param endpoint the endpoint of the device to be used
  * @param serial_number the serial number of the device, to put back in the
- * callback
+ * callback, this is a string, e.g. SN as HEX string e.g. "00FA10010701"
  * @param password the spake password to be used
  * @param recipient_id the recipient ID id for the resulting OSCORE context
  * (byte string)
