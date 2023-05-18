@@ -57,22 +57,23 @@ oc_free_endpoint(oc_endpoint_t *endpoint)
   }
 }
 
-void
+int
 oc_endpoint_set_serial_number(oc_endpoint_t *endpoint, char *serial_number)
 {
   if (endpoint) {
     strncpy((char *)&endpoint->serial_number, serial_number, SERIAL_NUM_SIZE);
   }
+  return 0;
 }
 
-void
+int
 oc_endpoint_set_oscore_id_from_str(oc_endpoint_t *endpoint, char *oscore_id)
 {
-  oc_conv_hex_string_to_oc_string(oscore_id, strlen(oscore_id),
-                                  &endpoint->oscore_id);
+  return oc_conv_hex_string_to_oc_string(oscore_id, strlen(oscore_id),
+                                         &endpoint->oscore_id);
 }
 
-void
+int
 oc_endpoint_set_oscore_id(oc_endpoint_t *endpoint, char *oscore_id,
                           int oscore_id_len)
 {
