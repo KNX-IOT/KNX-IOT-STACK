@@ -1,5 +1,6 @@
 /*
-// Copyright (c) 2017, 2020 Intel Corporation
+// Copyright (c) 2017, 2020 Intel Corporation 
+// Copyright (c) 2023 Cascoda Ltd
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -127,8 +128,9 @@ void oc_free_endpoint(oc_endpoint_t *endpoint);
  *
  * @param endpoint the end point
  * @param serial_number the device serial number
+ * @return int 0 success
  */
-void oc_endpoint_set_serial_number(oc_endpoint_t *endpoint,
+int oc_endpoint_set_serial_number(oc_endpoint_t *endpoint,
                                    char *serial_number);
 
 /**
@@ -137,8 +139,9 @@ void oc_endpoint_set_serial_number(oc_endpoint_t *endpoint,
  * @param endpoint the end point
  * @param oscore_str_id the OSCORE id (as string in hex) to use for
  * encryption/decryption
+ * @return int 0 success
  */
-void oc_endpoint_set_oscore_id_from_str(oc_endpoint_t *endpoint,
+int oc_endpoint_set_oscore_id_from_str(oc_endpoint_t *endpoint,
                                         char *oscore_str_id);
 
 /**
@@ -148,8 +151,9 @@ void oc_endpoint_set_oscore_id_from_str(oc_endpoint_t *endpoint,
  * @param oscore_id the OSCORE id (SID) to use for
  * encryption/decryption
  * @param oscore_id_len the length of the oscore_id
+ * @return int 0 success
  */
-void oc_endpoint_set_oscore_id(oc_endpoint_t *endpoint, char *oscore_id,
+int oc_endpoint_set_oscore_id(oc_endpoint_t *endpoint, char *oscore_id,
                                int oscore_id_len);
 
 /**
