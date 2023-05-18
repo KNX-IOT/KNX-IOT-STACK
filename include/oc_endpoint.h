@@ -145,8 +145,9 @@ void oc_endpoint_set_oscore_id_from_str(oc_endpoint_t *endpoint,
  * @brief set the OSCORE identifier (SID)
  *
  * @param endpoint the end point
- * @param oscore_str_id the OSCORE id (SID) to use for
+ * @param oscore_id the OSCORE id (SID) to use for
  * encryption/decryption
+ * @param oscore_id_len the length of the oscore_id
  */
 void oc_endpoint_set_oscore_id(oc_endpoint_t *endpoint, char *oscore_id,
                                int oscore_id_len);
