@@ -54,7 +54,7 @@ knx_publish_service(char *serial_no, uint64_t iid, uint32_t ia, bool pm)
            pm_subtype, serial_no);
 
   process_handle =
-    _spawnlp(_P_NOWAIT, "dns-sd", "dns-sd", "-R", serial_no_lower, subtypes,
+    _spawnlp(_P_NOWAIT, "dns-sd", "dns-sd", "-R", serial_no, subtypes,
              "local", port_str, sp_text_record, NULL);
 #endif /* OC_DNS_SD */
 
