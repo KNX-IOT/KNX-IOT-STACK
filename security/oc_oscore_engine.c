@@ -72,7 +72,7 @@ check_if_replayed_request(oc_oscore_context_t *oscore_ctx, uint64_t piv,
                           oc_ipv6_addr_t *dest_addr)
 {
   OC_DBG("Checking if message has been received before...");
-  OC_DBG("PIV: %d, Destination IP Address: ", piv);
+  OC_DBG("PIV: %d, Destination IP Address: ", (int)piv);
   PRINTipaddr(*source_endpoint);
   PRINT("\n");
 
@@ -637,6 +637,12 @@ oc_oscore_send_message(oc_message_t *msg)
     oscore_ctx = oc_oscore_find_context_by_kid(
       NULL, message->endpoint.device, oc_string(entry->osc_rid),
       oc_byte_string_len(entry->osc_rid));
+  }
+  // Search for OSCORE context using addressing information
+  if (oscore_ctx == NULL) {
+    oscore_ctx = oc_oscore_find_context_by_kid(
+      NULL, message->endpoint.device, oc_string(message->endpoint.oscore_id),
+      oc_byte_string_len(message->endpoint.oscore_id));
   }
 
   // Search for OSCORE context using addressing information
