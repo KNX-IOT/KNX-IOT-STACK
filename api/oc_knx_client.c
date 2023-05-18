@@ -30,8 +30,9 @@
 // ----------------------------------------------------------------------------
 
 #define COAP_PORT (5683)
-#define MAX_SECRET_LEN 32
-#define MAX_PASSWORD_LEN 30
+#define MAX_SECRET_LEN (32)
+#define MAX_PASSWORD_LEN (30)
+#define MAX_SERIAL_NUMBER_LEN (7) // serial number in bytes
 
 // ----------------------------------------------------------------------------
 
@@ -47,8 +48,9 @@ typedef struct broker_s_mode_userdata_t
 typedef struct oc_spake_context_t
 {
   char spake_password[MAX_PASSWORD_LEN]; /**< spake password */
-  oc_string_t serial_number;             /**< the serial number of the device */
-  char oscore_id[MAX_PASSWORD_LEN];      /**< the oscore_id for the device */
+  oc_string_t serial_number; /**< the serial number of the device string */
+  oc_string_t recipient_id;  /**< the recipient id used (byte string) */
+  oc_string_t oscore_id;     /**< the oscore id used (byte string) */
 } oc_spake_context_t;
 
 // ----------------------------------------------------------------------------
@@ -81,9 +83,11 @@ static void
 update_tokens(uint8_t *secret, int secret_size)
 {
   PRINT("update_tokens: \n");
-
-  oc_oscore_set_auth(oc_string(g_spake_ctx.serial_number),
-                     g_spake_ctx.oscore_id, secret, secret_size);
+  oc_oscore_set_auth_mac(oc_string(g_spake_ctx.serial_number),
+                         oc_string_len(g_spake_ctx.serial_number),
+                         oc_string(g_spake_ctx.recipient_id),
+                         oc_byte_string_len(g_spake_ctx.recipient_id), secret,
+                         secret_size);
 }
 
 static void
@@ -113,8 +117,9 @@ finish_spake_handshake(oc_client_response_t *data)
   mbedtls_ecp_point_free(&pubA);
 
   if (m_spake_cb) {
-    m_spake_cb(0, oc_string(g_spake_ctx.serial_number), g_spake_ctx.oscore_id,
-               shared_key, shared_key_len);
+    m_spake_cb(
+      0, oc_string(g_spake_ctx.serial_number), oc_string(g_spake_ctx.oscore_id),
+      oc_byte_string_len(g_spake_ctx.oscore_id), shared_key, shared_key_len);
   }
 }
 
@@ -136,7 +141,9 @@ do_credential_verification(oc_client_response_t *data)
 
   oc_print_rep_as_json(data->payload, true);
 
-  uint8_t *pB_bytes, *cB_bytes;
+  uint8_t *pB_bytes = NULL;
+  uint8_t **cB_bytes = NULL;
+
   oc_rep_t *rep = data->payload;
   while (rep != NULL) {
     if (rep->type == OC_REP_BYTE_STRING) {
@@ -221,7 +228,7 @@ do_credential_exchange(oc_client_response_t *data)
         inner_rep = inner_rep->next;
       }
     }
-    // OSCORE context
+    // oscore context
     if (rep->type == OC_REP_BYTE_STRING && rep->iname == 0) {
       strncpy((char *)&g_spake_ctx.oscore_id, oc_string(rep->value.string),
               MAX_PASSWORD_LEN);
@@ -255,7 +262,9 @@ do_credential_exchange(oc_client_response_t *data)
 #endif /* OC_SPAKE */
 
 int
-oc_initiate_spake(oc_endpoint_t *endpoint, char *password, char *oscore_id)
+oc_initiate_spake_parameter_request(oc_endpoint_t *endpoint,
+                                    char *serial_number, char *password,
+                                    char *recipient_id, size_t recipient_id_len)
 {
   int return_value = -1;
 
@@ -270,15 +279,75 @@ oc_initiate_spake(oc_endpoint_t *endpoint, char *password, char *oscore_id)
   uint8_t
     rnd[32]; // not actually used by the server, so just send some gibberish
   oc_rep_begin_root_object();
-  if (oscore_id) {
-    oc_rep_i_set_byte_string(root, 0, oscore_id, strlen(oscore_id));
-    strncpy((char *)&g_spake_ctx.oscore_id, oscore_id, MAX_PASSWORD_LEN);
-  }
+
+  oc_rep_i_set_byte_string(root, 0, recipient_id, recipient_id_len);
+  oc_byte_string_copy_from_char_with_size(&g_spake_ctx.recipient_id,
+                                          recipient_id, recipient_id_len);
+
   oc_rep_i_set_byte_string(root, 15, rnd, 32);
   oc_rep_end_root_object();
 
   strncpy((char *)&g_spake_ctx.spake_password, password, MAX_PASSWORD_LEN);
-  oc_string_copy_from_char(&g_spake_ctx.serial_number, endpoint->serial_number);
+
+  oc_string_copy_from_char(&g_spake_ctx.serial_number, serial_number);
+
+  // oc_conv_hex_string_to_oc_string(endpoint->oscore_id,
+  //                                 strlen(endpoint->oscore_id),
+  //                                     &(g_spake_ctx.serial_number));
+  // oc_string_copy_from_char(&g_spake_ctx.serial_number,
+  // endpoint->serial_number);
+
+  if (oc_do_post_ex(APPLICATION_CBOR, APPLICATION_CBOR)) {
+    return_value = 0;
+  }
+
+#endif /* OC_SPAKE */
+  return return_value;
+}
+
+int
+oc_initiate_spake(oc_endpoint_t *endpoint, char *password, char *recipient_id)
+{
+  int return_value = -1;
+
+  // sort this one out later..
+  return return_value;
+
+#ifndef OC_SPAKE
+  (void)endpoint;
+#else /* OC_SPAKE*/
+  // do parameter exchange
+  oc_init_post("/.well-known/knx/spake", endpoint, NULL,
+               &do_credential_exchange, HIGH_QOS, NULL);
+
+  // TODO fill with actual random data
+  uint8_t
+    rnd[32]; // not actually used by the server, so just send some gibberish
+  oc_rep_begin_root_object();
+  if (recipient_id) {
+    // convert from hex string to bytes
+    oc_conv_hex_string_to_oc_string(recipient_id, strlen(recipient_id),
+                                    &g_spake_ctx.recipient_id);
+    oc_rep_i_set_byte_string(root, 0, oc_string(g_spake_ctx.recipient_id),
+                             oc_byte_string_len(g_spake_ctx.recipient_id));
+    // oc_rep_i_set_byte_string(root, 0, oscore_id, strlen(oscore_id));
+    // strncpy((char *)&g_spake_ctx.recipient_id, recipient_id,
+    // MAX_PASSWORD_LEN);
+  }
+  oc_rep_i_set_byte_string(root, 15, rnd, 32);
+  oc_rep_end_root_object();
+
+  // password : still a string
+  strncpy((char *)&g_spake_ctx.spake_password, password, MAX_PASSWORD_LEN);
+  oc_string_copy(&g_spake_ctx.serial_number, endpoint->oscore_id);
+
+  // serial number in endpoint is a string, so it needs to be converted before
+  // going into the spake
+  // oc_conv_hex_string_to_oc_string(endpoint->serial_number,
+  // strlen(endpoint->serial_number),
+  //                                &g_spake_ctx.serial_number);
+  // oc_string_copy_from_char(&g_spake_ctx.serial_number,
+  // endpoint->serial_number);
 
   if (oc_do_post_ex(APPLICATION_CBOR, APPLICATION_CBOR)) {
     return_value = 0;
@@ -334,6 +403,8 @@ oc_knx_client_do_broker_request(char *resource_url, uint32_t ia,
                                 char *destination, char *rp)
 {
   char query[20];
+
+  // TODO: do the new discovery here
   snprintf(query, 20, "if=urn:knx:ia.%d", ia);
 
   // not sure if we should use a malloc here, what would happen if there are no
@@ -436,7 +507,7 @@ oc_issue_s_mode(int scope, int sia_value, uint32_t grpid,
     oc_create_multicast_group_address(group_mcast, grpid, iid, scope);
 #endif
   // set the group_address to the group address, since this field is used
-  // to find the oscore context id
+  // to find the OSCORE context id
   group_mcast.group_address = group_address;
   oc_send_s_mode(&group_mcast, "/.knx", sia_value, group_address, rp,
                  value_data, value_size);

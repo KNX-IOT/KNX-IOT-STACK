@@ -32,6 +32,8 @@
 #include "util/oc_process.h"
 #include "oc_knx.h"
 
+#include "api/oc_knx_sec.h"
+
 OC_PROCESS(oc_oscore_handler, "OSCORE Process");
 
 static void
@@ -160,6 +162,8 @@ oc_oscore_recv_message(oc_message_t *message)
     oc_oscore_context_t *oscore_ctx = NULL;
     // message->endpoint.flags |= SECURED;
     message->endpoint.flags += OSCORE;
+    uint8_t *key = NULL;
+    int key_len = 0;
 
     coap_packet_t oscore_pkt[1];
 
@@ -201,12 +205,16 @@ oc_oscore_recv_message(oc_message_t *message)
         // the context again.
         OC_DBG_OSCORE(
           "--- setting endpoint serial number with found token & index");
-        oc_endpoint_set_serial_number(&message->endpoint,
-                                      (char *)oscore_ctx->token_id);
+
+        // oc_endpoint_set_serial_number(&message->endpoint,
+        //                               (char *)oscore_ctx->token_id);
         oc_endpoint_set_auth_at_index(&message->endpoint,
                                       (int32_t)oscore_ctx->auth_at_index);
         // oc_string_copy_from_char(&message->endpoint.serial_number,
         //                         (char *)oscore_ctx->token_id);
+
+        // PRINT("using send key!!\n");
+        // key = oscore_ctx->sendkey;
       }
     } else {
       /* If message is response */
@@ -232,20 +240,11 @@ oc_oscore_recv_message(oc_message_t *message)
       goto oscore_recv_error;
     }
 
-    // oc_sec_cred_t *c = (oc_sec_cred_t *)oscore_ctx->cred;
-    // if (!(message->endpoint.flags & MULTICAST) &&
-    //    c->credtype != OC_CREDTYPE_OSCORE) {
-    //  OC_ERR("***unicast message protected using group OSCORE context; "
-    //         "silently ignore***");
-    //  goto oscore_recv_error;
-    //}
-
-    /* Copy "subjectuuid" of cred with OSCORE context to oc_endpoint_t */
-    // oc_sec_cred_t *oscore_cred = (oc_sec_cred_t *)oscore_ctx->cred;
-    // memcpy(message->endpoint.di.id, oscore_cred->subjectuuid.id, 16);
-
     /* Use recipient key for decryption */
-    uint8_t *key = oscore_ctx->recvkey;
+    // if (key == NULL) {
+    //   PRINT("using receive key!!\n");
+    key = oscore_ctx->recvkey;
+    //}
 
     /* If received Partial IV in message */
     if (oscore_pkt->piv_len > 0) {
@@ -627,14 +626,71 @@ oc_oscore_send_message(oc_message_t *msg)
   }
 
   oc_oscore_context_t *oscore_ctx = NULL;
-  oscore_ctx = oc_oscore_find_context_by_serial_number(
-    message->endpoint.device, message->endpoint.serial_number);
+  // most common case for unicast: we just get the cached index
+  int index = message->endpoint.auth_at_index - 1;
+
+  // get auth_at table entry at index
+  oc_auth_at_t *entry = oc_get_auth_at_entry(message->endpoint.device, index);
+  // if found, get the corresponding context
+  if (entry) {
+    OC_DBG_OSCORE("### Found auth at entry, getting context ###");
+    oscore_ctx = oc_oscore_find_context_by_kid(
+      NULL, message->endpoint.device, oc_string(entry->osc_rid),
+      oc_byte_string_len(entry->osc_rid));
+  }
+
+  // Search for OSCORE context using addressing information
   if (oscore_ctx == NULL) {
     oscore_ctx = oc_oscore_find_context_by_group_address(
       message->endpoint.device, message->endpoint.group_address);
   }
+
+  /* Clone incoming oc_message_t (*msg) from CoAP layer */
+  message = oc_internal_allocate_outgoing_message();
+  message->length = msg->length;
+  memcpy(message->data, msg->data, msg->length);
+  memcpy(&message->endpoint, &msg->endpoint, sizeof(oc_endpoint_t));
+
+  bool msg_valid = false;
+  if (msg->ref_count > 1) {
+    msg_valid = true;
+  }
+
+  oc_message_unref(msg);
+
+  OC_DBG_OSCORE("### parse CoAP message ###");
+  /* Parse CoAP message */
+  coap_packet_t coap_pkt[1];
+  coap_status_t code = 0;
+#ifdef OC_TCP
+  if (message->endpoint.flags & TCP) {
+    code = coap_tcp_parse_message(coap_pkt, message->data,
+                                  (uint32_t)message->length);
+  } else
+#endif /* OC_TCP */
+  {
+    code = coap_udp_parse_message(coap_pkt, message->data,
+                                  (uint16_t)message->length);
+  }
+
+  if (code != COAP_NO_ERROR) {
+    OC_ERR("***error parsing CoAP packet***");
+    goto oscore_send_error;
+  }
+
+  OC_DBG_OSCORE("### parsed CoAP message ###");
+
+  // Search for context using transaction data
   if (oscore_ctx == NULL) {
+    oscore_ctx = oc_oscore_find_context_by_token_mid(
+      message->endpoint.device, coap_pkt->token, coap_pkt->token_len,
+      coap_pkt->mid, NULL, NULL, false);
+  }
+  // We haven't found a context, so we free the message we just created
+  if (oscore_ctx == NULL) {
+    oc_message_unref(message);
     OC_ERR("oc_oscore_send_message: No OSCORE context found. ERROR");
+    goto oscore_send_error;
   }
 
   if (oscore_ctx) {
@@ -644,41 +700,6 @@ oc_oscore_send_message(oc_message_t *msg)
                   oscore_ctx->token_id);
     /* Use sender key for encryption */
     uint8_t *key = oscore_ctx->sendkey;
-
-    /* Clone incoming oc_message_t (*msg) from CoAP layer */
-    message = oc_internal_allocate_outgoing_message();
-    message->length = msg->length;
-    memcpy(message->data, msg->data, msg->length);
-    memcpy(&message->endpoint, &msg->endpoint, sizeof(oc_endpoint_t));
-
-    bool msg_valid = false;
-    if (msg->ref_count > 1) {
-      msg_valid = true;
-    }
-
-    oc_message_unref(msg);
-
-    OC_DBG_OSCORE("### parse CoAP message ###");
-    /* Parse CoAP message */
-    coap_packet_t coap_pkt[1];
-    coap_status_t code = 0;
-#ifdef OC_TCP
-    if (message->endpoint.flags & TCP) {
-      code = coap_tcp_parse_message(coap_pkt, message->data,
-                                    (uint32_t)message->length);
-    } else
-#endif /* OC_TCP */
-    {
-      code = coap_udp_parse_message(coap_pkt, message->data,
-                                    (uint16_t)message->length);
-    }
-
-    if (code != COAP_NO_ERROR) {
-      OC_ERR("***error parsing CoAP packet***");
-      goto oscore_send_error;
-    }
-
-    OC_DBG_OSCORE("### parsed CoAP message ###");
 
     uint8_t piv[OSCORE_PIV_LEN], piv_len = 0, kid[OSCORE_CTXID_LEN],
                                  kid_len = 0, nonce[OSCORE_AEAD_NONCE_LEN],
@@ -771,7 +792,7 @@ oc_oscore_send_message(oc_message_t *msg)
        * SSN */
       coap_transaction_t *transaction =
         coap_get_transaction_by_token(coap_pkt->token, coap_pkt->token_len);
-      if (transaction->retrans_counter == 0)
+      if (transaction && transaction->retrans_counter == 0)
         increment_ssn_in_context(oscore_ctx);
 
       /* Compute nonce using partial IV and context->sendid */

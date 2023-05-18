@@ -238,7 +238,7 @@ void _oc_new_string(
   oc_string_t *ocstring, const char *str, size_t str_len);
 
 /**
- * @brief new oc_string from string
+ * @brief new oc_string byte from string
  *
  * @param ocstring the ocstring to be allocated
  * @param str not terminated string
@@ -315,6 +315,8 @@ void _oc_alloc_string_array(
 /**
  * @brief convert array to hex
  *
+ * Note: hex_str is pre allocated with hex_str_len
+ *
  * @param[in] array the array of bytes
  * @param[in] array_len length of the array
  * @param hex_str data as hex
@@ -356,10 +358,18 @@ int oc_conv_hex_string_to_oc_string(const char *hex_str, size_t hex_str_len,
 int oc_string_is_hex_array(oc_string_t hex_string);
 
 /**
- * @brief prints the string as hex, with new line at the end
+ * @brief prints the input as hex string
  *
- * @param[in] hex_string the input string to be checked
- * @return int 0 success
+ * @param[in] hex_string the input string to be printed
+ * @return int printed amount of %x
+ */
+int oc_string_print_hex(oc_string_t hex_string);
+
+/**
+ * @brief prints the input as hex string with newline (\n) at the end.
+ *
+ * @param[in] hex_string the input string to be printed
+ * @return int printed amount of %x
  */
 int oc_string_println_hex(oc_string_t hex_string);
 
@@ -374,10 +384,19 @@ int oc_char_convert_to_lower(char *string);
 /**
  * @brief prints the string as hex
  *
- * @param[in] hex_string the input string to be checked
- * @return int 0 success
+ * @param[in] str the input string to be printed
+ * @param[in] str_len the length of the input string
+ * @return int printed amount of %x
  */
-int oc_string_print_hex(oc_string_t hex_string);
+int oc_char_print_hex(const char *str, int str_len);
+/**
+ * @brief prints the input as hex string with newline (\n) at the end.
+ *
+ * @param[in] str the input string to be printed
+ * @param[in] str_len the length of the input string
+ * @return int printed amount of %x
+ */
+int oc_char_println_hex(const char *str, int str_len);
 
 /**
  * @brief checks if the uri contains a wildcard (e.g. "*")
@@ -495,6 +514,31 @@ int oc_get_sn_from_ep(const char *param, int param_len, char *sn, int sn_len,
  * @return int 0 == success
  */
 int oc_string_copy_from_char(oc_string_t *string1, const char *string2);
+
+/**
+ * @brief copy string from char*
+ *
+ * Note: adds a null terminator
+ * @param string1 the oc_string to copy to
+ * @param string2 the char* to copy from
+ * @param string2_len the length of string2
+ * @return int 0 == success
+ */
+int oc_string_copy_from_char_with_size(oc_string_t *string1,
+                                       const char *string2, size_t string2_len);
+
+/**
+ * @brief copy byte string from char*
+ *
+ * Note: does NOT add a null terminator
+ * @param string1 the oc_string to copy to
+ * @param string2 the char* to copy from
+ * @param string2_len the length of string2
+ * @return int 0 == success
+ */
+int oc_byte_string_copy_from_char_with_size(oc_string_t *string1,
+                                            const char *string2,
+                                            size_t string2_len);
 
 /**
  * @brief copy oc_string

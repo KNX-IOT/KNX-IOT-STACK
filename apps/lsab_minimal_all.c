@@ -634,7 +634,7 @@ main(int argc, char *argv[])
 #endif /* OC_OSCORE */
 
   oc_device_info_t *device = oc_core_get_device_info(0);
-  PRINT("serial number: %s", oc_string_checked(device->serialnumber));
+  PRINT("serial number: %s\n", oc_string_checked(device->serialnumber));
 
   oc_endpoint_t *my_ep = oc_connectivity_get_endpoints(0);
   if (my_ep != NULL) {

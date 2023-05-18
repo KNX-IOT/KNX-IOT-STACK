@@ -122,10 +122,37 @@ void oc_oscore_free_context(oc_oscore_context_t *ctx);
  */
 void oc_oscore_free_all_contexts();
 
+/**
+ * @brief creates an OSCORE context (e.g. the internal structure for
+ encoding/decoding)
+ *
+ * Note: OSCORE context is also a field.
+ *
+ * @param device the device index
+ *
+ * @param senderid the SID
+ * @param senderid_size the length of SID
+ * @param recipientid the RID
+ * @param recipientid_size the length of RID
+ * @param ssn  the sender sequence number
+ * @param desc  the description
+
+ * @param mastersecret the OSCORE master secret
+ * @param mastersecret_size the length of the OSCORE master secret
+ * @param token_id the token
+ * @param token_id_size the length of the token_id
+ * @param auth_at_index index in the auth at table -1.
+ * @param from_storage initialize ssn from storage
+ *
+ * @return true parameters derived (installed, e.g. can be used for
+ * encryption/decryption)
+ * @return false parameters NOT derived (NOT installed)
+ */
 oc_oscore_context_t *oc_oscore_add_context(
-  size_t device, const char *senderid, const char *recipientid, uint64_t ssn,
-  const char *desc, const char *mastersecret, const char *token_id,
-  int auth_at_index, bool from_storage);
+  size_t device, const char *senderid, int senderid_size,
+  const char *recipientid, int recipientid_size, uint64_t ssn, const char *desc,
+  const char *mastersecret, int mastersecret_size, const char *token_id,
+  int token_id_size, int auth_at_index, bool from_storage);
 
 oc_oscore_context_t *oc_oscore_find_context_by_serial_number(
   size_t device, char *serial_number);

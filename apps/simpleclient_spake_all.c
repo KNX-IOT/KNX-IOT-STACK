@@ -154,6 +154,22 @@ get_dev_pm(oc_client_response_t *data)
     }
   }
 }
+void
+callback(oc_client_response_t *rsp)
+{
+  return;
+}
+
+oc_event_callback_retval_t
+do_pm(void *ep)
+{
+  oc_endpoint_t *endpoint = ep;
+  endpoint->flags |= SECURED | OSCORE;
+  oc_do_get("/dev/pm", endpoint, NULL, callback, HIGH_QOS, NULL);
+  return OC_EVENT_CONTINUE;
+}
+
+oc_endpoint_t the_endpoint;
 
 static oc_discovery_flags_t
 discovery(const char *payload, int len, oc_endpoint_t *endpoint,
@@ -191,8 +207,15 @@ discovery(const char *payload, int len, oc_endpoint_t *endpoint,
     PRINT(" DISCOVERY CT %.*s\n", param_len, param);
   }
 
+  memcpy(&the_endpoint, endpoint, sizeof(the_endpoint));
+  char sernum[6] = { 0x00, 0xfa, 0x10, 0x01, 0x07, 0x01 };
+  oc_new_string(&the_endpoint.oscore_id, sernum, 6);
+
   // do parameter exchange
-  oc_initiate_spake(endpoint, "LETTUCE", NULL);
+  oc_initiate_spake_parameter_request(endpoint, "00FA10010701", "LETTUCE",
+                                      "rcpids", strlen("rcpids"));
+
+  oc_set_delayed_callback(&the_endpoint, do_pm, 10);
 
   PRINT(" DISCOVERY- END\n");
   return OC_STOP_DISCOVERY;
@@ -246,10 +269,10 @@ handle_signal(int signal)
 }
 
 void
-my_spake_cb(int error, char *sn, char *oscore_id, uint8_t *secret,
-            int secret_size)
+my_spake_cb(int error, char *sn, char *oscore_id, int oscore_id_size,
+            uint8_t *secret, int secret_size)
 {
-  PRINT("my_spake_cb: SPAKE2+ Handshake Finished! %s\n", oscore_id);
+  PRINT("my_spake_cb: SPAKE2+ Handshake Finished! %s\n", sn);
   PRINT("my_spake_cb: code: %d\n", error);
   PRINT("my_spake_cb: Shared Secret: ");
   for (int i = 0; i < secret_size; i++) {

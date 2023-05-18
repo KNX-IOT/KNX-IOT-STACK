@@ -98,8 +98,9 @@ char *oc_at_profile_to_string(oc_at_profile_t at_profile);
  * "scope": ["if.sec", "if.b"],
  * "cnf": {
  * "osc": {
- * "alg": "AES-CCM-16-64-128",
- * "id": "<kid>",
+ * "alg": "AES-CCM-16-64-128", (decimal 10)
+ * "id": "<kid>/<sid>",
+ * "rid": "SID for response",
  * "ms": "f9af8s.6bd94e6f"
  * }}}
  * ```
@@ -112,7 +113,7 @@ char *oc_at_profile_to_string(oc_at_profile_t at_profile);
  * "cnf": {
  * "osc": {
  * "alg": "AES-CCM-16-64-128",
- * "id": "<kid>",
+ * "id": "<kid>/<sid>",
  * "ms": "f9af8s.6bd94e6f"
  * }}}
  * ```
@@ -122,27 +123,30 @@ char *oc_at_profile_to_string(oc_at_profile_t at_profile);
  *  |-----------|----------|------------|------------|
  *  | id        | 0        | string     | yes        |
  *  | profile   | 38       | unsigned   | yes        |
- *  | scope     | 9        | string/int | yes        |
+ *  | scope     | 9  | string/int array | yes        |
  *  | cnf       | 8        | map        | yes        |
  *  | osc       | 4        | map        | oscore     |
  *  | kid       | 2        | string     | optional   |
  *  | nbf       | 5        | integer    | optional   |
  *  | sub       | 2        | string     | conditional |
+ *  | aud       | 3        | string     | conditional |
  *
  *
- * Specific Oscore values
+ * Specific oscore values (ACE):
  *
  * https://datatracker.ietf.org/doc/html/draft-ietf-ace-oscore-profile-19#section-3.2.1
  *
  * | name      | CBOR label | CBOR type | description   |default value |
  * | ----------| -----------| ----------|---------------|--------------|
- * | id  | 0    | byte string | OSCORE Input Material Identifier |  - |
- * | version | 1    | unsigned integer | OSCORE   Version   | 1          |
- * | ms | 2    | byte string  | OSCORE Master Secret value (shall be PSK) | - |
- * | hkdf | 3    | text string / integer | HKDF value | HKDF SHA-256  |
- * | alg | 4  | text string / integer | AEAD Algorithm | AES-CCM-16-64-128 (10)|
- * | salt | 5 | byte string | Master Salt | Default empty byte string |
- * | contextId | 6    | byte string | OSCORE ID Context value | omit  |
+ * | id        | 0      | string      | full ctx identifier |  - |
+ * | ms        | 18:4:2 | byte string | Master Secret value (shall be PSK) | - |
+ * | version   | 18:4:1 | uint        | OSCORE Version | 1          |
+ * | hkdf      | 18:4:3 | integer     | HKDF value | HKDF SHA-256  (-10) |
+ * | alg       | 18:4:4 | integer     | AEAD Algorithm | AES-CCM-16-64-128 (10)|
+ * | salt      | 18:4:5 | byte string | Master Salt    | Default empty byte
+ *string | | contextId | 18:4:6 | byte string | OSCORE ID Context value | omit |
+ * | osc_rid   | 18:4:7 | byte string | OSCORE RID     | -  |
+ * | osc_id    | 18:4:0 | byte string | OSCORE SID     | -  |
  *
  * Example payload:
  * ```
@@ -156,23 +160,28 @@ char *oc_at_profile_to_string(oc_at_profile_t at_profile);
  */
 typedef struct oc_auth_at_t
 {
-  oc_string_t id;            /**< (0) token id*/
+  oc_string_t id;            /**< (0) auth/at/{id}, encoding: HEX */
   oc_interface_mask_t scope; /**< (9) the scope (interfaces) */
-  oc_at_profile_t profile;   /**< (38) "coap_oscore" or "coap_dtls"*/
-  oc_string_t aud;           /**< (13) audience (for out going requests) */
-  oc_string_t sub;           /**< (2) dtls 2 sub*/
-  oc_string_t kid;           /**< (8:2) dtls cnf:kid*/
-  oc_string_t osc_id;        /**< (18:4:0) oscore cnf:osc:id */
-  oc_string_t osc_version;   /**< (18:4:1) oscore cnf:osc:version (optional) */
-  oc_string_t osc_ms;        /**< (18:4:2) oscore cnf:osc:ms */
-  oc_string_t osc_hkdf;      /**< (18:4:3) oscore cnf:osc:hkdf (optional) */
-  oc_string_t osc_alg;       /**< (18:4:4) oscore cnf:osc:alg */
+  oc_at_profile_t
+    profile; /**< (38) "coap_oscore" or "coap_dtls", only oscore implemented*/
+  oc_string_t aud;         /**< (13) audience (for out going requests) */
+  oc_string_t sub;         /**< (2) DTLS (not used) 2 sub */
+  oc_string_t kid;         /**< (8:2) DTLS (not used)  cnf:kid*/
+  oc_string_t osc_version; /**< (18:4:1) OSCORE cnf:osc:version (optional) */
+  oc_string_t osc_ms;      /**< (18:4:2) OSCORE cnf:osc:ms (byte string) */
+  uint8_t osc_hkdf;        /**< (18:4:3) OSCORE cnf:osc:hkdf (optional-not used)
+                              (decimal value)*/
+  uint8_t osc_alg;         /**< (18:4:4) OSCORE cnf:osc:alg (optional- not used)
+                              default: decimal value 10*/
   oc_string_t
-    osc_salt; /**< (18:4:5) oscore cnf:osc:salt (optional) empty string */
+    osc_salt; /**< (18:4:5) OSCORE cnf:osc:salt (optional) empty string */
+  oc_string_t osc_contextid;
+  /**< (18:4:6) OSCORE cnf:osc:contextid (optional) (byte string) */
+  oc_string_t osc_id; /**< (18:4:0) OSCORE cnf:osc:id  (used as SID & KID) (byte
+                         string) */
   oc_string_t
-    osc_contextid; /**< (18:4:6) oscore cnf:osc:contextid (optional) */
-  int nbf;         /**< token not valid before (optional) */
-
+    osc_rid;   /**< (18:4:7) OSCORE cnf:osc:rid (recipient ID) (byte string) */
+  int nbf;     /**< token not valid before (optional) */
   int ga_len;  /**< length of the group addresses (ga) in the scope */
   int64_t *ga; /**< (scope) array of group addresses, for the group objects in
                   the scope, int64_t for framing arrays */
@@ -219,16 +228,43 @@ int oc_core_find_at_entry_with_context_id(size_t device_index,
 int oc_core_find_at_entry_empty_slot(size_t device_index);
 
 /**
- * @brief set shared (SPAKE) key to the auth at table.
+ * @brief set shared (SPAKE) key to the auth at table, on the Management Client
+ * side
  *
  * @param serial_number the serial_number of the device that has been negotiated
- * with spake2plus with (e.g. client side)
- * @param context_id the context_id delivered during the handshake
+ * with spake2plus. This will become the Receiver ID within the OSCORE context.
+ * This value is an ASCII-encoded string representing the hexadecimal serial
+ * number
+ * @param serial_number_size the size of the serial number
+ * @param clientrecipient_id the clientrecipient_id (delivered during the
+ * handshake). This will become the Sender ID. This value is in HEX
+ * @param clientrecipient_id_size the size of the clientrecipient_id
  * @param shared_key the master key after SPAKE2 handshake
  * @param shared_key_size the key size
  */
-void oc_oscore_set_auth(char *serial_number, char *context_id,
-                        uint8_t *shared_key, int shared_key_size);
+void oc_oscore_set_auth_mac(char *serial_number, int serial_number_size,
+                            char *clientrecipient_id,
+                            int clientrecipient_id_size, uint8_t *shared_key,
+                            int shared_key_size);
+
+/**
+ * @brief set shared (SPAKE) key to the auth at table, on the Device side
+ *
+ * @param serial_number the serial_number of the device that has been negotiated
+ * with spake2plus. This will become the Sender ID within the OSCORE context.
+ * This value is an ASCII-encoded string representing the hexadecimal serial
+ * number
+ * @param serial_number_size the size of the serial number
+ * @param clientrecipient_id the clientrecipient_id (delivered during the
+ * handshake). This will become the Receiver ID. This value is in HEX
+ * @param clientrecipient_id_size the size of the clientrecipient_id
+ * @param shared_key the master key after SPAKE2 handshake
+ * @param shared_key_size the key size
+ */
+void oc_oscore_set_auth_device(char *serial_number, int serial_number_size,
+                               char *clientrecipient_id,
+                               int clientrecipient_id_size, uint8_t *shared_key,
+                               int shared_key_size);
 
 /**
  * @brief retrieve auth at entry

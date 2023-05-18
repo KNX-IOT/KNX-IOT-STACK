@@ -127,6 +127,8 @@ volatile int quit = 0;         /**< stop variable, used by handle_signal */
 bool g_reset = false;
 int call_counter = 0;
 
+#define MY_SERIAL_NUMBER "123456789012"
+
 /**
  * @brief callback for the smode response
  * testing purpose
@@ -183,7 +185,7 @@ app_init(void)
     - base path (/)
     - the serial number
   */
-  ret |= oc_add_device("my_name", "1.0.0", "//", "000005", NULL, NULL);
+  ret |= oc_add_device("my_name", "1.0.0", "//", "123456789012", NULL, NULL);
   oc_device_info_t *device = oc_core_get_device_info(0);
   /* set the hardware version*/
   oc_core_set_device_hwv(0, 5, 6, 7);
@@ -1171,12 +1173,13 @@ response_get_pm(oc_client_response_t *data)
 
   call_counter++;
 
-  oc_do_get_ex("/dev/pm", &g_endpoint, NULL, response_get_pm, HIGH_QOS,
-               APPLICATION_CBOR, APPLICATION_CBOR, NULL);
+  // oc_do_get_ex("/dev/pm", &g_endpoint, NULL, response_get_pm, HIGH_QOS,
+  //              APPLICATION_CBOR, APPLICATION_CBOR, NULL);
 }
 
 void
-spake_cb(int error, char *sn, char *oscore_id, uint8_t *secret, int secret_size)
+spake_cb(int error, char *sn, char *oscore_id, int oscore_id_size,
+         uint8_t *secret, int secret_size)
 {
   PRINT("spake CB: invoke PM with encryption!!!!!\n");
 #ifdef OC_OSCORE
@@ -1184,10 +1187,14 @@ spake_cb(int error, char *sn, char *oscore_id, uint8_t *secret, int secret_size)
   g_endpoint.flags += OSCORE;
   PRINT("  spake_cb: enable OSCORE encryption\n");
 
-  // oc_endpoint_copy(&g_endpoint, endpoint);
-  oc_endpoint_set_serial_number(&g_endpoint, sn);
+  PRINT("  spake_cb SN %s\n", sn);
+  PRINT("  spake_cb id size %d\n", oscore_id_size);
+  PRINT("  spake_cb ms size %d\n", secret_size);
 
-  PRINT("  spake_cb: ep serial %s\n", g_endpoint.serial_number);
+  // oc_endpoint_copy(&g_endpoint, endpoint);
+  oc_endpoint_set_oscore_id_from_str(&g_endpoint, sn);
+
+  // PRINT("  spake_cb: ep serial %s\n", g_endpoint.serial_number);
 #endif
   PRINT("spake CB\n");
   oc_do_get_ex("/dev/pm", &g_endpoint, NULL, response_get_pm, HIGH_QOS,
@@ -1205,7 +1212,7 @@ discovery_cb(const char *payload, int len, oc_endpoint_t *endpoint,
   int uri_len;
   const char *param;
   int param_len;
-  char *my_serialnum = "000005";
+  char *my_serialnum = "123456789012";
 
   PRINT("[C]DISCOVERY: %.*s\n", len, payload);
   int nr_entries = oc_lf_number_of_entries(payload, len);
@@ -1220,13 +1227,30 @@ discovery_cb(const char *payload, int len, oc_endpoint_t *endpoint,
   PRINT("  [C] disable OSCORE encryption\n");
   PRINTipaddr_flags(*endpoint);
   PRINTipaddr(*endpoint);
-  oc_endpoint_set_serial_number(endpoint, my_serialnum);
+  oc_endpoint_set_oscore_id_from_str(endpoint, my_serialnum);
+  oc_string_println_hex(endpoint->oscore_id);
 
   // copy the endpoint so that we know it in the spake2plus callback
   oc_endpoint_copy(&g_endpoint, endpoint);
 
   oc_set_spake_response_cb(spake_cb);
-  oc_initiate_spake(endpoint, "LETTUCE", my_serialnum);
+  // oc_initiate_spake(endpoint, "LETTUCE", "abcdef");
+
+  // for testing the receive key must be the same, since we are talking to the
+  // same device. so it depends on who wil store the oscore context first.. with
+  // SID and RID.
+  uint8_t array[30];
+  size_t array_size = 30;
+
+  memset(array, 9, 30);
+
+  oc_conv_hex_string_to_byte_array(MY_SERIAL_NUMBER, strlen(MY_SERIAL_NUMBER),
+                                   array, &array_size);
+
+  PRINT("-------<RID  %s  %d     ", MY_SERIAL_NUMBER, (int)array_size);
+  oc_char_println_hex(array, array_size);
+  oc_initiate_spake_parameter_request(endpoint, my_serialnum, "LETTUCE", array,
+                                      array_size);
 
   PRINT("[C] DISCOVERY- END\n");
   return OC_STOP_DISCOVERY;
@@ -1254,7 +1278,7 @@ issue_requests_oscore(void)
   oc_new_string(&access_token.osc_ms, (char *)"ABCDE", 5);
   oc_new_string(&access_token.kid, "", 0);
   oc_new_string(&access_token.sub, "", 0);
-  oc_new_string(&access_token.osc_alg, "", 0);
+  // oc_new_string(&access_token.osc_alg, "", 0);
   access_token.profile = OC_PROFILE_COAP_OSCORE;
   int64_t ga_values[5] = { 1, 2, 3, 4, 5 };
   access_token.ga = ga_values;
@@ -1271,7 +1295,7 @@ issue_requests_oscore(void)
   oc_print_auth_at_entry(0, index);
 
   // first step is discover myself..
-  oc_do_wk_discovery_all("ep=urn:knx:sn.000005", 2, discovery_cb, NULL);
+  oc_do_wk_discovery_all("ep=urn:knx:sn.123456789012", 2, discovery_cb, NULL);
 }
 
 void oc_issue_s_mode(int scope, int sia_value, uint32_t grpid,
@@ -1301,10 +1325,6 @@ issue_s_mode_secure(void *data)
 
     oc_new_string(&access_token.osc_id, "y1234567890AB",
                   strlen("01234567890AB"));
-
-    if (oc_string_is_hex_array(access_token.osc_id) == -1) {
-      PRINT("not a valid hex-string: %s", oc_string(access_token.osc_id));
-    }
     char str_ms[14] = {
       '1', '2', '3', '4', '5', '\0', '6', '7', '8', '9', '1'
     };
@@ -1315,7 +1335,7 @@ issue_s_mode_secure(void *data)
     oc_new_string(&access_token.osc_ms, (char *)str_ms, 11);
     oc_new_string(&access_token.kid, "", 0);
     oc_new_string(&access_token.sub, "", 0);
-    oc_new_string(&access_token.osc_alg, "", 0);
+    // oc_new_string(&access_token.osc_alg, "", 0);
     access_token.profile = OC_PROFILE_COAP_OSCORE;
     int64_t ga_values[5] = { 1, 2, 3, 4, 5 };
     access_token.ga = ga_values;
@@ -1334,6 +1354,23 @@ issue_s_mode_secure(void *data)
   return OC_EVENT_CONTINUE;
 }
 
+/**
+ * test of decoding a message to myself
+ */
+static oc_event_callback_retval_t
+issue_spake(void *data)
+{
+
+  PRINT("issue_spake\n");
+  // oc_endpoint_t *my_ep = oc_connectivity_get_endpoints(0);
+
+  oc_do_wk_discovery_all("ep=urn:knx:sn.123456789012", 2, discovery_cb, NULL);
+
+  // int index = 0;
+  // oc_initiate_spake(my_ep, "LETTUCE", "ABCD");
+
+  return OC_EVENT_DONE;
+}
 /**
  * set a multicast s-mode message as delayed callback
  */
@@ -1477,13 +1514,17 @@ main(int argc, char *argv[])
   if (do_send_oscore) {
     handler.requests_entry = issue_requests_oscore;
   }
+  if (do_send_oscore) {
+    handler.requests_entry = issue_requests_oscore;
+  }
+
 #endif
 
 #ifdef OC_CLIENT
   // if (do_test_myself) {
   //  handler.requests_entry = issue_s_mode_secure;
   //}
-  oc_set_delayed_callback(NULL, issue_s_mode_secure, 2);
+  // oc_set_delayed_callback(NULL, schedule_spake, 2);
 #endif
 
   char *fname = "myswu_app";
@@ -1515,6 +1556,8 @@ main(int argc, char *argv[])
 
   PRINT("Server \"testserver_all\" running (polling), waiting on incoming "
         "connections.\n\n\n");
+
+  oc_set_delayed_callback(NULL, issue_spake, 2);
 
 #ifdef WIN32
   /* windows specific loop */
