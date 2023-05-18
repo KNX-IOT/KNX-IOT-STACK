@@ -201,7 +201,7 @@ oc_process_resources(oc_request_t *request, size_t device_index,
 }
 
 static int
-frame_sn(char* serial_number, uint64_t iid, uint32_t ia)
+frame_sn(char *serial_number, uint64_t iid, uint32_t ia)
 {
   int framed_bytes;
   int response_length = 0;
@@ -326,13 +326,14 @@ oc_wkcore_discovery_handler(oc_request_t *request,
          the ep=urn:knx:sn.* and if=urn:knx:if.pm concatenation. since that only
          needs to respond when the device is in programming mode
       */
-      //framed_bytes = oc_rep_add_line_to_buffer("<>;ep=\"urn:knx:sn.");
-      //response_length = response_length + framed_bytes;
-      //framed_bytes = oc_rep_add_line_to_buffer(oc_string(device->serialnumber));
-      //response_length = response_length + framed_bytes;
-      //framed_bytes = oc_rep_add_line_to_buffer("\"");
-      //response_length = response_length + framed_bytes;
-      //matches = 1;
+      // framed_bytes = oc_rep_add_line_to_buffer("<>;ep=\"urn:knx:sn.");
+      // response_length = response_length + framed_bytes;
+      // framed_bytes =
+      // oc_rep_add_line_to_buffer(oc_string(device->serialnumber));
+      // response_length = response_length + framed_bytes;
+      // framed_bytes = oc_rep_add_line_to_buffer("\"");
+      // response_length = response_length + framed_bytes;
+      // matches = 1;
 
       response_length =
         frame_sn(oc_string(device->serialnumber), device->iid, device->ia);
@@ -408,7 +409,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
       if (iid_str) {
         char iid_dev[20];
         snprintf(iid_dev, 19, "%" PRIx64 "", device->iid);
-        if (strncmp(iid_dev, iid_str+1, iid_str_len-1) == 0) {
+        if (strncmp(iid_dev, iid_str + 1, iid_str_len - 1) == 0) {
           response_length = response_length =
             frame_sn(oc_string(device->serialnumber), device->iid, device->ia);
           matches = 1;
