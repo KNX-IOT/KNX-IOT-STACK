@@ -627,12 +627,13 @@ oc_oscore_send_message(oc_message_t *msg)
 
   oc_oscore_context_t *oscore_ctx = NULL;
   // most common case for unicast: we just get the cached index
-  //int index = message->endpoint.auth_at_index - 1;
+  // int index = message->endpoint.auth_at_index - 1;
 
   // get auth_at table entry at index
-  //oc_auth_at_t *entry = oc_get_auth_at_entry(message->endpoint.device, index);
+  // oc_auth_at_t *entry = oc_get_auth_at_entry(message->endpoint.device,
+  // index);
   // if found, get the corresponding context
-  //if (entry) {
+  // if (entry) {
   //  OC_DBG_OSCORE("### Found auth at entry, getting context ###");
   //  oscore_ctx = oc_oscore_find_context_by_kid(
   //    NULL, message->endpoint.device, oc_string(entry->osc_rid),

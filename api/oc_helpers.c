@@ -356,7 +356,8 @@ oc_conv_hex_string_to_oc_string(const char *hex_str, size_t hex_str_len,
   int return_value = -1;
   size_t size_bytes = (hex_str_len / 2);
 
-  PRINT("oc_conv_hex_string_to_oc_string len:%d -> bytes:%d\n", (int)hex_str_len, (int)size_bytes);
+  PRINT("oc_conv_hex_string_to_oc_string len:%d -> bytes:%d\n",
+        (int)hex_str_len, (int)size_bytes);
 
   oc_free_string(out);
 

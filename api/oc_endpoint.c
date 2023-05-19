@@ -71,18 +71,19 @@ oc_endpoint_set_oscore_id_from_str(oc_endpoint_t *endpoint, char *oscore_id)
 {
   endpoint->oscore_id_len = SERIAL_NUM_SIZE;
   return oc_conv_hex_string_to_byte_array(oscore_id, strlen(oscore_id),
-                                   &endpoint->oscore_id, &endpoint->oscore_id_len);
+                                          &endpoint->oscore_id,
+                                          &endpoint->oscore_id_len);
 
-  //return oc_conv_hex_string_to_oc_string(oscore_id, strlen(oscore_id),
-  //                                       &endpoint->oscore_id);
+  // return oc_conv_hex_string_to_oc_string(oscore_id, strlen(oscore_id),
+  //                                        &endpoint->oscore_id);
 }
 
 int
 oc_endpoint_set_oscore_id(oc_endpoint_t *endpoint, char *oscore_id,
                           int oscore_id_len)
 {
-  //oc_free_string(&endpoint->oscore_id);
-  //oc_new_byte_string(&endpoint->oscore_id, oscore_id, oscore_id_len);
+  // oc_free_string(&endpoint->oscore_id);
+  // oc_new_byte_string(&endpoint->oscore_id, oscore_id, oscore_id_len);
   memcpy(endpoint->oscore_id, oscore_id, oscore_id_len);
   endpoint->oscore_id_len = oscore_id_len;
 

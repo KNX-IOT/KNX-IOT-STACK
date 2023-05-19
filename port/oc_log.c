@@ -31,6 +31,6 @@ oc_file_print(char *format, ...)
     vfprintf(fptr, format, args);
     va_end(args);
     // flush the file
-    fflush(fptr); 
+    fflush(fptr);
   }
 }

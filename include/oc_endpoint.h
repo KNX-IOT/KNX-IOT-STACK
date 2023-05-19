@@ -79,10 +79,10 @@ typedef struct oc_endpoint_t
   struct oc_endpoint_t *next; /**< pointer to the next structure */
   size_t device;              /**< device index */
   enum transport_flags flags; /**< the transport flags */
-  //oc_string_t
-  //  oscore_id; /**< OSCORE context (binary), e.g. binary serial number*/
-  char oscore_id[SERIAL_NUM_SIZE + 1];     /**< OSCORE context (binary), e.g.
-                                               binary serial number*/
+  // oc_string_t
+  //   oscore_id; /**< OSCORE context (binary), e.g. binary serial number*/
+  char oscore_id[SERIAL_NUM_SIZE + 1]; /**< OSCORE context (binary), e.g.
+                                           binary serial number*/
   size_t oscore_id_len;
   char *serial_number[SERIAL_NUM_SIZE + 1]; /**< The serial number (as client)
                                              for the device on the other side*/
