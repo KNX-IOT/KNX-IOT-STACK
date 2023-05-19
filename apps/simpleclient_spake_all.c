@@ -207,7 +207,8 @@ discovery(const char *payload, int len, oc_endpoint_t *endpoint,
     PRINT(" DISCOVERY CT %.*s\n", param_len, param);
   }
 
-  // memcpy(&the_endpoint, endpoint, sizeof(the_endpoint));
+  memcpy(&the_endpoint, endpoint, sizeof(the_endpoint));
+
   // char sernum[6] = { 0x00, 0xfa, 0x10, 0x01, 0x07, 0x01 };
   // memcpy(&the_endpoint.oscore_id, sernum, 6);
   // the_endpoint.oscore_id_len = 6;
