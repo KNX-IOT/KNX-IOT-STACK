@@ -1,5 +1,6 @@
 /*
 // Copyright (c) 2020 Intel Corporation
+// Copyright (c) 2023 Cascoda Ltd
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,8 +27,6 @@
 #include "oc_oscore.h"
 #include "oc_oscore_context.h"
 #include "oc_oscore_crypto.h"
-//#include "oc_pstat.h"
-//#include "oc_store.h"
 #include "oc_tls.h"
 #include "util/oc_process.h"
 #include "oc_knx.h"
@@ -200,21 +199,13 @@ oc_oscore_recv_message(oc_message_t *message)
       oscore_ctx =
         oc_oscore_find_context_by_kid(oscore_ctx, message->endpoint.device,
                                       oscore_pkt->kid, oscore_pkt->kid_len);
+      // make sure it is faulty
+      //oc_endpoint_set_auth_at_index(&message->endpoint,-1);
       if (oscore_ctx != NULL) {
-        // copy the serial number as return token, so that the reply can find
-        // the context again.
-        OC_DBG_OSCORE(
-          "--- setting endpoint serial number with found token & index");
-
-        // oc_endpoint_set_serial_number(&message->endpoint,
-        //                               (char *)oscore_ctx->token_id);
+        // set the auth index, so that the higher levels can use the context
+        // to check if the access permissions are correct.
         oc_endpoint_set_auth_at_index(&message->endpoint,
                                       (int32_t)oscore_ctx->auth_at_index);
-        // oc_string_copy_from_char(&message->endpoint.serial_number,
-        //                         (char *)oscore_ctx->token_id);
-
-        // PRINT("using send key!!\n");
-        // key = oscore_ctx->sendkey;
       }
     } else {
       /* If message is response */
@@ -239,12 +230,7 @@ oc_oscore_recv_message(oc_message_t *message)
       oscore_send_error(oscore_pkt, UNAUTHORIZED_4_01, &message->endpoint);
       goto oscore_recv_error;
     }
-
-    /* Use recipient key for decryption */
-    // if (key == NULL) {
-    //   PRINT("using receive key!!\n");
     key = oscore_ctx->recvkey;
-    //}
 
     /* If received Partial IV in message */
     if (oscore_pkt->piv_len > 0) {
@@ -626,20 +612,6 @@ oc_oscore_send_message(oc_message_t *msg)
   }
 
   oc_oscore_context_t *oscore_ctx = NULL;
-  // most common case for unicast: we just get the cached index
-  // int index = message->endpoint.auth_at_index - 1;
-
-  // get auth_at table entry at index
-  // oc_auth_at_t *entry = oc_get_auth_at_entry(message->endpoint.device,
-  // index);
-  // if found, get the corresponding context
-  // if (entry) {
-  //  OC_DBG_OSCORE("### Found auth at entry, getting context ###");
-  //  oscore_ctx = oc_oscore_find_context_by_kid(
-  //    NULL, message->endpoint.device, oc_string(entry->osc_rid),
-  //    oc_byte_string_len(entry->osc_rid));
-  //}
-  // Search for OSCORE context using addressing information
 
   PRINT("oc_oscore_send_message : SID ");
   oc_char_println_hex(message->endpoint.oscore_id,
@@ -653,6 +625,7 @@ oc_oscore_send_message(oc_message_t *msg)
   }
 
   // Search for OSCORE context using addressing information
+  // e.g. for the s-mode messages
   if (oscore_ctx == NULL) {
     oscore_ctx = oc_oscore_find_context_by_group_address(
       message->endpoint.device, message->endpoint.group_address);
@@ -905,7 +878,7 @@ oc_oscore_send_message(oc_message_t *msg)
     coap_pkt->observe = observe_option;
 
     /* Set the Proxy-uri option to the OCF URI bearing the peer's UUID */
-    // TODO
+    // not used yet
     // char uuid[37];
     // oc_uuid_to_str(&message->endpoint.di, uuid, OC_UUID_LEN);
     // oc_string_t proxy_uri;

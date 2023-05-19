@@ -291,12 +291,6 @@ oc_initiate_spake_parameter_request(oc_endpoint_t *endpoint,
 
   oc_string_copy_from_char(&g_spake_ctx.serial_number, serial_number);
 
-  // oc_conv_hex_string_to_oc_string(endpoint->oscore_id,
-  //                                 strlen(endpoint->oscore_id),
-  //                                     &(g_spake_ctx.serial_number));
-  // oc_string_copy_from_char(&g_spake_ctx.serial_number,
-  // endpoint->serial_number);
-
   if (oc_do_post_ex(APPLICATION_CBOR, APPLICATION_CBOR)) {
     return_value = 0;
   }
