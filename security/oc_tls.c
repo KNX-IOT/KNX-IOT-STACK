@@ -465,9 +465,9 @@ check_retr_timers(void)
         if (ret < 0 && ret != MBEDTLS_ERR_SSL_WANT_READ &&
             ret != MBEDTLS_ERR_SSL_WANT_WRITE) {
 #ifdef OC_DEBUG
-          char buf[256];
-          mbedtls_strerror(ret, buf, 256);
-          OC_ERR("oc_tls: mbedtls_error: %s", buf);
+          // char buf[256];
+          // mbedtls_strerror(ret, buf, 256);
+          // OC_ERR("oc_tls: mbedtls_error: %s", buf);
 #endif /* OC_DEBUG */
           oc_tls_free_peer(peer, false);
         }
@@ -1592,9 +1592,9 @@ oc_tls_send_message(oc_message_t *message)
     if (ret < 0 && ret != MBEDTLS_ERR_SSL_WANT_READ &&
         ret != MBEDTLS_ERR_SSL_WANT_WRITE) {
 #ifdef OC_DEBUG
-      char buf[256];
-      mbedtls_strerror(ret, buf, 256);
-      OC_ERR("oc_tls: mbedtls_error: %s", buf);
+      // char buf[256];
+      // mbedtls_strerror(ret, buf, 256);
+      // OC_ERR("oc_tls: mbedtls_error: %s", buf);
 #endif /* OC_DEBUG */
       oc_tls_free_peer(peer, false);
     } else {
@@ -1630,9 +1630,9 @@ write_application_data(oc_tls_peer_t *peer)
     if (ret < 0 && ret != MBEDTLS_ERR_SSL_WANT_READ &&
         ret != MBEDTLS_ERR_SSL_WANT_WRITE) {
 #ifdef OC_DEBUG
-      char buf[256];
-      mbedtls_strerror(ret, buf, 256);
-      OC_ERR("oc_tls: mbedtls_error: %s", buf);
+      // char buf[256];
+      // mbedtls_strerror(ret, buf, 256);
+      // OC_ERR("oc_tls: mbedtls_error: %s", buf);
 #endif /* OC_DEBUG */
       oc_tls_free_peer(peer, false);
       break;
@@ -1677,9 +1677,9 @@ oc_tls_init_connection(oc_message_t *message)
     if (ret < 0 && ret != MBEDTLS_ERR_SSL_WANT_READ &&
         ret != MBEDTLS_ERR_SSL_WANT_WRITE) {
 #ifdef OC_DEBUG
-      char buf[256];
-      mbedtls_strerror(ret, buf, 256);
-      OC_ERR("oc_tls: mbedtls_error: %s", buf);
+      // char buf[256];
+      // mbedtls_strerror(ret, buf, 256);
+      // OC_ERR("oc_tls: mbedtls_error: %s", buf);
 #endif /* OC_DEBUG */
       oc_tls_free_peer(peer, false);
     } else if (ret == 0) {
@@ -1790,9 +1790,9 @@ read_application_data_tcp(oc_tls_peer_t *peer)
           OC_DBG("oc_tls_tcp: Client wants to reconnect");
         } else {
 #ifdef OC_DEBUG
-          char buf[256];
-          mbedtls_strerror(ret, buf, 256);
-          OC_ERR("oc_tls_tcp: mbedtls_error: %s", buf);
+          // char buf[256];
+          // mbedtls_strerror(ret, buf, 256);
+          // OC_ERR("oc_tls_tcp: mbedtls_error: %s", buf);
 #endif /* OC_DEBUG */
         }
         if (peer->role == MBEDTLS_SSL_IS_SERVER &&
@@ -1865,9 +1865,9 @@ read_application_data(oc_tls_peer_t *peer)
       } else if (ret < 0 && ret != MBEDTLS_ERR_SSL_WANT_READ &&
                  ret != MBEDTLS_ERR_SSL_WANT_WRITE) {
 #ifdef OC_DEBUG
-        char buf[256];
-        mbedtls_strerror(ret, buf, 256);
-        OC_ERR("oc_tls: mbedtls_error: %s", buf);
+        // char buf[256];
+        // mbedtls_strerror(ret, buf, 256);
+        // OC_ERR("oc_tls: mbedtls_error: %s", buf);
 #endif /* OC_DEBUG */
         oc_tls_free_peer(peer, false);
         return;
@@ -1920,9 +1920,9 @@ read_application_data(oc_tls_peer_t *peer)
         OC_DBG("oc_tls: Client wants to reconnect");
       } else {
 #ifdef OC_DEBUG
-        char buf[256];
-        mbedtls_strerror(ret, buf, 256);
-        OC_ERR("oc_tls: mbedtls_error: %s", buf);
+        // char buf[256];
+        // mbedtls_strerror(ret, buf, 256);
+        // OC_ERR("oc_tls: mbedtls_error: %s", buf);
 #endif /* OC_DEBUG */
       }
       if (peer->role == MBEDTLS_SSL_IS_SERVER &&
