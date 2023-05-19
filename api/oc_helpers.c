@@ -361,9 +361,10 @@ oc_conv_hex_string_to_oc_string(const char *hex_str, size_t hex_str_len,
   oc_free_string(out);
   oc_alloc_string(out, size_bytes);
   char *ptr = oc_string(*out);
-
-  return_value =
-    oc_conv_hex_string_to_byte_array(hex_str, hex_str_len, ptr, &size_bytes);
+  if (ptr != NULL) {
+    return_value =
+      oc_conv_hex_string_to_byte_array(hex_str, hex_str_len, ptr, &size_bytes);
+  }
   PRINT("oc_conv_hex_string_to_oc_string result=%d", (int)return_value);
   return return_value;
 }
