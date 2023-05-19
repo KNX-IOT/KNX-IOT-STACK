@@ -76,8 +76,8 @@ oc_oscore_find_context_by_token_mid(size_t device, uint8_t *token,
       *request_piv = cb->piv;
       *request_piv_len = cb->piv_len;
     }
-    oscore_id = oc_string(cb->endpoint.oscore_id);
-    oscore_id_len = oc_string_len(cb->endpoint.oscore_id);
+    oscore_id = cb->endpoint.oscore_id;
+    oscore_id_len = cb->endpoint.oscore_id_len;
   } else {
 #endif /* OC_CLIENT */
     /* Search transactions by token and mid */
@@ -96,8 +96,8 @@ oc_oscore_find_context_by_token_mid(size_t device, uint8_t *token,
       *request_piv_len = t->message->endpoint.piv_len;
     }
     // serial_number = t->message->endpoint.serial_number;
-    oscore_id = oc_string(t->message->endpoint.oscore_id);
-    oscore_id_len = oc_string_len(t->message->endpoint.oscore_id);
+    oscore_id = t->message->endpoint.oscore_id;
+    oscore_id_len = t->message->endpoint.oscore_id_len;
 #ifdef OC_CLIENT
   }
 #endif /* OC_CLIENT */

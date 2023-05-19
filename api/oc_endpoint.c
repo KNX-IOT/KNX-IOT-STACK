@@ -77,8 +77,10 @@ int
 oc_endpoint_set_oscore_id(oc_endpoint_t *endpoint, char *oscore_id,
                           int oscore_id_len)
 {
-  oc_free_string(&endpoint->oscore_id);
-  oc_new_byte_string(&endpoint->oscore_id, oscore_id, oscore_id_len);
+  //oc_free_string(&endpoint->oscore_id);
+  //oc_new_byte_string(&endpoint->oscore_id, oscore_id, oscore_id_len);
+  memcpy(endpoint->oscore_id, oscore_id, oscore_id_len);
+  endpoint->oscore_id_len = oscore_id_len;
 
   return oscore_id_len;
 }

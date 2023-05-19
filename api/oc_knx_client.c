@@ -339,7 +339,7 @@ oc_initiate_spake(oc_endpoint_t *endpoint, char *password, char *recipient_id)
 
   // password : still a string
   strncpy((char *)&g_spake_ctx.spake_password, password, MAX_PASSWORD_LEN);
-  oc_string_copy(&g_spake_ctx.serial_number, endpoint->oscore_id);
+  //oc_string_copy(&g_spake_ctx.serial_number, endpoint->oscore_id);
 
   // serial number in endpoint is a string, so it needs to be converted before
   // going into the spake

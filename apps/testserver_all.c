@@ -1228,7 +1228,7 @@ discovery_cb(const char *payload, int len, oc_endpoint_t *endpoint,
   PRINTipaddr_flags(*endpoint);
   PRINTipaddr(*endpoint);
   oc_endpoint_set_oscore_id_from_str(endpoint, my_serialnum);
-  oc_string_println_hex(endpoint->oscore_id);
+  oc_char_println_hex(endpoint->oscore_id, endpoint->oscore_id_len);
 
   // copy the endpoint so that we know it in the spake2plus callback
   oc_endpoint_copy(&g_endpoint, endpoint);
