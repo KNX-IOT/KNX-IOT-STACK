@@ -213,9 +213,9 @@ discovery(const char *payload, int len, oc_endpoint_t *endpoint,
   //the_endpoint.oscore_id_len = 6;
 
    if (oc_endpoint_set_oscore_id_from_str(&the_endpoint, "00fa10010701") != 0) {
-    PRINT(
-      "  \n");
-    return;
+    //PRINT(
+    //  "  \n");
+    //return;
   }
   // do parameter exchange
   oc_initiate_spake_parameter_request(endpoint, "00FA10010701", "LETTUCE",
