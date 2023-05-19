@@ -162,7 +162,6 @@ oc_recv_message(oc_message_t *message)
 void
 oc_send_message(oc_message_t *message)
 {
-  oc_endpoint_print(&message->endpoint);
   if (oc_process_post(&message_buffer_handler,
                       oc_events[OUTBOUND_NETWORK_EVENT],
                       message) == OC_PROCESS_ERR_FULL) {

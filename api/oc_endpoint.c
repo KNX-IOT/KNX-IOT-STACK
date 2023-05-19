@@ -58,15 +58,6 @@ oc_free_endpoint(oc_endpoint_t *endpoint)
 }
 
 int
-oc_endpoint_set_serial_number(oc_endpoint_t *endpoint, char *serial_number)
-{
-  if (endpoint) {
-    strncpy((char *)&endpoint->serial_number, serial_number, SERIAL_NUM_SIZE);
-  }
-  return 0;
-}
-
-int
 oc_endpoint_set_oscore_id_from_str(oc_endpoint_t *endpoint, char *oscore_id)
 {
   endpoint->oscore_id_len = SERIAL_NUM_SIZE;

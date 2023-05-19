@@ -84,8 +84,6 @@ typedef struct oc_endpoint_t
   char oscore_id[SERIAL_NUM_SIZE + 1]; /**< OSCORE context (binary), e.g.
                                            binary serial number*/
   size_t oscore_id_len;
-  char *serial_number[SERIAL_NUM_SIZE + 1]; /**< The serial number (as client)
-                                             for the device on the other side*/
   union dev_addr {
     oc_ipv6_addr_t ipv6; /**< ipv6 address */
     oc_ipv4_addr_t ipv4; /**< ipv4 address */
@@ -96,7 +94,9 @@ typedef struct oc_endpoint_t
                        being used to find back the OSCORE
                   credential to be used for encryption for s-mode messages
                   e.g. looping over the list of group addresses of the key */
-  int32_t auth_at_index;  /**< auth at index +1 [1-max_indexes], 0 == error */
+  int32_t auth_at_index;  /**< auth at index +1 [1-max_indexes], 0 == error. 
+                          * Used for matching oscore context of response to request. 
+                          * Used for upper layers to check access interfaces. */
   uint8_t piv[OSCORE_PIV_LEN]; /**< OSCORE partial iv */
   uint8_t piv_len;             /**< OSCORE partial iv length */
 } oc_endpoint_t;
