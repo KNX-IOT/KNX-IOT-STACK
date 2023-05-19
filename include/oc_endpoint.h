@@ -94,9 +94,10 @@ typedef struct oc_endpoint_t
                        being used to find back the OSCORE
                   credential to be used for encryption for s-mode messages
                   e.g. looping over the list of group addresses of the key */
-  int32_t auth_at_index;  /**< auth at index +1 [1-max_indexes], 0 == error. 
-                          * Used for matching oscore context of response to request. 
-                          * Used for upper layers to check access interfaces. */
+  int32_t
+    auth_at_index; /**< auth at index +1 [1-max_indexes], 0 == error.
+                    * Used for matching oscore context of response to request.
+                    * Used for upper layers to check access interfaces. */
   uint8_t piv[OSCORE_PIV_LEN]; /**< OSCORE partial iv */
   uint8_t piv_len;             /**< OSCORE partial iv length */
 } oc_endpoint_t;

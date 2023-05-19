@@ -633,10 +633,10 @@ oc_oscore_send_message(oc_message_t *msg)
   oc_auth_at_t *entry = oc_get_auth_at_entry(message->endpoint.device, index);
   // if found, get the corresponding context
   if (entry) {
-   OC_DBG_OSCORE("### Found auth at entry, getting context ###");
-   oscore_ctx = oc_oscore_find_context_by_kid(
-     NULL, message->endpoint.device, oc_string(entry->osc_rid),
-     oc_byte_string_len(entry->osc_rid));
+    OC_DBG_OSCORE("### Found auth at entry, getting context ###");
+    oscore_ctx = oc_oscore_find_context_by_kid(
+      NULL, message->endpoint.device, oc_string(entry->osc_rid),
+      oc_byte_string_len(entry->osc_rid));
   }
   // Search for OSCORE context using addressing information
 
