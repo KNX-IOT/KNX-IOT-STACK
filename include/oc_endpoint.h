@@ -83,7 +83,7 @@ typedef struct oc_endpoint_t
   //  oscore_id; /**< OSCORE context (binary), e.g. binary serial number*/
   char oscore_id[SERIAL_NUM_SIZE + 1];     /**< OSCORE context (binary), e.g.
                                                binary serial number*/
-  int oscore_id_len;
+  size_t oscore_id_len;
   char *serial_number[SERIAL_NUM_SIZE + 1]; /**< The serial number (as client)
                                              for the device on the other side*/
   union dev_addr {
