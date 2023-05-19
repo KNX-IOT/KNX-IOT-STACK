@@ -646,7 +646,7 @@ oc_oscore_send_message(oc_message_t *msg)
   if (oscore_ctx == NULL) {
     // search the oscore id, e.g. the SID
     oscore_ctx = oc_oscore_find_context_by_oscore_id(
-      NULL, message->endpoint.device, oc_string(message->endpoint.oscore_id),
+      message->endpoint.device, oc_string(message->endpoint.oscore_id),
       oc_byte_string_len(message->endpoint.oscore_id));
   }
 
