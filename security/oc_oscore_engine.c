@@ -627,22 +627,29 @@ oc_oscore_send_message(oc_message_t *msg)
 
   oc_oscore_context_t *oscore_ctx = NULL;
   // most common case for unicast: we just get the cached index
-  int index = message->endpoint.auth_at_index - 1;
+  // int index = message->endpoint.auth_at_index - 1;
 
   // get auth_at table entry at index
-  oc_auth_at_t *entry = oc_get_auth_at_entry(message->endpoint.device, index);
+  // oc_auth_at_t *entry = oc_get_auth_at_entry(message->endpoint.device,
+  // index);
   // if found, get the corresponding context
-  if (entry) {
-    OC_DBG_OSCORE("### Found auth at entry, getting context ###");
-    oscore_ctx = oc_oscore_find_context_by_kid(
-      NULL, message->endpoint.device, oc_string(entry->osc_rid),
-      oc_byte_string_len(entry->osc_rid));
-  }
+  // if (entry) {
+  //  OC_DBG_OSCORE("### Found auth at entry, getting context ###");
+  //  oscore_ctx = oc_oscore_find_context_by_kid(
+  //    NULL, message->endpoint.device, oc_string(entry->osc_rid),
+  //    oc_byte_string_len(entry->osc_rid));
+  //}
   // Search for OSCORE context using addressing information
+
+  PRINT("oc_oscore_send_message : SID ");
+  oc_char_println_hex(message->endpoint.oscore_id,
+                      message->endpoint.oscore_id_len);
+
   if (oscore_ctx == NULL) {
-    oscore_ctx = oc_oscore_find_context_by_kid(
-      NULL, message->endpoint.device, oc_string(message->endpoint.oscore_id),
-      oc_byte_string_len(message->endpoint.oscore_id));
+    // search the oscore id, e.g. the SID
+    oscore_ctx = oc_oscore_find_context_by_oscore_id(
+      message->endpoint.device, message->endpoint.oscore_id,
+      message->endpoint.oscore_id_len);
   }
 
   // Search for OSCORE context using addressing information

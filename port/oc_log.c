@@ -1,5 +1,5 @@
 /*
-// Copyright (c) 2022 Cascoda Ltd.
+// Copyright (c) 2022-2023 Cascoda Ltd.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,5 +30,7 @@ oc_file_print(char *format, ...)
     va_start(args, format);
     vfprintf(fptr, format, args);
     va_end(args);
+    // flush the file
+    fflush(fptr);
   }
 }

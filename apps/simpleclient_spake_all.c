@@ -207,10 +207,16 @@ discovery(const char *payload, int len, oc_endpoint_t *endpoint,
     PRINT(" DISCOVERY CT %.*s\n", param_len, param);
   }
 
-  memcpy(&the_endpoint, endpoint, sizeof(the_endpoint));
-  char sernum[6] = { 0x00, 0xfa, 0x10, 0x01, 0x07, 0x01 };
-  oc_new_string(&the_endpoint.oscore_id, sernum, 6);
+  // memcpy(&the_endpoint, endpoint, sizeof(the_endpoint));
+  // char sernum[6] = { 0x00, 0xfa, 0x10, 0x01, 0x07, 0x01 };
+  // memcpy(&the_endpoint.oscore_id, sernum, 6);
+  // the_endpoint.oscore_id_len = 6;
 
+  if (oc_endpoint_set_oscore_id_from_str(&the_endpoint, "00fa10010701") != 0) {
+    // PRINT(
+    //   "  \n");
+    // return;
+  }
   // do parameter exchange
   oc_initiate_spake_parameter_request(endpoint, "00FA10010701", "LETTUCE",
                                       "rcpids", strlen("rcpids"));
