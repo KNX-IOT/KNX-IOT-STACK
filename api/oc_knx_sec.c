@@ -655,7 +655,7 @@ oc_core_auth_at_post_handler(oc_request_t *request,
                     oc_new_byte_string(
                       &g_at_entries[index].osc_ms,
                       oc_string(oscobject->value.string),
-                      oc_byte_string_len(oscobject->value.string));
+                      oc_string_len(oscobject->value.string));
                     other_updated = true;
                   }
                   if (oscobject->iname == 6 && subobject_nr == 8 &&
@@ -665,7 +665,7 @@ oc_core_auth_at_post_handler(oc_request_t *request,
                     oc_new_byte_string(
                       &g_at_entries[index].osc_contextid,
                       oc_string(oscobject->value.string),
-                      oc_byte_string_len(oscobject->value.string));
+                      oc_string_len(oscobject->value.string));
                     other_updated = true;
                   }
                   if (oscobject->iname == 7 && subobject_nr == 8 &&
@@ -675,7 +675,7 @@ oc_core_auth_at_post_handler(oc_request_t *request,
                     oc_new_byte_string(
                       &g_at_entries[index].osc_rid,
                       oc_string(oscobject->value.string),
-                      oc_byte_string_len(oscobject->value.string));
+                      oc_string_len(oscobject->value.string));
                     other_updated = true;
                   }
                   if (oscobject->iname == 0 && subobject_nr == 8 &&
@@ -685,7 +685,7 @@ oc_core_auth_at_post_handler(oc_request_t *request,
                     oc_new_byte_string(
                       &g_at_entries[index].osc_id,
                       oc_string(oscobject->value.string),
-                      oc_byte_string_len(oscobject->value.string));
+                      oc_string_len(oscobject->value.string));
                     other_updated = true;
                   }
                 } /* type */
