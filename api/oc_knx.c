@@ -185,7 +185,16 @@ oc_core_knx_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   code = "code" Unsigned
   time = "time" Unsigned
 */
-static void
+static size_t cached_device_index;
+static int cached_value;
+
+static oc_event_callback_retval_t delayed_reset(void* context)
+{
+  oc_reset_device(cached_device_index, cached_value);
+  return OC_EVENT_DONE;
+
+}
+
 oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
                          void *data)
 {
@@ -241,7 +250,10 @@ oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     restart_device(device_index);
     error = false;
   } else if (cmd == RESET_DEVICE) {
-    oc_reset_device(device_index, value);
+    // oc_reset_device(device_index, value);
+    cached_device_index = device_index;
+    cached_value = value;
+    oc_set_delayed_callback(NULL, delayed_reset, 0);
     error = false;
   }
 
