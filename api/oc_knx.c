@@ -254,7 +254,7 @@ oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     // oc_reset_device(device_index, value);
     cached_device_index = device_index;
     cached_value = value;
-    oc_set_delayed_callback(NULL, delayed_reset, 1);
+    oc_set_delayed_callback_ms(NULL, delayed_reset, 1);
     error = false;
   }
 
