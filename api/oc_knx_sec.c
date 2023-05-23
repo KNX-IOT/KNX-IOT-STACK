@@ -1455,7 +1455,7 @@ oc_reset_at_table(size_t device_index, int erase_code)
     oc_interface_mask_t scope = OC_IF_NONE;
     for (int i = 0; i < G_AT_MAX_ENTRIES; i++) {
       scope = oc_at_get_interface_mask(device_index, i);
-      if ((scope & OC_IF_SEC) > 0) {
+      if ((scope & OC_IF_SEC) != 0) {
         // reset the entries that are not "if.sec"
         oc_at_delete_entry(device_index, i);
         oc_print_auth_at_entry(device_index, i);
