@@ -707,12 +707,14 @@ oc_core_auth_at_post_handler(oc_request_t *request,
     }
     // temp backward compatibility fix: if context id is not there then use
     // SID for context ID
+    /*
     if (oc_string_len(g_at_entries[index].osc_contextid) == 0) {
       oc_free_string(&(g_at_entries[index].osc_contextid));
       oc_new_byte_string(&g_at_entries[index].osc_contextid,
                          oc_string(g_at_entries[index].osc_id),
                          oc_byte_string_len(g_at_entries[index].osc_id));
     }
+    */
 
     oc_print_auth_at_entry(device_index, index);
 
