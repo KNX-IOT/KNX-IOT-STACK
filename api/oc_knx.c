@@ -195,6 +195,7 @@ static oc_event_callback_retval_t delayed_reset(void* context)
 
 }
 
+static void
 oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
                          void *data)
 {
@@ -253,7 +254,7 @@ oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     // oc_reset_device(device_index, value);
     cached_device_index = device_index;
     cached_value = value;
-    oc_set_delayed_callback(NULL, delayed_reset, 0);
+    oc_set_delayed_callback(NULL, delayed_reset, 1);
     error = false;
   }
 
