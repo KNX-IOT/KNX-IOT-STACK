@@ -356,7 +356,6 @@ oc_wkcore_discovery_handler(oc_request_t *request,
         request->response->response_buffer->code = OC_IGNORE;
       }
     }
-    return;
   }
 
   /* handle individual address, spec 1.0 */
