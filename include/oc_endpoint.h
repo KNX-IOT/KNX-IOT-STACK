@@ -127,15 +127,6 @@ oc_endpoint_t *oc_new_endpoint(void);
  */
 void oc_free_endpoint(oc_endpoint_t *endpoint);
 
-/*
- * @brief set device serial number for the endpoint, e.g. the one to talk too
- *
- * @param endpoint the end point
- * @param serial_number the device serial number
- * @return int 0 success
- */
-int oc_endpoint_set_serial_number(oc_endpoint_t *endpoint, char *serial_number);
-
 /**
  * @brief set the OSCORE identifier (SID)
  *
