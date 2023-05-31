@@ -547,7 +547,8 @@ oc_oscore_send_multicast_message(oc_message_t *message)
     /* Set the Outer code for the OSCORE packet (POST/FETCH:2.04/2.05) */
     coap_pkt->code = OC_POST;
 
-    /* WIRESHARK FIX */
+    /* Wireshark fix - include the context ID on the wire as well */
+    /* otherwise cannot decode OSCORE messages that use implicit ID contexts */
     uint8_t idctx[16], idctx_len;
     memcpy(idctx, oscore_ctx->idctx, oscore_ctx->idctx_len);
     idctx_len = oscore_ctx->idctx_len;
