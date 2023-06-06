@@ -1,5 +1,5 @@
 /*
- // Copyright (c) 2022 Cascoda Ltd
+ // Copyright (c) 2022-2023 Cascoda Ltd
  //
  // Licensed under the Apache License, Version 2.0 (the "License");
  // you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 #include "oc_api.h"
 #include "api/oc_knx_p.h"
 #include "api/oc_knx_fp.h"
+#include "api/oc_knx_helpers.h"
 
 #include "oc_core_res.h"
 #include "oc_discovery.h"

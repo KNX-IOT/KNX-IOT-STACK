@@ -720,7 +720,7 @@ oc_get_sn_ia_iid_from_ep(const char *param, int param_len, char *sn, int sn_len,
         *ia = (uint32_t)strtol(&param[offset + 1 + 9], NULL, 16);
         char *point = oc_strnchr(&param[offset + 1 + 9], '.', param_len - 10 - offset);
         if (point) {
-          parse_uint64(&param[offset + 1 + 9], iid);
+          parse_uint64(point+1, iid);
           error = 0;
         }
       }
@@ -743,7 +743,7 @@ oc_get_sn_ia_iid_from_ep(const char *param, int param_len, char *sn, int sn_len,
           oc_strnchr(&param[offset + 1 + 9], '.', param_len - 10 - offset);
         if (point) {
           // read unit64_t from hex
-          if (parse_uint64(&param[offset + 1 + 9], iid) == 0) {
+          if (parse_uint64(point+1, iid) == 0) {
             error = 0;
           }
         }
@@ -761,7 +761,7 @@ oc_get_sn_ia_iid_from_ep(const char *param, int param_len, char *sn, int sn_len,
       char *point = oc_strnchr(&param[10], '.', param_len-10);
       if (point) {
         // read unit64_t from hex
-        if (parse_uint64(point, iid) == 0) {
+        if (parse_uint64(point+1, iid) == 0) {
           error = 0;
         }
       }
@@ -792,7 +792,7 @@ oc_get_sn_ia_iid_from_ep(const char *param, int param_len, char *sn, int sn_len,
       char *point = oc_strnchr(&param[9], '.', param_len - 9);
       if (point) {
         // read unit64_t from hex
-        if (parse_uint64(point, iid) == 0) {
+        if (parse_uint64(point+1, iid) == 0) {
           error = 0;
         }
       }
