@@ -276,13 +276,13 @@ TEST_F(TestLinkFormat, EP_N_SN1)
   int len = strlen(payload);
   char sn[30];
   uint32_t ia;
-  uint64_t idd;
+  uint64_t iid;
 
   int error = oc_get_sn_ia_iid_from_ep(payload, len, sn, 29, &ia, &iid);
   EXPECT_EQ(0, error);
   check_string("123456ab", sn, strlen(sn));
   EXPECT_EQ(0x20a, ia);
-  EXPECT_EQ(1, idd);
+  EXPECT_EQ(1, iid);
 }
 
 TEST_F(TestLinkFormat, EP_N_SN2)
@@ -291,13 +291,13 @@ TEST_F(TestLinkFormat, EP_N_SN2)
   int len = strlen(payload);
   char sn[30];
   uint32_t ia;
-  uint64_t idd;
+  uint64_t iid;
 
   int error = oc_get_sn_ia_iid_from_ep(payload, len, sn, 29, &ia, &iid);
   EXPECT_EQ(0, error);
   check_string("1234569999", sn, strlen(sn));
   EXPECT_EQ(0x20a, ia);
-  EXPECT_EQ(1, idd);
+  EXPECT_EQ(1, iid);
 }
 
 TEST_F(TestLinkFormat, EP_N_SN3)
@@ -306,13 +306,13 @@ TEST_F(TestLinkFormat, EP_N_SN3)
   int len = strlen(payload) - 1;
   char sn[30];
   uint32_t ia;
-  uint64_t idd;
+  uint64_t iid;
 
   int error = oc_get_sn_ia_iid_from_ep(payload, len, sn, 29, &ia, &iid);
   EXPECT_EQ(0, error);
   check_string("123456ab", sn, strlen(sn));
   EXPECT_EQ(0x20a, ia);
-  EXPECT_EQ(55555555555555, idd);
+  EXPECT_EQ(55555555555555, iid);
 }
 
 TEST_F(TestLinkFormat, EP_N_SN4)
@@ -321,13 +321,13 @@ TEST_F(TestLinkFormat, EP_N_SN4)
   int len = strlen(payload) - 1;
   char sn[30];
   uint32_t ia;
-  uint64_t idd;
+  uint64_t iid;
 
   int error = oc_get_sn_ia_iid_from_ep(payload, len, sn, 29, &ia, &iid);
   EXPECT_EQ(0, error);
   check_string("123456ab333", sn, strlen(sn));
   EXPECT_EQ(0x2a, ia);
-  EXPECT_EQ(0x1c, idd);
+  EXPECT_EQ(0x1c, iid);
 }
 
 TEST_F(TestLinkFormat, EP_N_SN5)
@@ -336,7 +336,7 @@ TEST_F(TestLinkFormat, EP_N_SN5)
   int len = strlen(payload);
   char sn[30];
   uint32_t ia;
-  uint64_t idd;
+  uint64_t iid;
 
   int error = oc_get_sn_ia_iid_from_ep(payload, len, sn, 29, &ia, &iid);
   EXPECT_EQ(-1, error);
@@ -349,7 +349,7 @@ TEST_F(TestLinkFormat, EP_N_SN6)
   int len = strlen(payload);
   char sn[30];
   uint32_t ia;
-  uint64_t idd;
+  uint64_t iid;
 
   int error = oc_get_sn_ia_iid_from_ep(payload, len, sn, 29, &ia, &iid);
   EXPECT_EQ(-1, error);
@@ -364,12 +364,12 @@ TEST_F(TestLinkFormat, EP_N_SN7)
   int len = strlen(payload);
   char sn[30];
   uint32_t ia;
-  uint64_t idd;
+  uint64_t iid;
 
   int error = oc_get_sn_ia_iid_from_ep(payload, len, sn, 29, &ia, &iid);
   EXPECT_EQ(0, error);
   EXPECT_EQ(0x20a, ia);
-  EXPECT_EQ(1, idd);
+  EXPECT_EQ(1, iid);
   check_string("123456ab", sn, strlen(sn));
 }
 
@@ -380,7 +380,7 @@ TEST_F(TestLinkFormat, EP_N_SN8)
   int len = strlen(payload);
   char sn[30];
   uint32_t ia;
-  uint64_t idd;
+  uint64_t iid;
 
   int error = oc_get_sn_ia_iid_from_ep(payload, len, sn, 29, &ia, &iid);
   EXPECT_EQ(0, error);
@@ -394,7 +394,7 @@ TEST_F(TestLinkFormat, EP_N_SN9
   int len = strlen(payload);
   char sn[30];
   uint32_t ia;
-  uint64_t idd;
+  uint64_t iid;
 
   int error = oc_get_sn_ia_iid_from_ep(payload, len, sn, 29, &ia, &iid);
   EXPECT_EQ(0, error);
@@ -409,7 +409,7 @@ TEST_F(TestLinkFormat, EP_N_SN10
   int len = strlen(payload);
   char sn[30];
   uint32_t ia;
-  uint64_t idd;
+  uint64_t iid;
 
   int error = oc_get_sn_ia_iid_from_ep(payload, len, sn, 29, &ia, &iid);
   EXPECT_EQ(0, error);
@@ -425,7 +425,7 @@ TEST_F(TestLinkFormat, EP_E_SN0)
   int len = strlen(payload);
   char sn[30];
   uint32_t ia;
-  uint64_t idd;
+  uint64_t iid;
 
   int error = oc_get_sn_ia_iid_from_ep(payload, len, sn, 29, &ia, &iid);
   EXPECT_EQ(-1, error);
@@ -439,7 +439,7 @@ TEST_F(TestLinkFormat, EP_E_SN1
   int len = strlen(payload);
   char sn[30];
   uint32_t ia;
-  uint64_t idd;
+  uint64_t iid;
 
   int error = oc_get_sn_ia_iid_from_ep(payload, len, sn, 29, &ia, &iid);
   EXPECT_EQ(-1, error);
@@ -454,7 +454,7 @@ TEST_F(TestLinkFormat, EP_W_SN2
   int len = strlen(payload);
   char sn[30];
   uint32_t ia;
-  uint64_t idd;
+  uint64_t iid;
 
   int error = oc_get_sn_ia_iid_from_ep(payload, len, sn, 29, &ia, &iid);
   EXPECT_EQ(0, error);
