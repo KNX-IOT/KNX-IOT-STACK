@@ -21,6 +21,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <inttypes.h>
 
 static bool mmem_initialized = false;
 
@@ -90,7 +91,6 @@ _oc_new_byte_string(
 #endif
     ocstring, str_len, BYTE_POOL);
   memcpy(oc_string(*ocstring), (const uint8_t *)str, str_len);
-  // memcpy(oc_string(*ocstring) + str_len, (const uint8_t *)"", 1);
 }
 
 void
@@ -661,6 +661,138 @@ oc_get_sn_from_ep(const char *param, int param_len, char *sn, int sn_len,
       PRINT("oc_get_sn_from_ep 222 string: string ia : '%s'\n", &param[9]);
       // read from hex
       *ia = (uint32_t)strtol(&param[9], NULL, 16);
+    } else {
+      int offset = blank - param;
+      char *quote = oc_strnchr(&param[offset], '\"', param_len);
+      int quote_len = quote - (&param[offset]);
+      int len_q = quote_len - 10;
+      int len = param_len - offset - 9;
+      if (len > len_q) {
+        len = len_q;
+      }
+      *ia = (uint32_t)strtol(&param[9], NULL, 16);
+      if (strncmp(&param[offset + 1], "knx://sn.", 9) == 0) {
+        strncpy(sn, (char *)&param[offset + 1 + 9], len);
+        error = 0;
+      }
+    }
+  }
+  return error;
+}
+
+int
+parse_uint64(const char* str, uint64_t *value)
+{
+  int filled_var = sscanf(str, "%" SCNx64, value);
+  if (filled_var == 1) {
+    return 0;
+  } 
+  return -1;
+}
+
+int
+oc_get_sn_ia_idd_from_ep(const char *param, int param_len, char *sn, int sn_len,
+                  uint32_t *ia, uint64_t *iid)
+{
+  int error = -1;
+  memset(sn, 0, 30);
+  *ia = 0;
+  *iid = 0;
+  if (param_len < 10) {
+    return error;
+  }
+  if (strncmp(param, "\"knx://sn.", 10) == 0) {
+    // spec 1.1 ep= contents: (with quote)
+    // "knx://sn.<sn> knx://ia.<ia>.<iid>"
+    char *blank = oc_strnchr(param, ' ', param_len);
+    if (blank == NULL) {
+      // the ia part is missing, so length -10 and 1 less to adjust for quot
+      strncpy(sn, (char *)&param[10], param_len - 11);
+    } else {
+      int offset = blank - param;
+      int len = offset - 10;
+      strncpy(sn, &param[10], len);
+      if (strncmp(&param[offset + 1], "knx://ia.", 9) == 0) {
+        // read unit64_t from hex
+        *ia = (uint32_t)strtol(&param[offset + 1 + 9], NULL, 16);
+        char *point = oc_strnchr(&param[offset + 1 + 9], '.', param_len - 10 - offset);
+        if (point) {
+          parse_uint64(&param[offset + 1 + 9], &iid);
+          error = 0;
+        }
+      }
+    }
+  } else if (strncmp(param, "knx://sn.", 9) == 0) {
+    // spec 1.1 ep= contents: (without quote)
+    // knx://sn.<sn> knx://ia.<ia>.<iid>"
+    char *blank = oc_strnchr(param, ' ', param_len);
+    if (blank == NULL) {
+      // the ia part is missing, so length -10 and 1 less to adjust for quot
+      strncpy(sn, (char *)&param[9], param_len - 11);
+    } else {
+      int offset = blank - param;
+      int len = offset - 9;
+      strncpy(sn, &param[9], len);
+      if (strncmp(&param[offset + 1], "knx://ia.", 9) == 0) {
+        // read from hex
+        *ia = (uint32_t)strtol(&param[offset + 1 + 9], NULL, 16);
+        char *point =
+          oc_strnchr(&param[offset + 1 + 9], '.', param_len - 10 - offset);
+        if (point) {
+          // read unit64_t from hex
+          if (parse_uint64(&param[offset + 1 + 9], &iid) == 0) {
+            error = 0;
+          }
+        }
+      }
+    }
+  } else if (strncmp(param, "\"knx://ia.", 10) == 0) {
+    // spec 1.1 ep= contents:
+    // "knx://ia.<ia>.<iid> knx://sn.<sn>"
+    char *blank = oc_strnchr(param, ' ', param_len);
+    if (blank == NULL) {
+      // the sn part is missing
+      PRINT("oc_get_sn_from_ep 222 string: string ia : '%s'\n", &param[10]);
+      // read from hex
+      *ia = (uint32_t)strtol(&param[10], NULL, 16);
+      char *point = oc_strnchr(&param[10], '.', param_len-10);
+      if (point) {
+        // read unit64_t from hex
+        if (parse_uint64(point, &iid) == 0) {
+          error = 0;
+        }
+      }
+    } else {
+      int offset = blank - param;
+      char *quote = oc_strnchr(&param[offset], '\"', param_len);
+      int quote_len = quote - (&param[offset]);
+      int len_q = quote_len - 10;
+      int len = param_len - offset - 9;
+      if (len > len_q) {
+        len = len_q;
+      }
+      *ia = (uint32_t)strtol(&param[10], NULL, 16);
+      if (strncmp(&param[offset + 1], "knx://sn.", 9) == 0) {
+        strncpy(sn, (char *)&param[offset + 1 + 9], len);
+        error = 0;
+      }
+    }
+  } else if (strncmp(param, "knx://ia.", 9) == 0) {
+    // spec 1.1 ep= contents:
+    // knx://ia.<ia>.<iid? knx://sn.<sn>"
+    char *blank = oc_strnchr(param, ' ', param_len);
+    if (blank == NULL) {
+      // the sn part is missing
+      PRINT("oc_get_sn_from_ep 222 string: string ia : '%s'\n", &param[9]);
+      // read from hex
+      *ia = (uint32_t)strtol(&param[9], NULL, 16);
+      char *point = oc_strnchr(&param[9], '.', param_len - 9);
+      if (point) {
+        // read unit64_t from hex
+        if (parse_uint64(point, &iid) == 0) {
+          error = 0;
+        }
+      }
     } else {
       int offset = blank - param;
       char *quote = oc_strnchr(&param[offset], '\"', param_len);
