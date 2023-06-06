@@ -237,3 +237,227 @@ TEST_F(TestLinkFormat, EP_SN6)
   EXPECT_EQ(-1, error);
   EXPECT_EQ(0x20b, ia);
 }
+
+
+TEST_F(TestLinkFormat, EP_SN7)
+{
+  // 2 blanks between sn & ia
+  const char payload[] = "\"knx://sn.1234569999  knx://ia.20a\"";
+  int len = strlen(payload);
+  char sn[30];
+  uint32_t ia;
+
+  int error = oc_get_sn_from_ep(payload, len, sn, 29, &ia);
+  EXPECT_EQ(-1, error);
+  EXPECT_EQ(0x20a, ia);
+  check_string("123456ab", sn, strlen(sn));
+}
+}
+
+
+TEST_F(TestLinkFormat, EP_SN8)
+{
+  // 2 blanks between ia & sn
+  const char payload[] = "\"knx://ia.2a  knx://sn.123456ab333\"";
+  int len = strlen(payload);
+  char sn[30];
+  uint32_t ia;
+
+  int error = oc_get_sn_from_ep(payload, len, sn, 29, &ia);
+  EXPECT_EQ(-1, error);
+  EXPECT_EQ(0x20b, ia);
+}
+
+// including IA
+
+TEST_F(TestLinkFormat, EP_N_SN1)
+{
+  const char payload[] = "\"knx://sn.123456ab knx://ia.20a.1\"";
+  int len = strlen(payload);
+  char sn[30];
+  uint32_t ia;
+  uint64_t idd;
+
+  int error = oc_get_sn_ia_iid_from_ep(payload, len, sn, 29, &ia, &iid);
+  EXPECT_EQ(0, error);
+  check_string("123456ab", sn, strlen(sn));
+  EXPECT_EQ(0x20a, ia);
+  EXPECT_EQ(1, idd);
+}
+
+TEST_F(TestLinkFormat, EP_N_SN2)
+{
+  const char payload[] = "\"knx://sn.1234569999 knx://ia.20a\"";
+  int len = strlen(payload);
+  char sn[30];
+  uint32_t ia;
+  uint64_t idd;
+
+  int error = oc_get_sn_ia_iid_from_ep(payload, len, sn, 29, &ia, &iid);
+  EXPECT_EQ(0, error);
+  check_string("1234569999", sn, strlen(sn));
+  EXPECT_EQ(0x20a, ia);
+  EXPECT_EQ(1, idd);
+}
+
+TEST_F(TestLinkFormat, EP_N_SN3)
+{
+  const char payload[] = "\"knx://ia.20a.55555555555555 knx://sn.123456ab\" ";
+  int len = strlen(payload) - 1;
+  char sn[30];
+  uint32_t ia;
+  uint64_t idd;
+
+  int error = oc_get_sn_ia_iid_from_ep(payload, len, sn, 29, &ia, &iid);
+  EXPECT_EQ(0, error);
+  check_string("123456ab", sn, strlen(sn));
+  EXPECT_EQ(0x20a, ia);
+  EXPECT_EQ(55555555555555, idd);
+}
+
+TEST_F(TestLinkFormat, EP_N_SN4)
+{
+  const char payload[] = "\"knx://ia.2a.1c knx://sn.123456ab333\"";
+  int len = strlen(payload) - 1;
+  char sn[30];
+  uint32_t ia;
+  uint64_t idd;
+
+  int error = oc_get_sn_ia_iid_from_ep(payload, len, sn, 29, &ia, &iid);
+  EXPECT_EQ(0, error);
+  check_string("123456ab333", sn, strlen(sn));
+  EXPECT_EQ(0x2a, ia);
+  EXPECT_EQ(0x1c, idd);
+}
+
+TEST_F(TestLinkFormat, EP_N_SN5)
+{
+  const char payload[] = "\"knx://sn.123456ab\"";
+  int len = strlen(payload);
+  char sn[30];
+  uint32_t ia;
+  uint64_t idd;
+
+  int error = oc_get_sn_ia_iid_from_ep(payload, len, sn, 29, &ia, &iid);
+  EXPECT_EQ(-1, error);
+  check_string("123456ab", sn, strlen(sn));
+}
+
+TEST_F(TestLinkFormat, EP_N_SN6)
+{
+  const char payload[] = "\"knx://ia.20b\"";
+  int len = strlen(payload);
+  char sn[30];
+  uint32_t ia;
+  uint64_t idd;
+
+  int error = oc_get_sn_ia_iid_from_ep(payload, len, sn, 29, &ia, &iid);
+  EXPECT_EQ(-1, error);
+  EXPECT_EQ(0x20b, ia);
+}
+
+
+TEST_F(TestLinkFormat, EP_N_SN7)
+{
+  // 2 blanks between sn & ia
+  const char payload[] = "\"knx://sn.1234569999  knx://ia.20a.1\"";
+  int len = strlen(payload);
+  char sn[30];
+  uint32_t ia;
+  uint64_t idd;
+
+  int error = oc_get_sn_ia_iid_from_ep(payload, len, sn, 29, &ia, &iid);
+  EXPECT_EQ(0, error);
+  EXPECT_EQ(0x20a, ia);
+  EXPECT_EQ(1, idd);
+  check_string("123456ab", sn, strlen(sn));
+}
+
+TEST_F(TestLinkFormat, EP_N_SN8)
+{
+  // 2 blanks between ia & sn
+  const char payload[] = "\"knx://ia.2a.ad  knx://sn.123456ab333\"";
+  int len = strlen(payload);
+  char sn[30];
+  uint32_t ia;
+  uint64_t idd;
+
+  int error = oc_get_sn_ia_iid_from_ep(payload, len, sn, 29, &ia, &iid);
+  EXPECT_EQ(0, error);
+  EXPECT_EQ(0x20b, ia);
+  EXPECT_EQ(0xad, iid);
+}
+
+TEST_F(TestLinkFormat, EP_N_SN9
+  // 2 blanks between ia & sn
+  const char payload[] = "\"knx://ia.0.0  knx://sn.123456ab333\"";
+  int len = strlen(payload);
+  char sn[30];
+  uint32_t ia;
+  uint64_t idd;
+
+  int error = oc_get_sn_ia_iid_from_ep(payload, len, sn, 29, &ia, &iid);
+  EXPECT_EQ(0, error);
+  EXPECT_EQ(0, ia);
+  EXPECT_EQ(0, iid);
+}
+
+
+TEST_F(TestLinkFormat, EP_N_SN10
+  // 2 blanks between ia & sn
+  const char payload[] = "\"knx://sn.123456ab333  knx://ia.0.0\"";
+  int len = strlen(payload);
+  char sn[30];
+  uint32_t ia;
+  uint64_t idd;
+
+  int error = oc_get_sn_ia_iid_from_ep(payload, len, sn, 29, &ia, &iid);
+  EXPECT_EQ(0, error);
+  EXPECT_EQ(0, ia);
+  EXPECT_EQ(0, iid);
+}
+
+
+TEST_F(TestLinkFormat, EP_E_SN0)
+{
+  // 2 blanks between ia & sn
+  const char payload[] = "\"knx://ia.2a  knx://sn.123456ab333\"";
+  int len = strlen(payload);
+  char sn[30];
+  uint32_t ia;
+  uint64_t idd;
+
+  int error = oc_get_sn_ia_iid_from_ep(payload, len, sn, 29, &ia, &iid);
+  EXPECT_EQ(-1, error);
+  EXPECT_EQ(0x20b, ia);
+  EXPECT_EQ(0, iid);
+}
+
+TEST_F(TestLinkFormat, EP_E_SN1
+  // 2 blanks between ia & sn
+  const char payload[] = "\"knx://ia.0  knx://sn.123456ab333\"";
+  int len = strlen(payload);
+  char sn[30];
+  uint32_t ia;
+  uint64_t idd;
+
+  int error = oc_get_sn_ia_iid_from_ep(payload, len, sn, 29, &ia, &iid);
+  EXPECT_EQ(-1, error);
+  EXPECT_EQ(0, ia);
+  EXPECT_EQ(0, iid);
+}
+
+
+TEST_F(TestLinkFormat, EP_W_SN2
+  // 2 blanks between ia & sn
+  const char payload[] = "\"knx://sn.123456ab333  knx://ia.0\"";
+  int len = strlen(payload);
+  char sn[30];
+  uint32_t ia;
+  uint64_t idd;
+
+  int error = oc_get_sn_ia_iid_from_ep(payload, len, sn, 29, &ia, &iid);
+  EXPECT_EQ(0, error);
+  EXPECT_EQ(0, ia);
+  EXPECT_EQ(0, iid);
+}

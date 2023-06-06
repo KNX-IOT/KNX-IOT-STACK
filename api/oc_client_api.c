@@ -21,10 +21,9 @@
 #include "messaging/coap/coap_signal.h"
 #endif /* OC_TCP */
 #include "oc_api.h"
-//#ifdef OC_SECURITY
 #ifdef OC_OSCORE
 #include "security/oc_tls.h"
-#endif /* OC_SECURITY */
+#endif /* OC_OSCORE */
 #ifdef OC_CLIENT
 
 static coap_transaction_t *transaction;
@@ -264,11 +263,6 @@ bool
 oc_init_multicast_update(oc_endpoint_t *mcast, const char *uri,
                          const char *query)
 {
-  // oc_make_ipv6_endpoint(mcast, IPV6 | MULTICAST | SECURED, 5683, 0xff, 0x02,
-  // 0,
-  //                      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x01, 0x58);
-  // mcast.addr.ipv6.scope = 0;
-
   coap_message_type_t type = COAP_TYPE_NON;
 
   multicast_update = oc_internal_allocate_outgoing_message();
@@ -414,10 +408,7 @@ oc_do_get_ex_secured(const char *uri, oc_endpoint_t *endpoint,
   endpoint->flags += OSCORE;
   PRINT("  enable OSCORE encryption\n");
 
-  // oc_endpoint_set_serial_number(endpoint, (char *)token);
   oc_endpoint_set_oscore_id_from_str(endpoint, (char *)token);
-  // PRINT("  ep oscore_id:");
-  // oc_string_println_hex(endpoint->oscore_id);
 
   oc_client_cb_t *cb = oc_ri_alloc_client_cb(uri, endpoint, OC_GET, query,
                                              client_handler, qos, user_data);
@@ -743,7 +734,6 @@ void
 oc_close_session(oc_endpoint_t *endpoint)
 {
   if (endpoint->flags & SECURED) {
-//#ifdef OC_SECURITY
 #ifdef OC_OSCORE
     oc_tls_close_connection(endpoint);
 #endif /* OC_SECURITY */
@@ -856,8 +846,6 @@ oc_lf_get_entry_uri(const char *payload, int payload_len, int entry,
 
   oc_lf_get_line(payload, payload_len, entry, &line, &line_len);
 
-  // PRINT(" LINE: %.*s\n", line_len, line);
-
   for (i = 0; i < line_len; i++) {
     if (line[i] == '<') {
       begin_uri = i + 1;
@@ -888,7 +876,6 @@ oc_lf_get_entry_param(const char *payload, int payload_len, int entry,
   oc_lf_get_line(payload, payload_len, entry, &line, &line_len);
 
   // <coap://[fe80::8d4c:632a:c5e7:ae09]:60054/p/a>;rt="urn:knx:dpa.352.51";if=if.a;ct=60
-  //
   int param_len = (int)strlen(param);
   for (i = 0; i < line_len - param_len - 1; i++) {
     if (line[i] == ';') {
