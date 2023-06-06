@@ -305,7 +305,7 @@ main(int argc, char *argv[])
   bool do_send_s_mode = false;
 
   for (int i = 0; i < argc; i++) {
-    printf("argv[%d] = %s\n", i, argv[i]);
+    PRINT("argv[%d] = %s\n", i, argv[i]);
   }
   if (argc > 1) {
     if (strcmp(argv[1], "-help") == 0) {

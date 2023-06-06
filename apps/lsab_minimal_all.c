@@ -440,9 +440,9 @@ send_delayed_response(void *context)
   if (response->active) {
     oc_set_separate_response_buffer(response);
     oc_send_separate_response(response, OC_STATUS_CHANGED);
-    printf("Delayed response sent\n");
+    PRINT("Delayed response sent\n");
   } else {
-    printf("Delayed response NOT active\n");
+    PRINT("Delayed response NOT active\n");
   }
 
   return OC_EVENT_DONE;
@@ -571,7 +571,7 @@ main(int argc, char *argv[])
 #endif
 
   for (int i = 0; i < argc; i++) {
-    printf("argv[%d] = %s\n", i, argv[i]);
+    PRINT("argv[%d] = %s\n", i, argv[i]);
   }
   if (argc > 1) {
     if (strcmp(argv[1], "reset") == 0) {

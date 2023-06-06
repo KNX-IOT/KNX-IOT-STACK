@@ -168,9 +168,9 @@ oc_spake_print_point(mbedtls_ecp_point *p)
   len = encode_point(&grp, p, buf);
 
   for (size_t i = 0; i < len; i++) {
-    printf("%02x", buf[i]);
+    PRINT("%02x", buf[i]);
   }
-  printf("\n");
+  PRINT("\n");
 }
 
 void
@@ -182,9 +182,9 @@ oc_spake_print_mpi(mbedtls_mpi *m)
   len = encode_mpi(m, buf);
 
   for (size_t i = 0; i < len; i++) {
-    printf("%02x", buf[i]);
+    PRINT("%02x", buf[i]);
   }
-  printf("\n");
+  PRINT("\n");
 }
 
 int
