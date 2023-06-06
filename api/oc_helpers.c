@@ -736,7 +736,8 @@ oc_get_sn_ia_iid_from_ep(const char *param, int param_len, char *sn, int sn_len,
       int offset = blank - param;
       int len = offset - 9;
       strncpy(sn, &param[9], len);
-      if (strncmp(&param[offset + 1], "knx://ia.", 9) == 0) {
+      char *ia_str = oc_strnchr(blank, 'k', param_len);
+      if (ia_str && strncmp(ia_str, "knx://ia.", 9) == 0) {
         // read from hex
         *ia = (uint32_t)strtol(&param[offset + 1 + 9], NULL, 16);
         char *point =
@@ -775,7 +776,8 @@ oc_get_sn_ia_iid_from_ep(const char *param, int param_len, char *sn, int sn_len,
         len = len_q;
       }
       *ia = (uint32_t)strtol(&param[10], NULL, 16);
-      if (strncmp(&param[offset + 1], "knx://sn.", 9) == 0) {
+      char *sn_str = oc_strnchr(blank, 'k', param_len);
+      if (sn_str && strncmp(sn_str, "knx://sn.", 9) == 0) {
         strncpy(sn, (char *)&param[offset + 1 + 9], len);
         error = 0;
       }

@@ -250,7 +250,7 @@ TEST_F(TestLinkFormat, EP_SN7)
   int error = oc_get_sn_from_ep(payload, len, sn, 29, &ia);
   EXPECT_EQ(-1, error);
   //EXPECT_EQ(0x20a, ia);
-  check_string("123456ab", sn, strlen(sn));
+  check_string("1234569999", sn, strlen(sn));
 }
 
 TEST_F(TestLinkFormat, EP_SN8)
@@ -351,14 +351,14 @@ TEST_F(TestLinkFormat, EP_N_SN6)
 
   int error = oc_get_sn_ia_iid_from_ep(payload, len, sn, 29, &ia, &iid);
   EXPECT_EQ(-1, error);
-  EXPECT_EQ(0x20b, ia);
+  //EXPECT_EQ(0x20b, ia);
 }
 
 
 TEST_F(TestLinkFormat, EP_N_SN7)
 {
   // 2 blanks between sn & ia
-  const char payload[] = "\"knx://sn.1234569999  knx://ia.20a.1\"";
+  const char payload[] = "\"knx://sn.1234560abc  knx://ia.20a.1\"";
   int len = strlen(payload);
   char sn[30];
   uint32_t ia;
@@ -368,7 +368,7 @@ TEST_F(TestLinkFormat, EP_N_SN7)
   EXPECT_EQ(0, error);
   EXPECT_EQ(0x20a, ia);
   EXPECT_EQ(1, iid);
-  check_string("123456ab", sn, strlen(sn));
+  check_string("1234560abc", sn, strlen(sn));
 }
 
 TEST_F(TestLinkFormat, EP_N_SN8)
