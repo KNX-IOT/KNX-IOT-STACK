@@ -252,8 +252,6 @@ TEST_F(TestLinkFormat, EP_SN7)
   EXPECT_EQ(0x20a, ia);
   check_string("123456ab", sn, strlen(sn));
 }
-}
-
 
 TEST_F(TestLinkFormat, EP_SN8)
 {

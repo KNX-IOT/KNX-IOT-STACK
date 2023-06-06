@@ -522,7 +522,7 @@ int oc_get_sn_from_ep(const char *param, int param_len, char *sn, int sn_len,
  * @return 0 == ok
  * string
  */
-int oc_get_sn_ia_idd_from_ep(const char *param, int param_len, char *sn,
+int oc_get_sn_ia_iid_from_ep(const char *param, int param_len, char *sn,
                              int sn_len,
                       uint32_t *ia, uint64_t *iid);
 

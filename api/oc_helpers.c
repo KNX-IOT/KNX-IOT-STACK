@@ -691,7 +691,7 @@ parse_uint64(const char* str, uint64_t *value)
 }
 
 int
-oc_get_sn_ia_idd_from_ep(const char *param, int param_len, char *sn, int sn_len,
+oc_get_sn_ia_iid_from_ep(const char *param, int param_len, char *sn, int sn_len,
                   uint32_t *ia, uint64_t *iid)
 {
   int error = -1;
