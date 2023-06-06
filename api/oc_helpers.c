@@ -684,6 +684,9 @@ static int
 parse_uint64(const char* str, uint64_t *value)
 {
   int filled_var = sscanf(str, "%" SCNx64, value);
+  PRINT("PTR %s", str);
+  PRINT("    %d - %d", filled_var, (int) value);
+
   if (filled_var == 1) {
     return 0;
   } 
