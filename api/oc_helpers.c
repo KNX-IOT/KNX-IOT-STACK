@@ -722,6 +722,7 @@ oc_get_sn_ia_iid_from_ep(const char *param, int param_len, char *sn, int sn_len,
         // read unit64_t from hex
         *ia = (uint32_t)strtol(&param[offset + 1 + 9], NULL, 16);
         char *point = oc_strnchr(&param[offset + 1 + 9], '.', param_len - 10 - offset);
+        print(" point 1 %s\n", point);
         if (point) {
           parse_uint64(point+1, iid);
           error = 0;
@@ -745,6 +746,7 @@ oc_get_sn_ia_iid_from_ep(const char *param, int param_len, char *sn, int sn_len,
         *ia = (uint32_t)strtol(&param[offset + 1 + 9], NULL, 16);
         char *point =
           oc_strnchr(&param[offset + 1 + 9], '.', param_len - 10 - offset);
+        print(" point 2 %s\n", point);
         if (point) {
           // read unit64_t from hex
           if (parse_uint64(point+1, iid) == 0) {
@@ -763,6 +765,7 @@ oc_get_sn_ia_iid_from_ep(const char *param, int param_len, char *sn, int sn_len,
       // read from hex
       *ia = (uint32_t)strtol(&param[10], NULL, 16);
       char *point = oc_strnchr(&param[10], '.', param_len-10);
+      print(" point 3 %s\n", point);
       if (point) {
         // read unit64_t from hex
         if (parse_uint64(point+1, iid) == 0) {
