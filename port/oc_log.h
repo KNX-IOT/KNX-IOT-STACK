@@ -73,7 +73,7 @@ extern "C" {
 #endif
 #endif
 #else
-#define PRINT(...) 
+#define PRINT(...)
 #endif
 
 #define SPRINTF(...) sprintf(__VA_ARGS__)

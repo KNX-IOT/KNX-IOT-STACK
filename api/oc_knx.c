@@ -188,11 +188,11 @@ oc_core_knx_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 static size_t cached_device_index;
 static int cached_value;
 
-static oc_event_callback_retval_t delayed_reset(void* context)
+static oc_event_callback_retval_t
+delayed_reset(void *context)
 {
   oc_reset_device(cached_device_index, cached_value);
   return OC_EVENT_DONE;
-
 }
 
 static void
