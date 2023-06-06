@@ -680,7 +680,7 @@ oc_get_sn_from_ep(const char *param, int param_len, char *sn, int sn_len,
   return error;
 }
 
-int
+static int
 parse_uint64(const char* str, uint64_t *value)
 {
   int filled_var = sscanf(str, "%" SCNx64, value);
