@@ -23,6 +23,7 @@ set(OC_OSCORE_ENABLED ON CACHE BOOL "Enable oscore")
 set(OC_IOT_ROUTER_ENABLED OFF CACHE BOOL "Enable IoT Router code")
 set(OC_PKI_ENABLED OFF CACHE BOOL "Enable PKI security")
 set(OC_PRINT_ENABLED ON CACHE BOOL "Enable print messages. Setting this to OFF will disable virtually all logging.")
+set(OC_PRINT_APP_ENABLED ON CACHE BOOL "Enable application log messages. Independent from OC_PRINT_ENABLED")
 set(OC_DEBUG_ENABLED ON CACHE BOOL "Enable debug messages")
 set(OC_DEBUG_OSCORE_ENABLED OFF CACHE BOOL "Enable security debug messages")
 set(OC_LOG_TO_FILE_ENABLED OFF CACHE BOOL "redirect debug messages to file")
@@ -168,6 +169,10 @@ endif()
 
 if(OC_PRINT_ENABLED)
     target_compile_definitions(kis-common INTERFACE OC_PRINT)
+endif()
+
+if(OC_PRINT_APP_ENABLED)
+    target_compile_definitions(kis-common INTERFACE OC_PRINT_APP)
 endif()
 
 if(OC_DEBUG_ENABLED)

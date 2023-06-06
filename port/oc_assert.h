@@ -47,6 +47,7 @@ void exit_impl(int status);
 static inline void
 oc_abort(const char *msg)
 {
+  (void)msg;
 #if OC_LOG_TO_FILE
   (void)msg;
 #else
