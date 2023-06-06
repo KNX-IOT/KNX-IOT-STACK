@@ -515,16 +515,16 @@ int oc_get_sn_from_ep(const char *param, int param_len, char *sn, int sn_len,
  *
  * @param param the string to be searched
  * @param param_len the length of the parameter
- * @param sn the sn for storage
- * @param sn_len the length of the sn for storage
+ * @param sn the serial number
+ * @param sn_len the length of the serial number
  * @param ia the individual address
  * @param iid the installation id
  * @return 0 == ok
  * string
  */
-int oc_get_sn_ia_iid_from_ep(const char *param, int param_len, char *sn,
+int oc_get_sn_ia_idd_from_ep(const char *param, int param_len, char *sn,
                              int sn_len,
-                      uint32_t *ia, uint64_t iid);
+                      uint32_t *ia, uint64_t *iid);
 
 /**
  * @brief copy string from char*

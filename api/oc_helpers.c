@@ -701,6 +701,9 @@ oc_get_sn_ia_idd_from_ep(const char *param, int param_len, char *sn, int sn_len,
   if (param_len < 10) {
     return error;
   }
+  if (param == NULL) {
+    return error;
+  }
   if (strncmp(param, "\"knx://sn.", 10) == 0) {
     // spec 1.1 ep= contents: (with quote)
     // "knx://sn.<sn> knx://ia.<ia>.<iid>"
