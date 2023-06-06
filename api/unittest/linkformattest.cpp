@@ -388,7 +388,7 @@ TEST_F(TestLinkFormat, EP_N_SN8)
   EXPECT_EQ(0xad, iid);
 }
 
-TEST_F(TestLinkFormat, EP_N_SN9
+TEST_F(TestLinkFormat, EP_N_SN9)
   // 2 blanks between ia & sn
   const char payload[] = "\"knx://ia.0.0  knx://sn.123456ab333\"";
   int len = strlen(payload);
@@ -403,7 +403,7 @@ TEST_F(TestLinkFormat, EP_N_SN9
 }
 
 
-TEST_F(TestLinkFormat, EP_N_SN10
+TEST_F(TestLinkFormat, EP_N_SN10)
   // 2 blanks between ia & sn
   const char payload[] = "\"knx://sn.123456ab333  knx://ia.0.0\"";
   int len = strlen(payload);
@@ -433,7 +433,7 @@ TEST_F(TestLinkFormat, EP_E_SN0)
   EXPECT_EQ(0, iid);
 }
 
-TEST_F(TestLinkFormat, EP_E_SN1
+TEST_F(TestLinkFormat, EP_OK_SN1)
   // 2 blanks between ia & sn
   const char payload[] = "\"knx://ia.0  knx://sn.123456ab333\"";
   int len = strlen(payload);
@@ -448,7 +448,7 @@ TEST_F(TestLinkFormat, EP_E_SN1
 }
 
 
-TEST_F(TestLinkFormat, EP_W_SN2
+TEST_F(TestLinkFormat, EP_OK_SN2)
   // 2 blanks between ia & sn
   const char payload[] = "\"knx://sn.123456ab333  knx://ia.0\"";
   int len = strlen(payload);
@@ -458,6 +458,21 @@ TEST_F(TestLinkFormat, EP_W_SN2
 
   int error = oc_get_sn_ia_iid_from_ep(payload, len, sn, 29, &ia, &iid);
   EXPECT_EQ(0, error);
+  EXPECT_EQ(0, ia);
+  EXPECT_EQ(0, iid);
+}
+
+
+TEST_F(TestLinkFormat, EP_E_SN3)
+  // 2 blanks between ia & sn
+  const char payload[] = "\"knx://sn  \"";
+  int len = strlen(payload);
+  char sn[30];
+  uint32_t ia;
+  uint64_t iid;
+
+  int error = oc_get_sn_ia_iid_from_ep(payload, len, sn, 29, &ia, &iid);
+  EXPECT_EQ(-1, error);
   EXPECT_EQ(0, ia);
   EXPECT_EQ(0, iid);
 }
