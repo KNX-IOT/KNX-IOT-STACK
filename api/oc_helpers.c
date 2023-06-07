@@ -25,6 +25,14 @@
 
 static bool mmem_initialized = false;
 
+#ifndef MAX
+#define MAX(n, m) (((n) < (m)) ? (m) : (n))
+#endif
+
+#ifndef MIN
+#define MIN(n, m) (((n) < (m)) ? (n) : (m))
+#endif
+
 static void
 oc_malloc(
 #ifdef OC_MEMORY_TRACE
@@ -698,7 +706,7 @@ static int
 parse_ia(const char* str, uint32_t *value)
 {
   printf(" ia str %s\n", str);
-  *value = (uint32_t)strtol(&str[1 + 9], NULL, 16);
+  *value = (uint32_t)strtol(&str[9], NULL, 16);
 
   printf(" ia value %d\n", *value);
   return 0;
@@ -710,14 +718,12 @@ parse_iid(const char *str, uint64_t *value)
 {
 
   printf(" iid str %s\n", str);
-  *value = (uint32_t)strtol(&str[1 + 9], NULL, 16);
-
   char *point = oc_strnchr(&str[1 + 9], '.',20);
   if (point == NULL) {
     return -1;
   }
 
-  return parse_uint64(point, value);
+  return parse_uint64(point+1, value);
 }
 
 
@@ -725,26 +731,31 @@ parse_iid(const char *str, uint64_t *value)
 static int
 parse_sn(const char *str, char* sn, int len_input)
 {
-  int len = strlen(str);
-  int cp_len = len;
-  printf(" sn str %s\n", str);
+  if (str) {
+    int len = strlen(str);
+    int cp_len = len;
+    int cp_len_quote = len;
+    int cp_len_blank = len;
+    printf(" sn str %s\n", str);
 
-  char *blank = oc_strnchr(str, ' ', len);
-  char *quote = oc_strnchr(str, '"', len);
-  if (blank) {
-    cp_len = str - blank -9; 
-  }
-  if (quote) {
-    cp_len = str - quote - 9;
-  }
-  if (cp_len > len_input) {
-    return -1;
-  }
+    char *blank = oc_strnchr(str, ' ', len);
+    char *quote = oc_strnchr(str, '"', len);
+    if (blank) {
+      cp_len_blank = MAX((blank - str) - 9, 0);
+    }
+    if (quote) {
+      cp_len_quote = MAX((quote - str) - 9, 0);
+    }
+    cp_len = MIN(cp_len_quote, cp_len_blank);
+    if (cp_len > len_input) {
+      return -1;
+    }
 
-  if (str && strncmp(str, "knx://sn.", 9) == 0) {
-    strncpy(sn, (char *)&str[9], cp_len);
-    printf("sn = '%s'\n", sn);
-    return 0;
+    if (str && strncmp(str, "knx://sn.", 9) == 0) {
+      strncpy(sn, (char *)&str[9], cp_len);
+      printf("sn = '%s'\n", sn);
+      return 0;
+    }
   }
   return -1;
 }
@@ -754,7 +765,7 @@ oc_get_sn_ia_iid_from_ep(const char *param, int param_len, char *sn, int sn_len,
                          uint32_t *ia, uint64_t *iid)
 {
   int error = -1;
-  memset(sn, 0, 30);
+  memset(sn, 0, sn_len);
   *ia = 0;
   *iid = 0;
   if (param_len < 10) {
@@ -781,7 +792,7 @@ oc_get_sn_ia_iid_from_ep(const char *param, int param_len, char *sn, int sn_len,
       return error;
     }
     // make sure it is the ia string
-    if (strncmp(&k2, "knx://ia.", 9) == 0) {
+    if (strncmp(k2, "knx://ia.", 9) == 0) {
       error = parse_ia(k2, ia);
       if (error != 0) {
         return error;
