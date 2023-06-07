@@ -692,8 +692,6 @@ static int
 parse_uint64(const char* str, uint64_t *value)
 {
   int filled_var = sscanf(str, "%" SCNx64, value);
-  PRINT("PTR %s", str);
-  PRINT("    %d - %d", filled_var, (int) *value);
 
   if (filled_var == 1) {
     return 0;
@@ -705,10 +703,7 @@ parse_uint64(const char* str, uint64_t *value)
 static int 
 parse_ia(const char* str, uint32_t *value)
 {
-  printf(" ia str %s\n", str);
   *value = (uint32_t)strtol(&str[9], NULL, 16);
-
-  printf(" ia value %d\n", *value);
   return 0;
 }
 
@@ -716,8 +711,6 @@ parse_ia(const char* str, uint32_t *value)
 static int
 parse_iid(const char *str, uint64_t *value)
 {
-
-  printf(" iid str %s\n", str);
   char *point = oc_strnchr(&str[1 + 9], '.', 20);
   if (point == NULL) {
     return -1;
@@ -726,7 +719,6 @@ parse_iid(const char *str, uint64_t *value)
     // first expected digit is not hex
     return -1;
   }
-
   return parse_uint64(point+1, value);
 }
 
@@ -740,7 +732,6 @@ parse_sn(const char *str, char* sn, int len_input)
     int cp_len = len;
     int cp_len_quote = len;
     int cp_len_blank = len;
-    printf(" sn str %s\n", str);
 
     char *blank = oc_strnchr(str, ' ', len);
     char *quote = oc_strnchr(str, '"', len);
@@ -759,7 +750,6 @@ parse_sn(const char *str, char* sn, int len_input)
     }
     if (str && strncmp(str, "knx://sn.", 9) == 0) {
       strncpy(sn, (char *)&str[9], cp_len);
-      printf("sn = '%s'\n", sn);
       return 0;
     }
   }
