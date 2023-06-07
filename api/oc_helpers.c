@@ -722,6 +722,10 @@ parse_iid(const char *str, uint64_t *value)
   if (point == NULL) {
     return -1;
   }
+  if (isxdigit(point + 1) == 0) {
+    // first expected digit is not hex
+    return -1;
+  }
 
   return parse_uint64(point+1, value);
 }
