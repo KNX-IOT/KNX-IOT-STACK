@@ -693,6 +693,39 @@ parse_uint64(const char* str, uint64_t *value)
   return -1;
 }
 
+// parse ia from "knx://ia.<ia>.
+static int 
+parse_ia(const char* str, uint32_t *value)
+{
+  *value = (uint32_t)strtol(&str[1 + 9], NULL, 16);
+  return 0;
+}
+
+// parse iid from "knx://ia.<ia>.<iid>
+static int
+parse_iid(const char *str, uint64_t *value)
+{
+  *value = (uint32_t)strtol(&str[1 + 9], NULL, 16);
+
+  char *point = oc_strnchr(&str[1 + 9], '.',20);
+  if (point == NULL)
+    return -1;
+
+  return parse_uint64(point, value);
+}
+
+
+// parse iid from "knx://sn.<sn>
+static int
+parse_sn(const char *str, char* sn, int len_input)
+{
+  if (str && strncmp(str, "knx://sn.", 9) == 0) {
+    strncpy(sn, (char *)&str[1 + 9], len_input);
+    return 0;
+  }
+  return -1;
+}
+
 int
 oc_get_sn_ia_iid_from_ep(const char *param, int param_len, char *sn, int sn_len,
                   uint32_t *ia, uint64_t *iid)
@@ -707,118 +740,60 @@ oc_get_sn_ia_iid_from_ep(const char *param, int param_len, char *sn, int sn_len,
   if (param == NULL) {
     return error;
   }
-  if (strncmp(param, "\"knx://sn.", 10) == 0) {
-    // spec 1.1 ep= contents: (with quote)
-    // "knx://sn.<sn> knx://ia.<ia>.<iid>"
-    char *blank = oc_strnchr(param, ' ', param_len);
-    if (blank == NULL) {
-      // the ia part is missing, so length -10 and 1 less to adjust for quot
-      strncpy(sn, (char *)&param[10], param_len - 11);
-    } else {
-      int offset = blank - param;
-      int len = offset - 10;
-      strncpy(sn, &param[10], len);
-      if (strncmp(&param[offset + 1], "knx://ia.", 9) == 0) {
-        // read unit64_t from hex
-        *ia = (uint32_t)strtol(&param[offset + 1 + 9], NULL, 16);
-        char *point = oc_strnchr(&param[offset + 1 + 9], '.', param_len - 10 - offset);
-        printf(" point 1 %s\n", point);
-        if (point) {
-          parse_uint64(point+1, iid);
-          error = 0;
-        }
-      }
-    }
-  } else if (strncmp(param, "knx://sn.", 9) == 0) {
-    // spec 1.1 ep= contents: (without quote)
-    // knx://sn.<sn> knx://ia.<ia>.<iid>"
-    char *blank = oc_strnchr(param, ' ', param_len);
-    if (blank == NULL) {
-      // the ia part is missing, so length -10 and 1 less to adjust for quot
-      strncpy(sn, (char *)&param[9], param_len - 11);
-    } else {
-      int offset = blank - param;
-      int len = offset - 9;
-      strncpy(sn, &param[9], len);
-      char *ia_str = oc_strnchr(blank, 'k', param_len);
-      if (ia_str && strncmp(ia_str, "knx://ia.", 9) == 0) {
-        // read from hex
-        *ia = (uint32_t)strtol(&param[offset + 1 + 9], NULL, 16);
-        char *point =
-          oc_strnchr(&param[offset + 1 + 9], '.', param_len - 10 - offset);
-        printf(" point 2 %s\n", point);
-        if (point) {
-          // read unit64_t from hex
-          if (parse_uint64(point+1, iid) == 0) {
-            error = 0;
-          }
-        }
-      }
-    }
-  } else if (strncmp(param, "\"knx://ia.", 10) == 0) {
-    // spec 1.1 ep= contents:
-    // "knx://ia.<ia>.<iid> knx://sn.<sn>"
-    char *blank = oc_strnchr(param, ' ', param_len);
-    if (blank == NULL) {
-      // the sn part is missing
-      PRINT("oc_get_sn_from_ep 222 string: string ia : '%s'\n", &param[10]);
-      // read from hex
-      *ia = (uint32_t)strtol(&param[10], NULL, 16);
-      char *point = oc_strnchr(&param[10], '.', param_len-10);
-      printf(" point 3 %s\n", point);
-      if (point) {
-        // read unit64_t from hex
-        if (parse_uint64(point+1, iid) == 0) {
-          error = 0;
-        }
-      }
-    } else {
-      int offset = blank - param;
-      char *quote = oc_strnchr(&param[offset], '\"', param_len);
-      int quote_len = quote - (&param[offset]);
-      int len_q = quote_len - 10;
-      int len = param_len - offset - 9;
-      if (len > len_q) {
-        len = len_q;
-      }
-      *ia = (uint32_t)strtol(&param[10], NULL, 16);
-      char *sn_str = oc_strnchr(blank, 'k', param_len);
-      if (sn_str && strncmp(sn_str, "knx://sn.", 9) == 0) {
-        strncpy(sn, (char *)&param[offset + 1 + 9], len);
-        error = 0;
-      }
-    }
-  } else if (strncmp(param, "knx://ia.", 9) == 0) {
-    // spec 1.1 ep= contents:
-    // knx://ia.<ia>.<iid? knx://sn.<sn>"
-    char *blank = oc_strnchr(param, ' ', param_len);
-    if (blank == NULL) {
-      // the sn part is missing
-      PRINT("oc_get_sn_from_ep 222 string: string ia : '%s'\n", &param[9]);
-      // read from hex
-      *ia = (uint32_t)strtol(&param[9], NULL, 16);
-      char *point = oc_strnchr(&param[9], '.', param_len - 9);
-      if (point) {
-        // read unit64_t from hex
-        if (parse_uint64(point+1, iid) == 0) {
-          error = 0;
-        }
-      }
-    } else {
-      int offset = blank - param;
-      char *quote = oc_strnchr(&param[offset], '\"', param_len);
-      int quote_len = quote - (&param[offset]);
-      int len_q = quote_len - 10;
-      int len = param_len - offset - 9;
-      if (len > len_q) {
-        len = len_q;
-      }
-      *ia = (uint32_t)strtol(&param[9], NULL, 16);
-      if (strncmp(&param[offset + 1], "knx://sn.", 9) == 0) {
-        strncpy(sn, (char *)&param[offset + 1 + 9], len);
-        error = 0;
-      }
-    }
+  char *k = oc_strnchr(param, 'k', param_len);
+  if (k == NULL) {
+    return error;
   }
+  // starting with serial number
+  // "knx://sn.<sn> knx://ia.<ia>.<iid>"
+  if (strncmp(k, "knx://sn.", 9) == 0) {
+    error = parse_sn(k, sn, sn_len);
+    if (error) {
+      return error;
+    }
+    // find the next k, note that the sn can't contain a k
+    char *k2 = oc_strnchr(&param[9], 'k', param_len-9);
+    if (k2 == NULL) {
+      // the ia part is missing
+      return error;
+    } 
+    // make sure it is the ia string
+    if (strncmp(&k2, "knx://ia.", 9) == 0) {
+      error = parse_ia(k2, ia);
+      if (error) {
+        return error;
+      }
+      error = parse_iid(k2, iid);
+      if (error) {
+        return error;
+      }
+      // all ok
+      return 0;
+    }
+  } else if (strncmp(k, "knx://ia.", 9) == 0) {
+    // "knx://ia.<ia>.<iid> knx://sn.<sn>"
+    error = parse_ia(k, ia);
+    if (error) {
+      return error;
+    }
+    error = parse_iid(k, iid);
+    if (error) {
+      return error;
+    }
+    // find the next k, note that the ia & iid can't contain a k
+    char *k2 = oc_strnchr(&param[9], 'k', param_len - 9);
+    if (k2 == NULL) {
+      // the ia part is missing
+      return error;
+    } 
+    if (strncmp(k2, "knx://sn.", 9) == 0) {
+      error = parse_sn(k2, sn, sn_len);
+      if (error) {
+        return error;
+      }
+      return 0;
+  }
+
+  // if not returned, then error
   return error;
 }
