@@ -699,6 +699,8 @@ parse_ia(const char* str, uint32_t *value)
 {
   printf(" ia str %s\n", str);
   *value = (uint32_t)strtol(&str[1 + 9], NULL, 16);
+
+  printf(" ia value %d\n", *value);
   return 0;
 }
 
@@ -723,10 +725,10 @@ parse_iid(const char *str, uint64_t *value)
 static int
 parse_sn(const char *str, char* sn, int len_input)
 {
-
   printf(" sn str %s\n", str);
   if (str && strncmp(str, "knx://sn.", 9) == 0) {
-    strncpy(sn, (char *)&str[1 + 9], len_input);
+    strncpy(sn, (char *)&str[9 + 1], len_input);
+    print("sn = %s\n", sn);
     return 0;
   }
   return -1;
@@ -766,11 +768,11 @@ oc_get_sn_ia_iid_from_ep(const char *param, int param_len, char *sn, int sn_len,
     // make sure it is the ia string
     if (strncmp(&k2, "knx://ia.", 9) == 0) {
       error = parse_ia(k2, ia);
-      if (error) {
+      if (error != 0) {
         return error;
       }
       error = parse_iid(k2, iid);
-      if (error) {
+      if (error != 0) {
         return error;
       }
       // all ok
@@ -779,11 +781,11 @@ oc_get_sn_ia_iid_from_ep(const char *param, int param_len, char *sn, int sn_len,
   } else if (strncmp(k, "knx://ia.", 9) == 0) {
     // "knx://ia.<ia>.<iid> knx://sn.<sn>"
     error = parse_ia(k, ia);
-    if (error) {
+    if (error != 0) {
       return error;
     }
     error = parse_iid(k, iid);
-    if (error) {
+    if (error != 0) {
       return error;
     }
     // find the next k, note that the ia & iid can't contain a k
@@ -794,7 +796,7 @@ oc_get_sn_ia_iid_from_ep(const char *param, int param_len, char *sn, int sn_len,
     }
     if (strncmp(k2, "knx://sn.", 9) == 0) {
       error = parse_sn(k2, sn, sn_len);
-      if (error) {
+      if (error != 0) {
         return error;
       }
       return 0;
