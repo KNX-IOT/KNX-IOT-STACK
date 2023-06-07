@@ -754,7 +754,9 @@ parse_sn(const char *str, char* sn, int len_input)
     if (cp_len > len_input) {
       return -1;
     }
-
+    if (cp_len == 0) {
+      return -1;
+    }
     if (str && strncmp(str, "knx://sn.", 9) == 0) {
       strncpy(sn, (char *)&str[9], cp_len);
       printf("sn = '%s'\n", sn);
@@ -812,7 +814,7 @@ oc_get_sn_ia_iid_from_ep(const char *param, int param_len, char *sn, int sn_len,
     // "knx://ia.<ia>.<iid> knx://sn.<sn>"
     error = parse_ia(k, ia);
     if (error != 0) {
-      return error;
+      return -1;
     }
     error = parse_iid(k, iid);
     if (error != 0) {
@@ -831,8 +833,7 @@ oc_get_sn_ia_iid_from_ep(const char *param, int param_len, char *sn, int sn_len,
       }
       return 0;
     }
-
-    // if not returned, then error
-    return -1;
   }
+  // if not returned, then error
+  return -1;
 }
