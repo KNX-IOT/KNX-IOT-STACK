@@ -728,7 +728,7 @@ parse_sn(const char *str, char* sn, int len_input)
 
 int
 oc_get_sn_ia_iid_from_ep(const char *param, int param_len, char *sn, int sn_len,
-                  uint32_t *ia, uint64_t *iid)
+                         uint32_t *ia, uint64_t *iid)
 {
   int error = -1;
   memset(sn, 0, 30);
@@ -752,11 +752,11 @@ oc_get_sn_ia_iid_from_ep(const char *param, int param_len, char *sn, int sn_len,
       return error;
     }
     // find the next k, note that the sn can't contain a k
-    char *k2 = oc_strnchr(&param[9], 'k', param_len-9);
+    char *k2 = oc_strnchr(&param[9], 'k', param_len - 9);
     if (k2 == NULL) {
       // the ia part is missing
       return error;
-    } 
+    }
     // make sure it is the ia string
     if (strncmp(&k2, "knx://ia.", 9) == 0) {
       error = parse_ia(k2, ia);
@@ -785,15 +785,16 @@ oc_get_sn_ia_iid_from_ep(const char *param, int param_len, char *sn, int sn_len,
     if (k2 == NULL) {
       // the ia part is missing
       return error;
-    } 
+    }
     if (strncmp(k2, "knx://sn.", 9) == 0) {
       error = parse_sn(k2, sn, sn_len);
       if (error) {
         return error;
       }
       return 0;
-  }
+    }
 
-  // if not returned, then error
-  return error;
+    // if not returned, then error
+    return error;
+  }
 }
