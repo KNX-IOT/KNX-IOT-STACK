@@ -21,8 +21,17 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <inttypes.h>
 
 static bool mmem_initialized = false;
+
+#ifndef MAX
+#define MAX(n, m) (((n) < (m)) ? (m) : (n))
+#endif
+
+#ifndef MIN
+#define MIN(n, m) (((n) < (m)) ? (n) : (m))
+#endif
 
 static void
 oc_malloc(
@@ -90,7 +99,6 @@ _oc_new_byte_string(
 #endif
     ocstring, str_len, BYTE_POOL);
   memcpy(oc_string(*ocstring), (const uint8_t *)str, str_len);
-  // memcpy(oc_string(*ocstring) + str_len, (const uint8_t *)"", 1);
 }
 
 void
@@ -678,4 +686,143 @@ oc_get_sn_from_ep(const char *param, int param_len, char *sn, int sn_len,
     }
   }
   return error;
+}
+
+static int
+parse_uint64(const char *str, uint64_t *value)
+{
+  int filled_var = sscanf(str, "%" SCNx64, value);
+
+  if (filled_var == 1) {
+    return 0;
+  }
+  return -1;
+}
+
+// parse ia from "knx://ia.<ia>.
+static int
+parse_ia(const char *str, uint32_t *value)
+{
+  *value = (uint32_t)strtol(&str[9], NULL, 16);
+  return 0;
+}
+
+// parse iid from knx://ia.<ia>.<iid>
+static int
+parse_iid(const char *str, uint64_t *value)
+{
+  char *point = oc_strnchr(&str[1 + 9], '.', 20);
+  if (point == NULL) {
+    return -1;
+  }
+  if (isxdigit(*(point + 1)) == 0) {
+    // first expected digit is not hex
+    return -1;
+  }
+  return parse_uint64(point + 1, value);
+}
+
+// parse iid from knx://sn.<sn>
+static int
+parse_sn(const char *str, char *sn, int len_input)
+{
+  if (str) {
+    int len = strlen(str);
+    int cp_len = len;
+    int cp_len_quote = len;
+    int cp_len_blank = len;
+
+    char *blank = oc_strnchr(str, ' ', len);
+    char *quote = oc_strnchr(str, '"', len);
+    if (blank) {
+      cp_len_blank = MAX((blank - str) - 9, 0);
+    }
+    if (quote) {
+      cp_len_quote = MAX((quote - str) - 9, 0);
+    }
+    cp_len = MIN(cp_len_quote, cp_len_blank);
+    if (cp_len > len_input) {
+      return -1;
+    }
+    if (cp_len == 0) {
+      return -1;
+    }
+    if (str && strncmp(str, "knx://sn.", 9) == 0) {
+      strncpy(sn, (char *)&str[9], cp_len);
+      return 0;
+    }
+  }
+  return -1;
+}
+
+int
+oc_get_sn_ia_iid_from_ep(const char *param, int param_len, char *sn, int sn_len,
+                         uint32_t *ia, uint64_t *iid)
+{
+  int error = -1;
+  memset(sn, 0, sn_len);
+  *ia = 0;
+  *iid = 0;
+  if (param_len < 10) {
+    return -1;
+  }
+  if (param == NULL) {
+    return -1;
+  }
+  char *k = oc_strnchr(param, 'k', param_len);
+  if (k == NULL) {
+    return -1;
+  }
+  // starting with serial number
+  // "knx://sn.<sn> knx://ia.<ia>.<iid>"
+  if (strncmp(k, "knx://sn.", 9) == 0) {
+    error = parse_sn(k, sn, sn_len);
+    if (error) {
+      return -1;
+    }
+    // find the next k, note that the sn can't contain a k
+    char *k2 = oc_strnchr(&param[9], 'k', param_len - 9);
+    if (k2 == NULL) {
+      // the ia part is missing
+      return -1;
+    }
+    // make sure it is the ia string
+    if (strncmp(k2, "knx://ia.", 9) == 0) {
+      error = parse_ia(k2, ia);
+      if (error != 0) {
+        return -1;
+      }
+      error = parse_iid(k2, iid);
+      if (error != 0) {
+        return -1;
+      }
+      // all ok
+      return 0;
+    }
+  } else if (strncmp(k, "knx://ia.", 9) == 0) {
+    // "knx://ia.<ia>.<iid> knx://sn.<sn>"
+    error = parse_ia(k, ia);
+    if (error != 0) {
+      return -1;
+    }
+    error = parse_iid(k, iid);
+    if (error != 0) {
+      return -1;
+    }
+    // find the next k, note that the ia & iid can't contain a k
+    char *k2 = oc_strnchr(&param[9], 'k', param_len - 9);
+    if (k2 == NULL) {
+      // the ia part is missing
+      return -1;
+    }
+    if (strncmp(k2, "knx://sn.", 9) == 0) {
+      error = parse_sn(k2, sn, sn_len);
+      if (error != 0) {
+        return -1;
+      }
+      return 0;
+    }
+  }
+  // if not returned, then error
+  return -1;
 }

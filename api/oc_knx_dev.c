@@ -19,6 +19,7 @@
 #include "api/oc_knx_fp.h"
 #include "api/oc_knx_gm.h"
 #include "api/oc_knx_sec.h"
+#include "api/oc_knx_helpers.h"
 #include "api/oc_main.h"
 #include "port/dns-sd.h"
 
