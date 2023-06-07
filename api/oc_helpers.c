@@ -725,10 +725,25 @@ parse_iid(const char *str, uint64_t *value)
 static int
 parse_sn(const char *str, char* sn, int len_input)
 {
+  int len = strlen(str);
+  int cp_len = len;
   printf(" sn str %s\n", str);
+
+  char *blank = oc_strnchr(str, ' ', len);
+  char *quote = oc_strnchr(str, '"', len);
+  if (blank) {
+    cp_len = str - blank -9; 
+  }
+  if (quote) {
+    cp_len = str - quote - 9;
+  }
+  if (cp_len > len_input) {
+    return -1;
+  }
+
   if (str && strncmp(str, "knx://sn.", 9) == 0) {
-    strncpy(sn, (char *)&str[9 + 1], len_input);
-    printf("sn = %s\n", sn);
+    strncpy(sn, (char *)&str[9], cp_len);
+    printf("sn = '%s'\n", sn);
     return 0;
   }
   return -1;
