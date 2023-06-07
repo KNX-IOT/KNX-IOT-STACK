@@ -718,7 +718,7 @@ parse_iid(const char *str, uint64_t *value)
 {
 
   printf(" iid str %s\n", str);
-  char *point = oc_strnchr(&str[1 + 9], '.',20);
+  char *point = oc_strnchr(&str[1 + 9], '.', 20);
   if (point == NULL) {
     return -1;
   }
