@@ -697,28 +697,34 @@ parse_uint64(const char* str, uint64_t *value)
 static int 
 parse_ia(const char* str, uint32_t *value)
 {
+  printf(" ia str %s\n", str);
   *value = (uint32_t)strtol(&str[1 + 9], NULL, 16);
   return 0;
 }
 
-// parse iid from "knx://ia.<ia>.<iid>
+// parse iid from knx://ia.<ia>.<iid>
 static int
 parse_iid(const char *str, uint64_t *value)
 {
+
+  printf(" iid str %s\n", str);
   *value = (uint32_t)strtol(&str[1 + 9], NULL, 16);
 
   char *point = oc_strnchr(&str[1 + 9], '.',20);
-  if (point == NULL)
+  if (point == NULL) {
     return -1;
+  }
 
   return parse_uint64(point, value);
 }
 
 
-// parse iid from "knx://sn.<sn>
+// parse iid from knx://sn.<sn>
 static int
 parse_sn(const char *str, char* sn, int len_input)
 {
+
+  printf(" sn str %s\n", str);
   if (str && strncmp(str, "knx://sn.", 9) == 0) {
     strncpy(sn, (char *)&str[1 + 9], len_input);
     return 0;
