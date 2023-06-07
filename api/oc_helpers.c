@@ -769,37 +769,37 @@ oc_get_sn_ia_iid_from_ep(const char *param, int param_len, char *sn, int sn_len,
   *ia = 0;
   *iid = 0;
   if (param_len < 10) {
-    return error;
+    return -1;
   }
   if (param == NULL) {
-    return error;
+    return -1;
   }
   char *k = oc_strnchr(param, 'k', param_len);
   if (k == NULL) {
-    return error;
+    return -1;
   }
   // starting with serial number
   // "knx://sn.<sn> knx://ia.<ia>.<iid>"
   if (strncmp(k, "knx://sn.", 9) == 0) {
     error = parse_sn(k, sn, sn_len);
     if (error) {
-      return error;
+      return -1;
     }
     // find the next k, note that the sn can't contain a k
     char *k2 = oc_strnchr(&param[9], 'k', param_len - 9);
     if (k2 == NULL) {
       // the ia part is missing
-      return error;
+      return -1;
     }
     // make sure it is the ia string
     if (strncmp(k2, "knx://ia.", 9) == 0) {
       error = parse_ia(k2, ia);
       if (error != 0) {
-        return error;
+        return -1;
       }
       error = parse_iid(k2, iid);
       if (error != 0) {
-        return error;
+        return -1;
       }
       // all ok
       return 0;
@@ -812,23 +812,23 @@ oc_get_sn_ia_iid_from_ep(const char *param, int param_len, char *sn, int sn_len,
     }
     error = parse_iid(k, iid);
     if (error != 0) {
-      return error;
+      return -1;
     }
     // find the next k, note that the ia & iid can't contain a k
     char *k2 = oc_strnchr(&param[9], 'k', param_len - 9);
     if (k2 == NULL) {
       // the ia part is missing
-      return error;
+      return -1;
     }
     if (strncmp(k2, "knx://sn.", 9) == 0) {
       error = parse_sn(k2, sn, sn_len);
       if (error != 0) {
-        return error;
+        return -1;
       }
       return 0;
     }
 
     // if not returned, then error
-    return error;
+    return -1;
   }
 }
