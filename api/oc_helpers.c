@@ -728,7 +728,7 @@ parse_sn(const char *str, char* sn, int len_input)
   printf(" sn str %s\n", str);
   if (str && strncmp(str, "knx://sn.", 9) == 0) {
     strncpy(sn, (char *)&str[9 + 1], len_input);
-    print("sn = %s\n", sn);
+    printf("sn = %s\n", sn);
     return 0;
   }
   return -1;
