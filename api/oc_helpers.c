@@ -689,19 +689,19 @@ oc_get_sn_from_ep(const char *param, int param_len, char *sn, int sn_len,
 }
 
 static int
-parse_uint64(const char* str, uint64_t *value)
+parse_uint64(const char *str, uint64_t *value)
 {
   int filled_var = sscanf(str, "%" SCNx64, value);
 
   if (filled_var == 1) {
     return 0;
-  } 
+  }
   return -1;
 }
 
 // parse ia from "knx://ia.<ia>.
-static int 
-parse_ia(const char* str, uint32_t *value)
+static int
+parse_ia(const char *str, uint32_t *value)
 {
   *value = (uint32_t)strtol(&str[9], NULL, 16);
   return 0;
@@ -719,13 +719,12 @@ parse_iid(const char *str, uint64_t *value)
     // first expected digit is not hex
     return -1;
   }
-  return parse_uint64(point+1, value);
+  return parse_uint64(point + 1, value);
 }
-
 
 // parse iid from knx://sn.<sn>
 static int
-parse_sn(const char *str, char* sn, int len_input)
+parse_sn(const char *str, char *sn, int len_input)
 {
   if (str) {
     int len = strlen(str);

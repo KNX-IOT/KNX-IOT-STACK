@@ -238,7 +238,6 @@ TEST_F(TestLinkFormat, EP_SN6)
   EXPECT_EQ(0x20b, ia);
 }
 
-
 TEST_F(TestLinkFormat, EP_SN7)
 {
   // 2 blanks between sn & ia
@@ -249,7 +248,7 @@ TEST_F(TestLinkFormat, EP_SN7)
 
   int error = oc_get_sn_from_ep(payload, len, sn, 29, &ia);
   EXPECT_EQ(-1, error);
-  //EXPECT_EQ(0x20a, ia);
+  // EXPECT_EQ(0x20a, ia);
   check_string("1234569999", sn, strlen(sn));
 }
 
@@ -263,7 +262,7 @@ TEST_F(TestLinkFormat, EP_SN8)
 
   int error = oc_get_sn_from_ep(payload, len, sn, 29, &ia);
   EXPECT_EQ(-1, error);
-  //EXPECT_EQ(0x20b, ia);
+  // EXPECT_EQ(0x20b, ia);
 }
 
 // including IA
@@ -351,9 +350,8 @@ TEST_F(TestLinkFormat, EP_N_SN6)
 
   int error = oc_get_sn_ia_iid_from_ep(payload, len, sn, 29, &ia, &iid);
   EXPECT_EQ(-1, error);
-  //EXPECT_EQ(0x20b, ia);
+  // EXPECT_EQ(0x20b, ia);
 }
-
 
 TEST_F(TestLinkFormat, EP_N_SN7)
 {
@@ -401,7 +399,6 @@ TEST_F(TestLinkFormat, EP_N_SN9)
   EXPECT_EQ(0, iid);
 }
 
-
 TEST_F(TestLinkFormat, EP_N_SN10)
 {
   // 2 blanks between ia & sn
@@ -416,9 +413,6 @@ TEST_F(TestLinkFormat, EP_N_SN10)
   EXPECT_EQ(0, ia);
   EXPECT_EQ(0, iid);
 }
-
-
-
 
 TEST_F(TestLinkFormat, EP_N_SN11)
 {
@@ -478,10 +472,9 @@ TEST_F(TestLinkFormat, EP_E_SN1)
 
   int error = oc_get_sn_ia_iid_from_ep(payload, len, sn, 29, &ia, &iid);
   EXPECT_EQ(-1, error);
-  //EXPECT_EQ(0, ia);
-  //EXPECT_EQ(0, iid);
+  // EXPECT_EQ(0, ia);
+  // EXPECT_EQ(0, iid);
 }
-
 
 TEST_F(TestLinkFormat, EP_E_SN3)
 {
@@ -494,8 +487,8 @@ TEST_F(TestLinkFormat, EP_E_SN3)
 
   int error = oc_get_sn_ia_iid_from_ep(payload, len, sn, 29, &ia, &iid);
   EXPECT_EQ(-1, error);
-  //EXPECT_EQ(0, ia);
-  //EXPECT_EQ(0, iid);
+  // EXPECT_EQ(0, ia);
+  // EXPECT_EQ(0, iid);
 }
 
 TEST_F(TestLinkFormat, EP_E_SN4)
@@ -509,8 +502,8 @@ TEST_F(TestLinkFormat, EP_E_SN4)
 
   int error = oc_get_sn_ia_iid_from_ep(payload, len, sn, 29, &ia, &iid);
   EXPECT_EQ(-1, error);
-  //EXPECT_EQ(0, ia);
-  //EXPECT_EQ(0, iid);
+  // EXPECT_EQ(0, ia);
+  // EXPECT_EQ(0, iid);
 }
 
 TEST_F(TestLinkFormat, EP_E_SN5)
@@ -524,8 +517,8 @@ TEST_F(TestLinkFormat, EP_E_SN5)
 
   int error = oc_get_sn_ia_iid_from_ep(NULL, len, sn, 29, &ia, &iid);
   EXPECT_EQ(-1, error);
-  //EXPECT_EQ(0, ia);
-  //EXPECT_EQ(0, iid);
+  // EXPECT_EQ(0, ia);
+  // EXPECT_EQ(0, iid);
 }
 
 TEST_F(TestLinkFormat, EP_E_SN6)
@@ -539,6 +532,6 @@ TEST_F(TestLinkFormat, EP_E_SN6)
 
   int error = oc_get_sn_ia_iid_from_ep(payload, len, sn, 29, &ia, &iid);
   EXPECT_EQ(-1, error);
-  //EXPECT_EQ(5, ia);
-  //EXPECT_EQ(0, iid);
+  // EXPECT_EQ(5, ia);
+  // EXPECT_EQ(0, iid);
 }

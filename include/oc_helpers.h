@@ -496,7 +496,7 @@ char *oc_strnchr(const char *string, char p, int size);
  * parameter
  *
  * deprecated!!
- * 
+ *
  * @param param the string to be searched
  * @param param_len the length of the parameter
  * @param sn the sn for storage
@@ -507,7 +507,6 @@ char *oc_strnchr(const char *string, char p, int size);
  */
 int oc_get_sn_from_ep(const char *param, int param_len, char *sn, int sn_len,
                       uint32_t *ia);
-
 
 /**
  * @brief retrieves the serial number and individual address from the ep
@@ -523,8 +522,7 @@ int oc_get_sn_from_ep(const char *param, int param_len, char *sn, int sn_len,
  * string
  */
 int oc_get_sn_ia_iid_from_ep(const char *param, int param_len, char *sn,
-                             int sn_len,
-                      uint32_t *ia, uint64_t *iid);
+                             int sn_len, uint32_t *ia, uint64_t *iid);
 
 /**
  * @brief copy string from char*
