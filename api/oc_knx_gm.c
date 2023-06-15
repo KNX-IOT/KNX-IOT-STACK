@@ -38,10 +38,10 @@ static uint32_t g_fra = 0; // the IPv4 sync latency fraction.
 static uint32_t g_tol = 0; // the IPv4 routing latency tolerance
 static uint32_t g_ttl = 0; // The value defines how many routers a multicast
                            // message
-                      // MAY pass until it gets discarded.
+                           // MAY pass until it gets discarded.
 #endif
 
-static oc_string_t g_key;   // IPv4 routing backbone key.
+static oc_string_t g_key; // IPv4 routing backbone key.
 static uint32_t g_mcast;  // Current IPv4 routing multicast address.
 
 int
@@ -1320,8 +1320,8 @@ oc_core_f_netip_mcast_put_handler(oc_request_t *request,
   while (rep != NULL) {
     if (rep->type == OC_REP_INT) {
       if (rep->iname == 1) {
-          PRINT("  oc_core_f_netip_mcast_put_handler (mcast) : %d\n",
-                (int)rep->value.integer);
+        PRINT("  oc_core_f_netip_mcast_put_handler (mcast) : %d\n",
+              (int)rep->value.integer);
         g_mcast = (int)rep->value.integer;
         dump_mcast();
       }
