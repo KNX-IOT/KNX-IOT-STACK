@@ -34,14 +34,15 @@
 
 #ifdef OC_IOT_ROUTER
 // ----------------------------------------------------------------------------
-static int g_fra = 0; // the IPv4 sync latency fraction.
-static int g_tol = 0; // the IPv4 routing latency tolerance
-static int g_ttl = 0; // The value defines how many routers a multicast message
-                      // MAY pass until it gets discarded.
+static uint32_t g_fra = 0; // the IPv4 sync latency fraction.
+static uint32_t g_tol = 0; // the IPv4 routing latency tolerance
+static uint32_t g_ttl = 0; // The value defines how many routers a multicast
+                           // message
+                           // MAY pass until it gets discarded.
 #endif
 
-static oc_string_t g_key;   // IPv4 routing backbone key.
-static oc_string_t g_mcast; // Current IPv4 routing multicast address.
+static oc_string_t g_key; // IPv4 routing backbone key.
+static uint32_t g_mcast;  // Current IPv4 routing multicast address.
 
 int
 oc_core_get_group_mapping_table_size()
@@ -104,7 +105,7 @@ oc_get_f_netip_key(size_t device_index)
 #endif
 }
 
-oc_string_t
+uint32_t
 oc_get_f_netip_mcast(size_t device_index)
 {
   (void)device_index;
@@ -1247,24 +1248,16 @@ oc_create_f_netip_ttl_resource(size_t device)
 void
 dump_mcast(void)
 {
-  int key_size = oc_string_len(g_mcast);
-  int written = oc_storage_write(GM_STORE_MCAST, oc_string(g_mcast), key_size);
-  if (written != key_size) {
-    PRINT("dump_mcast %d %d\n", key_size, written);
-  }
+  oc_storage_write(GM_STORE_MCAST, (uint8_t *)&g_mcast, sizeof(g_mcast));
 }
 
 void
 load_mcast(void)
 {
   int temp_size;
-  int key_size;
-  char tempstring[100];
-  temp_size = oc_storage_read(GM_STORE_MCAST, (uint8_t *)&tempstring, 99);
-  if (temp_size > 1) {
-    tempstring[temp_size] = 0;
-    oc_new_string(&g_mcast, tempstring, temp_size);
-  }
+
+  temp_size =
+    oc_storage_read(GM_STORE_MCAST, (uint8_t *)&g_mcast, sizeof(g_mcast));
 }
 
 static void
@@ -1293,7 +1286,7 @@ oc_core_f_netip_mcast_get_handler(oc_request_t *request,
   // }
   //  Content-Format: "application/cbor"
   oc_rep_begin_root_object();
-  oc_rep_i_set_byte_string(root, 1, oc_string(g_mcast), oc_string_len(g_mcast));
+  oc_rep_i_set_int(root, 1, g_mcast);
   oc_rep_end_root_object();
   oc_send_cbor_response(request, OC_STATUS_OK);
 
@@ -1325,11 +1318,11 @@ oc_core_f_netip_mcast_put_handler(oc_request_t *request,
   }
   oc_rep_t *rep = request->request_payload;
   while (rep != NULL) {
-    if (rep->type == OC_REP_BYTE_STRING) {
+    if (rep->type == OC_REP_INT) {
       if (rep->iname == 1) {
-        oc_free_string(&(g_mcast));
-        oc_new_string(&g_mcast, oc_string(rep->value.string),
-                      oc_string_len(rep->value.string));
+        PRINT("  oc_core_f_netip_mcast_put_handler (mcast) : %d\n",
+              (int)rep->value.integer);
+        g_mcast = (int)rep->value.integer;
         dump_mcast();
       }
     }

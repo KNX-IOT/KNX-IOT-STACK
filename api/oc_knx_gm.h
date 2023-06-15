@@ -198,7 +198,7 @@ int oc_get_f_netip_ttl(size_t device_index);
  * @param device_index index of the device
  * @return the mcast value
  */
-oc_string_t oc_get_f_netip_mcast(size_t device_index);
+uint32_t oc_get_f_netip_mcast(size_t device_index);
 
 /**
  * Callback invoked for all s-mode communication
