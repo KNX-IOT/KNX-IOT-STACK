@@ -375,6 +375,17 @@ oc_core_set_device_iid(size_t device_index, uint64_t iid)
   return 0;
 }
 
+uint64_t
+oc_core_get_device_iid(size_t device_index)
+{
+  if (device_index >= (int)oc_core_get_num_devices()) {
+    OC_ERR("  device_index %d to large\n", (int)device_index);
+    return -1;
+  }
+
+  return oc_device_info[device_index].iid;
+}
+
 int
 oc_core_set_and_store_device_iid(size_t device_index, uint64_t iid)
 {
