@@ -303,20 +303,20 @@ oc_print_uint64_t(uint64_t number)
 
   // Determine the length of the string representation
   uint64_t temp = number;
-  int numDigits = 0;
+  uint8_t numDigits = 0;
   while (temp != 0) {
       temp /= 10;
       numDigits++;
   }
   
   // Convert the number to a string
-  for (int i = numDigits - 1; i >= 0; i--) {
+  for (uint8_t i = numDigits - 1; i >= 0; i--) {
       str[i] = '0' + (number % 10);
       number /= 10;
   }
   str[numDigits] = '\0';
 
-  printf("%s\n", str);
+  printf("%s", str);
 
   return 0;
 }

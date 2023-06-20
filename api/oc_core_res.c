@@ -374,6 +374,7 @@ oc_core_set_device_iid(size_t device_index, uint64_t iid)
 
   printf("iid set: ");
   oc_print_uint64_t(iid);
+  printf("\n");
 
   return 0;
 }
