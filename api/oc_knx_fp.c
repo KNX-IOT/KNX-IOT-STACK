@@ -53,6 +53,10 @@ static void oc_print_group_rp_table_entry(int entry, char *Store,
                                           oc_group_rp_table_t *rp_table,
                                           int max_size);
 
+static void oc_print_reduced_group_rp_table_entry(int entry, char *Store,
+                                                  oc_group_rp_table_t *rp_table,
+                                                  int max_size);
+
 static void oc_dump_group_rp_table_entry(int entry, char *Store,
                                          oc_group_rp_table_t *rp_table,
                                          int max_size);
@@ -68,6 +72,28 @@ static int oc_core_find_used_nr_in_rp_table(oc_group_rp_table_t *rp_table,
                                             int max_size);
 
 // -----------------------------------------------------------------------------
+
+int
+oc_print_reduced_group_publisher_table(void)
+{
+#ifdef OC_PUBLISHER_TABLE
+  for (int i = 0; i < oc_core_get_publisher_table_size(); i++) {
+    oc_print_reduced_group_rp_table_entry(i, GPT_STORE, g_gpt,
+                                          oc_core_get_publisher_table_size());
+  }
+#endif
+  return 0;
+}
+
+int
+oc_print_reduced_group_recipient_table(void)
+{
+  for (int i = 0; i < oc_core_get_recipient_table_size(); i++) {
+    oc_print_reduced_group_rp_table_entry(i, GRT_STORE, g_grt,
+                                          oc_core_get_recipient_table_size());
+  }
+  return 0;
+}
 
 int
 oc_table_find_id_from_rep(oc_rep_t *object)
@@ -1739,6 +1765,31 @@ oc_print_group_rp_table_entry(int entry, char *Store,
     PRINT(" %u", rp_table[entry].ga[i]);
   }
   PRINT(" ]\n");
+}
+
+static void
+oc_print_reduced_group_rp_table_entry(int entry, char *Store,
+                                      oc_group_rp_table_t *rp_table,
+                                      int max_size)
+{
+  (void)max_size;
+  if (rp_table[entry].ga_len == 0) {
+    return;
+  }
+  printf("  %s [%d] --> [%d]\n", Store, entry, rp_table[entry].ga_len);
+  printf("    id (0)     : %d\n", rp_table[entry].id);
+
+  printf("    iid (26)   : ");
+  oc_print_uint64_t(rp_table[entry].iid);
+  printf("\n");
+
+  printf("    grpid (13) : %u\n", rp_table[entry].grpid);
+
+  printf("    ga (7)     : [");
+  for (int i = 0; i < rp_table[entry].ga_len; i++) {
+    printf(" %u", rp_table[entry].ga[i]);
+  }
+  printf(" ]\n");
 }
 
 #define RP_ENTRY_MAX_SIZE (1024)
