@@ -293,22 +293,22 @@ oc_join_string_array(oc_string_array_t *ocstringarray, oc_string_t *ocstring)
 int
 oc_print_uint64_t(uint64_t number)
 {
-  if (number == 0)
-  {
-    printf("0\n");
+  if (number == 0) {
+    printf("0");
     return 0;
   }
 
-  char str[21]; //uint64_t decimal number has max 20 numbers + 1 for null terminator
+  char str[21]; // uint64_t decimal number has max 20 numbers + 1 for null
+                // terminator
 
   // Determine the length of the string representation
   uint64_t temp = number;
   uint8_t numDigits = 0;
   while (temp != 0) {
-      temp /= 10;
-      numDigits++;
+    temp /= 10;
+    numDigits++;
   }
-  
+
   // Convert the number to a string
   for (uint8_t i = numDigits - 1; i >= 0; i--) {
       str[i] = '0' + (number % 10);

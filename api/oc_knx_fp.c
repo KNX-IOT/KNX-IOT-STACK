@@ -77,8 +77,8 @@ int
 oc_print_reduced_group_publisher_table(void)
 {
 #ifdef OC_PUBLISHER_TABLE
-  for (int i = 0; i < oc_core_get_publisher_table_size(); i++){
-    oc_print_reduced_group_rp_table_entry(i, GPT_STORE, g_gpt, 
+  for (int i = 0; i < oc_core_get_publisher_table_size(); i++) {
+    oc_print_reduced_group_rp_table_entry(i, GPT_STORE, g_gpt,
                                           oc_core_get_publisher_table_size());
   }
 #endif
@@ -89,7 +89,7 @@ int
 oc_print_reduced_group_recipient_table(void)
 {
   for (int i = 0; i < oc_core_get_recipient_table_size(); i++) {
-    oc_print_reduced_group_rp_table_entry(i, GRT_STORE, g_grt, 
+    oc_print_reduced_group_rp_table_entry(i, GRT_STORE, g_grt,
                                           oc_core_get_recipient_table_size());
   }
   return 0;
@@ -1769,7 +1769,8 @@ oc_print_group_rp_table_entry(int entry, char *Store,
 
 static void
 oc_print_reduced_group_rp_table_entry(int entry, char *Store,
-                                      oc_group_rp_table_t *rp_table, int max_size)
+                                      oc_group_rp_table_t *rp_table,
+                                      int max_size)
 {
   (void)max_size;
   if (rp_table[entry].ga_len == 0) {
