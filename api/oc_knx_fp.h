@@ -187,6 +187,22 @@ typedef struct oc_group_rp_table_t
 } oc_group_rp_table_t;
 
 /**
+ * @brief Prints a reduced version of the entries of the group publisher table:
+ *        Only id, iid and grpid are printed for each entry.
+ *
+ * @return int 0 == success
+ */
+int oc_print_reduced_group_publisher_table(void);
+
+/**
+ * @brief Prints a reduced version of the entries of the group recipient table:
+ *        Only id, iid and grpid are printed for each entry.
+ *
+ * @return int 0 == success
+ */
+int oc_print_reduced_group_recipient_table(void);
+
+/**
  * @brief find id (cbor key 0) in the response
  *
  * @return int -1 : not found, > -1 : value found
