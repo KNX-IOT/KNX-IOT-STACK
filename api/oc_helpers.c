@@ -311,8 +311,8 @@ oc_print_uint64_t(uint64_t number)
 
   // Convert the number to a string
   for (uint8_t i = numDigits - 1; i >= 0; i--) {
-      str[i] = '0' + (number % 10);
-      number /= 10;
+    str[i] = '0' + (number % 10);
+    number /= 10;
   }
   str[numDigits] = '\0';
 
