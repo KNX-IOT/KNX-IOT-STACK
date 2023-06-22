@@ -303,7 +303,7 @@ oc_print_uint64_t(uint64_t number)
 
   // Determine the length of the string representation
   uint64_t temp = number;
-  int numDigits = 0; //Note: This needs to be an int to prevent underflow
+  int numDigits = 0; // Note: This needs to be an int to prevent underflow
 
   while (temp != 0) {
     temp /= 10;
