@@ -303,14 +303,16 @@ oc_print_uint64_t(uint64_t number)
 
   // Determine the length of the string representation
   uint64_t temp = number;
-  uint8_t numDigits = 0;
+  int numDigits = 0; // Note: This needs to be an int to prevent underflow
+
   while (temp != 0) {
     temp /= 10;
     numDigits++;
   }
 
   // Convert the number to a string
-  for (uint8_t i = numDigits - 1; i >= 0; i--) {
+  int i; // int to prevent underflow!!
+  for (i = numDigits - 1; i >= 0; i--) {
     str[i] = '0' + (number % 10);
     number /= 10;
   }
