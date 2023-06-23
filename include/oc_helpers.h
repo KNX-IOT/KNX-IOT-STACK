@@ -588,8 +588,8 @@ int oc_url_cmp(oc_string_t string1, oc_string_t string2);
 
 /**
  * @brief print a uint64_t
- * 
- * @param number 
+ *
+ * @param number
  * @return int always returns 0
  */
 int oc_print_uint64_t(uint64_t number);
