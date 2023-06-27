@@ -594,6 +594,15 @@ int oc_url_cmp(oc_string_t string1, oc_string_t string2);
  */
 int oc_print_uint64_t(uint64_t number);
 
+/**
+ * @brief Converts a uint64_t to a string
+ *
+ * @param[in] number number to be converted to string
+ * @param[out] str Resulting string after conversion
+ * @return int always returns 0
+ */
+int oc_conv_uint64_to_string(char *str, uint64_t number);
+
 #ifdef __cplusplus
 }
 #endif

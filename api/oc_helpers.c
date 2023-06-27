@@ -291,15 +291,12 @@ oc_join_string_array(oc_string_array_t *ocstringarray, oc_string_t *ocstring)
 }
 
 int
-oc_print_uint64_t(uint64_t number)
+oc_conv_uint64_to_string(char *str, uint64_t number)
 {
   if (number == 0) {
-    printf("0");
+    snprintf(str, 2, "0");
     return 0;
   }
-
-  char str[21]; // uint64_t decimal number has max 20 numbers + 1 for null
-                // terminator
 
   // Determine the length of the string representation
   uint64_t temp = number;
@@ -318,9 +315,17 @@ oc_print_uint64_t(uint64_t number)
   }
   str[numDigits] = '\0';
 
-  printf("%s", str);
-
   return 0;
+}
+
+int
+oc_print_uint64_t(uint64_t number)
+{
+  char str[21]; // uint64_t decimal number has max 20 numbers + 1 for null
+                // terminator
+
+  oc_conv_uint64_to_string(str, number);
+  printf("%s", str);
 }
 
 int
