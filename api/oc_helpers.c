@@ -323,7 +323,7 @@ oc_print_uint64_t(uint64_t number)
 {
   char str[21]; // uint64_t decimal number has max 20 numbers + 1 for null
                 // terminator
-  
+
   oc_conv_uint64_to_string(str, number);
   printf("%s", str);
 }
