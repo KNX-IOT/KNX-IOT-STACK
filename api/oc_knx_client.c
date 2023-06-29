@@ -41,7 +41,8 @@ typedef struct broker_s_mode_userdata_t
   int ia;          /**< internal address of the destination */
   char path[20];   /**< the path on the device designated with ia */
   uint32_t ga;     /**< group address to use */
-  char rp_type[3]; /**< mode to send the message "w"  = 1  "r" = 2  "a" = 3  ("rp") */
+  char rp_type[3]; /**< mode to send the message "w"  = 1  "r" = 2  "a" = 3
+                      ("rp") */
   char resource_url[20]; /**< the url to pull the data from. */
 } broker_s_mode_userdata_t;
 
