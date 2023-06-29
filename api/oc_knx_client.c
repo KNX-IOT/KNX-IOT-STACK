@@ -548,7 +548,7 @@ oc_send_s_mode(oc_endpoint_t *endpoint, char *path, uint32_t sia_value,
 
     // ga
     oc_rep_i_set_int(value, 7, group_address);
-    // st M Service type code(write = w, read = r, response = a) 
+    // st M Service type code(write = w, read = r, response = a)
     // Enum : w, r, a (rp)
     oc_rep_i_set_text_string(value, 6, rp);
 
