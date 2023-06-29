@@ -78,6 +78,7 @@
  *
  */
 
+#define _WIN32_WINNT 0x8000
 #include "oc_api.h"
 #include "oc_knx.h"
 #include "port/oc_clock.h"

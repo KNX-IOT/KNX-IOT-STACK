@@ -18,6 +18,7 @@
 */
 
 #define WIN32_LEAN_AND_MEAN
+#define _WIN32_WINNT 0x8000
 // clang-format off
 #include <windows.h>
 #include <WinSock2.h>
@@ -31,6 +32,7 @@
 #ifdef OC_TCP
 #include "tcpadapter.h"
 #endif
+#undef interface
 #include "ipcontext.h"
 #include "mutex.h"
 #include "network_addresses.h"

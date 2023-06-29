@@ -38,7 +38,11 @@ unsigned int
 oc_random_value(void)
 {
   unsigned int val = 0;
+#ifdef __GNUC__
+  val = rand();
+#else
   rand_s(&val);
+#endif
   return val;
 }
 
