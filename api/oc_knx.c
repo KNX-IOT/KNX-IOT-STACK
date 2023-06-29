@@ -786,8 +786,13 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
     // Received from bus: -st w, any ga ==> @receiver:
     // cflags = w -> overwrite object value
     st_write = true;
+  } else if (strcmp(oc_string(g_received_notification.st), "a") == 0) {
+    // Case 2) spec 1.1
+    // Received from bus: -st rp, any ga
+    //@receiver: cflags = u -> overwrite object value
+    st_rep = true;
   } else if (strcmp(oc_string(g_received_notification.st), "rp") == 0) {
-    // Case 2)
+    // Case 2) spec 1.0
     // Received from bus: -st rp, any ga
     //@receiver: cflags = u -> overwrite object value
     st_rep = true;
