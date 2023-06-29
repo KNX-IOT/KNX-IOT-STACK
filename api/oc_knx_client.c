@@ -548,8 +548,8 @@ oc_send_s_mode(oc_endpoint_t *endpoint, char *path, uint32_t sia_value,
 
     // ga
     oc_rep_i_set_int(value, 7, group_address);
-    // st M Service type code(write = w, read = r, response = rp) Enum : w, r,
-    // rp
+    // st M Service type code(write = w, read = r, response = a)
+    // Enum : w, r, a (rp)
     oc_rep_i_set_text_string(value, 6, rp);
 
     // set the "value" key
@@ -695,7 +695,11 @@ oc_do_s_mode_with_scope_and_check(int scope, char *resource_url, char *rp,
     error = false;
   } else if (strcmp(rp, "r") == 0) {
     error = false;
+  } else if (strcmp(rp, "a") == 0) {
+    // spec 1.1
+    error = false;
   } else if (strcmp(rp, "rp") == 0) {
+    // spec 1.0
     error = false;
   }
   if (error) {
