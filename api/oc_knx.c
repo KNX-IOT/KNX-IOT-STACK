@@ -676,15 +676,6 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
       while (object != NULL) {
         switch (object->type) {
         case OC_REP_STRING: {
-#ifdef TAGS_AS_STRINGS
-          if (oc_string_len(object->name) == 2 &&
-              memcmp(oc_string(object->name), "st", 2) == 0) {
-            oc_free_string(&g_received_notification.st);
-            oc_new_string(&g_received_notification.st,
-                          oc_string(object->value.string),
-                          oc_string_len(object->value.string));
-          }
-#endif
           if (object->iname == 6) {
             oc_free_string(&g_received_notification.st);
             oc_new_string(&g_received_notification.st,
@@ -700,16 +691,6 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
         } break;
 
         case OC_REP_INT: {
-#ifdef TAGS_AS_STRINGS
-          if (oc_string_len(object->name) == 3 &&
-              memcmp(oc_string(object->name), "sia", 3) == 0) {
-            g_received_notification.sia = (uint32_t)object->value.integer;
-          }
-          if (oc_string_len(object->name) == 2 &&
-              memcmp(oc_string(object->name), "ga", 2) == 0) {
-            g_received_notification.ga = (uint32_t)object->value.integer;
-          }
-#endif
           // sia
           if (object->iname == 4) {
             g_received_notification.sia = (uint32_t)object->value.integer;
@@ -794,7 +775,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
     st_rep = true;
   } else if (strcmp(oc_string(g_received_notification.st), "rp") == 0) {
     // Case 2) spec 1.0
-    // Received from bus: -st rp, any ga
+    // Received from bus: -st a (rp), any ga
     //@receiver: cflags = u -> overwrite object value
     st_rep = true;
   } else if (strcmp(oc_string(g_received_notification.st), "r") == 0) {
@@ -898,10 +879,13 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
         // Sent: -st rp, sending association (1st assigned ga)
         // specifically: do not check the transmission flag
         PRINT("   (case3) (RP-UPDATE) sending RP due to READ flag \n");
+
 #ifdef OC_USE_MULTICAST_SCOPE_2
-        oc_do_s_mode_with_scope_no_check(2, oc_string(myurl), "rp");
+        // oc_do_s_mode_with_scope_no_check(2, oc_string(myurl), "rp");
+        oc_do_s_mode_with_scope_no_check(2, oc_string(myurl), "a");
 #endif
-        oc_do_s_mode_with_scope_no_check(5, oc_string(myurl), "rp");
+        // oc_do_s_mode_with_scope_no_check(5, oc_string(myurl), "rp");
+        oc_do_s_mode_with_scope_no_check(5, oc_string(myurl), "a");
       }
     }
     // get the next index in the table to get the url from.
