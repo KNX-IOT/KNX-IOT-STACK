@@ -14,7 +14,6 @@
 // limitations under the License.
 */
 
-
 #include "oc_endpoint.h"
 #include "oc_oscore_replay.h"
 
