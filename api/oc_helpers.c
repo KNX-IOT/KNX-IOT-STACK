@@ -291,7 +291,7 @@ oc_join_string_array(oc_string_array_t *ocstringarray, oc_string_t *ocstring)
 }
 
 int
-oc_conv_uint64_to_string(char *str, uint64_t number)
+oc_conv_uint64_to_dec_string(char *str, uint64_t number)
 {
   if (number == 0) {
     snprintf(str, 2, "0");
@@ -325,7 +325,7 @@ oc_print_uint64_t(uint64_t number, enum StringRepresentation rep)
                 // terminator
 
   if (rep == DEC_REPRESENTATION)
-    oc_conv_uint64_to_string(str, number);
+    oc_conv_uint64_to_dec_string(str, number);
   else
     oc_conv_uint64_to_hex_string(str, number);
 
