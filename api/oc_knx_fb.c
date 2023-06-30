@@ -229,7 +229,7 @@ oc_create_fb_x_resource(int resource_idx, size_t device)
 // -----------------------------------------------------------------------------
 
 int
-oc_count_functional_blocks(oc_request_t *request, size_t device_index)
+oc_count_functional_blocks(size_t device_index)
 {
   int counter = 0;
   int i;
