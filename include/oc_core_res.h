@@ -394,11 +394,14 @@ bool oc_filter_resource_by_if(oc_resource_t *resource, oc_request_t *request);
 
 /**
  * @brief frame the interface mask in the response, as string in the uri
- *
+ * example: full tag if= ":if.i"
+ * this function frames ":if.i" (truncated) or "urn:knx:if.i"
  * @param iface_mask The interface masks to frame
+ * @param truncated 1 = do not frame "urn:knx"
  * @return int 0 = success
  */
-int oc_frame_interfaces_mask_in_response(oc_interface_mask_t iface_mask);
+int oc_frame_interfaces_mask_in_response(oc_interface_mask_t iface_mask,
+                                         int truncated);
 
 #ifdef __cplusplus
 }
