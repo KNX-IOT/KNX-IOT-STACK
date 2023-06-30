@@ -60,7 +60,6 @@ void oc_create_knx_fb_resources(size_t device);
 
 /**
  *@brief count functional blocks in a device
- * @param request the request
  * @param device_index the device index
  */
 int oc_count_functional_blocks(size_t device_index);

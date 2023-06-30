@@ -41,9 +41,9 @@ int check_if_query_l_exist(oc_request_t *request, bool *ps_exists,
 /**
  * @brief helper function to frame url part of query response:
  * spec 1.0:
- * url?l=ps
- * url?l=total
- * url?l=ps;ps=total
+ * <url?l=ps>
+ * <url?l=total>
+ * <url?l=ps;ps=total>
  * spec 1.1: 
  * url
  *
