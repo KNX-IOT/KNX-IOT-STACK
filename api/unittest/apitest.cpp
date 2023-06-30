@@ -139,21 +139,15 @@ TEST(HELPER_uint64, oc_conv_uint64_hex)
   };
 
   struct test_vector_entry hex_test_vector[] = {
-    {"0", 0},
-    {"1", 1},
-    {"1", 0x01},
-    {"abc", 0xabc},
-    {"abc", 0x0abc},
-    {"ab0c", 0xab0c},
-    {"ab00c", 0xab00c},
-    {"d0fc2", 856002},
-    {"ab000cd123", 0xAB000CD123}
+    { "0", 0 },           { "1", 1 },          { "1", 0x01 },
+    { "abc", 0xabc },     { "abc", 0x0abc },   { "ab0c", 0xab0c },
+    { "ab00c", 0xab00c }, { "d0fc2", 856002 }, { "ab000cd123", 0xAB000CD123 }
   };
 
-  int num_of_tests_hex = sizeof(hex_test_vector)/sizeof(struct test_vector_entry);
+  int num_of_tests_hex =
+    sizeof(hex_test_vector) / sizeof(struct test_vector_entry);
 
-  for (int i = 0; i < num_of_tests_hex; ++i)
-  {
+  for (int i = 0; i < num_of_tests_hex; ++i) {
     char str[17];
     oc_conv_uint64_to_hex_string(str, hex_test_vector[i].test_val);
     EXPECT_STREQ(hex_test_vector[i].expected_val, str);
@@ -169,16 +163,13 @@ TEST(HELPER_uint64, oc_conv_uint64_dec)
   };
 
   struct test_vector_entry decimal_test_vector[] = {
-    {"0", 0},
-    {"1", 1},
-    {"8710", 8710},
-    {"255", 0xff}
+    { "0", 0 }, { "1", 1 }, { "8710", 8710 }, { "255", 0xff }
   };
 
-  int num_of_tests_dec = sizeof(decimal_test_vector)/sizeof(struct test_vector_entry);
+  int num_of_tests_dec =
+    sizeof(decimal_test_vector) / sizeof(struct test_vector_entry);
 
-  for (int i = 0; i < num_of_tests_dec; ++i)
-  {
+  for (int i = 0; i < num_of_tests_dec; ++i) {
     char str[22];
     oc_conv_uint64_to_dec_string(str, decimal_test_vector[i].test_val);
     EXPECT_STREQ(decimal_test_vector[i].expected_val, str);

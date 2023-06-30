@@ -343,20 +343,20 @@ oc_conv_uint64_to_hex_string(char *str, uint64_t number)
   }
 
   // Convert to hex string, but will include leading zeros
-	for (uint8_t i = 0; i < 16; ++i) {
-		uint8_t nibble = (number >> ((16 - (i + 1)) * 4));
+  for (uint8_t i = 0; i < 16; ++i) {
+    uint8_t nibble = (number >> ((16 - (i + 1)) * 4));
     sprintf(temp_str + i, "%x", nibble & 0xF);
-	}
-	temp_str[16] = '\0';
+  }
+  temp_str[16] = '\0';
 
-	// Remove leading zeros
-	uint8_t leading_zeros;
-	for (leading_zeros = 0; leading_zeros < 16; ++leading_zeros) {
-	    if (temp_str[leading_zeros] != '0')
-	        break;
-	}
-	strcpy(str, temp_str + leading_zeros);
-	
+  // Remove leading zeros
+  uint8_t leading_zeros;
+  for (leading_zeros = 0; leading_zeros < 16; ++leading_zeros) {
+    if (temp_str[leading_zeros] != '0')
+      break;
+  }
+  strcpy(str, temp_str + leading_zeros);
+
   return 0;
 }
 
