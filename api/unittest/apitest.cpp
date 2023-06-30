@@ -134,7 +134,7 @@ TEST(HELPER_uint64, oc_conv_uint64_hex)
 {
   struct test_vector_entry
   {
-    char *expected_val;
+    char expected_val[17];
     uint64_t test_val;
   };
 
@@ -164,7 +164,7 @@ TEST(HELPER_uint64, oc_conv_uint64_dec)
 {
   struct test_vector_entry
   {
-    char *expected_val;
+    char expected_val[22];
     uint64_t test_val;
   };
 
