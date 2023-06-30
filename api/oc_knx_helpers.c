@@ -102,6 +102,45 @@ oc_frame_query_l(char *url, bool ps_exists, bool total_exists)
 }
 
 int
+check_if_query_pn_exist(oc_request_t *request, int *pn_value, int *ps_value)
+{
+  char *value = NULL;
+  int value_len = -1;
+
+  if (pn_value == NULL) {
+    return 0;
+  }
+  if (ps_value == NULL) {
+    return 0;
+  }
+
+  *ps_value = -1;
+  *pn_value = -1;
+
+  // handle query parameters
+  if (oc_query_values_available(request)) {
+    // check if pn exist
+    if (oc_query_value_exists(request, "pn")) {
+      oc_iterate_query_get_values(request, "pn", &value, &value_len);
+      pn_value = atoi(value);
+    }
+    oc_init_query_iterator();
+    if (oc_query_value_exists(request, "ps")) {
+      oc_iterate_query_get_values(request, "ps", &value, &value_len);
+      ps_value = atoi(value);
+    }
+  } /* query available */
+
+  if (*ps_value > -1) {
+    return 1;
+  }
+  if (*pn_value > -1) {
+    return 1;
+  }
+  return 0;
+}
+
+int
 oc_frame_integer(int value)
 {
   char string[10];
