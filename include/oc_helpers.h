@@ -598,10 +598,21 @@ int oc_print_uint64_t(uint64_t number);
  * @brief Converts a uint64_t to a string
  *
  * @param[in] number number to be converted to string
- * @param[out] str Resulting string after conversion
+ * @param[out] str Resulting string after conversion. IMPORTANT: Should have
+ * a size of at least 22 bytes (21 + null terminator)
  * @return int always returns 0
  */
 int oc_conv_uint64_to_string(char *str, uint64_t number);
+
+/**
+ * @brief Converts a uint64_t to a hex string representation
+ *
+ * @param[in] number number to be converted to hexadecimal string
+ * @param[out] str Resulting string after conversion. IMPORTANT: Should have
+ * a size of at least 17 bytes (16 + null terminator)
+ * @return int always returns 0
+ */
+int oc_conv_uint64_to_hex_string(char *str, uint64_t number);
 
 #ifdef __cplusplus
 }

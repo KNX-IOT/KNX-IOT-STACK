@@ -329,6 +329,34 @@ oc_print_uint64_t(uint64_t number)
 }
 
 int
+oc_conv_uint64_to_hex_string(char *str, uint64_t number)
+{
+  char temp_str[17];
+
+  if (number == 0) {
+    snprintf(str, 2, "0");
+    return 0;
+  }
+
+  // Convert to hex string, but will include leading zeros
+	for (uint8_t i = 0; i < 16; ++i) {
+		uint8_t nibble = (number >> ((16 - (i + 1)) * 4));
+    sprintf(temp_str + i, "%x", nibble & 0xF);
+	}
+	temp_str[16] = '\0';
+
+	// Remove leading zeros
+	uint8_t leading_zeros;
+	for (leading_zeros = 0; leading_zeros < 16; ++leading_zeros) {
+	    if (temp_str[leading_zeros] != '0')
+	        break;
+	}
+	strcpy(str, temp_str + leading_zeros);
+	
+  return 0;
+}
+
+int
 oc_conv_byte_array_to_hex_string(const uint8_t *array, size_t array_len,
                                  char *hex_str, size_t *hex_str_len)
 {
