@@ -70,7 +70,7 @@ int
 oc_frame_query_l(char *url, bool ps_exists, bool total_exists)
 {
   // example : < / fp / r / ? l = total>; total = 22; ps = 5
-  // spec 1.1. : no query arguments anymore in the url 
+  // spec 1.1. : no query arguments anymore in the url
   // of the link format response line
   int response_length = 0;
   int length;

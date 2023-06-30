@@ -258,8 +258,8 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   int if_len = 0;
   char *d_request = 0;
   int d_len = 0;
-  bool ps_exists= false;
-  bool total_exists=false;
+  bool ps_exists = false;
+  bool total_exists = false;
   int length;
 
   value_len = -1;
