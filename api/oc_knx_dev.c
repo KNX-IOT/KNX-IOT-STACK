@@ -598,20 +598,19 @@ oc_core_dev_ipv6_get_handler(oc_request_t *request,
     oc_rep_start_object(oc_rep_array(links), obj);
     // frame the entry
     oc_rep_i_set_byte_string(obj, 1, my_ep->addr.ipv6.address,
-                              sizeof(my_ep->addr.ipv6.address));
+                             sizeof(my_ep->addr.ipv6.address));
     // end object
     oc_rep_end_object(oc_rep_array(links), obj);
     // end array
     oc_rep_end_links_array();
-  }
-  else {
-    // return the single entry. 
+  } else {
+    // return the single entry.
     oc_rep_begin_root_object();
     oc_rep_i_set_byte_string(root, 1, my_ep->addr.ipv6.address,
                              sizeof(my_ep->addr.ipv6.address));
     oc_rep_end_root_object();
   }
-  
+
   oc_send_cbor_response(request, OC_STATUS_OK);
   return;
 }
