@@ -214,7 +214,7 @@ frame_sn(char *serial_number, uint64_t iid, uint32_t ia)
 
   framed_bytes = oc_rep_add_line_to_buffer(" knx://ia.");
   char text_hex[20];
-  snprintf(text_hex, 19, "%" PRIx64 "", iid);
+  oc_conv_uint64_to_hex_string(text_hex, iid);
   framed_bytes = oc_rep_add_line_to_buffer(text_hex);
   response_length = response_length + framed_bytes;
 
@@ -408,7 +408,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
       char *iid_str = oc_strnchr(&ep_request[10], '.', iid_str_len);
       if (iid_str) {
         char iid_dev[20];
-        snprintf(iid_dev, 19, "%" PRIx64 "", device->iid);
+        oc_conv_uint64_to_hex_string(iid_dev, device->iid);
         if (strncmp(iid_dev, iid_str + 1, iid_str_len - 1) == 0) {
           response_length = response_length =
             frame_sn(oc_string(device->serialnumber), device->iid, device->ia);
