@@ -400,7 +400,8 @@ bool oc_filter_resource_by_if(oc_resource_t *resource, oc_request_t *request);
  * @param truncated 1 = do not frame "urn:knx"
  * @return int 0 = success
  */
-int oc_frame_interfaces_mask_in_response(oc_interface_mask_t iface_mask, int truncated);
+int oc_frame_interfaces_mask_in_response(oc_interface_mask_t iface_mask,
+                                         int truncated);
 
 #ifdef __cplusplus
 }

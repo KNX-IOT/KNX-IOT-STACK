@@ -167,22 +167,22 @@ oc_core_encode_interfaces_mask(CborEncoder *parent,
 }
 
 int
-oc_frame_interfaces_mask_in_response(oc_interface_mask_t iface_mask, int truncate)
+oc_frame_interfaces_mask_in_response(oc_interface_mask_t iface_mask,
+                                     int truncate)
 {
   int total_size = 0;
   //  </ point - path - example1>;rt = ":dpa.352.51";if= ":if.i";ct = 50 60,
 
-  // start quote 
+  // start quote
   oc_rep_encode_raw((uint8_t *)"\"", 1);
   total_size += 1;
-
 
   if (iface_mask & OC_IF_I) {
     if (total_size > 1) {
       oc_rep_encode_raw((uint8_t *)" ", 1);
       total_size += 1;
     }
-    if (truncate !=  1) {
+    if (truncate != 1) {
       oc_rep_encode_raw((uint8_t *)"urn:knx", 7);
       total_size += 7;
     }
