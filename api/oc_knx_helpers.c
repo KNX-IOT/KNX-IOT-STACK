@@ -70,6 +70,8 @@ int
 oc_frame_query_l(char *url, bool ps_exists, bool total_exists)
 {
   // example : < / fp / r / ? l = total>; total = 22; ps = 5
+  // spec 1.1. : no query arguments anymore in the url 
+  // of the link format response line
   int response_length = 0;
   int length;
 
@@ -77,6 +79,10 @@ oc_frame_query_l(char *url, bool ps_exists, bool total_exists)
   response_length += length;
   length = oc_rep_add_line_to_buffer(url);
   response_length += length;
+  length = oc_rep_add_line_to_buffer(">");
+  response_length += length;
+
+  /*
   if (ps_exists && total_exists) {
     length = oc_rep_add_line_to_buffer("?l=ps;l=total>");
     response_length += length;
@@ -86,7 +92,11 @@ oc_frame_query_l(char *url, bool ps_exists, bool total_exists)
   } else if (total_exists) {
     length = oc_rep_add_line_to_buffer("?l=total>");
     response_length += length;
+  } else {
+    length = oc_rep_add_line_to_buffer(">");
+    response_length += length;
   }
+  */
 
   return response_length;
 }

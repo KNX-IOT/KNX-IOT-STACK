@@ -258,6 +258,9 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   int if_len = 0;
   char *d_request = 0;
   int d_len = 0;
+  bool ps_exists= false;
+  bool total_exists=false;
+  int length;
 
   value_len = -1;
   oc_init_query_iterator();
@@ -283,6 +286,37 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   // get the device structure from the request.
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
+
+  // handle query parameters: l=ps l=total
+  if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
+    // example : < / fp / r / ? l = total>; total = 22; ps = 5
+
+    length = oc_frame_query_l("/.well-known/core", ps_exists, total_exists);
+    response_length += length;
+    // count the application functional blocks
+    int nr_functional_blocks = oc_count_functional_blocks(device_index);
+    // add the others that always be there
+    // - dev
+    // - swu
+    // - auth
+    // and the <ep> entry
+    nr_functional_blocks += 4;
+    if (ps_exists) {
+      length = oc_rep_add_line_to_buffer(";ps=");
+      response_length += length;
+      length = oc_frame_integer(nr_functional_blocks);
+      response_length += length;
+    }
+    if (total_exists) {
+      length = oc_rep_add_line_to_buffer(";total=");
+      response_length += length;
+      length = oc_frame_integer(nr_functional_blocks);
+      response_length += length;
+    }
+
+    oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
+    return;
+  }
 
   /* if device is belongs to a group address
      ?d=urn:knx:g.s.[ga]
@@ -327,15 +361,6 @@ oc_wkcore_discovery_handler(oc_request_t *request,
          the ep=urn:knx:sn.* and if=urn:knx:if.pm concatenation. since that only
          needs to respond when the device is in programming mode
       */
-      // framed_bytes = oc_rep_add_line_to_buffer("<>;ep=\"urn:knx:sn.");
-      // response_length = response_length + framed_bytes;
-      // framed_bytes =
-      // oc_rep_add_line_to_buffer(oc_string(device->serialnumber));
-      // response_length = response_length + framed_bytes;
-      // framed_bytes = oc_rep_add_line_to_buffer("\"");
-      // response_length = response_length + framed_bytes;
-      // matches = 1;
-
       response_length =
         frame_sn(oc_string(device->serialnumber), device->iid, device->ia);
       matches = 1;
@@ -367,10 +392,10 @@ oc_wkcore_discovery_handler(oc_request_t *request,
     if (if_ia_i == device->ia) {
       /* return the ll entry: </dev/ia>;rt="dpt.value2Ucount";ct=50 */
       framed_bytes =
-        oc_rep_add_line_to_buffer("</dev/sa>;rt=\"dpa.0.57\";ct=50,");
+        oc_rep_add_line_to_buffer("</dev/sna>;rt=\"dpa.0.57\";ct=50,");
       response_length = response_length + framed_bytes;
       framed_bytes =
-        oc_rep_add_line_to_buffer("</dev/dp>;rt=\"dpa.0.58\";ct=50,");
+        oc_rep_add_line_to_buffer("</dev/da>;rt=\"dpa.0.58\";ct=50,");
       response_length = response_length + framed_bytes;
       framed_bytes =
         oc_rep_add_line_to_buffer("</dev/ia>;rt=\"dpt.value2Ucount\";ct=50");
