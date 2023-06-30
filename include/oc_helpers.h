@@ -35,6 +35,12 @@ extern "C" {
 typedef struct oc_mmem oc_handle_t, oc_string_t, oc_array_t, oc_string_array_t,
   oc_byte_string_array_t;
 
+enum StringRepresentation
+{
+  DEC_REPRESENTATION = 0,
+  HEX_REPRESENTATION,
+};
+
 #define oc_cast(block, type) ((type *)(OC_MMEM_PTR(&(block))))
 
 /**
@@ -587,12 +593,13 @@ int oc_string_cmp(oc_string_t string1, oc_string_t string2);
 int oc_url_cmp(oc_string_t string1, oc_string_t string2);
 
 /**
- * @brief print a uint64_t
+ * @brief print a uint64_t, in either decimal or hex representation
  *
  * @param number
+ * @param rep - string representation chosen (decimal or hex)
  * @return int always returns 0
  */
-int oc_print_uint64_t(uint64_t number);
+int oc_print_uint64_t(uint64_t number, enum StringRepresentation rep);
 
 /**
  * @brief Converts a uint64_t to a string

@@ -1780,7 +1780,7 @@ oc_print_reduced_group_rp_table_entry(int entry, char *Store,
   printf("    id (0)     : %d\n", rp_table[entry].id);
 
   printf("    iid (26)   : ");
-  oc_print_uint64_t(rp_table[entry].iid);
+  oc_print_uint64_t(rp_table[entry].iid, DEC_REPRESENTATION);
   printf("\n");
 
   printf("    grpid (13) : %u\n", rp_table[entry].grpid);
