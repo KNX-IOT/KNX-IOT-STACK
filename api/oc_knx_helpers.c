@@ -102,8 +102,7 @@ oc_frame_query_l(char *url, bool ps_exists, bool total_exists)
 }
 
 int
-check_if_query_pn_exist(oc_request_t *request, int *pn_value,
-                       int *ps_value)
+check_if_query_pn_exist(oc_request_t *request, int *pn_value, int *ps_value)
 {
   char *value = NULL;
   int value_len = -1;
@@ -130,7 +129,7 @@ check_if_query_pn_exist(oc_request_t *request, int *pn_value,
       oc_iterate_query_get_values(request, "ps", &value, &value_len);
       ps_value = atoi(value);
     }
-  }   /* query available */
+  } /* query available */
 
   if (*ps_value > -1) {
     return 1;
@@ -140,8 +139,6 @@ check_if_query_pn_exist(oc_request_t *request, int *pn_value,
   }
   return 0;
 }
-
-
 
 int
 oc_frame_integer(int value)

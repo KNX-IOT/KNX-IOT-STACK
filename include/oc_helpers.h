@@ -35,6 +35,11 @@ extern "C" {
 typedef struct oc_mmem oc_handle_t, oc_string_t, oc_array_t, oc_string_array_t,
   oc_byte_string_array_t;
 
+enum StringRepresentation {
+  DEC_REPRESENTATION = 0,
+  HEX_REPRESENTATION,
+};
+
 #define oc_cast(block, type) ((type *)(OC_MMEM_PTR(&(block))))
 
 /**
@@ -587,21 +592,33 @@ int oc_string_cmp(oc_string_t string1, oc_string_t string2);
 int oc_url_cmp(oc_string_t string1, oc_string_t string2);
 
 /**
- * @brief print a uint64_t
+ * @brief print a uint64_t, in either decimal or hex representation
  *
  * @param number
+ * @param rep - string representation chosen (decimal or hex)
  * @return int always returns 0
  */
-int oc_print_uint64_t(uint64_t number);
+int oc_print_uint64_t(uint64_t number, enum StringRepresentation rep);
 
 /**
- * @brief Converts a uint64_t to a string
+ * @brief Converts a uint64_t to a decimal string representation
  *
  * @param[in] number number to be converted to string
- * @param[out] str Resulting string after conversion
+ * @param[out] str Resulting string after conversion. IMPORTANT: Should have
+ * a size of at least 22 bytes (21 + null terminator)
  * @return int always returns 0
  */
-int oc_conv_uint64_to_string(char *str, uint64_t number);
+int oc_conv_uint64_to_dec_string(char *str, uint64_t number);
+
+/**
+ * @brief Converts a uint64_t to a hex string representation
+ *
+ * @param[in] number number to be converted to hexadecimal string
+ * @param[out] str Resulting string after conversion. IMPORTANT: Should have
+ * a size of at least 17 bytes (16 + null terminator)
+ * @return int always returns 0
+ */
+int oc_conv_uint64_to_hex_string(char *str, uint64_t number);
 
 #ifdef __cplusplus
 }
