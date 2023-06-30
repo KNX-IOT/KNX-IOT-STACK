@@ -291,7 +291,7 @@ oc_join_string_array(oc_string_array_t *ocstringarray, oc_string_t *ocstring)
 }
 
 int
-oc_conv_uint64_to_string(char *str, uint64_t number)
+oc_conv_uint64_to_dec_string(char *str, uint64_t number)
 {
   if (number == 0) {
     snprintf(str, 2, "0");
@@ -319,13 +319,45 @@ oc_conv_uint64_to_string(char *str, uint64_t number)
 }
 
 int
-oc_print_uint64_t(uint64_t number)
+oc_print_uint64_t(uint64_t number, enum StringRepresentation rep)
 {
   char str[21]; // uint64_t decimal number has max 20 numbers + 1 for null
                 // terminator
 
-  oc_conv_uint64_to_string(str, number);
+  if (rep == DEC_REPRESENTATION)
+    oc_conv_uint64_to_dec_string(str, number);
+  else
+    oc_conv_uint64_to_hex_string(str, number);
+
   printf("%s", str);
+}
+
+int
+oc_conv_uint64_to_hex_string(char *str, uint64_t number)
+{
+  char temp_str[17];
+
+  if (number == 0) {
+    snprintf(str, 2, "0");
+    return 0;
+  }
+
+  // Convert to hex string, but will include leading zeros
+  for (uint8_t i = 0; i < 16; ++i) {
+    uint8_t nibble = (number >> ((16 - (i + 1)) * 4));
+    sprintf(temp_str + i, "%x", nibble & 0xF);
+  }
+  temp_str[16] = '\0';
+
+  // Remove leading zeros
+  uint8_t leading_zeros;
+  for (leading_zeros = 0; leading_zeros < 16; ++leading_zeros) {
+    if (temp_str[leading_zeros] != '0')
+      break;
+  }
+  strcpy(str, temp_str + leading_zeros);
+
+  return 0;
 }
 
 int
