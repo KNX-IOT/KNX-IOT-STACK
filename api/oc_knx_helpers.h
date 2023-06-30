@@ -29,7 +29,8 @@ extern "C" {
 
 /**
  * @brief helper function to check if query parameter l exists
- *
+ * 
+ * example: /fp/r?l=total&l=ps
  * @param request the request
  * @param ps_exists return value if l=ps exists
  * @param total_exists return value if l=total exists
@@ -41,11 +42,11 @@ int check_if_query_l_exist(oc_request_t *request, bool *ps_exists,
 /**
  * @brief helper function to frame url part of query response:
  * spec 1.0:
- * <url?l=ps>
- * <url?l=total>
- * <url?l=ps;ps=total>
+ * - <url?l=ps>
+ * - <url?l=total>
+ * - <url?l=ps;ps=total>
  * spec 1.1: 
- * url
+ * - url
  *
  * @param url the url to be framed
  * @param ps_exists frame ps
@@ -53,6 +54,17 @@ int check_if_query_l_exist(oc_request_t *request, bool *ps_exists,
  * @return total bytes framed
  */
 int oc_frame_query_l(char *url, bool ps_exists, bool total_exists);
+
+/**
+ * @brief helper function to check if query parameter pn or ps exists
+ * 
+ * example: /dev/ipv6?pn=0&ps=3
+ * @param request the request
+ * @param pn_value return -1 if not exist otherwise value
+ * @param ps_value return -1 if not exist otherwise value
+ * @return int 1 == pn or ps exists
+ */
+check_if_query_pn_exist(oc_request_t *request, int *pn_value, int *ps_value);
 
 /**
  * @brief helper function to frame an integer in the response:
