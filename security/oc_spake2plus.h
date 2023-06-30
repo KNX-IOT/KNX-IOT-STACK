@@ -39,6 +39,10 @@ typedef struct
 
 #define SPAKE_CONTEXT "knxpase"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Initialize Spake2+
  *
@@ -207,5 +211,9 @@ int oc_spake_calc_cB(uint8_t *Ka_Ke, uint8_t cB[32],
 void oc_spake_print_point(mbedtls_ecp_point *p);
 
 void oc_spake_print_mpi(mbedtls_mpi *m);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // OC_SPAKE2PLUS_H
