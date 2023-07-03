@@ -26,6 +26,7 @@
 
 #include "oc_spake2plus.h"
 #include "port/oc_random.h"
+#include "port/oc_log.h"
 
 static mbedtls_ctr_drbg_context *ctr_drbg_ctx;
 static mbedtls_ecp_group grp;
