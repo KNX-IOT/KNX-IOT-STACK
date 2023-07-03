@@ -73,7 +73,6 @@ int
 oc_spake_init(void)
 {
   int ret = 0;
-  precalc_data.loaded = 0;
   // initialize entropy and drbg contexts
   mbedtls_ecp_group_init(&grp);
 
