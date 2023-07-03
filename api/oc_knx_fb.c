@@ -65,8 +65,8 @@ store_in_array(int value, int instance)
   if (value == -1) {
     return;
   }
-  g_int_array[0][g_array_size] = value;
-  g_int_array[1][g_array_size] = instance;
+  g_int_array[0][g_array_size] = value;    // functional block number
+  g_int_array[1][g_array_size] = instance; // instance of the functional block
   g_array_size++;
   // assert(g_array_size == ARRAY_SIZE);
 }
@@ -336,8 +336,10 @@ oc_add_function_blocks_to_response(oc_request_t *request, size_t device_index,
     length = oc_rep_add_line_to_buffer("</f/");
     *response_length += length;
     if (g_int_array[1][i] > 0) {
-      // functional block with instance with 2 numbers
-      snprintf(number, 23, "%03d_%02d", g_int_array[0][i], g_int_array[1][i]);
+      // functional block with instance with 2 numbers, e.g. <functional
+      // block>_<instance>
+      snprintf(number, 23, "%05d_%02d", g_int_array[0][i], g_int_array[1][i]);
+      // snprintf(number, 23, "%d_%d", g_int_array[0][i], g_int_array[1][i]);
     } else {
       // functional block with no instance, e.g. defaulting to instance 0.
       snprintf(number, 5, "%d", g_int_array[0][i]);
@@ -352,7 +354,8 @@ oc_add_function_blocks_to_response(oc_request_t *request, size_t device_index,
     *response_length += length;
     length = oc_rep_add_line_to_buffer(":fb.");
     *response_length += length;
-    snprintf(number, 5, "%d", g_int_array[0][i]);
+    // e.g. max functional block is 12345
+    snprintf(number, 6, "%d", g_int_array[0][i]);
     length = oc_rep_add_line_to_buffer(number);
     *response_length += length;
     length = oc_rep_add_line_to_buffer("\";");
