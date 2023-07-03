@@ -1362,8 +1362,10 @@ oc_core_knx_spake_separate_post_handler(void *req_p)
 
   if (valid_request == SPAKE_RND) {
 #ifdef OC_SPAKE
-    // generate random numbers for rnd, salt & it (# of iterations)
-    oc_spake_parameter_exchange(g_pase.rnd, g_pase.salt, &g_pase.it);
+    if (oc_spake_get_parameters(g_pase.rnd, g_pase.salt, &g_pase.it, NULL, NULL) != 0) {
+      // generate random numbers for rnd, salt & it (# of iterations)
+      oc_spake_parameter_exchange(g_pase.rnd, g_pase.salt, &g_pase.it);
+    }
     OC_DBG_SPAKE("Rnd:");
     OC_LOGbytes_SPAKE(g_pase.rnd, sizeof(g_pase.rnd));
     OC_DBG_SPAKE("Salt:");
@@ -1395,23 +1397,27 @@ oc_core_knx_spake_separate_post_handler(void *req_p)
 
     const char *password = oc_spake_get_password();
     int ret;
-    mbedtls_mpi_free(&spake_data.w0);
-    mbedtls_ecp_point_free(&spake_data.L);
     mbedtls_mpi_free(&spake_data.y);
     mbedtls_ecp_point_free(&spake_data.pub_y);
 
-    mbedtls_mpi_init(&spake_data.w0);
-    mbedtls_ecp_point_init(&spake_data.L);
     mbedtls_mpi_init(&spake_data.y);
     mbedtls_ecp_point_init(&spake_data.pub_y);
 
-    ret = oc_spake_calc_w0_L(password, sizeof(g_pase.salt), g_pase.salt,
-                             g_pase.it, &spake_data.w0, &spake_data.L);
+    if (oc_spake_get_parameters(NULL, NULL, NULL, &spake_data.w0, &spake_data.L) != 0) {
+      mbedtls_mpi_free(&spake_data.w0);
+      mbedtls_ecp_point_free(&spake_data.L);
+      mbedtls_mpi_init(&spake_data.w0);
+      mbedtls_ecp_point_init(&spake_data.L);
+      
+      ret = oc_spake_calc_w0_L(password, sizeof(g_pase.salt), g_pase.salt,
+                              g_pase.it, &spake_data.w0, &spake_data.L);
 
-    if (ret != 0) {
-      OC_ERR("oc_spake_calc_w0_L failed with code %d", ret);
-      goto error;
+      if (ret != 0) {
+        OC_ERR("oc_spake_calc_w0_L failed with code %d", ret);
+        goto error;
+      }
     }
+
 
     ret = oc_spake_gen_keypair(&spake_data.y, &spake_data.pub_y);
     if (ret != 0) {
