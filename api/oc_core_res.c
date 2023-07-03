@@ -267,7 +267,7 @@ oc_frame_interfaces_mask_in_response(oc_interface_mask_t iface_mask,
       total_size += 1;
     }
     oc_rep_encode_raw((uint8_t *)":if.s", 5);
-    total_size += 4;
+    total_size += 5;
   }
   if (iface_mask & OC_IF_LI) {
     if (total_size > 1) {
@@ -303,7 +303,7 @@ oc_frame_interfaces_mask_in_response(oc_interface_mask_t iface_mask,
       total_size += 7;
     }
     oc_rep_encode_raw((uint8_t *)":if.sec", 7);
-    total_size += 6;
+    total_size += 7;
   }
   if (iface_mask & OC_IF_SWU) {
     if (total_size > 1) {
