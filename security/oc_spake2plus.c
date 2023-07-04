@@ -25,6 +25,7 @@
 #include <assert.h>
 
 #include "oc_spake2plus.h"
+#include "port/oc_spake.h"
 #include "port/oc_random.h"
 #include "port/oc_log.h"
 
@@ -60,15 +61,6 @@ static char password[33];
 #define KNX_RNG_LEN (32)
 #define KNX_SALT_LEN (32)
 
-struct precalc_data{
-  int loaded; /// 0: not loaded, 1: loaded
-  mbedtls_mpi w0;
-  mbedtls_ecp_point L;
-  uint8_t salt[32];
-  uint8_t rand[32];
-  uint32_t iter;
-}precalc_data;
-
 int
 oc_spake_init(void)
 {
@@ -100,56 +92,6 @@ void
 oc_spake_set_password(char *new_pass)
 {
   strncpy(password, new_pass, sizeof(password));
-}
-
-int 
-oc_spake_set_parameters(uint8_t rand[32], uint8_t salt[32], int it, mbedtls_mpi w0, mbedtls_ecp_point L)
-{
-  int ret;
-  precalc_data.loaded = 0;
-  memcpy(precalc_data.rand, rand, 32);
-  memcpy(precalc_data.salt, salt, 32);
-  precalc_data.iter = it;
-  MBEDTLS_MPI_CHK(mbedtls_mpi_copy(&precalc_data.w0, &w0));
-  MBEDTLS_MPI_CHK(mbedtls_mpi_copy(&precalc_data.L.X, &L.X));
-  MBEDTLS_MPI_CHK(mbedtls_mpi_copy(&precalc_data.L.Y, &L.Y));
-  MBEDTLS_MPI_CHK(mbedtls_mpi_copy(&precalc_data.L.Z, &L.Z));
-  precalc_data.loaded = 1;
-  return 0;
-cleanup:
-  mbedtls_mpi_free(&precalc_data.w0);
-  mbedtls_ecp_point_free(&precalc_data.L);
-  return ret;
-}
-
-int
-oc_spake_get_parameters(uint8_t *rand, uint8_t *salt, int *it, mbedtls_mpi *w0, mbedtls_ecp_point *L)
-{
-  if (precalc_data.loaded != 1)
-    return 1;
-  int ret;
-  if (rand) {
-    memcpy(rand, precalc_data.rand, 32);
-  }
-  if (salt) {
-    memcpy(salt, precalc_data.salt, 32);
-  }
-  if (it) {
-    *it = precalc_data.iter;
-  }
-  if (w0) {
-    MBEDTLS_MPI_CHK(mbedtls_mpi_copy(w0, &precalc_data.w0));
-  }
-  if (L) {
-    MBEDTLS_MPI_CHK(mbedtls_mpi_copy(&L->X, &precalc_data.L.X));
-    MBEDTLS_MPI_CHK(mbedtls_mpi_copy(&L->Y, &precalc_data.L.Y));
-    MBEDTLS_MPI_CHK(mbedtls_mpi_copy(&L->Z, &precalc_data.L.Z));
-  }
-  return 0;
-cleanup:
-  mbedtls_mpi_free(w0);
-  mbedtls_ecp_point_free(L);
-  return ret;
 }
 
 // encode value as zero-padded little endian bytes

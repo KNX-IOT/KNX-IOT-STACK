@@ -21,6 +21,7 @@ if(UNIX OR WIN32)
         ${PORT_DIR}/random.c
         ${PORT_DIR}/storage.c
         ${PORT_DIR}/tcpadapter.c
+        ${PORT_DIR}/oc_spake.c
     )
 
     if(OC_LOG_TO_FILE_ENABLED)
