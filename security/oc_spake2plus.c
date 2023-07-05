@@ -25,7 +25,6 @@
 #include <assert.h>
 
 #include "oc_spake2plus.h"
-#include "port/oc_spake.h"
 #include "port/oc_random.h"
 #include "port/oc_log.h"
 
@@ -61,6 +60,15 @@ static char password[33];
 #define KNX_RNG_LEN (32)
 #define KNX_SALT_LEN (32)
 
+struct spake_parameters{
+  int loaded; /// 0: not loaded, 1: loaded
+  mbedtls_mpi w0;
+  mbedtls_ecp_point L;
+  uint8_t salt[32];
+  uint8_t rand[32];
+  uint32_t iter;
+}g_spake_parameters;
+
 int
 oc_spake_init(void)
 {
@@ -92,6 +100,56 @@ void
 oc_spake_set_password(char *new_pass)
 {
   strncpy(password, new_pass, sizeof(password));
+}
+
+int 
+oc_spake_set_parameters(uint8_t rand[32], uint8_t salt[32], int it, mbedtls_mpi w0, mbedtls_ecp_point L)
+{
+  int ret;
+  g_spake_parameters.loaded = 0;
+  memcpy(g_spake_parameters.rand, rand, 32);
+  memcpy(g_spake_parameters.salt, salt, 32);
+  g_spake_parameters.iter = it;
+  MBEDTLS_MPI_CHK(mbedtls_mpi_copy(&g_spake_parameters.w0, &w0));
+  MBEDTLS_MPI_CHK(mbedtls_mpi_copy(&g_spake_parameters.L.X, &L.X));
+  MBEDTLS_MPI_CHK(mbedtls_mpi_copy(&g_spake_parameters.L.Y, &L.Y));
+  MBEDTLS_MPI_CHK(mbedtls_mpi_copy(&g_spake_parameters.L.Z, &L.Z));
+  g_spake_parameters.loaded = 1;
+  return 0;
+cleanup:
+  mbedtls_mpi_free(&g_spake_parameters.w0);
+  mbedtls_ecp_point_free(&g_spake_parameters.L);
+  return ret;
+}
+
+int
+oc_spake_get_parameters(uint8_t *rand, uint8_t *salt, int *it, mbedtls_mpi *w0, mbedtls_ecp_point *L)
+{
+  if (g_spake_parameters.loaded != 1)
+    return 1;
+  int ret;
+  if (rand) {
+    memcpy(rand, g_spake_parameters.rand, 32);
+  }
+  if (salt) {
+    memcpy(salt, g_spake_parameters.salt, 32);
+  }
+  if (it) {
+    *it = g_spake_parameters.iter;
+  }
+  if (w0) {
+    MBEDTLS_MPI_CHK(mbedtls_mpi_copy(w0, &g_spake_parameters.w0));
+  }
+  if (L) {
+    MBEDTLS_MPI_CHK(mbedtls_mpi_copy(&L->X, &g_spake_parameters.L.X));
+    MBEDTLS_MPI_CHK(mbedtls_mpi_copy(&L->Y, &g_spake_parameters.L.Y));
+    MBEDTLS_MPI_CHK(mbedtls_mpi_copy(&L->Z, &g_spake_parameters.L.Z));
+  }
+  return 0;
+cleanup:
+  mbedtls_mpi_free(w0);
+  mbedtls_ecp_point_free(L);
+  return ret;
 }
 
 // encode value as zero-padded little endian bytes

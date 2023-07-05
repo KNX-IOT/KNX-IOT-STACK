@@ -78,6 +78,32 @@ int oc_spake_test_vector();
 int oc_spake_parameter_exchange(uint8_t rnd[32], uint8_t salt[32], int *it);
 
 /**
+ * @brief Get the pre-loaded fields needed for PASE and SPAKE
+ * 
+ * @ref oc_spake_set_parameters() must be used to set these values
+ * 
+ * @param rnd Random number
+ * @param salt The salt to be used fo PBKDF2
+ * @param it The number of iterations to be used for PBKDF2
+ * @param w0 omega0 value for SPAKE2+
+ * @param L L ecp point for SPAKE2+
+ * @return int 0 on success
+*/
+int oc_spake_get_parameters(uint8_t rnd[32], uint8_t salt[32], int *it, mbedtls_mpi *w0, mbedtls_ecp_point *L);
+
+/**
+ * @brief Set the pre-loaded fields needed for PASE and SPAKE
+ * 
+ * @param rnd Random number
+ * @param salt The salt to be used fo PBKDF2
+ * @param it The number of iterations to be used for PBKDF2
+ * @param w0 omega0 value for SPAKE2+
+ * @param L L ecp point for SPAKE2+
+ * @return int 0 on success
+*/
+int oc_spake_set_parameters(uint8_t rnd[32], uint8_t salt[32], int it, mbedtls_mpi w0, mbedtls_ecp_point L);
+
+/**
  * @brief Get the currently set Spake2+ password
  *
  * @return Null-terminated string holding the password
