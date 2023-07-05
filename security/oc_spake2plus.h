@@ -79,9 +79,9 @@ int oc_spake_parameter_exchange(uint8_t rnd[32], uint8_t salt[32], int *it);
 
 /**
  * @brief Get the pre-loaded fields needed for PASE and SPAKE
- * 
+ *
  * @ref oc_spake_set_parameters() must be used to set these values
- * 
+ *
  * @param rnd Random number
  * @param salt The salt to be used fo PBKDF2
  * @param it The number of iterations to be used for PBKDF2
@@ -89,7 +89,7 @@ int oc_spake_parameter_exchange(uint8_t rnd[32], uint8_t salt[32], int *it);
  * @param L L ecp point for SPAKE2+
  * @return int 0 on success
  */
-int oc_spake_get_parameters(uint8_t rnd[32], uint8_t salt[32], int *it, 
+int oc_spake_get_parameters(uint8_t rnd[32], uint8_t salt[32], int *it,
                             mbedtls_mpi *w0, mbedtls_ecp_point *L);
 
 /**
@@ -102,7 +102,7 @@ int oc_spake_get_parameters(uint8_t rnd[32], uint8_t salt[32], int *it,
  * @param L L ecp point for SPAKE2+
  * @return int 0 on success
  */
-int oc_spake_set_parameters(uint8_t rnd[32], uint8_t salt[32], int it, 
+int oc_spake_set_parameters(uint8_t rnd[32], uint8_t salt[32], int it,
                             mbedtls_mpi w0, mbedtls_ecp_point L);
 
 /**

@@ -1405,7 +1405,7 @@ oc_core_knx_spake_separate_post_handler(void *req_p)
     mbedtls_mpi_init(&spake_data.y);
     mbedtls_ecp_point_init(&spake_data.pub_y);
 
-    ret = oc_spake_get_w0_L(password, sizeof(g_pase.salt), g_pase.salt, 
+    ret = oc_spake_get_w0_L(password, sizeof(g_pase.salt), g_pase.salt,
                             g_pase.it, &spake_data.w0, &spake_data.L);
     if (ret != 0) {
       OC_ERR("oc_spake_get_w0_L failed with code %d", ret);
