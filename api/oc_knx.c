@@ -1395,18 +1395,22 @@ oc_core_knx_spake_separate_post_handler(void *req_p)
 
     const char *password = oc_spake_get_password();
     int ret;
-    mbedtls_mpi_free(&spake_data.y);
-    mbedtls_ecp_point_free(&spake_data.pub_y);
     mbedtls_mpi_free(&spake_data.w0);
     mbedtls_ecp_point_free(&spake_data.L);
+    mbedtls_mpi_free(&spake_data.y);
+    mbedtls_ecp_point_free(&spake_data.pub_y);
 
-    mbedtls_mpi_init(&spake_data.y);
-    mbedtls_ecp_point_init(&spake_data.pub_y);
     mbedtls_mpi_init(&spake_data.w0);
     mbedtls_ecp_point_init(&spake_data.L);
+    mbedtls_mpi_init(&spake_data.y);
+    mbedtls_ecp_point_init(&spake_data.pub_y);
 
-    oc_spake_get_w0_L(password, sizeof(g_pase.salt), g_pase.salt, g_pase.it, 
+    ret = oc_spake_get_w0_L(password, sizeof(g_pase.salt), g_pase.salt, g_pase.it, 
                       &spake_data.w0, &spake_data.L);
+    if (ret != 0) {
+      OC_ERR("oc_spake_get_w0_L failed with code %d", ret);
+      goto error;
+    }
 
     ret = oc_spake_gen_keypair(&spake_data.y, &spake_data.pub_y);
     if (ret != 0) {
