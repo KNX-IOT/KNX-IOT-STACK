@@ -102,7 +102,7 @@ oc_spake_set_password(char *new_pass)
   strncpy(password, new_pass, sizeof(password));
 }
 
-int 
+int
 oc_spake_set_parameters(uint8_t rand[32], uint8_t salt[32], int it, mbedtls_mpi w0, mbedtls_ecp_point L)
 {
   int ret;
@@ -150,6 +150,33 @@ cleanup:
   mbedtls_mpi_free(w0);
   mbedtls_ecp_point_free(L);
   return ret;
+}
+
+int
+oc_spake_get_pbkdf_params(uint8_t rnd[32], uint8_t salt[32], int *it)
+{
+  if (oc_spake_get_parameters(rnd, salt, it, NULL, NULL) == 0)
+    return 0;
+
+  // generate random numbers for rnd, salt & it (# of iterations)
+  return oc_spake_parameter_exchange(rnd, salt, it);
+}
+
+int
+oc_spake_get_w0_L(const char *pw, size_t len_salt, const uint8_t *salt,
+                       int it, mbedtls_mpi *w0, mbedtls_ecp_point *L)
+{
+  int ret;
+  if (oc_spake_get_parameters(NULL, NULL, NULL, w0, L) == 0)
+    return 0;
+
+  ret = oc_spake_calc_w0_L(password, len_salt, salt, it, w0, L);
+
+  if (ret != 0) {
+    OC_ERR("oc_spake_calc_w0_L failed with code %d", ret);
+  }
+  return ret;
+
 }
 
 // encode value as zero-padded little endian bytes

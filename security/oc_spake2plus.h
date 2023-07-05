@@ -104,6 +104,34 @@ int oc_spake_get_parameters(uint8_t rnd[32], uint8_t salt[32], int *it, mbedtls_
 int oc_spake_set_parameters(uint8_t rnd[32], uint8_t salt[32], int it, mbedtls_mpi w0, mbedtls_ecp_point L);
 
 /**
+ * @brief get the PBKDF params for OC SPAKE
+ * 
+ * @param rnd Random number
+ * @param salt the salt to be used for PBKDF2
+ * @param it The number of iterations to be used for PBKDF2
+ * @return int 0 on success, mbedtls error code on failure
+*/
+int oc_spake_get_pbkdf_params(uint8_t rnd[32], uint8_t salt[32], int *it);
+
+/**
+ * @brief get the W0 and L values for SPAKE exchange
+ *
+ * Uses PBKDF2 with SHA256 & HMAC to calculate a 40-byte output which is
+ * converted into w0 and w1.
+ *
+ * @param pw the null-terminated password
+ * @param salt 32-byte array containing the salt
+ * @param it the number of iterations to perform within PBKDF2
+ * @param w0 the w0 parameter as defined by SPAKE2+. Must be initialized by the
+ * caller.
+ * @param L the L parameter as defined by SPAKE2+. Must be initialized by the
+ * caller.
+ * @return int 0 on success, mbedtls error code on failure
+*/
+int oc_spake_get_w0_L(const char *pw, size_t len_salt, const uint8_t *salt,
+                       int it, mbedtls_mpi *w0, mbedtls_ecp_point *L);
+
+/**
  * @brief Get the currently set Spake2+ password
  *
  * @return Null-terminated string holding the password
