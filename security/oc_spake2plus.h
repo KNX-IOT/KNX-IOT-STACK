@@ -88,29 +88,31 @@ int oc_spake_parameter_exchange(uint8_t rnd[32], uint8_t salt[32], int *it);
  * @param w0 omega0 value for SPAKE2+
  * @param L L ecp point for SPAKE2+
  * @return int 0 on success
-*/
-int oc_spake_get_parameters(uint8_t rnd[32], uint8_t salt[32], int *it, mbedtls_mpi *w0, mbedtls_ecp_point *L);
+ */
+int oc_spake_get_parameters(uint8_t rnd[32], uint8_t salt[32], int *it, 
+                            mbedtls_mpi *w0, mbedtls_ecp_point *L);
 
 /**
  * @brief Set the pre-loaded fields needed for PASE and SPAKE
- * 
+ *
  * @param rnd Random number
  * @param salt The salt to be used fo PBKDF2
  * @param it The number of iterations to be used for PBKDF2
  * @param w0 omega0 value for SPAKE2+
  * @param L L ecp point for SPAKE2+
  * @return int 0 on success
-*/
-int oc_spake_set_parameters(uint8_t rnd[32], uint8_t salt[32], int it, mbedtls_mpi w0, mbedtls_ecp_point L);
+ */
+int oc_spake_set_parameters(uint8_t rnd[32], uint8_t salt[32], int it, 
+                            mbedtls_mpi w0, mbedtls_ecp_point L);
 
 /**
  * @brief get the PBKDF params for OC SPAKE
- * 
+ *
  * @param rnd Random number
  * @param salt the salt to be used for PBKDF2
  * @param it The number of iterations to be used for PBKDF2
  * @return int 0 on success, mbedtls error code on failure
-*/
+ */
 int oc_spake_get_pbkdf_params(uint8_t rnd[32], uint8_t salt[32], int *it);
 
 /**
@@ -127,9 +129,9 @@ int oc_spake_get_pbkdf_params(uint8_t rnd[32], uint8_t salt[32], int *it);
  * @param L the L parameter as defined by SPAKE2+. Must be initialized by the
  * caller.
  * @return int 0 on success, mbedtls error code on failure
-*/
+ */
 int oc_spake_get_w0_L(const char *pw, size_t len_salt, const uint8_t *salt,
-                       int it, mbedtls_mpi *w0, mbedtls_ecp_point *L);
+                      int it, mbedtls_mpi *w0, mbedtls_ecp_point *L);
 
 /**
  * @brief Get the currently set Spake2+ password
