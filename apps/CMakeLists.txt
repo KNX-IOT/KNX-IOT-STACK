@@ -18,6 +18,7 @@ add_executable(testclient_all
     ${PROJECT_SOURCE_DIR}/testclient_all.c
 )
 target_link_libraries(testclient_all
+        mbedtls
         kisClientServer
     )
 file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/testclient_all_creds)
@@ -26,6 +27,7 @@ add_executable(simpleclient_spake_all
     ${PROJECT_SOURCE_DIR}/simpleclient_spake_all.c
 )
 target_link_libraries(simpleclient_spake_all
+        mbedtls
         kisClientServer
     )
 file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/simpleclient_spake_all_creds)
