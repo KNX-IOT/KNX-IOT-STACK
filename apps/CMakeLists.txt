@@ -35,6 +35,7 @@ add_executable(lssb_minimal_all
     ${PROJECT_SOURCE_DIR}/lssb_minimal_all.c
 )
 target_link_libraries(lssb_minimal_all
+        mbedtls
         kisClientServer
     )
 file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/lssb_minimal_all_creds)
@@ -52,6 +53,7 @@ add_executable(lsab_minimal_all
     ${PROJECT_SOURCE_DIR}/lsab_minimal_all.c
 )
 target_link_libraries(lsab_minimal_all
+        mbedtls
         kisClientServer
     )
 file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/lsab_minimal_all_creds)

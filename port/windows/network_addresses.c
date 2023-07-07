@@ -27,6 +27,7 @@
 #include <oc_log.h>
 #include <ws2tcpip.h>
 // clang-format on
+#undef interface
 
 /**
  * Structure to manage interface list.

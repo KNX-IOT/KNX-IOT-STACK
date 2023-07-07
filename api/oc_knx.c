@@ -1362,8 +1362,8 @@ oc_core_knx_spake_separate_post_handler(void *req_p)
 
   if (valid_request == SPAKE_RND) {
 #ifdef OC_SPAKE
-    // generate random numbers for rnd, salt & it (# of iterations)
-    oc_spake_parameter_exchange(g_pase.rnd, g_pase.salt, &g_pase.it);
+    // get random numbers for rnd, salt & it (# of iterations)
+    oc_spake_get_pbkdf_params(g_pase.rnd, g_pase.salt, &g_pase.it);
     OC_DBG_SPAKE("Rnd:");
     OC_LOGbytes_SPAKE(g_pase.rnd, sizeof(g_pase.rnd));
     OC_DBG_SPAKE("Salt:");
@@ -1405,11 +1405,10 @@ oc_core_knx_spake_separate_post_handler(void *req_p)
     mbedtls_mpi_init(&spake_data.y);
     mbedtls_ecp_point_init(&spake_data.pub_y);
 
-    ret = oc_spake_calc_w0_L(password, sizeof(g_pase.salt), g_pase.salt,
-                             g_pase.it, &spake_data.w0, &spake_data.L);
-
+    ret = oc_spake_get_w0_L(password, sizeof(g_pase.salt), g_pase.salt,
+                            g_pase.it, &spake_data.w0, &spake_data.L);
     if (ret != 0) {
-      OC_ERR("oc_spake_calc_w0_L failed with code %d", ret);
+      OC_ERR("oc_spake_get_w0_L failed with code %d", ret);
       goto error;
     }
 
@@ -1434,7 +1433,6 @@ oc_core_knx_spake_separate_post_handler(void *req_p)
       goto error;
     }
 
-    uint8_t Ka_Ke[32];
     if (ret = oc_spake_calc_transcript_responder(&spake_data, g_pase.pa, &pB)) {
       OC_ERR("oc_spake_calc_transcript_responder failed with code %d", ret);
       mbedtls_ecp_point_free(&pB);

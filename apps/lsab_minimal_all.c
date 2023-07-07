@@ -68,6 +68,7 @@
  *   can be included without changing this code
  */
 
+#define _WIN32_WINNT 0x8000
 #include "oc_api.h"
 #include "oc_core_res.h"
 #include "api/oc_knx_fp.h"
