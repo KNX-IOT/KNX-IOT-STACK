@@ -154,6 +154,9 @@ oc_free_rep(oc_rep_t *rep)
   case OC_REP_OBJECT_ARRAY:
     oc_free_rep(rep->value.object_array);
     break;
+  case OC_REP_TUPLE_ARRAY:
+    oc_free_rep(rep->value.tuple_array);
+    break;
   default:
     break;
   }
