@@ -1372,7 +1372,8 @@ typedef enum {
   OC_REP_BOOL_ARRAY = 0x0B,
   OC_REP_BYTE_STRING_ARRAY = 0x0C,
   OC_REP_STRING_ARRAY = 0x0D,
-  OC_REP_OBJECT_ARRAY = 0x0E
+  OC_REP_OBJECT_ARRAY = 0x0E,
+  OC_REP_TUPLE_ARRAY = 0x0F
 } oc_rep_value_type_t;
 
 /**
@@ -1397,6 +1398,7 @@ typedef struct oc_rep_s
     oc_array_t array;
     struct oc_rep_s *object;
     struct oc_rep_s *object_array;
+    struct oc_rep_s *tuple_array;
   } value; ///< the value as union
 } oc_rep_t;
 
