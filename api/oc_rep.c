@@ -357,21 +357,50 @@ oc_parse_rep_value_array(CborValue *value, oc_rep_t **rep, CborError *err)
   oc_rep_value_type_t type = OC_REP_NIL;
   *err |= cbor_value_enter_container(value, &array);
   len = 0;
-  cbor_value_get_array_length(value, &len);
+  // we need to iterate through anyway to check the types
+  // cbor_value_get_array_length(value, &len);
   if (len == 0) {
     CborValue t = array;
     while (!cbor_value_at_end(&t)) {
       len++;
       if (*err != CborNoError)
-        return;
+        return;    
       switch(t.type){
-        case CborIntegerType: type |= OC_REP_INT; break;
-        case CborDoubleType: type |= OC_REP_DOUBLE; break;
-        case CborBooleanType: type |= OC_REP_BOOL; break;
-        case CborByteStringType: type |= OC_REP_BYTE_STRING; break;
-        case CborTextStringType: type |= OC_REP_STRING; break;
-        case CborMapType: type |= OC_REP_OBJECT; break;
-        case CborArrayType: type |= OC_REP_ARRAY; break;
+        case CborIntegerType: 
+          if(type == OC_REP_NIL || type == OC_REP_INT) 
+            type = OC_REP_INT; 
+          else 
+            type = OC_REP_TUPLE_ARRAY; break;
+        case CborDoubleType: 
+          if(type == OC_REP_NIL || type == OC_REP_DOUBLE) 
+            type = OC_REP_DOUBLE; 
+          else 
+            type = OC_REP_TUPLE_ARRAY; break;
+        case CborBooleanType: 
+          if(type == OC_REP_NIL || type == OC_REP_BOOL) 
+            type = OC_REP_BOOL; 
+          else 
+            type = OC_REP_TUPLE_ARRAY; break;
+        case CborByteStringType: 
+          if(type == OC_REP_NIL || type == OC_REP_BYTE_STRING) 
+            type = OC_REP_BYTE_STRING; 
+          else 
+            type = OC_REP_TUPLE_ARRAY; break;
+        case CborTextStringType: 
+          if(type == OC_REP_NIL || type == OC_REP_STRING) 
+            type = OC_REP_STRING; 
+          else 
+            type = OC_REP_TUPLE_ARRAY; break;
+        case CborMapType: 
+          if(type == OC_REP_NIL || type == OC_REP_OBJECT) 
+            type = OC_REP_OBJECT; 
+          else 
+            type = OC_REP_TUPLE_ARRAY; break;
+        case CborArrayType: 
+          if(type == OC_REP_NIL || type == OC_REP_ARRAY) 
+            type = OC_REP_ARRAY; 
+          else 
+            type = OC_REP_TUPLE_ARRAY; break;
       }
       *err = cbor_value_advance(&t);
     }
@@ -464,14 +493,13 @@ oc_parse_rep_value_array(CborValue *value, oc_rep_t **rep, CborError *err)
           }
           prev = &cur->value.object_array;
         }
-        (*prev)->next = 0;
-        (*prev)->iname = k;
 
         if (array.type != CborMapType) {
           *err |= CborErrorIllegalType;
           return;
         }
         oc_parse_rep_value_object(&array, prev, err);
+        (*prev)->next = 0;
         prev = &(*prev)->next;
       } break;
       case OC_REP_ARRAY:{} //fallthrough to default case
@@ -485,10 +513,10 @@ oc_parse_rep_value_array(CborValue *value, oc_rep_t **rep, CborError *err)
           }
           prev = &cur->value.tuple_array;
         }
-        (*prev)->next = 0;
-        (*prev)->iname = k;
 
         oc_parse_single_entity(&array, prev, err);
+        (*prev)->next = 0;
+        (*prev)->iname = k;
         prev = &(*prev)->next;
 
       } break;
