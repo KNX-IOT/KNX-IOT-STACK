@@ -516,6 +516,7 @@ oc_parse_rep_value_array(CborValue *value, oc_rep_t **rep, CborError *err)
 
         oc_parse_single_entity(&array, prev, err);
         (*prev)->next = 0;
+        (*prev)->iname = k;
         prev = &(*prev)->next;
 
       } break;
@@ -922,6 +923,19 @@ bool
 oc_rep_i_get_object_array(oc_rep_t *rep, int key, oc_rep_t **value)
 {
   return oc_rep_i_get_value(rep, OC_REP_OBJECT_ARRAY, key, (void **)value,
+                            NULL);
+}
+
+bool
+oc_rep_get_mixed_array(oc_rep_t *rep, const char *key, oc_rep_t **value)
+{
+  return oc_rep_get_value(rep, OC_REP_MIXED_ARRAY, key, (void **)value, NULL);
+}
+
+bool
+oc_rep_i_get_mixed_array(oc_rep_t *rep, int key, oc_rep_t **value)
+{
+  return oc_rep_i_get_value(rep, OC_REP_MIXED_ARRAY, key, (void **)value,
                             NULL);
 }
 

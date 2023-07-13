@@ -2068,6 +2068,70 @@ bool oc_rep_get_object_array(oc_rep_t *rep, const char *key, oc_rep_t **value);
 bool oc_rep_i_get_object_array(oc_rep_t *rep, int key, oc_rep_t **value);
 
 /**
+ * Read a mixed array value from an `oc_rep_t`
+ *
+ * Calling the returned value an array is a misnomer. The value actually
+ * returned is a linked list of oc_rep_t objects. The linked list must be walked
+ * to see each item in the mixed array.
+ *
+ * Example:
+ * ~~~{.c}
+ *     oc_rep_t * space_2001_out = NULL;
+ *     if ( true == oc_rep_get_mixed_array(rep, "space_2001", &space_2001_out))
+ * {
+ *         while (space_2001_out != NULL) {
+ *             char * str_out = NULL;
+ *             size_t str_out_size = 0;
+ *             if (space_2001_out->type == OC_REP_STRING)
+ *                 printf("Character Name: %s", oc_string(space_2001_out->value.string));
+ *             space_2001_out = space_2001_out->next;
+ *         }
+ *     }
+ * ~~~
+ *
+ * @param rep oc_rep_t to read mixed array value from
+ * @param key the key name for the mixed array value
+ * @param value the return mixed array value
+ *
+ * @return true if key and value are found and returned.
+ *
+ * @see oc_rep_set_{type}
+ */
+bool oc_rep_get_mixed_array(oc_rep_t *rep, const char *key, oc_rep_t **value);
+
+/**
+ * Read a mixed array value from an `oc_rep_t` with integer key
+ *
+ * Calling the returned value an array is a misnomer. The value actually
+ * returned is a linked list of oc_rep_t objects. The linked list must be walked
+ * to see each item in the mixed array.
+ *
+ * Example:
+ * ~~~{.c}
+ *     oc_rep_t * space_2001_out = NULL;
+ *     if ( true == oc_rep_i_get_mixed_array(rep, 5, &space_2001_out))
+ * {
+ *         while (space_2001_out != NULL) {
+ *             char * str_out = NULL;
+ *             size_t str_out_size = 0;
+ *             if (space_2001_out->type == OC_REP_STRING)
+ *                 printf("Character Name: %s", oc_string(space_2001_out->value.string));
+ *             space_2001_out = space_2001_out->next;
+ *         }
+ *     }
+ * ~~~
+ *
+ * @param rep oc_rep_t to read mixed array value from
+ * @param key the key name for the mixed array value
+ * @param value the return mixed array value
+ *
+ * @return true if key and value are found and returned.
+ *
+ * @see oc_rep_set_{type}
+ */
+bool oc_rep_i_get_mixed_array(oc_rep_t *rep, int key, oc_rep_t **value);
+
+/**
  * Tab character(s) used for oc_rep_to_json function when doing pretty_print
  */
 #define OC_PRETTY_PRINT_TAB_CHARACTER "  "
