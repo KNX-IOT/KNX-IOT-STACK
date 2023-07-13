@@ -2372,7 +2372,7 @@ TEST(TestRep, OCRepIAddGetIntArray)
 
 TEST(TestRep, OCRepGetSetMixedArray)
 {
-  
+
   /*buffer for oc_rep_t */
   uint8_t buf[1024];
   oc_rep_new(&buf[0], 1024);
@@ -2408,7 +2408,7 @@ TEST(TestRep, OCRepGetSetMixedArray)
   oc_rep_t *rep = NULL;
   oc_parse_rep(payload, payload_len, &rep);
   ASSERT_TRUE(rep != NULL);
-  for (oc_rep_t *r = rep; r != NULL; r = r->next){
+  for (oc_rep_t *r = rep; r != NULL; r = r->next) {
     printf("r->type: %d\n", r->type);
   }
 
@@ -2421,15 +2421,15 @@ TEST(TestRep, OCRepGetSetMixedArray)
     EXPECT_EQ(mixed_out->type, OC_REP_BOOL);
     EXPECT_EQ(mixed_out->value.boolean, true);
     mixed_out = mixed_out->next;
-    
+
     EXPECT_NE(mixed_out, NULL);
     EXPECT_EQ(mixed_out->type, OC_REP_INT);
     EXPECT_EQ(mixed_out->value.integer, 7);
     mixed_out = mixed_out->next;
-    
+
     EXPECT_NE(mixed_out, NULL);
     EXPECT_EQ(mixed_out->type, OC_REP_DOUBLE);
-    EXPECT_LT(std::abs(mixed_out->value.double_p-3.141596), 0.0001);
+    EXPECT_LT(std::abs(mixed_out->value.double_p - 3.141596), 0.0001);
     mixed_out = mixed_out->next;
   }
 
@@ -2445,14 +2445,13 @@ TEST(TestRep, OCRepGetSetMixedArray)
   json_size = oc_rep_to_json(rep, NULL, 0, true);
   json = (char *)malloc(json_size + 1);
   oc_rep_to_json(rep, json, json_size + 1, true);
-  const char pretty_json[] =
-    "{\n"
-    "  \"9\" : [\n"
-    "      true,\n"
-    "      7,\n"
-    "      3.141596\n"
-    "    ]\n"
-    "}\n";
+  const char pretty_json[] = "{\n"
+                             "  \"9\" : [\n"
+                             "      true,\n"
+                             "      7,\n"
+                             "      3.141596\n"
+                             "    ]\n"
+                             "}\n";
   EXPECT_STREQ(pretty_json, json);
   free(json);
   json = NULL;

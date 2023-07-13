@@ -2083,8 +2083,9 @@ bool oc_rep_i_get_object_array(oc_rep_t *rep, int key, oc_rep_t **value);
  *             char * str_out = NULL;
  *             size_t str_out_size = 0;
  *             if (space_2001_out->type == OC_REP_STRING)
- *                 printf("Character Name: %s", oc_string(space_2001_out->value.string));
- *             space_2001_out = space_2001_out->next;
+ *                 printf("Character Name: %s",
+ * oc_string(space_2001_out->value.string)); space_2001_out =
+ * space_2001_out->next;
  *         }
  *     }
  * ~~~
@@ -2115,8 +2116,9 @@ bool oc_rep_get_mixed_array(oc_rep_t *rep, const char *key, oc_rep_t **value);
  *             char * str_out = NULL;
  *             size_t str_out_size = 0;
  *             if (space_2001_out->type == OC_REP_STRING)
- *                 printf("Character Name: %s", oc_string(space_2001_out->value.string));
- *             space_2001_out = space_2001_out->next;
+ *                 printf("Character Name: %s",
+ * oc_string(space_2001_out->value.string)); space_2001_out =
+ * space_2001_out->next;
  *         }
  *     }
  * ~~~

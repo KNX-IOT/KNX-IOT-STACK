@@ -165,10 +165,10 @@ oc_free_rep(oc_rep_t *rep)
   _free_rep(rep);
 }
 
-static void
-oc_parse_rep_value_object(CborValue *value, oc_rep_t **rep, CborError *err);
-static void
-oc_parse_rep_value_array(CborValue *value, oc_rep_t **rep, CborError *err);
+static void oc_parse_rep_value_object(CborValue *value, oc_rep_t **rep,
+                                      CborError *err);
+static void oc_parse_rep_value_array(CborValue *value, oc_rep_t **rep,
+                                     CborError *err);
 
 /*
   An Object is a collection of key-value pairs.
@@ -189,7 +189,7 @@ oc_parse_single_entity(CborValue *value, oc_rep_t **rep, CborError *err)
   size_t len;
   if (*rep == NULL)
     *rep = _alloc_rep();
-  
+
   if (*rep == NULL) {
     *err = CborErrorOutOfMemory;
     return;
@@ -364,43 +364,50 @@ oc_parse_rep_value_array(CborValue *value, oc_rep_t **rep, CborError *err)
     while (!cbor_value_at_end(&t)) {
       len++;
       if (*err != CborNoError)
-        return;    
-      switch(t.type){
-        case CborIntegerType: 
-          if(type == OC_REP_NIL || type == OC_REP_INT) 
-            type = OC_REP_INT; 
-          else 
-            type = OC_REP_MIXED_ARRAY; break;
-        case CborDoubleType: 
-          if(type == OC_REP_NIL || type == OC_REP_DOUBLE) 
-            type = OC_REP_DOUBLE; 
-          else 
-            type = OC_REP_MIXED_ARRAY; break;
-        case CborBooleanType: 
-          if(type == OC_REP_NIL || type == OC_REP_BOOL) 
-            type = OC_REP_BOOL; 
-          else 
-            type = OC_REP_MIXED_ARRAY; break;
-        case CborByteStringType: 
-          if(type == OC_REP_NIL || type == OC_REP_BYTE_STRING) 
-            type = OC_REP_BYTE_STRING; 
-          else 
-            type = OC_REP_MIXED_ARRAY; break;
-        case CborTextStringType: 
-          if(type == OC_REP_NIL || type == OC_REP_STRING) 
-            type = OC_REP_STRING; 
-          else 
-            type = OC_REP_MIXED_ARRAY; break;
-        case CborMapType: 
-          if(type == OC_REP_NIL || type == OC_REP_OBJECT) 
-            type = OC_REP_OBJECT; 
-          else 
-            type = OC_REP_MIXED_ARRAY; break;
-        case CborArrayType: 
-          if(type == OC_REP_NIL || type == OC_REP_ARRAY) 
-            type = OC_REP_ARRAY; 
-          else 
-            type = OC_REP_MIXED_ARRAY; break;
+        return;
+      switch (t.type) {
+      case CborIntegerType:
+        if (type == OC_REP_NIL || type == OC_REP_INT)
+          type = OC_REP_INT;
+        else
+          type = OC_REP_MIXED_ARRAY;
+        break;
+      case CborDoubleType:
+        if (type == OC_REP_NIL || type == OC_REP_DOUBLE)
+          type = OC_REP_DOUBLE;
+        else
+          type = OC_REP_MIXED_ARRAY;
+        break;
+      case CborBooleanType:
+        if (type == OC_REP_NIL || type == OC_REP_BOOL)
+          type = OC_REP_BOOL;
+        else
+          type = OC_REP_MIXED_ARRAY;
+        break;
+      case CborByteStringType:
+        if (type == OC_REP_NIL || type == OC_REP_BYTE_STRING)
+          type = OC_REP_BYTE_STRING;
+        else
+          type = OC_REP_MIXED_ARRAY;
+        break;
+      case CborTextStringType:
+        if (type == OC_REP_NIL || type == OC_REP_STRING)
+          type = OC_REP_STRING;
+        else
+          type = OC_REP_MIXED_ARRAY;
+        break;
+      case CborMapType:
+        if (type == OC_REP_NIL || type == OC_REP_OBJECT)
+          type = OC_REP_OBJECT;
+        else
+          type = OC_REP_MIXED_ARRAY;
+        break;
+      case CborArrayType:
+        if (type == OC_REP_NIL || type == OC_REP_ARRAY)
+          type = OC_REP_ARRAY;
+        else
+          type = OC_REP_MIXED_ARRAY;
+        break;
       }
       *err = cbor_value_advance(&t);
     }
@@ -408,124 +415,122 @@ oc_parse_rep_value_array(CborValue *value, oc_rep_t **rep, CborError *err)
   k = 0;
   while (!cbor_value_at_end(&array)) {
     switch (type) {
-      case OC_REP_INT: {
-        if (k == 0) {
-          oc_new_int_array(&cur->value.array, len);
-          cur->type = OC_REP_INT_ARRAY;
-        }
-        if (array.type != CborIntegerType) {
-          *err |= CborErrorIllegalType;
+    case OC_REP_INT: {
+      if (k == 0) {
+        oc_new_int_array(&cur->value.array, len);
+        cur->type = OC_REP_INT_ARRAY;
+      }
+      if (array.type != CborIntegerType) {
+        *err |= CborErrorIllegalType;
+        return;
+      }
+      *err |= cbor_value_get_int64(&array, oc_int_array(cur->value.array) + k);
+    } break;
+    case OC_REP_BOOL: {
+      if (k == 0) {
+        oc_new_bool_array(&cur->value.array, len);
+        cur->type = OC_REP_BOOL_ARRAY;
+      }
+      if (array.type != CborBooleanType) {
+        *err |= CborErrorIllegalType;
+        return;
+      }
+      *err |=
+        cbor_value_get_boolean(&array, oc_bool_array(cur->value.array) + k);
+    } break;
+    case OC_REP_DOUBLE: {
+      if (k == 0) {
+        oc_new_double_array(&cur->value.array, len);
+        cur->type = OC_REP_DOUBLE_ARRAY;
+      }
+      if (array.type != CborDoubleType) {
+        *err |= CborErrorIllegalType;
+        return;
+      }
+      *err |=
+        cbor_value_get_double(&array, oc_double_array(cur->value.array) + k);
+    } break;
+    case OC_REP_BYTE_STRING: {
+      if (k == 0) {
+        oc_new_byte_string_array(&cur->value.array, len);
+        cur->type = OC_REP_BYTE_STRING_ARRAY;
+      }
+      if (array.type != CborByteStringType) {
+        *err |= CborErrorIllegalType;
+        return;
+      }
+      *err |= cbor_value_calculate_string_length(&array, &len);
+      if (len >= STRING_ARRAY_ITEM_MAX_LEN) {
+        len = STRING_ARRAY_ITEM_MAX_LEN - 1;
+      }
+      oc_byte_string_array_get_item_size(cur->value.array, k) = len;
+      *err |= cbor_value_copy_byte_string(
+        &array, (uint8_t *)oc_byte_string_array_get_item(cur->value.array, k),
+        &len, NULL);
+    } break;
+    case OC_REP_STRING: {
+      if (k == 0) {
+        oc_new_string_array(&cur->value.array, len);
+        cur->type = OC_REP_STRING_ARRAY;
+      }
+      if (array.type != CborTextStringType) {
+        *err |= CborErrorIllegalType;
+        return;
+      }
+      *err |= cbor_value_calculate_string_length(&array, &len);
+      len++;
+      if (len >= STRING_ARRAY_ITEM_MAX_LEN) {
+        len = STRING_ARRAY_ITEM_MAX_LEN - 1;
+      }
+      uint8_t *size = (uint8_t *)oc_string_array_get_item(cur->value.array, k);
+      *err |= cbor_value_copy_text_string(
+        &array, (uint8_t *)oc_string_array_get_item(cur->value.array, k), &len,
+        NULL);
+      oc_string_array_get_item(cur->value.array, k)[len] = 0;
+    } break;
+    case OC_REP_OBJECT: {
+      if (k == 0) {
+        cur->type = OC_REP_OBJECT_ARRAY;
+        cur->value.object_array = _alloc_rep();
+        if (cur->value.object_array == NULL) {
+          *err = CborErrorOutOfMemory;
           return;
         }
-        *err |=
-          cbor_value_get_int64(&array, oc_int_array(cur->value.array) + k);
-      } break;
-      case OC_REP_BOOL:{
-        if (k == 0) {
-          oc_new_bool_array(&cur->value.array, len);
-          cur->type = OC_REP_BOOL_ARRAY;
-        }
-        if (array.type != CborBooleanType) {
-          *err |= CborErrorIllegalType;
-          return;
-        }
-        *err |=
-          cbor_value_get_boolean(&array, oc_bool_array(cur->value.array) + k);
-      } break;
-      case OC_REP_DOUBLE:{
-        if (k == 0) {
-          oc_new_double_array(&cur->value.array, len);
-          cur->type = OC_REP_DOUBLE_ARRAY;
-        }
-        if (array.type != CborDoubleType) {
-          *err |= CborErrorIllegalType;
-          return;
-        }
-        *err |=
-          cbor_value_get_double(&array, oc_double_array(cur->value.array) + k);
-      } break;
-      case OC_REP_BYTE_STRING:{
-        if (k == 0) {
-          oc_new_byte_string_array(&cur->value.array, len);
-          cur->type = OC_REP_BYTE_STRING_ARRAY;
-        }
-        if (array.type != CborByteStringType) {
-          *err |= CborErrorIllegalType;
-          return;
-        }
-        *err |= cbor_value_calculate_string_length(&array, &len);
-        if (len >= STRING_ARRAY_ITEM_MAX_LEN) {
-          len = STRING_ARRAY_ITEM_MAX_LEN - 1;
-        }
-        oc_byte_string_array_get_item_size(cur->value.array, k) = len;
-        *err |= cbor_value_copy_byte_string(
-          &array, (uint8_t *)oc_byte_string_array_get_item(cur->value.array, k),
-          &len, NULL);
-      } break;
-      case OC_REP_STRING:{
-        if (k == 0) {
-          oc_new_string_array(&cur->value.array, len);
-          cur->type = OC_REP_STRING_ARRAY;
-        }
-        if (array.type != CborTextStringType) {
-          *err |= CborErrorIllegalType;
-          return;
-        }
-        *err |= cbor_value_calculate_string_length(&array, &len);
-        len++;
-        if (len >= STRING_ARRAY_ITEM_MAX_LEN) {
-          len = STRING_ARRAY_ITEM_MAX_LEN - 1;
-        }
-        uint8_t *size =
-          (uint8_t *)oc_string_array_get_item(cur->value.array, k);
-        *err |= cbor_value_copy_text_string(
-          &array, (uint8_t *)oc_string_array_get_item(cur->value.array, k),
-          &len, NULL);
-          oc_string_array_get_item(cur->value.array, k)[len] = 0;
-      } break;
-      case OC_REP_OBJECT:{
-        if (k == 0) {
-          cur->type = OC_REP_OBJECT_ARRAY;
-          cur->value.object_array = _alloc_rep();
-          if (cur->value.object_array == NULL) {
-            *err = CborErrorOutOfMemory;
-            return;
-          }
-          prev = &cur->value.object_array;
-        }
+        prev = &cur->value.object_array;
+      }
 
-        if (array.type != CborMapType) {
-          *err |= CborErrorIllegalType;
+      if (array.type != CborMapType) {
+        *err |= CborErrorIllegalType;
+        return;
+      }
+      oc_parse_rep_value_object(&array, prev, err);
+      (*prev)->next = 0;
+      prev = &(*prev)->next;
+    } break;
+    case OC_REP_ARRAY: {
+    }          // fallthrough to default case
+    default: { // TUPLE ARRAY
+      if (k == 0) {
+        cur->type = OC_REP_MIXED_ARRAY;
+        cur->value.mixed_array = _alloc_rep();
+        if (cur->value.mixed_array == NULL) {
+          *err = CborErrorOutOfMemory;
           return;
         }
-        oc_parse_rep_value_object(&array, prev, err);
-        (*prev)->next = 0;
-        prev = &(*prev)->next;
-      } break;
-      case OC_REP_ARRAY:{} //fallthrough to default case
-      default: {// TUPLE ARRAY
-        if (k == 0) {
-          cur->type = OC_REP_MIXED_ARRAY;
-          cur->value.mixed_array = _alloc_rep();
-          if (cur->value.mixed_array == NULL) {
-            *err = CborErrorOutOfMemory;
-            return;
-          }
-          prev = &cur->value.mixed_array;
-        }
+        prev = &cur->value.mixed_array;
+      }
 
-        oc_parse_single_entity(&array, prev, err);
-        (*prev)->next = 0;
-        prev = &(*prev)->next;
+      oc_parse_single_entity(&array, prev, err);
+      (*prev)->next = 0;
+      prev = &(*prev)->next;
 
-      } break;
+    } break;
     }
     *err = cbor_value_advance(&array);
     if (*err != CborNoError)
       return;
     k++;
   }
-
 }
 
 int
@@ -539,17 +544,17 @@ oc_parse_rep(const uint8_t *in_payload, int payload_size, oc_rep_t **out_rep)
   if (cbor_value_is_valid(&root_value)) {
     oc_parse_single_entity(&root_value, out_rep, &err);
   }
-  //since this has now changed so it returns an object/array at top level
-  //rather than the first element (linked list style)
-  //we need to correct this
-  if (*out_rep){
+  // since this has now changed so it returns an object/array at top level
+  // rather than the first element (linked list style)
+  // we need to correct this
+  if (*out_rep) {
     if ((*out_rep)->type == OC_REP_OBJECT)
       *out_rep = (*out_rep)->value.object;
     else if ((*out_rep)->type == OC_REP_OBJECT_ARRAY)
       *out_rep = (*out_rep)->value.object_array;
     else if ((*out_rep)->type == OC_REP_MIXED_ARRAY)
       *out_rep = (*out_rep)->value.mixed_array;
-  } 
+  }
   return err;
 }
 
@@ -940,8 +945,7 @@ oc_rep_get_mixed_array(oc_rep_t *rep, const char *key, oc_rep_t **value)
 bool
 oc_rep_i_get_mixed_array(oc_rep_t *rep, int key, oc_rep_t **value)
 {
-  return oc_rep_i_get_value(rep, OC_REP_MIXED_ARRAY, key, (void **)value,
-                            NULL);
+  return oc_rep_i_get_value(rep, OC_REP_MIXED_ARRAY, key, (void **)value, NULL);
 }
 
 /*
@@ -1063,8 +1067,8 @@ oc_rep_to_json_format(oc_rep_t *rep, char *buf, size_t buf_size, int tab_depth,
           : snprintf(buf, buf_size, "\"%s\":", oc_string_checked(rep->name));
       OC_JSON_UPDATE_BUFFER_AND_TOTAL;
     } else {
-      //this should only print if iname >= 0
-      //if its <0 then it't NOT an object member
+      // this should only print if iname >= 0
+      // if its <0 then it't NOT an object member
       if ((rep->iname >= 0)) {
         num_char_printed = (pretty_print)
                              ? snprintf(buf, buf_size, "\"%d\" : ", rep->iname)
@@ -1354,12 +1358,12 @@ oc_rep_to_json_format(oc_rep_t *rep, char *buf, size_t buf_size, int tab_depth,
         OC_JSON_UPDATE_BUFFER_AND_TOTAL;
       }
       num_char_printed = oc_rep_to_json_format(rep_array, buf, buf_size,
-                                                tab_depth + 2, pretty_print);
+                                               tab_depth + 2, pretty_print);
       OC_JSON_UPDATE_BUFFER_AND_TOTAL;
-        if (pretty_print) {
-          num_char_printed = oc_rep_to_json_tab(buf, buf_size, tab_depth + 2);
-          OC_JSON_UPDATE_BUFFER_AND_TOTAL;
-        }
+      if (pretty_print) {
+        num_char_printed = oc_rep_to_json_tab(buf, buf_size, tab_depth + 2);
+        OC_JSON_UPDATE_BUFFER_AND_TOTAL;
+      }
 
       num_char_printed = snprintf(buf, buf_size, "]");
       OC_JSON_UPDATE_BUFFER_AND_TOTAL;
