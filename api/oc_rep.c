@@ -516,7 +516,6 @@ oc_parse_rep_value_array(CborValue *value, oc_rep_t **rep, CborError *err)
 
         oc_parse_single_entity(&array, prev, err);
         (*prev)->next = 0;
-        (*prev)->iname = k;
         prev = &(*prev)->next;
 
       } break;
