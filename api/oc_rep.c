@@ -1063,13 +1063,16 @@ oc_rep_to_json_format(oc_rep_t *rep, char *buf, size_t buf_size, int tab_depth,
           : snprintf(buf, buf_size, "\"%s\":", oc_string_checked(rep->name));
       OC_JSON_UPDATE_BUFFER_AND_TOTAL;
     } else {
-      if ((rep->iname >= 0) || (tab_depth > 0)) {
+      //this should only print if iname >= 0
+      //if its <0 then it't NOT an object member
+      if ((rep->iname >= 0)) {
         num_char_printed = (pretty_print)
                              ? snprintf(buf, buf_size, "\"%d\" : ", rep->iname)
                              : snprintf(buf, buf_size, "\"%d\":", rep->iname);
         OC_JSON_UPDATE_BUFFER_AND_TOTAL;
       }
     }
+    printf("rep->type: %d\n", rep->type);
     switch (rep->type) {
     case OC_REP_NIL: {
       num_char_printed = snprintf(buf, buf_size, "null");
@@ -1339,6 +1342,26 @@ oc_rep_to_json_format(oc_rep_t *rep, char *buf, size_t buf_size, int tab_depth,
         OC_JSON_UPDATE_BUFFER_AND_TOTAL;
       }
       num_char_printed = snprintf(buf, buf_size, "}]");
+      OC_JSON_UPDATE_BUFFER_AND_TOTAL;
+      break;
+    }
+    case OC_REP_MIXED_ARRAY: {
+      num_char_printed = snprintf(buf, buf_size, "[");
+      OC_JSON_UPDATE_BUFFER_AND_TOTAL;
+      oc_rep_t *rep_array = rep->value.mixed_array;
+      if (pretty_print && rep_array) {
+        num_char_printed = snprintf(buf, buf_size, "\n");
+        OC_JSON_UPDATE_BUFFER_AND_TOTAL;
+      }
+      num_char_printed = oc_rep_to_json_format(rep_array, buf, buf_size,
+                                                tab_depth + 2, pretty_print);
+      OC_JSON_UPDATE_BUFFER_AND_TOTAL;
+        if (pretty_print) {
+          num_char_printed = oc_rep_to_json_tab(buf, buf_size, tab_depth + 2);
+          OC_JSON_UPDATE_BUFFER_AND_TOTAL;
+        }
+
+      num_char_printed = snprintf(buf, buf_size, "]");
       OC_JSON_UPDATE_BUFFER_AND_TOTAL;
       break;
     }

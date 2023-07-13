@@ -2370,6 +2370,96 @@ TEST(TestRep, OCRepIAddGetIntArray)
   oc_free_rep(rep);
 }
 
+TEST(TestRep, OCRepGetSetMixedArray)
+{
+  
+  /*buffer for oc_rep_t */
+  uint8_t buf[1024];
+  oc_rep_new(&buf[0], 1024);
+
+  /* add values to root object */
+  oc_rep_begin_root_object();
+  EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
+
+  oc_rep_i_set_key(oc_rep_object(root), 9);
+  oc_rep_begin_array(oc_rep_object(root), i2);
+  // oc_rep_set_key(oc_rep_object(root), "fibonacci");
+  // oc_rep_i_set_key(oc_rep_object(i2), 2);
+  EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
+  {
+    oc_rep_add_boolean(i2, true);
+    EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
+    oc_rep_add_int(i2, 7);
+    EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
+    oc_rep_add_double(i2, 3.1415962);
+    EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
+  }
+  oc_rep_close_array(root, i2);
+  EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
+  oc_rep_end_root_object();
+  EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
+
+  /* convert CborEncoder to oc_rep_t */
+  const uint8_t *payload = oc_rep_get_encoder_buf();
+  int payload_len = oc_rep_get_encoded_payload_size();
+  EXPECT_NE(payload_len, -1);
+  struct oc_memb rep_objects = { sizeof(oc_rep_t), 0, 0, 0, 0 };
+  oc_rep_set_pool(&rep_objects);
+  oc_rep_t *rep = NULL;
+  oc_parse_rep(payload, payload_len, &rep);
+  ASSERT_TRUE(rep != NULL);
+  for (oc_rep_t *r = rep; r != NULL; r = r->next){
+    printf("r->type: %d\n", r->type);
+  }
+
+  /* read the values from the oc_rep_t */
+  oc_rep_t *mixed_out = 0;
+  EXPECT_TRUE(oc_rep_i_get_mixed_array(rep, 9, &mixed_out));
+
+  {
+    EXPECT_NE(mixed_out, NULL);
+    EXPECT_EQ(mixed_out->type, OC_REP_BOOL);
+    EXPECT_EQ(mixed_out->value.boolean, true);
+    mixed_out = mixed_out->next;
+    
+    EXPECT_NE(mixed_out, NULL);
+    EXPECT_EQ(mixed_out->type, OC_REP_INT);
+    EXPECT_EQ(mixed_out->value.integer, 7);
+    mixed_out = mixed_out->next;
+    
+    EXPECT_NE(mixed_out, NULL);
+    EXPECT_EQ(mixed_out->type, OC_REP_DOUBLE);
+    EXPECT_LT(std::abs(mixed_out->value.double_p-3.141596), 0.0001);
+    mixed_out = mixed_out->next;
+  }
+
+  char *json;
+  size_t json_size;
+  json_size = oc_rep_to_json(rep, NULL, 0, false);
+  json = (char *)malloc(json_size + 1);
+  oc_rep_to_json(rep, json, json_size + 1, false);
+  const char non_pretty_json[] = "{\"9\":[true,7,3.141596]}";
+  EXPECT_STREQ(non_pretty_json, json);
+  free(json);
+  json = NULL;
+  json_size = oc_rep_to_json(rep, NULL, 0, true);
+  json = (char *)malloc(json_size + 1);
+  oc_rep_to_json(rep, json, json_size + 1, true);
+  const char pretty_json[] =
+    "{\n"
+    "  \"9\" : [\n"
+    "      true,\n"
+    "      7,\n"
+    "      3.141596\n"
+    "    ]\n"
+    "}\n";
+  EXPECT_STREQ(pretty_json, json);
+  free(json);
+  json = NULL;
+
+  oc_free_rep(rep);
+}
+
 // oc_rep_i_set_bool_array
 // oc_rep_i_set_string_array
 // oc_rep_i_set_double_array
