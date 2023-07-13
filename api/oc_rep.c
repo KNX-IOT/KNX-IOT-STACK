@@ -516,7 +516,6 @@ oc_parse_rep_value_array(CborValue *value, oc_rep_t **rep, CborError *err)
 
         oc_parse_single_entity(&array, prev, err);
         (*prev)->next = 0;
-        (*prev)->iname = k;
         prev = &(*prev)->next;
 
       } break;
@@ -608,6 +607,9 @@ oc_rep_get_value(oc_rep_t *rep, oc_rep_value_type_t type, const char *key,
       case OC_REP_OBJECT_ARRAY:
         *value = rep_value->value.object_array;
         break;
+      case OC_REP_MIXED_ARRAY:
+        *value = rep_value->value.mixed_array;
+        break;
       default:
         return false;
       }
@@ -670,6 +672,9 @@ oc_rep_i_get_value(oc_rep_t *rep, oc_rep_value_type_t type, int key,
         break;
       case OC_REP_OBJECT_ARRAY:
         *value = rep_value->value.object_array;
+        break;
+      case OC_REP_MIXED_ARRAY:
+        *value = rep_value->value.mixed_array;
         break;
       default:
         return false;
