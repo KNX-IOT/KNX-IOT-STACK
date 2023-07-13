@@ -154,8 +154,8 @@ oc_free_rep(oc_rep_t *rep)
   case OC_REP_OBJECT_ARRAY:
     oc_free_rep(rep->value.object_array);
     break;
-  case OC_REP_TUPLE_ARRAY:
-    oc_free_rep(rep->value.tuple_array);
+  case OC_REP_MIXED_ARRAY:
+    oc_free_rep(rep->value.mixed_array);
     break;
   default:
     break;
@@ -370,37 +370,37 @@ oc_parse_rep_value_array(CborValue *value, oc_rep_t **rep, CborError *err)
           if(type == OC_REP_NIL || type == OC_REP_INT) 
             type = OC_REP_INT; 
           else 
-            type = OC_REP_TUPLE_ARRAY; break;
+            type = OC_REP_MIXED_ARRAY; break;
         case CborDoubleType: 
           if(type == OC_REP_NIL || type == OC_REP_DOUBLE) 
             type = OC_REP_DOUBLE; 
           else 
-            type = OC_REP_TUPLE_ARRAY; break;
+            type = OC_REP_MIXED_ARRAY; break;
         case CborBooleanType: 
           if(type == OC_REP_NIL || type == OC_REP_BOOL) 
             type = OC_REP_BOOL; 
           else 
-            type = OC_REP_TUPLE_ARRAY; break;
+            type = OC_REP_MIXED_ARRAY; break;
         case CborByteStringType: 
           if(type == OC_REP_NIL || type == OC_REP_BYTE_STRING) 
             type = OC_REP_BYTE_STRING; 
           else 
-            type = OC_REP_TUPLE_ARRAY; break;
+            type = OC_REP_MIXED_ARRAY; break;
         case CborTextStringType: 
           if(type == OC_REP_NIL || type == OC_REP_STRING) 
             type = OC_REP_STRING; 
           else 
-            type = OC_REP_TUPLE_ARRAY; break;
+            type = OC_REP_MIXED_ARRAY; break;
         case CborMapType: 
           if(type == OC_REP_NIL || type == OC_REP_OBJECT) 
             type = OC_REP_OBJECT; 
           else 
-            type = OC_REP_TUPLE_ARRAY; break;
+            type = OC_REP_MIXED_ARRAY; break;
         case CborArrayType: 
           if(type == OC_REP_NIL || type == OC_REP_ARRAY) 
             type = OC_REP_ARRAY; 
           else 
-            type = OC_REP_TUPLE_ARRAY; break;
+            type = OC_REP_MIXED_ARRAY; break;
       }
       *err = cbor_value_advance(&t);
     }
@@ -505,13 +505,13 @@ oc_parse_rep_value_array(CborValue *value, oc_rep_t **rep, CborError *err)
       case OC_REP_ARRAY:{} //fallthrough to default case
       default: {// TUPLE ARRAY
         if (k == 0) {
-          cur->type = OC_REP_TUPLE_ARRAY;
-          cur->value.tuple_array = _alloc_rep();
-          if (cur->value.tuple_array == NULL) {
+          cur->type = OC_REP_MIXED_ARRAY;
+          cur->value.mixed_array = _alloc_rep();
+          if (cur->value.mixed_array == NULL) {
             *err = CborErrorOutOfMemory;
             return;
           }
-          prev = &cur->value.tuple_array;
+          prev = &cur->value.mixed_array;
         }
 
         oc_parse_single_entity(&array, prev, err);
@@ -540,6 +540,17 @@ oc_parse_rep(const uint8_t *in_payload, int payload_size, oc_rep_t **out_rep)
   if (cbor_value_is_valid(&root_value)) {
     oc_parse_single_entity(&root_value, out_rep, &err);
   }
+  //since this has now changed so it returns an object/array at top level
+  //rather than the first element (linked list style)
+  //we need to correct this
+  if (*out_rep){
+    if ((*out_rep)->type == OC_REP_OBJECT)
+      *out_rep = (*out_rep)->value.object;
+    else if ((*out_rep)->type == OC_REP_OBJECT_ARRAY)
+      *out_rep = (*out_rep)->value.object_array;
+    else if ((*out_rep)->type == OC_REP_MIXED_ARRAY)
+      *out_rep = (*out_rep)->value.mixed_array;
+  } 
   return err;
 }
 
