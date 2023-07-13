@@ -1274,32 +1274,28 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
   }
 #endif /* OC_SPAKE */
 
-  oc_rep_t *obj, *rep = request->request_payload;
+  oc_rep_t *rep = request->request_payload;
 
   int valid_request = 0;
   // check input
   // note: no check if there are multiple byte strings in the request payload
-
-  for(; rep != NULL; rep = rep->next) {
-    if (rep->type != OC_REP_OBJECT)
-      continue;
-    for (obj = rep->value.object; obj != NULL; obj = obj->next) {
-      switch (obj->type) {
-      case OC_REP_BYTE_STRING: {
-        if (obj->iname == SPAKE_PA_SHARE_P) {
-          valid_request = SPAKE_PA_SHARE_P;
-        }
-        if (obj->iname == SPAKE_CA_CONFIRM_P) {
-          valid_request = SPAKE_CA_CONFIRM_P;
-        }
-        if (obj->iname == SPAKE_RND) {
-          valid_request = SPAKE_RND;
-        }
-      } break;
-      default:
-        break;
+  while (rep != NULL) {
+    switch (rep->type) {
+    case OC_REP_BYTE_STRING: {
+      if (rep->iname == SPAKE_PA_SHARE_P) {
+        valid_request = SPAKE_PA_SHARE_P;
       }
+      if (rep->iname == SPAKE_CA_CONFIRM_P) {
+        valid_request = SPAKE_CA_CONFIRM_P;
+      }
+      if (rep->iname == SPAKE_RND) {
+        valid_request = SPAKE_RND;
+      }
+    } break;
+    default:
+      break;
     }
+    rep = rep->next;
   }
 
   if (valid_request == 0) {
@@ -1315,40 +1311,34 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     oc_new_byte_string(&g_pase.id, "rkey", strlen("rkey"));
   }
   // handle input
-  
-  for(; rep != NULL; rep = rep->next) {
-    if (rep->type != OC_REP_OBJECT)
-      continue;
-    for (obj = rep->value.object; obj != NULL; obj = obj->next) {
-      switch (obj->type) {
-      case OC_REP_BYTE_STRING: {
-        if (obj->iname == SPAKE_CA_CONFIRM_P) {
-          memcpy(g_pase.ca, oc_cast(obj->value.string, uint8_t),
-                sizeof(g_pase.ca));
-        }
-        if (obj->iname == SPAKE_PA_SHARE_P) {
-          memcpy(g_pase.pa, oc_cast(obj->value.string, uint8_t),
-                sizeof(g_pase.pa));
-          printf("copied g_pase.pa: ");
-          OC_LOGbytes_internal("SKY", g_pase.pa, 65);
-        }
-        if (obj->iname == SPAKE_RND) {
-          memcpy(g_pase.rnd, oc_cast(obj->value.string, uint8_t),
-                sizeof(g_pase.rnd));
-        }
-        if (obj->iname == SPAKE_ID) {
-          // if the ID is present, overwrite the default
-          oc_free_string(&g_pase.id);
-          oc_new_byte_string(&g_pase.id, oc_string(obj->value.string),
-                            oc_string_len(obj->value.string));
-          PRINT("==> CLIENT RECEIVES %d\n",
-                (int)oc_byte_string_len(obj->value.string));
-        }
-      } break;
-      default:
-        break;
+  while (rep != NULL) {
+    switch (rep->type) {
+    case OC_REP_BYTE_STRING: {
+      if (rep->iname == SPAKE_CA_CONFIRM_P) {
+        memcpy(g_pase.ca, oc_cast(rep->value.string, uint8_t),
+               sizeof(g_pase.ca));
       }
+      if (rep->iname == SPAKE_PA_SHARE_P) {
+        memcpy(g_pase.pa, oc_cast(rep->value.string, uint8_t),
+               sizeof(g_pase.pa));
+      }
+      if (rep->iname == SPAKE_RND) {
+        memcpy(g_pase.rnd, oc_cast(rep->value.string, uint8_t),
+               sizeof(g_pase.rnd));
+      }
+      if (rep->iname == SPAKE_ID) {
+        // if the ID is present, overwrite the default
+        oc_free_string(&g_pase.id);
+        oc_new_byte_string(&g_pase.id, oc_string(rep->value.string),
+                           oc_string_len(rep->value.string));
+        PRINT("==> CLIENT RECEIVES %d\n",
+              (int)oc_byte_string_len(rep->value.string));
+      }
+    } break;
+    default:
+      break;
     }
+    rep = rep->next;
   }
 
   PRINT("oc_core_knx_spake_post_handler valid_request: %d\n", valid_request);
@@ -1442,8 +1432,7 @@ oc_core_knx_spake_separate_post_handler(void *req_p)
       mbedtls_ecp_point_free(&pB);
       goto error;
     }
-    printf("g_pase.pa: ");
-    OC_LOGbytes_internal("SKY", g_pase.pa, 65);
+
     if (ret = oc_spake_calc_transcript_responder(&spake_data, g_pase.pa, &pB)) {
       OC_ERR("oc_spake_calc_transcript_responder failed with code %d", ret);
       mbedtls_ecp_point_free(&pB);

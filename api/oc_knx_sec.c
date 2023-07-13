@@ -494,7 +494,7 @@ oc_core_auth_at_post_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
-  oc_rep_t *arr, *rep = NULL;
+  oc_rep_t *rep = NULL;
   oc_rep_t *object = NULL;
   oc_rep_t *subobject = NULL;
   oc_rep_t *oscobject = NULL;
@@ -516,219 +516,210 @@ oc_core_auth_at_post_handler(oc_request_t *request,
 
   rep = request->request_payload;
   while (rep != NULL) {
-    if (rep->type != OC_REP_OBJECT_ARRAY) {
-      rep = rep->next;
-      continue;
-    }
-    arr = rep->value.object_array;
-    while (arr != NULL) {
-
-      if (arr->type == OC_REP_OBJECT) {
-        object = arr->value.object;
-        oc_string_t *at = find_access_token_from_payload(object);
-        if (at == NULL) {
-          PRINT("  access token not found!\n");
+    if (rep->type == OC_REP_OBJECT) {
+      object = rep->value.object;
+      oc_string_t *at = find_access_token_from_payload(object);
+      if (at == NULL) {
+        PRINT("  access token not found!\n");
+        oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+        return;
+      }
+      index = find_index_from_at(at);
+      if (index != -1) {
+        PRINT("   entry already exist! \n");
+        return_status = OC_STATUS_CHANGED;
+      } else {
+        index = find_empty_at_index();
+        return_status = OC_STATUS_CREATED;
+        if (index == -1) {
+          PRINT("  no space left!\n");
           oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
           return;
         }
-        index = find_index_from_at(at);
-        if (index != -1) {
-          PRINT("   entry already exist! \n");
-          return_status = OC_STATUS_CHANGED;
-        } else {
-          index = find_empty_at_index();
-          return_status = OC_STATUS_CREATED;
-          if (index == -1) {
-            PRINT("  no space left!\n");
-            oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
-            return;
+      }
+      PRINT("  storage index: %d (%s)\n", index, oc_string_checked(*at));
+      oc_free_string(&(g_at_entries[index].id));
+      oc_new_string(&g_at_entries[index].id, oc_string(*at),
+                    oc_string_len(*at));
+
+      object = rep->value.object;
+      while (object != NULL) {
+        if (object->type == OC_REP_STRING_ARRAY) {
+          // scope
+          if (object->iname == 9) {
+            // scope: array of interfaces as string
+            oc_string_array_t str_array;
+            size_t str_array_size = 0;
+            oc_interface_mask_t interfaces = OC_IF_NONE;
+            oc_rep_i_get_string_array(object, 9, &str_array, &str_array_size);
+            for (size_t i = 0; i < str_array_size; i++) {
+              char *if_str = oc_string_array_get_item(str_array, i);
+              oc_interface_mask_t if_mask =
+                oc_ri_get_interface_mask(if_str, strlen(if_str));
+              interfaces = interfaces + if_mask;
+            }
+            g_at_entries[index].scope = interfaces;
+            scope_updated = true;
+          }
+        } else if (object->type == OC_REP_INT_ARRAY) {
+          // scope
+          if (object->iname == 9) {
+            g_at_entries[index].scope = OC_IF_NONE;
+            int64_t *array = 0;
+            size_t array_size = 0;
+            // not making a deep copy
+            oc_rep_i_get_int_array(object, 9, &array, &array_size);
+            if (array_size > 0) {
+              // make the deep copy
+              if ((g_at_entries[index].ga_len > 0) &&
+                  (&g_at_entries[index].ga != NULL)) {
+                int64_t *cur_arr = g_at_entries[index].ga;
+                if (cur_arr) {
+                  free(cur_arr);
+                }
+                g_at_entries[index].ga = NULL;
+              }
+              g_at_entries[index].ga_len = (int)array_size;
+              // always set the group address scope, if there is 1 or more ga
+              // entries
+              g_at_entries[index].scope = OC_IF_G;
+              int64_t *new_array =
+                (int64_t *)malloc(array_size * sizeof(uint64_t));
+              if (new_array) {
+                for (size_t i = 0; i < array_size; i++) {
+                  new_array[i] = array[i];
+                }
+                g_at_entries[index].ga = new_array;
+              } else {
+                OC_ERR("out of memory");
+              }
+            }
+          }
+        } else if (object->type == OC_REP_STRING) {
+          if (object->iname == 2) {
+            // sub
+            oc_free_string(&(g_at_entries[index].sub));
+            oc_new_string(&g_at_entries[index].sub,
+                          oc_string(object->value.string),
+                          oc_string_len(object->value.string));
+          }
+          if (object->iname == 3) {
+            // aud
+            oc_free_string(&(g_at_entries[index].aud));
+            oc_new_string(&g_at_entries[index].aud,
+                          oc_string(object->value.string),
+                          oc_string_len(object->value.string));
+          }
+        } else if (object->type == OC_REP_INT) {
+          if (object->iname == 38) {
+            // profile (38 ("coap_dtls" ==1 or "coap_oscore" == 2))
+            PRINT("   profile %d\n", (int)object->value.integer);
+            g_at_entries[index].profile = (int)object->value.integer;
+          }
+        } else if (object->type == OC_REP_OBJECT) {
+          // level of cnf or sub.
+          subobject = object->value.object;
+          int subobject_nr = object->iname;
+          PRINT("  subobject_nr %d\n", subobject_nr);
+          while (subobject) {
+            if (subobject->type == OC_REP_STRING) {
+              if (subobject->iname == 3 && subobject_nr == 8) {
+                // cnf::kid (8::3)
+                oc_free_string(&(g_at_entries[index].kid));
+                oc_new_string(&g_at_entries[index].kid,
+                              oc_string(subobject->value.string),
+                              oc_string_len(subobject->value.string));
+              }
+            } else if (subobject->type == OC_REP_OBJECT) {
+              oscobject = subobject->value.object;
+              int oscobject_nr = subobject->iname;
+              while (oscobject) {
+                if (oscobject->type == OC_REP_INT) {
+                  if (oscobject->iname == 4 && subobject_nr == 8 &&
+                      oscobject_nr == 4) {
+                    // not storing it: we only support value 10 at the moment.
+                    // g_at_entries[index].osc_alg = (int)object->value.integer;
+                    if ((int)object->value.integer != 10) {
+                      OC_ERR("algorithm is not 10 : %d",
+                             (int)object->value.integer);
+                      return_status = OC_STATUS_BAD_REQUEST;
+                    }
+                    other_updated = true;
+                  }
+                }
+                if (oscobject->type == OC_REP_BYTE_STRING) {
+                  if (oscobject->iname == 2 && subobject_nr == 8 &&
+                      oscobject_nr == 4) {
+                    // cnf::osc::ms
+                    oc_free_string(&(g_at_entries[index].osc_ms));
+                    oc_new_byte_string(&g_at_entries[index].osc_ms,
+                                       oc_string(oscobject->value.string),
+                                       oc_string_len(oscobject->value.string));
+                    other_updated = true;
+                  }
+                  if (oscobject->iname == 6 && subobject_nr == 8 &&
+                      oscobject_nr == 4) {
+                    // cnf::osc::contextId
+                    oc_free_string(&(g_at_entries[index].osc_contextid));
+                    oc_new_byte_string(&g_at_entries[index].osc_contextid,
+                                       oc_string(oscobject->value.string),
+                                       oc_string_len(oscobject->value.string));
+                    other_updated = true;
+                  }
+                  if (oscobject->iname == 7 && subobject_nr == 8 &&
+                      oscobject_nr == 4) {
+                    // cnf::osc::rid
+                    oc_free_string(&(g_at_entries[index].osc_rid));
+                    oc_new_byte_string(&g_at_entries[index].osc_rid,
+                                       oc_string(oscobject->value.string),
+                                       oc_string_len(oscobject->value.string));
+                    other_updated = true;
+                  }
+                  if (oscobject->iname == 0 && subobject_nr == 8 &&
+                      oscobject_nr == 4) {
+                    // cnf::osc::id
+                    oc_free_string(&(g_at_entries[index].osc_id));
+                    oc_new_byte_string(&g_at_entries[index].osc_id,
+                                       oc_string(oscobject->value.string),
+                                       oc_string_len(oscobject->value.string));
+                    other_updated = true;
+                  }
+                } /* type */
+
+                oscobject = oscobject->next;
+              }
+            }
+            subobject = subobject->next;
           }
         }
-        PRINT("  storage index: %d (%s)\n", index, oc_string_checked(*at));
-        oc_free_string(&(g_at_entries[index].id));
-        oc_new_string(&g_at_entries[index].id, oc_string(*at),
-                      oc_string_len(*at));
-
-        object = arr->value.object;
-        while (object != NULL) {
-          if (object->type == OC_REP_STRING_ARRAY) {
-            // scope
-            if (object->iname == 9) {
-              // scope: array of interfaces as string
-              oc_string_array_t str_array;
-              size_t str_array_size = 0;
-              oc_interface_mask_t interfaces = OC_IF_NONE;
-              oc_rep_i_get_string_array(object, 9, &str_array, &str_array_size);
-              for (size_t i = 0; i < str_array_size; i++) {
-                char *if_str = oc_string_array_get_item(str_array, i);
-                oc_interface_mask_t if_mask =
-                  oc_ri_get_interface_mask(if_str, strlen(if_str));
-                interfaces = interfaces + if_mask;
-              }
-              g_at_entries[index].scope = interfaces;
-              scope_updated = true;
-            }
-          } else if (object->type == OC_REP_INT_ARRAY) {
-            // scope
-            if (object->iname == 9) {
-              g_at_entries[index].scope = OC_IF_NONE;
-              int64_t *array = 0;
-              size_t array_size = 0;
-              // not making a deep copy
-              oc_rep_i_get_int_array(object, 9, &array, &array_size);
-              if (array_size > 0) {
-                // make the deep copy
-                if ((g_at_entries[index].ga_len > 0) &&
-                    (&g_at_entries[index].ga != NULL)) {
-                  int64_t *cur_arr = g_at_entries[index].ga;
-                  if (cur_arr) {
-                    free(cur_arr);
-                  }
-                  g_at_entries[index].ga = NULL;
-                }
-                g_at_entries[index].ga_len = (int)array_size;
-                // always set the group address scope, if there is 1 or more ga
-                // entries
-                g_at_entries[index].scope = OC_IF_G;
-                int64_t *new_array =
-                  (int64_t *)malloc(array_size * sizeof(uint64_t));
-                if (new_array) {
-                  for (size_t i = 0; i < array_size; i++) {
-                    new_array[i] = array[i];
-                  }
-                  g_at_entries[index].ga = new_array;
-                } else {
-                  OC_ERR("out of memory");
-                }
-              }
-            }
-          } else if (object->type == OC_REP_STRING) {
-            if (object->iname == 2) {
-              // sub
-              oc_free_string(&(g_at_entries[index].sub));
-              oc_new_string(&g_at_entries[index].sub,
-                            oc_string(object->value.string),
-                            oc_string_len(object->value.string));
-            }
-            if (object->iname == 3) {
-              // aud
-              oc_free_string(&(g_at_entries[index].aud));
-              oc_new_string(&g_at_entries[index].aud,
-                            oc_string(object->value.string),
-                            oc_string_len(object->value.string));
-            }
-          } else if (object->type == OC_REP_INT) {
-            if (object->iname == 38) {
-              // profile (38 ("coap_dtls" ==1 or "coap_oscore" == 2))
-              PRINT("   profile %d\n", (int)object->value.integer);
-              g_at_entries[index].profile = (int)object->value.integer;
-            }
-          } else if (object->type == OC_REP_OBJECT) {
-            // level of cnf or sub.
-            subobject = object->value.object;
-            int subobject_nr = object->iname;
-            PRINT("  subobject_nr %d\n", subobject_nr);
-            while (subobject) {
-              if (subobject->type == OC_REP_STRING) {
-                if (subobject->iname == 3 && subobject_nr == 8) {
-                  // cnf::kid (8::3)
-                  oc_free_string(&(g_at_entries[index].kid));
-                  oc_new_string(&g_at_entries[index].kid,
-                                oc_string(subobject->value.string),
-                                oc_string_len(subobject->value.string));
-                }
-              } else if (subobject->type == OC_REP_OBJECT) {
-                oscobject = subobject->value.object;
-                int oscobject_nr = subobject->iname;
-                while (oscobject) {
-                  if (oscobject->type == OC_REP_INT) {
-                    if (oscobject->iname == 4 && subobject_nr == 8 &&
-                        oscobject_nr == 4) {
-                      // not storing it: we only support value 10 at the moment.
-                      // g_at_entries[index].osc_alg = (int)object->value.integer;
-                      if ((int)object->value.integer != 10) {
-                        OC_ERR("algorithm is not 10 : %d",
-                              (int)object->value.integer);
-                        return_status = OC_STATUS_BAD_REQUEST;
-                      }
-                      other_updated = true;
-                    }
-                  }
-                  if (oscobject->type == OC_REP_BYTE_STRING) {
-                    if (oscobject->iname == 2 && subobject_nr == 8 &&
-                        oscobject_nr == 4) {
-                      // cnf::osc::ms
-                      oc_free_string(&(g_at_entries[index].osc_ms));
-                      oc_new_byte_string(&g_at_entries[index].osc_ms,
-                                        oc_string(oscobject->value.string),
-                                        oc_string_len(oscobject->value.string));
-                      other_updated = true;
-                    }
-                    if (oscobject->iname == 6 && subobject_nr == 8 &&
-                        oscobject_nr == 4) {
-                      // cnf::osc::contextId
-                      oc_free_string(&(g_at_entries[index].osc_contextid));
-                      oc_new_byte_string(&g_at_entries[index].osc_contextid,
-                                        oc_string(oscobject->value.string),
-                                        oc_string_len(oscobject->value.string));
-                      other_updated = true;
-                    }
-                    if (oscobject->iname == 7 && subobject_nr == 8 &&
-                        oscobject_nr == 4) {
-                      // cnf::osc::rid
-                      oc_free_string(&(g_at_entries[index].osc_rid));
-                      oc_new_byte_string(&g_at_entries[index].osc_rid,
-                                        oc_string(oscobject->value.string),
-                                        oc_string_len(oscobject->value.string));
-                      other_updated = true;
-                    }
-                    if (oscobject->iname == 0 && subobject_nr == 8 &&
-                        oscobject_nr == 4) {
-                      // cnf::osc::id
-                      oc_free_string(&(g_at_entries[index].osc_id));
-                      oc_new_byte_string(&g_at_entries[index].osc_id,
-                                        oc_string(oscobject->value.string),
-                                        oc_string_len(oscobject->value.string));
-                      other_updated = true;
-                    }
-                  } /* type */
-
-                  oscobject = oscobject->next;
-                }
-              }
-              subobject = subobject->next;
-            }
-          }
-          object = object->next;
-        } // while (inner object)
-      }   // if type == object
-      // show the entry on screen
-      //
-      // temp backward compatibility fix: if recipient id is not there then use
-      // SID for recipient ID
-      if (oc_string_len(g_at_entries[index].osc_rid) == 0) {
-        oc_free_string(&(g_at_entries[index].osc_rid));
-        oc_new_byte_string(&g_at_entries[index].osc_rid,
-                          oc_string(g_at_entries[index].osc_id),
-                          oc_byte_string_len(g_at_entries[index].osc_id));
-      }
-      // temp backward compatibility fix: if context id is not there then use
-      // SID for context ID
-      /*
-      if (oc_string_len(g_at_entries[index].osc_contextid) == 0) {
-        oc_free_string(&(g_at_entries[index].osc_contextid));
-        oc_new_byte_string(&g_at_entries[index].osc_contextid,
-                          oc_string(g_at_entries[index].osc_id),
-                          oc_byte_string_len(g_at_entries[index].osc_id));
-      }
-      */
-
-      oc_print_auth_at_entry(device_index, index);
-
-      // dump the entry to persistent storage
-      oc_at_dump_entry(device_index, index);
-      arr = arr->next;
+        object = object->next;
+      } // while (inner object)
+    }   // if type == object
+    // show the entry on screen
+    //
+    // temp backward compatibility fix: if recipient id is not there then use
+    // SID for recipient ID
+    if (oc_string_len(g_at_entries[index].osc_rid) == 0) {
+      oc_free_string(&(g_at_entries[index].osc_rid));
+      oc_new_byte_string(&g_at_entries[index].osc_rid,
+                         oc_string(g_at_entries[index].osc_id),
+                         oc_byte_string_len(g_at_entries[index].osc_id));
     }
+    // temp backward compatibility fix: if context id is not there then use
+    // SID for context ID
+    /*
+    if (oc_string_len(g_at_entries[index].osc_contextid) == 0) {
+      oc_free_string(&(g_at_entries[index].osc_contextid));
+      oc_new_byte_string(&g_at_entries[index].osc_contextid,
+                         oc_string(g_at_entries[index].osc_id),
+                         oc_byte_string_len(g_at_entries[index].osc_id));
+    }
+    */
+
+    oc_print_auth_at_entry(device_index, index);
+
+    // dump the entry to persistent storage
+    oc_at_dump_entry(device_index, index);
     rep = rep->next;
   } // while (rep)
 
