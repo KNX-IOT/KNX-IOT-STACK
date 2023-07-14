@@ -1076,7 +1076,6 @@ oc_rep_to_json_format(oc_rep_t *rep, char *buf, size_t buf_size, int tab_depth,
         OC_JSON_UPDATE_BUFFER_AND_TOTAL;
       }
     }
-    printf("rep->type: %d\n", rep->type);
     switch (rep->type) {
     case OC_REP_NIL: {
       num_char_printed = snprintf(buf, buf_size, "null");
