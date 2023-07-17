@@ -548,12 +548,17 @@ oc_parse_rep(const uint8_t *in_payload, int payload_size, oc_rep_t **out_rep)
   // rather than the first element (linked list style)
   // we need to correct this
   if (*out_rep) {
+    oc_rep_t * r = *out_rep;
     if ((*out_rep)->type == OC_REP_OBJECT)
       *out_rep = (*out_rep)->value.object;
     else if ((*out_rep)->type == OC_REP_OBJECT_ARRAY)
       *out_rep = (*out_rep)->value.object_array;
     else if ((*out_rep)->type == OC_REP_MIXED_ARRAY)
       *out_rep = (*out_rep)->value.mixed_array;
+    else
+      return err;
+    r->type = OC_REP_NIL;
+    oc_free_rep(r);
   }
   return err;
 }
