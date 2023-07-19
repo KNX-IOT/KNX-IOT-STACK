@@ -915,7 +915,6 @@ oc_create_knx_knx_resource(int resource_idx, size_t device)
                             APPLICATION_CBOR, OC_DISCOVERABLE,
                             oc_core_knx_knx_get_handler, 0,
                             oc_core_knx_knx_post_handler, 0, 1, "urn:knx:g.s");
-
 }
 
 void
