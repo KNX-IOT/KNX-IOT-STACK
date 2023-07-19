@@ -265,6 +265,7 @@ typedef enum {
   OC_KNX_LDEVID,            /**< LDevID */
   OC_KNX_LSM,               /**< load state machine */
   OC_KNX_DOT_KNX,           /**< .knx resource */
+  OC_KNX_G,                 /**< g (renamed) .knx resource */
   OC_KNX_FINGERPRINT,       /**< FINGERPRINT value of loaded contents */
   OC_KNX_IA,                /**< .well-known / knx / ia */
   OC_KNX_OSN,               /**< .well-known / knx / osn */

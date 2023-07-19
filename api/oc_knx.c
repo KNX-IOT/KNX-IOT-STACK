@@ -917,6 +917,17 @@ oc_create_knx_knx_resource(int resource_idx, size_t device)
                             oc_core_knx_knx_post_handler, 0, 1, "urn:knx:g.s");
 }
 
+void
+oc_create_knx_g_resource(int resource_idx, size_t device)
+{
+  OC_DBG("oc_create_knx_g_resource (g)\n");
+
+  oc_core_populate_resource(resource_idx, device, "/g", OC_IF_LI | OC_IF_G,
+                            APPLICATION_CBOR, OC_DISCOVERABLE,
+                            oc_core_knx_knx_get_handler, 0,
+                            oc_core_knx_knx_post_handler, 0, 1, "urn:knx:g.s");
+}
+
 int
 oc_knx_knx_ignore_smessage_from_self(bool ignore)
 {
@@ -1638,6 +1649,7 @@ oc_create_knx_resources(size_t device_index)
 
   oc_create_knx_lsm_resource(OC_KNX_LSM, device_index);
   oc_create_knx_knx_resource(OC_KNX_DOT_KNX, device_index);
+  oc_create_knx_knx_resource(OC_KNX_G, device_index);
   oc_create_knx_fingerprint_resource(OC_KNX_FINGERPRINT, device_index);
   oc_create_knx_ia(OC_KNX_IA, device_index);
   oc_create_knx_osn_resource(OC_KNX_OSN, device_index);
