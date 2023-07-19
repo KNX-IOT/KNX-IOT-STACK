@@ -75,17 +75,17 @@ typedef struct oc_device_info_t
   oc_knx_version_info_t hwv; /**< knx hardware version */
   oc_knx_version_info_t fwv; /**< fwv firmware version */
   oc_knx_version_info_t ap;  /**< fwv application version */
-  oc_string_t hwt;           /**< knx hardware type */
-  oc_string_t model;         /**< knx model */
-  oc_string_t hostname;      /**< knx host name */
-  uint32_t mid;              /**< knx manufactorer ID */
-  uint64_t fid;              /**< knx fabric id */
-  uint32_t ia;               /**< knx ia Device individual address */
-  uint64_t iid;              /**< knx iid (installation id) */
-  uint32_t port;             /**< coap port number */
-  uint32_t mport;            /**< multicast port number */
-  bool pm;                   /**< knx programming mode */
-  oc_lsm_state_t lsm_s;      /**< knx lsm states */
+  oc_string_t hwt; /**< knx hardware type, should not be larger than 6 chars */
+  oc_string_t model;    /**< knx model */
+  oc_string_t hostname; /**< knx host name */
+  uint32_t mid;         /**< knx manufactorer ID */
+  uint64_t fid;         /**< knx fabric id */
+  uint32_t ia;          /**< knx ia Device individual address */
+  uint64_t iid;         /**< knx iid (installation id) */
+  uint32_t port;        /**< coap port number */
+  uint32_t mport;       /**< multicast port number */
+  bool pm;              /**< knx programming mode */
+  oc_lsm_state_t lsm_s; /**< knx lsm states */
   oc_core_add_device_cb_t add_device_cb; /**< callback when device is changed */
   void *data;                            /**< user data */
 } oc_device_info_t;
@@ -204,6 +204,8 @@ int oc_core_set_and_store_device_ia(size_t device_index, uint32_t ia);
 
 /**
  * @brief sets the hardware type (string)
+ * input string should not be larger than 6,
+ * note that if the input is larger than 6, it will be truncated to 6 chars
  *
  * @param device_index the device index
  * @param hardware_type the hardware type

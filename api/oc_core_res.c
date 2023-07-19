@@ -421,14 +421,19 @@ oc_core_set_and_store_device_ia(size_t device_index, uint32_t ia)
 int
 oc_core_set_device_hwt(size_t device_index, const char *hardwaretype)
 {
+  int hwt_len = 0;
   if (device_index >= (int)oc_core_get_num_devices()) {
     OC_ERR("device_index %d to large\n", (int)device_index);
     return -1;
   }
+  hwt_len = strlen(hardwaretype);
+  if (strlen(hardwaretype) > 6) {
+    // truncate the hardware type
+    hwt_len = 6;
+  }
 
   oc_free_string(&oc_device_info[device_index].hwt);
-  oc_new_string(&oc_device_info[device_index].hwt, hardwaretype,
-                strlen(hardwaretype));
+  oc_new_string(&oc_device_info[device_index].hwt, hardwaretype, hwt_len);
 
   return 0;
 }
