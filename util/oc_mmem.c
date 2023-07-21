@@ -49,13 +49,15 @@
 #error "Please define byte, int, double pool sizes in oc_config.h"
 #endif /* ...POOL_SIZE */
 
+static float floats[OC_FLOATS_POOL_SIZE];
 static double doubles[OC_DOUBLES_POOL_SIZE];
 static int64_t ints[OC_INTS_POOL_SIZE];
 static unsigned char bytes[OC_BYTES_POOL_SIZE];
-static unsigned int avail_bytes, avail_ints, avail_doubles;
+static unsigned int avail_bytes, avail_ints, avail_doubles, avail_floats;
 
 OC_LIST(bytes_list);
 OC_LIST(ints_list);
+OC_LIST(floats_list);
 OC_LIST(doubles_list);
 #else /* !OC_DYNAMIC_ALLOCATION */
 #include <stdlib.h>
@@ -109,6 +111,21 @@ _oc_mmem_alloc(
     avail_ints -= size;
 #endif /* !OC_DYNAMIC_ALLOCATION */
     break;
+  case FLOAT_POOL:
+    bytes_allocated += size * sizeof(float);
+#ifdef OC_DYNAMIC_ALLOCATION
+    m->ptr = malloc(size * sizeof(float));
+    m->size = size;
+#else  /* OC_DYNAMIC_ALLOCATION */
+    if (avail_floats < size) {
+      OC_WRN("float pool exhausted");
+      return 0;
+    }
+    oc_list_add(floats_list, m);
+    m->ptr = &floats[OC_FLOAT_POOL_SIZE - avail_floats];
+    m->size = size;
+    avail_floats -= size;
+#endif /* !OC_DYNAMIC_ALLOCATION */
   case DOUBLE_POOL:
     bytes_allocated += size * sizeof(double);
 #ifdef OC_DYNAMIC_ALLOCATION
@@ -154,6 +171,9 @@ _oc_mmem_free(
   case INT_POOL:
     bytes_freed *= sizeof(int64_t);
     break;
+  case FLOAT_POOL:
+    bytes_freed *= sizeof(float);
+    break;
   case DOUBLE_POOL:
     bytes_freed *= sizeof(double);
     break;
@@ -177,6 +197,11 @@ _oc_mmem_free(
     case INT_POOL:
       memmove(m->ptr, m->next->ptr,
               &ints[OC_INTS_POOL_SIZE - avail_ints] - (int64_t *)m->next->ptr);
+      break;
+    case FLOAT_POOL:
+      memmove(m->ptr, m->next->ptr,
+              &floats[OC_FLOATS_POOL_SIZE - avail_floats] -
+                (float *)m->next->ptr);
       break;
     case DOUBLE_POOL:
       memmove(m->ptr, m->next->ptr,
