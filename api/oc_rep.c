@@ -910,7 +910,7 @@ oc_rep_i_get_bool_array(oc_rep_t *rep, int key, bool **value, size_t *size)
 
 bool
 oc_rep_get_float_array(oc_rep_t *rep, const char *key, float **value,
-                        size_t *size)
+                       size_t *size)
 {
   if (!size) {
     OC_ERR("Error of input parameters");
@@ -926,8 +926,7 @@ oc_rep_i_get_float_array(oc_rep_t *rep, int key, float **value, size_t *size)
     OC_ERR("Error of input parameters");
     return false;
   }
-  return oc_rep_i_get_value(rep, OC_REP_FLOAT_ARRAY, key, (void **)value,
-                            size);
+  return oc_rep_i_get_value(rep, OC_REP_FLOAT_ARRAY, key, (void **)value, size);
 }
 
 bool
@@ -1270,10 +1269,10 @@ oc_rep_to_json_format(oc_rep_t *rep, char *buf, size_t buf_size, int tab_depth,
       size_t float_array_size = 0;
       if (oc_string(rep->name) != NULL) {
         oc_rep_get_float_array(rep, oc_string(rep->name), &float_array,
-                                &float_array_size);
+                               &float_array_size);
       } else {
         oc_rep_i_get_float_array(rep, rep->iname, &float_array,
-                                  &float_array_size);
+                                 &float_array_size);
       }
       for (size_t i = 0; i < float_array_size; i++) {
         num_char_printed = snprintf(buf, buf_size, "%f", float_array[i]);

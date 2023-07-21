@@ -66,7 +66,7 @@ enum StringRepresentation {
 #define oc_free_int_array(ocarray) (_oc_free_array(__func__, ocarray, INT_POOL))
 #define oc_free_bool_array(ocarray)                                            \
   (_oc_free_array(__func__, ocarray, BYTE_POOL))
-#define oc_free_float_array(ocarray)                                          \
+#define oc_free_float_array(ocarray)                                           \
   (_oc_free_array(__func__, ocarray, FLOAT_POOL))
 #define oc_free_double_array(ocarray)                                          \
   (_oc_free_array(__func__, ocarray, DOUBLE_POOL))
@@ -75,7 +75,7 @@ enum StringRepresentation {
   (_oc_new_array(__func__, ocarray, size, INT_POOL))
 #define oc_new_bool_array(ocarray, size)                                       \
   (_oc_new_array(__func__, ocarray, size, BYTE_POOL))
-#define oc_new_float_array(ocarray, size)                                     \
+#define oc_new_float_array(ocarray, size)                                      \
   (_oc_new_array(__func__, ocarray, size, FLOAT_POOL))
 #define oc_new_double_array(ocarray, size)                                     \
   (_oc_new_array(__func__, ocarray, size, DOUBLE_POOL))
@@ -161,7 +161,7 @@ enum StringRepresentation {
  * @brief new float array
  *
  */
-#define oc_new_float_array(ocarray, size)                                     \
+#define oc_new_float_array(ocarray, size)                                      \
   (_oc_new_array(ocarray, size, FLOAT_POOL))
 
 /**

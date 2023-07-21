@@ -199,7 +199,7 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
 #define oc_rep_set_float(object, key, value)                                   \
   do {                                                                         \
     g_err |= cbor_encode_text_string(&object##_map, #key, strlen(#key));       \
-    g_err |= cbor_encode_float(&object##_map, value);                         \
+    g_err |= cbor_encode_float(&object##_map, value);                          \
   } while (0)
 
 /**
@@ -221,10 +221,10 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
  *
  * @see oc_rep_i_get_float
  */
-#define oc_rep_i_set_float(object, key, value)                                \
+#define oc_rep_i_set_float(object, key, value)                                 \
   do {                                                                         \
     g_err |= cbor_encode_int(&object##_map, (int64_t)(key));                   \
-    g_err |= cbor_encode_float(&object##_map, value);                         \
+    g_err |= cbor_encode_float(&object##_map, value);                          \
   } while (0)
 
 /**
@@ -757,10 +757,10 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
  * @see oc_rep_close_array
  * @see oc_rep_set_float_array
  */
-#define oc_rep_add_float(parent, value)                                       \
+#define oc_rep_add_float(parent, value)                                        \
   g_err |= cbor_encode_float(&parent##_array, value)
 
-#define oc_rep_set_value_float(parent, value)                                 \
+#define oc_rep_set_value_float(parent, value)                                  \
   g_err |= cbor_encode_float(&parent##_map, value)
 
 /**
@@ -924,10 +924,10 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
  * Open a cbor array object belonging to `parent` object under the `key` name.
  * Items can then be added to the array till oc_rep_close_array is called.
  *
- * Most common array types such as `int`, `bool`, `double`, `float` and `strings` have
- * specific macros for handling those array types.  This macro will mostly be
- * used to make arrays where the length is unknown ahead of time or to make
- * an array of other objects.
+ * Most common array types such as `int`, `bool`, `double`, `float` and
+ * `strings` have specific macros for handling those array types.  This macro
+ * will mostly be used to make arrays where the length is unknown ahead of time
+ * or to make an array of other objects.
  *
  * For and example of this macro being used see oc_rep_object_array_begin_item.
  *
@@ -1251,7 +1251,7 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
  *     oc_rep_end_root_object();
  * ~~~
  */
-#define oc_rep_set_float_array(object, key, values, length)                   \
+#define oc_rep_set_float_array(object, key, values, length)                    \
   do {                                                                         \
     g_err |= cbor_encode_text_string(&object##_map, #key, strlen(#key));       \
     CborEncoder key##_value_array;                                             \
@@ -1259,7 +1259,7 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
       cbor_encoder_create_array(&object##_map, &key##_value_array, length);    \
     int i;                                                                     \
     for (i = 0; i < (length); i++) {                                           \
-      g_err |= cbor_encode_floating_point(&key##_value_array, CborFloatType,  \
+      g_err |= cbor_encode_floating_point(&key##_value_array, CborFloatType,   \
                                           &(values)[i]);                       \
     }                                                                          \
     g_err |= cbor_encoder_close_container(&object##_map, &key##_value_array);  \
@@ -1292,7 +1292,7 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
  *
  * @see oc_rep_i_get_float_array
  */
-#define oc_rep_i_set_float_array(object, key, values, length)                 \
+#define oc_rep_i_set_float_array(object, key, values, length)                  \
   do {                                                                         \
     g_err |= cbor_encode_int(&object##_map, (int64_t)(key));                   \
     CborEncoder x_key##_value_array;                                           \
@@ -1300,8 +1300,8 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
       cbor_encoder_create_array(&object##_map, &x_key##_value_array, length);  \
     int i;                                                                     \
     for (i = 0; i < (length); i++) {                                           \
-      g_err |= cbor_encode_floating_point(&x_key##_value_array,                \
-                                          CborFloatType, &(values)[i]);       \
+      g_err |= cbor_encode_floating_point(&x_key##_value_array, CborFloatType, \
+                                          &(values)[i]);                       \
     }                                                                          \
     g_err |=                                                                   \
       cbor_encoder_close_container(&object##_map, &x_key##_value_array);       \
@@ -1476,7 +1476,7 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
  *     oc_rep_end_root_object();
  * ~~~
  */
-#define oc_rep_set_float_array(object, key, values, length)                   \
+#define oc_rep_set_float_array(object, key, values, length)                    \
   do {                                                                         \
     g_err |= cbor_encode_text_string(&object##_map, #key, strlen(#key));       \
     CborEncoder key##_value_array;                                             \
@@ -1517,7 +1517,7 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
  *
  * @see oc_rep_i_get_float_array
  */
-#define oc_rep_i_set_float_array(object, key, values, length)                 \
+#define oc_rep_i_set_float_array(object, key, values, length)                  \
   do {                                                                         \
     g_err |= cbor_encode_int(&object##_map, (int64_t)(key));                   \
     CborEncoder x_key##_value_array;                                           \
@@ -1525,13 +1525,12 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
       cbor_encoder_create_array(&object##_map, &x_key##_value_array, length);  \
     int i;                                                                     \
     for (i = 0; i < (length); i++) {                                           \
-      g_err |= cbor_encode_floating_point(&x_key##_value_array,                \
-                                          CborFloatType, &(values)[i]);       \
+      g_err |= cbor_encode_floating_point(&x_key##_value_array, CborFloatType, \
+                                          &(values)[i]);                       \
     }                                                                          \
     g_err |=                                                                   \
       cbor_encoder_close_container(&object##_map, &x_key##_value_array);       \
   } while (0)
-
 
 /**
  * Add a string array using an oc_string_array_t as `values` to the cbor
@@ -2060,7 +2059,7 @@ bool oc_rep_i_get_bool_array(oc_rep_t *rep, int key, bool **value,
  * @see oc_rep_set_float_array
  */
 bool oc_rep_get_float_array(oc_rep_t *rep, const char *key, float **value,
-                             size_t *size);
+                            size_t *size);
 
 /**
  * Read an float array value from an `oc_rep_t` with an integer key
@@ -2087,7 +2086,7 @@ bool oc_rep_get_float_array(oc_rep_t *rep, const char *key, float **value,
  * @see oc_rep_i_set_float_array
  */
 bool oc_rep_i_get_float_array(oc_rep_t *rep, int key, float **value,
-                               size_t *size);
+                              size_t *size);
 
 /**
  * Read an double array value from an `oc_rep_t`
