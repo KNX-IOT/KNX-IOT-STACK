@@ -180,6 +180,54 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
   } while (0)
 
 /**
+ * Add a float `value` to the cbor `object` under the `key` name
+ * Example:
+ *
+ * To build the an object with the following cbor value
+ *
+ *     {
+ *       "pi": 3.14159
+ *     }
+ *
+ * The following code could be used:
+ * ~~~{.c}
+ *     oc_rep_begin_root_object();
+ *     oc_rep_set_float(root, pi, 3.14159);
+ *     oc_rep_end_root_object();
+ * ~~~
+ */
+#define oc_rep_set_float(object, key, value)                                   \
+  do {                                                                         \
+    g_err |= cbor_encode_text_string(&object##_map, #key, strlen(#key));       \
+    g_err |= cbor_encode_float(&object##_map, value);                         \
+  } while (0)
+
+/**
+ * Add a float `value` to the cbor `object` under the integer `key` name
+ * Example:
+ *
+ * To build the an object with the following cbor value
+ *
+ *     {
+ *       5 : 3.14159
+ *     }
+ *
+ * The following code could be used:
+ * ~~~{.c}
+ *     oc_rep_begin_root_object();
+ *     oc_rep_i_set_float(root, 5, 3.14159);
+ *     oc_rep_end_root_object();
+ * ~~~
+ *
+ * @see oc_rep_i_get_float
+ */
+#define oc_rep_i_set_float(object, key, value)                                \
+  do {                                                                         \
+    g_err |= cbor_encode_int(&object##_map, (int64_t)(key));                   \
+    g_err |= cbor_encode_float(&object##_map, value);                         \
+  } while (0)
+
+/**
  * Add an integer `value` to the cbor `object` under the `key` name
  * Example:
  *
@@ -1282,6 +1330,88 @@ int oc_rep_add_line_size_to_buffer(const char *line, int len);
   } while (0)
 
 /**
+ * Add a float array with `values` of `length` to the cbor `object` under the
+ * `key` name.
+ *
+ * Example:
+ *
+ * To build the an object with the following cbor value
+ *
+ *     {
+ *       "math_constants": [ 3.14159, 2.71828, 1.414121, 1.61803 ]
+ *     }
+ *
+ * The following code could be used:
+ *
+ * ~~~{.c}
+ *     float math_constants[] = { 3.14159, 2.71828, 1.414121, 1.61803 };
+ *     oc_rep_begin_root_object();
+ *     oc_rep_set_float_array(root,
+ *                            math_constants,
+ *                            math_constants,
+ *                            (int)(sizeof(math_constants)/
+ *                                sizeof(math_constants[0]) ) );
+ *     oc_rep_end_root_object();
+ * ~~~
+ */
+#define oc_rep_set_float_array(object, key, values, length)                   \
+  do {                                                                         \
+    g_err |= cbor_encode_text_string(&object##_map, #key, strlen(#key));       \
+    CborEncoder key##_value_array;                                             \
+    g_err |=                                                                   \
+      cbor_encoder_create_array(&object##_map, &key##_value_array, length);    \
+    int i;                                                                     \
+    for (i = 0; i < (length); i++) {                                           \
+      g_err |= cbor_encode_floating_point(&key##_value_array, CborFloatType,   \
+                                          &(values)[i]);                       \
+    }                                                                          \
+    g_err |= cbor_encoder_close_container(&object##_map, &key##_value_array);  \
+  } while (0)
+
+/**
+ * Add a float array with `values` of `length` to the cbor `object` under the
+ * integer `key` name.
+ *
+ * Example:
+ *
+ * To build the an object with the following cbor value
+ *
+ *     {
+ *       6 : [ 3.14159, 2.71828, 1.414121, 1.61803 ]
+ *     }
+ *
+ * The following code could be used:
+ *
+ * ~~~{.c}
+ *     float math_constants[] = { 3.14159, 2.71828, 1.414121, 1.61803 };
+ *     oc_rep_begin_root_object();
+ *     oc_rep_i_set_float_array(root,
+ *                              6,
+ *                              math_constants,
+ *                              (int)(sizeof(math_constants)/
+ *                                sizeof(math_constants[0]) ) );
+ *     oc_rep_end_root_object();
+ * ~~~
+ *
+ * @see oc_rep_i_get_float_array
+ */
+#define oc_rep_i_set_float_array(object, key, values, length)                 \
+  do {                                                                         \
+    g_err |= cbor_encode_int(&object##_map, (int64_t)(key));                   \
+    CborEncoder x_key##_value_array;                                           \
+    g_err |=                                                                   \
+      cbor_encoder_create_array(&object##_map, &x_key##_value_array, length);  \
+    int i;                                                                     \
+    for (i = 0; i < (length); i++) {                                           \
+      g_err |= cbor_encode_floating_point(&x_key##_value_array,                \
+                                          CborFloatType, &(values)[i]);       \
+    }                                                                          \
+    g_err |=                                                                   \
+      cbor_encoder_close_container(&object##_map, &x_key##_value_array);       \
+  } while (0)
+
+
+/**
  * Add a string array using an oc_string_array_t as `values` to the cbor
  * `object` under the integer `key` name.
  *
@@ -1373,7 +1503,8 @@ typedef enum {
   OC_REP_BYTE_STRING_ARRAY = 0x0C,
   OC_REP_STRING_ARRAY = 0x0D,
   OC_REP_OBJECT_ARRAY = 0x0E,
-  OC_REP_MIXED_ARRAY = 0x0F
+  OC_REP_MIXED_ARRAY = 0x0F,
+  OC_REP_FLOAT = 0x10,
 } oc_rep_value_type_t;
 
 /**
