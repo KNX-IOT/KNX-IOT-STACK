@@ -25,6 +25,7 @@
 
 #include "oc_core_res.h"
 #include "oc_endpoint.h"
+#include "oc_knx_helpers.h"
 
 #ifdef OC_SECURITY
 #include "security/oc_pstat.h"
