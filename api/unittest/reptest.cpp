@@ -911,8 +911,8 @@ TEST(TestRep, OCRepSetGetFloatArray)
   /* read the values from the oc_rep_t */
   float *math_constants_out = 0;
   size_t math_constants_len;
-  EXPECT_TRUE(oc_rep_get_float_array(
-    rep, "math_constants", &math_constants_out, &math_constants_len));
+  EXPECT_TRUE(oc_rep_get_float_array(rep, "math_constants", &math_constants_out,
+                                     &math_constants_len));
   ASSERT_EQ(sizeof(math_constants) / sizeof(math_constants[0]),
             math_constants_len);
   for (size_t i = 0; i < math_constants_len; ++i) {
@@ -923,13 +923,13 @@ TEST(TestRep, OCRepSetGetFloatArray)
   EXPECT_FALSE(oc_rep_get_float_array(
     NULL, "math_constants", &math_constants_out, &math_constants_len));
   EXPECT_FALSE(oc_rep_get_float_array(rep, NULL, &math_constants_out,
-                                       &math_constants_len));
+                                      &math_constants_len));
   EXPECT_FALSE(
     oc_rep_get_float_array(rep, "math_constants", NULL, &math_constants_len));
   EXPECT_FALSE(
     oc_rep_get_float_array(rep, "math_constants", &math_constants_out, NULL));
   EXPECT_FALSE(oc_rep_get_float_array(rep, "not_a_key", &math_constants_out,
-                                       &math_constants_len));
+                                      &math_constants_len));
 
   char *json;
   size_t json_size;
@@ -1069,8 +1069,8 @@ TEST(TestRep, OCRepAddGetFloatArray)
   /* read the values from the oc_rep_t */
   float *math_constants_out = 0;
   size_t math_constants_len;
-  EXPECT_TRUE(oc_rep_get_float_array(
-    rep, "math_constants", &math_constants_out, &math_constants_len));
+  EXPECT_TRUE(oc_rep_get_float_array(rep, "math_constants", &math_constants_out,
+                                     &math_constants_len));
   ASSERT_EQ(sizeof(math_constants) / sizeof(math_constants[0]),
             math_constants_len);
   for (size_t i = 0; i < math_constants_len; ++i) {
@@ -1922,8 +1922,8 @@ TEST(TestRep, OCRepISetGetFloatArray)
   /* read the values from the oc_rep_t */
   float *math_constants_out = 0;
   size_t math_constants_len;
-  EXPECT_TRUE(oc_rep_i_get_float_array(rep, 5, &math_constants_out,
-                                        &math_constants_len));
+  EXPECT_TRUE(
+    oc_rep_i_get_float_array(rep, 5, &math_constants_out, &math_constants_len));
   ASSERT_EQ(sizeof(math_constants) / sizeof(math_constants[0]),
             math_constants_len);
   for (size_t i = 0; i < math_constants_len; ++i) {
@@ -1932,13 +1932,13 @@ TEST(TestRep, OCRepISetGetFloatArray)
 
   /* Error handling */
   EXPECT_FALSE(oc_rep_i_get_float_array(NULL, 5, &math_constants_out,
-                                         &math_constants_len));
+                                        &math_constants_len));
   // EXPECT_FALSE(oc_rep_get_double_array(rep, NULL, &math_constants_out,
   //                                     &math_constants_len));
   EXPECT_FALSE(oc_rep_i_get_float_array(rep, 5, NULL, &math_constants_len));
   EXPECT_FALSE(oc_rep_i_get_float_array(rep, 5, &math_constants_out, NULL));
-  EXPECT_FALSE(oc_rep_i_get_float_array(rep, 6, &math_constants_out,
-                                         &math_constants_len));
+  EXPECT_FALSE(
+    oc_rep_i_get_float_array(rep, 6, &math_constants_out, &math_constants_len));
 
   char *json;
   size_t json_size;
