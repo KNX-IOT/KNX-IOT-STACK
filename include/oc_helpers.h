@@ -66,6 +66,8 @@ enum StringRepresentation {
 #define oc_free_int_array(ocarray) (_oc_free_array(__func__, ocarray, INT_POOL))
 #define oc_free_bool_array(ocarray)                                            \
   (_oc_free_array(__func__, ocarray, BYTE_POOL))
+#define oc_free_float_array(ocarray)                                           \
+  (_oc_free_array(__func__, ocarray, FLOAT_POOL))
 #define oc_free_double_array(ocarray)                                          \
   (_oc_free_array(__func__, ocarray, DOUBLE_POOL))
 
@@ -73,6 +75,8 @@ enum StringRepresentation {
   (_oc_new_array(__func__, ocarray, size, INT_POOL))
 #define oc_new_bool_array(ocarray, size)                                       \
   (_oc_new_array(__func__, ocarray, size, BYTE_POOL))
+#define oc_new_float_array(ocarray, size)                                      \
+  (_oc_new_array(__func__, ocarray, size, FLOAT_POOL))
 #define oc_new_double_array(ocarray, size)                                     \
   (_oc_new_array(__func__, ocarray, size, DOUBLE_POOL))
 
@@ -129,6 +133,12 @@ enum StringRepresentation {
 #define oc_free_bool_array(ocarray) (_oc_free_array(ocarray, BYTE_POOL))
 
 /**
+ * @brief free array of floats
+ *
+ */
+#define oc_free_float_array(ocarray) (_oc_free_array(ocarray, FLOAT_POOL))
+
+/**
  * @brief free array of doubles
  *
  */
@@ -146,6 +156,13 @@ enum StringRepresentation {
  */
 #define oc_new_bool_array(ocarray, size)                                       \
   (_oc_new_array(ocarray, size, BYTE_POOL))
+
+/**
+ * @brief new float array
+ *
+ */
+#define oc_new_float_array(ocarray, size)                                      \
+  (_oc_new_array(ocarray, size, FLOAT_POOL))
 
 /**
  * @brief new double array
@@ -181,9 +198,11 @@ void oc_concat_strings(oc_string_t *concat, const char *str1, const char *str2);
 
 #define oc_int_array_size(ocintarray) ((ocintarray).size)
 #define oc_bool_array_size(ocboolarray) ((ocboolarray).size)
+#define oc_float_array_size(ocfloatarray) ((ocfloatarray).size)
 #define oc_double_array_size(ocdoublearray) ((ocdoublearray).size)
 #define oc_int_array(ocintarray) (oc_cast(ocintarray, int64_t))
 #define oc_bool_array(ocboolarray) (oc_cast(ocboolarray, bool))
+#define oc_float_array(ocfloatarray) (oc_cast(ocfloatarray, float))
 #define oc_double_array(ocdoublearray) (oc_cast(ocdoublearray, double))
 
 #ifdef OC_DYNAMIC_ALLOCATION

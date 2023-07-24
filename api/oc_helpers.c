@@ -151,6 +151,7 @@ _oc_new_array(
   switch (type) {
   case INT_POOL:
   case BYTE_POOL:
+  case FLOAT_POOL:
   case DOUBLE_POOL:
     oc_malloc(
 #ifdef OC_MEMORY_TRACE

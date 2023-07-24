@@ -138,6 +138,9 @@ oc_free_rep(oc_rep_t *rep)
   case OC_REP_BOOL_ARRAY:
     oc_free_bool_array(&rep->value.array);
     break;
+  case OC_REP_FLOAT_ARRAY:
+    oc_free_float_array(&rep->value.array);
+    break;
   case OC_REP_DOUBLE_ARRAY:
     oc_free_double_array(&rep->value.array);
     break;
@@ -210,6 +213,10 @@ oc_parse_single_entity(CborValue *value, oc_rep_t **rep, CborError *err)
   case CborBooleanType:
     *err |= cbor_value_get_boolean(value, &cur->value.boolean);
     cur->type = OC_REP_BOOL;
+    break;
+  case CborFloatType:
+    *err |= cbor_value_get_float(value, &cur->value.float_p);
+    cur->type = OC_REP_FLOAT;
     break;
   case CborDoubleType:
     *err |= cbor_value_get_double(value, &cur->value.double_p);
@@ -372,6 +379,12 @@ oc_parse_rep_value_array(CborValue *value, oc_rep_t **rep, CborError *err)
         else
           type = OC_REP_MIXED_ARRAY;
         break;
+      case CborFloatType:
+        if (type == OC_REP_NIL || type == OC_REP_FLOAT)
+          type = OC_REP_FLOAT;
+        else
+          type = OC_REP_MIXED_ARRAY;
+        break;
       case CborDoubleType:
         if (type == OC_REP_NIL || type == OC_REP_DOUBLE)
           type = OC_REP_DOUBLE;
@@ -437,6 +450,18 @@ oc_parse_rep_value_array(CborValue *value, oc_rep_t **rep, CborError *err)
       }
       *err |=
         cbor_value_get_boolean(&array, oc_bool_array(cur->value.array) + k);
+    } break;
+    case OC_REP_FLOAT: {
+      if (k == 0) {
+        oc_new_float_array(&cur->value.array, len);
+        cur->type = OC_REP_FLOAT_ARRAY;
+      }
+      if (array.type != CborFloatType) {
+        *err |= CborErrorIllegalType;
+        return;
+      }
+      *err |=
+        cbor_value_get_float(&array, oc_float_array(cur->value.array) + k);
     } break;
     case OC_REP_DOUBLE: {
       if (k == 0) {
@@ -586,6 +611,9 @@ oc_rep_get_value(oc_rep_t *rep, oc_rep_value_type_t type, const char *key,
       case OC_REP_BOOL:
         **(bool **)value = rep_value->value.boolean;
         break;
+      case OC_REP_FLOAT:
+        **(float **)value = rep_value->value.float_p;
+        break;
       case OC_REP_DOUBLE:
         **(double **)value = rep_value->value.double_p;
         break;
@@ -601,6 +629,10 @@ oc_rep_get_value(oc_rep_t *rep, oc_rep_value_type_t type, const char *key,
       case OC_REP_BOOL_ARRAY:
         *value = oc_bool_array(rep_value->value.array);
         *size = (int)oc_bool_array_size(rep_value->value.array);
+        break;
+      case OC_REP_FLOAT_ARRAY:
+        *value = oc_float_array(rep_value->value.array);
+        *size = (int)oc_float_array_size(rep_value->value.array);
         break;
       case OC_REP_DOUBLE_ARRAY:
         *value = oc_double_array(rep_value->value.array);
@@ -652,6 +684,9 @@ oc_rep_i_get_value(oc_rep_t *rep, oc_rep_value_type_t type, int key,
       case OC_REP_BOOL:
         **(bool **)value = rep_value->value.boolean;
         break;
+      case OC_REP_FLOAT:
+        **(float **)value = rep_value->value.float_p;
+        break;
       case OC_REP_DOUBLE:
         **(double **)value = rep_value->value.double_p;
         break;
@@ -667,6 +702,10 @@ oc_rep_i_get_value(oc_rep_t *rep, oc_rep_value_type_t type, int key,
       case OC_REP_BOOL_ARRAY:
         *value = oc_bool_array(rep_value->value.array);
         *size = (int)oc_bool_array_size(rep_value->value.array);
+        break;
+      case OC_REP_FLOAT_ARRAY:
+        *value = oc_float_array(rep_value->value.array);
+        *size = (int)oc_float_array_size(rep_value->value.array);
         break;
       case OC_REP_DOUBLE_ARRAY:
         *value = oc_double_array(rep_value->value.array);
@@ -739,6 +778,28 @@ oc_rep_i_get_bool(oc_rep_t *rep, int key, bool *value)
     return false;
   }
   return oc_rep_i_get_value(rep, OC_REP_BOOL, key, (void **)&value,
+                            (size_t *)NULL);
+}
+
+bool
+oc_rep_get_float(oc_rep_t *rep, const char *key, float *value)
+{
+  if (!value) {
+    OC_ERR("Error of input parameters");
+    return false;
+  }
+  return oc_rep_get_value(rep, OC_REP_FLOAT, key, (void **)&value,
+                          (size_t *)NULL);
+}
+
+bool
+oc_rep_i_get_float(oc_rep_t *rep, int key, float *value)
+{
+  if (!value) {
+    OC_ERR("Error of input parameters");
+    return false;
+  }
+  return oc_rep_i_get_value(rep, OC_REP_FLOAT, key, (void **)&value,
                             (size_t *)NULL);
 }
 
@@ -845,6 +906,27 @@ oc_rep_i_get_bool_array(oc_rep_t *rep, int key, bool **value, size_t *size)
     return false;
   }
   return oc_rep_i_get_value(rep, OC_REP_BOOL_ARRAY, key, (void **)value, size);
+}
+
+bool
+oc_rep_get_float_array(oc_rep_t *rep, const char *key, float **value,
+                       size_t *size)
+{
+  if (!size) {
+    OC_ERR("Error of input parameters");
+    return false;
+  }
+  return oc_rep_get_value(rep, OC_REP_FLOAT_ARRAY, key, (void **)value, size);
+}
+
+bool
+oc_rep_i_get_float_array(oc_rep_t *rep, int key, float **value, size_t *size)
+{
+  if (!size) {
+    OC_ERR("Error of input parameters");
+    return false;
+  }
+  return oc_rep_i_get_value(rep, OC_REP_FLOAT_ARRAY, key, (void **)value, size);
 }
 
 bool
@@ -1098,6 +1180,11 @@ oc_rep_to_json_format(oc_rep_t *rep, char *buf, size_t buf_size, int tab_depth,
       OC_JSON_UPDATE_BUFFER_AND_TOTAL;
       break;
     }
+    case OC_REP_FLOAT: {
+      num_char_printed = snprintf(buf, buf_size, "%f", rep->value.float_p);
+      OC_JSON_UPDATE_BUFFER_AND_TOTAL;
+      break;
+    }
     case OC_REP_DOUBLE: {
       num_char_printed = snprintf(buf, buf_size, "%f", rep->value.double_p);
       OC_JSON_UPDATE_BUFFER_AND_TOTAL;
@@ -1166,6 +1253,31 @@ oc_rep_to_json_format(oc_rep_t *rep, char *buf, size_t buf_size, int tab_depth,
 
         OC_JSON_UPDATE_BUFFER_AND_TOTAL;
         if (i < int_array_size - 1) {
+          num_char_printed = (pretty_print) ? snprintf(buf, buf_size, ", ")
+                                            : snprintf(buf, buf_size, ",");
+          OC_JSON_UPDATE_BUFFER_AND_TOTAL;
+        }
+      }
+      num_char_printed = snprintf(buf, buf_size, "]");
+      OC_JSON_UPDATE_BUFFER_AND_TOTAL;
+      break;
+    }
+    case OC_REP_FLOAT_ARRAY: {
+      num_char_printed = snprintf(buf, buf_size, "[");
+      OC_JSON_UPDATE_BUFFER_AND_TOTAL;
+      float *float_array;
+      size_t float_array_size = 0;
+      if (oc_string(rep->name) != NULL) {
+        oc_rep_get_float_array(rep, oc_string(rep->name), &float_array,
+                               &float_array_size);
+      } else {
+        oc_rep_i_get_float_array(rep, rep->iname, &float_array,
+                                 &float_array_size);
+      }
+      for (size_t i = 0; i < float_array_size; i++) {
+        num_char_printed = snprintf(buf, buf_size, "%f", float_array[i]);
+        OC_JSON_UPDATE_BUFFER_AND_TOTAL;
+        if (i < float_array_size - 1) {
           num_char_printed = (pretty_print) ? snprintf(buf, buf_size, ", ")
                                             : snprintf(buf, buf_size, ",");
           OC_JSON_UPDATE_BUFFER_AND_TOTAL;

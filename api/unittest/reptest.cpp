@@ -56,6 +56,61 @@ TEST(TestRep, RepToJson_null)
   EXPECT_EQ(4, oc_rep_to_json(rep, buf, 5, true));
   EXPECT_STREQ("{\n}\n", buf);
 }
+
+/*
+ * Most code done here is to enable testing without passing the code through the
+ * framework. End users are not expected to call oc_rep_new, oc_rep_set_pool
+ * and oc_parse_rep
+ */
+TEST(TestRep, OCRepSetGetFloat)
+{
+
+  /*buffer for oc_rep_t */
+  uint8_t buf[1024];
+  oc_rep_new(&buf[0], 1024);
+
+  /* add int values to root object */
+  oc_rep_begin_root_object();
+  oc_rep_set_float(root, pi, 3.14159);
+  oc_rep_end_root_object();
+
+  /* convert CborEncoder to oc_rep_t */
+  const uint8_t *payload = oc_rep_get_encoder_buf();
+  int payload_len = oc_rep_get_encoded_payload_size();
+  EXPECT_NE(payload_len, -1);
+  struct oc_memb rep_objects = { sizeof(oc_rep_t), 0, 0, 0, 0 };
+  oc_rep_set_pool(&rep_objects);
+  oc_rep_t *rep = NULL;
+  oc_parse_rep(payload, payload_len, &rep);
+  ASSERT_TRUE(rep != NULL);
+
+  /* read values from  the oc_rep_t */
+  float pi_out = 0;
+  EXPECT_TRUE(oc_rep_get_float(rep, "pi", &pi_out));
+  EXPECT_FLOAT_EQ(3.14159, pi_out);
+  /* error handling */
+  EXPECT_FALSE(oc_rep_get_float(NULL, "pi", &pi_out));
+  EXPECT_FALSE(oc_rep_get_float(rep, NULL, &pi_out));
+  EXPECT_FALSE(oc_rep_get_float(rep, "pi", NULL));
+  EXPECT_FALSE(oc_rep_get_float(rep, "no_a_key", &pi_out));
+
+  char *json;
+  size_t json_size;
+  json_size = oc_rep_to_json(rep, NULL, 0, false);
+  json = (char *)malloc(json_size + 1);
+  oc_rep_to_json(rep, json, json_size + 1, false);
+  EXPECT_STREQ("{\"pi\":3.141590}", json);
+  free(json);
+  json = NULL;
+  json_size = oc_rep_to_json(rep, NULL, 0, true);
+  json = (char *)malloc(json_size + 1);
+  oc_rep_to_json(rep, json, json_size + 1, true);
+  EXPECT_STREQ("{\n  \"pi\" : 3.141590\n}\n", json);
+  free(json);
+  json = NULL;
+
+  oc_free_rep(rep);
+}
 /*
  * Most code done here is to enable testing without passing the code through the
  * framework. End users are not expected to call oc_rep_new, oc_rep_set_pool
@@ -826,6 +881,80 @@ TEST(TestRep, OCRepAddGetBoolArray)
   oc_free_rep(rep);
 }
 
+TEST(TestRep, OCRepSetGetFloatArray)
+{
+  /*buffer for oc_rep_t */
+  uint8_t buf[1024];
+  oc_rep_new(&buf[0], 1024);
+
+  /* add values to root object */
+  oc_rep_begin_root_object();
+  EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
+  float math_constants[] = { 3.14159, 2.71828, 1.414121, 1.61803 };
+  oc_rep_set_float_array(
+    root, math_constants, math_constants,
+    (int)(sizeof(math_constants) / sizeof(math_constants[0])));
+  EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
+  oc_rep_end_root_object();
+  EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
+
+  /* convert CborEncoder to oc_rep_t */
+  const uint8_t *payload = oc_rep_get_encoder_buf();
+  int payload_len = oc_rep_get_encoded_payload_size();
+  EXPECT_NE(payload_len, -1);
+  struct oc_memb rep_objects = { sizeof(oc_rep_t), 0, 0, 0, 0 };
+  oc_rep_set_pool(&rep_objects);
+  oc_rep_t *rep = NULL;
+  oc_parse_rep(payload, payload_len, &rep);
+  ASSERT_TRUE(rep != NULL);
+
+  /* read the values from the oc_rep_t */
+  float *math_constants_out = 0;
+  size_t math_constants_len;
+  EXPECT_TRUE(oc_rep_get_float_array(rep, "math_constants", &math_constants_out,
+                                     &math_constants_len));
+  ASSERT_EQ(sizeof(math_constants) / sizeof(math_constants[0]),
+            math_constants_len);
+  for (size_t i = 0; i < math_constants_len; ++i) {
+    EXPECT_EQ(math_constants[i], math_constants_out[i]);
+  }
+
+  /* Error handling */
+  EXPECT_FALSE(oc_rep_get_float_array(
+    NULL, "math_constants", &math_constants_out, &math_constants_len));
+  EXPECT_FALSE(oc_rep_get_float_array(rep, NULL, &math_constants_out,
+                                      &math_constants_len));
+  EXPECT_FALSE(
+    oc_rep_get_float_array(rep, "math_constants", NULL, &math_constants_len));
+  EXPECT_FALSE(
+    oc_rep_get_float_array(rep, "math_constants", &math_constants_out, NULL));
+  EXPECT_FALSE(oc_rep_get_float_array(rep, "not_a_key", &math_constants_out,
+                                      &math_constants_len));
+
+  char *json;
+  size_t json_size;
+  json_size = oc_rep_to_json(rep, NULL, 0, false);
+  json = (char *)malloc(json_size + 1);
+  oc_rep_to_json(rep, json, json_size + 1, false);
+  const char non_pretty_json[] =
+    "{\"math_constants\":[3.141590,2.718280,1.414121,1.618030]}";
+  EXPECT_STREQ(non_pretty_json, json);
+  free(json);
+  json = NULL;
+  json_size = oc_rep_to_json(rep, NULL, 0, true);
+  json = (char *)malloc(json_size + 1);
+  oc_rep_to_json(rep, json, json_size + 1, true);
+  const char pretty_json[] =
+    "{\n"
+    "  \"math_constants\" : [3.141590, 2.718280, 1.414121, 1.618030]\n"
+    "}\n";
+
+  EXPECT_STREQ(pretty_json, json);
+  free(json);
+  json = NULL;
+
+  oc_free_rep(rep);
+}
 TEST(TestRep, OCRepSetGetDoubleArray)
 {
   /*buffer for oc_rep_t */
@@ -901,6 +1030,77 @@ TEST(TestRep, OCRepSetGetDoubleArray)
   oc_free_rep(rep);
 }
 
+/*
+ * Build Float Array using oc_rep_add_float instead of oc_rep_set_float
+ */
+TEST(TestRep, OCRepAddGetFloatArray)
+{
+  /*buffer for oc_rep_t */
+  uint8_t buf[1024];
+  oc_rep_new(&buf[0], 1024);
+
+  /* add values to root object */
+  oc_rep_begin_root_object();
+  EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
+  float math_constants[] = { 3.14159, 2.71828, 1.414121, 1.61803 };
+  oc_rep_open_array(root, math_constants);
+  EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
+  for (size_t i = 0; i < (sizeof(math_constants) / sizeof(math_constants[0]));
+       i++) {
+    oc_rep_add_float(math_constants, math_constants[i]);
+    EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
+  }
+  oc_rep_close_array(root, math_constants);
+  EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
+
+  oc_rep_end_root_object();
+  EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
+
+  /* convert CborEncoder to oc_rep_t */
+  const uint8_t *payload = oc_rep_get_encoder_buf();
+  int payload_len = oc_rep_get_encoded_payload_size();
+  EXPECT_NE(payload_len, -1);
+  struct oc_memb rep_objects = { sizeof(oc_rep_t), 0, 0, 0, 0 };
+  oc_rep_set_pool(&rep_objects);
+  oc_rep_t *rep = NULL;
+  oc_parse_rep(payload, payload_len, &rep);
+  ASSERT_TRUE(rep != NULL);
+
+  /* read the values from the oc_rep_t */
+  float *math_constants_out = 0;
+  size_t math_constants_len;
+  EXPECT_TRUE(oc_rep_get_float_array(rep, "math_constants", &math_constants_out,
+                                     &math_constants_len));
+  ASSERT_EQ(sizeof(math_constants) / sizeof(math_constants[0]),
+            math_constants_len);
+  for (size_t i = 0; i < math_constants_len; ++i) {
+    EXPECT_EQ(math_constants[i], math_constants_out[i]);
+  }
+
+  char *json;
+  size_t json_size;
+  json_size = oc_rep_to_json(rep, NULL, 0, false);
+  json = (char *)malloc(json_size + 1);
+  oc_rep_to_json(rep, json, json_size + 1, false);
+  const char non_pretty_json[] =
+    "{\"math_constants\":[3.141590,2.718280,1.414121,1.618030]}";
+  EXPECT_STREQ(non_pretty_json, json);
+  free(json);
+  json = NULL;
+  json_size = oc_rep_to_json(rep, NULL, 0, true);
+  json = (char *)malloc(json_size + 1);
+  oc_rep_to_json(rep, json, json_size + 1, true);
+  const char pretty_json[] =
+    "{\n"
+    "  \"math_constants\" : [3.141590, 2.718280, 1.414121, 1.618030]\n"
+    "}\n";
+
+  EXPECT_STREQ(pretty_json, json);
+  free(json);
+  json = NULL;
+
+  oc_free_rep(rep);
+}
 /*
  * Build Double Array using oc_rep_add_double instead of oc_rep_set_double
  */
@@ -1595,6 +1795,54 @@ TEST(TestRep, OCRepRootArrayObject)
  * testing with tag is an integer instead of ascii
  * ====================================================================================
  */
+TEST(TestRep, OCRepISetGetFloat)
+{
+
+  /*buffer for oc_rep_t */
+  uint8_t buf[1024];
+  oc_rep_new(&buf[0], 1024);
+
+  /* add int values to root object */
+  oc_rep_begin_root_object();
+  oc_rep_i_set_float(root, 5, 3.14159);
+  oc_rep_end_root_object();
+
+  /* convert CborEncoder to oc_rep_t */
+  const uint8_t *payload = oc_rep_get_encoder_buf();
+  int payload_len = oc_rep_get_encoded_payload_size();
+  EXPECT_NE(payload_len, -1);
+  struct oc_memb rep_objects = { sizeof(oc_rep_t), 0, 0, 0, 0 };
+  oc_rep_set_pool(&rep_objects);
+  oc_rep_t *rep = NULL;
+  oc_parse_rep(payload, payload_len, &rep);
+  ASSERT_TRUE(rep != NULL);
+
+  /* read values from  the oc_rep_t */
+  float pi_out = 0;
+  EXPECT_TRUE(oc_rep_i_get_float(rep, 5, &pi_out));
+  EXPECT_FLOAT_EQ(3.14159, pi_out);
+  /* error handling */
+  EXPECT_FALSE(oc_rep_i_get_float(NULL, 5, &pi_out));
+  EXPECT_FALSE(oc_rep_i_get_float(rep, 5, NULL));
+  EXPECT_FALSE(oc_rep_i_get_float(rep, 0, &pi_out));
+
+  char *json;
+  size_t json_size;
+  json_size = oc_rep_to_json(rep, NULL, 0, false);
+  json = (char *)malloc(json_size + 1);
+  oc_rep_to_json(rep, json, json_size + 1, false);
+  EXPECT_STREQ("{\"5\":3.141590}", json);
+  free(json);
+  json = NULL;
+  json_size = oc_rep_to_json(rep, NULL, 0, true);
+  json = (char *)malloc(json_size + 1);
+  oc_rep_to_json(rep, json, json_size + 1, true);
+  EXPECT_STREQ("{\n  \"5\" : 3.141590\n}\n", json);
+  free(json);
+  json = NULL;
+
+  oc_free_rep(rep);
+}
 TEST(TestRep, OCRepISetGetDouble)
 {
 
@@ -1644,6 +1892,78 @@ TEST(TestRep, OCRepISetGetDouble)
   oc_free_rep(rep);
 }
 
+TEST(TestRep, OCRepISetGetFloatArray)
+{
+  /*buffer for oc_rep_t */
+  uint8_t buf[1024];
+  oc_rep_new(&buf[0], 1024);
+
+  /* add values to root object */
+  oc_rep_begin_root_object();
+  EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
+  float math_constants[] = { 3.14159, 2.71828, 1.414121, 1.61803 };
+  oc_rep_i_set_float_array(
+    root, 5, math_constants,
+    (int)(sizeof(math_constants) / sizeof(math_constants[0])));
+  EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
+  oc_rep_end_root_object();
+  EXPECT_EQ(CborNoError, oc_rep_get_cbor_errno());
+
+  /* convert CborEncoder to oc_rep_t */
+  const uint8_t *payload = oc_rep_get_encoder_buf();
+  int payload_len = oc_rep_get_encoded_payload_size();
+  EXPECT_NE(payload_len, -1);
+  struct oc_memb rep_objects = { sizeof(oc_rep_t), 0, 0, 0, 0 };
+  oc_rep_set_pool(&rep_objects);
+  oc_rep_t *rep = NULL;
+  oc_parse_rep(payload, payload_len, &rep);
+  ASSERT_TRUE(rep != NULL);
+
+  /* read the values from the oc_rep_t */
+  float *math_constants_out = 0;
+  size_t math_constants_len;
+  EXPECT_TRUE(
+    oc_rep_i_get_float_array(rep, 5, &math_constants_out, &math_constants_len));
+  ASSERT_EQ(sizeof(math_constants) / sizeof(math_constants[0]),
+            math_constants_len);
+  for (size_t i = 0; i < math_constants_len; ++i) {
+    EXPECT_EQ(math_constants[i], math_constants_out[i]);
+  }
+
+  /* Error handling */
+  EXPECT_FALSE(oc_rep_i_get_float_array(NULL, 5, &math_constants_out,
+                                        &math_constants_len));
+  // EXPECT_FALSE(oc_rep_get_double_array(rep, NULL, &math_constants_out,
+  //                                     &math_constants_len));
+  EXPECT_FALSE(oc_rep_i_get_float_array(rep, 5, NULL, &math_constants_len));
+  EXPECT_FALSE(oc_rep_i_get_float_array(rep, 5, &math_constants_out, NULL));
+  EXPECT_FALSE(
+    oc_rep_i_get_float_array(rep, 6, &math_constants_out, &math_constants_len));
+
+  char *json;
+  size_t json_size;
+  json_size = oc_rep_to_json(rep, NULL, 0, false);
+  json = (char *)malloc(json_size + 1);
+  oc_rep_to_json(rep, json, json_size + 1, false);
+  const char non_pretty_json[] =
+    "{\"5\":[3.141590,2.718280,1.414121,1.618030]}";
+  EXPECT_STREQ(non_pretty_json, json);
+  free(json);
+  json = NULL;
+  json_size = oc_rep_to_json(rep, NULL, 0, true);
+  json = (char *)malloc(json_size + 1);
+  oc_rep_to_json(rep, json, json_size + 1, true);
+  const char pretty_json[] =
+    "{\n"
+    "  \"5\" : [3.141590, 2.718280, 1.414121, 1.618030]\n"
+    "}\n";
+
+  EXPECT_STREQ(pretty_json, json);
+  free(json);
+  json = NULL;
+
+  oc_free_rep(rep);
+}
 TEST(TestRep, OCRepISetGetDoubleArray)
 {
   /*buffer for oc_rep_t */
@@ -2458,7 +2778,3 @@ TEST(TestRep, OCRepGetSetMixedArray)
 
   oc_free_rep(rep);
 }
-
-// oc_rep_i_set_bool_array
-// oc_rep_i_set_string_array
-// oc_rep_i_set_double_array
