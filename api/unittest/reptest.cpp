@@ -87,7 +87,7 @@ TEST(TestRep, OCRepSetGetFloat)
   /* read values from  the oc_rep_t */
   float pi_out = 0;
   EXPECT_TRUE(oc_rep_get_float(rep, "pi", &pi_out));
-  EXPECT_EQ(3.14159, pi_out);
+  EXPECT_FLOAT_EQ(3.14159, pi_out);
   /* error handling */
   EXPECT_FALSE(oc_rep_get_float(NULL, "pi", &pi_out));
   EXPECT_FALSE(oc_rep_get_float(rep, NULL, &pi_out));
@@ -1820,7 +1820,7 @@ TEST(TestRep, OCRepISetGetFloat)
   /* read values from  the oc_rep_t */
   float pi_out = 0;
   EXPECT_TRUE(oc_rep_i_get_float(rep, 5, &pi_out));
-  EXPECT_EQ(3.14159, pi_out);
+  EXPECT_FLOAT_EQ(3.14159, pi_out);
   /* error handling */
   EXPECT_FALSE(oc_rep_i_get_float(NULL, 5, &pi_out));
   EXPECT_FALSE(oc_rep_i_get_float(rep, 5, NULL));
