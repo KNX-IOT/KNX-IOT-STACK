@@ -64,7 +64,8 @@ int oc_frame_query_l(char *url, bool ps_exists, bool total_exists);
  * @param ps_value return -1 if not exist otherwise value
  * @return int 1 == pn or ps exists
  */
-int check_if_query_pn_exist(oc_request_t *request, int *pn_value, int *ps_value);
+int check_if_query_pn_exist(oc_request_t *request, int *pn_value,
+                            int *ps_value);
 
 /**
  * @brief helper function to frame an integer in the response:
