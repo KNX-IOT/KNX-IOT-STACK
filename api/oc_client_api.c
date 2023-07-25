@@ -734,7 +734,7 @@ void
 oc_close_session(oc_endpoint_t *endpoint)
 {
   if (endpoint->flags & SECURED) {
-#ifdef OC_OSCORE
+#ifdef OC_SECURITY
     oc_tls_close_connection(endpoint);
 #endif /* OC_SECURITY */
   } else if (endpoint->flags & TCP) {

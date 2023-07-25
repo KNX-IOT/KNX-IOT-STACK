@@ -618,8 +618,10 @@ stop_processes(void)
 #endif /* OC_SECURITY */
 #ifdef OC_OSCORE
   oc_process_exit(&oc_oscore_handler);
-  oc_process_exit(&oc_tls_handler);
 #endif /* OC_OSCORE */
+#ifdef OC_SECURITY
+  oc_process_exit(&oc_tls_handler);
+#endif/* OC_SECURITY */
 
   oc_process_exit(&message_buffer_handler);
 }

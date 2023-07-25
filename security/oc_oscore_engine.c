@@ -926,8 +926,8 @@ oc_oscore_send_message(oc_message_t *msg)
   }
 oscore_send_dispatch:
   OC_DBG_OSCORE("#################################");
-  if (!oc_tls_connected(&message->endpoint)) {
-  }
+  //if (!oc_tls_connected(&message->endpoint)) {
+  //}
   message->endpoint.flags |= OSCORE_ENCRYPTED;
 
 #ifdef OC_CLIENT
@@ -942,16 +942,19 @@ oscore_send_dispatch:
 #endif /* OC_CLIENT */
 
 #ifdef OC_CLIENT
-
+#ifdef OC_SECURITY
   OC_DBG_OSCORE("Outbound network event: forwarding to TLS");
   if (!oc_tls_connected(&message->endpoint)) {
     OC_DBG_OSCORE("Posting INIT_TLS_CONN_EVENT");
     oc_process_post(&oc_tls_handler, oc_events[INIT_TLS_CONN_EVENT], message);
   } else
+#endif /* OC_SECURITY */
 #endif /* OC_CLIENT */
   {
+#ifdef OC_SECURITY
     OC_DBG_OSCORE("Posting RI_TO_TLS_EVENT");
     oc_process_post(&oc_tls_handler, oc_events[RI_TO_TLS_EVENT], message);
+#endif /* OC_SECURITY */
   }
   return 0;
 
