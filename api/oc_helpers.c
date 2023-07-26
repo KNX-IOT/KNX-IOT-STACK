@@ -545,6 +545,16 @@ oc_string_cmp(oc_string_t string1, oc_string_t string2)
 }
 
 int
+oc_byte_string_cmp(oc_string_t string1, oc_string_t string2)
+{
+  if (oc_byte_string_len(string1) != oc_byte_string_len(string2)) {
+    return -1;
+  }
+  return memcmp(oc_string(string1), oc_string(string2),
+                 oc_byte_string_len(string1));
+}
+
+int
 oc_url_cmp(oc_string_t string1, oc_string_t string2)
 {
   char *str1 = oc_string(string1);

@@ -601,6 +601,15 @@ int oc_string_copy(oc_string_t *string1, oc_string_t string2);
 int oc_string_cmp(oc_string_t string1, oc_string_t string2);
 
 /**
+ * @brief oc_string compare for byte strings (no null terminator)
+ * 
+ * @param string1 byte string 1 to be compared
+ * @param string2 byte string 2 to be compared
+ * @return int 0 == equal
+ */
+int oc_byte_string_cmp(oc_string_t string1, oc_string_t string2);
+
+/**
  * @brief url compare
  * same as string compare but ignores the leading / of the urls
  *
