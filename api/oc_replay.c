@@ -134,6 +134,20 @@ bool oc_replay_is_synchronized_client(uint64_t rx_ssn, oc_string_t rx_kid, oc_st
 		is out of the window, so ssns 1, 0 would be rejected
 		*/
 
+
+		/*
+
+		PROBLEM: spec is ambiguous / contradicts with OSCORE
+		paragraph 2731 of KNX specification is where the problem lies.
+		if you implement that algorithm verbatim, you drop loads of valid packets
+
+		if you look at oscore specification, it says that the 'default mechanism is an anti-replay
+		sliding window (see section 4.1.2.6 of RFC6347).' Algorithm above implements said anti-replay
+		sliding window, but setting the size of this window at run-time is non-trivial if we want
+		to use the efficient bitfield
+		
+		*/
+
 		return true;
 	}
 	else
