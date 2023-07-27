@@ -134,6 +134,7 @@ bool oc_replay_is_synchronized_client(uint64_t rx_ssn, oc_string_t rx_kid, oc_st
 		{
 			// not received before, so remember that this SSN has been seen before
 			rec->window |= 1 << ssn_diff;
+			rec->time = oc_clock_time();
 			return true;
 		}
 	}
@@ -145,7 +146,8 @@ bool oc_replay_is_synchronized_client(uint64_t rx_ssn, oc_string_t rx_kid, oc_st
 		rec->window = rec->window << (-ssn_diff);
 		// set bit 1, indicating ssn rec->rx_ssn has been received
 		rec->window |= 1;
-
+		rec->time = oc_clock_time();
+		return true;
 
 		// TODO: reject if greater than oscore replwdo
 	}
@@ -155,7 +157,18 @@ bool oc_replay_is_synchronized_client(uint64_t rx_ssn, oc_string_t rx_kid, oc_st
 // otherwise, create new replay record
 void oc_replay_add_synchronised_client(uint64_t rx_ssn, oc_string_t rx_kid, oc_string_t rx_kid_ctx)
 {
+	struct oc_replay_record *rec = get_record(rx_kid, rx_kid_ctx);
 
+	if (!rec)
+	{
+		rec = get_empty_record();
+		oc_byte_string_copy(&rec->rx_kid, rx_kid);
+		oc_byte_string_copy(&rec->rx_kid_ctx, rx_kid_ctx);
+		rec->in_use = true;
+	}
 
+	rec->rx_ssn = rx_ssn;
+	rec->window = 1;
+	rec->time = oc_clock_time();
 }
 

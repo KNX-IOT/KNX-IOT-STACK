@@ -509,6 +509,14 @@ oc_string_copy(oc_string_t *string1, oc_string_t string2)
 }
 
 int
+oc_byte_string_copy(oc_string_t *string1, oc_string_t string2)
+{
+  oc_free_string(string1);
+  oc_new_byte_string(string1, oc_string(string2), oc_byte_string_len(string2));
+  return 0;
+}
+
+int
 oc_string_copy_from_char(oc_string_t *string1, const char *string2)
 {
   oc_free_string(string1);
