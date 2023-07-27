@@ -1,7 +1,8 @@
 #include <stdbool.h>
 
+#include "oc_replay.h"
+
 #include "oc_assert.h"
-#include "oc_helpers.h"
 #include "oc_clock.h"
 
 #ifndef OC_MAX_REPLAY_RECORDS
@@ -44,7 +45,7 @@ static struct oc_replay_record * get_record(oc_string_t rx_kid, oc_string_t rx_k
 		if (rec->in_use) {
 			bool rx_kid_match = oc_byte_string_cmp(rx_kid, rec->rx_kid) == 0;
 			bool null_contexts = oc_byte_string_len(rx_kid_ctx) == 0 && oc_byte_string_len(rec->rx_kid_ctx) == 0;
-			bool contexts_match = oc_byte_string_cmp(rx_kid_ctx, rec->rx_kid_ctx);
+			bool contexts_match = oc_byte_string_cmp(rx_kid_ctx, rec->rx_kid_ctx) == 0;
 
 			if(rx_kid_match && (null_contexts || contexts_match))
 				return rec;
@@ -71,7 +72,7 @@ static void free_record(struct oc_replay_record *rec)
 // return true if SSN of device identified by KID & KID_CTX is within replay window
 //    if it is, update SSN within replay record
 // return false if no entry found, or if SSN is outside replay window
-bool oc_replay_is_synchronized_client(uint64_t rx_ssn, oc_string_t rx_kid, oc_string_t rx_kid_ctx)
+bool oc_replay_check_client(uint64_t rx_ssn, oc_string_t rx_kid, oc_string_t rx_kid_ctx)
 {
 	/*
 	With CoAP over UDP, you cannot guarantee messages are received in order.
@@ -115,7 +116,6 @@ bool oc_replay_is_synchronized_client(uint64_t rx_ssn, oc_string_t rx_kid, oc_st
 	if (rec == NULL)
 		return false;
 
-
 	int64_t ssn_diff = rec->rx_ssn - rx_ssn;
 
 	if (ssn_diff >= 0)
@@ -155,7 +155,7 @@ bool oc_replay_is_synchronized_client(uint64_t rx_ssn, oc_string_t rx_kid, oc_st
 
 // update replay record if match found
 // otherwise, create new replay record
-void oc_replay_add_synchronised_client(uint64_t rx_ssn, oc_string_t rx_kid, oc_string_t rx_kid_ctx)
+void oc_replay_add_client(uint64_t rx_ssn, oc_string_t rx_kid, oc_string_t rx_kid_ctx)
 {
 	struct oc_replay_record *rec = get_record(rx_kid, rx_kid_ctx);
 
