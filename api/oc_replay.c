@@ -1,6 +1,8 @@
 #include <stdbool.h>
+
 #include "oc_assert.h"
 #include "oc_helpers.h"
+#include "oc_clock.h"
 
 #ifndef OC_MAX_REPLAY_RECORDS
 #define OC_MAX_REPLAY_RECORDS (20)
@@ -11,6 +13,8 @@ struct oc_replay_record
 	uint64_t rx_ssn; /// most recent received SSN of client
 	oc_string_t rx_kid; /// byte string holding the KID of the client
 	oc_string_t rx_kid_ctx; /// byte string holding the KID context of the client. can be null
+	oc_clock_time_t time; /// time of last received packet
+	uint32_t window; /// bitfield indicating received SSNs through bit position
 	bool in_use; /// whether this structure is in use & has valid data
 };
 
@@ -25,6 +29,7 @@ static struct oc_replay_record * get_empty_record()
 		if (!replay_records[i].in_use)
 			return replay_records + i;
 	}
+	// TODO: if no free record found, free least recently used & return it
 }
 
 // find record with KID and CTX
@@ -55,8 +60,10 @@ static void free_record(struct oc_replay_record *rec)
 	if (replay_records <= rec && rec < replay_records + OC_MAX_REPLAY_RECORDS)
 	{
 		rec->rx_ssn = 0;
+		rec->window = 0;
 		oc_free_string(&rec->rx_kid);
 		oc_free_string(&rec->rx_kid_ctx);
+		rec->time = 0;
 		rec->in_use = false;
 	}
 }
@@ -66,93 +73,81 @@ static void free_record(struct oc_replay_record *rec)
 // return false if no entry found, or if SSN is outside replay window
 bool oc_replay_is_synchronized_client(uint64_t rx_ssn, oc_string_t rx_kid, oc_string_t rx_kid_ctx)
 {
+	/*
+	With CoAP over UDP, you cannot guarantee messages are received in order.
+	what if you happen to receive SSN 32 followed by non-replayed SSNs 28, 
+	29, 30, 31... do you drop all these?
+
+	We can use the default anti-replay algorithm specified by OSCORE, which
+	uses a sliding window in order to track every received SSN within a
+	given range.
+	
+	This can be implemented very efficiently using a bitfield, where the
+	position of bits indicate the SSN being considered, and the value
+	of the bit indicates whether the packet has been received before 
+
+	The entire bitfield is left shifted whenever the recorded SSN increases,
+	thus 'sliding' the window in a very efficient manner
+
+	Here's an example of the algorithm in operation, with a reduced bitfield
+	for readability:
+
+	ssn = 8
+	bitfield = 0b1100'0011
+
+	rx 6, 8 - 6 = 2, check bit 2, accept & set bit 2
+	 
+	ssn = 8
+	bitfield = 0b1100'0111
+
+	rx 7 again, thrown out because bit 8 - 7 = 1 is set
+	rx 2 again, thrown out because 8 - 2 = 6 and bit 6 is set
+	rx 8, 8 - 8 = 0, check bit 0 & reject
+
+	rx 9, 8 - 9 = -1,  change ssn, left shift bitfield by 1, set bit 0
+	
+	ssn = 9
+	bitfield = 0b1000'1111
+
+	*/
+
 	struct oc_replay_record * rec = get_record(rx_kid, rx_kid_ctx);
 	if (rec == NULL)
 		return false;
 
-	uint64_t window = 32; // TODO update this value with API
 
-	if (rec->rx_ssn < rx_ssn && rx_ssn <= rec->rx_ssn + window)
+	int64_t ssn_diff = rec->rx_ssn - rx_ssn;
+
+	if (ssn_diff >= 0)
 	{
-		// ssn is within window! save it
+		// ensure it is not too old
+		if (ssn_diff > sizeof(rec->window) * 8)
+			return false;
 
-		// hmm, cannot guarantee messages are received in order...
-		// what if you happen to receive SSN 32 followed by
-		// non-replayed SSNs 28, 29, 30, 31... do you drop all these?
-		rec->rx_ssn = rx_ssn;
-
-		// better algorithm: also store a bitfield which keeps track 
-		// of actually received messages outside of the window.
-
-		// the bitwise position in this bitfield indicates whether 
-		// a message was received with that message id
-
-		// and you can use a saturating shift to modify the bitfield when the window shifts
-		// 0th bit is always set as it represents the current SSN - makes math simpler
-		// but maybe not strictly necessary
-
-		/*
-		
-		for example:
-
-		ssn = 1
-		bitfield = 0b0000'0001
-
-
-		rx 2, is valid. 2 - 1 = 1, so left shift bitfield by 1 and set 1 (for current ssn)
-
-		ssn = 2
-		bitfield = 0b0000'0011
-
-		rx 2, thrown out because ssn is already 2 & bit 0 is set
-		rx 1, thrown out because 2 - 1 = 1 and bit 1 is set
-
-		rx 8, valid but has skipped some values. 8 - 2 = 6, so left shift bitfield by 6 and set 1
-
-		ssn = 8
-		bitfield = 0b1100'0001
-
-		rx 7, invalid without bitfield but has not been seen before
-		so we set bit 8 - 7 = 1 and accept it
-
-		ssn = 8
-		bitfield = 0b1100'0011
-
-		rx 6, accept & set bit 8 - 6 = 2
-
-		ssn = 8
-		bitfield = 0b1100'0111
-
-		rx 7 again, thrown out because bit 8 - 7 = 1 is set
-		rx 2 again, thrown out because 8 - 2 = 6 and bit 6 is set!!
-
-		rx 9, change ssn and left shift bitfield
-		ssn = 9
-		bitfield = 0b1000'1111
-
-		have to assume that everything beyond what is tracked by the bitfield
-		is out of the window, so ssns 1, 0 would be rejected
-		*/
-
-
-		/*
-
-		PROBLEM: spec is ambiguous / contradicts with OSCORE
-		paragraph 2731 of KNX specification is where the problem lies.
-		if you implement that algorithm verbatim, you drop loads of valid packets
-
-		if you look at oscore specification, it says that the 'default mechanism is an anti-replay
-		sliding window (see section 4.1.2.6 of RFC6347).' Algorithm above implements said anti-replay
-		sliding window, but setting the size of this window at run-time is non-trivial if we want
-		to use the efficient bitfield
-		
-		*/
-
-		return true;
+		// received SSN is within the window - see if it has been received before
+		if (rec->window & (1 << ssn_diff))
+		{
+			// received before, so this is a replay
+			return false;
+		}
+		else
+		{
+			// not received before, so remember that this SSN has been seen before
+			rec->window |= 1 << ssn_diff;
+			return true;
+		}
 	}
 	else
 	{
-		return false;
+		// slide the window and accept the packet
+		rec->rx_ssn = rx_ssn;
+		// ssn_diff is negative in this side of the if
+		rec->window = rec->window << (-ssn_diff);
+		// set bit 1, indicating ssn rec->rx_ssn has been received
+		rec->window |= 1;
+
+
+		// TODO: reject if greater than oscore replwdo
 	}
 }
 
