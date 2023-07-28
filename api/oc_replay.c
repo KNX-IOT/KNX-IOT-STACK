@@ -186,3 +186,14 @@ oc_replay_add_client(uint64_t rx_ssn, oc_string_t rx_kid,
   rec->window = 1;
   rec->time = oc_clock_time();
 }
+
+void oc_replay_free_client(oc_string_t rx_kid)
+{
+  for (size_t i = 0; i < OC_MAX_REPLAY_RECORDS; ++i) {
+	struct oc_replay_record *rec = replay_records + i;
+	if(oc_byte_string_cmp(rx_kid, rec->rx_kid) == 0)
+	{
+		free_record(rec);
+	}
+  }
+}
