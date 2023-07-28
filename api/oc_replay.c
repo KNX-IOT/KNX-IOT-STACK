@@ -22,6 +22,21 @@ struct oc_replay_record
 // this is the list of synchronised clients
 static struct oc_replay_record replay_records[OC_MAX_REPLAY_RECORDS] = {0};
 
+// make record available for reuse
+static void free_record(struct oc_replay_record *rec)
+{
+	// bounds check
+	if (replay_records <= rec && rec < replay_records + OC_MAX_REPLAY_RECORDS)
+	{
+		rec->rx_ssn = 0;
+		rec->window = 0;
+		oc_free_string(&rec->rx_kid);
+		oc_free_string(&rec->rx_kid_ctx);
+		rec->time = 0;
+		rec->in_use = false;
+	}
+}
+
 // get the first available record
 static struct oc_replay_record * get_empty_record()
 {
@@ -30,7 +45,16 @@ static struct oc_replay_record * get_empty_record()
 		if (!replay_records[i].in_use)
 			return replay_records + i;
 	}
-	// TODO: if no free record found, free least recently used & return it
+
+	struct oc_replay_record *oldest_rec = replay_records;
+
+	for (size_t i = 1; i < OC_MAX_REPLAY_RECORDS; ++i)
+	{
+		if (replay_records[i].time < oldest_rec->time)
+			oldest_rec = replay_records + i;
+	}
+	free_record(oldest_rec);
+	return oldest_rec;
 }
 
 // find record with KID and CTX
@@ -52,21 +76,6 @@ static struct oc_replay_record * get_record(oc_string_t rx_kid, oc_string_t rx_k
 		}
 	}
 	return NULL;
-}
-
-// make record available for reuse
-static void free_record(struct oc_replay_record *rec)
-{
-	// bounds check
-	if (replay_records <= rec && rec < replay_records + OC_MAX_REPLAY_RECORDS)
-	{
-		rec->rx_ssn = 0;
-		rec->window = 0;
-		oc_free_string(&rec->rx_kid);
-		oc_free_string(&rec->rx_kid_ctx);
-		rec->time = 0;
-		rec->in_use = false;
-	}
 }
 
 // return true if SSN of device identified by KID & KID_CTX is within replay window
@@ -116,6 +125,10 @@ bool oc_replay_check_client(uint64_t rx_ssn, oc_string_t rx_kid, oc_string_t rx_
 	if (rec == NULL)
 		return false;
 
+	// received message matched existing record, so this record is useful &
+	// should be kept around - thus we update the time here
+	rec->time = oc_clock_time();
+
 	int64_t ssn_diff = rec->rx_ssn - rx_ssn;
 
 	if (ssn_diff >= 0)
@@ -134,7 +147,6 @@ bool oc_replay_check_client(uint64_t rx_ssn, oc_string_t rx_kid, oc_string_t rx_
 		{
 			// not received before, so remember that this SSN has been seen before
 			rec->window |= 1 << ssn_diff;
-			rec->time = oc_clock_time();
 			return true;
 		}
 	}
@@ -146,7 +158,6 @@ bool oc_replay_check_client(uint64_t rx_ssn, oc_string_t rx_kid, oc_string_t rx_
 		rec->window = rec->window << (-ssn_diff);
 		// set bit 1, indicating ssn rec->rx_ssn has been received
 		rec->window |= 1;
-		rec->time = oc_clock_time();
 		return true;
 
 		// TODO: reject if greater than oscore replwdo
