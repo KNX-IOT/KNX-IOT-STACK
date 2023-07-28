@@ -100,8 +100,7 @@ TEST(ReplayProtection, TimeBasedFree)
   oc_string_t kid;
   oc_new_byte_string(&kid, "abcd", 4);
 
-  for (int i = 0; i < 40; ++i)
-  {
+  for (int i = 0; i < 40; ++i) {
     oc_replay_add_client(5, kid, empty);
     // increment the first character, so that we get 30 different values
     (*oc_string(kid))++;
@@ -109,8 +108,7 @@ TEST(ReplayProtection, TimeBasedFree)
   }
 
   // check 20 most recently added values - should still be readable
-  for (int i = 20; i < 30; ++i)
-  {
+  for (int i = 20; i < 30; ++i) {
     (*oc_string(kid))--;
     EXPECT_TRUE(oc_replay_check_client(6, kid, empty));
   }
