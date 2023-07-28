@@ -40,7 +40,7 @@ bool oc_replay_check_client(uint64_t rx_ssn, oc_string_t rx_kid,
 /**
  * @brief Free all clients with a given KID. Should be used whenever the
  * corresponding access token is deleted
- * 
+ *
  * @param rx_kid the KID
  */
 void oc_replay_free_client(oc_string_t rx_kid);
