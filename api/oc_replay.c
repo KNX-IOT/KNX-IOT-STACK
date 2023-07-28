@@ -4,6 +4,7 @@
 
 #include "oc_assert.h"
 #include "oc_clock.h"
+#include "oc_knx_sec.h"
 
 #ifndef OC_MAX_REPLAY_RECORDS
 #define OC_MAX_REPLAY_RECORDS (20)
@@ -152,15 +153,21 @@ bool oc_replay_check_client(uint64_t rx_ssn, oc_string_t rx_kid, oc_string_t rx_
 	}
 	else
 	{
-		// slide the window and accept the packet
-		rec->rx_ssn = rx_ssn;
-		// ssn_diff is negative in this side of the if
-		rec->window = rec->window << (-ssn_diff);
-		// set bit 1, indicating ssn rec->rx_ssn has been received
-		rec->window |= 1;
-		return true;
-
-		// TODO: reject if greater than oscore replwdo
+		uint64_t rplwdo = oc_oscore_get_rplwdo();
+		if (-ssn_diff <=rplwdo)
+		{
+			// slide the window and accept the packet
+			rec->rx_ssn = rx_ssn;
+			// ssn_diff is negative in this side of the if
+			rec->window = rec->window << (-ssn_diff);
+			// set bit 1, indicating ssn rec->rx_ssn has been received
+			rec->window |= 1;
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 }
 

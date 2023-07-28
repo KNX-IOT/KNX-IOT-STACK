@@ -105,14 +105,30 @@ TEST(ReplayProtection, TimeBasedFree)
     oc_replay_add_client(5, kid, empty);
     // increment the first character, so that we get 30 different values
     (*oc_string(kid))++;
-    // clock is ms resolution, so wait for 1ms between changes
-    usleep(1000);
+    usleep(1);
   }
 
-  // check 10 most recently added values - should still be readable
+  // check 20 most recently added values - should still be readable
   for (int i = 20; i < 30; ++i)
   {
     (*oc_string(kid))--;
     EXPECT_TRUE(oc_replay_check_client(6, kid, empty));
   }
+}
+
+extern uint64_t g_oscore_replaywindow;
+
+TEST(ReplayProtection, RplWdo)
+{
+
+  oc_string_t empty = {};
+  oc_string_t kid;
+  oc_new_byte_string(&kid, "abcd", 4);
+
+  oc_replay_add_client(5, kid, empty);
+  // outside the upper bound of the replay window
+  EXPECT_FALSE(oc_replay_check_client(55, kid, empty));
+  // fake an update to the replay window upper bound
+  g_oscore_replaywindow = 64;
+  EXPECT_TRUE(oc_replay_check_client(55, kid, empty));
 }
