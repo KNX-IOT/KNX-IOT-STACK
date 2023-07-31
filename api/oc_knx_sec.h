@@ -56,8 +56,6 @@
 
 #include <stddef.h>
 
-#include "oc_ri.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
