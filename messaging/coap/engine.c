@@ -98,18 +98,12 @@ static uint16_t history[OC_REQUEST_HISTORY_SIZE];
 static uint8_t history_dev[OC_REQUEST_HISTORY_SIZE];
 static uint8_t idx;
 
-#ifndef OC_SEEN_SENDERS_SIZE
-#define OC_SEEN_SENDERS_SIZE (32)
-#endif
-
 #ifndef OC_ECHO_FRESHNESS_TIME
 #define OC_ECHO_FRESHNESS_TIME (10 * OC_CLOCK_CONF_TICKS_PER_SECOND)
 #endif
 
 // cache of previously seen senders - they have responded with a valid Echo
 // response when asked to do so
-static oc_ipv6_addr_t seen_senders[OC_SEEN_SENDERS_SIZE];
-size_t seen_sender_idx = 0;
 
 bool
 oc_coap_check_if_duplicate(uint16_t mid, uint8_t device)
@@ -406,18 +400,8 @@ coap_receive(oc_message_t *msg)
         coap_new_transaction(response->mid, NULL, 0, &msg->endpoint);
 
       if (transaction) {
-        bool new_sender = true;
-        for (int i = 0; i < OC_SEEN_SENDERS_SIZE; ++i) {
-          if (memcmp(seen_senders[i].address, msg->endpoint.addr.ipv6.address,
-                     16) == 0 &&
-              seen_senders[i].port == msg->endpoint.addr.ipv6.port) {
-            new_sender = false;
-            break;
-          }
-        }
 
         bool is_myself = false;
-        //
         // check if incoming message is from myself.
         // if so, then return with bad request
         oc_endpoint_t *my_ep = oc_connectivity_get_endpoints(0);
@@ -488,11 +472,8 @@ coap_receive(oc_message_t *msg)
             return 0;
           } else {
             // message received with fresh echo, add to seen senders list
-            OC_DBG("Included Echo is Fresh! Adding endpoint to seen senders "
-                   "list...");
-            oc_ipv6_addr_t *entry_ptr = &seen_senders[seen_sender_idx];
-            memcpy(entry_ptr, &msg->endpoint.addr.ipv6, sizeof(oc_ipv6_addr_t));
-            seen_sender_idx = (seen_sender_idx + 1) % OC_SEEN_SENDERS_SIZE;
+            OC_DBG("Included Echo is Fresh! Adding SSN to list...");
+            // TODO add SSN to list
           }
         }
 #ifdef OC_BLOCK_WISE
@@ -1098,7 +1079,6 @@ void
 coap_init_engine(void)
 {
   coap_register_as_transaction_handler();
-  memset(seen_senders, 0, sizeof(seen_senders));
 }
 /*---------------------------------------------------------------------------*/
 OC_PROCESS_THREAD(coap_engine, ev, data)
