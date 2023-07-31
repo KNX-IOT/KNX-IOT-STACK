@@ -88,7 +88,6 @@ set(API_SOURCES
     ${PROJECT_SOURCE_DIR}/api/oc_main.c
     ${PROJECT_SOURCE_DIR}/api/oc_network_events.c
     ${PROJECT_SOURCE_DIR}/api/oc_rep.c
-    ${PROJECT_SOURCE_DIR}/api/oc_replay.c
     ${PROJECT_SOURCE_DIR}/api/oc_ri.c
     ${PROJECT_SOURCE_DIR}/api/oc_server_api.c
     ${PROJECT_SOURCE_DIR}/api/oc_session_events.c

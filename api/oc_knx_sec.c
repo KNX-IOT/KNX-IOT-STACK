@@ -25,7 +25,7 @@
 #include "oc_knx.h"
 #include "oc_knx_helpers.h"
 
-uint64_t g_oscore_replaywindow = 32;
+uint64_t g_oscore_replaywindow = 0;
 uint64_t g_oscore_osndelay = 0;
 
 /** the list of connections */
