@@ -283,6 +283,14 @@ coap_receive(oc_message_t *msg)
       transaction = coap_get_transaction_by_mid(message->mid);
       if (transaction) {
 #ifdef OC_CLIENT
+        // This block retransmits messages with included Echo options
+        // for which we have a transaction. This includes Echo retransmissions
+        // for unicast acknowledged requests, but not NON requests, or
+        // multicast S-Mode messages (which are always NON)
+
+        // We need a new mechanism for retransmission of NON requests, which
+        // is separate from transactions but works in a similar way, and does
+        // not take up more memory than necessary
         uint8_t echo_value[COAP_ECHO_LEN];
         size_t echo_len = coap_get_header_echo(message, echo_value);
         if (message->code == UNAUTHORIZED_4_01 && echo_len != 0) {
@@ -421,7 +429,9 @@ coap_receive(oc_message_t *msg)
 
         // temporary: disable requesting echos from peers by trusting
         // every device
-        new_sender = false;
+        
+        // TODO logic for checking for replay attacks should go here
+        bool new_sender = false;
 
         // server-side logic for handling responses with echo option
         if (new_sender && msg->endpoint.flags & OSCORE_DECRYPTED &&
