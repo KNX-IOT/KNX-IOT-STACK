@@ -367,7 +367,7 @@ oc_oscore_recv_message(oc_message_t *message)
 
     OC_DBG_OSCORE("### serializing CoAP message ###");
     /* Serialize fully decrypted CoAP packet to message->data buffer */
-    message->length = coap_serialize_message((void *)coap_pkt, message->data);
+    message->length = coap_oscore_serialize_message((void *)coap_pkt, message->data, true, true, true);
 
     OC_DBG_OSCORE("### setting OSCORE and OSCORE_DECRYPTED ###");
     /* set the oscore encryption and decryption flags*/
