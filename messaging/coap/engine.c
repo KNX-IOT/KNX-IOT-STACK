@@ -430,9 +430,10 @@ coap_receive(oc_message_t *msg)
 
         // get kid, kid_ctx & ssn
         bool client_is_sync = false;
-        oc_string_t kid, kid_ctx;
+        oc_string_t kid = {0};
+        oc_string_t kid_ctx = {0};
         uint64_t ssn;
-
+        if (msg->endpoint.flags & OSCORE_DECRYPTED)
         {
           uint8_t *kid_array;
           uint8_t kid_len;
@@ -441,16 +442,15 @@ coap_receive(oc_message_t *msg)
           uint8_t *piv;
           uint8_t piv_len;
 
-          // NO COAP_OPTION_OSCORE INSIDE FUNCTION CALL BELOW
-          // so functions end up using uninitialised memory
           coap_get_header_oscore(message, &piv, &piv_len, &kid_array, &kid_len, &kid_ctx_array, &kid_ctx_len);
           oc_new_byte_string(&kid, kid_array, kid_len);
           oc_new_byte_string(&kid_ctx, kid_ctx_array, kid_ctx_len);
           oscore_read_piv(piv, piv_len, &ssn);
+
+          client_is_sync = oc_replay_check_client(ssn, kid, kid_ctx);
         }
 
         // check for freshness
-        client_is_sync = oc_replay_check_client(ssn, kid, kid_ctx);
 
         // if it is, not a new sender, so bypass all this
         // if not fresh, send unauthorised with included echo
