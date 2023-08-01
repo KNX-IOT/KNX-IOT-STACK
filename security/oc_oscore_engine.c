@@ -360,7 +360,8 @@ oc_oscore_recv_message(oc_message_t *message)
     memcpy(coap_pkt->kid, oscore_pkt->kid, oscore_pkt->kid_len);
     coap_pkt->kid_ctx_len = oscore_pkt->kid_ctx_len;
     memcpy(coap_pkt->kid_ctx, oscore_pkt->kid_ctx, oscore_pkt->kid_ctx_len);
-    // SSN can be found in the first byte of the PIV, which is copied into the endpoint
+    coap_pkt->piv_len = oscore_pkt->piv_len;
+    memcpy(coap_pkt->piv, oscore_pkt->piv, oscore_pkt->piv_len);
 
     OC_DBG_OSCORE("### serializing CoAP message ###");
     /* Serialize fully decrypted CoAP packet to message->data buffer */

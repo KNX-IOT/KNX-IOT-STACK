@@ -55,6 +55,7 @@
 
 #include "api/oc_events.h"
 #include "api/oc_main.h"
+#include "api/oc_replay.h"
 #include "oc_api.h"
 #include "oc_buffer.h"
 
@@ -427,15 +428,47 @@ coap_receive(oc_message_t *msg)
           }
         }
 
-        // temporary: disable requesting echos from peers by trusting
-        // every device
-        
-        // TODO logic for checking for replay attacks should go here
-        bool new_sender = false;
+        // get kid, kid_ctx & ssn
+        bool client_is_sync = false;
+        oc_string_t kid, kid_ctx;
+        uint64_t ssn;
 
-        // server-side logic for handling responses with echo option
-        if (new_sender && msg->endpoint.flags & OSCORE_DECRYPTED &&
+        {
+          uint8_t *kid_array;
+          uint8_t kid_len;
+          uint8_t *kid_ctx_array;
+          uint8_t kid_ctx_len;
+          uint8_t *piv;
+          uint8_t piv_len;
+          coap_get_header_oscore(message, &piv, &piv_len, &kid_array, &kid_len, &kid_ctx_array, &kid_ctx_len);
+
+          oc_new_byte_string(&kid, kid_array, kid_len);
+          oc_new_byte_string(&kid_ctx, kid_ctx_array, kid_ctx_len);
+          oscore_read_piv(piv, piv_len, &ssn);
+        }
+
+        // check for freshness
+        client_is_sync = oc_replay_check_client(ssn, kid, kid_ctx);
+
+        // if it is, not a new sender, so bypass all this
+        // if not fresh, send unauthorised with included echo
+
+        // messages with a valid echo should not be checked for
+        // freshness, just accept them
+
+        // potential issue: does this enable replay attacks through
+        // retransmitting frames that include the echo??? Could protect
+        // against this by only accepting messages with included echo
+        // once - so we would have to distinguish between new senders &
+        // old senders with a retransmission
+
+        // Server-side logic for sending responses with an echo option,
+        // and checking whether the echo option included in a retransmitted
+        // request is fresh enough.
+        if (!client_is_sync && msg->endpoint.flags & OSCORE_DECRYPTED &&
             is_myself == false) {
+          // Client is not synchronised, so we go through echo replay
+          // protection codepath
           uint8_t echo_value[COAP_ECHO_LEN];
           size_t echo_len = coap_get_header_echo(message, echo_value);
           oc_clock_time_t current_time = oc_clock_time();
@@ -483,7 +516,7 @@ coap_receive(oc_message_t *msg)
           } else {
             // message received with fresh echo, add to seen senders list
             OC_DBG("Included Echo is Fresh! Adding SSN to list...");
-            // TODO add SSN to list
+            oc_replay_add_client(ssn, kid, kid_ctx);
           }
         }
 #ifdef OC_BLOCK_WISE
