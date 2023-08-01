@@ -356,6 +356,8 @@ oc_oscore_recv_message(oc_message_t *message)
     coap_pkt->observe = oscore_pkt->observe;
 
     /* Also copy kid, kid_ctx and ssn, for replay protection */
+
+    SET_OPTION(coap_pkt, COAP_OPTION_OSCORE);
     coap_pkt->kid_len = oscore_pkt->kid_len;
     memcpy(coap_pkt->kid, oscore_pkt->kid, oscore_pkt->kid_len);
     coap_pkt->kid_ctx_len = oscore_pkt->kid_ctx_len;

@@ -440,8 +440,10 @@ coap_receive(oc_message_t *msg)
           uint8_t kid_ctx_len;
           uint8_t *piv;
           uint8_t piv_len;
-          coap_get_header_oscore(message, &piv, &piv_len, &kid_array, &kid_len, &kid_ctx_array, &kid_ctx_len);
 
+          // NO COAP_OPTION_OSCORE INSIDE FUNCTION CALL BELOW
+          // so functions end up using uninitialised memory
+          coap_get_header_oscore(message, &piv, &piv_len, &kid_array, &kid_len, &kid_ctx_array, &kid_ctx_len);
           oc_new_byte_string(&kid, kid_array, kid_len);
           oc_new_byte_string(&kid_ctx, kid_ctx_array, kid_ctx_len);
           oscore_read_piv(piv, piv_len, &ssn);
