@@ -151,7 +151,6 @@ coap_send_unauth_echo_response(coap_message_type_t type, uint16_t mid,
                                uint8_t *echo, size_t echo_len,
                                oc_endpoint_t *endpoint)
 {
-  OC_DBG("CoAP send Unauthorised Echo Response message: mid=%u", mid);
   coap_packet_t msg[1]; // empty response
   coap_udp_init_message(msg, type, UNAUTHORIZED_4_01, mid);
   OC_WRN("CoAP send Unauthorised Echo Response message: mid=%u", mid);
@@ -435,17 +434,9 @@ coap_receive(oc_message_t *msg)
         uint64_t ssn;
         if (msg->endpoint.flags & OSCORE_DECRYPTED)
         {
-          uint8_t *kid_array;
-          uint8_t kid_len;
-          uint8_t *kid_ctx_array;
-          uint8_t kid_ctx_len;
-          uint8_t *piv;
-          uint8_t piv_len;
-
-          coap_get_header_oscore(message, &piv, &piv_len, &kid_array, &kid_len, &kid_ctx_array, &kid_ctx_len);
-          oc_new_byte_string(&kid, kid_array, kid_len);
-          oc_new_byte_string(&kid_ctx, kid_ctx_array, kid_ctx_len);
-          oscore_read_piv(piv, piv_len, &ssn);
+          oc_new_byte_string(&kid, msg->endpoint.kid, msg->endpoint.kid_len);
+          oc_new_byte_string(&kid_ctx, msg->endpoint.kid_ctx, msg->endpoint.kid_ctx_len);
+          oscore_read_piv(msg->endpoint.piv, msg->endpoint.piv_len, &ssn);
 
           client_is_sync = oc_replay_check_client(ssn, kid, kid_ctx);
         }
@@ -476,7 +467,7 @@ coap_receive(oc_message_t *msg)
           oc_clock_time_t current_time = oc_clock_time();
 
           if (echo_len == 0) {
-            OC_DBG("Received request from new sender, sending Unauthorised "
+            OC_DBG("Received request from unsynchronized client, sending Unauthorised "
                    "with Echo Challenge...");
             coap_send_unauth_echo_response(
               message->type == COAP_TYPE_CON ? COAP_TYPE_ACK : COAP_TYPE_NON,
@@ -505,14 +496,17 @@ coap_receive(oc_message_t *msg)
           // okay
           oc_clock_time_t received_timestamp = (*(oc_clock_time_t *)echo_value);
 
-          OC_DBG("Included Echo timestamp difference %lu, threshold %d",
-                 current_time - received_timestamp, OC_ECHO_FRESHNESS_TIME);
+          OC_DBG("Included Echo timestamp difference %llu, threshold %d",
+                 (uint64_t) (current_time - received_timestamp), OC_ECHO_FRESHNESS_TIME);
           if (current_time - received_timestamp > OC_ECHO_FRESHNESS_TIME) {
             OC_ERR("Stale timestamp! Current time  %" PRIu64 ","
                    " received time %" PRIu64 "",
                    (uint64_t)current_time, (uint64_t)received_timestamp);
-            OC_ERR("Dropping frame!");
-            // message containing echo is stale, just drop it
+            OC_ERR("Sending Uauthorised with Echo Challenge...");
+            coap_send_unauth_echo_response(
+              message->type == COAP_TYPE_CON ? COAP_TYPE_ACK : COAP_TYPE_NON,
+              message->mid, message->token, message->token_len,
+              (uint8_t *)&current_time, sizeof(current_time), &msg->endpoint);
             coap_clear_transaction(transaction);
             return 0;
           } else {

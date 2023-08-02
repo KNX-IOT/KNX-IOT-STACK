@@ -250,7 +250,6 @@ oc_oscore_recv_message(oc_message_t *message)
     if (oscore_pkt->piv_len > 0) {
       /* If message is request */
       if (oscore_pkt->code >= OC_GET && oscore_pkt->code <= OC_FETCH) {
-        /* Check if this is a repeat request and discard */
         uint64_t piv = 0;
         oscore_read_piv(oscore_pkt->piv, oscore_pkt->piv_len, &piv);
         /* Compose AAD using received piv and context->recvid */
@@ -371,13 +370,10 @@ oc_oscore_recv_message(oc_message_t *message)
 
     /* Also copy kid, kid_ctx and ssn, for replay protection */
 
-    SET_OPTION(coap_pkt, COAP_OPTION_OSCORE);
-    coap_pkt->kid_len = oscore_pkt->kid_len;
-    memcpy(coap_pkt->kid, oscore_pkt->kid, oscore_pkt->kid_len);
-    coap_pkt->kid_ctx_len = oscore_pkt->kid_ctx_len;
-    memcpy(coap_pkt->kid_ctx, oscore_pkt->kid_ctx, oscore_pkt->kid_ctx_len);
-    coap_pkt->piv_len = oscore_pkt->piv_len;
-    memcpy(coap_pkt->piv, oscore_pkt->piv, oscore_pkt->piv_len);
+    message->endpoint.kid_len = oscore_pkt->kid_len;
+    memcpy(message->endpoint.kid, oscore_pkt->kid, oscore_pkt->kid_len);
+    message->endpoint.kid_ctx_len = oscore_pkt->kid_ctx_len;
+    memcpy(message->endpoint.kid_ctx, oscore_pkt->kid_ctx, oscore_pkt->kid_ctx_len);
 
     OC_DBG_OSCORE("### serializing CoAP message ###");
     /* Serialize fully decrypted CoAP packet to message->data buffer */

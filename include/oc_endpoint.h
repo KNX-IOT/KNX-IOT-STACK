@@ -100,6 +100,10 @@ typedef struct oc_endpoint_t
                     * Used for upper layers to check access interfaces. */
   uint8_t piv[OSCORE_PIV_LEN]; /**< OSCORE partial iv */
   uint8_t piv_len;             /**< OSCORE partial iv length */
+  uint8_t kid_len;
+  uint8_t kid[OSCORE_CTXID_LEN];
+  uint8_t kid_ctx_len;
+  uint8_t kid_ctx[OSCORE_IDCTX_LEN];
 } oc_endpoint_t;
 
 #define oc_make_ipv4_endpoint(__name__, __flags__, __port__, ...)              \
