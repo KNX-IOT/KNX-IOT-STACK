@@ -248,6 +248,20 @@ oc_oscore_recv_message(oc_message_t *message)
 
     /* If received Partial IV in message */
     if (oscore_pkt->piv_len > 0) {
+      /* If message is request */
+      if (oscore_pkt->code >= OC_GET && oscore_pkt->code <= OC_FETCH) {
+        /* Check if this is a repeat request and discard */
+        uint64_t piv = 0;
+        oscore_read_piv(oscore_pkt->piv, oscore_pkt->piv_len, &piv);
+        /* Compose AAD using received piv and context->recvid */
+        oc_oscore_compose_AAD(oscore_ctx->recvid, oscore_ctx->recvid_len,
+                              oscore_pkt->piv, oscore_pkt->piv_len, AAD,
+                              &AAD_len);
+        OC_DBG_OSCORE(
+          "---composed AAD using received Partial IV and Recipient ID");
+        OC_LOGbytes_OSCORE(AAD, AAD_len);
+      }
+
       /* Copy received piv into oc_message_t->endpoint */
       memcpy(message->endpoint.piv, oscore_pkt->piv, oscore_pkt->piv_len);
       message->endpoint.piv_len = oscore_pkt->piv_len;
