@@ -2,7 +2,7 @@
 
 #include "oc_replay.h"
 
-#include "oc_clock.h"
+#include "port/oc_clock.h"
 #include "oc_knx_sec.h"
 
 #ifndef OC_MAX_REPLAY_RECORDS
