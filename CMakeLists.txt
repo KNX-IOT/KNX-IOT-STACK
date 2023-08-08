@@ -30,6 +30,7 @@ set(OC_LOG_TO_FILE_ENABLED OFF CACHE BOOL "redirect debug messages to file")
 set(CLANG_TIDY_ENABLED OFF CACHE BOOL "Enable clang-tidy analysis during compilation.")
 set(OC_USE_STORAGE ON CACHE BOOL "Persistent storage of data.")
 set(OC_USE_MULTICAST_SCOPE_2 ON CACHE BOOL "devices send also group multicast events with scope2.")
+set(OC_REPLAY_PROTECTION_ENABLED OFF CACHE BOOL "Enable replay protection using the Echo option")
 
 set(KNX_BUILTIN_MBEDTLS ON CACHE BOOL "Use built-in mbedTLS, as opposed to external lib from different project")
 set(KNX_BUILTIN_TINYCBOR ON CACHE BOOL "Use built-in TinyCBOR, as opposed to external lib from different project")
@@ -88,6 +89,7 @@ set(API_SOURCES
     ${PROJECT_SOURCE_DIR}/api/oc_main.c
     ${PROJECT_SOURCE_DIR}/api/oc_network_events.c
     ${PROJECT_SOURCE_DIR}/api/oc_rep.c
+    ${PROJECT_SOURCE_DIR}/api/oc_replay.c
     ${PROJECT_SOURCE_DIR}/api/oc_ri.c
     ${PROJECT_SOURCE_DIR}/api/oc_server_api.c
     ${PROJECT_SOURCE_DIR}/api/oc_session_events.c
@@ -133,7 +135,6 @@ set(CORE_SOURCES
     ${PROJECT_SOURCE_DIR}/security/oc_oscore_context.c
     ${PROJECT_SOURCE_DIR}/security/oc_oscore_crypto.c
     ${PROJECT_SOURCE_DIR}/security/oc_oscore_engine.c
-    ${PROJECT_SOURCE_DIR}/security/oc_oscore_replay.c
     ${PROJECT_SOURCE_DIR}/security/oc_spake2plus.c
     ${PROJECT_SOURCE_DIR}/security/oc_tls.c
 
@@ -181,6 +182,9 @@ endif()
 
 if(OC_DEBUG_OSCORE_ENABLED)
     target_compile_definitions(kis-common INTERFACE OC_DEBUG_OSCORE)
+endif()
+if(OC_REPLAY_PROTECTION_ENABLED)
+    target_compile_definitions(kis-common INTERFACE OC_REPLAY_PROTECTION)
 endif()
 
 

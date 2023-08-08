@@ -55,6 +55,7 @@
 
 #include "api/oc_events.h"
 #include "api/oc_main.h"
+#include "api/oc_replay.h"
 #include "oc_api.h"
 #include "oc_buffer.h"
 
@@ -98,18 +99,12 @@ static uint16_t history[OC_REQUEST_HISTORY_SIZE];
 static uint8_t history_dev[OC_REQUEST_HISTORY_SIZE];
 static uint8_t idx;
 
-#ifndef OC_SEEN_SENDERS_SIZE
-#define OC_SEEN_SENDERS_SIZE (32)
-#endif
-
 #ifndef OC_ECHO_FRESHNESS_TIME
 #define OC_ECHO_FRESHNESS_TIME (10 * OC_CLOCK_CONF_TICKS_PER_SECOND)
 #endif
 
 // cache of previously seen senders - they have responded with a valid Echo
 // response when asked to do so
-static oc_ipv6_addr_t seen_senders[OC_SEEN_SENDERS_SIZE];
-size_t seen_sender_idx = 0;
 
 bool
 oc_coap_check_if_duplicate(uint16_t mid, uint8_t device)
@@ -156,7 +151,6 @@ coap_send_unauth_echo_response(coap_message_type_t type, uint16_t mid,
                                uint8_t *echo, size_t echo_len,
                                oc_endpoint_t *endpoint)
 {
-  OC_DBG("CoAP send Unauthorised Echo Response message: mid=%u", mid);
   coap_packet_t msg[1]; // empty response
   coap_udp_init_message(msg, type, UNAUTHORIZED_4_01, mid);
   OC_WRN("CoAP send Unauthorised Echo Response message: mid=%u", mid);
@@ -289,6 +283,14 @@ coap_receive(oc_message_t *msg)
       transaction = coap_get_transaction_by_mid(message->mid);
       if (transaction) {
 #ifdef OC_CLIENT
+        // This block retransmits messages with included Echo options
+        // for which we have a transaction. This includes Echo retransmissions
+        // for unicast acknowledged requests, but not NON requests, or
+        // multicast S-Mode messages (which are always NON)
+
+        // We need a new mechanism for retransmission of NON requests, which
+        // is separate from transactions but works in a similar way, and does
+        // not take up more memory than necessary
         uint8_t echo_value[COAP_ECHO_LEN];
         size_t echo_len = coap_get_header_echo(message, echo_value);
         if (message->code == UNAUTHORIZED_4_01 && echo_len != 0) {
@@ -401,100 +403,111 @@ coap_receive(oc_message_t *msg)
         }
       }
 
-      /* create transaction for response */
+      bool is_myself = false;
+      // check if incoming message is from myself.
+      // if so, then return with bad request
+      oc_endpoint_t *my_ep = oc_connectivity_get_endpoints(0);
+#ifdef OC_DEBUG
+      if (my_ep != NULL) {
+        PRINT("engine : myself:");
+        PRINTipaddr(*my_ep);
+        PRINT("\n");
+      }
+#endif /* OC_DEBUG */
+      if (oc_endpoint_compare_address(&msg->endpoint, my_ep) == 0) {
+        if (msg->endpoint.addr.ipv6.port == my_ep->addr.ipv6.port) {
+          OC_DBG(" same address and port: not handling message");
+          is_myself = true;
+        }
+      }
+
+#ifdef OC_REPLAY_PROTECTION
+      bool client_is_sync = true;
+      oc_string_t kid = { 0 };
+      oc_string_t kid_ctx = { 0 };
+      uint64_t ssn;
+
+      if (msg->endpoint.flags & OSCORE_DECRYPTED) {
+        oc_new_byte_string(&kid, msg->endpoint.kid, msg->endpoint.kid_len);
+        oc_new_byte_string(&kid_ctx, msg->endpoint.kid_ctx,
+                           msg->endpoint.kid_ctx_len);
+        oscore_read_piv(msg->endpoint.piv, msg->endpoint.piv_len, &ssn);
+
+        client_is_sync = oc_replay_check_client(ssn, kid, kid_ctx);
+      }
+
+      // Server-side logic for sending responses with an echo option,
+      // and checking whether the echo option included in a retransmitted
+      // request is fresh enough.
+      if (!client_is_sync && msg->endpoint.flags & OSCORE_DECRYPTED &&
+          is_myself == false) {
+        // Client is not synchronised, so we go through echo replay
+        // protection codepath
+        uint8_t echo_value[COAP_ECHO_LEN];
+        size_t echo_len = coap_get_header_echo(message, echo_value);
+        oc_clock_time_t current_time = oc_clock_time();
+
+        if (echo_len == 0) {
+          OC_DBG(
+            "Received request from unsynchronized client, sending Unauthorised "
+            "with Echo Challenge...");
+          coap_send_unauth_echo_response(
+            message->type == COAP_TYPE_CON ? COAP_TYPE_ACK : COAP_TYPE_NON,
+            message->mid, message->token, message->token_len,
+            (uint8_t *)&current_time, sizeof(current_time), &msg->endpoint);
+          if (transaction)
+            coap_clear_transaction(transaction);
+          OC_ERR("CoAP send Unauthorised Echo Response message with ECHO");
+          return UNAUTHORIZED_4_01;
+        } else if (echo_len != sizeof(oc_clock_time_t)) // KNX-IoT servers use
+                                                        // 8-byte echo options
+        {
+          OC_DBG(
+            "Received request with bad Echo size %d! Sending bad option...",
+            (int)echo_len);
+          coap_send_empty_response(
+            message->type == COAP_TYPE_CON ? COAP_TYPE_ACK : COAP_TYPE_NON,
+            message->mid, message->token, message->token_len, BAD_OPTION_4_02,
+            &msg->endpoint);
+          if (transaction)
+            coap_clear_transaction(transaction);
+          return BAD_OPTION_4_02;
+        }
+
+        // this is potentially endianess-sensitive, but we've already checked
+        // that the echo value is 8 bytes, and correct echo values originate
+        // on the same machine where they are generated, so this should be
+        // okay
+        oc_clock_time_t received_timestamp = (*(oc_clock_time_t *)echo_value);
+
+        OC_DBG("Included Echo timestamp difference %llu, threshold %d",
+               (uint64_t)(current_time - received_timestamp),
+               OC_ECHO_FRESHNESS_TIME);
+        if (current_time - received_timestamp > OC_ECHO_FRESHNESS_TIME) {
+          OC_ERR("Stale timestamp! Current time  %" PRIu64 ","
+                 " received time %" PRIu64 "",
+                 (uint64_t)current_time, (uint64_t)received_timestamp);
+          OC_ERR("Sending Uauthorised with Echo Challenge...");
+          coap_send_unauth_echo_response(
+            message->type == COAP_TYPE_CON ? COAP_TYPE_ACK : COAP_TYPE_NON,
+            message->mid, message->token, message->token_len,
+            (uint8_t *)&current_time, sizeof(current_time), &msg->endpoint);
+          if (transaction)
+            coap_clear_transaction(transaction);
+          return 0;
+        } else {
+          // message received with fresh echo, add to seen senders list
+          OC_DBG("Included Echo is Fresh! Adding SSN to list...");
+          oc_replay_add_client(ssn, kid, kid_ctx);
+        }
+      }
+#endif
+
+      /* create transaction for (blockwise?) response */
       transaction =
         coap_new_transaction(response->mid, NULL, 0, &msg->endpoint);
 
       if (transaction) {
-        bool new_sender = true;
-        for (int i = 0; i < OC_SEEN_SENDERS_SIZE; ++i) {
-          if (memcmp(seen_senders[i].address, msg->endpoint.addr.ipv6.address,
-                     16) == 0 &&
-              seen_senders[i].port == msg->endpoint.addr.ipv6.port) {
-            new_sender = false;
-            break;
-          }
-        }
-
-        bool is_myself = false;
-        //
-        // check if incoming message is from myself.
-        // if so, then return with bad request
-        oc_endpoint_t *my_ep = oc_connectivity_get_endpoints(0);
-#ifdef OC_DEBUG
-        if (my_ep != NULL) {
-          PRINT("engine : myself:");
-          PRINTipaddr(*my_ep);
-          PRINT("\n");
-        }
-#endif /* OC_DEBUG */
-        if (oc_endpoint_compare_address(&msg->endpoint, my_ep) == 0) {
-          if (msg->endpoint.addr.ipv6.port == my_ep->addr.ipv6.port) {
-            OC_DBG(" same address and port: not handling message");
-            is_myself = true;
-          }
-        }
-
-        // temporary: disable requesting echos from peers by trusting
-        // every device
-        new_sender = false;
-
-        // server-side logic for handling responses with echo option
-        if (new_sender && msg->endpoint.flags & OSCORE_DECRYPTED &&
-            is_myself == false) {
-          uint8_t echo_value[COAP_ECHO_LEN];
-          size_t echo_len = coap_get_header_echo(message, echo_value);
-          oc_clock_time_t current_time = oc_clock_time();
-
-          if (echo_len == 0) {
-            OC_DBG("Received request from new sender, sending Unauthorised "
-                   "with Echo Challenge...");
-            coap_send_unauth_echo_response(
-              message->type == COAP_TYPE_CON ? COAP_TYPE_ACK : COAP_TYPE_NON,
-              message->mid, message->token, message->token_len,
-              (uint8_t *)&current_time, sizeof(current_time), &msg->endpoint);
-            coap_clear_transaction(transaction);
-            OC_ERR("CoAP send Unauthorised Echo Response message with ECHO");
-            return UNAUTHORIZED_4_01;
-          } else if (echo_len != sizeof(oc_clock_time_t)) // KNX-IoT servers use
-                                                          // 8-byte echo options
-          {
-            OC_DBG(
-              "Received request with bad Echo size %d! Sending bad option...",
-              (int)echo_len);
-            coap_send_empty_response(
-              message->type == COAP_TYPE_CON ? COAP_TYPE_ACK : COAP_TYPE_NON,
-              message->mid, message->token, message->token_len, BAD_OPTION_4_02,
-              &msg->endpoint);
-            coap_clear_transaction(transaction);
-            return BAD_OPTION_4_02;
-          }
-
-          // this is potentially endianess-sensitive, but we've already checked
-          // that the echo value is 8 bytes, and correct echo values originate
-          // on the same machine where they are generated, so this should be
-          // okay
-          oc_clock_time_t received_timestamp = (*(oc_clock_time_t *)echo_value);
-
-          OC_DBG("Included Echo timestamp difference %lu, threshold %d",
-                 current_time - received_timestamp, OC_ECHO_FRESHNESS_TIME);
-          if (current_time - received_timestamp > OC_ECHO_FRESHNESS_TIME) {
-            OC_ERR("Stale timestamp! Current time  %" PRIu64 ","
-                   " received time %" PRIu64 "",
-                   (uint64_t)current_time, (uint64_t)received_timestamp);
-            OC_ERR("Dropping frame!");
-            // message containing echo is stale, just drop it
-            coap_clear_transaction(transaction);
-            return 0;
-          } else {
-            // message received with fresh echo, add to seen senders list
-            OC_DBG("Included Echo is Fresh! Adding endpoint to seen senders "
-                   "list...");
-            oc_ipv6_addr_t *entry_ptr = &seen_senders[seen_sender_idx];
-            memcpy(entry_ptr, &msg->endpoint.addr.ipv6, sizeof(oc_ipv6_addr_t));
-            seen_sender_idx = (seen_sender_idx + 1) % OC_SEEN_SENDERS_SIZE;
-          }
-        }
 #ifdef OC_BLOCK_WISE
         const uint8_t *incoming_block;
         uint32_t incoming_block_len =
@@ -1098,7 +1111,6 @@ void
 coap_init_engine(void)
 {
   coap_register_as_transaction_handler();
-  memset(seen_senders, 0, sizeof(seen_senders));
 }
 /*---------------------------------------------------------------------------*/
 OC_PROCESS_THREAD(coap_engine, ev, data)

@@ -66,52 +66,6 @@ dump_cred(void *data)
   return OC_EVENT_DONE;
 }
 
-static bool
-check_if_replayed_request(oc_oscore_context_t *oscore_ctx, uint64_t piv,
-                          const oc_endpoint_t *source_endpoint,
-                          oc_ipv6_addr_t *dest_addr)
-{
-  OC_DBG("Checking if message has been received before...");
-  OC_DBG("PIV: %d, Destination IP Address: ", (int)piv);
-  PRINTipaddr(*source_endpoint);
-  PRINT("\n");
-
-  uint8_t i;
-  if (piv == 0 && oscore_ctx->rwin[0].ssn == 0 &&
-      oscore_ctx->rwin[OSCORE_REPLAY_WINDOW_SIZE - 1].ssn == 0) {
-    goto fresh_request;
-  }
-  for (i = 0; i < OSCORE_REPLAY_WINDOW_SIZE; i++) {
-    bool has_same_ssn = oscore_ctx->rwin[i].ssn == piv;
-    bool has_same_sender =
-      memcmp(oscore_ctx->rwin[i].sender_address,
-             source_endpoint->addr.ipv6.address,
-             sizeof(oscore_ctx->rwin[i].sender_address)) == 0;
-    bool has_same_ga =
-      memcmp(oscore_ctx->rwin[i].destination_address, dest_addr->address,
-             sizeof(dest_addr->address)) == 0;
-    if (has_same_ssn && has_same_sender && has_same_ga &&
-        oscore_ctx->rwin[i].ssn != 0) {
-      OC_DBG_OSCORE("Duplicate message!");
-      return true;
-    }
-  }
-fresh_request:
-  oscore_ctx->rwin_idx = (oscore_ctx->rwin_idx + 1) % OSCORE_REPLAY_WINDOW_SIZE;
-
-  // SSN
-  oscore_ctx->rwin[oscore_ctx->rwin_idx].ssn = piv;
-  // source address
-  memcpy(oscore_ctx->rwin[oscore_ctx->rwin_idx].sender_address,
-         source_endpoint->addr.ipv6.address,
-         sizeof(oscore_ctx->rwin[oscore_ctx->rwin_idx].sender_address));
-  // group address
-  memcpy(oscore_ctx->rwin[oscore_ctx->rwin_idx].destination_address,
-         dest_addr->address, sizeof(dest_addr->address));
-
-  return false;
-}
-
 static int
 oc_oscore_recv_message(oc_message_t *message)
 {
@@ -250,19 +204,8 @@ oc_oscore_recv_message(oc_message_t *message)
     if (oscore_pkt->piv_len > 0) {
       /* If message is request */
       if (oscore_pkt->code >= OC_GET && oscore_pkt->code <= OC_FETCH) {
-        /* Check if this is a repeat request and discard */
         uint64_t piv = 0;
         oscore_read_piv(oscore_pkt->piv, oscore_pkt->piv_len, &piv);
-        /*
-        // enable this again when the echo option is finished
-        if (check_if_replayed_request(oscore_ctx, piv, &message->endpoint,
-                                      &message->mcast_dest)) {
-          OC_ERR("REPLAY: returning UNAUTHORIZED");
-          oscore_send_error(oscore_pkt, UNAUTHORIZED_4_01, &message->endpoint);
-          goto oscore_recv_error;
-        }
-        */
-
         /* Compose AAD using received piv and context->recvid */
         oc_oscore_compose_AAD(oscore_ctx->recvid, oscore_ctx->recvid_len,
                               oscore_pkt->piv, oscore_pkt->piv_len, AAD,
@@ -379,9 +322,18 @@ oc_oscore_recv_message(oc_message_t *message)
     coap_pkt->token_len = oscore_pkt->token_len;
     coap_pkt->observe = oscore_pkt->observe;
 
+    /* Also copy kid, kid_ctx and ssn, for replay protection */
+
+    message->endpoint.kid_len = oscore_pkt->kid_len;
+    memcpy(message->endpoint.kid, oscore_pkt->kid, oscore_pkt->kid_len);
+    message->endpoint.kid_ctx_len = oscore_pkt->kid_ctx_len;
+    memcpy(message->endpoint.kid_ctx, oscore_pkt->kid_ctx,
+           oscore_pkt->kid_ctx_len);
+
     OC_DBG_OSCORE("### serializing CoAP message ###");
     /* Serialize fully decrypted CoAP packet to message->data buffer */
-    message->length = coap_serialize_message((void *)coap_pkt, message->data);
+    message->length = coap_oscore_serialize_message(
+      (void *)coap_pkt, message->data, true, true, true);
 
     OC_DBG_OSCORE("### setting OSCORE and OSCORE_DECRYPTED ###");
     /* set the oscore encryption and decryption flags*/

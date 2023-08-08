@@ -592,6 +592,15 @@ int oc_byte_string_copy_from_char_with_size(oc_string_t *string1,
 int oc_string_copy(oc_string_t *string1, oc_string_t string2);
 
 /**
+ * @brief copy oc_string used as a byte string
+ *
+ * @param string1 the oc_string to copy to
+ * @param string2 the oc_string to copy from
+ * @return int 0 == success
+ */
+int oc_byte_string_copy(oc_string_t *string1, oc_string_t string2);
+
+/**
  * @brief oc_string compare
  *
  * @param string1 string 1 to be compared
@@ -599,6 +608,15 @@ int oc_string_copy(oc_string_t *string1, oc_string_t string2);
  * @return int 0 == equal
  */
 int oc_string_cmp(oc_string_t string1, oc_string_t string2);
+
+/**
+ * @brief oc_string compare for byte strings (no null terminator)
+ *
+ * @param string1 byte string 1 to be compared
+ * @param string2 byte string 2 to be compared
+ * @return int 0 == equal
+ */
+int oc_byte_string_cmp(oc_string_t string1, oc_string_t string2);
 
 /**
  * @brief url compare
