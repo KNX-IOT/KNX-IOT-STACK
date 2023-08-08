@@ -1,5 +1,5 @@
 /*
-// Copyright (c) 2021-2022 Cascoda Ltd
+// Copyright (c) 2021-2023 Cascoda Ltd
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -67,9 +67,11 @@ extern "C" {
  * see section 3.5.4.2 Access Token Resource Object
  */
 typedef enum {
-  OC_PROFILE_UNKNOWN = 0, /**< unknown profile */
-  OC_PROFILE_COAP_DTLS,   /**< "coap_dtls" */
-  OC_PROFILE_COAP_OSCORE  /**< "coap_oscore" */
+  OC_PROFILE_UNKNOWN = 0,      /**< unknown profile */
+  OC_PROFILE_COAP_DTLS = 1,    /**< "coap_dtls" */
+  OC_PROFILE_COAP_OSCORE = 2,  /**< "coap_oscore" */
+  OC_PROFILE_COAP_TLS = 254,   /**< coap_tls" [OSCORE] for [X.509] certificates with TLS */
+  OC_PROFILE_COAP_PASE = 255   /**< "coap_pase" [OSCORE] with PASE credentials */
 } oc_at_profile_t;
 
 /**
@@ -131,7 +133,6 @@ char *oc_at_profile_to_string(oc_at_profile_t at_profile);
  *  | kid       | 2        | string     | optional   |
  *  | nbf       | 5        | integer    | optional   |
  *  | sub       | 2        | string     | conditional |
- *  | aud       | 3        | string     | conditional |
  *
  *
  * Specific oscore values (ACE):
@@ -147,7 +148,6 @@ char *oc_at_profile_to_string(oc_at_profile_t at_profile);
  * | alg       | 18:4:4 | integer     | AEAD Algorithm | AES-CCM-16-64-128 (10)|
  * | salt      | 18:4:5 | byte string | Master Salt    | Default empty byte
  *string | | contextId | 18:4:6 | byte string | OSCORE ID Context value | omit |
- * | osc_rid   | 18:4:7 | byte string | OSCORE RID     | -  |
  * | osc_id    | 18:4:0 | byte string | OSCORE SID     | -  |
  *
  * Example payload:
@@ -166,7 +166,7 @@ typedef struct oc_auth_at_t
   oc_interface_mask_t scope; /**< (9) the scope (interfaces) */
   oc_at_profile_t
     profile; /**< (38) "coap_oscore" or "coap_dtls", only oscore implemented*/
-  oc_string_t aud;         /**< (13) audience (for out going requests) */
+  oc_string_t aud;         /**< not used anymore, references  */
   oc_string_t sub;         /**< (2) DTLS (not used) 2 sub */
   oc_string_t kid;         /**< (8:2) DTLS (not used)  cnf:kid*/
   oc_string_t osc_version; /**< (18:4:1) OSCORE cnf:osc:version (optional) */
@@ -178,9 +178,9 @@ typedef struct oc_auth_at_t
   oc_string_t
     osc_salt; /**< (18:4:5) OSCORE cnf:osc:salt (optional) empty string */
   oc_string_t osc_contextid;
-  /**< (18:4:6) OSCORE cnf:osc:contextid (optional) (byte string) */
+  /**< (18:4:6) OSCORE cnf:osc:contextid used as "kid_context" (byte string, 6 bytes) */
   oc_string_t osc_id; /**< (18:4:0) OSCORE cnf:osc:id  (used as SID & KID) (byte
-                         string) */
+                         string), max 7 bytes */
   oc_string_t
     osc_rid;   /**< (18:4:7) OSCORE cnf:osc:rid (recipient ID) (byte string) */
   int nbf;     /**< token not valid before (optional) */
@@ -190,9 +190,9 @@ typedef struct oc_auth_at_t
 } oc_auth_at_t;
 
 /**
- * @brief returns the size (amount of total entries) of the auth / at table
+ * @brief returns the size (amount of total entries) of the auth/at table
  *
- * @return the allocated amount of entries of the auth at table
+ * @return the allocated amount of entries of the auth/at table
  */
 int oc_core_get_at_table_size();
 
@@ -269,7 +269,7 @@ void oc_oscore_set_auth_device(char *client_senderid, int client_senderid_size,
                                int shared_key_size);
 
 /**
- * @brief retrieve auth at entry
+ * @brief retrieve auth/at entry
  *
  * @param device_index the device index
  * @param index the index in the table
@@ -278,7 +278,7 @@ void oc_oscore_set_auth_device(char *client_senderid, int client_senderid_size,
 oc_auth_at_t *oc_get_auth_at_entry(size_t device_index, int index);
 
 /**
- * @brief print the auth at entry
+ * @brief print the auth/at entry
  *
  * @param device_index the device index
  * @param index the index in the table to be printed
