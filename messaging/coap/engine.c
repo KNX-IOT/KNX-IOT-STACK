@@ -421,9 +421,8 @@ coap_receive(oc_message_t *msg)
         }
       }
 
-      // clients are considered synchronised if replay protection is turned off
-      bool client_is_sync = true;
 #ifdef OC_REPLAY_PROTECTION
+      bool client_is_sync = true;
       oc_string_t kid = {0};
       oc_string_t kid_ctx = {0};
       uint64_t ssn;
@@ -436,7 +435,6 @@ coap_receive(oc_message_t *msg)
 
         client_is_sync = oc_replay_check_client(ssn, kid, kid_ctx);
       }
-#endif
 
       // Server-side logic for sending responses with an echo option,
       // and checking whether the echo option included in a retransmitted
@@ -501,6 +499,7 @@ coap_receive(oc_message_t *msg)
           oc_replay_add_client(ssn, kid, kid_ctx);
         }
       }
+#endif
 
       /* create transaction for (blockwise?) response */
       transaction =
