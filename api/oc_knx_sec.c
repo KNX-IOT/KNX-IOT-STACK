@@ -52,6 +52,12 @@ oc_string_to_at_profile(oc_string_t str)
   if (strcmp(oc_string(str), "coap_dtls") == 0) {
     return OC_PROFILE_COAP_DTLS;
   }
+  if (strcmp(oc_string(str), "coap_tls") == 0) {
+    return OC_PROFILE_COAP_TLS;
+  }
+  if (strcmp(oc_string(str), "coap_pase") == 0) {
+    return OC_PROFILE_COAP_PASE;
+  }
   return OC_PROFILE_UNKNOWN;
 }
 
@@ -63,6 +69,12 @@ oc_at_profile_to_string(oc_at_profile_t at_profile)
   }
   if (at_profile == OC_PROFILE_COAP_DTLS) {
     return "coap_dtls";
+  }
+  if (at_profile == OC_PROFILE_COAP_TLS) {
+    return "coap_tls";
+  }
+  if (at_profile == OC_PROFILE_COAP_PASE) {
+    return "coap_pase";
   }
   return "";
 }
@@ -603,13 +615,13 @@ oc_core_auth_at_post_handler(oc_request_t *request,
                           oc_string(object->value.string),
                           oc_string_len(object->value.string));
           }
-          if (object->iname == 3) {
+          //if (object->iname == 3) {
             // aud
-            oc_free_string(&(g_at_entries[index].aud));
-            oc_new_string(&g_at_entries[index].aud,
-                          oc_string(object->value.string),
-                          oc_string_len(object->value.string));
-          }
+          //  oc_free_string(&(g_at_entries[index].aud));
+          //  oc_new_string(&g_at_entries[index].aud,
+          //                oc_string(object->value.string),
+          //                oc_string_len(object->value.string));
+          //}
         } else if (object->type == OC_REP_INT) {
           if (object->iname == 38) {
             // profile (38 ("coap_dtls" ==1 or "coap_oscore" == 2))
@@ -827,9 +839,9 @@ oc_core_auth_at_x_get_handler(oc_request_t *request,
   // id : 0
   oc_rep_i_set_text_string(root, 0, oc_string(g_at_entries[index].id));
   // audience : 3
-  if (oc_string_len(g_at_entries[index].aud) > 0) {
-    oc_rep_i_set_text_string(root, 3, oc_string(g_at_entries[index].aud));
-  }
+  //if (oc_string_len(g_at_entries[index].aud) > 0) {
+  //  oc_rep_i_set_text_string(root, 3, oc_string(g_at_entries[index].aud));
+  //}
   // the scope as list of cflags or group object table entries
   int nr_entries = oc_total_interface_in_mask(g_at_entries[index].scope);
   if (nr_entries > 0) {
