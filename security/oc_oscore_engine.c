@@ -327,11 +327,13 @@ oc_oscore_recv_message(oc_message_t *message)
     message->endpoint.kid_len = oscore_pkt->kid_len;
     memcpy(message->endpoint.kid, oscore_pkt->kid, oscore_pkt->kid_len);
     message->endpoint.kid_ctx_len = oscore_pkt->kid_ctx_len;
-    memcpy(message->endpoint.kid_ctx, oscore_pkt->kid_ctx, oscore_pkt->kid_ctx_len);
+    memcpy(message->endpoint.kid_ctx, oscore_pkt->kid_ctx,
+           oscore_pkt->kid_ctx_len);
 
     OC_DBG_OSCORE("### serializing CoAP message ###");
     /* Serialize fully decrypted CoAP packet to message->data buffer */
-    message->length = coap_oscore_serialize_message((void *)coap_pkt, message->data, true, true, true);
+    message->length = coap_oscore_serialize_message(
+      (void *)coap_pkt, message->data, true, true, true);
 
     OC_DBG_OSCORE("### setting OSCORE and OSCORE_DECRYPTED ###");
     /* set the oscore encryption and decryption flags*/

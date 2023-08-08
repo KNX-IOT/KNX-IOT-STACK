@@ -61,7 +61,7 @@ get_empty_record()
 static struct oc_replay_record *
 get_record(oc_string_t rx_kid, oc_string_t rx_kid_ctx)
 {
-  if(oc_byte_string_len(rx_kid) == 0)
+  if (oc_byte_string_len(rx_kid) == 0)
     return NULL;
 
   for (size_t i = 0; i < OC_MAX_REPLAY_RECORDS; ++i) {

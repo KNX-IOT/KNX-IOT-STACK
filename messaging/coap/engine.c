@@ -423,14 +423,14 @@ coap_receive(oc_message_t *msg)
 
 #ifdef OC_REPLAY_PROTECTION
       bool client_is_sync = true;
-      oc_string_t kid = {0};
-      oc_string_t kid_ctx = {0};
+      oc_string_t kid = { 0 };
+      oc_string_t kid_ctx = { 0 };
       uint64_t ssn;
 
-      if (msg->endpoint.flags & OSCORE_DECRYPTED)
-      {
+      if (msg->endpoint.flags & OSCORE_DECRYPTED) {
         oc_new_byte_string(&kid, msg->endpoint.kid, msg->endpoint.kid_len);
-        oc_new_byte_string(&kid_ctx, msg->endpoint.kid_ctx, msg->endpoint.kid_ctx_len);
+        oc_new_byte_string(&kid_ctx, msg->endpoint.kid_ctx,
+                           msg->endpoint.kid_ctx_len);
         oscore_read_piv(msg->endpoint.piv, msg->endpoint.piv_len, &ssn);
 
         client_is_sync = oc_replay_check_client(ssn, kid, kid_ctx);
@@ -448,8 +448,9 @@ coap_receive(oc_message_t *msg)
         oc_clock_time_t current_time = oc_clock_time();
 
         if (echo_len == 0) {
-          OC_DBG("Received request from unsynchronized client, sending Unauthorised "
-                  "with Echo Challenge...");
+          OC_DBG(
+            "Received request from unsynchronized client, sending Unauthorised "
+            "with Echo Challenge...");
           coap_send_unauth_echo_response(
             message->type == COAP_TYPE_CON ? COAP_TYPE_ACK : COAP_TYPE_NON,
             message->mid, message->token, message->token_len,
@@ -480,11 +481,12 @@ coap_receive(oc_message_t *msg)
         oc_clock_time_t received_timestamp = (*(oc_clock_time_t *)echo_value);
 
         OC_DBG("Included Echo timestamp difference %llu, threshold %d",
-                (uint64_t) (current_time - received_timestamp), OC_ECHO_FRESHNESS_TIME);
+               (uint64_t)(current_time - received_timestamp),
+               OC_ECHO_FRESHNESS_TIME);
         if (current_time - received_timestamp > OC_ECHO_FRESHNESS_TIME) {
           OC_ERR("Stale timestamp! Current time  %" PRIu64 ","
-                  " received time %" PRIu64 "",
-                  (uint64_t)current_time, (uint64_t)received_timestamp);
+                 " received time %" PRIu64 "",
+                 (uint64_t)current_time, (uint64_t)received_timestamp);
           OC_ERR("Sending Uauthorised with Echo Challenge...");
           coap_send_unauth_echo_response(
             message->type == COAP_TYPE_CON ? COAP_TYPE_ACK : COAP_TYPE_NON,
