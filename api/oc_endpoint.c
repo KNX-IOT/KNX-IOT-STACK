@@ -60,7 +60,7 @@ oc_free_endpoint(oc_endpoint_t *endpoint)
 int
 oc_endpoint_set_oscore_id_from_str(oc_endpoint_t *endpoint, char *oscore_id)
 {
-  endpoint->oscore_id_len = SERIAL_NUM_SIZE;
+  endpoint->oscore_id_len = MAX_ID_SIZE;
   return oc_conv_hex_string_to_byte_array(oscore_id, strlen(oscore_id),
                                           &endpoint->oscore_id,
                                           &endpoint->oscore_id_len);

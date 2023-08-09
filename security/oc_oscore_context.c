@@ -150,8 +150,8 @@ oc_oscore_find_context_by_oscore_id(size_t device, char *oscore_id,
 
   oc_oscore_context_t *ctx = (oc_oscore_context_t *)oc_list_head(contexts);
   while (ctx != NULL) {
-    char *ctx_serial_number = ctx->token_id;
-    if (memcmp(oscore_id, ctx_serial_number, cmp_len) == 0) {
+    char *ctx_number = ctx->sendid;
+    if (memcmp(oscore_id, ctx_number, cmp_len) == 0) { 
       PRINT("oc_oscore_find_context_by_oscore_id FOUND auth/at index: %d\n",
             ctx->auth_at_index);
       OC_DBG_OSCORE("    Common IV:");
@@ -192,7 +192,7 @@ oc_oscore_find_context_by_rid(size_t device, char *rid, size_t rid_len)
 
   oc_oscore_context_t *ctx = (oc_oscore_context_t *)oc_list_head(contexts);
   while (ctx != NULL) {
-    char *ctx_recvid = ctx->recvid;
+    char *ctx_recvid = ctx->sendid;
     if (memcmp(rid, ctx_recvid, cmp_len) == 0) {
       PRINT("oc_oscore_find_context_by_rid FOUND auth/at index: %d\n",
             ctx->auth_at_index);
@@ -286,10 +286,7 @@ oc_oscore_add_context(size_t device, const char *senderid, int senderid_size,
     OC_ERR("senderid_size > %d = %d", OSCORE_CTXID_LEN, senderid_size);
     return NULL;
   }
-  if (recipientid_size > OSCORE_CTXID_LEN) {
-    OC_ERR("recipientid_size > %d = %d", OSCORE_CTXID_LEN, recipientid_size);
-    return NULL;
-  }
+
   if (osc_ctx_size > OSCORE_IDCTX_LEN) {
     OC_ERR("osc_ctx_size > %d = %d", OSCORE_IDCTX_LEN, osc_ctx_size);
     return NULL;
@@ -347,9 +344,6 @@ oc_oscore_add_context(size_t device, const char *senderid, int senderid_size,
     // }
     memcpy(ctx->recvid, recipientid, recipientid_size);
     ctx->recvid_len = (uint8_t)recipientid_size;
-  } else {
-    OC_ERR("recipientid == NULL");
-    goto add_oscore_context_error;
   }
   PRINT("RecvID (%d):", ctx->recvid_len);
   OC_LOGbytes_OSCORE(ctx->recvid, ctx->recvid_len);

@@ -1251,7 +1251,7 @@ oc_at_load_entry(int entry)
             oc_free_string(&g_at_entries[entry].osc_id);
             oc_new_byte_string(&g_at_entries[entry].osc_id,
                                oc_string(rep->value.string),
-                               oc_string_len(rep->value.string));
+                               oc_byte_string_len(rep->value.string));
           }
           if (rep->iname == 842) {
             oc_free_string(&g_at_entries[entry].osc_ms);
@@ -1464,39 +1464,30 @@ oc_reset_at_table(size_t device_index, int erase_code)
 // ----------------------------------------------------------------------------
 
 void
-oc_oscore_set_auth_mac(char *serial_number, int serial_number_size,
-                       char *client_recipientid, int client_recipientid_size,
+oc_oscore_set_auth_mac(char *entry_id, int entry_size,
+                       char *oscore_id, int oscore_id_size,
                        uint8_t *shared_key, int shared_key_size)
 {
   // create the token & store in at tables at position 0
   // note there should be no entries.. if there is an entry then overwrite
   // it..
-  PRINT("oc_oscore_set_auth_mac sn       : %s\n", serial_number);
-  PRINT("oc_oscore_set_auth_mac rid [%d] : ", client_recipientid_size);
-  oc_char_println_hex(client_recipientid, client_recipientid_size);
+  PRINT("oc_oscore_set_auth_mac entry       : %s\n", entry_id);
+  PRINT("oc_oscore_set_auth_mac oscore [%d] : ", oscore_id_size);
+  oc_char_println_hex(oscore_id, oscore_id_size);
   PRINT("oc_oscore_set_auth_mac ms  [%d] : ", shared_key_size);
   oc_char_println_hex(shared_key, shared_key_size);
 
   oc_auth_at_t spake_entry;
   memset(&spake_entry, 0, sizeof(spake_entry));
   // this is the index in the table, so it is the full string
-  oc_new_string(&spake_entry.id, serial_number, serial_number_size);
+  oc_new_string(&spake_entry.id, entry_id, entry_size);
   spake_entry.ga_len = 0;
   spake_entry.profile = OC_PROFILE_COAP_OSCORE;
   spake_entry.scope = OC_IF_SEC | OC_IF_D | OC_IF_P;
   oc_new_byte_string(&spake_entry.osc_ms, (char *)shared_key, shared_key_size);
-  // no context id
-  //oc_new_byte_string(&spake_entry.osc_rid, client_recipientid,
-  //                   client_recipientid_size);
-  // not that HEX was NOT on the wire, but the byte string.
-  // so we have to store the byte string
-  oc_conv_hex_string_to_oc_string(serial_number, serial_number_size,
-                                  &spake_entry.osc_id);
+  oc_new_byte_string(&spake_entry.osc_id, (char *)oscore_id, oscore_id_size);
 
-  PRINT("oc_oscore_set_auth_mac osc_id (hex) from serial number: ");
-  oc_string_println_hex(spake_entry.osc_id);
-
-  int index = oc_core_find_at_entry_with_id(0, serial_number);
+  int index = oc_core_find_at_entry_with_id(0, entry_id);
   if (index == -1) {
     index = oc_core_find_at_entry_empty_slot(0);
   }

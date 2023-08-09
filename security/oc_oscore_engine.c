@@ -197,6 +197,9 @@ oc_oscore_recv_message(oc_message_t *message)
       OC_DBG_OSCORE("--- got kid from incoming message");
       OC_LOGbytes(oscore_pkt->kid, oscore_pkt->kid_len);
       OC_DBG_OSCORE("### searching for OSCORE context by kid ###");
+
+      oc_endpoint_set_oscore_id(&message->endpoint, oscore_pkt->kid,
+                                oscore_pkt->kid_len);
       oscore_ctx =
         oc_oscore_find_context_by_kid(oscore_ctx, message->endpoint.device,
                                       oscore_pkt->kid, oscore_pkt->kid_len);
@@ -210,6 +213,7 @@ oc_oscore_recv_message(oc_message_t *message)
         //                               (char *)oscore_ctx->token_id);
         oc_endpoint_set_auth_at_index(&message->endpoint,
                                       (int32_t)oscore_ctx->auth_at_index);
+        oc_endpoint_set_oscore_id(&message->endpoint, oscore_pkt->kid, oscore_pkt->kid_len);
         // oc_string_copy_from_char(&message->endpoint.serial_number,
         //                         (char *)oscore_ctx->token_id);
 

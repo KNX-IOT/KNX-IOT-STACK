@@ -166,6 +166,7 @@ do_pm(void *ep)
 {
   oc_endpoint_t *endpoint = ep;
   endpoint->flags |= SECURED | OSCORE;
+  oc_endpoint_set_oscore_id(ep, "rcpids", strlen("rcpids"));
   oc_do_get("/dev/pm", endpoint, NULL, callback, HIGH_QOS, NULL);
   return OC_EVENT_CONTINUE;
 }
@@ -214,13 +215,13 @@ discovery(const char *payload, int len, oc_endpoint_t *endpoint,
   // memcpy(&the_endpoint.oscore_id, sernum, 6);
   // the_endpoint.oscore_id_len = 6;
 
-  if (oc_endpoint_set_oscore_id_from_str(&the_endpoint, "00fa10010701") != 0) {
+  //if (oc_endpoint_set_oscore_id_from_str(&the_endpoint, "00fa10010701") != 0) {
     // PRINT(
     //   "  \n");
     // return;
-  }
+  //}
   // do parameter exchange
-  oc_initiate_spake_parameter_request(endpoint, "00FA10010701", "LETTUCE",
+  oc_initiate_spake_parameter_request(endpoint, "00fa10010701", "LETTUCE",
                                       "rcpids", strlen("rcpids"));
 
   oc_set_delayed_callback(&the_endpoint, do_pm, 10);

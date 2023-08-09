@@ -1346,6 +1346,16 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
               (int)oc_byte_string_len(rep->value.string));
       }
     } break;
+    case OC_REP_STRING: {
+      if (rep->iname == SPAKE_ID) {
+        // if the ID is present, overwrite the default
+        oc_free_string(&g_pase.id);
+        oc_new_byte_string(&g_pase.id, oc_string(rep->value.string),
+                           oc_string_len(rep->value.string));
+        PRINT("==> CLIENT RECEIVES %d\n",
+              (int)oc_byte_string_len(rep->value.string));
+      }
+    }
     default:
       break;
     }
