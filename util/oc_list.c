@@ -147,6 +147,33 @@ oc_list_add(oc_list_t list, void *item)
 }
 /*---------------------------------------------------------------------------*/
 /**
+ * Add items at the end of a list.
+ *
+ * This function adds an item to the end of the list.
+ *
+ * \param list The list.
+ * \param item A pointer to the items to be added (another list)
+ *
+ * \sa oc_list_push_block()
+ *
+ */
+void
+oc_list_add_block(oc_list_t list, void *item)
+{
+  struct list *l;
+  // get tail
+
+  l = oc_list_tail(list);
+  ((struct list *)oc_list_tail((oc_list_t)item))->next = l;
+
+  if (l == NULL) {
+    *list = item;
+  } else {
+    l->next = item;
+  }
+}
+/*---------------------------------------------------------------------------*/
+/**
  * Add an item to the start of the list.
  */
 void

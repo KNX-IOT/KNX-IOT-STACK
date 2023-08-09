@@ -30,6 +30,20 @@
 extern "C" {
 #endif
 
+
+// #define OC_RI_CREATE_RESOURCE_CONST
+
+#define OC_CORE_CREATE_RESOURCE_LINKED(resource_name, next_resource,      \
+                                device_index, uri, iface_mask, content_format, \
+                                properties, get_cb, put_cb, post_cb,           \
+                                delete_cb, num_resource_types, ...)            \
+  oc_ri_create_const_resource_linked(next_resource, resource_name, device_index, NULL, uri, NULL, iface_mask, content_format, properties, get_cb, put_cb, post_cb, delete_cb, NULL, 0, 0, num_resources, __VA_ARGS__)                              \
+
+
+#define OC_CORE_CREATE_RESOURCE_FINAL(resource_name, next_resource, ...)       \
+  oc_resource_dummy_t resource_final{ NULL, -1 };                                     \
+  OC_CORE_CREATE_RESOURCE_LINKED(resource_name, next_resource, __VA_ARGS__)
+
 /**
  * @brief callback for initializing the platform
  *

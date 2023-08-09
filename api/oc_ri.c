@@ -60,6 +60,7 @@
 OC_LIST(app_resources);
 OC_LIST(observe_callbacks);
 OC_MEMB(app_resources_s, oc_resource_t, OC_MAX_APP_RESOURCES);
+OC_MEMB(app_resource_datas_s, oc_resource_data_t, OC_MAX_APP_RESOURCES);
 #endif /* OC_SERVER */
 
 #ifdef OC_CLIENT
@@ -685,11 +686,21 @@ oc_ri_alloc_resource(void)
   return oc_memb_alloc(&app_resources_s);
 }
 
+oc_resource_data_t *
+oc_ri_alloc_resource_data(void)
+{
+  return oc_memb_alloc(&app_resource_datas_s);
+}
+
 bool
 oc_ri_delete_resource(oc_resource_t *resource)
 {
   if (!resource)
     return false;
+  if (resource->is_const) {
+    OC_ERR("oc_ri_delete_resource: resource is const!");
+    return false;
+  }
 
   /**
    * Prevent double deallocation: oc_rt_factory_free_created_resource
@@ -702,7 +713,7 @@ oc_ri_delete_resource(oc_resource_t *resource)
     return true;
   }
 
-  if (resource->num_observers > 0) {
+  if (resource->runtime_data->num_observers > 0) {
     coap_remove_observer_by_resource(resource);
   }
 
@@ -716,6 +727,10 @@ oc_ri_add_resource(oc_resource_t *resource)
 {
   if (!resource)
     return false;
+  if (resource->is_const) {
+    OC_ERR("oc_ri_add_resource: resource is const!");
+    return false;
+  }
 
   bool valid = true;
 
@@ -733,24 +748,69 @@ oc_ri_add_resource(oc_resource_t *resource)
 
   return valid;
 }
+
+bool
+oc_ri_add_resource_block(const oc_resource_t *resource)
+{
+  const oc_resource_t *it = resource;
+  if (!resource)
+    return false;
+
+  bool valid = true;
+
+  do {
+
+    if (!resource->get_handler.cb && !resource->put_handler.cb &&
+        !resource->post_handler.cb && !resource->delete_handler.cb)
+      valid = false;
+        
+    if ((resource->properties & OC_PERIODIC) &&
+        resource->observe_period_seconds == 0)
+      valid = false;
+
+  } while(it = oc_ri_resource_next(it));
+
+
+  if (valid) {
+    oc_list_add_block(app_resources, resource);
+  }
+
+  return valid;
+}
 #endif /* OC_SERVER */
 
 void
 oc_ri_free_resource_properties(oc_resource_t *resource)
 {
-  if (resource) {
-    // Resource names and URIs use the oc_string_t type to point to read-only
-    // memory, so we do not need to free
-    // oc_free_string(&(resource->name));
-    resource->name.ptr = NULL;
-    resource->name.size = 0;
-    // oc_free_string(&(resource->uri));
-    resource->uri.ptr = NULL;
-    resource->uri.size = 0;
-    if (oc_string_array_get_allocated_size(resource->types) > 0) {
-      oc_free_string_array(&(resource->types));
-    }
+  if (resource == NULL) {
+    return;
   }
+  if (resource->is_const) {
+    return;
+  }
+  // Resource names and URIs use the oc_string_t type to point to read-only
+  // memory, so we do not need to free
+  // oc_free_string(&(resource->name));
+  resource->name.ptr = NULL;
+  resource->name.size = 0;
+  // oc_free_string(&(resource->uri));
+  resource->uri.ptr = NULL;
+  resource->uri.size = 0;
+  if (oc_string_array_get_allocated_size(resource->types) > 0) {
+    oc_free_string_array(&(resource->types));
+  }
+}
+
+oc_resource_t *
+oc_ri_resource_next(const oc_resource_t *resource)
+{
+  if (resource == NULL)
+    return NULL;
+  do {
+    resource = resource->next;
+    // device = -1 means dummy resource (MUST BE IN RAM)
+  } while (resource && resource->device == -1);
+  return resource;
 }
 
 void

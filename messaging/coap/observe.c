@@ -128,7 +128,7 @@ add_observer(oc_resource_t *resource, oc_endpoint_t *endpoint,
 #ifdef OC_BLOCK_WISE
     o->block2_size = block2_size;
 #endif /* OC_BLOCK_WISE */
-    resource->num_observers++;
+    resource->runtime_data->num_observers++;
 #ifdef OC_DYNAMIC_ALLOCATION
     OC_DBG("Adding observer (%u) for /%s [0x%02X%02X]",
            oc_list_length(observers_list) + 1, oc_string_checked(o->url),
@@ -171,7 +171,7 @@ coap_remove_observer(coap_observer_t *o)
     response_state->ref_count = 0;
   }
 #endif /* OC_BLOCK_WISE */
-  o->resource->num_observers--;
+  o->resource->runtime_data->num_observers--;
   oc_free_string(&o->url);
   oc_list_remove(observers_list, o);
   oc_memb_free(&observers_memb, o);
@@ -339,7 +339,7 @@ coap_notify_observers(oc_resource_t *resource,
 
   // bool resource_is_collection = false;
   coap_observer_t *obs = NULL;
-  if (resource->num_observers > 0) {
+  if (resource->runtime_data->num_observers > 0) {
 #ifdef OC_BLOCK_WISE
     oc_blockwise_state_t *response_state = NULL;
 #endif /* OC_BLOCK_WISE */
@@ -519,7 +519,7 @@ coap_notify_observers(oc_resource_t *resource,
 
           coap_set_status_code(notification, response_buf->code);
           if (notification->code < BAD_REQUEST_4_00 &&
-              obs->resource->num_observers) {
+              obs->resource->runtime_data->num_observers) {
             coap_set_header_observe(notification, (obs->obs_counter)++);
             observe_counter++;
           } else {
@@ -558,7 +558,7 @@ coap_notify_observers(oc_resource_t *resource,
     OC_WRN("coap_notify_observers: no observers");
   }
 
-  return resource->num_observers;
+  return resource->runtime_data->num_observers;
 }
 
 void
@@ -721,7 +721,7 @@ notify_resource_defaults_observer(oc_resource_t *resource,
         } //! blockwise transfer
         coap_set_status_code(notification, response_buf->code);
         if (notification->code < BAD_REQUEST_4_00 &&
-            obs->resource->num_observers) {
+            obs->resource->runtime_data->num_observers) {
           coap_set_header_observe(notification, (obs->obs_counter)++);
           observe_counter++;
         } else {

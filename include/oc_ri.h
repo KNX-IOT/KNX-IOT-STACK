@@ -27,6 +27,38 @@
 #include "oc_uuid.h"
 #include "util/oc_etimer.h"
 
+#define oc_ri_create_const_resource_linked(                                    \
+  next_resource, resource_name, device_index, name, uri, dpt, iface_mask,      \
+  content_format, properties, get_cb, put_cb, post_cb, delete_cb, ctx,         \
+  observe_period, instance, num_resource_types, ...)                           \
+  extern const oc_resource_t next_resource;                                    \
+  oc_resource_data_t resource_name##data;                                      \
+  const oc_resource_t resource_name{                                           \
+    /*next*/ &next_resource,                                                   \
+    /*device*/ device_index,                                                   \
+    /*name*/ oc_string_create_const(name),                                     \
+    /*uri*/ oc_string_create_const(uri),                                       \
+    /*types*/ oc_string_array_create_const(num_resource_types, __VA_ARGS__),   \
+    /*dpt*/ oc_string_create_const(dpt),                                       \
+    /*interfaces*/ iface_mask,                                                 \
+    /*content_type*/ content_format,                                           \
+    /*properties*/ properties,                                                 \
+    /*get_handler*/ { get_cb, ctx },                                           \
+    /*put_handler*/ { put_cb, ctx },                                           \
+    /*post_handler*/ { post_cb, ctx },                                         \
+    /*delete_handler*/ { delete_cb, ctx },                                     \
+    /*get_properties*/ { NULL, NULL },                                         \
+    /*set_properties*/ { NULL, NULL },                                         \
+    /*observe_period_seconds*/ observe_period,                                 \
+    /*fb_instance*/ instance,                                                  \
+    /*is_const*/ true,                                                         \
+    /*runtime_data*/ &resource_name##data,                                     \
+  };
+#define oc_ri_create_const_resource_final(resource_name, ...)                  \
+  oc_resource_dummy_t resource_block_end #resource_name;                       \
+  oc_ri_create_const_resource_linked(resource_block_end #resource_name,        \
+                                     resource_name, __VA_ARGS__)
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -376,6 +408,11 @@ typedef struct oc_properties_cb_t
   void *user_data;
 } oc_properties_cb_t;
 
+typedef struct oc_resource_data_t
+{
+  uint8_t num_observers; /**< amount of observers */
+} oc_resource_data_t;
+
 /**
  * @brief resource structure
  *
@@ -398,10 +435,17 @@ struct oc_resource_s
   oc_request_handler_t delete_handler; /**< callback for DELETE */
   oc_properties_cb_t get_properties;   /**< callback for get properties */
   oc_properties_cb_t set_properties;   /**< callback for set properties */
-  uint8_t num_observers;               /**< amount of observers */
   uint16_t observe_period_seconds;     /**< observe period in seconds */
   uint8_t fb_instance; /**< function block instance, default = 0 */
+  const bool is_const; /**< Whether the associated resource data is readonly */
+  oc_resource_data_t *runtime_data; /**< Runtime modifiable data*/
 };
+
+typedef struct oc_resource_dummy_s
+{
+  struct oc_resource_s *next; /**< next resource*/
+  size_t device;              /**< Should ALWAYS be -1 for dummy node*/
+} oc_resource_dummy_t;
 
 typedef struct oc_link_s oc_link_t;
 
@@ -544,6 +588,15 @@ bool oc_ri_delete_resource(oc_resource_t *resource);
  * @param resource the resource
  */
 void oc_ri_free_resource_properties(oc_resource_t *resource);
+
+/**
+ * @brief get the next resource
+ *
+ * @param resource current resource
+ * @return next resource or NULL if at end
+ * skips over dummy resources
+ */
+oc_resource_t *oc_ri_resource_next(const oc_resource_t *resource);
 
 /**
  * @brief retrieve the query value at the nth position
