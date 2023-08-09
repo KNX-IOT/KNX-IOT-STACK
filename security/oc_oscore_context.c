@@ -32,7 +32,8 @@
 OC_LIST(contexts);
 OC_MEMB(ctx_s, oc_oscore_context_t, 20);
 
-// checking against receiver in contexts
+// checking against sender in contexts
+// because receiver is always ""
 oc_oscore_context_t *
 oc_oscore_find_context_by_kid(oc_oscore_context_t *ctx, size_t device_index,
                               uint8_t *kid, uint8_t kid_len)
@@ -47,9 +48,9 @@ oc_oscore_find_context_by_kid(oc_oscore_context_t *ctx, size_t device_index,
 
   while (ctx != NULL) {
     PRINT("  ---> recvid:");
-    oc_char_println_hex((char *)(ctx->recvid), ctx->recvid_len);
+    oc_char_println_hex((char *)(ctx->sendid), ctx->sendid_len);
 
-    if (kid_len == ctx->recvid_len && memcmp(kid, ctx->recvid, kid_len) == 0) {
+    if (kid_len == ctx->sendid_len && memcmp(kid, ctx->sendid, kid_len) == 0) {
       PRINT("oc_oscore_find_context_by_kid FOUND  auth/at index: %d\n",
             ctx->auth_at_index);
       return ctx;
@@ -96,7 +97,6 @@ oc_oscore_find_context_by_token_mid(size_t device, uint8_t *token,
       *request_piv = t->message->endpoint.piv;
       *request_piv_len = t->message->endpoint.piv_len;
     }
-    // serial_number = t->message->endpoint.serial_number;
     oscore_id = t->message->endpoint.oscore_id;
     oscore_id_len = t->message->endpoint.oscore_id_len;
 #ifdef OC_CLIENT
@@ -110,11 +110,6 @@ oc_oscore_find_context_by_token_mid(size_t device, uint8_t *token,
   }
 
   while (ctx != NULL) {
-    //  oc_sec_cred_t *cred = (oc_sec_cred_t *)ctx->cred;
-    //  if (memcmp(cred->subjectuuid.id, uuid->id, 16) == 0 &&
-    //      ctx->device == device) {
-    //    return ctx;
-    //   }
     char *ctx_serial_number = ctx->token_id;
     if (memcmp(oscore_id, ctx_serial_number, oscore_id_len) == 0) {
       PRINT("oc_oscore_find_context_by_token_mid FOUND auth/at index: %d\n",
