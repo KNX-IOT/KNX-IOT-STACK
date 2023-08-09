@@ -1251,7 +1251,7 @@ oc_at_load_entry(int entry)
             oc_free_string(&g_at_entries[entry].osc_id);
             oc_new_byte_string(&g_at_entries[entry].osc_id,
                                oc_string(rep->value.string),
-                               oc_byte_string_len(rep->value.string));
+                               oc_string_len(rep->value.string));
           }
           if (rep->iname == 842) {
             oc_free_string(&g_at_entries[entry].osc_ms);

@@ -271,6 +271,10 @@ oc_oscore_recv_message(oc_message_t *message)
         oc_oscore_compose_AAD(oscore_ctx->recvid, oscore_ctx->recvid_len,
                               oscore_pkt->piv, oscore_pkt->piv_len, AAD,
                               &AAD_len);
+
+        //oc_oscore_compose_AAD(oscore_ctx->sendid, oscore_ctx->sendid_len,
+        //                      oscore_pkt->piv, oscore_pkt->piv_len, AAD,
+        //                      &AAD_len);
         OC_DBG_OSCORE(
           "---composed AAD using received Partial IV and Recipient ID");
         OC_LOGbytes_OSCORE(AAD, AAD_len);
@@ -287,6 +291,10 @@ oc_oscore_recv_message(oc_message_t *message)
       oc_oscore_AEAD_nonce(oscore_ctx->recvid, oscore_ctx->recvid_len,
                            message->endpoint.piv, message->endpoint.piv_len,
                            oscore_ctx->commoniv, nonce, OSCORE_AEAD_NONCE_LEN);
+
+      //oc_oscore_AEAD_nonce(oscore_ctx->sendid, oscore_ctx->sendid_len,
+      //                     message->endpoint.piv, message->endpoint.piv_len,
+      //                     oscore_ctx->commoniv, nonce, OSCORE_AEAD_NONCE_LEN);
 
       OC_DBG_OSCORE(
         "---computed AEAD nonce using received Partial IV and Recipient ID");
