@@ -642,8 +642,8 @@ oc_oscore_send_message(oc_message_t *msg)
   if (entry) {
     OC_DBG_OSCORE("### Found auth at entry, getting context ###");
     oscore_ctx = oc_oscore_find_context_by_kid(
-      NULL, message->endpoint.device, oc_string(entry->osc_rid),
-      oc_byte_string_len(entry->osc_rid));
+      NULL, message->endpoint.device, oc_string(entry->osc_id),
+      oc_byte_string_len(entry->osc_id));
   }
   // Search for OSCORE context using addressing information
 
@@ -827,7 +827,7 @@ oc_oscore_send_message(oc_message_t *msg)
       OC_LOGbytes_OSCORE(message->endpoint.piv, message->endpoint.piv_len);
 
       /* Compose AAD using request_piv and context->recvid */
-      oc_oscore_compose_AAD(oscore_ctx->recvid, oscore_ctx->recvid_len,
+      oc_oscore_compose_AAD("", 0,
                             message->endpoint.piv, message->endpoint.piv_len,
                             AAD, &AAD_len);
       OC_DBG_OSCORE("---composed AAD using request_piv and Recipient ID");
@@ -906,17 +906,10 @@ oc_oscore_send_message(oc_message_t *msg)
 
     /* Set the OSCORE option */
     coap_set_header_oscore(coap_pkt, piv, piv_len, kid, kid_len, NULL, 0);
+    /* adding context id ??*/
 
     /* Reflect the Observe option (if present in the CoAP packet) */
     coap_pkt->observe = observe_option;
-
-    /* Set the Proxy-uri option to the OCF URI bearing the peer's UUID */
-    // TODO
-    // char uuid[37];
-    // oc_uuid_to_str(&message->endpoint.di, uuid, OC_UUID_LEN);
-    // oc_string_t proxy_uri;
-    // oc_concat_strings(&proxy_uri, "ocf://", uuid);
-    // coap_set_header_proxy_uri(coap_pkt, oc_string(proxy_uri));
 
     /* Serialize OSCORE message to oc_message_t */
     OC_DBG_OSCORE("### serializing OSCORE message ###");
