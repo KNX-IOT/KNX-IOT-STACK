@@ -102,6 +102,8 @@ extern "C" {
 #define OC_MAX_APP_DATA_SIZE (oc_get_max_app_data_size())
 #endif /* OC_DYNAMIC_ALLOCATION */
 
+
+
 struct oc_message_s
 {
   struct oc_message_s *next;
@@ -123,6 +125,7 @@ struct oc_message_s
   size_t read_offset;
 #endif /* OC_TCP */
   uint8_t encrypted;
+  void (*soft_ref_cb)(struct oc_message_s *);
 };
 
 /**

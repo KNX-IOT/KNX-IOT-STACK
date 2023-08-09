@@ -49,12 +49,10 @@ allocate_message(struct oc_memb *pool)
 {
   oc_network_event_handler_mutex_lock();
   oc_message_t *message = (oc_message_t *)oc_memb_alloc(pool);
-  // OC_DBG(" message allocated %p", message);
   oc_network_event_handler_mutex_unlock();
   if (message) {
 #if defined(OC_DYNAMIC_ALLOCATION) && !defined(OC_INOUT_BUFFER_SIZE)
     message->data = malloc(OC_PDU_SIZE);
-    // OC_DBG(" (((((((( message data %p size: %d", message->data, OC_PDU_SIZE);
     if (!message->data) {
       OC_ERR("Out of memory, cannot allocate message");
       oc_memb_free(pool, message);
@@ -68,9 +66,8 @@ allocate_message(struct oc_memb *pool)
     message->endpoint.interface_index = -1;
     message->endpoint.device = 0;
     message->endpoint.group_address = 0;
+    message->soft_ref_cb = NULL;
 
-    // OC_DBG("allocating message ref_count %d", message->ref_count);
-    OC_DBG("message data: %p", message->data);
 #ifdef OC_OSCORE
     message->encrypted = 0;
 #endif /* OC_OSCORE */
@@ -79,11 +76,29 @@ allocate_message(struct oc_memb *pool)
            oc_memb_numfree(pool));
 #endif /* !OC_DYNAMIC_ALLOCATION || OC_INOUT_BUFFER_SIZE */
   }
-#if !defined(OC_DYNAMIC_ALLOCATION) || defined(OC_INOUT_BUFFER_SIZE)
   else {
+
+    // iterate through memory blocks, searching for blocks with one reference
+    // and an assigned weak ref callback
+    for (int i = 0; i < pool->num; ++i)
+    {
+      int offset = pool->size * i;
+      message = pool->mem + offset;
+
+      if (message->ref_count == 1 && message->soft_ref_cb != NULL)
+      {
+        // if found, call the callback, free the block and return it!
+        message->soft_ref_cb(message);
+        oc_message_unref(message);
+        // we know that was the last reference, so now we can allocate
+        // a new message successfully
+        return allocate_message(pool);
+      }
+    }
+
     OC_WRN("buffer: No free TX/RX buffers!");
+    message = NULL;
   }
-#endif /* !OC_DYNAMIC_ALLOCATION || OC_INOUT_BUFFER_SIZE */
   return message;
 }
 
@@ -120,7 +135,6 @@ oc_message_add_ref(oc_message_t *message)
   if (message) {
     message->ref_count++;
   }
-  OC_DBG("%d", message->ref_count);
 }
 
 void
@@ -130,17 +144,13 @@ oc_message_unref(oc_message_t *message)
     message->ref_count--;
     OC_DBG("refcount: %d", message->ref_count);
     if (message->ref_count <= 0) {
-      // PRINT("oc_message_unref: deallocating\n");
 #if defined(OC_DYNAMIC_ALLOCATION) && !defined(OC_INOUT_BUFFER_SIZE)
       if (message->data != NULL) {
-        // OC_DBG(" )))))))) Free message data %p", message->data);
         free(message->data);
       }
 #endif /* OC_DYNAMIC_ALLOCATION && !OC_INOUT_BUFFER_SIZE */
       struct oc_memb *pool = message->pool;
       if (pool != NULL) {
-        // OC_DBG(" FFFFFFFFFFF  Free message %p from pool %p size %d", message,
-        //  pool, pool->size);
         oc_memb_free(pool, message);
       }
 #if !defined(OC_DYNAMIC_ALLOCATION) || defined(OC_INOUT_BUFFER_SIZE)

@@ -26,6 +26,10 @@
 extern "C" {
 #endif
 
+// FOR TESTING
+#define OC_INOUT_BUFFER_POOL 2
+#define OC_INOUT_BUFFER_SIZE (1232)
+
 typedef uint64_t oc_clock_time_t;
 #define OC_CLOCK_CONF_TICKS_PER_SECOND CLOCKS_PER_SEC
 
