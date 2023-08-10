@@ -191,8 +191,10 @@ enum StringRepresentation {
   (_oc_free_string(ocstringarray))
 
 #endif /* !OC_MEMORY_TRACE */
-#define OC_SIZE_ZERO(x) NULL
-#define OC_SIZE_MANY(x) x 
+#define _MAKE_NULL(...) NULL
+#define _ECHO
+#define OC_SIZE_ZERO() _MAKE_NULL, 0
+#define OC_SIZE_MANY(x) _ECHO, x 
 /**
  * @brief Helper macros to create const versions of oc types
  * These are special and need some help to understand things correctly

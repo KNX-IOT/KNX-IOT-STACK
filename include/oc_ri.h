@@ -28,21 +28,21 @@
 #include "util/oc_etimer.h"
 
 #define oc_ri_internal_expand(...) __VA_ARGS__
-#define oc_ri_internal_expand_call(fn, ...) oc_ri_internal_expand_call2(fn, (__VA_ARGS__))
+#define oc_ri_internal_expand_call(fn, ...)                                    \
+  oc_ri_internal_expand_call2(fn, (__VA_ARGS__))
 #define oc_ri_internal_expand_call2(fn, args) fn args
 
 #define oc_ri_create_const_resource_internal(                                  \
   next_resource, resource_name, device_index, name, uri, dpt, iface_mask,      \
   content_format, properties, get_cb, put_cb, post_cb, delete_cb, ctx,         \
-  observe_period, instance, ...)                       \
+  observe_period, instance, ...)                                               \
   oc_resource_data_t resource_name##_data;                                     \
   const oc_resource_t resource_name = {                                        \
     /*next*/ (oc_resource_t *)&next_resource,                                  \
     /*device*/ device_index,                                                   \
     /*name*/ oc_string_create_const(name),                                     \
-    /*uri*/ oc_string_create_const(uri),                                       \
-    /*types*/                                                                  \
-    oc_ri_internal_expand_call(oc_string_array_create_const, __VA_ARGS__),   \
+    /*uri*/ oc_string_create_const(uri), /*types*/                             \
+    oc_ri_internal_expand_call(oc_string_array_create_const, __VA_ARGS__),     \
     /*dpt*/ oc_string_create_const(dpt),                                       \
     /*interfaces*/ iface_mask,                                                 \
     /*content_type*/ content_format,                                           \
@@ -61,12 +61,14 @@
 
 #define oc_ri_create_const_resource_linked(next_resource, ...)                 \
   extern const oc_resource_t next_resource;                                    \
-  oc_ri_internal_expand_call(oc_ri_create_const_resource_internal,(next_resource, __VA_ARGS__))
+  oc_ri_internal_expand_call(oc_ri_create_const_resource_internal,             \
+                             (next_resource, __VA_ARGS__))
 
 #define oc_ri_create_const_resource_final(resource_name, ...)                  \
   oc_resource_dummy_t resource_block_end##resource_name = { NULL, -1 };        \
-  oc_ri_internal_expand_call(oc_ri_create_const_resource_internal, (resource_block_end##resource_name,      \
-                                       resource_name, __VA_ARGS__))
+  oc_ri_internal_expand_call(                                                  \
+    oc_ri_create_const_resource_internal,                                      \
+    (resource_block_end##resource_name, resource_name, __VA_ARGS__))
 
 #ifdef __cplusplus
 extern "C" {
@@ -125,8 +127,8 @@ typedef enum {
   OC_STATUS_GATEWAY_TIMEOUT,          /**< Gateway Timeout 5.04*/
   OC_STATUS_PROXYING_NOT_SUPPORTED,   /**< Proxying not supported 5.05 */
   __NUM_OC_STATUS_CODES__,
-  OC_IGNORE,      /**< Ignore: do not respond to request */
-  OC_PING_TIMEOUT /**< Ping Time out */
+  OC_IGNORE,                          /**< Ignore: do not respond to request */
+  OC_PING_TIMEOUT                     /**< Ping Time out */
 } oc_status_t;
 
 /**
@@ -313,8 +315,10 @@ typedef enum {
   OC_KNX,                   /**< .well-known / knx */
   OC_KNX_FP_G,              /**< FP/G */
   OC_KNX_FP_G_X,            /**< FP/G/X */
+#ifdef OC_PUBLISHER_TABLE
   OC_KNX_FP_P,              /**< FP/P */
   OC_KNX_FP_P_X,            /**< FP/P/X */
+#endif
   OC_KNX_FP_R,              /**< FP/R */
   OC_KNX_FP_R_X,            /**< FP/R/X */
   OC_KNX_P,                 /**< P */
@@ -332,7 +336,9 @@ typedef enum {
   OC_KNX_SWU_PKGBYTES,      /**< sw package bytes*/
   OC_KNX_SWU_PKGQURL,       /**< sw query url */
   OC_KNX_SWU_PKGNAMES,      /**< sw package names*/
+#if 0 // THIS SHOULD BE IMPLEMENTED IF INCLUDED
   OC_KNX_SWU_PKG,           /**< sw package */
+#endif
   OC_KNX_SWU,               /**< swu top level */
   OC_KNX_P_OSCORE_REPLWDO,  /**< oscore replay window*/
   OC_KNX_P_OSCORE_OSNDELAY, /**< oscore osn delay*/
@@ -341,8 +347,10 @@ typedef enum {
   OC_KNX_AUTH,              /**< auth list all sub resources */
   OC_KNX_AUTH_AT,           /**< auth/at resource listing auth/at/X */
   OC_KNX_AUTH_AT_X,         /**< auth/at/X resources */
+#ifdef OC_IOT_ROUTER
   OC_KNX_FP_GM,             /**< FP/GM */
   OC_KNX_FP_GM_X,           /**< FP/GM/X */
+#endif
   /* List of resources on a logical device: start */
   WELLKNOWNCORE /**< well-known/core resource */
   /* List of resources on a logical device: end */
@@ -358,15 +366,15 @@ typedef struct oc_resource_s oc_resource_t;
  */
 typedef struct oc_request_t
 {
-  oc_endpoint_t *origin;     /**< origin of the request */
-  const oc_resource_t *resource;   /**< resource structure */
-  const char *query;         /**< query (as string) */
-  size_t query_len;          /**< query length */
-  const char *uri_path;      /**< path (as string) */
-  size_t uri_path_len;       /**< path length */
-  oc_rep_t *request_payload; /**< request payload structure */
-  const uint8_t *_payload;   /**< payload of the request */
-  size_t _payload_len;       /**< payload size */
+  oc_endpoint_t *origin;         /**< origin of the request */
+  const oc_resource_t *resource; /**< resource structure */
+  const char *query;             /**< query (as string) */
+  size_t query_len;              /**< query length */
+  const char *uri_path;          /**< path (as string) */
+  size_t uri_path_len;           /**< path length */
+  oc_rep_t *request_payload;     /**< request payload structure */
+  const uint8_t *_payload;       /**< payload of the request */
+  size_t _payload_len;           /**< payload size */
   oc_content_format_t
     content_format; /**< content format (of the payload in the request) */
   oc_content_format_t

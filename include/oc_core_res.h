@@ -33,45 +33,46 @@ extern "C" {
 /**
  * @brief Create const CORE resource
  * Should only be used internally!
- * 
+ *
  * @related OC_CORE_CREATE_CONST_RESOURCE_LINKED
  * @related OC_CORE_CREATE_CONST_RESOURCE_FINAL
-*/
+ */
 #define OC_CORE_CREATE_CONST_RESOURCE_INTERNAL(                                \
   resource_name, next_resource, device_index, uri, iface_mask, content_format, \
   properties, get_cb, put_cb, post_cb, delete_cb, dpt, num_resource_types,     \
-  ...)                                                                      \
-  oc_ri_internal_expand_call(oc_ri_create_const_resource_internal,                                         \
-    core_resource_##next_resource, core_resource_##resource_name, device_index, NULL, uri, dpt,  \
-    iface_mask, content_format, properties, get_cb, put_cb, post_cb,           \
-    delete_cb, NULL, 0, 0, num_resource_types, __VA_ARGS__)
+  ...)                                                                         \
+  oc_ri_internal_expand_call(                                                  \
+    oc_ri_create_const_resource_internal, core_resource_##next_resource,       \
+    core_resource_##resource_name, device_index, NULL, uri, dpt, iface_mask,   \
+    content_format, properties, get_cb, put_cb, post_cb, delete_cb, NULL, 0,   \
+    0, num_resource_types, __VA_ARGS__)
 
 /**
  * @brief Create const CORE linked to the next one
- * 
+ *
  * @param resource_name name of this resource
  * @param next_resource name of next resource
- * 
+ *
  * @related OC_CORE_CREATE_CONST_RESOURCE_FINAL
-*/
+ */
 #define OC_CORE_CREATE_CONST_RESOURCE_LINKED(resource_name, next_resource,     \
                                              ...)                              \
-  extern const oc_resource_t core_resource_##next_resource;                             \
+  extern const oc_resource_t core_resource_##next_resource;                    \
   oc_ri_internal_expand_call(OC_CORE_CREATE_CONST_RESOURCE_INTERNAL,           \
                              resource_name, next_resource, __VA_ARGS__)
 
 /**
  * @brief Create const CORE linked to a final, non-const dummy
- * 
+ *
  * @param resource_name name of this resource
- * 
+ *
  * @related OC_CORE_CREATE_CONST_RESOURCE_LINKED
-*/
+ */
 #define OC_CORE_CREATE_CONST_RESOURCE_FINAL(resource_name, ...)                \
-  oc_resource_dummy_t core_resource_##resource_name##_final = { NULL, -1 };             \
-  oc_ri_internal_expand_call(                                                  \
-    OC_CORE_CREATE_CONST_RESOURCE_INTERNAL,                                    \
-    resource_name, resource_name##_final, __VA_ARGS__)
+  oc_resource_dummy_t core_resource_##resource_name##_final = { NULL, -1 };    \
+  oc_ri_internal_expand_call(OC_CORE_CREATE_CONST_RESOURCE_INTERNAL,           \
+                             resource_name, resource_name##_final,             \
+                             __VA_ARGS__)
 
 /**
  * @brief callback for initializing the platform
