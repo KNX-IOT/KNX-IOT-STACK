@@ -27,18 +27,22 @@
 #include "oc_uuid.h"
 #include "util/oc_etimer.h"
 
-#define oc_ri_create_const_resource_linked(                                    \
+#define oc_ri_internal_expand(...) __VA_ARGS__
+#define oc_ri_internal_expand_call(fn, ...) oc_ri_internal_expand_call2(fn, (__VA_ARGS__))
+#define oc_ri_internal_expand_call2(fn, args) fn args
+
+#define oc_ri_create_const_resource_internal(                                  \
   next_resource, resource_name, device_index, name, uri, dpt, iface_mask,      \
   content_format, properties, get_cb, put_cb, post_cb, delete_cb, ctx,         \
-  observe_period, instance, num_resource_types, ...)                           \
-  extern const oc_resource_t next_resource;                                    \
-  oc_resource_data_t resource_name##data;                                      \
-  const oc_resource_t resource_name{                                           \
-    /*next*/ &next_resource,                                                   \
+  observe_period, instance, ...)                       \
+  oc_resource_data_t resource_name##_data;                                     \
+  const oc_resource_t resource_name = {                                        \
+    /*next*/ (oc_resource_t *)&next_resource,                                  \
     /*device*/ device_index,                                                   \
     /*name*/ oc_string_create_const(name),                                     \
     /*uri*/ oc_string_create_const(uri),                                       \
-    /*types*/ oc_string_array_create_const(num_resource_types, __VA_ARGS__),   \
+    /*types*/                                                                  \
+    oc_ri_internal_expand_call(oc_string_array_create_const, __VA_ARGS__),   \
     /*dpt*/ oc_string_create_const(dpt),                                       \
     /*interfaces*/ iface_mask,                                                 \
     /*content_type*/ content_format,                                           \
@@ -52,12 +56,17 @@
     /*observe_period_seconds*/ observe_period,                                 \
     /*fb_instance*/ instance,                                                  \
     /*is_const*/ true,                                                         \
-    /*runtime_data*/ &resource_name##data,                                     \
+    /*runtime_data*/ &resource_name##_data,                                    \
   };
+
+#define oc_ri_create_const_resource_linked(next_resource, ...)                 \
+  extern const oc_resource_t next_resource;                                    \
+  oc_ri_internal_expand_call(oc_ri_create_const_resource_internal,(next_resource, __VA_ARGS__))
+
 #define oc_ri_create_const_resource_final(resource_name, ...)                  \
-  oc_resource_dummy_t resource_block_end #resource_name;                       \
-  oc_ri_create_const_resource_linked(resource_block_end #resource_name,        \
-                                     resource_name, __VA_ARGS__)
+  oc_resource_dummy_t resource_block_end##resource_name = { NULL, -1 };        \
+  oc_ri_internal_expand_call(oc_ri_create_const_resource_internal, (resource_block_end##resource_name,      \
+                                       resource_name, __VA_ARGS__))
 
 #ifdef __cplusplus
 extern "C" {

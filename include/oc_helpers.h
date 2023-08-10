@@ -191,14 +191,25 @@ enum StringRepresentation {
   (_oc_free_string(ocstringarray))
 
 #endif /* !OC_MEMORY_TRACE */
-
+#define OC_SIZE_ZERO(x) NULL
+#define OC_SIZE_MANY(x) x 
+/**
+ * @brief Helper macros to create const versions of oc types
+ * These are special and need some help to understand things correctly
+*/
+/**
+ * @brief creates a const oc_mmem struct
+ * unlikely to be used outside of the library
+ * @param count number of elements
+ * @param ptr pointer to const data
+*/
 #define oc_mmem_create_const(count, ptr) {NULL, count, ptr}
 #define oc_string_create_const(s) oc_mmem_create_const(sizeof(s), s)
-#define oc_string_array_create_const(n, ...) oc_mmem_create_const(n, ((const char[n][32]){__VA_ARGS__}))
-#define oc_int_array_create_const(n, ...) oc_mmem_create_const(n, ((int64_t[n]){__VA_ARGS__}))
-#define oc_bool_array_create_const(n, ...) oc_mmem_create_const(n, ((bool[n]){__VA_ARGS__}))
-#define oc_bool_float_create_const(n, ...) oc_mmem_create_const(n, ((float[n]){__VA_ARGS__}))
-#define oc_bool_double_create_const(n, ...) oc_mmem_create_const(n, ((double[n]){__VA_ARGS__}))
+#define oc_string_array_create_const(f, n, ...) oc_mmem_create_const(n, f((char[n][32]){__VA_ARGS__}))
+#define oc_int_array_create_const(f, n, ...) oc_mmem_create_const(n, f((int64_t[n]){__VA_ARGS__}))
+#define oc_bool_array_create_const(f, n, ...) oc_mmem_create_const(n, f((bool[n]){__VA_ARGS__}))
+#define oc_bool_float_create_const(f, n, ...) oc_mmem_create_const(n, f((float[n]){__VA_ARGS__}))
+#define oc_bool_double_create_const(f, n, ...) oc_mmem_create_const(n, f((double[n]){__VA_ARGS__}))
 
 void oc_concat_strings(oc_string_t *concat, const char *str1, const char *str2);
 #define oc_string_len(ocstring) ((ocstring).size ? (ocstring).size - 1 : 0)
