@@ -274,7 +274,7 @@ oc_initiate_spake_parameter_request(oc_endpoint_t *endpoint,
     rnd[32]; // not actually used by the server, so just send some gibberish
   oc_rep_begin_root_object();
 
-  oc_rep_i_set_byte_string(root, 0, recipient_id, recipient_id_len);
+  oc_rep_i_set_text_string(root, 0, recipient_id);
   oc_byte_string_copy_from_char_with_size(&g_spake_ctx.oscore_id,
                                           recipient_id, recipient_id_len);
 
