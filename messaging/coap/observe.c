@@ -101,11 +101,11 @@ coap_remove_observer_handle_by_uri(oc_endpoint_t *endpoint, const char *uri,
 /*---------------------------------------------------------------------------*/
 static int
 #ifdef OC_BLOCK_WISE
-add_observer(oc_resource_t *resource, uint16_t block2_size,
+add_observer(const oc_resource_t *resource, uint16_t block2_size,
              oc_endpoint_t *endpoint, const uint8_t *token, size_t token_len,
              const char *uri, size_t uri_len, oc_interface_mask_t iface_mask)
 #else  /* OC_BLOCK_WISE */
-add_observer(oc_resource_t *resource, oc_endpoint_t *endpoint,
+add_observer(const oc_resource_t *resource, oc_endpoint_t *endpoint,
              const uint8_t *token, size_t token_len, const char *uri,
              size_t uri_len, oc_interface_mask_t iface_mask)
 #endif /* !OC_BLOCK_WISE */
@@ -320,7 +320,7 @@ coap_remove_observers_on_dos_change(size_t device, bool reset)
 #endif /* OC_SECURITY */
 
 int
-coap_notify_observers(oc_resource_t *resource,
+coap_notify_observers(const oc_resource_t *resource,
                       oc_response_buffer_t *response_buf,
                       oc_endpoint_t *endpoint)
 {
@@ -562,7 +562,7 @@ coap_notify_observers(oc_resource_t *resource,
 }
 
 void
-notify_resource_defaults_observer(oc_resource_t *resource,
+notify_resource_defaults_observer(const oc_resource_t *resource,
                                   oc_interface_mask_t iface_mask,
                                   oc_response_buffer_t *response_buf)
 {
@@ -760,12 +760,12 @@ leave_notify_observers:;
 /*---------------------------------------------------------------------------*/
 #ifdef OC_BLOCK_WISE
 int
-coap_observe_handler(void *request, void *response, oc_resource_t *resource,
+coap_observe_handler(void *request, void *response, const oc_resource_t *resource,
                      uint16_t block2_size, oc_endpoint_t *endpoint,
                      oc_interface_mask_t iface_mask)
 #else  /* OC_BLOCK_WISE */
 int
-coap_observe_handler(void *request, void *response, oc_resource_t *resource,
+coap_observe_handler(void *request, void *response, const oc_resource_t *resource,
                      oc_endpoint_t *endpoint, oc_interface_mask_t iface_mask)
 #endif /* !OC_BLOCK_WISE */
 {

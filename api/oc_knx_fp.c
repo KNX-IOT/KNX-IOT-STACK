@@ -329,7 +329,7 @@ oc_belongs_href_to_resource(oc_string_t href, bool discoverable,
                             size_t device_index)
 {
 
-  oc_resource_t *resource = oc_ri_get_app_resources();
+  const oc_resource_t *resource = oc_ri_get_app_resources();
   for (; resource; resource = resource->next) {
     if (discoverable) {
       if (resource->device != device_index ||

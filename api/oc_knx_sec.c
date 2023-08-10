@@ -1665,7 +1665,7 @@ oc_init_oscore_from_storage(size_t device_index, bool from_storage)
 // ----------------------------------------------------------------------------
 
 bool
-oc_is_resource_secure(oc_method_t method, oc_resource_t *resource)
+oc_is_resource_secure(oc_method_t method, const oc_resource_t *resource)
 {
   // see table 6.1.3: all resources with methods that do not have
   // an interface that is not secure
@@ -1814,7 +1814,7 @@ oc_knx_contains_interface(oc_interface_mask_t calling_interfaces,
 }
 
 static bool
-method_allowed(oc_method_t method, oc_resource_t *resource,
+method_allowed(oc_method_t method, const oc_resource_t *resource,
                oc_endpoint_t *endpoint)
 {
   if (oc_is_resource_secure(method, resource) == false) {
@@ -1866,7 +1866,7 @@ method_allowed(oc_method_t method, oc_resource_t *resource,
 }
 
 bool
-oc_knx_sec_check_acl(oc_method_t method, oc_resource_t *resource,
+oc_knx_sec_check_acl(oc_method_t method, const oc_resource_t *resource,
                      oc_endpoint_t *endpoint)
 {
   // first check if the method is allowed on the resource

@@ -350,7 +350,7 @@ typedef struct oc_resource_s oc_resource_t;
 typedef struct oc_request_t
 {
   oc_endpoint_t *origin;     /**< origin of the request */
-  oc_resource_t *resource;   /**< resource structure */
+  const oc_resource_t *resource;   /**< resource structure */
   const char *query;         /**< query (as string) */
   size_t query_len;          /**< query length */
   const char *uri_path;      /**< path (as string) */
@@ -545,15 +545,16 @@ bool oc_check_accept_header(oc_request_t *request, oc_content_format_t accept);
  * @param device the device index
  * @return oc_resource_t* the resource structure
  */
-oc_resource_t *oc_ri_get_app_resource_by_uri(const char *uri, size_t uri_len,
-                                             size_t device);
+const oc_resource_t *oc_ri_get_app_resource_by_uri(const char *uri,
+                                                   size_t uri_len,
+                                                   size_t device);
 
 /**
  * @brief retrieve list of resources
  *
  * @return oc_resource_t* the resource list
  */
-oc_resource_t *oc_ri_get_app_resources(void);
+const oc_resource_t *oc_ri_get_app_resources(void);
 
 #ifdef OC_SERVER
 /**
@@ -563,6 +564,12 @@ oc_resource_t *oc_ri_get_app_resources(void);
  */
 oc_resource_t *oc_ri_alloc_resource(void);
 /**
+ * @brief allocate a resource structure
+ *
+ * @return oc_resource_t*
+ */
+oc_resource_data_t *oc_ri_alloc_resource_data(void);
+/**
  * @brief add resource to the system
  *
  * @param resource the resource to be added to the list of application resources
@@ -570,6 +577,15 @@ oc_resource_t *oc_ri_alloc_resource(void);
  * @return false failure
  */
 bool oc_ri_add_resource(oc_resource_t *resource);
+/**
+ * @brief add resource block to the system
+ *
+ * @param resource the resource block to be added to the list of application
+ * resources
+ * @return true success
+ * @return false failure
+ */
+bool oc_ri_add_resource_block(const oc_resource_t *resource);
 
 /**
  * @brief remove the resource from the list of application resources
@@ -579,7 +595,16 @@ bool oc_ri_add_resource(oc_resource_t *resource);
  * @return true success
  * @return false failure
  */
-bool oc_ri_delete_resource(oc_resource_t *resource);
+bool oc_ri_delete_resource(const oc_resource_t *resource);
+/**
+ * @brief remove the resource block from the list of application resources
+ *
+ * @param resource the resource block to be removed from the list of application
+ * resources
+ * @return true success
+ * @return false failure
+ */
+bool oc_ri_delete_resource_block(const oc_resource_t *resource);
 #endif /* OC_SERVER */
 
 /**
@@ -596,7 +621,7 @@ void oc_ri_free_resource_properties(oc_resource_t *resource);
  * @return next resource or NULL if at end
  * skips over dummy resources
  */
-oc_resource_t *oc_ri_resource_next(const oc_resource_t *resource);
+const oc_resource_t *oc_ri_resource_next(const oc_resource_t *resource);
 
 /**
  * @brief retrieve the query value at the nth position
@@ -665,7 +690,7 @@ oc_interface_mask_t oc_ri_get_interface_mask(char *iface, size_t if_len);
  * @return true valid
  * @return false not valid
  */
-bool oc_ri_is_app_resource_valid(oc_resource_t *resource);
+bool oc_ri_is_app_resource_valid(const oc_resource_t *resource);
 
 /**
  * @brief create a new request from the old request

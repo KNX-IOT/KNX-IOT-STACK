@@ -260,13 +260,13 @@ oc_populate_resource_object(oc_resource_t *resource, const char *name,
                             size_t device)
 {
   if (name) {
-    resource->name.ptr = name;
+    resource->name.ptr = (char*)name;
     resource->name.size = strlen(name) + 1;
     resource->name.next = NULL;
   }
   oc_check_uri(uri);
   resource->uri.next = NULL;
-  resource->uri.ptr = uri;
+  resource->uri.ptr = (char*)uri;
   resource->uri.size = strlen(uri) + 1; // include null terminator in size
   oc_new_string_array(&resource->types, num_resource_types);
   resource->properties = 0;
@@ -293,6 +293,7 @@ oc_new_resource(const char *name, const char *uri, uint8_t num_resource_types,
       resource->runtime_data = data;
       resource->runtime_data->num_observers = 0;
       resource->properties = OC_DISCOVERABLE;
+      *(bool*)&resource->is_const = false;
       oc_populate_resource_object(resource, name, uri, num_resource_types,
                                   device_index);
     }
@@ -631,7 +632,7 @@ oc_send_separate_response_with_length(oc_separate_response_t *handle,
         }
       }
     } else {
-      oc_resource_t *resource = oc_ri_get_app_resource_by_uri(
+      const oc_resource_t *resource = oc_ri_get_app_resource_by_uri(
         oc_string(cur->uri), oc_string_len(cur->uri), cur->endpoint.device);
       if (resource) {
         coap_notify_observers(resource, &response_buffer, &cur->endpoint);

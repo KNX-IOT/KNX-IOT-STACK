@@ -38,7 +38,7 @@
 #include <inttypes.h>
 
 bool
-oc_add_resource_to_wk(oc_resource_t *resource, oc_request_t *request,
+oc_add_resource_to_wk(const oc_resource_t *resource, oc_request_t *request,
                       size_t device_index, size_t *response_length, int matches,
                       int truncate)
 {
@@ -154,7 +154,7 @@ oc_add_resource_to_wk(oc_resource_t *resource, oc_request_t *request,
 }
 
 bool
-oc_filter_resource(oc_resource_t *resource, oc_request_t *request,
+oc_filter_resource(const oc_resource_t *resource, oc_request_t *request,
                    size_t device_index, size_t *response_length, int matches,
                    int truncate)
 {
@@ -187,7 +187,7 @@ oc_process_resources(oc_request_t *request, size_t device_index,
     matches = 1;
   }
 
-  oc_resource_t *resource = oc_ri_get_app_resources();
+  const oc_resource_t *resource = oc_ri_get_app_resources();
   for (; resource; resource = resource->next) {
     if (resource->device != device_index ||
         !(resource->properties & OC_DISCOVERABLE))

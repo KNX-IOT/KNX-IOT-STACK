@@ -78,7 +78,7 @@ oc_core_count_dp_in_fb(size_t device_index, int instance, int fb_value)
   int counter = 0;
   int i;
 
-  oc_resource_t *resource = oc_ri_get_app_resources();
+  const oc_resource_t *resource = oc_ri_get_app_resources();
   for (; resource; resource = resource->next) {
     if (resource->device != device_index ||
         !(resource->properties & OC_DISCOVERABLE)) {
@@ -178,7 +178,7 @@ oc_core_fb_x_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 
   // do the actual creation of the payload, e.g. the data points per functional
   // block instance
-  oc_resource_t *resource = oc_ri_get_app_resources();
+  const oc_resource_t *resource = oc_ri_get_app_resources();
   for (; resource; resource = resource->next) {
     if (resource->device != device_index ||
         !(resource->properties & OC_DISCOVERABLE)) {
@@ -239,7 +239,7 @@ oc_count_functional_blocks(size_t device_index)
     return g_nr_functional_blocks;
   }
 
-  oc_resource_t *resource = oc_ri_get_app_resources();
+  const oc_resource_t *resource = oc_ri_get_app_resources();
   for (; resource; resource = resource->next) {
     if (resource->device != device_index ||
         !(resource->properties & OC_DISCOVERABLE)) {
@@ -289,7 +289,7 @@ oc_add_function_blocks_to_response(oc_request_t *request, size_t device_index,
   g_array_size = 0;
   bool netip_added = false;
 
-  oc_resource_t *resource = oc_ri_get_app_resources();
+  const oc_resource_t *resource = oc_ri_get_app_resources();
   for (; resource; resource = resource->next) {
     if (resource->device != device_index ||
         !(resource->properties & OC_DISCOVERABLE)) {

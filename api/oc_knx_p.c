@@ -32,7 +32,7 @@ oc_add_data_points_to_response(oc_request_t *request, size_t device_index,
   (void)request;
   int length = 0;
 
-  oc_resource_t *resource = oc_ri_get_app_resources();
+  const oc_resource_t *resource = oc_ri_get_app_resources();
   for (; resource; resource = resource->next) {
     if (resource->device != device_index ||
         (resource->properties & OC_DISCOVERABLE)) {
@@ -83,7 +83,7 @@ oc_core_p_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 
     // count the discoverable resources
     int matches = 0;
-    oc_resource_t *resource = oc_ri_get_app_resources();
+    const oc_resource_t *resource = oc_ri_get_app_resources();
     for (; resource; resource = resource->next) {
       if (resource->device != device_index ||
           (resource->properties & OC_DISCOVERABLE)) {
@@ -201,7 +201,7 @@ oc_core_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
           new_request.uri_path = "/p";
           new_request.uri_path_len = 4;
 
-          oc_resource_t *my_resource = oc_ri_get_app_resource_by_uri(
+          const oc_resource_t *my_resource = oc_ri_get_app_resource_by_uri(
             oc_string(*myurl), oc_string_len(*myurl), device_index);
           if (my_resource) {
             // this should not be the request..

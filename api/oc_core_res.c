@@ -640,7 +640,7 @@ oc_core_populate_resource(int core_resource, size_t device_index,
   r->device = device_index;
   oc_check_uri(uri);
   r->uri.next = NULL;
-  r->uri.ptr = uri;
+  r->uri.ptr = (char*)uri;
   r->uri.size = strlen(uri) + 1; // include null terminator in size
   r->properties = properties;
   va_list rt_list;
@@ -727,7 +727,7 @@ oc_core_get_resource_by_uri(const char *uri, size_t device)
 }
 
 bool
-oc_filter_resource_by_rt(oc_resource_t *resource, oc_request_t *request)
+oc_filter_resource_by_rt(const oc_resource_t *resource, oc_request_t *request)
 {
   bool match = true, more_query_params = false;
   char *rt = NULL;
@@ -771,7 +771,7 @@ oc_filter_resource_by_rt(oc_resource_t *resource, oc_request_t *request)
 }
 
 bool
-oc_filter_resource_by_if(oc_resource_t *resource, oc_request_t *request)
+oc_filter_resource_by_if(const oc_resource_t *resource, oc_request_t *request)
 {
   bool match = true, more_query_params = false;
   char *value = NULL;

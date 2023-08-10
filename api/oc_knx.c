@@ -812,7 +812,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
     PRINT(" .knx : url  %s\n", oc_string_checked(myurl));
     if (oc_string_len(myurl) > 0) {
       // get the resource to do the fake post on
-      oc_resource_t *my_resource = oc_ri_get_app_resource_by_uri(
+      const oc_resource_t *my_resource = oc_ri_get_app_resource_by_uri(
         oc_string(myurl), oc_string_len(myurl), device_index);
       if (my_resource == NULL) {
         return;

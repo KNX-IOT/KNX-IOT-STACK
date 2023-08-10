@@ -394,7 +394,7 @@ void oc_core_bind_dpt_resource(int core_resource, size_t device_index,
  * @return true resource type (or wild card) is in the request
  * @return false resource type is not in the request
  */
-bool oc_filter_resource_by_rt(oc_resource_t *resource, oc_request_t *request);
+bool oc_filter_resource_by_rt(const oc_resource_t *resource, oc_request_t *request);
 
 /**
  * @brief filter if the query parameters of the request contains the resource
@@ -406,7 +406,7 @@ bool oc_filter_resource_by_rt(oc_resource_t *resource, oc_request_t *request);
  * @return true interface type of the resource is in the request
  * @return false interface type of the resource is not in the request
  */
-bool oc_filter_resource_by_if(oc_resource_t *resource, oc_request_t *request);
+bool oc_filter_resource_by_if(const oc_resource_t *resource, oc_request_t *request);
 
 /**
  * @brief frame the interface mask in the response, as string in the uri
