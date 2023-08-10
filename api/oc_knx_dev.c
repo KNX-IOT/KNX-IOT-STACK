@@ -66,6 +66,12 @@ oc_core_dev_sn_get_handler(oc_request_t *request,
   oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
 }
 
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(dev_sn, dev_hwv, 0, "/dev/sn", OC_IF_D,
+                                     APPLICATION_CBOR, OC_DISCOVERABLE,
+                                     oc_core_dev_sn_get_handler, 0, 0, 0,
+                                     "urn:knx:dpt.serNum", OC_SIZE_MANY(1),
+                                     "urn:knx:dpa:0.11")
+
 void
 oc_create_dev_sn_resource(int resource_idx, size_t device)
 {
@@ -112,6 +118,11 @@ oc_core_dev_hwv_get_handler(oc_request_t *request,
   }
   oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
 }
+
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(dev_hwv, dev_fwv, 0, "/dev/hwv", OC_IF_D,
+                                     APPLICATION_CBOR, OC_DISCOVERABLE,
+                                     oc_core_dev_hwv_get_handler, 0, 0, 0,
+                                     "urn:knx:dpt.version", OC_SIZE_ZERO());
 
 void
 oc_create_dev_hwv_resource(int resource_idx, size_t device)
@@ -160,6 +171,12 @@ oc_core_dev_fwv_get_handler(oc_request_t *request,
   oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
 }
 
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(dev_fwv, dev_hwt, 0, "/dev/fwv", OC_IF_D,
+                                     APPLICATION_CBOR, OC_DISCOVERABLE,
+                                     oc_core_dev_fwv_get_handler, 0, 0, 0,
+                                     "urn:knx:dpt.version", OC_SIZE_MANY(1),
+                                     "urn:knx:dpa.0.25");
+
 void
 oc_create_dev_fwv_resource(int resource_idx, size_t device)
 {
@@ -198,6 +215,12 @@ oc_core_dev_hwt_get_handler(oc_request_t *request,
   }
   oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
 }
+
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(dev_hwt, dev_model, 0, "/dev/hwt", OC_IF_D,
+                                     APPLICATION_CBOR, OC_DISCOVERABLE,
+                                     oc_core_dev_hwt_get_handler, 0, 0, 0,
+                                     "urn:knx:dpt.varString8859_1",
+                                     OC_SIZE_ZERO());
 
 void
 oc_create_dev_hwt_resource(int resource_idx, size_t device)
@@ -238,6 +261,12 @@ oc_core_dev_model_get_handler(oc_request_t *request,
   }
   oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
 }
+
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(dev_model, dev_ia, 0, "/dev/model",
+                                     OC_IF_D, APPLICATION_CBOR, OC_DISCOVERABLE,
+                                     oc_core_dev_model_get_handler, 0, 0, 0,
+                                     "urn:knx:dpt.utf8", OC_SIZE_MANY(1),
+                                     "urn:knx:dpa.0.15");
 
 void
 oc_create_dev_model_resource(int resource_idx, size_t device)
@@ -352,6 +381,13 @@ oc_core_dev_ia_put_handler(oc_request_t *request,
   }
 }
 
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(dev_ia, dev_hostname, 0, "/dev/ia",
+                                     OC_IF_P, APPLICATION_CBOR, OC_DISCOVERABLE,
+                                     oc_core_dev_ia_get_handler,
+                                     oc_core_dev_ia_put_handler, 0, 0, NULL,
+                                     OC_SIZE_MANY(1),
+                                     "urn:knx:dpt.value2Ucount");
+
 void
 oc_create_dev_ia_resource(int resource_idx, size_t device)
 {
@@ -432,6 +468,13 @@ oc_core_dev_hostname_get_handler(oc_request_t *request,
   }
   oc_send_cbor_response(request, OC_STATUS_OK);
 }
+
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(dev_hostname, dev_iid, 0, "/dev/hname",
+                                     OC_IF_P, APPLICATION_CBOR, OC_DISCOVERABLE,
+                                     oc_core_dev_hostname_get_handler,
+                                     oc_core_dev_hostname_put_handler, 0, 0,
+                                     "urn:knx:dpt.varString8859_1",
+                                     OC_SIZE_ZERO());
 
 void
 oc_create_dev_hostname_resource(int resource_idx, size_t device)
@@ -518,6 +561,13 @@ oc_core_dev_iid_get_handler(oc_request_t *request,
 
   oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
 }
+
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(dev_iid, dev_pm, 0, "/dev/iid", OC_IF_P,
+                                     APPLICATION_CBOR, OC_DISCOVERABLE,
+                                     oc_core_dev_iid_get_handler,
+                                     oc_core_dev_iid_put_handler, 0, 0,
+                                     "urn:knx:dpt.value8Ucount",
+                                     OC_SIZE_ZERO());
 
 void
 oc_create_dev_iid_resource(int resource_idx, size_t device)
@@ -615,6 +665,11 @@ oc_core_dev_ipv6_get_handler(oc_request_t *request,
   return;
 }
 
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(dev_ipv6, dev_sa, 0, "/dev/ipv6", OC_IF_P,
+                                     APPLICATION_CBOR, OC_DISCOVERABLE,
+                                     oc_core_dev_ipv6_get_handler, 0, 0, 0,
+                                     "urn:knx:dpt.ipv6", OC_SIZE_ZERO());
+
 void
 oc_create_dev_ipv6_resource(int resource_idx, size_t device)
 {
@@ -703,6 +758,13 @@ oc_core_dev_pm_put_handler(oc_request_t *request,
   oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
 }
 
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(dev_pm, dev_ipv6, 0, "/dev/pm", OC_IF_P,
+                                     APPLICATION_CBOR, OC_DISCOVERABLE,
+                                     oc_core_dev_pm_get_handler,
+                                     oc_core_dev_pm_put_handler, 0, 0,
+                                     "urn:knx:dpt.binaryValue", OC_SIZE_MANY(1),
+                                     "urn:knx:dpa.0.54");
+
 void
 oc_create_dev_pm_resource(int resource_idx, size_t device)
 {
@@ -754,6 +816,11 @@ oc_core_dev_dev_get_handler(oc_request_t *request,
   PRINT("oc_core_dev_dev_get_handler - end\n");
 }
 
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(dev, app, 0, "/dev", OC_IF_LI,
+                                     APPLICATION_LINK_FORMAT, 0,
+                                     oc_core_dev_dev_get_handler, 0, 0, 0, NULL,
+                                     OC_SIZE_MANY(1), "urn:knx:fb.0");
+
 void
 oc_create_dev_dev_resource(int resource_idx, size_t device)
 {
@@ -770,8 +837,8 @@ oc_create_dev_dev_resource(int resource_idx, size_t device)
   Each KNX IoT device, i.e.a Router or an end device,
   SHALL have a unique KNX Individual Address in a network.The KNX Individual
   Address is a 2 octet value that consist of an 8 bit Subnetwork
-  Address(see “dev / sa”) and
-  an 8 bit Device Address(see “dev / da”)
+  Address(see ï¿½dev / saï¿½) and
+  an 8 bit Device Address(see ï¿½dev / daï¿½)
   octet 0 == subnetwork
   octet 1 == device address
   Example: Subnetwork Address: 0, Device Address: 1 = 0x0001
@@ -804,6 +871,12 @@ oc_core_dev_sa_get_handler(oc_request_t *request,
 
   oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
 }
+
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(dev_sa, dev_da, 0, "/dev/sna", OC_IF_P,
+                                     APPLICATION_CBOR, OC_DISCOVERABLE,
+                                     oc_core_dev_sa_get_handler, 0, 0, 0,
+                                     "urn:knx:dpt.value1Ucount",
+                                     OC_SIZE_MANY(1), "urn:knx:dpa.0.57");
 
 void
 oc_create_dev_sa_resource(int resource_idx, size_t device)
@@ -846,6 +919,12 @@ oc_core_dev_da_get_handler(oc_request_t *request,
 
   oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
 }
+
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(dev_da, dev_port, 0, "/dev/da", OC_IF_P,
+                                     APPLICATION_CBOR, OC_DISCOVERABLE,
+                                     oc_core_dev_da_get_handler, 0, 0, 0,
+                                     "urn:knx:dpa.0.58", OC_SIZE_MANY(1),
+                                     "urn:knx:dpa.0.58");
 
 void
 oc_create_dev_da_resource(int resource_idx, size_t device)
@@ -918,6 +997,12 @@ oc_core_dev_port_put_handler(oc_request_t *request,
 
   oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
 }
+
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(dev_port, dev_mport, 0, "/dev/port",
+                                     OC_IF_P, APPLICATION_CBOR, OC_DISCOVERABLE,
+                                     oc_core_dev_port_get_handler, 0, 0, 0,
+                                     "urn:knx:dpt.value2Ucount",
+                                     OC_SIZE_ZERO());
 
 void
 oc_create_dev_port_resource(int resource_idx, size_t device)
@@ -994,6 +1079,11 @@ oc_core_dev_mport_put_handler(oc_request_t *request,
   oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
 }
 
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(dev_mport, dev_mid, 0, "/dev/mport",
+                                     OC_IF_P, APPLICATION_CBOR, OC_DISCOVERABLE,
+                                     oc_core_dev_mport_get_handler, 0, 0, 0,
+                                     "urn:knx:dpt.value2Ucount",
+                                     OC_SIZE_ZERO());
 void
 oc_create_dev_mport_resource(int resource_idx, size_t device)
 {
@@ -1126,6 +1216,13 @@ oc_core_ap_x_put_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
 }
 
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(app_x, knx_spake, 0, "/ap/pv", OC_IF_P,
+                                     APPLICATION_CBOR, OC_DISCOVERABLE,
+                                     oc_core_ap_x_get_handler,
+                                     oc_core_ap_x_put_handler, 0, 0,
+                                     "urn:knx:dpt.programVersion",
+                                     OC_SIZE_MANY(1), "urn:knx:dpa.3.13");
+
 void
 oc_create_ap_x_resource(int resource_idx, size_t device)
 {
@@ -1191,6 +1288,12 @@ oc_core_ap_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   }
 }
 
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(app, app_x, 0, "/ap", OC_IF_P,
+                                     APPLICATION_LINK_FORMAT, OC_DISCOVERABLE,
+                                     oc_core_ap_get_handler, 0, 0, 0,
+                                     "urn:knx:dpt.value2Ucount",
+                                     OC_SIZE_MANY(1), "urn:knx:fb.3");
+
 void
 oc_create_ap_resource(int resource_idx, size_t device)
 {
@@ -1230,6 +1333,11 @@ oc_core_dev_mid_get_handler(oc_request_t *request,
   oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
 }
 
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(dev_mid, dev, 0, "/dev/mid", OC_IF_P,
+                                     APPLICATION_CBOR, OC_DISCOVERABLE,
+                                     oc_core_dev_mid_get_handler, 0, 0, 0,
+                                     "urn:knx:dpt.value2Ucount",
+                                     OC_SIZE_MANY(1), "urn:knx:dpa.0.12");
 void
 oc_create_dev_mid_resource(int resource_idx, size_t device)
 {

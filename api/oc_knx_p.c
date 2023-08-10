@@ -220,6 +220,12 @@ oc_core_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   PRINT("oc_core_p_post_handler - end\n");
 }
 
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_p, knx_f, 0, "/p",
+                                     OC_IF_LI | OC_IF_C | OC_IF_B,
+                                     APPLICATION_LINK_FORMAT, 0,
+                                     oc_core_p_get_handler, 0,
+                                     oc_core_p_post_handler, 0, NULL,
+                                     OC_SIZE_MANY(1), "urn:knx:fb.0");
 void
 oc_create_p_resource(int resource_idx, size_t device)
 {

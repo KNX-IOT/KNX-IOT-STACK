@@ -539,6 +539,12 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   }
 }
 
+OC_CORE_CREATE_CONST_RESOURCE_FINAL(well_known_core, 0,
+                                    "/.well-known/core", OC_IF_NONE,
+                                    APPLICATION_LINK_FORMAT, OC_DISCOVERABLE,
+                                    oc_wkcore_discovery_handler, 0, 0, 0, NULL,
+                                    OC_SIZE_MANY(1), "wk")
+
 void
 oc_create_discovery_resource(int resource_idx, size_t device)
 {

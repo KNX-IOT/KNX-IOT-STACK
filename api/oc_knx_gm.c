@@ -670,14 +670,20 @@ oc_core_fp_gm_post_handler(oc_request_t *request,
   request->response->response_buffer->response_length = response_length;
 }
 
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_fp_gm, knx_fp_gm_x, "/fp/gm",
+                                     OC_IF_C | OC_IF_B, APPLICATION_CBOR,
+                                     OC_DISCOVERABLE, oc_core_fp_gm_get_handler,
+                                     0, oc_core_fp_gm_post_handler, 0, NULL,
+                                     OC_SIZE_MANY(1), "urn:knx:if.c");
+
 void
 oc_create_fp_gm_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_fp_gm_resource\n");
-  oc_core_populate_resource(
-    resource_idx, device, "/fp/gm", OC_IF_C | OC_IF_B, APPLICATION_CBOR,
-    OC_DISCOVERABLE, oc_core_fp_gm_get_handler, 0, oc_core_fp_gm_post_handler,
-    0, 0, 1, "urn:knx:if.c");
+  oc_core_populate_resource(resource_idx, device, "/fp/gm", OC_IF_C | OC_IF_B,
+                            APPLICATION_CBOR, OC_DISCOVERABLE,
+                            oc_core_fp_gm_get_handler, 0,
+                            oc_core_fp_gm_post_handler, 0, 1, "urn:knx:if.c");
 }
 
 static void
@@ -774,6 +780,13 @@ oc_core_fp_gm_x_del_handler(oc_request_t *request,
   oc_send_cbor_response(request, OC_STATUS_OK);
 }
 
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_fp_gm_x, well_known_core, 0,
+                                     "/fp/gm/*", OC_IF_D, APPLICATION_CBOR,
+                                     OC_DISCOVERABLE,
+                                     oc_core_fp_gm_x_get_handler, 0, 0,
+                                     oc_core_fp_gm_x_del_handler, NULL,
+                                     OC_SIZE_MANY(1), "urn:knx:if.c");
+
 void
 oc_create_fp_gm_x_resource(int resource_idx, size_t device)
 {
@@ -781,7 +794,7 @@ oc_create_fp_gm_x_resource(int resource_idx, size_t device)
   oc_core_populate_resource(resource_idx, device, "/fp/gm/*", OC_IF_D,
                             APPLICATION_CBOR, OC_DISCOVERABLE,
                             oc_core_fp_gm_x_get_handler, 0, 0,
-                            oc_core_fp_gm_x_del_handler, 0, 1, "urn:knx:if.c");
+                            oc_core_fp_gm_x_del_handler, 1, "urn:knx:if.c");
 }
 
 // -----------------------------------------------------------------------------
@@ -1363,6 +1376,8 @@ oc_create_f_netip_mcast_resource(size_t device)
 
 // -----------------------------------------------------------------------------
 
+// This is never called and has no oc_core_resource_t entry?
+// I guess no OC_CORE_CREATE_CONST_RESOURCE_LINKED().
 // to be removed
 void
 oc_create_f_netip_resource(int resource_idx, size_t device)
