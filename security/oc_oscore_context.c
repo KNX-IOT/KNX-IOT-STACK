@@ -336,9 +336,6 @@ oc_oscore_add_context(size_t device, const char *senderid, int senderid_size,
     // explicit token
     memcpy(ctx->token_id, senderid, senderid_size);
     ctx->sendid_len = (uint8_t)senderid_size;
-  } else {
-    OC_ERR("senderid == NULL");
-    goto add_oscore_context_error;
   }
   PRINT("SendID (%d):", ctx->sendid_len);
   OC_LOGbytes_OSCORE(ctx->sendid, ctx->sendid_len);
@@ -352,9 +349,6 @@ oc_oscore_add_context(size_t device, const char *senderid, int senderid_size,
     // }
     memcpy(ctx->recvid, recipientid, recipientid_size);
     ctx->recvid_len = (uint8_t)recipientid_size;
-  } else {
-    OC_ERR("recipientid == NULL");
-    goto add_oscore_context_error;
   }
   PRINT("RecvID (%d):", ctx->recvid_len);
   OC_LOGbytes_OSCORE(ctx->recvid, ctx->recvid_len);

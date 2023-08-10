@@ -233,18 +233,18 @@ int oc_core_find_at_entry_empty_slot(size_t device_index);
  * @brief set shared (SPAKE) key to the auth at table, on the Management Client
  * side
  *
- * @param serial_number the serial_number of the device that has been negotiated
+ * @param client_senderid the client_senderid of the device that has been negotiated
  * with spake2plus. This will become the Receiver ID within the OSCORE context.
  * This value is an ASCII-encoded string representing the hexadecimal serial
  * number
- * @param serial_number_size the size of the serial number
+ * @param client_senderid_size the size of the serial number
  * @param clientrecipient_id the clientrecipient_id (delivered during the
  * handshake). This will become the Sender ID. This value is in HEX
  * @param clientrecipient_id_size the size of the clientrecipient_id
  * @param shared_key the master key after SPAKE2 handshake
  * @param shared_key_size the key size
  */
-void oc_oscore_set_auth_mac(char *serial_number, int serial_number_size,
+void oc_oscore_set_auth_mac(char *client_senderid, int client_senderid_size,
                             char *clientrecipient_id,
                             int clientrecipient_id_size, uint8_t *shared_key,
                             int shared_key_size);
@@ -252,18 +252,18 @@ void oc_oscore_set_auth_mac(char *serial_number, int serial_number_size,
 /**
  * @brief set shared (SPAKE) key to the auth at table, on the Device side
  *
- * @param serial_number the serial_number of the device that has been negotiated
+ * @param client_senderid the client_senderid of the device that has been negotiated
  * with spake2plus. This will become the Sender ID within the OSCORE context.
  * This value is an ASCII-encoded string representing the hexadecimal serial
  * number
- * @param serial_number_size the size of the serial number
+ * @param client_senderid_size the size of the serial number
  * @param clientrecipient_id the clientrecipient_id (delivered during the
  * handshake). This will become the Receiver ID. This value is in HEX
  * @param clientrecipient_id_size the size of the clientrecipient_id
  * @param shared_key the master key after SPAKE2 handshake
  * @param shared_key_size the key size
  */
-void oc_oscore_set_auth_device(char *serial_number, int serial_number_size,
+void oc_oscore_set_auth_device(char *client_senderid, int client_senderid_size,
                                char *clientrecipient_id,
                                int clientrecipient_id_size, uint8_t *shared_key,
                                int shared_key_size);
