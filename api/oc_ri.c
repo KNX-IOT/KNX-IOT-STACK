@@ -60,6 +60,7 @@
 OC_LIST(app_resources);
 OC_LIST(observe_callbacks);
 OC_MEMB(app_resources_s, oc_resource_t, OC_MAX_APP_RESOURCES);
+OC_MEMB(app_resource_datas_s, oc_resource_data_t, OC_MAX_APP_RESOURCES);
 #endif /* OC_SERVER */
 
 #ifdef OC_CLIENT
@@ -370,16 +371,16 @@ oc_ri_new_request_from_request(oc_request_t new_request, oc_request_t request,
 }
 
 #ifdef OC_SERVER
-oc_resource_t *
+const oc_resource_t *
 oc_ri_get_app_resources(void)
 {
   return oc_list_head(app_resources);
 }
 
 bool
-oc_ri_is_app_resource_valid(oc_resource_t *resource)
+oc_ri_is_app_resource_valid(const oc_resource_t *resource)
 {
-  oc_resource_t *res = oc_ri_get_app_resources();
+  const oc_resource_t *res = oc_ri_get_app_resources();
   while (res) {
     if (res == resource) {
       return true;
@@ -625,7 +626,7 @@ stop_processes(void)
 }
 
 #ifdef OC_SERVER
-oc_resource_t *
+const oc_resource_t *
 oc_ri_get_app_resource_by_uri(const char *uri, size_t uri_len, size_t device)
 {
   if (!uri || uri_len == 0)
@@ -633,7 +634,7 @@ oc_ri_get_app_resource_by_uri(const char *uri, size_t uri_len, size_t device)
   int skip = 0;
   if (uri[0] != '/')
     skip = 1;
-  oc_resource_t *res = oc_ri_get_app_resources();
+  const oc_resource_t *res = oc_ri_get_app_resources();
   while (res != NULL) {
     if (oc_string_len(res->uri) == (uri_len + skip) &&
         strncmp(uri, oc_string(res->uri) + skip, uri_len) == 0 &&
@@ -648,9 +649,16 @@ oc_ri_get_app_resource_by_uri(const char *uri, size_t uri_len, size_t device)
 static void
 oc_ri_delete_all_app_resources(void)
 {
-  oc_resource_t *res = oc_ri_get_app_resources();
+  const oc_resource_t *res = oc_ri_get_app_resources();
   while (res) {
-    oc_ri_delete_resource(res);
+    if (oc_ri_delete_resource(res) == true)
+      ;
+    else if (oc_ri_delete_resource_block(res) == true)
+      ;
+    else {
+      // we'll get stuck in an infinite loop!
+      return;
+    }
     res = oc_ri_get_app_resources();
   }
 }
@@ -685,11 +693,22 @@ oc_ri_alloc_resource(void)
   return oc_memb_alloc(&app_resources_s);
 }
 
-bool
-oc_ri_delete_resource(oc_resource_t *resource)
+oc_resource_data_t *
+oc_ri_alloc_resource_data(void)
 {
-  if (!resource)
+  return oc_memb_alloc(&app_resource_datas_s);
+}
+
+bool
+oc_ri_delete_resource(const oc_resource_t *_resource)
+{
+  if (!_resource)
     return false;
+  if (_resource->is_const) {
+    OC_ERR("oc_ri_delete_resource: resource is const!");
+    return false;
+  }
+  oc_resource_t *resource = (oc_resource_t *)_resource;
 
   /**
    * Prevent double deallocation: oc_rt_factory_free_created_resource
@@ -702,7 +721,7 @@ oc_ri_delete_resource(oc_resource_t *resource)
     return true;
   }
 
-  if (resource->num_observers > 0) {
+  if (resource->runtime_data->num_observers > 0) {
     coap_remove_observer_by_resource(resource);
   }
 
@@ -712,10 +731,52 @@ oc_ri_delete_resource(oc_resource_t *resource)
 }
 
 bool
+oc_ri_delete_resource_block(const oc_resource_t *_resource)
+{
+  if (!_resource)
+    return false;
+  const oc_resource_t *dummy_resource = _resource;
+  while (dummy_resource && dummy_resource->device != -1) {
+    dummy_resource = dummy_resource->next;
+  }
+  if (!dummy_resource)
+    return false;
+
+  /**
+   * Prevent double deallocation: oc_rt_factory_free_created_resource
+   * called below will invoke the delete handler of the resource which will
+   * invoke this function again. We use the list of resources to check
+   * whether the resource exists and when it doesn't we assume that
+   * a deallocation of the resource was already invoked and skip this one.
+   */
+  if (oc_list_remove_block2(app_resources, (void *)_resource,
+                            (void *)dummy_resource) == NULL) {
+    return true;
+  }
+
+  for (; _resource != dummy_resource; _resource = _resource->next) {
+    if (_resource->is_const)
+      continue;
+    oc_resource_t *resource = (oc_resource_t *)_resource;
+    if (resource->runtime_data->num_observers > 0) {
+      coap_remove_observer_by_resource(resource);
+    }
+    oc_ri_free_resource_properties(resource);
+    oc_memb_free(&app_resources_s, resource);
+  }
+
+  return true;
+}
+
+bool
 oc_ri_add_resource(oc_resource_t *resource)
 {
   if (!resource)
     return false;
+  if (resource->is_const) {
+    OC_ERR("oc_ri_add_resource: resource is const!");
+    return false;
+  }
 
   bool valid = true;
 
@@ -733,24 +794,69 @@ oc_ri_add_resource(oc_resource_t *resource)
 
   return valid;
 }
+
+bool
+oc_ri_add_resource_block(const oc_resource_t *resource)
+{
+  const oc_resource_t *it = resource;
+  if (!resource)
+    return false;
+
+  bool valid = true;
+
+  do {
+
+    if (!resource->get_handler.cb && !resource->put_handler.cb &&
+        !resource->post_handler.cb && !resource->delete_handler.cb)
+      valid = false;
+
+    if ((resource->properties & OC_PERIODIC) &&
+        resource->observe_period_seconds == 0)
+      valid = false;
+
+  } while (it = oc_ri_resource_next(it));
+
+  if (valid) {
+    oc_list_add_block(app_resources, (void *)resource);
+  }
+
+  return valid;
+}
 #endif /* OC_SERVER */
 
 void
 oc_ri_free_resource_properties(oc_resource_t *resource)
 {
-  if (resource) {
-    // Resource names and URIs use the oc_string_t type to point to read-only
-    // memory, so we do not need to free
-    // oc_free_string(&(resource->name));
-    resource->name.ptr = NULL;
-    resource->name.size = 0;
-    // oc_free_string(&(resource->uri));
-    resource->uri.ptr = NULL;
-    resource->uri.size = 0;
-    if (oc_string_array_get_allocated_size(resource->types) > 0) {
-      oc_free_string_array(&(resource->types));
-    }
+  if (resource == NULL) {
+    return;
   }
+  if (resource->is_const) {
+    OC_ERR("oc_ri_free_resource_properties: resource is const");
+    return;
+  }
+  // Resource names and URIs use the oc_string_t type to point to read-only
+  // memory, so we do not need to free
+  // oc_free_string(&(resource->name));
+  resource->name.ptr = NULL;
+  resource->name.size = 0;
+  // oc_free_string(&(resource->uri));
+  resource->uri.ptr = NULL;
+  resource->uri.size = 0;
+  if (oc_string_array_get_allocated_size(resource->types) > 0) {
+    oc_free_string_array(&(resource->types));
+  }
+}
+
+const oc_resource_t *
+oc_ri_resource_next(const oc_resource_t *resource)
+{
+  if (resource == NULL)
+    return NULL;
+  do {
+    resource = resource->next;
+    // device = -1 means dummy resource (MUST BE IN RAM)
+  } while (resource && resource->device == -1);
+  return resource;
 }
 
 void
@@ -852,7 +958,7 @@ periodic_observe_handler(void *data)
 }
 
 static oc_event_callback_t *
-get_periodic_observe_callback(oc_resource_t *resource)
+get_periodic_observe_callback(const oc_resource_t *resource)
 {
   oc_event_callback_t *event_cb;
   bool found = false;
@@ -873,7 +979,7 @@ get_periodic_observe_callback(oc_resource_t *resource)
 }
 
 static void
-remove_periodic_observe_callback(oc_resource_t *resource)
+remove_periodic_observe_callback(const oc_resource_t *resource)
 {
   oc_event_callback_t *event_cb = get_periodic_observe_callback(resource);
 
@@ -885,7 +991,7 @@ remove_periodic_observe_callback(oc_resource_t *resource)
 }
 
 static bool
-add_periodic_observe_callback(oc_resource_t *resource)
+add_periodic_observe_callback(const oc_resource_t *resource)
 {
   oc_event_callback_t *event_cb = get_periodic_observe_callback(resource);
 
@@ -897,7 +1003,7 @@ add_periodic_observe_callback(oc_resource_t *resource)
       return false;
     }
 
-    event_cb->data = resource;
+    event_cb->data = (void *)resource;
     event_cb->callback = periodic_observe_handler;
     OC_PROCESS_CONTEXT_BEGIN(&timed_callback_events);
     oc_etimer_set(&event_cb->timer,
@@ -1109,7 +1215,7 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
     }
   }
 
-  oc_resource_t *resource, *cur_resource = NULL;
+  const oc_resource_t *resource, *cur_resource = NULL;
 
   /* If there were no errors thus far, attempt to locate the specific
    * resource object that will handle the request using the request uri.
@@ -1411,7 +1517,7 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
           // only handle observe when not doing multicast
           PRINT(" adding callback\n");
           oc_ri_add_timed_event_callback_ticks(
-            cur_resource, &oc_observe_notification_delayed, 0);
+            (void *)cur_resource, &oc_observe_notification_delayed, 0);
         } else {
           PRINT(" not adding callback\n");
         }

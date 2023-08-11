@@ -329,7 +329,7 @@ oc_belongs_href_to_resource(oc_string_t href, bool discoverable,
                             size_t device_index)
 {
 
-  oc_resource_t *resource = oc_ri_get_app_resources();
+  const oc_resource_t *resource = oc_ri_get_app_resources();
   for (; resource; resource = resource->next) {
     if (discoverable) {
       if (resource->device != device_index ||
@@ -600,6 +600,12 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
 }
 
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_fp_g, knx_fp_g_x, 0, "/fp/g",
+                                     OC_IF_C | OC_IF_B, APPLICATION_CBOR,
+                                     OC_DISCOVERABLE, oc_core_fp_g_get_handler,
+                                     0, oc_core_fp_g_post_handler, 0, NULL,
+                                     OC_SIZE_MANY(1), "urn:knx:if.c");
+
 void
 oc_create_fp_g_resource(int resource_idx, size_t device)
 {
@@ -607,7 +613,7 @@ oc_create_fp_g_resource(int resource_idx, size_t device)
   oc_core_populate_resource(resource_idx, device, "/fp/g", OC_IF_C | OC_IF_B,
                             APPLICATION_CBOR, OC_DISCOVERABLE,
                             oc_core_fp_g_get_handler, 0,
-                            oc_core_fp_g_post_handler, 0, 0, 1, "urn:knx:if.c");
+                            oc_core_fp_g_post_handler, 0, 1, "urn:knx:if.c");
 }
 
 static void
@@ -697,6 +703,21 @@ oc_core_fp_g_x_del_handler(oc_request_t *request,
   oc_send_cbor_response_no_payload_size(request, OC_STATUS_DELETED);
 }
 
+#ifdef OC_PUBLISHER_TABLE
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_fp_g_x, knx_fp_p, 0, "/fp/g/*",
+                                     OC_IF_D | OC_IF_C, APPLICATION_CBOR,
+                                     OC_DISCOVERABLE,
+                                     oc_core_fp_g_x_get_handler, 0, 0,
+                                     oc_core_fp_g_x_del_handler, NULL,
+                                     OC_SIZE_MANY(1), "urn:knx:if.c");
+#else
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_fp_g_x, knx_fp_r, 0, "/fp/g/*",
+                                     OC_IF_D | OC_IF_C, APPLICATION_CBOR,
+                                     OC_DISCOVERABLE,
+                                     oc_core_fp_g_x_get_handler, 0, 0,
+                                     oc_core_fp_g_x_del_handler, NULL,
+                                     OC_SIZE_MANY(1), "urn:knx:if.c");
+#endif
 void
 oc_create_fp_g_x_resource(int resource_idx, size_t device)
 {
@@ -704,7 +725,7 @@ oc_create_fp_g_x_resource(int resource_idx, size_t device)
   oc_core_populate_resource(resource_idx, device, "/fp/g/*", OC_IF_D | OC_IF_C,
                             APPLICATION_CBOR, OC_DISCOVERABLE,
                             oc_core_fp_g_x_get_handler, 0, 0,
-                            oc_core_fp_g_x_del_handler, 0, 1, "urn:knx:if.c");
+                            oc_core_fp_g_x_del_handler, 1, "urn:knx:if.c");
 }
 
 // ---------------------PUBLISHER------------------------------------------
@@ -949,6 +970,12 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   oc_send_cbor_response_no_payload_size(request, OC_STATUS_CHANGED);
 }
 
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_fp_p, knx_fp_p_x, 0, "/fp/p",
+                                     OC_IF_C | OC_IF_B, APPLICATION_CBOR,
+                                     OC_DISCOVERABLE, oc_core_fp_p_get_handler,
+                                     0, oc_core_fp_p_post_handler, 0, NULL,
+                                     OC_SIZE_MANY(1), "urn:knx:if.c");
+
 void
 oc_create_fp_p_resource(int resource_idx, size_t device)
 {
@@ -956,7 +983,7 @@ oc_create_fp_p_resource(int resource_idx, size_t device)
   oc_core_populate_resource(resource_idx, device, "/fp/p", OC_IF_C | OC_IF_B,
                             APPLICATION_CBOR, OC_DISCOVERABLE,
                             oc_core_fp_p_get_handler, 0,
-                            oc_core_fp_p_post_handler, 0, 0, 1, "urn:knx:if.c");
+                            oc_core_fp_p_post_handler, 0, 1, "urn:knx:if.c");
 }
 
 static void
@@ -1069,6 +1096,13 @@ oc_core_fp_p_x_del_handler(oc_request_t *request,
 
   oc_send_cbor_response_no_payload_size(request, OC_STATUS_DELETED);
 }
+
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_fp_p_x, knx_fp_r, 0, "/fp/p/*",
+                                     OC_IF_D | OC_IF_C, APPLICATION_CBOR,
+                                     OC_DISCOVERABLE,
+                                     oc_core_fp_p_x_get_handler, 0, 0,
+                                     oc_core_fp_p_x_del_handler, NULL,
+                                     OC_SIZE_MANY(1), "urn:knx:if.c");
 
 void
 oc_create_fp_p_x_resource(int resource_idx, size_t device)
@@ -1301,6 +1335,11 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   oc_send_cbor_response_no_payload_size(request, OC_STATUS_CHANGED);
 }
 
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_fp_r, knx_fp_r_x, 0, "/fp/r",
+                                     OC_IF_C | OC_IF_B, APPLICATION_CBOR,
+                                     OC_DISCOVERABLE, oc_core_fp_r_get_handler,
+                                     0, oc_core_fp_r_post_handler, 0, NULL,
+                                     OC_SIZE_MANY(1), "urn:knx:if.c");
 void
 oc_create_fp_r_resource(int resource_idx, size_t device)
 {
@@ -1308,7 +1347,7 @@ oc_create_fp_r_resource(int resource_idx, size_t device)
   oc_core_populate_resource(resource_idx, device, "/fp/r", OC_IF_C | OC_IF_B,
                             APPLICATION_CBOR, OC_DISCOVERABLE,
                             oc_core_fp_r_get_handler, 0,
-                            oc_core_fp_r_post_handler, 0, 0, 1, "urn:knx:if.c");
+                            oc_core_fp_r_post_handler, 0, 1, "urn:knx:if.c");
 }
 
 static void
@@ -1416,6 +1455,12 @@ oc_core_fp_r_x_del_handler(oc_request_t *request,
   oc_send_cbor_response_no_payload_size(request, OC_STATUS_DELETED);
 }
 
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_fp_r_x, knx_p, 0, "/fp/r/*",
+                                     OC_IF_D | OC_IF_C, APPLICATION_CBOR,
+                                     OC_DISCOVERABLE,
+                                     oc_core_fp_r_x_get_handler, 0, 0,
+                                     oc_core_fp_r_x_del_handler, NULL,
+                                     OC_SIZE_MANY(1), "urn:knx:if.c");
 void
 oc_create_fp_r_x_resource(int resource_idx, size_t device)
 {
@@ -1423,7 +1468,7 @@ oc_create_fp_r_x_resource(int resource_idx, size_t device)
   oc_core_populate_resource(resource_idx, device, "/fp/r/*", OC_IF_D | OC_IF_C,
                             APPLICATION_CBOR, OC_DISCOVERABLE,
                             oc_core_fp_r_x_get_handler, 0, 0,
-                            oc_core_fp_r_x_del_handler, 0, 1, "urn:knx:if.c");
+                            oc_core_fp_r_x_del_handler, 1, "urn:knx:if.c");
 }
 
 bool
@@ -2215,17 +2260,20 @@ oc_create_knx_fp_resources(size_t device_index)
 {
   OC_DBG("oc_create_knx_fp_resources");
 
-  oc_create_fp_g_resource(OC_KNX_FP_G, device_index);
-  oc_create_fp_g_x_resource(OC_KNX_FP_G_X, device_index);
+  if (device_index == 0) {
+    OC_DBG("resources for dev 0 created statically");
+  } else {
+    oc_create_fp_g_resource(OC_KNX_FP_G, device_index);
+    oc_create_fp_g_x_resource(OC_KNX_FP_G_X, device_index);
 
 #ifdef OC_PUBLISHER_TABLE
-  oc_create_fp_p_resource(OC_KNX_FP_P, device_index);
-  oc_create_fp_p_x_resource(OC_KNX_FP_P_X, device_index);
+    oc_create_fp_p_resource(OC_KNX_FP_P, device_index);
+    oc_create_fp_p_x_resource(OC_KNX_FP_P_X, device_index);
 #endif /* OC_PUBLISHER_TABLE */
 
-  oc_create_fp_r_resource(OC_KNX_FP_R, device_index);
-  oc_create_fp_r_x_resource(OC_KNX_FP_R_X, device_index);
-
+    oc_create_fp_r_resource(OC_KNX_FP_R, device_index);
+    oc_create_fp_r_x_resource(OC_KNX_FP_R_X, device_index);
+  }
   oc_init_tables();
   oc_load_group_object_table();
   oc_load_rp_object_table();

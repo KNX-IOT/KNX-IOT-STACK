@@ -32,7 +32,7 @@ oc_add_data_points_to_response(oc_request_t *request, size_t device_index,
   (void)request;
   int length = 0;
 
-  oc_resource_t *resource = oc_ri_get_app_resources();
+  const oc_resource_t *resource = oc_ri_get_app_resources();
   for (; resource; resource = resource->next) {
     if (resource->device != device_index ||
         (resource->properties & OC_DISCOVERABLE)) {
@@ -83,7 +83,7 @@ oc_core_p_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 
     // count the discoverable resources
     int matches = 0;
-    oc_resource_t *resource = oc_ri_get_app_resources();
+    const oc_resource_t *resource = oc_ri_get_app_resources();
     for (; resource; resource = resource->next) {
       if (resource->device != device_index ||
           (resource->properties & OC_DISCOVERABLE)) {
@@ -201,7 +201,7 @@ oc_core_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
           new_request.uri_path = "/p";
           new_request.uri_path_len = 4;
 
-          oc_resource_t *my_resource = oc_ri_get_app_resource_by_uri(
+          const oc_resource_t *my_resource = oc_ri_get_app_resource_by_uri(
             oc_string(*myurl), oc_string_len(*myurl), device_index);
           if (my_resource) {
             // this should not be the request..
@@ -220,6 +220,12 @@ oc_core_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   PRINT("oc_core_p_post_handler - end\n");
 }
 
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_p, knx_f, 0, "/p",
+                                     OC_IF_LI | OC_IF_C | OC_IF_B,
+                                     APPLICATION_LINK_FORMAT, 0,
+                                     oc_core_p_get_handler, 0,
+                                     oc_core_p_post_handler, 0, NULL,
+                                     OC_SIZE_MANY(1), "urn:knx:fb.0");
 void
 oc_create_p_resource(int resource_idx, size_t device)
 {
@@ -235,6 +241,12 @@ oc_create_p_resource(int resource_idx, size_t device)
 void
 oc_create_knx_p_resources(size_t device_index)
 {
+  OC_DBG("oc_create_knx_p_resources");
+
+  if (device_index == 0) {
+    OC_DBG("resources for dev 0 created statically");
+    return;
+  }
 
   oc_create_p_resource(OC_KNX_P, device_index);
 }

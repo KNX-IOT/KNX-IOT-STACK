@@ -391,7 +391,7 @@ bool oc_if_method_allowed_according_to_mask(oc_interface_mask_t iface_mask,
  * @return true has access
  * @return false does not have access
  */
-bool oc_knx_sec_check_acl(oc_method_t method, oc_resource_t *resource,
+bool oc_knx_sec_check_acl(oc_method_t method, const oc_resource_t *resource,
                           oc_endpoint_t *endpoint);
 
 #ifdef __cplusplus

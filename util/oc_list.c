@@ -147,6 +147,33 @@ oc_list_add(oc_list_t list, void *item)
 }
 /*---------------------------------------------------------------------------*/
 /**
+ * Add items at the end of a list.
+ *
+ * This function adds an item to the end of the list.
+ *
+ * \param list The list.
+ * \param item A pointer to the items to be added (another list)
+ *
+ * \sa oc_list_push_block()
+ *
+ */
+void
+oc_list_add_block(oc_list_t list, void *item)
+{
+  struct list *l;
+  // get tail
+
+  l = oc_list_tail(list);
+  ((struct list *)oc_list_tail((oc_list_t)item))->next = l;
+
+  if (l == NULL) {
+    *list = item;
+  } else {
+    l->next = item;
+  }
+}
+/*---------------------------------------------------------------------------*/
+/**
  * Add an item to the start of the list.
  */
 void
@@ -257,6 +284,59 @@ oc_list_remove2(oc_list_t list, void *item)
     if (*l == item) {
       *l = (*l)->next;
       return item;
+    }
+  }
+
+  return NULL;
+}
+/*---------------------------------------------------------------------------*/
+/**
+ * Remove a specific block from a list.
+ *
+ * This function removes a specified block from the list.
+ *
+ * \param list The list.
+ * \param firstitem The first item in the block that is to be removed from the
+ * list. \param lastitem The last item in the block that is to be removed from
+ * the list.
+ *
+ */
+/*---------------------------------------------------------------------------*/
+void
+oc_list_remove_block(oc_list_t list, void *firstitem, void *lastitem)
+{
+  struct list **l;
+
+  for (l = (struct list **)list; *l != NULL; l = &(*l)->next) {
+    if (*l == firstitem) {
+      *l = ((struct list *)lastitem)->next;
+      return;
+    }
+  }
+}
+/*---------------------------------------------------------------------------*/
+/**
+ * Remove a specific block from a list and return a pointer to the removed
+ * block.
+ *
+ * This function removes a specified element from the list.
+ *
+ * \param list The list.
+ * \param firstitem The first item in the block that is to be removed from the
+ * list. \param lastitem The last item in the block that is to be removed from
+ * the list. \return Pointer to the removed element of list.
+ *
+ */
+/*---------------------------------------------------------------------------*/
+void *
+oc_list_remove_block2(oc_list_t list, void *firstitem, void *lastitem)
+{
+  struct list **l;
+
+  for (l = (struct list **)list; *l != NULL; l = &(*l)->next) {
+    if (*l == firstitem) {
+      *l = ((struct list *)lastitem)->next;
+      return firstitem;
     }
   }
 

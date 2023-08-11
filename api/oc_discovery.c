@@ -38,7 +38,7 @@
 #include <inttypes.h>
 
 bool
-oc_add_resource_to_wk(oc_resource_t *resource, oc_request_t *request,
+oc_add_resource_to_wk(const oc_resource_t *resource, oc_request_t *request,
                       size_t device_index, size_t *response_length, int matches,
                       int truncate)
 {
@@ -154,7 +154,7 @@ oc_add_resource_to_wk(oc_resource_t *resource, oc_request_t *request,
 }
 
 bool
-oc_filter_resource(oc_resource_t *resource, oc_request_t *request,
+oc_filter_resource(const oc_resource_t *resource, oc_request_t *request,
                    size_t device_index, size_t *response_length, int matches,
                    int truncate)
 {
@@ -187,7 +187,7 @@ oc_process_resources(oc_request_t *request, size_t device_index,
     matches = 1;
   }
 
-  oc_resource_t *resource = oc_ri_get_app_resources();
+  const oc_resource_t *resource = oc_ri_get_app_resources();
   for (; resource; resource = resource->next) {
     if (resource->device != device_index ||
         !(resource->properties & OC_DISCOVERABLE))
@@ -539,14 +539,22 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   }
 }
 
+OC_CORE_CREATE_CONST_RESOURCE_FINAL(well_known_core, 0, "/.well-known/core",
+                                    OC_IF_NONE, APPLICATION_LINK_FORMAT,
+                                    OC_DISCOVERABLE,
+                                    oc_wkcore_discovery_handler, 0, 0, 0, NULL,
+                                    OC_SIZE_MANY(1), "wk");
+
 void
 oc_create_discovery_resource(int resource_idx, size_t device)
 {
-  if (resource_idx == WELLKNOWNCORE) {
+  if (resource_idx == WELLKNOWNCORE && device > 0) {
     oc_core_populate_resource(resource_idx, device, "/.well-known/core",
                               OC_IF_NONE, APPLICATION_LINK_FORMAT,
                               OC_DISCOVERABLE, oc_wkcore_discovery_handler, 0,
                               0, 0, 1, "wk");
+  } else if (device == 0) {
+    OC_DBG("resources for dev 0 created statically");
   }
 }
 

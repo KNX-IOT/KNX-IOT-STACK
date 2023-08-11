@@ -595,7 +595,7 @@ oc_s_mode_get_resource_value(char *resource_url, char *rp, uint8_t *buf,
     return 0;
   }
 
-  oc_resource_t *my_resource =
+  const oc_resource_t *my_resource =
     oc_ri_get_app_resource_by_uri(resource_url, strlen(resource_url), 0);
   if (my_resource == NULL) {
     PRINT(" oc_do_s_mode : error no URL found %s\n", resource_url);
@@ -728,7 +728,7 @@ oc_do_s_mode_with_scope_and_check(int scope, char *resource_url, char *rp,
     return;
   }
 
-  oc_resource_t *my_resource =
+  const oc_resource_t *my_resource =
     oc_ri_get_app_resource_by_uri(resource_url, strlen(resource_url), 0);
   if (my_resource == NULL) {
     PRINT(" oc_do_s_mode_with_scope_internal : error no URL found %s\n",

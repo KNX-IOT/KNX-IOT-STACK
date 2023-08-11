@@ -47,7 +47,7 @@ void oc_create_discovery_resource(int resource_idx, size_t device);
  * @return true resource added (as entry) to the response
  * @return false resource not added to the response
  */
-bool oc_filter_resource(oc_resource_t *resource, oc_request_t *request,
+bool oc_filter_resource(const oc_resource_t *resource, oc_request_t *request,
                         size_t device_index, size_t *response_length,
                         int matches, int truncate);
 
@@ -63,7 +63,7 @@ bool oc_filter_resource(oc_resource_t *resource, oc_request_t *request,
  * @return true
  * @return false
  */
-bool oc_add_resource_to_wk(oc_resource_t *resource, oc_request_t *request,
+bool oc_add_resource_to_wk(const oc_resource_t *resource, oc_request_t *request,
                            size_t device_index, size_t *response_length,
                            int matches, int truncate);
 
