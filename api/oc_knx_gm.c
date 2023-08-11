@@ -670,7 +670,7 @@ oc_core_fp_gm_post_handler(oc_request_t *request,
   request->response->response_buffer->response_length = response_length;
 }
 
-OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_fp_gm, knx_fp_gm_x, "/fp/gm",
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_fp_gm, knx_fp_gm_x, 0, "/fp/gm",
                                      OC_IF_C | OC_IF_B, APPLICATION_CBOR,
                                      OC_DISCOVERABLE, oc_core_fp_gm_get_handler,
                                      0, oc_core_fp_gm_post_handler, 0, NULL,
