@@ -105,7 +105,8 @@ oc_core_shutdown(void)
 #ifdef OC_DYNAMIC_ALLOCATION
   if (core_resources) {
 #endif /* OC_DYNAMIC_ALLOCATION */
-    for (i = 0; i < 1 + (WELLKNOWNCORE * device_count); ++i) {
+    size_t max_resource = 1 + (WELLKNOWNCORE * (device_count?device_count-1:0));
+    for (i = 0; i < max_resource; ++i) {
       oc_resource_t *core_resource = &core_resources[i];
       oc_ri_free_resource_properties(core_resource);
     }
