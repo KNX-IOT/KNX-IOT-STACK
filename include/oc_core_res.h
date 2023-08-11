@@ -33,7 +33,7 @@ extern "C" {
 /**
  * @brief generate an `extern` declaration of a core const resource
  *
- * @param name name of resource
+ * @param resource_name name of resource to create decl for
  */
 #define OC_CORE_EXTERN_CONST_RESOURCE(resource_name)                           \
   extern const oc_resource_t core_resource_##resource_name;
