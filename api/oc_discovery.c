@@ -543,16 +543,18 @@ OC_CORE_CREATE_CONST_RESOURCE_FINAL(well_known_core, 0,
                                     "/.well-known/core", OC_IF_NONE,
                                     APPLICATION_LINK_FORMAT, OC_DISCOVERABLE,
                                     oc_wkcore_discovery_handler, 0, 0, 0, NULL,
-                                    OC_SIZE_MANY(1), "wk")
+                                    OC_SIZE_MANY(1), "wk");
 
 void
 oc_create_discovery_resource(int resource_idx, size_t device)
 {
-  if (resource_idx == WELLKNOWNCORE) {
+  if (resource_idx == WELLKNOWNCORE && device > 0) {
     oc_core_populate_resource(resource_idx, device, "/.well-known/core",
                               OC_IF_NONE, APPLICATION_LINK_FORMAT,
                               OC_DISCOVERABLE, oc_wkcore_discovery_handler, 0,
                               0, 0, 1, "wk");
+  } else if (device == 0) {
+    OC_DBG("resources for dev 0 created statically");
   }
 }
 

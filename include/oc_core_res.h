@@ -31,6 +31,20 @@ extern "C" {
 #endif
 
 /**
+ * @brief generate an `extern` declaration of a core const resource
+ * 
+ * @param name name of resource
+*/
+#define OC_CORE_EXTERN_CONST_RESOURCE(resource_name) \
+  extern const oc_resource_t core_resource_##resource_name;
+/**
+ * @brief get the internal name of a core const resource
+ * 
+ * @param name name of resource
+*/
+#define OC_CORE_RESOURCE_NAME(name) core_resource_##name
+
+/**
  * @brief Create const CORE resource
  * Should only be used internally!
  *
@@ -357,7 +371,7 @@ void oc_core_encode_interfaces_mask(CborEncoder *parent,
  * @param device the device index
  * @return oc_resource_t* the resource handle
  */
-oc_resource_t *oc_core_get_resource_by_index(int type, size_t device);
+const oc_resource_t *oc_core_get_resource_by_index(int type, size_t device);
 
 /**
  * @brief retrieve the resource by uri
@@ -366,7 +380,7 @@ oc_resource_t *oc_core_get_resource_by_index(int type, size_t device);
  * @param device the device index
  * @return oc_resource_t* the resource handle
  */
-oc_resource_t *oc_core_get_resource_by_uri(const char *uri, size_t device);
+const oc_resource_t *oc_core_get_resource_by_uri(const char *uri, size_t device);
 
 /**
  * @brief Ensure that the given URI starts with a forward slash

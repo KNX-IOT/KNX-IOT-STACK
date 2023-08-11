@@ -226,8 +226,8 @@ OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_swu_maxdefer, knx_swu_method, 0,
                                      "/swu/maxdefer", OC_IF_LI,
                                      APPLICATION_CBOR, OC_DISCOVERABLE,
                                      oc_knx_swu_maxdefer_get_handler,
-                                     oc_knx_swu_maxdefer_put_handler, 0,
-                                     "urn:knx:dpt.timePeriodSec", NULL,
+                                     oc_knx_swu_maxdefer_put_handler, 0, 0,
+                                     "urn:knx:dpt.timePeriodSec",
                                      OC_SIZE_ZERO());
 void
 oc_create_knx_swu_maxdefer_resource(int resource_idx, size_t device)
@@ -794,7 +794,7 @@ oc_core_knx_swu_get_handler(oc_request_t *request,
   size_t device_index = request->resource->device;
 
   for (i = (int)OC_KNX_SWU_PROTOCOL; i < (int)OC_KNX_SWU; i++) {
-    oc_resource_t *resource = oc_core_get_resource_by_index(i, device_index);
+    const oc_resource_t *resource = oc_core_get_resource_by_index(i, device_index);
     if (oc_filter_resource(resource, request, device_index, &response_length,
                            matches, 1)) {
       matches++;
@@ -829,22 +829,25 @@ oc_create_knx_swu_resources(size_t device_index)
 {
   OC_DBG("oc_create_knx_swu_resources");
 
-  oc_create_knx_swu_protocol_resource(OC_KNX_SWU_PROTOCOL, device_index);
-  oc_create_knx_swu_maxdefer_resource(OC_KNX_SWU_MAXDEFER, device_index);
-  oc_create_knx_swu_method_resource(OC_KNX_SWU_METHOD, device_index);
-  oc_create_knx_swu_lastupdate_resource(OC_KNX_LASTUPDATE, device_index);
-  oc_create_knx_swu_result_resource(OC_KNX_SWU_RESULT, device_index);
-  oc_create_knx_swu_state_resource(OC_KNX_SWU_STATE, device_index);
-  // /swu/update/{filename} // optional resource not implemented
-  oc_create_knx_swu_update_resource(OC_KNX_SWU_UPDATE, device_index);
-  oc_create_knx_swu_pkgv_resource(OC_KNX_SWU_PKGV, device_index);
-  oc_create_knx_swu_a_resource(OC_KNX_SWU_PKGCMD, device_index);
-  oc_create_knx_swu_pkgbytes_resource(OC_KNX_SWU_PKGBYTES, device_index);
-  oc_create_knx_swu_pkgqurl_resource(OC_KNX_SWU_PKGQURL, device_index);
-  oc_create_knx_swu_pkgnames_resource(OC_KNX_SWU_PKGNAMES, device_index);
+  if (device_index == 0) {
+    OC_DBG("resources for dev 0 created statically");
+  } else {
+    oc_create_knx_swu_protocol_resource(OC_KNX_SWU_PROTOCOL, device_index);
+    oc_create_knx_swu_maxdefer_resource(OC_KNX_SWU_MAXDEFER, device_index);
+    oc_create_knx_swu_method_resource(OC_KNX_SWU_METHOD, device_index);
+    oc_create_knx_swu_lastupdate_resource(OC_KNX_LASTUPDATE, device_index);
+    oc_create_knx_swu_result_resource(OC_KNX_SWU_RESULT, device_index);
+    oc_create_knx_swu_state_resource(OC_KNX_SWU_STATE, device_index);
+    // /swu/update/{filename} // optional resource not implemented
+    oc_create_knx_swu_update_resource(OC_KNX_SWU_UPDATE, device_index);
+    oc_create_knx_swu_pkgv_resource(OC_KNX_SWU_PKGV, device_index);
+    oc_create_knx_swu_a_resource(OC_KNX_SWU_PKGCMD, device_index);
+    oc_create_knx_swu_pkgbytes_resource(OC_KNX_SWU_PKGBYTES, device_index);
+    oc_create_knx_swu_pkgqurl_resource(OC_KNX_SWU_PKGQURL, device_index);
+    oc_create_knx_swu_pkgnames_resource(OC_KNX_SWU_PKGNAMES, device_index);
 
-  oc_create_knx_swu_resource(OC_KNX_SWU, device_index);
-
+    oc_create_knx_swu_resource(OC_KNX_SWU, device_index);
+  } 
   oc_swu_set_package_name("");
   oc_swu_set_last_update("");
   oc_swu_set_package_version(0, 0, 0);

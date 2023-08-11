@@ -241,7 +241,7 @@ oc_core_knx_f_oscore_get_handler(oc_request_t *request,
 
   for (i = (int)OC_KNX_P_OSCORE_REPLWDO; i <= (int)OC_KNX_P_OSCORE_OSNDELAY;
        i++) {
-    oc_resource_t *resource = oc_core_get_resource_by_index(i, device_index);
+    const oc_resource_t *resource = oc_core_get_resource_by_index(i, device_index);
     if (oc_filter_resource(resource, request, device_index, &response_length,
                            matches, 1)) {
       matches++;
@@ -1067,7 +1067,7 @@ oc_core_knx_auth_get_handler(oc_request_t *request,
   }
   size_t device_index = request->resource->device;
   for (i = (int)OC_KNX_A_SEN; i < (int)OC_KNX_AUTH; i++) {
-    oc_resource_t *resource = oc_core_get_resource_by_index(i, device_index);
+    const oc_resource_t *resource = oc_core_get_resource_by_index(i, device_index);
     if (oc_filter_resource(resource, request, device_index, &response_length,
                            matches, 1)) {
       matches++;
@@ -1655,6 +1655,11 @@ oc_create_knx_sec_resources(size_t device_index)
   OC_DBG("oc_create_knx_sec_resources");
 
   oc_load_at_table(device_index);
+  
+  if (device_index == 0) {
+    OC_DBG("resources for dev 0 created statically");
+    return;
+  }
 
   oc_create_knx_p_oscore_replwdo_resource(OC_KNX_P_OSCORE_REPLWDO,
                                           device_index);

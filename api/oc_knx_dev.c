@@ -800,7 +800,7 @@ oc_core_dev_dev_get_handler(oc_request_t *request,
   size_t device_index = request->resource->device;
 
   for (i = (int)OC_DEV_SN; i < (int)OC_DEV; i++) {
-    oc_resource_t *resource = oc_core_get_resource_by_index(i, device_index);
+    const oc_resource_t *resource = oc_core_get_resource_by_index(i, device_index);
     if (oc_filter_resource(resource, request, device_index, &response_length,
                            matches, 1)) {
       matches++;
@@ -1273,7 +1273,7 @@ oc_core_ap_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   }
 
   size_t device_index = request->resource->device;
-  oc_resource_t *resource =
+  const oc_resource_t *resource =
     oc_core_get_resource_by_index(OC_APP_X, device_index);
   if (resource) {
     PRINT("URL %s\n", oc_string(resource->uri));
@@ -1520,6 +1520,11 @@ void
 oc_create_knx_device_resources(size_t device_index)
 {
   OC_DBG("oc_create_knx_device_resources");
+
+  if (device_index == 0) {
+    OC_DBG("resources for dev 0 created statically");
+    return;
+  }
 
   oc_create_dev_sn_resource(OC_DEV_SN, device_index);
   oc_create_dev_hwv_resource(OC_DEV_HWV, device_index);

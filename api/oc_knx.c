@@ -1708,7 +1708,11 @@ oc_knx_load_state(size_t device_index)
 void
 oc_create_knx_resources(size_t device_index)
 {
-  OC_DBG("oc_create_knx_resources");
+  OC_DBG("oc_create_knx_resources");  
+  if (device_index == 0) {
+    OC_DBG("resources for dev 0 created statically");
+    return;
+  }
 
   oc_create_knx_lsm_resource(OC_KNX_LSM, device_index);
   oc_create_knx_knx_resource(OC_KNX_DOT_KNX, device_index);

@@ -2260,17 +2260,20 @@ oc_create_knx_fp_resources(size_t device_index)
 {
   OC_DBG("oc_create_knx_fp_resources");
 
-  oc_create_fp_g_resource(OC_KNX_FP_G, device_index);
-  oc_create_fp_g_x_resource(OC_KNX_FP_G_X, device_index);
+  if (device_index == 0) {
+    OC_DBG("resources for dev 0 created statically");
+  } else {
+    oc_create_fp_g_resource(OC_KNX_FP_G, device_index);
+    oc_create_fp_g_x_resource(OC_KNX_FP_G_X, device_index);
 
 #ifdef OC_PUBLISHER_TABLE
-  oc_create_fp_p_resource(OC_KNX_FP_P, device_index);
-  oc_create_fp_p_x_resource(OC_KNX_FP_P_X, device_index);
+    oc_create_fp_p_resource(OC_KNX_FP_P, device_index);
+    oc_create_fp_p_x_resource(OC_KNX_FP_P_X, device_index);
 #endif /* OC_PUBLISHER_TABLE */
 
-  oc_create_fp_r_resource(OC_KNX_FP_R, device_index);
-  oc_create_fp_r_x_resource(OC_KNX_FP_R_X, device_index);
-
+    oc_create_fp_r_resource(OC_KNX_FP_R, device_index);
+    oc_create_fp_r_x_resource(OC_KNX_FP_R_X, device_index);
+  }
   oc_init_tables();
   oc_load_group_object_table();
   oc_load_rp_object_table();

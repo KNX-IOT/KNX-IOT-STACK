@@ -241,6 +241,12 @@ oc_create_p_resource(int resource_idx, size_t device)
 void
 oc_create_knx_p_resources(size_t device_index)
 {
+  OC_DBG("oc_create_knx_p_resources");
+  
+  if (device_index == 0) {
+    OC_DBG("resources for dev 0 created statically");
+    return;
+  }
 
   oc_create_p_resource(OC_KNX_P, device_index);
 }

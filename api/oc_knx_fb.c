@@ -462,7 +462,12 @@ oc_create_fb_resource(int resource_idx, size_t device)
 void
 oc_create_knx_fb_resources(size_t device_index)
 {
+  OC_DBG("oc_create_knx_fb_resources");
 
+  if (device_index == 0) {
+    OC_DBG("resources for dev 0 created statically");
+    return;
+  }
   oc_create_fb_x_resource(OC_KNX_F_X, device_index);
 
   // should be last of the dev/xxx resources, it will list those.
