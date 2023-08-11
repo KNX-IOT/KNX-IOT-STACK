@@ -47,9 +47,6 @@ extern "C" {
 /**
  * @brief Create const CORE resource
  * Should only be used internally!
- *
- * @related OC_CORE_CREATE_CONST_RESOURCE_LINKED
- * @related OC_CORE_CREATE_CONST_RESOURCE_FINAL
  */
 #if defined _MSC_VER && !defined __INTEL_COMPILER
 #define OC_CORE_CREATE_CONST_RESOURCE_INTERNAL(                                \
