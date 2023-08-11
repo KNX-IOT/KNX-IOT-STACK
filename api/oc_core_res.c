@@ -43,7 +43,7 @@ static oc_resource_t *core_resources = NULL;
 static oc_device_info_t *oc_device_info = NULL;
 #else  /* OC_DYNAMIC_ALLOCATION */
 // TODO fix this for static allocation, this is not used at the moment..
-static oc_resource_t core_resources[1 + OCF_D * (OC_MAX_NUM_DEVICES-1)];
+static oc_resource_t core_resources[1 + OCF_D * (OC_MAX_NUM_DEVICES - 1)];
 static oc_device_info_t oc_device_info[OC_MAX_NUM_DEVICES];
 #endif /* !OC_DYNAMIC_ALLOCATION */
 static oc_platform_info_t oc_platform_info;
@@ -553,10 +553,10 @@ oc_core_add_device(const char *name, const char *version, const char *base,
     oc_abort("Insufficient memory");
   }
   if (device_count > 0) {
-      oc_resource_t *device_resources = &core_resources[new_num - WELLKNOWNCORE];
-      memset(device_resources, 0, WELLKNOWNCORE * sizeof(oc_resource_t));
+    oc_resource_t *device_resources = &core_resources[new_num - WELLKNOWNCORE];
+    memset(device_resources, 0, WELLKNOWNCORE * sizeof(oc_resource_t));
   } else {
-    //device 0 is compile-time generated
+    // device 0 is compile-time generated
     oc_device_info = (oc_device_info_t *)realloc(
       oc_device_info, (device_count + 1) * sizeof(oc_device_info_t));
     if (!oc_device_info) {
@@ -564,7 +564,8 @@ oc_core_add_device(const char *name, const char *version, const char *base,
     }
     memset(&oc_device_info[device_count], 0, sizeof(oc_device_info_t));
     OC_CORE_EXTERN_CONST_RESOURCE(dev_sn);
-    oc_list_add_block(core_resource_list, (oc_resource_t*)&OC_CORE_RESOURCE_NAME(dev_sn));
+    oc_list_add_block(core_resource_list,
+                      (oc_resource_t *)&OC_CORE_RESOURCE_NAME(dev_sn));
   }
 
   oc_device_info = (oc_device_info_t *)realloc(
@@ -646,7 +647,8 @@ oc_core_populate_resource(int core_resource, size_t device_index,
                           oc_request_callback_t delete, int num_resource_types,
                           ...)
 {
-  const oc_resource_t *_r = oc_core_get_resource_by_index(core_resource, device_index);
+  const oc_resource_t *_r =
+    oc_core_get_resource_by_index(core_resource, device_index);
   if (!_r) {
     return;
   }
@@ -654,11 +656,11 @@ oc_core_populate_resource(int core_resource, size_t device_index,
     OC_ERR("oc_core_populate_resource: resource is const");
     return;
   }
-  oc_resource_t *r = (oc_resource_t*)_r;
+  oc_resource_t *r = (oc_resource_t *)_r;
   r->device = device_index;
   oc_check_uri(uri);
   r->uri.next = NULL;
-  r->uri.ptr = (char*)uri;
+  r->uri.ptr = (char *)uri;
   r->uri.size = strlen(uri) + 1; // include null terminator in size
   r->properties = properties;
   va_list rt_list;
@@ -685,7 +687,8 @@ void
 oc_core_bind_dpt_resource(int core_resource, size_t device_index,
                           const char *dpt)
 {
-  const oc_resource_t *r = oc_core_get_resource_by_index(core_resource, device_index);
+  const oc_resource_t *r =
+    oc_core_get_resource_by_index(core_resource, device_index);
   if (!r) {
     return;
   }
@@ -694,7 +697,7 @@ oc_core_bind_dpt_resource(int core_resource, size_t device_index,
     return;
   }
 
-  oc_resource_bind_dpt((oc_resource_t*)r, dpt);
+  oc_resource_bind_dpt((oc_resource_t *)r, dpt);
 }
 
 oc_device_info_t *
@@ -725,12 +728,12 @@ oc_core_get_resource_by_index(int type, size_t device)
     return oc_list_head(core_resource_list);
   }
   if (device != 0) {
-    return &core_resources[WELLKNOWNCORE * (device-1) + type];
+    return &core_resources[WELLKNOWNCORE * (device - 1) + type];
   }
-  //traverse the list
+  // traverse the list
   const oc_resource_t *res = oc_list_head(core_resource_list);
-  while(type && res) {
-    res = oc_list_item_next((void*)res);
+  while (type && res) {
+    res = oc_list_item_next((void *)res);
     type--;
   }
   return res;

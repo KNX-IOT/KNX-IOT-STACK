@@ -651,10 +651,12 @@ oc_ri_delete_all_app_resources(void)
 {
   const oc_resource_t *res = oc_ri_get_app_resources();
   while (res) {
-    if (oc_ri_delete_resource(res) == true);
-    else if (oc_ri_delete_resource_block(res) == true);
+    if (oc_ri_delete_resource(res) == true)
+      ;
+    else if (oc_ri_delete_resource_block(res) == true)
+      ;
     else {
-      //we'll get stuck in an infinite loop!
+      // we'll get stuck in an infinite loop!
       return;
     }
     res = oc_ri_get_app_resources();
@@ -706,7 +708,7 @@ oc_ri_delete_resource(const oc_resource_t *_resource)
     OC_ERR("oc_ri_delete_resource: resource is const!");
     return false;
   }
-  oc_resource_t *resource = (oc_resource_t*)_resource;
+  oc_resource_t *resource = (oc_resource_t *)_resource;
 
   /**
    * Prevent double deallocation: oc_rt_factory_free_created_resource
@@ -734,7 +736,7 @@ oc_ri_delete_resource_block(const oc_resource_t *_resource)
   if (!_resource)
     return false;
   const oc_resource_t *dummy_resource = _resource;
-  while(dummy_resource && dummy_resource->device != -1) {
+  while (dummy_resource && dummy_resource->device != -1) {
     dummy_resource = dummy_resource->next;
   }
   if (!dummy_resource)
@@ -747,14 +749,15 @@ oc_ri_delete_resource_block(const oc_resource_t *_resource)
    * whether the resource exists and when it doesn't we assume that
    * a deallocation of the resource was already invoked and skip this one.
    */
-  if (oc_list_remove_block2(app_resources, (void*)_resource, (void*)dummy_resource) == NULL) {
+  if (oc_list_remove_block2(app_resources, (void *)_resource,
+                            (void *)dummy_resource) == NULL) {
     return true;
   }
 
-  for(;_resource != dummy_resource; _resource = _resource->next) {
+  for (; _resource != dummy_resource; _resource = _resource->next) {
     if (_resource->is_const)
       continue;
-    oc_resource_t *resource = (oc_resource_t*)_resource;
+    oc_resource_t *resource = (oc_resource_t *)_resource;
     if (resource->runtime_data->num_observers > 0) {
       coap_remove_observer_by_resource(resource);
     }
@@ -806,16 +809,15 @@ oc_ri_add_resource_block(const oc_resource_t *resource)
     if (!resource->get_handler.cb && !resource->put_handler.cb &&
         !resource->post_handler.cb && !resource->delete_handler.cb)
       valid = false;
-        
+
     if ((resource->properties & OC_PERIODIC) &&
         resource->observe_period_seconds == 0)
       valid = false;
 
-  } while(it = oc_ri_resource_next(it));
-
+  } while (it = oc_ri_resource_next(it));
 
   if (valid) {
-    oc_list_add_block(app_resources, (void*)resource);
+    oc_list_add_block(app_resources, (void *)resource);
   }
 
   return valid;
@@ -1001,7 +1003,7 @@ add_periodic_observe_callback(const oc_resource_t *resource)
       return false;
     }
 
-    event_cb->data = (void*)resource;
+    event_cb->data = (void *)resource;
     event_cb->callback = periodic_observe_handler;
     OC_PROCESS_CONTEXT_BEGIN(&timed_callback_events);
     oc_etimer_set(&event_cb->timer,
@@ -1515,7 +1517,7 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
           // only handle observe when not doing multicast
           PRINT(" adding callback\n");
           oc_ri_add_timed_event_callback_ticks(
-            (void*)cur_resource, &oc_observe_notification_delayed, 0);
+            (void *)cur_resource, &oc_observe_notification_delayed, 0);
         } else {
           PRINT(" not adding callback\n");
         }

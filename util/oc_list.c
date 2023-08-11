@@ -296,8 +296,9 @@ oc_list_remove2(oc_list_t list, void *item)
  * This function removes a specified block from the list.
  *
  * \param list The list.
- * \param firstitem The first item in the block that is to be removed from the list.
- * \param lastitem The last item in the block that is to be removed from the list.
+ * \param firstitem The first item in the block that is to be removed from the
+ * list. \param lastitem The last item in the block that is to be removed from
+ * the list.
  *
  */
 /*---------------------------------------------------------------------------*/
@@ -308,7 +309,7 @@ oc_list_remove_block(oc_list_t list, void *firstitem, void *lastitem)
 
   for (l = (struct list **)list; *l != NULL; l = &(*l)->next) {
     if (*l == firstitem) {
-      *l = ((struct list*)lastitem)->next;
+      *l = ((struct list *)lastitem)->next;
       return;
     }
   }
@@ -321,9 +322,9 @@ oc_list_remove_block(oc_list_t list, void *firstitem, void *lastitem)
  * This function removes a specified element from the list.
  *
  * \param list The list.
- * \param firstitem The first item in the block that is to be removed from the list.
- * \param lastitem The last item in the block that is to be removed from the list.
- * \return Pointer to the removed element of list.
+ * \param firstitem The first item in the block that is to be removed from the
+ * list. \param lastitem The last item in the block that is to be removed from
+ * the list. \return Pointer to the removed element of list.
  *
  */
 /*---------------------------------------------------------------------------*/
@@ -334,7 +335,7 @@ oc_list_remove_block2(oc_list_t list, void *firstitem, void *lastitem)
 
   for (l = (struct list **)list; *l != NULL; l = &(*l)->next) {
     if (*l == firstitem) {
-      *l = ((struct list*)lastitem)->next;
+      *l = ((struct list *)lastitem)->next;
       return firstitem;
     }
   }

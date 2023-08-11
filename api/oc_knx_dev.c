@@ -800,7 +800,8 @@ oc_core_dev_dev_get_handler(oc_request_t *request,
   size_t device_index = request->resource->device;
 
   for (i = (int)OC_DEV_SN; i < (int)OC_DEV; i++) {
-    const oc_resource_t *resource = oc_core_get_resource_by_index(i, device_index);
+    const oc_resource_t *resource =
+      oc_core_get_resource_by_index(i, device_index);
     if (oc_filter_resource(resource, request, device_index, &response_length,
                            matches, 1)) {
       matches++;

@@ -96,12 +96,13 @@ void notify_resource_defaults_observer(const oc_resource_t *resource,
                                        oc_response_buffer_t *response_buf);
 
 #ifdef OC_BLOCK_WISE
-int coap_observe_handler(void *request, void *response, const oc_resource_t *resource,
-                         uint16_t block2_size, oc_endpoint_t *endpoint,
+int coap_observe_handler(void *request, void *response,
+                         const oc_resource_t *resource, uint16_t block2_size,
+                         oc_endpoint_t *endpoint,
                          oc_interface_mask_t iface_mask);
 #else  /* OC_BLOCK_WISE */
-int coap_observe_handler(void *request, void *response, const oc_resource_t *resource,
-                         oc_endpoint_t *endpoint,
+int coap_observe_handler(void *request, void *response,
+                         const oc_resource_t *resource, oc_endpoint_t *endpoint,
                          oc_interface_mask_t iface_mask);
 #endif /* !OC_BLOCK_WISE */
 

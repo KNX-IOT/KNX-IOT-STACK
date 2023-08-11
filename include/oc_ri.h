@@ -170,8 +170,8 @@ typedef enum {
   OC_STATUS_GATEWAY_TIMEOUT,          /**< Gateway Timeout 5.04*/
   OC_STATUS_PROXYING_NOT_SUPPORTED,   /**< Proxying not supported 5.05 */
   __NUM_OC_STATUS_CODES__,
-  OC_IGNORE,                          /**< Ignore: do not respond to request */
-  OC_PING_TIMEOUT                     /**< Ping Time out */
+  OC_IGNORE,      /**< Ignore: do not respond to request */
+  OC_PING_TIMEOUT /**< Ping Time out */
 } oc_status_t;
 
 /**
@@ -334,52 +334,52 @@ typedef enum {
                      type (MaC uses this id for compatibility checks) */
   OC_DEV_MODEL, /**< Device model */
   OC_DEV_IA,    /**< Device individual address */
-  OC_DEV_HOSTNAME,          /**< Device host name for DNS resolution. */
-  OC_DEV_IID,               /**< KNX installation ID */
-  OC_DEV_PM,                /**< Programming Mode */
-  OC_DEV_IPV6,              /**< IPV6 */
-  OC_DEV_SA,                /**< /dev/sa subnet address */
-  OC_DEV_DA,                /**< /dev/da device address */
-  OC_DEV_PORT,              /**< /dev/port the coap port number */
-  OC_DEV_MPORT,             /**< /dev/mport the multicast port number */
-  OC_DEV_MID,               /**< /dev/mid the manufacturer id */
-  OC_DEV,                   /**< core link */
-  OC_APP,                   /**< application id (list) */
-  OC_APP_X,                 /**< application id entry */
-  OC_KNX_SPAKE,             /**< spake */
-  OC_KNX_IDEVID,            /**< IDevID */
-  OC_KNX_LDEVID,            /**< LDevID */
-  OC_KNX_LSM,               /**< load state machine */
-  OC_KNX_DOT_KNX,           /**< .knx resource */
-  OC_KNX_G,                 /**< g (renamed) .knx resource */
-  OC_KNX_FINGERPRINT,       /**< FINGERPRINT value of loaded contents */
-  OC_KNX_IA,                /**< .well-known / knx / ia */
-  OC_KNX_OSN,               /**< .well-known / knx / osn */
-  OC_KNX,                   /**< .well-known / knx */
-  OC_KNX_FP_G,              /**< FP/G */
-  OC_KNX_FP_G_X,            /**< FP/G/X */
+  OC_DEV_HOSTNAME,    /**< Device host name for DNS resolution. */
+  OC_DEV_IID,         /**< KNX installation ID */
+  OC_DEV_PM,          /**< Programming Mode */
+  OC_DEV_IPV6,        /**< IPV6 */
+  OC_DEV_SA,          /**< /dev/sa subnet address */
+  OC_DEV_DA,          /**< /dev/da device address */
+  OC_DEV_PORT,        /**< /dev/port the coap port number */
+  OC_DEV_MPORT,       /**< /dev/mport the multicast port number */
+  OC_DEV_MID,         /**< /dev/mid the manufacturer id */
+  OC_DEV,             /**< core link */
+  OC_APP,             /**< application id (list) */
+  OC_APP_X,           /**< application id entry */
+  OC_KNX_SPAKE,       /**< spake */
+  OC_KNX_IDEVID,      /**< IDevID */
+  OC_KNX_LDEVID,      /**< LDevID */
+  OC_KNX_LSM,         /**< load state machine */
+  OC_KNX_DOT_KNX,     /**< .knx resource */
+  OC_KNX_G,           /**< g (renamed) .knx resource */
+  OC_KNX_FINGERPRINT, /**< FINGERPRINT value of loaded contents */
+  OC_KNX_IA,          /**< .well-known / knx / ia */
+  OC_KNX_OSN,         /**< .well-known / knx / osn */
+  OC_KNX,             /**< .well-known / knx */
+  OC_KNX_FP_G,        /**< FP/G */
+  OC_KNX_FP_G_X,      /**< FP/G/X */
 #ifdef OC_PUBLISHER_TABLE
-  OC_KNX_FP_P,              /**< FP/P */
-  OC_KNX_FP_P_X,            /**< FP/P/X */
+  OC_KNX_FP_P,   /**< FP/P */
+  OC_KNX_FP_P_X, /**< FP/P/X */
 #endif
-  OC_KNX_FP_R,              /**< FP/R */
-  OC_KNX_FP_R_X,            /**< FP/R/X */
-  OC_KNX_P,                 /**< P */
-  OC_KNX_F,                 /**< /f */
-  OC_KNX_F_X,               /**< /f/X */
-  OC_KNX_SWU_PROTOCOL,      /**< software update protocol */
-  OC_KNX_SWU_MAXDEFER,      /**< swu max defer */
-  OC_KNX_SWU_METHOD,        /**< sw method */
-  OC_KNX_LASTUPDATE,        /**< sw last update */
-  OC_KNX_SWU_RESULT,        /**< sw result */
-  OC_KNX_SWU_STATE,         /**< sw state */
-  OC_KNX_SWU_UPDATE,        /**< sw update */
-  OC_KNX_SWU_PKGV,          /**< sw package version */
-  OC_KNX_SWU_PKGCMD,        /**< sw package command*/
-  OC_KNX_SWU_PKGBYTES,      /**< sw package bytes*/
-  OC_KNX_SWU_PKGQURL,       /**< sw query url */
-  OC_KNX_SWU_PKGNAMES,      /**< sw package names*/
-#if 0                       // THIS SHOULD BE IMPLEMENTED IF INCLUDED
+  OC_KNX_FP_R,         /**< FP/R */
+  OC_KNX_FP_R_X,       /**< FP/R/X */
+  OC_KNX_P,            /**< P */
+  OC_KNX_F,            /**< /f */
+  OC_KNX_F_X,          /**< /f/X */
+  OC_KNX_SWU_PROTOCOL, /**< software update protocol */
+  OC_KNX_SWU_MAXDEFER, /**< swu max defer */
+  OC_KNX_SWU_METHOD,   /**< sw method */
+  OC_KNX_LASTUPDATE,   /**< sw last update */
+  OC_KNX_SWU_RESULT,   /**< sw result */
+  OC_KNX_SWU_STATE,    /**< sw state */
+  OC_KNX_SWU_UPDATE,   /**< sw update */
+  OC_KNX_SWU_PKGV,     /**< sw package version */
+  OC_KNX_SWU_PKGCMD,   /**< sw package command*/
+  OC_KNX_SWU_PKGBYTES, /**< sw package bytes*/
+  OC_KNX_SWU_PKGQURL,  /**< sw query url */
+  OC_KNX_SWU_PKGNAMES, /**< sw package names*/
+#if 0                  // THIS SHOULD BE IMPLEMENTED IF INCLUDED
   OC_KNX_SWU_PKG,           /**< sw package */
 #endif
   OC_KNX_SWU,               /**< swu top level */
@@ -391,8 +391,8 @@ typedef enum {
   OC_KNX_AUTH_AT,           /**< auth/at resource listing auth/at/X */
   OC_KNX_AUTH_AT_X,         /**< auth/at/X resources */
 #ifdef OC_IOT_ROUTER
-  OC_KNX_FP_GM,             /**< FP/GM */
-  OC_KNX_FP_GM_X,           /**< FP/GM/X */
+  OC_KNX_FP_GM,   /**< FP/GM */
+  OC_KNX_FP_GM_X, /**< FP/GM/X */
 #endif
   /* List of resources on a logical device: start */
   WELLKNOWNCORE /**< well-known/core resource */

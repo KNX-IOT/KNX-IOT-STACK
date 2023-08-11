@@ -794,7 +794,8 @@ oc_core_knx_swu_get_handler(oc_request_t *request,
   size_t device_index = request->resource->device;
 
   for (i = (int)OC_KNX_SWU_PROTOCOL; i < (int)OC_KNX_SWU; i++) {
-    const oc_resource_t *resource = oc_core_get_resource_by_index(i, device_index);
+    const oc_resource_t *resource =
+      oc_core_get_resource_by_index(i, device_index);
     if (oc_filter_resource(resource, request, device_index, &response_length,
                            matches, 1)) {
       matches++;
@@ -847,7 +848,7 @@ oc_create_knx_swu_resources(size_t device_index)
     oc_create_knx_swu_pkgnames_resource(OC_KNX_SWU_PKGNAMES, device_index);
 
     oc_create_knx_swu_resource(OC_KNX_SWU, device_index);
-  } 
+  }
   oc_swu_set_package_name("");
   oc_swu_set_last_update("");
   oc_swu_set_package_version(0, 0, 0);

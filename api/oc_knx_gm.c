@@ -1490,7 +1490,7 @@ oc_create_knx_iot_router_resources(size_t device_index)
 {
 #ifdef OC_IOT_ROUTER
   OC_DBG("oc_create_knx_gm_resources");
-  
+
   if (device_index == 0) {
     OC_DBG("resources for dev 0 created statically");
   } else {

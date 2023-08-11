@@ -260,13 +260,13 @@ oc_populate_resource_object(oc_resource_t *resource, const char *name,
                             size_t device)
 {
   if (name) {
-    resource->name.ptr = (char*)name;
+    resource->name.ptr = (char *)name;
     resource->name.size = strlen(name) + 1;
     resource->name.next = NULL;
   }
   oc_check_uri(uri);
   resource->uri.next = NULL;
-  resource->uri.ptr = (char*)uri;
+  resource->uri.ptr = (char *)uri;
   resource->uri.size = strlen(uri) + 1; // include null terminator in size
   oc_new_string_array(&resource->types, num_resource_types);
   resource->properties = 0;
@@ -293,7 +293,7 @@ oc_new_resource(const char *name, const char *uri, uint8_t num_resource_types,
       resource->runtime_data = data;
       resource->runtime_data->num_observers = 0;
       resource->properties = OC_DISCOVERABLE;
-      *(bool*)&resource->is_const = false;
+      *(bool *)&resource->is_const = false;
       oc_populate_resource_object(resource, name, uri, num_resource_types,
                                   device_index);
     }

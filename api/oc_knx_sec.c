@@ -199,14 +199,11 @@ oc_core_knx_p_oscore_replwdo_put_handler(oc_request_t *request,
   oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
 }
 
-OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_p_oscore_replwdo,
-                                     knx_p_oscore_osndelay, 0,
-                                     "/p/oscore/replwdo", OC_IF_D,
-                                     APPLICATION_CBOR, OC_DISCOVERABLE, 
-                                     oc_core_knx_p_oscore_replwdo_get_handler,
-                                     oc_core_knx_p_oscore_replwdo_put_handler,
-                                     0, 0, NULL, OC_SIZE_MANY(1),
-                                     ":dpt.value2UCount");
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(
+  knx_p_oscore_replwdo, knx_p_oscore_osndelay, 0, "/p/oscore/replwdo", OC_IF_D,
+  APPLICATION_CBOR, OC_DISCOVERABLE, oc_core_knx_p_oscore_replwdo_get_handler,
+  oc_core_knx_p_oscore_replwdo_put_handler, 0, 0, NULL, OC_SIZE_MANY(1),
+  ":dpt.value2UCount");
 void
 oc_create_knx_p_oscore_replwdo_resource(int resource_idx, size_t device)
 {
@@ -241,7 +238,8 @@ oc_core_knx_f_oscore_get_handler(oc_request_t *request,
 
   for (i = (int)OC_KNX_P_OSCORE_REPLWDO; i <= (int)OC_KNX_P_OSCORE_OSNDELAY;
        i++) {
-    const oc_resource_t *resource = oc_core_get_resource_by_index(i, device_index);
+    const oc_resource_t *resource =
+      oc_core_get_resource_by_index(i, device_index);
     if (oc_filter_resource(resource, request, device_index, &response_length,
                            matches, 1)) {
       matches++;
@@ -1067,7 +1065,8 @@ oc_core_knx_auth_get_handler(oc_request_t *request,
   }
   size_t device_index = request->resource->device;
   for (i = (int)OC_KNX_A_SEN; i < (int)OC_KNX_AUTH; i++) {
-    const oc_resource_t *resource = oc_core_get_resource_by_index(i, device_index);
+    const oc_resource_t *resource =
+      oc_core_get_resource_by_index(i, device_index);
     if (oc_filter_resource(resource, request, device_index, &response_length,
                            matches, 1)) {
       matches++;
@@ -1655,7 +1654,7 @@ oc_create_knx_sec_resources(size_t device_index)
   OC_DBG("oc_create_knx_sec_resources");
 
   oc_load_at_table(device_index);
-  
+
   if (device_index == 0) {
     OC_DBG("resources for dev 0 created statically");
     return;
