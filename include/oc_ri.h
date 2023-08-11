@@ -26,12 +26,14 @@
 #include "oc_rep.h"
 #include "oc_uuid.h"
 #include "util/oc_etimer.h"
-
+#if defined _MSC_VER && !defined __INTEL_COMPILER
 #define oc_ri_internal_expand(...) __VA_ARGS__
 #define oc_ri_internal_expand_call(fn, ...)                                    \
   oc_ri_internal_expand_call2(fn, (__VA_ARGS__))
 #define oc_ri_internal_expand_call2(fn, args) fn args
+#endif
 
+#if defined _MSC_VER && !defined __INTEL_COMPILER
 #define oc_ri_create_const_resource_internal(                                  \
   next_resource, resource_name, device_index, name, uri, dpt, iface_mask,      \
   content_format, properties, get_cb, put_cb, post_cb, delete_cb, ctx,         \
@@ -58,18 +60,59 @@
     /*is_const*/ true,                                                         \
     /*runtime_data*/ &resource_name##_data,                                    \
   };
+#else
+#define oc_ri_create_const_resource_internal(                                  \
+  next_resource, resource_name, device_index, name, uri, dpt, iface_mask,      \
+  content_format, properties, get_cb, put_cb, post_cb, delete_cb, ctx,         \
+  observe_period, instance, ...)                                               \
+  oc_resource_data_t resource_name##_data;                                     \
+  const oc_resource_t resource_name = {                                        \
+    /*next*/ (oc_resource_t *)&next_resource,                                  \
+    /*device*/ device_index,                                                   \
+    /*name*/ oc_string_create_const(name),                                     \
+    /*uri*/ oc_string_create_const(uri), /*types*/                             \
+    oc_string_array_create_const(__VA_ARGS__),                                 \
+    /*dpt*/ oc_string_create_const(dpt),                                       \
+    /*interfaces*/ iface_mask,                                                 \
+    /*content_type*/ content_format,                                           \
+    /*properties*/ properties,                                                 \
+    /*get_handler*/ { get_cb, ctx },                                           \
+    /*put_handler*/ { put_cb, ctx },                                           \
+    /*post_handler*/ { post_cb, ctx },                                         \
+    /*delete_handler*/ { delete_cb, ctx },                                     \
+    /*get_properties*/ { NULL, NULL },                                         \
+    /*set_properties*/ { NULL, NULL },                                         \
+    /*observe_period_seconds*/ observe_period,                                 \
+    /*fb_instance*/ instance,                                                  \
+    /*is_const*/ true,                                                         \
+    /*runtime_data*/ &resource_name##_data,                                    \
+  };
+#endif
 
+#if defined _MSC_VER && !defined __INTEL_COMPILER
 #define oc_ri_create_const_resource_linked(next_resource, ...)                 \
   extern const oc_resource_t next_resource;                                    \
   oc_ri_internal_expand_call(oc_ri_create_const_resource_internal,             \
-                             (next_resource, __VA_ARGS__))
+                             next_resource, __VA_ARGS__)
+#else
+#define oc_ri_create_const_resource_linked(next_resource, ...)                 \
+  extern const oc_resource_t next_resource;                                    \
+  oc_ri_create_const_resource_internal(next_resource, __VA_ARGS__)
+#endif
 
+#if defined _MSC_VER && !defined __INTEL_COMPILER
 #define oc_ri_create_const_resource_final(resource_name, ...)                  \
   oc_resource_dummy_t resource_block_end##resource_name = { NULL, -1 };        \
-  oc_ri_internal_expand_call(                                                  \
-    oc_ri_create_const_resource_internal,                                      \
-    (resource_block_end##resource_name, resource_name, __VA_ARGS__))
-
+  oc_ri_internal_expand_call(oc_ri_create_const_resource_internal,             \
+                             resource_block_end##resource_name, resource_name, \
+                             __VA_ARGS__)
+#else
+#define oc_ri_create_const_resource_final(resource_name, ...)                  \
+  oc_resource_dummy_t resource_block_end##resource_name = { NULL, -1 };        \
+                                                                               \
+  oc_ri_create_const_resource_internal(resource_block_end##resource_name,      \
+                                       resource_name, __VA_ARGS__)
+#endif
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -336,7 +379,7 @@ typedef enum {
   OC_KNX_SWU_PKGBYTES,      /**< sw package bytes*/
   OC_KNX_SWU_PKGQURL,       /**< sw query url */
   OC_KNX_SWU_PKGNAMES,      /**< sw package names*/
-#if 0 // THIS SHOULD BE IMPLEMENTED IF INCLUDED
+#if 0                       // THIS SHOULD BE IMPLEMENTED IF INCLUDED
   OC_KNX_SWU_PKG,           /**< sw package */
 #endif
   OC_KNX_SWU,               /**< swu top level */

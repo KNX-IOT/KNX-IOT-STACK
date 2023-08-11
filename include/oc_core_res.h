@@ -32,16 +32,16 @@ extern "C" {
 
 /**
  * @brief generate an `extern` declaration of a core const resource
- * 
+ *
  * @param name name of resource
-*/
-#define OC_CORE_EXTERN_CONST_RESOURCE(resource_name) \
+ */
+#define OC_CORE_EXTERN_CONST_RESOURCE(resource_name)                           \
   extern const oc_resource_t core_resource_##resource_name;
 /**
  * @brief get the internal name of a core const resource
- * 
+ *
  * @param name name of resource
-*/
+ */
 #define OC_CORE_RESOURCE_NAME(name) core_resource_##name
 
 /**
@@ -51,6 +51,7 @@ extern "C" {
  * @related OC_CORE_CREATE_CONST_RESOURCE_LINKED
  * @related OC_CORE_CREATE_CONST_RESOURCE_FINAL
  */
+#if defined _MSC_VER && !defined __INTEL_COMPILER
 #define OC_CORE_CREATE_CONST_RESOURCE_INTERNAL(                                \
   resource_name, next_resource, device_index, uri, iface_mask, content_format, \
   properties, get_cb, put_cb, post_cb, delete_cb, dpt, num_resource_types,     \
@@ -60,7 +61,17 @@ extern "C" {
     core_resource_##resource_name, device_index, NULL, uri, dpt, iface_mask,   \
     content_format, properties, get_cb, put_cb, post_cb, delete_cb, NULL, 0,   \
     0, num_resource_types, __VA_ARGS__)
-
+#else
+#define OC_CORE_CREATE_CONST_RESOURCE_INTERNAL(                                \
+  resource_name, next_resource, device_index, uri, iface_mask, content_format, \
+  properties, get_cb, put_cb, post_cb, delete_cb, dpt, num_resource_types,     \
+  ...)                                                                         \
+  oc_ri_create_const_resource_internal(                                        \
+    core_resource_##next_resource, core_resource_##resource_name,              \
+    device_index, NULL, uri, dpt, iface_mask, content_format, properties,      \
+    get_cb, put_cb, post_cb, delete_cb, NULL, 0, 0, num_resource_types,        \
+    __VA_ARGS__)
+#endif
 /**
  * @brief Create const CORE linked to the next one
  *
@@ -69,11 +80,19 @@ extern "C" {
  *
  * @related OC_CORE_CREATE_CONST_RESOURCE_FINAL
  */
+#if defined _MSC_VER && !defined __INTEL_COMPILER
 #define OC_CORE_CREATE_CONST_RESOURCE_LINKED(resource_name, next_resource,     \
                                              ...)                              \
   extern const oc_resource_t core_resource_##next_resource;                    \
   oc_ri_internal_expand_call(OC_CORE_CREATE_CONST_RESOURCE_INTERNAL,           \
                              resource_name, next_resource, __VA_ARGS__)
+#else
+#define OC_CORE_CREATE_CONST_RESOURCE_LINKED(resource_name, next_resource,     \
+                                             ...)                              \
+  extern const oc_resource_t core_resource_##next_resource;                    \
+  OC_CORE_CREATE_CONST_RESOURCE_INTERNAL(resource_name, next_resource,         \
+                                         __VA_ARGS__)
+#endif
 
 /**
  * @brief Create const CORE linked to a final, non-const dummy
@@ -82,11 +101,18 @@ extern "C" {
  *
  * @related OC_CORE_CREATE_CONST_RESOURCE_LINKED
  */
+#if defined _MSC_VER && !defined __INTEL_COMPILER
 #define OC_CORE_CREATE_CONST_RESOURCE_FINAL(resource_name, ...)                \
   oc_resource_dummy_t core_resource_##resource_name##_final = { NULL, -1 };    \
   oc_ri_internal_expand_call(OC_CORE_CREATE_CONST_RESOURCE_INTERNAL,           \
                              resource_name, resource_name##_final,             \
                              __VA_ARGS__)
+#else
+#define OC_CORE_CREATE_CONST_RESOURCE_FINAL(resource_name, ...)                \
+  oc_resource_dummy_t core_resource_##resource_name##_final = { NULL, -1 };    \
+  OC_CORE_CREATE_CONST_RESOURCE_INTERNAL(resource_name, resource_name##_final, \
+                                         __VA_ARGS__)
+#endif
 
 /**
  * @brief callback for initializing the platform
@@ -380,7 +406,8 @@ const oc_resource_t *oc_core_get_resource_by_index(int type, size_t device);
  * @param device the device index
  * @return oc_resource_t* the resource handle
  */
-const oc_resource_t *oc_core_get_resource_by_uri(const char *uri, size_t device);
+const oc_resource_t *oc_core_get_resource_by_uri(const char *uri,
+                                                 size_t device);
 
 /**
  * @brief Ensure that the given URI starts with a forward slash
