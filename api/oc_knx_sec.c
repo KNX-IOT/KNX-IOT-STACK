@@ -678,15 +678,15 @@ oc_core_auth_at_post_handler(oc_request_t *request,
                                        oc_string_len(oscobject->value.string));
                     other_updated = true;
                   }
-                  if (oscobject->iname == 7 && subobject_nr == 8 &&
-                      oscobject_nr == 4) {
-                    // cnf::osc::rid
-                    oc_free_string(&(g_at_entries[index].osc_rid));
-                    oc_new_byte_string(&g_at_entries[index].osc_rid,
-                                       oc_string(oscobject->value.string),
-                                       oc_string_len(oscobject->value.string));
-                    other_updated = true;
-                  }
+                  // if (oscobject->iname == 7 && subobject_nr == 8 &&
+                  //     oscobject_nr == 4) {
+                  //   // cnf::osc::rid
+                  //   oc_free_string(&(g_at_entries[index].osc_rid));
+                  //   oc_new_byte_string(&g_at_entries[index].osc_rid,
+                  //                      oc_string(oscobject->value.string),
+                  //                      oc_string_len(oscobject->value.string));
+                  //   other_updated = true;
+                  // }
                   if (oscobject->iname == 0 && subobject_nr == 8 &&
                       oscobject_nr == 4) {
                     // cnf::osc::id
@@ -708,26 +708,6 @@ oc_core_auth_at_post_handler(oc_request_t *request,
       } // while (inner object)
     }   // if type == object
     // show the entry on screen
-    //
-    // temp backward compatibility fix: if recipient id is not there then use
-    // SID for recipient ID
-    if (oc_string_len(g_at_entries[index].osc_rid) == 0) {
-      oc_free_string(&(g_at_entries[index].osc_rid));
-      oc_new_byte_string(&g_at_entries[index].osc_rid,
-                         oc_string(g_at_entries[index].osc_id),
-                         oc_byte_string_len(g_at_entries[index].osc_id));
-    }
-    // temp backward compatibility fix: if context id is not there then use
-    // SID for context ID
-    /*
-    if (oc_string_len(g_at_entries[index].osc_contextid) == 0) {
-      oc_free_string(&(g_at_entries[index].osc_contextid));
-      oc_new_byte_string(&g_at_entries[index].osc_contextid,
-                         oc_string(g_at_entries[index].osc_id),
-                         oc_byte_string_len(g_at_entries[index].osc_id));
-    }
-    */
-
     oc_print_auth_at_entry(device_index, index);
 
     // dump the entry to persistent storage
@@ -892,12 +872,12 @@ oc_core_auth_at_x_get_handler(oc_request_t *request,
         oc_byte_string_len(
           g_at_entries[index].osc_contextid)); // root::cnf::osc::contextid
     }
-    if (oc_string_len(g_at_entries[index].osc_rid) > 0) {
-      oc_rep_i_set_byte_string(
-        osc, 7, oc_string(g_at_entries[index].osc_rid),
-        oc_byte_string_len(
-          g_at_entries[index].osc_rid)); // root::cnf::osc::osc_rid
-    }
+    // if (oc_string_len(g_at_entries[index].osc_rid) > 0) {
+    //   oc_rep_i_set_byte_string(
+    //     osc, 7, oc_string(g_at_entries[index].osc_rid),
+    //     oc_byte_string_len(
+    //       g_at_entries[index].osc_rid)); // root::cnf::osc::osc_rid
+    // }
     if (oc_string_len(g_at_entries[index].osc_id) > 0) {
       oc_rep_i_set_byte_string(
         osc, 0, oc_string(g_at_entries[index].osc_id),
