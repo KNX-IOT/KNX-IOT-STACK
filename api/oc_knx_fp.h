@@ -181,7 +181,8 @@ typedef struct oc_group_rp_table_t
   uint32_t grpid;   /**< the multicast group id */
   oc_string_t path; /**< contents of path, default path = ".knx"*/
   oc_string_t url;  /**< contents of url */
-  oc_string_t at;   /**< Access token id. Reference to the security credentials for unicast subscription encryption. */
+  oc_string_t at;   /**< Access token id. Reference to the security credentials
+                       for unicast subscription encryption. */
   bool con;         /**< confirmed message, default = false*/
   uint32_t *ga;     /**< array of integers */
   int ga_len;       /**< length of the array of group addresses identifiers */

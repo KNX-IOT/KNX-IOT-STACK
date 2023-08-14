@@ -1346,7 +1346,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
               (int)oc_byte_string_len(rep->value.string));
       }
     } break;
-  case OC_REP_STRING: {
+    case OC_REP_STRING: {
       if (rep->iname == SPAKE_ID) {
         // if the ID is present, overwrite the default
         oc_free_string(&g_pase.id);
@@ -1356,7 +1356,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
               (int)oc_byte_string_len(rep->value.string));
       }
     } break;
-  default:
+    default:
       break;
     }
     rep = rep->next;
@@ -1501,10 +1501,9 @@ oc_core_knx_spake_separate_post_handler(void *req_p)
     oc_device_info_t *device = oc_core_get_device_info(0);
     // serial number should be supplied as string array
     PRINT("CLIENT: pase.id length: %d\n", (int)oc_byte_string_len(g_pase.id));
-    oc_oscore_set_auth_device(
-      oc_string(g_pase.id), oc_byte_string_len(g_pase.id),
-      "", 0,
-     shared_key, (int)shared_key_len);
+    oc_oscore_set_auth_device(oc_string(g_pase.id),
+                              oc_byte_string_len(g_pase.id), "", 0, shared_key,
+                              (int)shared_key_len);
 
     // empty payload
     oc_send_empty_separate_response(&spake_separate_rsp, OC_STATUS_CHANGED);

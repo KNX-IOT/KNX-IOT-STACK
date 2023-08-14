@@ -615,8 +615,8 @@ oc_core_auth_at_post_handler(oc_request_t *request,
                           oc_string(object->value.string),
                           oc_string_len(object->value.string));
           }
-          //if (object->iname == 3) {
-            // aud
+          // if (object->iname == 3) {
+          //  aud
           //  oc_free_string(&(g_at_entries[index].aud));
           //  oc_new_string(&g_at_entries[index].aud,
           //                oc_string(object->value.string),
@@ -819,7 +819,7 @@ oc_core_auth_at_x_get_handler(oc_request_t *request,
   // id : 0
   oc_rep_i_set_text_string(root, 0, oc_string(g_at_entries[index].id));
   // audience : 3
-  //if (oc_string_len(g_at_entries[index].aud) > 0) {
+  // if (oc_string_len(g_at_entries[index].aud) > 0) {
   //  oc_rep_i_set_text_string(root, 3, oc_string(g_at_entries[index].aud));
   //}
   // the scope as list of cflags or group object table entries
@@ -1641,22 +1641,20 @@ oc_init_oscore_from_storage(size_t device_index, bool from_storage)
 
         // contexts for sending have populated sender id and null receive id
         // the spake key, however, is for receiving only, and the osc_id is
-        // already inside receiver_id. 
+        // already inside receiver_id.
 
-        // by default, posts to auth/at set id into the sender id, so the created
-        // contexts are only usable for sending. so we must create contexts for receiving
-        // with ids swapped in certain circumstances, right now for group comms and
-        // subsequent tool keys
+        // by default, posts to auth/at set id into the sender id, so the
+        // created contexts are only usable for sending. so we must create
+        // contexts for receiving with ids swapped in certain circumstances,
+        // right now for group comms and subsequent tool keys
 
         if (g_at_entries[i].scope & (OC_IF_G | OC_IF_SEC)) {
           uint64_t ssn = 0;
           oc_oscore_context_t *ctx = oc_oscore_add_context(
-            device_index,
-            oc_string(g_at_entries[i].osc_rid),
+            device_index, oc_string(g_at_entries[i].osc_rid),
             oc_byte_string_len(g_at_entries[i].osc_rid),
             oc_string(g_at_entries[i].osc_id),
-            oc_byte_string_len(g_at_entries[i].osc_id),
-            ssn, "desc",
+            oc_byte_string_len(g_at_entries[i].osc_id), ssn, "desc",
             oc_string(g_at_entries[i].osc_ms),
             oc_byte_string_len(g_at_entries[i].osc_ms),
             oc_string(g_at_entries[i].osc_contextid),

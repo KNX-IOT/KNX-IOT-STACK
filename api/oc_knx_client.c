@@ -84,8 +84,7 @@ update_tokens(uint8_t *secret, int secret_size)
 {
   PRINT("update_tokens: \n");
   oc_oscore_set_auth_mac(oc_string(g_spake_ctx.oscore_id),
-                         oc_byte_string_len(g_spake_ctx.oscore_id),
-                         "", 0,
+                         oc_byte_string_len(g_spake_ctx.oscore_id), "", 0,
                          secret, secret_size);
 }
 
@@ -275,8 +274,8 @@ oc_initiate_spake_parameter_request(oc_endpoint_t *endpoint,
   oc_rep_begin_root_object();
 
   oc_rep_i_set_text_string(root, 0, recipient_id);
-  oc_byte_string_copy_from_char_with_size(&g_spake_ctx.oscore_id,
-                                          recipient_id, recipient_id_len);
+  oc_byte_string_copy_from_char_with_size(&g_spake_ctx.oscore_id, recipient_id,
+                                          recipient_id_len);
 
   oc_rep_i_set_byte_string(root, 15, rnd, 32);
   oc_rep_end_root_object();

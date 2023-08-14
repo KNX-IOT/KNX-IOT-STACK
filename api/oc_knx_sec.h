@@ -67,11 +67,12 @@ extern "C" {
  * see section 3.5.4.2 Access Token Resource Object
  */
 typedef enum {
-  OC_PROFILE_UNKNOWN = 0,      /**< unknown profile */
-  OC_PROFILE_COAP_DTLS = 1,    /**< "coap_dtls" */
-  OC_PROFILE_COAP_OSCORE = 2,  /**< "coap_oscore" */
-  OC_PROFILE_COAP_TLS = 254,   /**< coap_tls" [OSCORE] for [X.509] certificates with TLS */
-  OC_PROFILE_COAP_PASE = 255   /**< "coap_pase" [OSCORE] with PASE credentials */
+  OC_PROFILE_UNKNOWN = 0,     /**< unknown profile */
+  OC_PROFILE_COAP_DTLS = 1,   /**< "coap_dtls" */
+  OC_PROFILE_COAP_OSCORE = 2, /**< "coap_oscore" */
+  OC_PROFILE_COAP_TLS =
+    254, /**< coap_tls" [OSCORE] for [X.509] certificates with TLS */
+  OC_PROFILE_COAP_PASE = 255 /**< "coap_pase" [OSCORE] with PASE credentials */
 } oc_at_profile_t;
 
 /**
@@ -178,7 +179,8 @@ typedef struct oc_auth_at_t
   oc_string_t
     osc_salt; /**< (18:4:5) OSCORE cnf:osc:salt (optional) empty string */
   oc_string_t osc_contextid;
-  /**< (18:4:6) OSCORE cnf:osc:contextid used as "kid_context" (byte string, 6 bytes) */
+  /**< (18:4:6) OSCORE cnf:osc:contextid used as "kid_context" (byte string, 6
+   * bytes) */
   oc_string_t osc_id; /**< (18:4:0) OSCORE cnf:osc:id  (used as SID & KID) (byte
                          string), max 7 bytes */
   oc_string_t
@@ -233,10 +235,10 @@ int oc_core_find_at_entry_empty_slot(size_t device_index);
  * @brief set shared (SPAKE) key to the auth at table, on the Management Client
  * side
  *
- * @param client_senderid the client_senderid of the device that has been negotiated
- * with spake2plus. This will become the Receiver ID within the OSCORE context.
- * This value is an ASCII-encoded string representing the hexadecimal serial
- * number
+ * @param client_senderid the client_senderid of the device that has been
+ * negotiated with spake2plus. This will become the Receiver ID within the
+ * OSCORE context. This value is an ASCII-encoded string representing the
+ * hexadecimal serial number
  * @param client_senderid_size the size of the serial number
  * @param clientrecipient_id the clientrecipient_id (delivered during the
  * handshake). This will become the Sender ID. This value is in HEX
@@ -252,10 +254,10 @@ void oc_oscore_set_auth_mac(char *client_senderid, int client_senderid_size,
 /**
  * @brief set shared (SPAKE) key to the auth at table, on the Device side
  *
- * @param client_senderid the client_senderid of the device that has been negotiated
- * with spake2plus. This will become the Sender ID within the OSCORE context.
- * This value is an ASCII-encoded string representing the hexadecimal serial
- * number
+ * @param client_senderid the client_senderid of the device that has been
+ * negotiated with spake2plus. This will become the Sender ID within the OSCORE
+ * context. This value is an ASCII-encoded string representing the hexadecimal
+ * serial number
  * @param client_senderid_size the size of the serial number
  * @param clientrecipient_id the clientrecipient_id (delivered during the
  * handshake). This will become the Receiver ID. This value is in HEX
