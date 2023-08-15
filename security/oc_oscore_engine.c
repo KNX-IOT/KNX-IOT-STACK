@@ -616,8 +616,8 @@ oc_oscore_send_message(oc_message_t *msg)
   if (entry) {
     OC_DBG_OSCORE("### Found auth at entry, getting context ###");
     oscore_ctx = oc_oscore_find_context_by_kid(
-      NULL, message->endpoint.device, oc_string(entry->osc_rid),
-      oc_byte_string_len(entry->osc_rid));
+      NULL, message->endpoint.device, oc_string(entry->osc_id),
+      oc_byte_string_len(entry->osc_id));
   }
   // Search for OSCORE context using addressing information
 
@@ -777,6 +777,9 @@ oc_oscore_send_message(oc_message_t *msg)
         goto oscore_send_dispatch;
       }
       OC_DBG("### protecting outgoing response ###");
+      
+      // TODO: reuse request AEAD nonce instead of sending new SSN
+
       /* Response */
       /* Per specification, all responses must include a new Partial IV */
       /* Use context->SSN as partial IV */
