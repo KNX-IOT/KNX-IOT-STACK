@@ -849,7 +849,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
         // if (my_resource->post_handler.cb) {
         //  my_resource->post_handler.cb(&new_request, iface_mask, data);
         if (my_resource->put_handler.cb) {
-          my_resource->put_handler.cb(&new_request, iface_mask, 
+          my_resource->put_handler.cb(&new_request, iface_mask,
                                       my_resource->put_handler.user_data);
           if ((cflags & OC_CFLAG_TRANSMISSION) > 0) {
             // Case 3) part 1
@@ -870,8 +870,8 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
         // Received from bus: -st rp , any ga
         // @receiver : cflags = u->overwrite object value
         if (my_resource->post_handler.cb) {
-          my_resource->post_handler.cb(&new_request, iface_mask, 
-                                      my_resource->post_handler.user_data);
+          my_resource->post_handler.cb(&new_request, iface_mask,
+                                       my_resource->post_handler.user_data);
           if ((cflags & OC_CFLAG_TRANSMISSION) > 0) {
             PRINT(
               "   (case3) (RP-UPDATE) sending WRITE due to TRANSMIT flag \n");
