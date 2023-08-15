@@ -39,12 +39,16 @@ OC_PROCESS(oc_oscore_handler, "OSCORE Process");
 static bool g_ssn_in_use = false;
 static uint64_t g_ssn = 0;
 
-void oc_oscore_set_next_ssn(uint64_t ssn) {
+void
+oc_oscore_set_next_ssn(uint64_t ssn)
+{
   g_ssn = ssn;
   g_ssn_in_use = true;
 }
 
-uint64_t oc_oscore_get_next_ssn() {
+uint64_t
+oc_oscore_get_next_ssn()
+{
   return g_ssn;
 }
 
@@ -437,8 +441,7 @@ oc_oscore_send_multicast_message(oc_message_t *message)
 
     OC_DBG_OSCORE("### protecting multicast request ###");
 
-    if (g_ssn_in_use)
-    {
+    if (g_ssn_in_use) {
       oscore_ctx->ssn = g_ssn;
       g_ssn_in_use = false;
     }
@@ -704,8 +707,7 @@ oc_oscore_send_message(oc_message_t *msg)
     ) {
 
       OC_DBG_OSCORE("### protecting outgoing request ###");
-      if (g_ssn_in_use)
-      {
+      if (g_ssn_in_use) {
         oscore_ctx->ssn = g_ssn;
         g_ssn_in_use = false;
       }
