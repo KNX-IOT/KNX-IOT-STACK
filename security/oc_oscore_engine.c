@@ -36,6 +36,18 @@
 
 OC_PROCESS(oc_oscore_handler, "OSCORE Process");
 
+static bool g_ssn_in_use = false;
+static uint64_t g_ssn = 0;
+
+void oc_oscore_set_next_ssn(uint64_t ssn) {
+  g_ssn = ssn;
+  g_ssn_in_use = true;
+}
+
+uint64_t oc_oscore_get_next_ssn() {
+  return g_ssn;
+}
+
 static void
 increment_ssn_in_context(oc_oscore_context_t *ctx)
 {
@@ -424,6 +436,13 @@ oc_oscore_send_multicast_message(oc_message_t *message)
                                  AAD[OSCORE_AAD_MAX_LEN], AAD_len = 0;
 
     OC_DBG_OSCORE("### protecting multicast request ###");
+
+    if (g_ssn_in_use)
+    {
+      oscore_ctx->ssn = g_ssn;
+      g_ssn_in_use = false;
+    }
+
     /* Use context->SSN as Partial IV */
     oscore_store_piv(oscore_ctx->ssn, piv, &piv_len);
     // OC_DBG_OSCORE("---using SSN as Partial IV: %lu", oscore_ctx->ssn);
@@ -685,6 +704,11 @@ oc_oscore_send_message(oc_message_t *msg)
     ) {
 
       OC_DBG_OSCORE("### protecting outgoing request ###");
+      if (g_ssn_in_use)
+      {
+        oscore_ctx->ssn = g_ssn;
+        g_ssn_in_use = false;
+      }
       /* Request */
       /* Use context->SSN as Partial IV */
       oscore_store_piv(oscore_ctx->ssn, piv, &piv_len);
