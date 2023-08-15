@@ -637,7 +637,7 @@ oc_s_mode_get_resource_value(char *resource_url, char *rp, uint8_t *buf,
   // get the value...oc_request_t request_obj;
   oc_interface_mask_t iface_mask = OC_IF_NONE;
   // void *data;
-  my_resource->get_handler.cb(&request, iface_mask, NULL);
+  my_resource->get_handler.cb(&request, iface_mask, my_resource->get_handler.user_data);
 
   // get the data
   int value_size = oc_rep_get_encoded_payload_size();
