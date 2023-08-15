@@ -1645,20 +1645,19 @@ oc_init_oscore_from_storage(size_t device_index, bool from_storage)
 
         // by default, posts to auth/at set id into the sender id, so the
         // created contexts are only usable for sending. so we must create
-        // contexts for receiving with ids swapped in certain circumstances,
-        // right now for group comms and subsequent tool keys
+        // contexts for receiving with ids swapped
 
-        if (g_at_entries[i].scope & (OC_IF_G | OC_IF_SEC)) {
-          uint64_t ssn = 0;
-          oc_oscore_context_t *ctx = oc_oscore_add_context(
-            device_index, oc_string(g_at_entries[i].osc_rid),
-            oc_byte_string_len(g_at_entries[i].osc_rid),
-            oc_string(g_at_entries[i].osc_id),
-            oc_byte_string_len(g_at_entries[i].osc_id), ssn, "desc",
-            oc_string(g_at_entries[i].osc_ms),
-            oc_byte_string_len(g_at_entries[i].osc_ms),
-            oc_string(g_at_entries[i].osc_contextid),
-            oc_byte_string_len(g_at_entries[i].osc_contextid), i, from_storage);
+        ctx = oc_oscore_add_context(
+          device_index, oc_string(g_at_entries[i].osc_rid),
+          oc_byte_string_len(g_at_entries[i].osc_rid),
+          oc_string(g_at_entries[i].osc_id),
+          oc_byte_string_len(g_at_entries[i].osc_id), ssn, "desc",
+          oc_string(g_at_entries[i].osc_ms),
+          oc_byte_string_len(g_at_entries[i].osc_ms),
+          oc_string(g_at_entries[i].osc_contextid),
+          oc_byte_string_len(g_at_entries[i].osc_contextid), i, from_storage);
+        if (ctx == NULL) {
+          OC_ERR("  failed to load index= %d", i);
         }
       } else {
         OC_DBG_OSCORE("oc_init_oscore: no oscore context");
