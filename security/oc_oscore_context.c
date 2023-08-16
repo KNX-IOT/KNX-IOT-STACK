@@ -118,7 +118,7 @@ oc_oscore_find_context_by_token_mid(size_t device, uint8_t *token,
     //      ctx->device == device) {
     //    return ctx;
     //   }
-    if (memcmp(oscore_id, ctx->sendid , oscore_id_len) == 0) {
+    if (memcmp(oscore_id, ctx->sendid, oscore_id_len) == 0) {
       PRINT("oc_oscore_find_context_by_token_mid FOUND auth/at index: %d\n",
             ctx->auth_at_index);
       return ctx;

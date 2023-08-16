@@ -777,7 +777,7 @@ oc_oscore_send_message(oc_message_t *msg)
         goto oscore_send_dispatch;
       }
       OC_DBG("### protecting outgoing response ###");
-      
+
       // TODO: reuse request AEAD nonce instead of sending new SSN
 
       /* Response */
