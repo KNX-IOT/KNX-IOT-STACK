@@ -267,7 +267,7 @@ void oc_knx_load_state(size_t device_index);
  *
  * @see oc_knx_device_storage_reset
  * @param device_index the device index
- 
+ * @param reset_value the reset value
  * @return int 0== success
  */
 int oc_reset_device(size_t device_index, int reset_value);
