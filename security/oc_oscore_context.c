@@ -41,6 +41,9 @@ oc_oscore_find_context_by_kid(oc_oscore_context_t *ctx, size_t device_index,
     ctx = (oc_oscore_context_t *)oc_list_head(contexts);
   }
 
+  if (kid_len == 0)
+    return NULL;
+
   PRINT("oc_oscore_find_context_by_kid : dev=%d  kid:(%d) :", (int)device_index,
         kid_len);
   oc_char_println_hex((char *)(kid), kid_len);
@@ -115,8 +118,7 @@ oc_oscore_find_context_by_token_mid(size_t device, uint8_t *token,
     //      ctx->device == device) {
     //    return ctx;
     //   }
-    char *ctx_serial_number = ctx->token_id;
-    if (memcmp(oscore_id, ctx_serial_number, oscore_id_len) == 0) {
+    if (memcmp(oscore_id, ctx->sendid, oscore_id_len) == 0) {
       PRINT("oc_oscore_find_context_by_token_mid FOUND auth/at index: %d\n",
             ctx->auth_at_index);
       return ctx;
@@ -336,9 +338,6 @@ oc_oscore_add_context(size_t device, const char *senderid, int senderid_size,
     // explicit token
     memcpy(ctx->token_id, senderid, senderid_size);
     ctx->sendid_len = (uint8_t)senderid_size;
-  } else {
-    OC_ERR("senderid == NULL");
-    goto add_oscore_context_error;
   }
   PRINT("SendID (%d):", ctx->sendid_len);
   OC_LOGbytes_OSCORE(ctx->sendid, ctx->sendid_len);
@@ -352,9 +351,6 @@ oc_oscore_add_context(size_t device, const char *senderid, int senderid_size,
     // }
     memcpy(ctx->recvid, recipientid, recipientid_size);
     ctx->recvid_len = (uint8_t)recipientid_size;
-  } else {
-    OC_ERR("recipientid == NULL");
-    goto add_oscore_context_error;
   }
   PRINT("RecvID (%d):", ctx->recvid_len);
   OC_LOGbytes_OSCORE(ctx->recvid, ctx->recvid_len);

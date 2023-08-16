@@ -905,6 +905,11 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
             oc_new_string(&g_gpt[index].url, oc_string(object->value.string),
                           oc_string_len(object->value.string));
           }
+          if (object->iname == 14) {
+            oc_free_string(&g_gpt[index].at);
+            oc_new_string(&g_gpt[index].at, oc_string(object->value.string),
+                          oc_string_len(object->value.string));
+          }
         } break;
         case OC_REP_INT_ARRAY: {
           if (object->iname == 7) {
@@ -1050,6 +1055,10 @@ oc_core_fp_p_x_get_handler(oc_request_t *request,
     /* url -10 */
     oc_rep_i_set_text_string(root, 10, oc_string(g_gpt[index].url));
   }
+  // at - 14
+  if (oc_string_len(g_gpt[index].at) > 0) {
+    oc_rep_i_set_text_string(root, 14, oc_string(g_gpt[index].at));
+  }
 
   /* ga -7 */
   oc_rep_i_set_int_array(root, 7, g_gpt[index].ga, g_gpt[index].ga_len);
@@ -1083,6 +1092,8 @@ oc_core_fp_p_x_del_handler(oc_request_t *request,
   g_gpt[index].id = 0;
   oc_free_string(&g_gpt[index].url);
   oc_new_string(&g_gpt[index].url, "", 0);
+  oc_free_string(&g_gpt[index].at);
+  oc_new_string(&g_gpt[index].at, "", 0);
   // oc_free_int_array(g_gpt[index].ga);
   free(g_gpt[index].ga);
   g_gpt[index].ga = NULL;
@@ -1275,6 +1286,11 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
             oc_new_string(&g_grt[index].url, oc_string(object->value.string),
                           oc_string_len(object->value.string));
           }
+          if (object->iname == 14) {
+            oc_free_string(&g_grt[index].at);
+            oc_new_string(&g_grt[index].at, oc_string(object->value.string),
+                          oc_string_len(object->value.string));
+          }
         } break;
         case OC_REP_INT_ARRAY: {
           if (object->iname == 7) {
@@ -1407,6 +1423,10 @@ oc_core_fp_r_x_get_handler(oc_request_t *request,
   oc_rep_i_set_text_string(root, 112, oc_string(g_grt[index].path));
   // url- 10
   oc_rep_i_set_text_string(root, 10, oc_string(g_grt[index].url));
+  // at - 14
+  if (oc_string_len(g_gpt[index].at) > 0) {
+    oc_rep_i_set_text_string(root, 14, oc_string(g_grt[index].at));
+  }
   // ga - 7
   oc_rep_i_set_int_array(root, 7, g_grt[index].ga, g_grt[index].ga_len);
 
@@ -1441,6 +1461,8 @@ oc_core_fp_r_x_del_handler(oc_request_t *request,
   g_grt[index].id = 0;
   oc_free_string(&g_grt[index].url);
   oc_new_string(&g_grt[index].url, "", 0);
+  oc_free_string(&g_grt[index].at);
+  oc_new_string(&g_grt[index].at, "", 0);
   // oc_free_int_array(g_grt[index].ga);
   free(g_grt[index].ga);
   g_grt[index].ga = NULL;
@@ -1515,6 +1537,7 @@ oc_core_get_recipient_index_url_or_path(int index)
 
     } else {
       // do .knx
+      // spec 1.1. change this to /g
       PRINT("      oc_core_get_recipient_index_url_or_path (default) %s\n",
             ".knx");
       return ".knx";
@@ -1805,6 +1828,9 @@ oc_print_group_rp_table_entry(int entry, char *Store,
   if (oc_string_len(rp_table[entry].url) > 0) {
     PRINT("    url (10)   : '%s'\n", oc_string_checked(rp_table[entry].url));
   }
+  if (oc_string_len(rp_table[entry].at) > 0) {
+    PRINT("    at (14) : %s\n", oc_string_checked(rp_table[entry].at));
+  }
   PRINT("    ga (7)     : [");
   for (int i = 0; i < rp_table[entry].ga_len; i++) {
     PRINT(" %u", rp_table[entry].ga[i]);
@@ -1866,6 +1892,8 @@ oc_dump_group_rp_table_entry(int entry, char *Store,
   oc_rep_i_set_int(root, 25, rp_table[entry].fid);
   // grpid - 13
   oc_rep_i_set_int(root, 13, rp_table[entry].grpid);
+  // at - 14
+  oc_rep_i_set_text_string(root, 14, oc_string(rp_table[entry].at));
   // path- 112
   oc_rep_i_set_text_string(root, 112, oc_string(rp_table[entry].path));
   // url - 10
@@ -1947,6 +1975,11 @@ oc_load_group_rp_table_entry(int entry, char *Store,
             oc_new_string(&rp_table[entry].url, oc_string(rep->value.string),
                           oc_string_len(rep->value.string));
           }
+          if (rep->iname == 14) {
+            oc_free_string(&rp_table[entry].at);
+            oc_new_string(&rp_table[entry].at, oc_string(rep->value.string),
+                          oc_string_len(rep->value.string));
+          }
           break;
         case OC_REP_INT_ARRAY:
           if (rep->iname == 7) {
@@ -2019,6 +2052,7 @@ oc_free_group_rp_table_entry(int entry, char *Store,
   if (init == false) {
     oc_free_string(&rp_table[entry].path);
     oc_free_string(&rp_table[entry].url);
+    oc_free_string(&rp_table[entry].at);
     free(rp_table[entry].ga);
   }
   rp_table[entry].ga = NULL;

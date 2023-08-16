@@ -50,7 +50,6 @@ typedef struct oc_spake_context_t
 {
   char spake_password[MAX_PASSWORD_LEN]; /**< spake password */
   oc_string_t serial_number; /**< the serial number of the device string */
-  oc_string_t recipient_id;  /**< the recipient id used (byte string) */
   oc_string_t oscore_id;     /**< the oscore id used (byte string) */
 } oc_spake_context_t;
 
@@ -84,11 +83,9 @@ static void
 update_tokens(uint8_t *secret, int secret_size)
 {
   PRINT("update_tokens: \n");
-  oc_oscore_set_auth_mac(oc_string(g_spake_ctx.serial_number),
-                         oc_string_len(g_spake_ctx.serial_number),
-                         oc_string(g_spake_ctx.recipient_id),
-                         oc_byte_string_len(g_spake_ctx.recipient_id), secret,
-                         secret_size);
+  oc_oscore_set_auth_mac(oc_string(g_spake_ctx.oscore_id),
+                         oc_byte_string_len(g_spake_ctx.oscore_id), "", 0,
+                         secret, secret_size);
 }
 
 static void
@@ -229,11 +226,6 @@ do_credential_exchange(oc_client_response_t *data)
         inner_rep = inner_rep->next;
       }
     }
-    // oscore context
-    if (rep->type == OC_REP_BYTE_STRING && rep->iname == 0) {
-      strncpy((char *)&g_spake_ctx.oscore_id, oc_string(rep->value.string),
-              MAX_PASSWORD_LEN);
-    }
     rep = rep->next;
   }
 
@@ -281,9 +273,9 @@ oc_initiate_spake_parameter_request(oc_endpoint_t *endpoint,
     rnd[32]; // not actually used by the server, so just send some gibberish
   oc_rep_begin_root_object();
 
-  oc_rep_i_set_byte_string(root, 0, recipient_id, recipient_id_len);
-  oc_byte_string_copy_from_char_with_size(&g_spake_ctx.recipient_id,
-                                          recipient_id, recipient_id_len);
+  oc_rep_i_set_text_string(root, 0, recipient_id);
+  oc_byte_string_copy_from_char_with_size(&g_spake_ctx.oscore_id, recipient_id,
+                                          recipient_id_len);
 
   oc_rep_i_set_byte_string(root, 15, rnd, 32);
   oc_rep_end_root_object();
@@ -328,9 +320,9 @@ oc_initiate_spake(oc_endpoint_t *endpoint, char *password, char *recipient_id)
   if (recipient_id) {
     // convert from hex string to bytes
     oc_conv_hex_string_to_oc_string(recipient_id, strlen(recipient_id),
-                                    &g_spake_ctx.recipient_id);
-    oc_rep_i_set_byte_string(root, 0, oc_string(g_spake_ctx.recipient_id),
-                             oc_byte_string_len(g_spake_ctx.recipient_id));
+                                    &g_spake_ctx.oscore_id);
+    oc_rep_i_set_byte_string(root, 0, oc_string(g_spake_ctx.oscore_id),
+                             oc_byte_string_len(g_spake_ctx.oscore_id));
     // oc_rep_i_set_byte_string(root, 0, oscore_id, strlen(oscore_id));
     // strncpy((char *)&g_spake_ctx.recipient_id, recipient_id,
     // MAX_PASSWORD_LEN);

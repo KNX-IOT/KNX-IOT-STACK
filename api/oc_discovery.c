@@ -423,8 +423,9 @@ oc_wkcore_discovery_handler(oc_request_t *request,
     bool frame_ep = false;
     /* new style release 1.1 */
     /* request for all devices via serial number wild card*/
-    char *ep_ia = ep_request + 9;
-    uint32_t ia = atoi(ep_ia);
+    /* example:     knx://ia.d773e094b6.1101 */
+    char *ep_ia = ep_request + 20; // at the end, after the second dot
+    uint32_t ia = strtol(ep_ia, NULL, 16);
     if (ia == device->ia) {
       // ia is the same
       // now do the extra work to check the iid
