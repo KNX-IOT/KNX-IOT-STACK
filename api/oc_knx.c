@@ -1259,7 +1259,7 @@ oc_create_knx_idevid_resource(int resource_idx, size_t device)
 // ----------------------------------------------------------------------------
 
 #ifdef OC_SPAKE
-static spake_data_t spake_data = {0};
+static spake_data_t spake_data = { 0 };
 static int failed_handshake_count = 0;
 
 static bool is_blocking = false;
@@ -1633,7 +1633,8 @@ oc_create_knx_spake_resource(int resource_idx, size_t device)
 }
 
 #ifdef OC_SPAKE
-void oc_initialise_spake_data()
+void
+oc_initialise_spake_data()
 {
   // can fail if initialization of the RNG does not work
   int ret = oc_spake_init();
