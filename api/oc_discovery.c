@@ -426,7 +426,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
     // example:    knx://ia.d773e094b6.1101
     //char *ep_ia = ep_request + 9;
     char *ep_ia = ep_request + 20; // at the end, after the second dot
-    uint32_t ia = atoi(ep_ia);
+    uint32_t ia = strtol(ep_ia, NULL, 16);
     if (ia == device->ia) {
       // ia is the same
       // now do the extra work to check the iid
