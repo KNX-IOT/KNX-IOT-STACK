@@ -1259,7 +1259,7 @@ oc_create_knx_idevid_resource(int resource_idx, size_t device)
 // ----------------------------------------------------------------------------
 
 #ifdef OC_SPAKE
-static spake_data_t spake_data;
+static spake_data_t spake_data = {0};
 static int failed_handshake_count = 0;
 
 static bool is_blocking = false;
