@@ -304,6 +304,10 @@ void oc_create_knx_resources(size_t device);
 int oc_knx_knx_ignore_smessage_from_self(bool ignore);
 
 #ifdef OC_SPAKE
+/**
+ * @brief Initialise the RNG used for SPAKE2+ and global data structures
+ * 
+ */
 void oc_initialise_spake_data(void);
 #endif
 
