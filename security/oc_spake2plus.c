@@ -341,11 +341,6 @@ oc_spake_calc_w0_w1(const char *pw, size_t len_salt, const uint8_t *salt,
   MBEDTLS_MPI_CHK(mbedtls_mpi_mod_mpi(w0, &w0s, &grp.N));
   MBEDTLS_MPI_CHK(mbedtls_mpi_mod_mpi(w1, &w1s, &grp.N));
 
-  OC_DBG_SPAKE("SPAKE: w0");
-  oc_spake_print_mpi(&w0);
-  OC_DBG_SPAKE("SPAKE: w1");
-  oc_spake_print_mpi(&w1);
-
 cleanup:
   mbedtls_md_free(&ctx);
   mbedtls_mpi_free(&w0s);
