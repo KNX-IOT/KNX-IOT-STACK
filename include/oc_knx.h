@@ -267,7 +267,7 @@ void oc_knx_load_state(size_t device_index);
  *
  * @see oc_knx_device_storage_reset
  * @param device_index the device index
- * @param reset_value the reset value
+ 
  * @return int 0== success
  */
 int oc_reset_device(size_t device_index, int reset_value);
@@ -302,6 +302,10 @@ void oc_create_knx_resources(size_t device);
  *
  */
 int oc_knx_knx_ignore_smessage_from_self(bool ignore);
+
+#ifdef OC_SPAKE
+void oc_initialise_spake_data(void);
+#endif
 
 #ifdef __cplusplus
 }

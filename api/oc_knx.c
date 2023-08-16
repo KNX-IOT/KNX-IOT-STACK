@@ -1630,8 +1630,11 @@ oc_create_knx_spake_resource(int resource_idx, size_t device)
   oc_core_populate_resource(resource_idx, device, "/.well-known/knx/spake",
                             OC_IF_NONE, APPLICATION_CBOR, OC_DISCOVERABLE, 0, 0,
                             oc_core_knx_spake_post_handler, 0, 0);
+}
 
 #ifdef OC_SPAKE
+void oc_initialise_spake_data()
+{
   // can fail if initialization of the RNG does not work
   int ret = oc_spake_init();
   assert(ret == 0);
@@ -1641,8 +1644,8 @@ oc_create_knx_spake_resource(int resource_idx, size_t device)
   mbedtls_ecp_point_init(&spake_data.pub_y);
   // start SPAKE brute force protection timer
   oc_set_delayed_callback(NULL, decrement_counter, 10);
-#endif /* OC_SPAKE */
 }
+#endif /* OC_SPAKE */
 
 // ----------------------------------------------------------------------------
 
