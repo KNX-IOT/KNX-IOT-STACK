@@ -1493,7 +1493,7 @@ oc_oscore_set_auth_mac(char *client_senderid, int client_senderid_size,
   oc_new_byte_string(&spake_entry.osc_id, client_senderid,
                      client_senderid_size);
 
-  int index = oc_core_find_at_entry_with_id(0, client_senderid);
+  int index = oc_core_find_at_entry_with_id(0, oc_string(spake_entry.id));
   if (index == -1) {
     index = oc_core_find_at_entry_empty_slot(0);
   }
@@ -1536,7 +1536,7 @@ oc_oscore_set_auth_device(char *client_senderid, int client_senderid_size,
   oc_new_byte_string(&spake_entry.osc_rid, client_recipientid,
                      client_recipientid_size);
 
-  int index = oc_core_find_at_entry_with_id(0, client_senderid);
+  int index = oc_core_find_at_entry_with_id(0, oc_string(spake_entry.id));
   if (index == -1) {
     index = oc_core_find_at_entry_empty_slot(0);
   }
