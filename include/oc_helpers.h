@@ -211,8 +211,9 @@ enum StringRepresentation {
   }
 #define oc_string_create_const(s) oc_mmem_create_const(sizeof(s), s)
 #define oc_string_array_create_const(f, n, ...)                                \
-  oc_mmem_create_const((n * STRING_ARRAY_ITEM_MAX_LEN),                        \
-                       f((const char[n][STRING_ARRAY_ITEM_MAX_LEN]){ __VA_ARGS__ }))
+  oc_mmem_create_const(                                                        \
+    (n * STRING_ARRAY_ITEM_MAX_LEN),                                           \
+    f((const char[n][STRING_ARRAY_ITEM_MAX_LEN]){ __VA_ARGS__ }))
 #define oc_int_array_create_const(f, n, ...)                                   \
   oc_mmem_create_const(n, f((const int64_t[n]){ __VA_ARGS__ }))
 #define oc_bool_array_create_const(f, n, ...)                                  \
