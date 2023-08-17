@@ -192,7 +192,7 @@ enum StringRepresentation {
 
 #endif /* !OC_MEMORY_TRACE */
 #define _MAKE_NULL(...) NULL
-#define _ECHO(...) __VA_ARGS__
+#define _ECHO
 #define OC_SIZE_ZERO() _MAKE_NULL, 0
 #define OC_SIZE_MANY(x) _ECHO, x
 /**
