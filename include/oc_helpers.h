@@ -211,14 +211,15 @@ enum StringRepresentation {
   }
 #define oc_string_create_const(s) oc_mmem_create_const(sizeof(s), s)
 #define oc_string_array_create_const(f, n, ...)                                \
-  oc_mmem_create_const((n*STRING_ARRAY_ITEM_MAX_LEN), f((char[n][STRING_ARRAY_ITEM_MAX_LEN]){ __VA_ARGS__ }))
+  oc_mmem_create_const((n * STRING_ARRAY_ITEM_MAX_LEN),                        \
+                       f((char[n][STRING_ARRAY_ITEM_MAX_LEN]){ __VA_ARGS__ }))
 #define oc_int_array_create_const(f, n, ...)                                   \
   oc_mmem_create_const(n, f((int64_t[n]){ __VA_ARGS__ }))
 #define oc_bool_array_create_const(f, n, ...)                                  \
   oc_mmem_create_const(n, f((bool[n]){ __VA_ARGS__ }))
-#define oc_float_array_create_const(f, n, ...)                                  \
+#define oc_float_array_create_const(f, n, ...)                                 \
   oc_mmem_create_const(n, f((float[n]){ __VA_ARGS__ }))
-#define oc_double_array_create_const(f, n, ...)                                 \
+#define oc_double_array_create_const(f, n, ...)                                \
   oc_mmem_create_const(n, f((double[n]){ __VA_ARGS__ }))
 
 void oc_concat_strings(oc_string_t *concat, const char *str1, const char *str2);
@@ -229,12 +230,14 @@ void oc_concat_strings(oc_string_t *concat, const char *str1, const char *str2);
 #define oc_bool_array_size(ocboolarray) ((ocboolarray).size)
 #define oc_float_array_size(ocfloatarray) ((ocfloatarray).size)
 #define oc_double_array_size(ocdoublearray) ((ocdoublearray).size)
-#define oc_string_array_size(ocstringarray) ((ocstringarray).size/STRING_ARRAY_ITEM_MAX_LEN)
+#define oc_string_array_size(ocstringarray)                                    \
+  ((ocstringarray).size / STRING_ARRAY_ITEM_MAX_LEN)
 #define oc_int_array(ocintarray) (oc_cast(ocintarray, int64_t))
 #define oc_bool_array(ocboolarray) (oc_cast(ocboolarray, bool))
 #define oc_float_array(ocfloatarray) (oc_cast(ocfloatarray, float))
 #define oc_double_array(ocdoublearray) (oc_cast(ocdoublearray, double))
-#define oc_string_array(ocstringarray) ((char(*)[STRING_ARRAY_ITEM_MAX_LEN])(OC_MMEM_PTR(&(oc_string_array))))
+#define oc_string_array(ocstringarray)                                         \
+  ((char(*)[STRING_ARRAY_ITEM_MAX_LEN])(OC_MMEM_PTR(&(oc_string_array))))
 
 #ifdef OC_DYNAMIC_ALLOCATION
 #define STRING_ARRAY_ITEM_MAX_LEN 32
