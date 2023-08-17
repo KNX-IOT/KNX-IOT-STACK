@@ -212,15 +212,15 @@ enum StringRepresentation {
 #define oc_string_create_const(s) oc_mmem_create_const(sizeof(s), s)
 #define oc_string_array_create_const(f, n, ...)                                \
   oc_mmem_create_const((n * STRING_ARRAY_ITEM_MAX_LEN),                        \
-                       f((char[n][STRING_ARRAY_ITEM_MAX_LEN]){ __VA_ARGS__ }))
+                       f((const char[n][STRING_ARRAY_ITEM_MAX_LEN]){ __VA_ARGS__ }))
 #define oc_int_array_create_const(f, n, ...)                                   \
-  oc_mmem_create_const(n, f((int64_t[n]){ __VA_ARGS__ }))
+  oc_mmem_create_const(n, f((const int64_t[n]){ __VA_ARGS__ }))
 #define oc_bool_array_create_const(f, n, ...)                                  \
-  oc_mmem_create_const(n, f((bool[n]){ __VA_ARGS__ }))
+  oc_mmem_create_const(n, f((const bool[n]){ __VA_ARGS__ }))
 #define oc_float_array_create_const(f, n, ...)                                 \
-  oc_mmem_create_const(n, f((float[n]){ __VA_ARGS__ }))
+  oc_mmem_create_const(n, f((const float[n]){ __VA_ARGS__ }))
 #define oc_double_array_create_const(f, n, ...)                                \
-  oc_mmem_create_const(n, f((double[n]){ __VA_ARGS__ }))
+  oc_mmem_create_const(n, f((const double[n]){ __VA_ARGS__ }))
 
 void oc_concat_strings(oc_string_t *concat, const char *str1, const char *str2);
 #define oc_string_len(ocstring) ((ocstring).size ? (ocstring).size - 1 : 0)
