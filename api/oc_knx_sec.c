@@ -1517,19 +1517,10 @@ oc_reset_at_table(size_t device_index, int erase_code)
 // ----------------------------------------------------------------------------
 
 void
-oc_oscore_set_auth_mac(char *client_senderid, int client_senderid_size,
+oc_oscore_set_auth_shared(char *client_senderid, int client_senderid_size,
                        char *client_recipientid, int client_recipientid_size,
                        uint8_t *shared_key, int shared_key_size)
 {
-  // create the token & store in at tables at position 0
-  // note there should be no entries.. if there is an entry then overwrite
-  // it..
-  PRINT("oc_oscore_set_auth_mac sn       : %s\n", client_senderid);
-  PRINT("oc_oscore_set_auth_mac rid [%d] : ", client_recipientid_size);
-  oc_char_println_hex(client_recipientid, client_recipientid_size);
-  PRINT("oc_oscore_set_auth_mac ms  [%d] : ", shared_key_size);
-  oc_char_println_hex(shared_key, shared_key_size);
-
   oc_auth_at_t spake_entry;
   memset(&spake_entry, 0, sizeof(spake_entry));
   // this is the index in the table, so it is the full string
@@ -1560,6 +1551,27 @@ oc_oscore_set_auth_mac(char *client_senderid, int client_senderid_size,
   }
 }
 
+
+void
+oc_oscore_set_auth_mac(char *client_senderid, int client_senderid_size,
+                       char *client_recipientid, int client_recipientid_size,
+                       uint8_t *shared_key, int shared_key_size)
+{
+  // create the token & store in at tables at position 0
+  // note there should be no entries.. if there is an entry then overwrite
+  // it..
+  PRINT("oc_oscore_set_auth_mac sn       : %s\n", client_senderid);
+  PRINT("oc_oscore_set_auth_mac rid [%d] : ", client_recipientid_size);
+  oc_char_println_hex(client_recipientid, client_recipientid_size);
+  PRINT("oc_oscore_set_auth_mac ms  [%d] : ", shared_key_size);
+  oc_char_println_hex(shared_key, shared_key_size);
+
+  oc_oscore_set_auth_shared(client_senderid, client_senderid_size, 
+    client_recipientid, client_recipientid_size, 
+    shared_key, shared_key_size
+    );
+}
+
 // This looks very similar to oc_oscore_set_auth_mac, but has some very
 // particular differences. The key identifier is the same as before (serial
 // number), but the sender & receiver IDs are swapped. Here, the sender ID is
@@ -1575,32 +1587,10 @@ oc_oscore_set_auth_device(char *client_senderid, int client_senderid_size,
   PRINT("oc_oscore_set_auth_device ms : (%d) ", shared_key_size);
   oc_char_println_hex(shared_key, shared_key_size);
 
-  oc_auth_at_t spake_entry;
-  memset(&spake_entry, 0, sizeof(spake_entry));
-  // this is the index in the table, so it is the full string
-  oc_new_string(&spake_entry.id, client_senderid, client_senderid_size);
-  spake_entry.ga_len = 0;
-  spake_entry.profile = OC_PROFILE_COAP_OSCORE;
-  spake_entry.scope = OC_IF_SEC | OC_IF_D | OC_IF_P;
-  oc_new_byte_string(&spake_entry.osc_ms, (char *)shared_key, shared_key_size);
-  // no context id
-  oc_new_byte_string(&spake_entry.osc_id, client_senderid,
-                     client_senderid_size);
-  oc_new_byte_string(&spake_entry.osc_rid, client_recipientid,
-                     client_recipientid_size);
-
-  int index = oc_core_find_at_entry_with_id(0, oc_string(spake_entry.id));
-  if (index == -1) {
-    index = oc_core_find_at_entry_empty_slot(0);
-  }
-  if (index == -1) {
-    OC_ERR("no space left in auth/at");
-  } else {
-    oc_core_set_at_table((size_t)0, index, spake_entry, true);
-    oc_at_dump_entry((size_t)0, index);
-    // add the oscore context...
-    oc_init_oscore(0);
-  }
+  oc_oscore_set_auth_shared(client_senderid, client_senderid_size, 
+    client_recipientid, client_recipientid_size, 
+    shared_key, shared_key_size
+    );
 }
 
 oc_auth_at_t *
