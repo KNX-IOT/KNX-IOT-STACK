@@ -778,16 +778,6 @@ oc_oscore_send_message(oc_message_t *msg)
       }
       OC_DBG("### protecting outgoing response ###");
 
-      // TODO: reuse request AEAD nonce instead of sending new SSN
-
-      /* Response */
-      /* Per specification, all responses must include a new Partial IV */
-      /* Use context->SSN as partial IV */
-      oscore_store_piv(oscore_ctx->ssn, piv, &piv_len);
-      // OC_DBG_OSCORE("---using SSN as Partial IV: %lu", oscore_ctx->ssn);
-      OC_LOGbytes_OSCORE(piv, piv_len);
-      OC_DBG_OSCORE("---");
-
       /* Increment SSN for the original request, retransmissions use the same
        * SSN */
       coap_transaction_t *transaction =
@@ -795,9 +785,9 @@ oc_oscore_send_message(oc_message_t *msg)
       if (transaction && transaction->retrans_counter == 0)
         increment_ssn_in_context(oscore_ctx);
 
-      /* Compute nonce using partial IV and context->sendid */
-      oc_oscore_AEAD_nonce(oscore_ctx->sendid, oscore_ctx->sendid_len, piv,
-                           piv_len, oscore_ctx->commoniv, nonce,
+      /* Compute nonce using partial IV and sender ID of the sender ( = receiver ID )*/
+      oc_oscore_AEAD_nonce(oscore_ctx->recvid, oscore_ctx->recvid_len, message->endpoint.piv,
+                           message->endpoint.piv_len, oscore_ctx->commoniv, nonce,
                            OSCORE_AEAD_NONCE_LEN);
 
       OC_DBG_OSCORE(
@@ -886,7 +876,16 @@ oc_oscore_send_message(oc_message_t *msg)
     }
 
     /* Set the OSCORE option */
-    coap_set_header_oscore(coap_pkt, piv, piv_len, kid, kid_len, NULL, 0);
+    if ((coap_pkt->code >= OC_GET && coap_pkt->code <= OC_DELETE))
+    {
+      // requests encode the PIV
+      coap_set_header_oscore(coap_pkt, piv, piv_len, kid, kid_len, NULL, 0);
+    }
+    else
+    {
+      // responses use the (cached) piv of the matching request, stored in the ep/clientcb
+      coap_set_header_oscore(coap_pkt, NULL, 0, kid, kid_len, NULL, 0);
+    }
 
     /* Reflect the Observe option (if present in the CoAP packet) */
     coap_pkt->observe = observe_option;
