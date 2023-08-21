@@ -78,7 +78,7 @@ oc_core_count_dp_in_fb(size_t device_index, int instance, int fb_value)
   int counter = 0;
   int i;
 
-  oc_resource_t *resource = oc_ri_get_app_resources();
+  const oc_resource_t *resource = oc_ri_get_app_resources();
   for (; resource; resource = resource->next) {
     if (resource->device != device_index ||
         !(resource->properties & OC_DISCOVERABLE)) {
@@ -178,7 +178,7 @@ oc_core_fb_x_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 
   // do the actual creation of the payload, e.g. the data points per functional
   // block instance
-  oc_resource_t *resource = oc_ri_get_app_resources();
+  const oc_resource_t *resource = oc_ri_get_app_resources();
   for (; resource; resource = resource->next) {
     if (resource->device != device_index ||
         !(resource->properties & OC_DISCOVERABLE)) {
@@ -215,6 +215,11 @@ oc_core_fb_x_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   PRINT("oc_core_fb_x_get_handler - end\n");
 }
 
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_f_x, knx_swu_protocol, 0, "/f/*",
+                                     OC_IF_LI, APPLICATION_LINK_FORMAT, 0,
+                                     oc_core_fb_x_get_handler, 0, 0, 0, NULL,
+                                     OC_SIZE_MANY(1), "urn:knx:fb.0");
+
 void
 oc_create_fb_x_resource(int resource_idx, size_t device)
 {
@@ -239,7 +244,7 @@ oc_count_functional_blocks(size_t device_index)
     return g_nr_functional_blocks;
   }
 
-  oc_resource_t *resource = oc_ri_get_app_resources();
+  const oc_resource_t *resource = oc_ri_get_app_resources();
   for (; resource; resource = resource->next) {
     if (resource->device != device_index ||
         !(resource->properties & OC_DISCOVERABLE)) {
@@ -289,7 +294,7 @@ oc_add_function_blocks_to_response(oc_request_t *request, size_t device_index,
   g_array_size = 0;
   bool netip_added = false;
 
-  oc_resource_t *resource = oc_ri_get_app_resources();
+  const oc_resource_t *resource = oc_ri_get_app_resources();
   for (; resource; resource = resource->next) {
     if (resource->device != device_index ||
         !(resource->properties & OC_DISCOVERABLE)) {
@@ -438,6 +443,11 @@ oc_core_fb_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   PRINT("oc_core_fb_get_handler - end\n");
 }
 
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_f, knx_f_x, 0, "/f", OC_IF_LI,
+                                     APPLICATION_LINK_FORMAT, 0,
+                                     oc_core_fb_get_handler, 0, 0, 0, NULL,
+                                     OC_SIZE_MANY(1), "urn:knx:fb.0");
+
 void
 oc_create_fb_resource(int resource_idx, size_t device)
 {
@@ -452,7 +462,12 @@ oc_create_fb_resource(int resource_idx, size_t device)
 void
 oc_create_knx_fb_resources(size_t device_index)
 {
+  OC_DBG("oc_create_knx_fb_resources");
 
+  if (device_index == 0) {
+    OC_DBG("resources for dev 0 created statically");
+    return;
+  }
   oc_create_fb_x_resource(OC_KNX_F_X, device_index);
 
   // should be last of the dev/xxx resources, it will list those.

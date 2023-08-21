@@ -191,6 +191,37 @@ enum StringRepresentation {
   (_oc_free_string(ocstringarray))
 
 #endif /* !OC_MEMORY_TRACE */
+#define _MAKE_NULL(...) NULL
+#define _ECHO
+#define OC_SIZE_ZERO() _MAKE_NULL, 0
+#define OC_SIZE_MANY(x) _ECHO, x
+/**
+ * @brief Helper macros to create const versions of oc types
+ * These are special and need some help to understand things correctly
+ */
+/**
+ * @brief creates a const oc_mmem struct
+ * unlikely to be used outside of the library
+ * @param count number of elements
+ * @param ptr pointer to const data
+ */
+#define oc_mmem_create_const(count, ptr)                                       \
+  {                                                                            \
+    NULL, count, ptr                                                           \
+  }
+#define oc_string_create_const(s) oc_mmem_create_const(sizeof(s), s)
+#define oc_string_array_create_const(f, n, ...)                                \
+  oc_mmem_create_const(                                                        \
+    (n * STRING_ARRAY_ITEM_MAX_LEN),                                           \
+    f((const char[n][STRING_ARRAY_ITEM_MAX_LEN]){ __VA_ARGS__ }))
+#define oc_int_array_create_const(f, n, ...)                                   \
+  oc_mmem_create_const(n, f((const int64_t[n]){ __VA_ARGS__ }))
+#define oc_bool_array_create_const(f, n, ...)                                  \
+  oc_mmem_create_const(n, f((const bool[n]){ __VA_ARGS__ }))
+#define oc_float_array_create_const(f, n, ...)                                 \
+  oc_mmem_create_const(n, f((const float[n]){ __VA_ARGS__ }))
+#define oc_double_array_create_const(f, n, ...)                                \
+  oc_mmem_create_const(n, f((const double[n]){ __VA_ARGS__ }))
 
 void oc_concat_strings(oc_string_t *concat, const char *str1, const char *str2);
 #define oc_string_len(ocstring) ((ocstring).size ? (ocstring).size - 1 : 0)
@@ -200,10 +231,14 @@ void oc_concat_strings(oc_string_t *concat, const char *str1, const char *str2);
 #define oc_bool_array_size(ocboolarray) ((ocboolarray).size)
 #define oc_float_array_size(ocfloatarray) ((ocfloatarray).size)
 #define oc_double_array_size(ocdoublearray) ((ocdoublearray).size)
+#define oc_string_array_size(ocstringarray)                                    \
+  ((ocstringarray).size / STRING_ARRAY_ITEM_MAX_LEN)
 #define oc_int_array(ocintarray) (oc_cast(ocintarray, int64_t))
 #define oc_bool_array(ocboolarray) (oc_cast(ocboolarray, bool))
 #define oc_float_array(ocfloatarray) (oc_cast(ocfloatarray, float))
 #define oc_double_array(ocdoublearray) (oc_cast(ocdoublearray, double))
+#define oc_string_array(ocstringarray)                                         \
+  ((char(*)[STRING_ARRAY_ITEM_MAX_LEN])(OC_MMEM_PTR(&(ocstringarray))))
 
 #ifdef OC_DYNAMIC_ALLOCATION
 #define STRING_ARRAY_ITEM_MAX_LEN 32

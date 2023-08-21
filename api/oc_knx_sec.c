@@ -52,6 +52,12 @@ oc_string_to_at_profile(oc_string_t str)
   if (strcmp(oc_string(str), "coap_dtls") == 0) {
     return OC_PROFILE_COAP_DTLS;
   }
+  if (strcmp(oc_string(str), "coap_tls") == 0) {
+    return OC_PROFILE_COAP_TLS;
+  }
+  if (strcmp(oc_string(str), "coap_pase") == 0) {
+    return OC_PROFILE_COAP_PASE;
+  }
   return OC_PROFILE_UNKNOWN;
 }
 
@@ -63,6 +69,12 @@ oc_at_profile_to_string(oc_at_profile_t at_profile)
   }
   if (at_profile == OC_PROFILE_COAP_DTLS) {
     return "coap_dtls";
+  }
+  if (at_profile == OC_PROFILE_COAP_TLS) {
+    return "coap_tls";
+  }
+  if (at_profile == OC_PROFILE_COAP_PASE) {
+    return "coap_pase";
   }
   return "";
 }
@@ -125,6 +137,13 @@ oc_core_knx_p_oscore_osndelay_put_handler(oc_request_t *request,
   oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
 }
 
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_p_oscore_osndelay, knx_f_oscore, 0,
+                                     "/p/oscore/osndelay", OC_IF_D,
+                                     APPLICATION_CBOR, OC_DISCOVERABLE,
+                                     oc_core_knx_f_oscore_osndelay_get_handler,
+                                     oc_core_knx_p_oscore_osndelay_put_handler,
+                                     0, 0, NULL, OC_SIZE_MANY(1),
+                                     ":dpt:timePeriodMsec");
 void
 oc_create_knx_p_oscore_osndelay_resource(int resource_idx, size_t device)
 {
@@ -192,6 +211,11 @@ oc_core_knx_p_oscore_replwdo_put_handler(oc_request_t *request,
   oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
 }
 
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(
+  knx_p_oscore_replwdo, knx_p_oscore_osndelay, 0, "/p/oscore/replwdo", OC_IF_D,
+  APPLICATION_CBOR, OC_DISCOVERABLE, oc_core_knx_p_oscore_replwdo_get_handler,
+  oc_core_knx_p_oscore_replwdo_put_handler, 0, 0, NULL, OC_SIZE_MANY(1),
+  ":dpt.value2UCount");
 void
 oc_create_knx_p_oscore_replwdo_resource(int resource_idx, size_t device)
 {
@@ -226,7 +250,8 @@ oc_core_knx_f_oscore_get_handler(oc_request_t *request,
 
   for (i = (int)OC_KNX_P_OSCORE_REPLWDO; i <= (int)OC_KNX_P_OSCORE_OSNDELAY;
        i++) {
-    oc_resource_t *resource = oc_core_get_resource_by_index(i, device_index);
+    const oc_resource_t *resource =
+      oc_core_get_resource_by_index(i, device_index);
     if (oc_filter_resource(resource, request, device_index, &response_length,
                            matches, 1)) {
       matches++;
@@ -240,6 +265,11 @@ oc_core_knx_f_oscore_get_handler(oc_request_t *request,
   }
 }
 
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_f_oscore, knx_a_sen, 0, "/f/oscore",
+                                     OC_IF_LI, APPLICATION_LINK_FORMAT,
+                                     OC_DISCOVERABLE,
+                                     oc_core_knx_f_oscore_get_handler, 0, 0, 0,
+                                     NULL, OC_SIZE_ZERO());
 void
 oc_create_knx_f_oscore_resource(int resource_idx, size_t device)
 {
@@ -314,6 +344,11 @@ oc_core_a_sen_post_handler(oc_request_t *request,
   oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
 }
 
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_a_sen, knx_auth, 0, "/a/sen",
+                                     OC_IF_SEC, APPLICATION_CBOR,
+                                     OC_DISCOVERABLE, 0, 0,
+                                     oc_core_a_sen_post_handler, 0, NULL,
+                                     OC_SIZE_ZERO());
 void
 oc_create_a_sen_resource(int resource_idx, size_t device)
 {
@@ -321,7 +356,7 @@ oc_create_a_sen_resource(int resource_idx, size_t device)
   // "/a/sen"
   oc_core_populate_resource(resource_idx, device, "/a/sen", OC_IF_SEC,
                             APPLICATION_CBOR, OC_DISCOVERABLE, 0, 0,
-                            oc_core_a_sen_post_handler, 0, 0, "");
+                            oc_core_a_sen_post_handler, 0, 0);
 }
 
 // ----------------------------------------------------------------------------
@@ -603,13 +638,13 @@ oc_core_auth_at_post_handler(oc_request_t *request,
                           oc_string(object->value.string),
                           oc_string_len(object->value.string));
           }
-          if (object->iname == 3) {
-            // aud
-            oc_free_string(&(g_at_entries[index].aud));
-            oc_new_string(&g_at_entries[index].aud,
-                          oc_string(object->value.string),
-                          oc_string_len(object->value.string));
-          }
+          // if (object->iname == 3) {
+          //  aud
+          //  oc_free_string(&(g_at_entries[index].aud));
+          //  oc_new_string(&g_at_entries[index].aud,
+          //                oc_string(object->value.string),
+          //                oc_string_len(object->value.string));
+          //}
         } else if (object->type == OC_REP_INT) {
           if (object->iname == 38) {
             // profile (38 ("coap_dtls" ==1 or "coap_oscore" == 2))
@@ -666,15 +701,15 @@ oc_core_auth_at_post_handler(oc_request_t *request,
                                        oc_string_len(oscobject->value.string));
                     other_updated = true;
                   }
-                  if (oscobject->iname == 7 && subobject_nr == 8 &&
-                      oscobject_nr == 4) {
-                    // cnf::osc::rid
-                    oc_free_string(&(g_at_entries[index].osc_rid));
-                    oc_new_byte_string(&g_at_entries[index].osc_rid,
-                                       oc_string(oscobject->value.string),
-                                       oc_string_len(oscobject->value.string));
-                    other_updated = true;
-                  }
+                  // if (oscobject->iname == 7 && subobject_nr == 8 &&
+                  //     oscobject_nr == 4) {
+                  //   // cnf::osc::rid
+                  //   oc_free_string(&(g_at_entries[index].osc_rid));
+                  //   oc_new_byte_string(&g_at_entries[index].osc_rid,
+                  //                      oc_string(oscobject->value.string),
+                  //                      oc_string_len(oscobject->value.string));
+                  //   other_updated = true;
+                  // }
                   if (oscobject->iname == 0 && subobject_nr == 8 &&
                       oscobject_nr == 4) {
                     // cnf::osc::id
@@ -696,26 +731,6 @@ oc_core_auth_at_post_handler(oc_request_t *request,
       } // while (inner object)
     }   // if type == object
     // show the entry on screen
-    //
-    // temp backward compatibility fix: if recipient id is not there then use
-    // SID for recipient ID
-    if (oc_string_len(g_at_entries[index].osc_rid) == 0) {
-      oc_free_string(&(g_at_entries[index].osc_rid));
-      oc_new_byte_string(&g_at_entries[index].osc_rid,
-                         oc_string(g_at_entries[index].osc_id),
-                         oc_byte_string_len(g_at_entries[index].osc_id));
-    }
-    // temp backward compatibility fix: if context id is not there then use
-    // SID for context ID
-    /*
-    if (oc_string_len(g_at_entries[index].osc_contextid) == 0) {
-      oc_free_string(&(g_at_entries[index].osc_contextid));
-      oc_new_byte_string(&g_at_entries[index].osc_contextid,
-                         oc_string(g_at_entries[index].osc_id),
-                         oc_byte_string_len(g_at_entries[index].osc_id));
-    }
-    */
-
     oc_print_auth_at_entry(device_index, index);
 
     // dump the entry to persistent storage
@@ -759,6 +774,14 @@ oc_core_auth_at_delete_handler(oc_request_t *request,
   PRINT("oc_core_auth_at_delete_handler - end\n");
   oc_send_cbor_response_no_payload_size(request, OC_STATUS_DELETED);
 }
+
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_auth_at, knx_auth_at_x, 0, "/auth/at",
+                                     OC_IF_LI | OC_IF_B | OC_IF_SEC,
+                                     APPLICATION_LINK_FORMAT, OC_DISCOVERABLE,
+                                     oc_core_auth_at_get_handler, 0,
+                                     oc_core_auth_at_post_handler,
+                                     oc_core_auth_at_delete_handler, NULL,
+                                     OC_SIZE_MANY(1), "urn:knx:fb.at");
 
 void
 oc_create_auth_at_resource(int resource_idx, size_t device)
@@ -827,9 +850,9 @@ oc_core_auth_at_x_get_handler(oc_request_t *request,
   // id : 0
   oc_rep_i_set_text_string(root, 0, oc_string(g_at_entries[index].id));
   // audience : 3
-  if (oc_string_len(g_at_entries[index].aud) > 0) {
-    oc_rep_i_set_text_string(root, 3, oc_string(g_at_entries[index].aud));
-  }
+  // if (oc_string_len(g_at_entries[index].aud) > 0) {
+  //  oc_rep_i_set_text_string(root, 3, oc_string(g_at_entries[index].aud));
+  //}
   // the scope as list of cflags or group object table entries
   int nr_entries = oc_total_interface_in_mask(g_at_entries[index].scope);
   if (nr_entries > 0) {
@@ -880,12 +903,12 @@ oc_core_auth_at_x_get_handler(oc_request_t *request,
         oc_byte_string_len(
           g_at_entries[index].osc_contextid)); // root::cnf::osc::contextid
     }
-    if (oc_string_len(g_at_entries[index].osc_rid) > 0) {
-      oc_rep_i_set_byte_string(
-        osc, 7, oc_string(g_at_entries[index].osc_rid),
-        oc_byte_string_len(
-          g_at_entries[index].osc_rid)); // root::cnf::osc::osc_rid
-    }
+    // if (oc_string_len(g_at_entries[index].osc_rid) > 0) {
+    //   oc_rep_i_set_byte_string(
+    //     osc, 7, oc_string(g_at_entries[index].osc_rid),
+    //     oc_byte_string_len(
+    //       g_at_entries[index].osc_rid)); // root::cnf::osc::osc_rid
+    // }
     if (oc_string_len(g_at_entries[index].osc_id) > 0) {
       oc_rep_i_set_byte_string(
         osc, 0, oc_string(g_at_entries[index].osc_id),
@@ -988,6 +1011,22 @@ oc_core_auth_at_x_delete_handler(oc_request_t *request,
   oc_send_cbor_response_no_payload_size(request, OC_STATUS_DELETED);
 }
 
+#ifdef OC_IOT_ROUTER
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_auth_at_x, knx_fp_gm, 0, "/auth/at/*",
+                                     OC_IF_SEC, APPLICATION_CBOR,
+                                     OC_DISCOVERABLE,
+                                     oc_core_auth_at_x_get_handler, 0, 0,
+                                     oc_core_auth_at_x_delete_handler, NULL,
+                                     OC_SIZE_MANY(1), "dpt.a[n]");
+#else
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_auth_at_x, well_known_core, 0,
+                                     "/auth/at/*", OC_IF_SEC, APPLICATION_CBOR,
+                                     OC_DISCOVERABLE,
+                                     oc_core_auth_at_x_get_handler, 0, 0,
+                                     oc_core_auth_at_x_delete_handler, NULL,
+                                     OC_SIZE_MANY(1), "dpt.a[n]");
+#endif
+
 void
 oc_create_auth_at_x_resource(int resource_idx, size_t device)
 {
@@ -1018,7 +1057,8 @@ oc_core_knx_auth_get_handler(oc_request_t *request,
   }
   size_t device_index = request->resource->device;
   for (i = (int)OC_KNX_A_SEN; i < (int)OC_KNX_AUTH; i++) {
-    oc_resource_t *resource = oc_core_get_resource_by_index(i, device_index);
+    const oc_resource_t *resource =
+      oc_core_get_resource_by_index(i, device_index);
     if (oc_filter_resource(resource, request, device_index, &response_length,
                            matches, 1)) {
       matches++;
@@ -1031,6 +1071,11 @@ oc_core_knx_auth_get_handler(oc_request_t *request,
   }
 }
 
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_auth, knx_auth_at, 0, "/auth",
+                                     OC_IF_B | OC_IF_SEC,
+                                     APPLICATION_LINK_FORMAT, OC_DISCOVERABLE,
+                                     oc_core_knx_auth_get_handler, 0, 0, 0,
+                                     NULL, OC_SIZE_ZERO());
 void
 oc_create_knx_auth_resource(int resource_idx, size_t device)
 {
@@ -1472,23 +1517,14 @@ oc_reset_at_table(size_t device_index, int erase_code)
 // ----------------------------------------------------------------------------
 
 void
-oc_oscore_set_auth_mac(char *serial_number, int serial_number_size,
-                       char *client_recipientid, int client_recipientid_size,
-                       uint8_t *shared_key, int shared_key_size)
+oc_oscore_set_auth_shared(char *client_senderid, int client_senderid_size,
+                          char *client_recipientid, int client_recipientid_size,
+                          uint8_t *shared_key, int shared_key_size)
 {
-  // create the token & store in at tables at position 0
-  // note there should be no entries.. if there is an entry then overwrite
-  // it..
-  PRINT("oc_oscore_set_auth_mac sn       : %s\n", serial_number);
-  PRINT("oc_oscore_set_auth_mac rid [%d] : ", client_recipientid_size);
-  oc_char_println_hex(client_recipientid, client_recipientid_size);
-  PRINT("oc_oscore_set_auth_mac ms  [%d] : ", shared_key_size);
-  oc_char_println_hex(shared_key, shared_key_size);
-
   oc_auth_at_t spake_entry;
   memset(&spake_entry, 0, sizeof(spake_entry));
   // this is the index in the table, so it is the full string
-  oc_new_string(&spake_entry.id, serial_number, serial_number_size);
+  oc_new_string(&spake_entry.id, client_senderid, client_senderid_size);
   spake_entry.ga_len = 0;
   spake_entry.profile = OC_PROFILE_COAP_OSCORE;
   spake_entry.scope = OC_IF_SEC | OC_IF_D | OC_IF_P;
@@ -1498,13 +1534,10 @@ oc_oscore_set_auth_mac(char *serial_number, int serial_number_size,
                      client_recipientid_size);
   // not that HEX was NOT on the wire, but the byte string.
   // so we have to store the byte string
-  oc_conv_hex_string_to_oc_string(serial_number, serial_number_size,
-                                  &spake_entry.osc_id);
+  oc_new_byte_string(&spake_entry.osc_id, client_senderid,
+                     client_senderid_size);
 
-  PRINT("oc_oscore_set_auth_mac osc_id (hex) from serial number: ");
-  oc_string_println_hex(spake_entry.osc_id);
-
-  int index = oc_core_find_at_entry_with_id(0, serial_number);
+  int index = oc_core_find_at_entry_with_id(0, oc_string(spake_entry.id));
   if (index == -1) {
     index = oc_core_find_at_entry_empty_slot(0);
   }
@@ -1518,51 +1551,43 @@ oc_oscore_set_auth_mac(char *serial_number, int serial_number_size,
   }
 }
 
+void
+oc_oscore_set_auth_mac(char *client_senderid, int client_senderid_size,
+                       char *client_recipientid, int client_recipientid_size,
+                       uint8_t *shared_key, int shared_key_size)
+{
+  // create the token & store in at tables at position 0
+  // note there should be no entries.. if there is an entry then overwrite
+  // it..
+  PRINT("oc_oscore_set_auth_mac sn       : %s\n", client_senderid);
+  PRINT("oc_oscore_set_auth_mac rid [%d] : ", client_recipientid_size);
+  oc_char_println_hex(client_recipientid, client_recipientid_size);
+  PRINT("oc_oscore_set_auth_mac ms  [%d] : ", shared_key_size);
+  oc_char_println_hex(shared_key, shared_key_size);
+
+  oc_oscore_set_auth_shared(client_senderid, client_senderid_size,
+                            client_recipientid, client_recipientid_size,
+                            shared_key, shared_key_size);
+}
+
 // This looks very similar to oc_oscore_set_auth_mac, but has some very
 // particular differences. The key identifier is the same as before (serial
 // number), but the sender & receiver IDs are swapped. Here, the sender ID is
-// client_recipientid, referring to the MAC. And the receiver ID is the serial
-// number.
+// client_recipientid, referring to the MAC. And the receiver ID is emtpy string
 void
-oc_oscore_set_auth_device(char *serial_number, int serial_number_size,
+oc_oscore_set_auth_device(char *client_senderid, int client_senderid_size,
                           char *client_recipientid, int client_recipientid_size,
                           uint8_t *shared_key, int shared_key_size)
 {
-  PRINT("oc_oscore_set_auth_device sn :%s\n", serial_number);
+  PRINT("oc_oscore_set_auth_device sn :%s\n", client_senderid);
   PRINT("oc_oscore_set_auth_device rid : (%d) ", client_recipientid_size);
   oc_char_println_hex(client_recipientid, client_recipientid_size);
   PRINT("oc_oscore_set_auth_device ms : (%d) ", shared_key_size);
   oc_char_println_hex(shared_key, shared_key_size);
 
-  oc_auth_at_t spake_entry;
-  memset(&spake_entry, 0, sizeof(spake_entry));
-  // this is the index in the table, so it is the full string
-  oc_new_string(&spake_entry.id, serial_number, serial_number_size);
-  spake_entry.ga_len = 0;
-  spake_entry.profile = OC_PROFILE_COAP_OSCORE;
-  spake_entry.scope = OC_IF_SEC | OC_IF_D | OC_IF_P;
-  oc_new_byte_string(&spake_entry.osc_ms, (char *)shared_key, shared_key_size);
-  // no context id
-  oc_new_byte_string(&spake_entry.osc_id, client_recipientid,
-                     client_recipientid_size);
-  oc_conv_hex_string_to_oc_string(serial_number, serial_number_size,
-                                  &spake_entry.osc_rid);
-
-  PRINT("  osc_id (hex) from serial number: ");
-  oc_string_println_hex(spake_entry.osc_id);
-
-  int index = oc_core_find_at_entry_with_id(0, serial_number);
-  if (index == -1) {
-    index = oc_core_find_at_entry_empty_slot(0);
-  }
-  if (index == -1) {
-    OC_ERR("no space left in auth/at");
-  } else {
-    oc_core_set_at_table((size_t)0, index, spake_entry, true);
-    oc_at_dump_entry((size_t)0, index);
-    // add the oscore context...
-    oc_init_oscore(0);
-  }
+  oc_oscore_set_auth_shared(client_senderid, client_senderid_size,
+                            client_recipientid, client_recipientid_size,
+                            shared_key, shared_key_size);
 }
 
 oc_auth_at_t *
@@ -1601,6 +1626,11 @@ oc_create_knx_sec_resources(size_t device_index)
   OC_DBG("oc_create_knx_sec_resources");
 
   oc_load_at_table(device_index);
+
+  if (device_index == 0) {
+    OC_DBG("resources for dev 0 created statically");
+    return;
+  }
 
   oc_create_knx_p_oscore_replwdo_resource(OC_KNX_P_OSCORE_REPLWDO,
                                           device_index);
@@ -1641,12 +1671,32 @@ oc_init_oscore_from_storage(size_t device_index, bool from_storage)
 
       if (g_at_entries[i].profile == OC_PROFILE_COAP_OSCORE) {
         uint64_t ssn = 0;
-        // one context: for sending and receiving.
         oc_oscore_context_t *ctx = oc_oscore_add_context(
           device_index, oc_string(g_at_entries[i].osc_id),
           oc_byte_string_len(g_at_entries[i].osc_id),
           oc_string(g_at_entries[i].osc_rid),
           oc_byte_string_len(g_at_entries[i].osc_rid), ssn, "desc",
+          oc_string(g_at_entries[i].osc_ms),
+          oc_byte_string_len(g_at_entries[i].osc_ms),
+          oc_string(g_at_entries[i].osc_contextid),
+          oc_byte_string_len(g_at_entries[i].osc_contextid), i, from_storage);
+        if (ctx == NULL) {
+          OC_ERR("  failed to load index= %d", i);
+        }
+
+        // contexts for sending have populated sender id and null receive id
+        // the spake key, however, is for receiving only, and the osc_id is
+        // already inside receiver_id.
+
+        // by default, posts to auth/at set id into the sender id, so the
+        // created contexts are only usable for sending. so we must create
+        // contexts for receiving with ids swapped
+
+        ctx = oc_oscore_add_context(
+          device_index, oc_string(g_at_entries[i].osc_rid),
+          oc_byte_string_len(g_at_entries[i].osc_rid),
+          oc_string(g_at_entries[i].osc_id),
+          oc_byte_string_len(g_at_entries[i].osc_id), ssn, "desc",
           oc_string(g_at_entries[i].osc_ms),
           oc_byte_string_len(g_at_entries[i].osc_ms),
           oc_string(g_at_entries[i].osc_contextid),
@@ -1665,7 +1715,7 @@ oc_init_oscore_from_storage(size_t device_index, bool from_storage)
 // ----------------------------------------------------------------------------
 
 bool
-oc_is_resource_secure(oc_method_t method, oc_resource_t *resource)
+oc_is_resource_secure(oc_method_t method, const oc_resource_t *resource)
 {
   // see table 6.1.3: all resources with methods that do not have
   // an interface that is not secure
@@ -1814,7 +1864,7 @@ oc_knx_contains_interface(oc_interface_mask_t calling_interfaces,
 }
 
 static bool
-method_allowed(oc_method_t method, oc_resource_t *resource,
+method_allowed(oc_method_t method, const oc_resource_t *resource,
                oc_endpoint_t *endpoint)
 {
   if (oc_is_resource_secure(method, resource) == false) {
@@ -1866,7 +1916,7 @@ method_allowed(oc_method_t method, oc_resource_t *resource,
 }
 
 bool
-oc_knx_sec_check_acl(oc_method_t method, oc_resource_t *resource,
+oc_knx_sec_check_acl(oc_method_t method, const oc_resource_t *resource,
                      oc_endpoint_t *endpoint)
 {
   // first check if the method is allowed on the resource

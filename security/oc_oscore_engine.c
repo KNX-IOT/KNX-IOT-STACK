@@ -36,6 +36,22 @@
 
 OC_PROCESS(oc_oscore_handler, "OSCORE Process");
 
+static bool g_ssn_in_use = false;
+static uint64_t g_ssn = 0;
+
+void
+oc_oscore_set_next_ssn(uint64_t ssn)
+{
+  g_ssn = ssn;
+  g_ssn_in_use = true;
+}
+
+uint64_t
+oc_oscore_get_next_ssn()
+{
+  return g_ssn;
+}
+
 static void
 increment_ssn_in_context(oc_oscore_context_t *ctx)
 {
@@ -424,6 +440,12 @@ oc_oscore_send_multicast_message(oc_message_t *message)
                                  AAD[OSCORE_AAD_MAX_LEN], AAD_len = 0;
 
     OC_DBG_OSCORE("### protecting multicast request ###");
+
+    if (g_ssn_in_use) {
+      oscore_ctx->ssn = g_ssn;
+      g_ssn_in_use = false;
+    }
+
     /* Use context->SSN as Partial IV */
     oscore_store_piv(oscore_ctx->ssn, piv, &piv_len);
     // OC_DBG_OSCORE("---using SSN as Partial IV: %lu", oscore_ctx->ssn);
@@ -594,8 +616,8 @@ oc_oscore_send_message(oc_message_t *msg)
   if (entry) {
     OC_DBG_OSCORE("### Found auth at entry, getting context ###");
     oscore_ctx = oc_oscore_find_context_by_kid(
-      NULL, message->endpoint.device, oc_string(entry->osc_rid),
-      oc_byte_string_len(entry->osc_rid));
+      NULL, message->endpoint.device, oc_string(entry->osc_id),
+      oc_byte_string_len(entry->osc_id));
   }
   // Search for OSCORE context using addressing information
 
@@ -685,6 +707,10 @@ oc_oscore_send_message(oc_message_t *msg)
     ) {
 
       OC_DBG_OSCORE("### protecting outgoing request ###");
+      if (g_ssn_in_use) {
+        oscore_ctx->ssn = g_ssn;
+        g_ssn_in_use = false;
+      }
       /* Request */
       /* Use context->SSN as Partial IV */
       oscore_store_piv(oscore_ctx->ssn, piv, &piv_len);
@@ -697,6 +723,8 @@ oc_oscore_send_message(oc_message_t *msg)
       coap_transaction_t *transaction =
         coap_get_transaction_by_token(coap_pkt->token, coap_pkt->token_len);
       if (transaction && transaction->retrans_counter == 0)
+        increment_ssn_in_context(oscore_ctx);
+      else if (!transaction)
         increment_ssn_in_context(oscore_ctx);
 
 #ifdef OC_CLIENT
@@ -751,13 +779,6 @@ oc_oscore_send_message(oc_message_t *msg)
         goto oscore_send_dispatch;
       }
       OC_DBG("### protecting outgoing response ###");
-      /* Response */
-      /* Per specification, all responses must include a new Partial IV */
-      /* Use context->SSN as partial IV */
-      oscore_store_piv(oscore_ctx->ssn, piv, &piv_len);
-      // OC_DBG_OSCORE("---using SSN as Partial IV: %lu", oscore_ctx->ssn);
-      OC_LOGbytes_OSCORE(piv, piv_len);
-      OC_DBG_OSCORE("---");
 
       /* Increment SSN for the original request, retransmissions use the same
        * SSN */
@@ -765,11 +786,14 @@ oc_oscore_send_message(oc_message_t *msg)
         coap_get_transaction_by_token(coap_pkt->token, coap_pkt->token_len);
       if (transaction && transaction->retrans_counter == 0)
         increment_ssn_in_context(oscore_ctx);
+      else if (!transaction)
+        increment_ssn_in_context(oscore_ctx);
 
-      /* Compute nonce using partial IV and context->sendid */
-      oc_oscore_AEAD_nonce(oscore_ctx->sendid, oscore_ctx->sendid_len, piv,
-                           piv_len, oscore_ctx->commoniv, nonce,
-                           OSCORE_AEAD_NONCE_LEN);
+      /* Compute nonce using partial IV and sender ID of the sender ( = receiver
+       * ID )*/
+      oc_oscore_AEAD_nonce(oscore_ctx->recvid, oscore_ctx->recvid_len,
+                           message->endpoint.piv, message->endpoint.piv_len,
+                           oscore_ctx->commoniv, nonce, OSCORE_AEAD_NONCE_LEN);
 
       OC_DBG_OSCORE(
         "---computed AEAD nonce using new Partial IV (SSN) and Sender ID");
@@ -857,7 +881,14 @@ oc_oscore_send_message(oc_message_t *msg)
     }
 
     /* Set the OSCORE option */
-    coap_set_header_oscore(coap_pkt, piv, piv_len, kid, kid_len, NULL, 0);
+    if ((coap_pkt->code >= OC_GET && coap_pkt->code <= OC_DELETE)) {
+      // requests encode the PIV
+      coap_set_header_oscore(coap_pkt, piv, piv_len, kid, kid_len, NULL, 0);
+    } else {
+      // responses use the (cached) piv of the matching request, stored in the
+      // ep/clientcb
+      coap_set_header_oscore(coap_pkt, NULL, 0, kid, kid_len, NULL, 0);
+    }
 
     /* Reflect the Observe option (if present in the CoAP packet) */
     coap_pkt->observe = observe_option;

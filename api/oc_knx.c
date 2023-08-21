@@ -284,6 +284,13 @@ oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   return;
 }
 
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx, knx_fp_g, 0, "/.well-known/knx",
+                                     OC_IF_LI | OC_IF_SEC,
+                                     APPLICATION_LINK_FORMAT, OC_DISCOVERABLE,
+                                     oc_core_knx_get_handler, 0,
+                                     oc_core_knx_post_handler, 0, NULL,
+                                     OC_SIZE_ZERO());
+
 void
 oc_create_knx_resource(int resource_idx, size_t device)
 {
@@ -291,7 +298,7 @@ oc_create_knx_resource(int resource_idx, size_t device)
   oc_core_populate_resource(resource_idx, device, "/.well-known/knx",
                             OC_IF_LI | OC_IF_SEC, APPLICATION_LINK_FORMAT,
                             OC_DISCOVERABLE, oc_core_knx_get_handler, 0,
-                            oc_core_knx_post_handler, 0, 0, "");
+                            oc_core_knx_post_handler, 0, 0);
 }
 
 // ----------------------------------------------------------------------------
@@ -501,6 +508,12 @@ oc_core_knx_lsm_post_handler(oc_request_t *request,
   oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
 }
 
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_lsm, knx_dot_knx, 0, "/a/lsm", OC_IF_C,
+                                     APPLICATION_CBOR, OC_DISCOVERABLE,
+                                     oc_core_knx_lsm_get_handler, 0,
+                                     oc_core_knx_lsm_post_handler, 0, NULL,
+                                     OC_SIZE_ZERO());
+
 void
 oc_create_knx_lsm_resource(int resource_idx, size_t device)
 {
@@ -508,7 +521,7 @@ oc_create_knx_lsm_resource(int resource_idx, size_t device)
   // "/a/lsm"
   oc_core_populate_resource(
     resource_idx, device, "/a/lsm", OC_IF_C, APPLICATION_CBOR, OC_DISCOVERABLE,
-    oc_core_knx_lsm_get_handler, 0, oc_core_knx_lsm_post_handler, 0, 0, "");
+    oc_core_knx_lsm_get_handler, 0, oc_core_knx_lsm_post_handler, 0, 0);
 }
 
 // ----------------------------------------------------------------------------
@@ -812,7 +825,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
     PRINT(" .knx : url  %s\n", oc_string_checked(myurl));
     if (oc_string_len(myurl) > 0) {
       // get the resource to do the fake post on
-      oc_resource_t *my_resource = oc_ri_get_app_resource_by_uri(
+      const oc_resource_t *my_resource = oc_ri_get_app_resource_by_uri(
         oc_string(myurl), oc_string_len(myurl), device_index);
       if (my_resource == NULL) {
         return;
@@ -836,7 +849,8 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
         // if (my_resource->post_handler.cb) {
         //  my_resource->post_handler.cb(&new_request, iface_mask, data);
         if (my_resource->put_handler.cb) {
-          my_resource->put_handler.cb(&new_request, iface_mask, data);
+          my_resource->put_handler.cb(&new_request, iface_mask,
+                                      my_resource->put_handler.user_data);
           if ((cflags & OC_CFLAG_TRANSMISSION) > 0) {
             // Case 3) part 1
             // @sender : updated object value + cflags = t
@@ -856,7 +870,8 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
         // Received from bus: -st rp , any ga
         // @receiver : cflags = u->overwrite object value
         if (my_resource->post_handler.cb) {
-          my_resource->post_handler.cb(&new_request, iface_mask, data);
+          my_resource->post_handler.cb(&new_request, iface_mask,
+                                       my_resource->post_handler.user_data);
           if ((cflags & OC_CFLAG_TRANSMISSION) > 0) {
             PRINT(
               "   (case3) (RP-UPDATE) sending WRITE due to TRANSMIT flag \n");
@@ -906,6 +921,13 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
   oc_send_cbor_response_no_payload_size(request, OC_STATUS_OK);
 }
 
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_dot_knx, knx_g, 0, "/.knx",
+                                     OC_IF_LI | OC_IF_G, APPLICATION_CBOR,
+                                     OC_DISCOVERABLE,
+                                     oc_core_knx_knx_get_handler, 0,
+                                     oc_core_knx_knx_post_handler, 0, NULL,
+                                     OC_SIZE_MANY(1), "urn:knx:g.s");
+
 void
 oc_create_knx_knx_resource(int resource_idx, size_t device)
 {
@@ -917,6 +939,12 @@ oc_create_knx_knx_resource(int resource_idx, size_t device)
                             oc_core_knx_knx_post_handler, 0, 1, "urn:knx:g.s");
 }
 
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_g, knx_fingerprint, 0, "/g",
+                                     OC_IF_LI | OC_IF_G, APPLICATION_CBOR,
+                                     OC_DISCOVERABLE,
+                                     oc_core_knx_knx_get_handler, 0,
+                                     oc_core_knx_knx_post_handler, 0, NULL,
+                                     OC_SIZE_MANY(1), "urn:knx:g.s");
 void
 oc_create_knx_g_resource(int resource_idx, size_t device)
 {
@@ -960,13 +988,19 @@ oc_core_knx_fingerprint_get_handler(oc_request_t *request,
   oc_send_cbor_response(request, OC_STATUS_OK);
 }
 
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_fingerprint, knx_ia, 0,
+                                     "/.well-known/knx/f", OC_IF_C,
+                                     APPLICATION_CBOR, OC_DISCOVERABLE,
+                                     oc_core_knx_fingerprint_get_handler, 0, 0,
+                                     0, NULL, OC_SIZE_ZERO());
+
 void
 oc_create_knx_fingerprint_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_fingerprint_resource\n");
-  oc_core_populate_resource(
-    resource_idx, device, "/.well-known/knx/f", OC_IF_C, APPLICATION_CBOR,
-    OC_DISCOVERABLE, oc_core_knx_fingerprint_get_handler, 0, 0, 0, 0, "");
+  oc_core_populate_resource(resource_idx, device, "/.well-known/knx/f", OC_IF_C,
+                            APPLICATION_CBOR, OC_DISCOVERABLE,
+                            oc_core_knx_fingerprint_get_handler, 0, 0, 0, 0);
 }
 
 // ----------------------------------------------------------------------------
@@ -1072,6 +1106,12 @@ oc_core_knx_ia_post_handler(oc_request_t *request,
   }
 }
 
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_ia, knx_osn, 0, "/.well-known/knx/ia",
+                                     OC_IF_C, APPLICATION_CBOR, OC_DISCOVERABLE,
+                                     oc_core_knx_ia_get_handler, 0,
+                                     oc_core_knx_ia_post_handler, 0, NULL,
+                                     OC_SIZE_ZERO());
+
 void
 oc_create_knx_ia(int resource_idx, size_t device)
 {
@@ -1106,6 +1146,12 @@ oc_core_knx_osn_get_handler(oc_request_t *request,
   PRINT("oc_core_knx_osn_get_handler - done\n");
   oc_send_cbor_response(request, OC_STATUS_OK);
 }
+
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_osn, knx, 0, "/.well-known/knx/osn",
+                                     OC_IF_NONE, APPLICATION_CBOR,
+                                     OC_DISCOVERABLE,
+                                     oc_core_knx_osn_get_handler, 0, 0, 0, NULL,
+                                     OC_SIZE_ZERO());
 
 void
 oc_create_knx_osn_resource(int resource_idx, size_t device)
@@ -1146,6 +1192,12 @@ oc_core_knx_ldevid_get_handler(oc_request_t *request,
   PRINT("oc_core_knx_ldevid_get_handler- done\n");
 }
 
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_ldevid, knx_lsm, 0,
+                                     "/.well-known/knx/ldevid", OC_IF_D,
+                                     APPLICATION_PKCS7_CMC_REQUEST,
+                                     OC_DISCOVERABLE,
+                                     oc_core_knx_ldevid_get_handler, 0, 0, 0,
+                                     NULL, OC_SIZE_MANY(1), ":dpt.a[n]");
 /* optional resource */
 void
 oc_create_knx_ldevid_resource(int resource_idx, size_t device)
@@ -1154,7 +1206,7 @@ oc_create_knx_ldevid_resource(int resource_idx, size_t device)
   oc_core_populate_resource(resource_idx, device, "/.well-known/knx/ldevid",
                             OC_IF_D, APPLICATION_PKCS7_CMC_REQUEST,
                             OC_DISCOVERABLE, oc_core_knx_ldevid_get_handler, 0,
-                            0, 0, 0, 1, ":dpt.a[n]");
+                            0, 0, 1, ":dpt.a[n]");
 }
 
 // ----------------------------------------------------------------------------
@@ -1187,6 +1239,13 @@ oc_core_knx_idevid_get_handler(oc_request_t *request,
   PRINT("oc_core_knx_idevid_get_handler- done\n");
 }
 
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_idevid, knx_ldevid, 0,
+                                     "/.well-known/knx/idevid", OC_IF_D,
+                                     APPLICATION_PKCS7_CMC_REQUEST,
+                                     OC_DISCOVERABLE,
+                                     oc_core_knx_idevid_get_handler, 0, 0, 0,
+                                     NULL, OC_SIZE_MANY(1), ":dpt.a[n]");
+
 void
 oc_create_knx_idevid_resource(int resource_idx, size_t device)
 {
@@ -1194,13 +1253,13 @@ oc_create_knx_idevid_resource(int resource_idx, size_t device)
   oc_core_populate_resource(resource_idx, device, "/.well-known/knx/idevid",
                             OC_IF_D, APPLICATION_PKCS7_CMC_REQUEST,
                             OC_DISCOVERABLE, oc_core_knx_idevid_get_handler, 0,
-                            0, 0, 0, 1, ":dpt.a[n]");
+                            0, 0, 1, ":dpt.a[n]");
 }
 
 // ----------------------------------------------------------------------------
 
 #ifdef OC_SPAKE
-static spake_data_t spake_data;
+static spake_data_t spake_data = { 0 };
 static int failed_handshake_count = 0;
 
 static bool is_blocking = false;
@@ -1337,6 +1396,16 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
         memcpy(g_pase.rnd, oc_cast(rep->value.string, uint8_t),
                sizeof(g_pase.rnd));
       }
+      if (rep->iname == SPAKE_ID) {
+        // if the ID is present, overwrite the default
+        oc_free_string(&g_pase.id);
+        oc_new_byte_string(&g_pase.id, oc_string(rep->value.string),
+                           oc_string_len(rep->value.string));
+        PRINT("==> CLIENT RECEIVES %d\n",
+              (int)oc_byte_string_len(rep->value.string));
+      }
+    } break;
+    case OC_REP_STRING: {
       if (rep->iname == SPAKE_ID) {
         // if the ID is present, overwrite the default
         oc_free_string(&g_pase.id);
@@ -1491,10 +1560,9 @@ oc_core_knx_spake_separate_post_handler(void *req_p)
     oc_device_info_t *device = oc_core_get_device_info(0);
     // serial number should be supplied as string array
     PRINT("CLIENT: pase.id length: %d\n", (int)oc_byte_string_len(g_pase.id));
-    oc_oscore_set_auth_device(
-      oc_string(device->serialnumber), oc_string_len(device->serialnumber),
-      oc_string(g_pase.id), oc_byte_string_len(g_pase.id), shared_key,
-      (int)shared_key_len);
+    oc_oscore_set_auth_device(oc_string(g_pase.id),
+                              oc_byte_string_len(g_pase.id), "", 0, shared_key,
+                              (int)shared_key_len);
 
     // empty payload
     oc_send_empty_separate_response(&spake_separate_rsp, OC_STATUS_CHANGED);
@@ -1549,15 +1617,25 @@ error:
   return OC_EVENT_DONE;
 }
 
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_spake, knx_idevid, 0,
+                                     "/.well-known/knx/spake", OC_IF_NONE,
+                                     APPLICATION_CBOR, OC_DISCOVERABLE, 0, 0,
+                                     oc_core_knx_spake_post_handler, 0, NULL,
+                                     OC_SIZE_ZERO());
+
 void
 oc_create_knx_spake_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_spake_resource\n");
   oc_core_populate_resource(resource_idx, device, "/.well-known/knx/spake",
                             OC_IF_NONE, APPLICATION_CBOR, OC_DISCOVERABLE, 0, 0,
-                            oc_core_knx_spake_post_handler, 0, 0, "");
+                            oc_core_knx_spake_post_handler, 0, 0);
+}
 
 #ifdef OC_SPAKE
+void
+oc_initialise_spake_data()
+{
   // can fail if initialization of the RNG does not work
   int ret = oc_spake_init();
   assert(ret == 0);
@@ -1567,8 +1645,8 @@ oc_create_knx_spake_resource(int resource_idx, size_t device)
   mbedtls_ecp_point_init(&spake_data.pub_y);
   // start SPAKE brute force protection timer
   oc_set_delayed_callback(NULL, decrement_counter, 10);
-#endif /* OC_SPAKE */
 }
+#endif /* OC_SPAKE */
 
 // ----------------------------------------------------------------------------
 
@@ -1646,6 +1724,10 @@ void
 oc_create_knx_resources(size_t device_index)
 {
   OC_DBG("oc_create_knx_resources");
+  if (device_index == 0) {
+    OC_DBG("resources for dev 0 created statically");
+    return;
+  }
 
   oc_create_knx_lsm_resource(OC_KNX_LSM, device_index);
   oc_create_knx_knx_resource(OC_KNX_DOT_KNX, device_index);

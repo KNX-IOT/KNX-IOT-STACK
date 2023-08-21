@@ -26,7 +26,93 @@
 #include "oc_rep.h"
 #include "oc_uuid.h"
 #include "util/oc_etimer.h"
+#if defined _MSC_VER && !defined __INTEL_COMPILER
+#define oc_ri_internal_expand(...) __VA_ARGS__
+#define oc_ri_internal_expand_call(fn, ...)                                    \
+  oc_ri_internal_expand_call2(fn, (__VA_ARGS__))
+#define oc_ri_internal_expand_call2(fn, args) fn args
+#endif
 
+#if defined _MSC_VER && !defined __INTEL_COMPILER
+#define oc_ri_create_const_resource_internal(                                  \
+  next_resource, resource_name, device_index, name, uri, dpt, iface_mask,      \
+  content_format, properties, get_cb, put_cb, post_cb, delete_cb, ctx,         \
+  observe_period, instance, ...)                                               \
+  oc_resource_data_t resource_name##_data;                                     \
+  const oc_resource_t resource_name = {                                        \
+    /*next*/ (oc_resource_t *)&next_resource,                                  \
+    /*device*/ device_index,                                                   \
+    /*name*/ oc_string_create_const(name),                                     \
+    /*uri*/ oc_string_create_const(uri), /*types*/                             \
+    oc_ri_internal_expand_call(oc_string_array_create_const, __VA_ARGS__),     \
+    /*dpt*/ oc_string_create_const(dpt),                                       \
+    /*interfaces*/ iface_mask,                                                 \
+    /*content_type*/ content_format,                                           \
+    /*properties*/ properties,                                                 \
+    /*get_handler*/ { get_cb, ctx },                                           \
+    /*put_handler*/ { put_cb, ctx },                                           \
+    /*post_handler*/ { post_cb, ctx },                                         \
+    /*delete_handler*/ { delete_cb, ctx },                                     \
+    /*get_properties*/ { NULL, NULL },                                         \
+    /*set_properties*/ { NULL, NULL },                                         \
+    /*observe_period_seconds*/ observe_period,                                 \
+    /*fb_instance*/ instance,                                                  \
+    /*is_const*/ true,                                                         \
+    /*runtime_data*/ &resource_name##_data,                                    \
+  };
+#else
+#define oc_ri_create_const_resource_internal(                                  \
+  next_resource, resource_name, device_index, name, uri, dpt, iface_mask,      \
+  content_format, properties, get_cb, put_cb, post_cb, delete_cb, ctx,         \
+  observe_period, instance, ...)                                               \
+  oc_resource_data_t resource_name##_data;                                     \
+  const oc_resource_t resource_name = {                                        \
+    /*next*/ (oc_resource_t *)&next_resource,                                  \
+    /*device*/ device_index,                                                   \
+    /*name*/ oc_string_create_const(name),                                     \
+    /*uri*/ oc_string_create_const(uri), /*types*/                             \
+    oc_string_array_create_const(__VA_ARGS__),                                 \
+    /*dpt*/ oc_string_create_const(dpt),                                       \
+    /*interfaces*/ iface_mask,                                                 \
+    /*content_type*/ content_format,                                           \
+    /*properties*/ properties,                                                 \
+    /*get_handler*/ { get_cb, ctx },                                           \
+    /*put_handler*/ { put_cb, ctx },                                           \
+    /*post_handler*/ { post_cb, ctx },                                         \
+    /*delete_handler*/ { delete_cb, ctx },                                     \
+    /*get_properties*/ { NULL, NULL },                                         \
+    /*set_properties*/ { NULL, NULL },                                         \
+    /*observe_period_seconds*/ observe_period,                                 \
+    /*fb_instance*/ instance,                                                  \
+    /*is_const*/ true,                                                         \
+    /*runtime_data*/ &resource_name##_data,                                    \
+  };
+#endif
+
+#if defined _MSC_VER && !defined __INTEL_COMPILER
+#define oc_ri_create_const_resource_linked(next_resource, ...)                 \
+  extern const oc_resource_t next_resource;                                    \
+  oc_ri_internal_expand_call(oc_ri_create_const_resource_internal,             \
+                             next_resource, __VA_ARGS__)
+#else
+#define oc_ri_create_const_resource_linked(next_resource, ...)                 \
+  extern const oc_resource_t next_resource;                                    \
+  oc_ri_create_const_resource_internal(next_resource, __VA_ARGS__)
+#endif
+
+#if defined _MSC_VER && !defined __INTEL_COMPILER
+#define oc_ri_create_const_resource_final(resource_name, ...)                  \
+  oc_resource_dummy_t resource_block_end##resource_name = { NULL, -1 };        \
+  oc_ri_internal_expand_call(oc_ri_create_const_resource_internal,             \
+                             resource_block_end##resource_name, resource_name, \
+                             __VA_ARGS__)
+#else
+#define oc_ri_create_const_resource_final(resource_name, ...)                  \
+  oc_resource_dummy_t resource_block_end##resource_name = { NULL, -1 };        \
+                                                                               \
+  oc_ri_create_const_resource_internal(resource_block_end##resource_name,      \
+                                       resource_name, __VA_ARGS__)
+#endif
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -248,50 +334,54 @@ typedef enum {
                      type (MaC uses this id for compatibility checks) */
   OC_DEV_MODEL, /**< Device model */
   OC_DEV_IA,    /**< Device individual address */
-  OC_DEV_HOSTNAME,          /**< Device host name for DNS resolution. */
-  OC_DEV_IID,               /**< KNX installation ID */
-  OC_DEV_PM,                /**< Programming Mode */
-  OC_DEV_IPV6,              /**< IPV6 */
-  OC_DEV_SA,                /**< /dev/sa subnet address */
-  OC_DEV_DA,                /**< /dev/da device address */
-  OC_DEV_PORT,              /**< /dev/port the coap port number */
-  OC_DEV_MPORT,             /**< /dev/mport the multicast port number */
-  OC_DEV_MID,               /**< /dev/mid the manufacturer id */
-  OC_DEV,                   /**< core link */
-  OC_APP,                   /**< application id (list) */
-  OC_APP_X,                 /**< application id entry */
-  OC_KNX_SPAKE,             /**< spake */
-  OC_KNX_IDEVID,            /**< IDevID */
-  OC_KNX_LDEVID,            /**< LDevID */
-  OC_KNX_LSM,               /**< load state machine */
-  OC_KNX_DOT_KNX,           /**< .knx resource */
-  OC_KNX_G,                 /**< g (renamed) .knx resource */
-  OC_KNX_FINGERPRINT,       /**< FINGERPRINT value of loaded contents */
-  OC_KNX_IA,                /**< .well-known / knx / ia */
-  OC_KNX_OSN,               /**< .well-known / knx / osn */
-  OC_KNX,                   /**< .well-known / knx */
-  OC_KNX_FP_G,              /**< FP/G */
-  OC_KNX_FP_G_X,            /**< FP/G/X */
-  OC_KNX_FP_P,              /**< FP/P */
-  OC_KNX_FP_P_X,            /**< FP/P/X */
-  OC_KNX_FP_R,              /**< FP/R */
-  OC_KNX_FP_R_X,            /**< FP/R/X */
-  OC_KNX_P,                 /**< P */
-  OC_KNX_F,                 /**< /f */
-  OC_KNX_F_X,               /**< /f/X */
-  OC_KNX_SWU_PROTOCOL,      /**< software update protocol */
-  OC_KNX_SWU_MAXDEFER,      /**< swu max defer */
-  OC_KNX_SWU_METHOD,        /**< sw method */
-  OC_KNX_LASTUPDATE,        /**< sw last update */
-  OC_KNX_SWU_RESULT,        /**< sw result */
-  OC_KNX_SWU_STATE,         /**< sw state */
-  OC_KNX_SWU_UPDATE,        /**< sw update */
-  OC_KNX_SWU_PKGV,          /**< sw package version */
-  OC_KNX_SWU_PKGCMD,        /**< sw package command*/
-  OC_KNX_SWU_PKGBYTES,      /**< sw package bytes*/
-  OC_KNX_SWU_PKGQURL,       /**< sw query url */
-  OC_KNX_SWU_PKGNAMES,      /**< sw package names*/
+  OC_DEV_HOSTNAME,    /**< Device host name for DNS resolution. */
+  OC_DEV_IID,         /**< KNX installation ID */
+  OC_DEV_PM,          /**< Programming Mode */
+  OC_DEV_IPV6,        /**< IPV6 */
+  OC_DEV_SA,          /**< /dev/sa subnet address */
+  OC_DEV_DA,          /**< /dev/da device address */
+  OC_DEV_PORT,        /**< /dev/port the coap port number */
+  OC_DEV_MPORT,       /**< /dev/mport the multicast port number */
+  OC_DEV_MID,         /**< /dev/mid the manufacturer id */
+  OC_DEV,             /**< core link */
+  OC_APP,             /**< application id (list) */
+  OC_APP_X,           /**< application id entry */
+  OC_KNX_SPAKE,       /**< spake */
+  OC_KNX_IDEVID,      /**< IDevID */
+  OC_KNX_LDEVID,      /**< LDevID */
+  OC_KNX_LSM,         /**< load state machine */
+  OC_KNX_DOT_KNX,     /**< .knx resource */
+  OC_KNX_G,           /**< g (renamed) .knx resource */
+  OC_KNX_FINGERPRINT, /**< FINGERPRINT value of loaded contents */
+  OC_KNX_IA,          /**< .well-known / knx / ia */
+  OC_KNX_OSN,         /**< .well-known / knx / osn */
+  OC_KNX,             /**< .well-known / knx */
+  OC_KNX_FP_G,        /**< FP/G */
+  OC_KNX_FP_G_X,      /**< FP/G/X */
+#ifdef OC_PUBLISHER_TABLE
+  OC_KNX_FP_P,   /**< FP/P */
+  OC_KNX_FP_P_X, /**< FP/P/X */
+#endif
+  OC_KNX_FP_R,         /**< FP/R */
+  OC_KNX_FP_R_X,       /**< FP/R/X */
+  OC_KNX_P,            /**< P */
+  OC_KNX_F,            /**< /f */
+  OC_KNX_F_X,          /**< /f/X */
+  OC_KNX_SWU_PROTOCOL, /**< software update protocol */
+  OC_KNX_SWU_MAXDEFER, /**< swu max defer */
+  OC_KNX_SWU_METHOD,   /**< sw method */
+  OC_KNX_LASTUPDATE,   /**< sw last update */
+  OC_KNX_SWU_RESULT,   /**< sw result */
+  OC_KNX_SWU_STATE,    /**< sw state */
+  OC_KNX_SWU_UPDATE,   /**< sw update */
+  OC_KNX_SWU_PKGV,     /**< sw package version */
+  OC_KNX_SWU_PKGCMD,   /**< sw package command*/
+  OC_KNX_SWU_PKGBYTES, /**< sw package bytes*/
+  OC_KNX_SWU_PKGQURL,  /**< sw query url */
+  OC_KNX_SWU_PKGNAMES, /**< sw package names*/
+#if 0                  // THIS SHOULD BE IMPLEMENTED IF INCLUDED
   OC_KNX_SWU_PKG,           /**< sw package */
+#endif
   OC_KNX_SWU,               /**< swu top level */
   OC_KNX_P_OSCORE_REPLWDO,  /**< oscore replay window*/
   OC_KNX_P_OSCORE_OSNDELAY, /**< oscore osn delay*/
@@ -300,8 +390,10 @@ typedef enum {
   OC_KNX_AUTH,              /**< auth list all sub resources */
   OC_KNX_AUTH_AT,           /**< auth/at resource listing auth/at/X */
   OC_KNX_AUTH_AT_X,         /**< auth/at/X resources */
-  OC_KNX_FP_GM,             /**< FP/GM */
-  OC_KNX_FP_GM_X,           /**< FP/GM/X */
+#ifdef OC_IOT_ROUTER
+  OC_KNX_FP_GM,   /**< FP/GM */
+  OC_KNX_FP_GM_X, /**< FP/GM/X */
+#endif
   /* List of resources on a logical device: start */
   WELLKNOWNCORE /**< well-known/core resource */
   /* List of resources on a logical device: end */
@@ -317,15 +409,15 @@ typedef struct oc_resource_s oc_resource_t;
  */
 typedef struct oc_request_t
 {
-  oc_endpoint_t *origin;     /**< origin of the request */
-  oc_resource_t *resource;   /**< resource structure */
-  const char *query;         /**< query (as string) */
-  size_t query_len;          /**< query length */
-  const char *uri_path;      /**< path (as string) */
-  size_t uri_path_len;       /**< path length */
-  oc_rep_t *request_payload; /**< request payload structure */
-  const uint8_t *_payload;   /**< payload of the request */
-  size_t _payload_len;       /**< payload size */
+  oc_endpoint_t *origin;         /**< origin of the request */
+  const oc_resource_t *resource; /**< resource structure */
+  const char *query;             /**< query (as string) */
+  size_t query_len;              /**< query length */
+  const char *uri_path;          /**< path (as string) */
+  size_t uri_path_len;           /**< path length */
+  oc_rep_t *request_payload;     /**< request payload structure */
+  const uint8_t *_payload;       /**< payload of the request */
+  size_t _payload_len;           /**< payload size */
   oc_content_format_t
     content_format; /**< content format (of the payload in the request) */
   oc_content_format_t
@@ -376,6 +468,11 @@ typedef struct oc_properties_cb_t
   void *user_data;
 } oc_properties_cb_t;
 
+typedef struct oc_resource_data_t
+{
+  uint8_t num_observers; /**< amount of observers */
+} oc_resource_data_t;
+
 /**
  * @brief resource structure
  *
@@ -398,10 +495,17 @@ struct oc_resource_s
   oc_request_handler_t delete_handler; /**< callback for DELETE */
   oc_properties_cb_t get_properties;   /**< callback for get properties */
   oc_properties_cb_t set_properties;   /**< callback for set properties */
-  uint8_t num_observers;               /**< amount of observers */
   uint16_t observe_period_seconds;     /**< observe period in seconds */
   uint8_t fb_instance; /**< function block instance, default = 0 */
+  const bool is_const; /**< Whether the associated resource data is readonly */
+  oc_resource_data_t *runtime_data; /**< Runtime modifiable data*/
 };
+
+typedef struct oc_resource_dummy_s
+{
+  struct oc_resource_s *next; /**< next resource*/
+  size_t device;              /**< Should ALWAYS be -1 for dummy node*/
+} oc_resource_dummy_t;
 
 typedef struct oc_link_s oc_link_t;
 
@@ -501,15 +605,16 @@ bool oc_check_accept_header(oc_request_t *request, oc_content_format_t accept);
  * @param device the device index
  * @return oc_resource_t* the resource structure
  */
-oc_resource_t *oc_ri_get_app_resource_by_uri(const char *uri, size_t uri_len,
-                                             size_t device);
+const oc_resource_t *oc_ri_get_app_resource_by_uri(const char *uri,
+                                                   size_t uri_len,
+                                                   size_t device);
 
 /**
  * @brief retrieve list of resources
  *
  * @return oc_resource_t* the resource list
  */
-oc_resource_t *oc_ri_get_app_resources(void);
+const oc_resource_t *oc_ri_get_app_resources(void);
 
 #ifdef OC_SERVER
 /**
@@ -519,6 +624,12 @@ oc_resource_t *oc_ri_get_app_resources(void);
  */
 oc_resource_t *oc_ri_alloc_resource(void);
 /**
+ * @brief allocate a resource structure
+ *
+ * @return oc_resource_t*
+ */
+oc_resource_data_t *oc_ri_alloc_resource_data(void);
+/**
  * @brief add resource to the system
  *
  * @param resource the resource to be added to the list of application resources
@@ -526,6 +637,15 @@ oc_resource_t *oc_ri_alloc_resource(void);
  * @return false failure
  */
 bool oc_ri_add_resource(oc_resource_t *resource);
+/**
+ * @brief add resource block to the system
+ *
+ * @param resource the resource block to be added to the list of application
+ * resources
+ * @return true success
+ * @return false failure
+ */
+bool oc_ri_add_resource_block(const oc_resource_t *resource);
 
 /**
  * @brief remove the resource from the list of application resources
@@ -535,7 +655,16 @@ bool oc_ri_add_resource(oc_resource_t *resource);
  * @return true success
  * @return false failure
  */
-bool oc_ri_delete_resource(oc_resource_t *resource);
+bool oc_ri_delete_resource(const oc_resource_t *resource);
+/**
+ * @brief remove the resource block from the list of application resources
+ *
+ * @param resource the resource block to be removed from the list of application
+ * resources
+ * @return true success
+ * @return false failure
+ */
+bool oc_ri_delete_resource_block(const oc_resource_t *resource);
 #endif /* OC_SERVER */
 
 /**
@@ -544,6 +673,15 @@ bool oc_ri_delete_resource(oc_resource_t *resource);
  * @param resource the resource
  */
 void oc_ri_free_resource_properties(oc_resource_t *resource);
+
+/**
+ * @brief get the next resource
+ *
+ * @param resource current resource
+ * @return next resource or NULL if at end
+ * skips over dummy resources
+ */
+const oc_resource_t *oc_ri_resource_next(const oc_resource_t *resource);
 
 /**
  * @brief retrieve the query value at the nth position
@@ -612,7 +750,7 @@ oc_interface_mask_t oc_ri_get_interface_mask(char *iface, size_t if_len);
  * @return true valid
  * @return false not valid
  */
-bool oc_ri_is_app_resource_valid(oc_resource_t *resource);
+bool oc_ri_is_app_resource_valid(const oc_resource_t *resource);
 
 /**
  * @brief create a new request from the old request

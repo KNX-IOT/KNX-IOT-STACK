@@ -260,13 +260,13 @@ oc_populate_resource_object(oc_resource_t *resource, const char *name,
                             size_t device)
 {
   if (name) {
-    resource->name.ptr = name;
+    resource->name.ptr = (char *)name;
     resource->name.size = strlen(name) + 1;
     resource->name.next = NULL;
   }
   oc_check_uri(uri);
   resource->uri.next = NULL;
-  resource->uri.ptr = uri;
+  resource->uri.ptr = (char *)uri;
   resource->uri.size = strlen(uri) + 1; // include null terminator in size
   oc_new_string_array(&resource->types, num_resource_types);
   resource->properties = 0;
@@ -282,14 +282,18 @@ oc_new_resource(const char *name, const char *uri, uint8_t num_resource_types,
                 size_t device_index)
 {
   oc_resource_t *resource = NULL;
+  oc_resource_data_t *data = NULL;
   if (strlen(uri) < OC_MAX_URL_LENGTH) {
 
     resource = oc_ri_alloc_resource();
-    if (resource) {
+    data = oc_ri_alloc_resource_data();
+    if (resource && data) {
       resource->interfaces = OC_IF_NONE;
       resource->observe_period_seconds = 0;
-      resource->num_observers = 0;
+      resource->runtime_data = data;
+      resource->runtime_data->num_observers = 0;
       resource->properties = OC_DISCOVERABLE;
+      *(bool *)&resource->is_const = false;
       oc_populate_resource_object(resource, name, uri, num_resource_types,
                                   device_index);
     }
@@ -308,6 +312,10 @@ oc_resource_bind_resource_interface(oc_resource_t *resource,
     OC_ERR("oc_resource_bind_resource_interface: resource is NULL");
     return;
   }
+  if (resource->is_const) {
+    OC_ERR("oc_resource_bind_resource_interface: resource data is const");
+    return;
+  }
 
   resource->interfaces |= iface_mask;
 }
@@ -315,24 +323,32 @@ oc_resource_bind_resource_interface(oc_resource_t *resource,
 void
 oc_resource_bind_resource_type(oc_resource_t *resource, const char *type)
 {
-  if (resource) {
-    oc_string_array_add_item(resource->types, (char *)type);
-  } else {
+  if (resource == NULL) {
     OC_ERR("oc_resource_bind_resource_type: resource is NULL");
+    return;
   }
+  if (resource->is_const) {
+    OC_ERR("oc_resource_bind_resource_type: resource data is const");
+    return;
+  }
+  oc_string_array_add_item(resource->types, (char *)type);
 }
 
 void
 oc_resource_bind_dpt(oc_resource_t *resource, const char *dpt)
 {
-  if (resource) {
-    oc_free_string(&resource->dpt);
-    memset(&resource->dpt, 0, sizeof(oc_string_t));
-    if (dpt) {
-      oc_new_string(&resource->dpt, dpt, strlen(dpt));
-    }
-  } else {
+  if (resource == NULL) {
     OC_ERR("oc_resource_bind_dpt: resource is NULL");
+    return;
+  }
+  if (resource->is_const) {
+    OC_ERR("oc_resource_bind_dpt: resource data is const");
+    return;
+  }
+  oc_free_string(&resource->dpt);
+  memset(&resource->dpt, 0, sizeof(oc_string_t));
+  if (dpt) {
+    oc_new_string(&resource->dpt, dpt, strlen(dpt));
   }
 }
 
@@ -340,11 +356,15 @@ void
 oc_resource_bind_content_type(oc_resource_t *resource,
                               oc_content_format_t content_type)
 {
-  if (resource) {
-    resource->content_type = content_type;
-  } else {
+  if (resource == NULL) {
     OC_ERR("oc_resource_bind_content_type: resource is NULL");
+    return;
   }
+  if (resource->is_const) {
+    OC_ERR("oc_resource_bind_content_type: resource data is const");
+    return;
+  }
+  resource->content_type = content_type;
 }
 
 #ifdef OC_SECURITY
@@ -362,6 +382,10 @@ oc_resource_set_discoverable(oc_resource_t *resource, bool state)
     OC_ERR("oc_resource_set_discoverable: resource is NULL");
     return;
   }
+  if (resource->is_const) {
+    OC_ERR("oc_resource_set_discoverable: resource data is const");
+    return;
+  }
 
   if (state)
     resource->properties |= OC_DISCOVERABLE;
@@ -374,6 +398,10 @@ oc_resource_set_observable(oc_resource_t *resource, bool state)
 {
   if (resource == NULL) {
     OC_ERR("oc_resource_set_observable: resource is NULL");
+    return;
+  }
+  if (resource->is_const) {
+    OC_ERR("oc_resource_set_discoverable: resource data is const");
     return;
   }
 
@@ -390,6 +418,10 @@ oc_resource_set_periodic_observable(oc_resource_t *resource, uint16_t seconds)
     OC_ERR("oc_resource_set_periodic_observable: resource is NULL");
     return;
   }
+  if (resource->is_const) {
+    OC_ERR("oc_resource_set_periodic_observable: resource data is const");
+    return;
+  }
 
   resource->properties |= OC_OBSERVABLE | OC_PERIODIC;
   resource->observe_period_seconds = seconds;
@@ -403,7 +435,10 @@ oc_resource_set_function_block_instance(oc_resource_t *resource,
     OC_ERR("oc_resource_set_function_block_instance: resource is NULL");
     return;
   }
-
+  if (resource->is_const) {
+    OC_ERR("oc_resource_set_function_block_instance: resource data is const");
+    return;
+  }
   resource->fb_instance = instance;
 }
 
@@ -416,6 +451,10 @@ oc_resource_set_properties_cbs(oc_resource_t *resource,
 {
   if (resource == NULL) {
     OC_ERR("oc_resource_set_properties_cbs: resource is NULL");
+    return;
+  }
+  if (resource->is_const) {
+    OC_ERR("oc_resource_set_properties_cbs: resource data is const");
     return;
   }
 
@@ -433,6 +472,10 @@ oc_resource_set_request_handler(oc_resource_t *resource, oc_method_t method,
 
   if (resource == NULL) {
     OC_ERR("oc_resource_set_request_handler: resource is NULL");
+    return;
+  }
+  if (resource->is_const) {
+    OC_ERR("oc_resource_set_request_handler: resource data is const");
     return;
   }
 
@@ -589,7 +632,7 @@ oc_send_separate_response_with_length(oc_separate_response_t *handle,
         }
       }
     } else {
-      oc_resource_t *resource = oc_ri_get_app_resource_by_uri(
+      const oc_resource_t *resource = oc_ri_get_app_resource_by_uri(
         oc_string(cur->uri), oc_string_len(cur->uri), cur->endpoint.device);
       if (resource) {
         coap_notify_observers(resource, &response_buffer, &cur->endpoint);
