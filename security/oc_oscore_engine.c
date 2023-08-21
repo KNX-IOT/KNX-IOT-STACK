@@ -789,10 +789,11 @@ oc_oscore_send_message(oc_message_t *msg)
       else if (!transaction)
         increment_ssn_in_context(oscore_ctx);
 
-      /* Compute nonce using partial IV and sender ID of the sender ( = receiver ID )*/
-      oc_oscore_AEAD_nonce(oscore_ctx->recvid, oscore_ctx->recvid_len, message->endpoint.piv,
-                           message->endpoint.piv_len, oscore_ctx->commoniv, nonce,
-                           OSCORE_AEAD_NONCE_LEN);
+      /* Compute nonce using partial IV and sender ID of the sender ( = receiver
+       * ID )*/
+      oc_oscore_AEAD_nonce(oscore_ctx->recvid, oscore_ctx->recvid_len,
+                           message->endpoint.piv, message->endpoint.piv_len,
+                           oscore_ctx->commoniv, nonce, OSCORE_AEAD_NONCE_LEN);
 
       OC_DBG_OSCORE(
         "---computed AEAD nonce using new Partial IV (SSN) and Sender ID");
@@ -880,14 +881,12 @@ oc_oscore_send_message(oc_message_t *msg)
     }
 
     /* Set the OSCORE option */
-    if ((coap_pkt->code >= OC_GET && coap_pkt->code <= OC_DELETE))
-    {
+    if ((coap_pkt->code >= OC_GET && coap_pkt->code <= OC_DELETE)) {
       // requests encode the PIV
       coap_set_header_oscore(coap_pkt, piv, piv_len, kid, kid_len, NULL, 0);
-    }
-    else
-    {
-      // responses use the (cached) piv of the matching request, stored in the ep/clientcb
+    } else {
+      // responses use the (cached) piv of the matching request, stored in the
+      // ep/clientcb
       coap_set_header_oscore(coap_pkt, NULL, 0, kid, kid_len, NULL, 0);
     }
 

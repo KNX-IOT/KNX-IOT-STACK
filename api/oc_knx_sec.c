@@ -1518,8 +1518,8 @@ oc_reset_at_table(size_t device_index, int erase_code)
 
 void
 oc_oscore_set_auth_shared(char *client_senderid, int client_senderid_size,
-                       char *client_recipientid, int client_recipientid_size,
-                       uint8_t *shared_key, int shared_key_size)
+                          char *client_recipientid, int client_recipientid_size,
+                          uint8_t *shared_key, int shared_key_size)
 {
   oc_auth_at_t spake_entry;
   memset(&spake_entry, 0, sizeof(spake_entry));
@@ -1551,7 +1551,6 @@ oc_oscore_set_auth_shared(char *client_senderid, int client_senderid_size,
   }
 }
 
-
 void
 oc_oscore_set_auth_mac(char *client_senderid, int client_senderid_size,
                        char *client_recipientid, int client_recipientid_size,
@@ -1566,10 +1565,9 @@ oc_oscore_set_auth_mac(char *client_senderid, int client_senderid_size,
   PRINT("oc_oscore_set_auth_mac ms  [%d] : ", shared_key_size);
   oc_char_println_hex(shared_key, shared_key_size);
 
-  oc_oscore_set_auth_shared(client_senderid, client_senderid_size, 
-    client_recipientid, client_recipientid_size, 
-    shared_key, shared_key_size
-    );
+  oc_oscore_set_auth_shared(client_senderid, client_senderid_size,
+                            client_recipientid, client_recipientid_size,
+                            shared_key, shared_key_size);
 }
 
 // This looks very similar to oc_oscore_set_auth_mac, but has some very
@@ -1587,10 +1585,9 @@ oc_oscore_set_auth_device(char *client_senderid, int client_senderid_size,
   PRINT("oc_oscore_set_auth_device ms : (%d) ", shared_key_size);
   oc_char_println_hex(shared_key, shared_key_size);
 
-  oc_oscore_set_auth_shared(client_senderid, client_senderid_size, 
-    client_recipientid, client_recipientid_size, 
-    shared_key, shared_key_size
-    );
+  oc_oscore_set_auth_shared(client_senderid, client_senderid_size,
+                            client_recipientid, client_recipientid_size,
+                            shared_key, shared_key_size);
 }
 
 oc_auth_at_t *
