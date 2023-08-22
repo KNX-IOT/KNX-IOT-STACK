@@ -83,7 +83,7 @@ allocate_message(struct oc_memb *pool)
     for (int i = 0; i < pool->num; ++i)
     {
       int offset = pool->size * i;
-      message = pool->mem + offset;
+      message = (oc_message_t*) pool->mem + offset;
 
       if (message->ref_count == 1 && message->soft_ref_cb != NULL)
       {
