@@ -21,7 +21,6 @@
 #include "oc_knx_sec.h"
 #include "oc_config.h"
 #include "messaging/coap/constants.h"
-#include "oc_buffer.h"
 #include "oc_api.h"
 
 #ifndef OC_MAX_REPLAY_RECORDS
@@ -229,14 +228,6 @@ oc_replay_free_client(oc_string_t rx_kid)
   }
 }
 
-/*
- * Add functions fro:
- *  - track this message pls
- *  - free tracked message record (and stop callback)
- *  - free tracked message after timeout
- *  - free record because message was freed
- */
-
 struct oc_message_s * oc_replay_find_msg_by_token(uint16_t token_len, uint8_t *token)
 {
   for (int i = 0; i < OC_MAX_MESSAGE_RECORDS; ++i)
@@ -272,11 +263,13 @@ static struct oc_cached_message_record * find_empty_msg_record()
       return message_records + i;
   return NULL;
 }
-oc_event_callback_retval_t oc_replay_free_msg_handler(void *msg)
+
+static oc_event_callback_retval_t oc_replay_free_msg_handler(void *msg)
 {
   struct oc_cached_message_record *rec = find_record_by_msg(msg);
   rec->token_len = 0;
   rec->message = NULL;
+  oc_message_unref(msg);
   return OC_EVENT_DONE;
 }
 

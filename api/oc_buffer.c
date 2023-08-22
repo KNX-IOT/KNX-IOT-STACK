@@ -89,7 +89,6 @@ allocate_message(struct oc_memb *pool)
       {
         // if found, call the callback, free the block and return it!
         message->soft_ref_cb(message);
-        oc_message_unref(message);
         // we know that was the last reference, so now we can allocate
         // a new message successfully
         return allocate_message(pool);
