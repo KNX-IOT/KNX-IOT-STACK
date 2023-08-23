@@ -19,6 +19,8 @@
 #include "oc_signal_event_loop.h"
 #include "port/oc_network_events_mutex.h"
 #include "util/oc_memb.h"
+#include "messaging/coap/coap.h"
+#include "api/oc_replay.h"
 #include <stdint.h>
 #include <stdio.h>
 #ifdef OC_DYNAMIC_ALLOCATION
@@ -171,6 +173,18 @@ oc_recv_message(oc_message_t *message)
 void
 oc_send_message(oc_message_t *message)
 {
+  uint8_t version = (COAP_HEADER_VERSION_MASK & message->data[0]) >>
+                      COAP_HEADER_VERSION_POSITION;
+  uint8_t type =
+    (COAP_HEADER_TYPE_MASK & message->data[0]) >> COAP_HEADER_TYPE_POSITION;
+  uint8_t code = message->data[1];
+  uint8_t token_len = (COAP_HEADER_TOKEN_LEN_MASK & message->data[0]) >>
+                        COAP_HEADER_TOKEN_LEN_POSITION;
+  uint8_t *token = message->data + COAP_HEADER_LEN;
+
+  if (version == 1 && type == 1 && (type >> 5 == 0))
+    oc_replay_track_message(message, token_len, token);
+
   if (oc_process_post(&message_buffer_handler,
                       oc_events[OUTBOUND_NETWORK_EVENT],
                       message) == OC_PROCESS_ERR_FULL) {
