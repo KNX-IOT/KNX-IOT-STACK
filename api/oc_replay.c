@@ -273,19 +273,19 @@ static oc_event_callback_retval_t oc_replay_free_msg_handler(void *msg)
   return OC_EVENT_DONE;
 }
 
-void oc_replay_free_msg_cb(struct oc_message_s *msg)
+void oc_replay_message_unref(struct oc_message_s *msg)
 {
   oc_replay_free_msg_handler(msg);
   oc_remove_delayed_callback(msg, oc_replay_free_msg_handler);
 }
 
-void oc_replay_track_message(struct oc_message_s *msg, uint16_t token_len, uint8_t *token)
+void oc_replay_message_track(struct oc_message_s *msg, uint16_t token_len, uint8_t *token)
 {
   struct oc_cached_message_record *rec = find_empty_msg_record();
   if (rec == NULL)
     return;
   oc_message_add_ref(msg);
-  msg->soft_ref_cb = oc_replay_free_msg_cb;
+  msg->soft_ref_cb = oc_replay_message_unref;
 
   rec->token_len = token_len;
   memcpy(rec->token, token, token_len);

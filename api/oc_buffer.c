@@ -180,7 +180,7 @@ oc_send_message(oc_message_t *message)
 
   if (version == 1 && type == 1 && (code >> 5 == 0))
   {
-    oc_replay_track_message(message, token_len, token);
+    oc_replay_message_track(message, token_len, token);
   }
 
   if (oc_process_post(&message_buffer_handler,

@@ -79,14 +79,14 @@ void oc_replay_free_client(oc_string_t rx_kid);
  * @param token_len the length of the message's token
  * @param token the token, used for identifying the message
  */
-void oc_replay_track_message(struct oc_message_s *msg, uint16_t token_len, uint8_t *token);
+void oc_replay_message_track(struct oc_message_s *msg, uint16_t token_len, uint8_t *token);
 
 /**
  * @brief Free a message that was previously marked with oc_replay_track_message()
  *
  * @param msg pointer to the message buffer
  */
-void oc_replay_free_msg_cb(struct oc_message_s *msg);
+void oc_replay_message_unref(struct oc_message_s *msg);
 
 /**
  * @brief Find a previously tracked message and mark it as no longer tracked
