@@ -143,7 +143,7 @@ get_dev_pm(oc_client_response_t *data)
     PRINT("  get_dev_pm received : %d\n", rep->value.boolean);
   }
 
-  if (oc_init_put("/dev/pm", data->endpoint, NULL, &put_dev_pm, HIGH_QOS,
+  if (oc_init_put("/dev/pm", data->endpoint, NULL, &put_dev_pm, LOW_QOS,
                   NULL)) {
 
     cbor_encode_boolean(&g_encoder, true);
@@ -171,7 +171,7 @@ do_pm(void *ep)
   }
   oc_endpoint_t *endpoint = ep;
   endpoint->flags |= SECURED | OSCORE;
-  oc_do_get("/dev/pm", endpoint, NULL, callback, HIGH_QOS, NULL);
+  oc_do_get("/dev/pm", endpoint, NULL, callback, LOW_QOS, NULL);
   return OC_EVENT_CONTINUE;
 }
 
@@ -223,7 +223,7 @@ discovery(const char *payload, int len, oc_endpoint_t *endpoint,
   oc_initiate_spake_parameter_request(endpoint, "00fa10010701", "LETTUCE",
                                       "rcpids", strlen("rcpids"));
 
-  oc_set_delayed_callback(&the_endpoint, do_pm, 10);
+  oc_set_delayed_callback(&the_endpoint, do_pm, 2);
 
   PRINT(" DISCOVERY- END\n");
   return OC_STOP_DISCOVERY;

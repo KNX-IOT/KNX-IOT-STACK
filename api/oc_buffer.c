@@ -85,7 +85,7 @@ allocate_message(struct oc_memb *pool)
     for (int i = 0; i < pool->num; ++i)
     {
       int offset = pool->size * i;
-      message = (oc_message_t*) pool->mem + offset;
+      message = (oc_message_t*) ((uint8_t*)pool->mem + offset);
 
       if (message->ref_count == 1 && message->soft_ref_cb != NULL)
       {
@@ -143,7 +143,6 @@ oc_message_unref(oc_message_t *message)
 {
   if (message) {
     message->ref_count--;
-    OC_DBG("refcount: %d", message->ref_count);
     if (message->ref_count <= 0) {
 #if defined(OC_DYNAMIC_ALLOCATION) && !defined(OC_INOUT_BUFFER_SIZE)
       if (message->data != NULL) {
@@ -154,9 +153,6 @@ oc_message_unref(oc_message_t *message)
       if (pool != NULL) {
         oc_memb_free(pool, message);
       }
-#if !defined(OC_DYNAMIC_ALLOCATION) || defined(OC_INOUT_BUFFER_SIZE)
-      OC_DBG("buffer: freed TX/RX buffer; num free: %d", oc_memb_numfree(pool));
-#endif /* !OC_DYNAMIC_ALLOCATION || OC_INOUT_BUFFER_SIZE */
     }
   }
 }
@@ -182,8 +178,10 @@ oc_send_message(oc_message_t *message)
                         COAP_HEADER_TOKEN_LEN_POSITION;
   uint8_t *token = message->data + COAP_HEADER_LEN;
 
-  if (version == 1 && type == 1 && (type >> 5 == 0))
+  if (version == 1 && type == 1 && (code >> 5 == 0))
+  {
     oc_replay_track_message(message, token_len, token);
+  }
 
   if (oc_process_post(&message_buffer_handler,
                       oc_events[OUTBOUND_NETWORK_EVENT],
