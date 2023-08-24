@@ -68,8 +68,9 @@ void oc_replay_free_client(oc_string_t rx_kid);
  * the stack runs out of buffers, or after a timeout.
  *
  * If static message buffers are used, this can lead to to a constrained client
- * having to drop messages that are otherwise preserved for echo retransmissions,
- * if many requests are being sent out in a short period of time.
+ * having to drop messages that are otherwise preserved for echo
+ * retransmissions, if many requests are being sent out in a short period of
+ * time.
  *
  * Messages that need to be retransmitted are identified by the token of 4.01
  * Unauthorised requests with an Echo option which must be included in the
@@ -79,10 +80,12 @@ void oc_replay_free_client(oc_string_t rx_kid);
  * @param token_len the length of the message's token
  * @param token the token, used for identifying the message
  */
-void oc_replay_message_track(struct oc_message_s *msg, uint16_t token_len, uint8_t *token);
+void oc_replay_message_track(struct oc_message_s *msg, uint16_t token_len,
+                             uint8_t *token);
 
 /**
- * @brief Free a message that was previously marked with oc_replay_message_track()
+ * @brief Free a message that was previously marked with
+ * oc_replay_message_track()
  *
  * @param msg pointer to the message buffer
  */
@@ -91,14 +94,15 @@ void oc_replay_message_unref(struct oc_message_s *msg);
 /**
  * @brief Find a previously tracked message and mark it as no longer tracked
  *
- * The soft reference will be removed. If this is the last remaining reference to the
- * message, the message will be freed.
+ * The soft reference will be removed. If this is the last remaining reference
+ * to the message, the message will be freed.
  *
  * @param token_len Length of the token
  * @param token Token used to identify the message
- * @return struct oc_message_s* 
+ * @return struct oc_message_s*
  */
-struct oc_message_s * oc_replay_find_msg_by_token(uint16_t token_len, uint8_t *token);
+struct oc_message_s *oc_replay_find_msg_by_token(uint16_t token_len,
+                                                 uint8_t *token);
 
 #ifdef __cplusplus
 }

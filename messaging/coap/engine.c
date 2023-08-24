@@ -339,20 +339,19 @@ coap_receive(oc_message_t *msg)
 #endif
 
         coap_clear_transaction(transaction);
-      }
-      else
-      {
+      } else {
         uint8_t echo_value[COAP_ECHO_LEN];
         size_t echo_len = coap_get_header_echo(message, echo_value);
         if (message->code == UNAUTHORIZED_4_01 && echo_len != 0) {
           // find in oc_replay tracker and retransmit
-          oc_message_t *original_message = oc_replay_find_msg_by_token(message->token_len, message->token);
-          if(original_message)
-          {
-            // parse the original message, just like in the case where we have a transaction
+          oc_message_t *original_message =
+            oc_replay_find_msg_by_token(message->token_len, message->token);
+          if (original_message) {
+            // parse the original message, just like in the case where we have a
+            // transaction
             coap_packet_t retransmitted_pkt[1];
             coap_udp_parse_message(retransmitted_pkt, original_message->data,
-                                  (uint16_t)original_message->length);
+                                   (uint16_t)original_message->length);
 
             client_cb = oc_ri_find_client_cb_by_mid(retransmitted_pkt->mid);
             OC_DBG("Pointer to MID Client Callback: %p", client_cb);
@@ -366,32 +365,33 @@ coap_receive(oc_message_t *msg)
               i += sizeof(r);
             }
             retransmitted_pkt->mid = coap_get_mid();
-          
+
             // a little bit naughty - modify the old client callback to refer to
             // the new (retransmitted) packet
             client_cb->mid = retransmitted_pkt->mid;
             client_cb->token_len = retransmitted_pkt->token_len;
             memcpy(client_cb->token, retransmitted_pkt->token,
-                  client_cb->token_len);
+                   client_cb->token_len);
 
-            // add reference to original message so that it is not freed while we still need it
+            // add reference to original message so that it is not freed while
+            // we still need it
             oc_message_add_ref(original_message);
 
-            oc_message_t *retransmitted_message = oc_internal_allocate_outgoing_message();
+            oc_message_t *retransmitted_message =
+              oc_internal_allocate_outgoing_message();
             retransmitted_message->endpoint = original_message->endpoint;
             retransmitted_message->length = coap_oscore_serialize_message(
-              retransmitted_pkt, retransmitted_message->data, true, true,
-              true);
+              retransmitted_pkt, retransmitted_message->data, true, true, true);
 
             coap_send_message(retransmitted_message);
             // unref original message
             oc_message_unref(original_message);
             oc_replay_message_unref(original_message);
-          }
-          else
-          {
-            // need to retransmit but no longer have original buffer. just drop it.
-            OC_ERR("=== Could not find original request for response with echo! Dropping! ===");
+          } else {
+            // need to retransmit but no longer have original buffer. just drop
+            // it.
+            OC_ERR("=== Could not find original request for response with "
+                   "echo! Dropping! ===");
             return 0;
           }
         }

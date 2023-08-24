@@ -640,8 +640,7 @@ oc_oscore_send_message(oc_message_t *msg)
 
   /* Clone incoming oc_message_t (*msg) from CoAP layer */
   message = oc_internal_allocate_outgoing_message();
-  if (message == NULL)
-  {
+  if (message == NULL) {
     OC_ERR("***No memory to allocate outgoing message!***");
     goto oscore_send_error;
   }

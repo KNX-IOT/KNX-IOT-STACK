@@ -77,20 +77,17 @@ allocate_message(struct oc_memb *pool)
     OC_DBG("buffer: Allocated TX/RX buffer; num free: %d",
            oc_memb_numfree(pool));
 #endif /* !OC_DYNAMIC_ALLOCATION || OC_INOUT_BUFFER_SIZE */
-  }
-  else {
+  } else {
     // no unused buffers, so go through buffers with soft references and
     // free one. said buffer can no longer be used for e.g. retransmitting
     // requests when challenged with an Echo option. however, freeing up
     // one of these means that it can no longer be used for its original
     // purpose
-    for (int i = 0; i < pool->num; ++i)
-    {
+    for (int i = 0; i < pool->num; ++i) {
       int offset = pool->size * i;
-      message = (oc_message_t*) ((uint8_t*)pool->mem + offset);
+      message = (oc_message_t *)((uint8_t *)pool->mem + offset);
 
-      if (message->ref_count == 1 && message->soft_ref_cb != NULL)
-      {
+      if (message->ref_count == 1 && message->soft_ref_cb != NULL) {
         OC_WRN("Freeing echo retransmission candidate %p");
         message->soft_ref_cb(message);
         // we know that was the last reference, so now we can allocate
@@ -176,16 +173,16 @@ oc_send_message(oc_message_t *message)
   // point we only have the encoded CoAP bytes, so we parse just the header
   // and token.
   uint8_t version = (COAP_HEADER_VERSION_MASK & message->data[0]) >>
-                      COAP_HEADER_VERSION_POSITION;
+                    COAP_HEADER_VERSION_POSITION;
   uint8_t type =
     (COAP_HEADER_TYPE_MASK & message->data[0]) >> COAP_HEADER_TYPE_POSITION;
   uint8_t code = message->data[1];
   uint8_t token_len = (COAP_HEADER_TOKEN_LEN_MASK & message->data[0]) >>
-                        COAP_HEADER_TOKEN_LEN_POSITION;
+                      COAP_HEADER_TOKEN_LEN_POSITION;
   uint8_t *token = message->data + COAP_HEADER_LEN;
 
-  if (version == 1 && type == 1 && (code >> 5 == 0) && message->endpoint.flags & SECURED)
-  {
+  if (version == 1 && type == 1 && (code >> 5 == 0) &&
+      message->endpoint.flags & SECURED) {
     oc_replay_message_track(message, token_len, token);
   }
 
