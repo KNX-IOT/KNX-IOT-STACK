@@ -232,8 +232,7 @@ struct oc_message_s * oc_replay_find_msg_by_token(uint16_t token_len, uint8_t *t
 {
   for (int i = 0; i < OC_MAX_MESSAGE_RECORDS; ++i)
   {
-    
-    if (message_records[i].message = NULL)
+    if (message_records[i].message == NULL)
       continue;
 
       if(message_records[i].token_len == token_len)
@@ -267,15 +266,21 @@ static struct oc_cached_message_record * find_empty_msg_record()
 static oc_event_callback_retval_t oc_replay_free_msg_handler(void *msg)
 {
   struct oc_cached_message_record *rec = find_record_by_msg(msg);
-  rec->token_len = 0;
-  rec->message = NULL;
-  oc_message_unref(msg);
+  if (msg)
+  {
+    OC_DBG("Freeing tracked mesage %p with token:", msg);
+    OC_LOGbytes(rec->token, rec->token_len);
+    rec->token_len = 0;
+    rec->message = NULL;
+    oc_message_unref(msg);
+  }
   return OC_EVENT_DONE;
 }
 
 void oc_replay_message_unref(struct oc_message_s *msg)
 {
   oc_replay_free_msg_handler(msg);
+  OC_DBG("Removing callback...");
   oc_remove_delayed_callback(msg, oc_replay_free_msg_handler);
 }
 
@@ -284,6 +289,8 @@ void oc_replay_message_track(struct oc_message_s *msg, uint16_t token_len, uint8
   struct oc_cached_message_record *rec = find_empty_msg_record();
   if (rec == NULL)
     return;
+  OC_DBG("Tracking message %p with token:", msg);
+  OC_LOGbytes(token, token_len);
   oc_message_add_ref(msg);
   msg->soft_ref_cb = oc_replay_message_unref;
 
