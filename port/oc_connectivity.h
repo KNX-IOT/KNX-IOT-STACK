@@ -102,8 +102,6 @@ extern "C" {
 #define OC_MAX_APP_DATA_SIZE (oc_get_max_app_data_size())
 #endif /* OC_DYNAMIC_ALLOCATION */
 
-
-
 struct oc_message_s
 {
   struct oc_message_s *next;

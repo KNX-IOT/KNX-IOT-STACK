@@ -79,9 +79,11 @@ allocate_message(struct oc_memb *pool)
 #endif /* !OC_DYNAMIC_ALLOCATION || OC_INOUT_BUFFER_SIZE */
   }
   else {
-
-    // iterate through memory blocks, searching for blocks with one reference
-    // and an assigned weak ref callback
+    // no unused buffers, so go through buffers with soft references and
+    // free one. said buffer can no longer be used for e.g. retransmitting
+    // requests when challenged with an Echo option. however, freeing up
+    // one of these means that it can no longer be used for its original
+    // purpose
     for (int i = 0; i < pool->num; ++i)
     {
       int offset = pool->size * i;
@@ -89,7 +91,6 @@ allocate_message(struct oc_memb *pool)
 
       if (message->ref_count == 1 && message->soft_ref_cb != NULL)
       {
-        // if found, call the callback, free the block and return it!
         OC_WRN("Freeing echo retransmission candidate %p");
         message->soft_ref_cb(message);
         // we know that was the last reference, so now we can allocate
@@ -170,6 +171,10 @@ oc_recv_message(oc_message_t *message)
 void
 oc_send_message(oc_message_t *message)
 {
+  // we only want to cache OSCORE-secured requests, as these frames are the
+  // only ones that will be challenged with an Echo option. however, at this
+  // point we only have the encoded CoAP bytes, so we parse just the header
+  // and token.
   uint8_t version = (COAP_HEADER_VERSION_MASK & message->data[0]) >>
                       COAP_HEADER_VERSION_POSITION;
   uint8_t type =
