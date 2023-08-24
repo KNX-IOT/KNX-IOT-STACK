@@ -90,6 +90,7 @@ allocate_message(struct oc_memb *pool)
       if (message->ref_count == 1 && message->soft_ref_cb != NULL)
       {
         // if found, call the callback, free the block and return it!
+        OC_WRN("Freeing echo retransmission candidate %p");
         message->soft_ref_cb(message);
         // we know that was the last reference, so now we can allocate
         // a new message successfully
@@ -178,7 +179,7 @@ oc_send_message(oc_message_t *message)
                         COAP_HEADER_TOKEN_LEN_POSITION;
   uint8_t *token = message->data + COAP_HEADER_LEN;
 
-  if (version == 1 && type == 1 && (code >> 5 == 0))
+  if (version == 1 && type == 1 && (code >> 5 == 0) && message->endpoint.flags & SECURED)
   {
     oc_replay_message_track(message, token_len, token);
   }

@@ -342,14 +342,6 @@ coap_receive(oc_message_t *msg)
       }
       else
       {
-        // no transaction
-        // note that the coap pkt type uses a pointer for the payload!!
-        // so you will have to keep the original message around while
-        // sending the retransmission
-
-        // so, add a reference to old one, send new one, unref old one &
-        // soft-unref old one too!
-
         uint8_t echo_value[COAP_ECHO_LEN];
         size_t echo_len = coap_get_header_echo(message, echo_value);
         if (message->code == UNAUTHORIZED_4_01 && echo_len != 0) {
@@ -390,9 +382,8 @@ coap_receive(oc_message_t *msg)
             retransmitted_message->length = coap_oscore_serialize_message(
               retransmitted_pkt, retransmitted_message->data, true, true,
               true);
-            // send without transaction
-            coap_send_message(retransmitted_message);
 
+            coap_send_message(retransmitted_message);
             // unref original message
             oc_message_unref(original_message);
             oc_replay_message_unref(original_message);

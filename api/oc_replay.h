@@ -82,7 +82,7 @@ void oc_replay_free_client(oc_string_t rx_kid);
 void oc_replay_message_track(struct oc_message_s *msg, uint16_t token_len, uint8_t *token);
 
 /**
- * @brief Free a message that was previously marked with oc_replay_track_message()
+ * @brief Free a message that was previously marked with oc_replay_message_track()
  *
  * @param msg pointer to the message buffer
  */

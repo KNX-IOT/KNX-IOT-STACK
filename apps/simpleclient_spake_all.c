@@ -223,7 +223,7 @@ discovery(const char *payload, int len, oc_endpoint_t *endpoint,
   oc_initiate_spake_parameter_request(endpoint, "00fa10010701", "LETTUCE",
                                       "rcpids", strlen("rcpids"));
 
-  oc_set_delayed_callback(&the_endpoint, do_pm, 10);
+  oc_set_delayed_callback(&the_endpoint, do_pm, 5);
 
   PRINT(" DISCOVERY- END\n");
   return OC_STOP_DISCOVERY;
