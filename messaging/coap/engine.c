@@ -287,6 +287,8 @@ coap_receive(oc_message_t *msg)
 #endif /* OC_TCP */
     {
       transaction = coap_get_transaction_by_mid(message->mid);
+      if (transaction == NULL)
+        transaction = coap_get_transaction_by_token(message->token, message->token_len);
       if (transaction) {
 #ifdef OC_CLIENT
         uint8_t echo_value[COAP_ECHO_LEN];
@@ -339,8 +341,12 @@ coap_receive(oc_message_t *msg)
           return 0;
         }
 #endif
-
-        coap_clear_transaction(transaction);
+        if (message->code == EMPTY_ACK_RESPONSE) {
+          OC_DBG("Empty ACK, keeping transaction for delayed response");
+          coap_set_delayed_transaction_acked(transaction);
+        } else {
+          coap_clear_transaction(transaction);
+        }
       }
       transaction = NULL;
     }
@@ -812,6 +818,9 @@ coap_receive(oc_message_t *msg)
 #endif /* OC_CLIENT */
 
       if (message->type == COAP_TYPE_CON) {
+        OC_DBG("Got message CON?");
+        coap_transaction_t *t = coap_get_transaction_by_token(message->token, message->token_len);
+        coap_set_delayed_transaction_recieved(t, message);
         coap_send_empty_response(COAP_TYPE_ACK, message->mid, NULL, 0, 0,
                                  &msg->endpoint);
       } else if (message->type == COAP_TYPE_ACK) {

@@ -67,6 +67,7 @@ extern "C" {
            ((float)COAP_RESPONSE_RANDOM_FACTOR - 1.0)) +                       \
           0.5) +                                                               \
          1)
+#define COAP_DELAYED_RESPONSE_TIMEOUT_TICKS (OC_CLOCK_SECOND * COAP_DELAYED_RESPONSE_TIMEOUT)
 
 /* container for transactions with message buffer and retransmission info */
 typedef struct coap_transaction
@@ -89,6 +90,9 @@ coap_transaction_t *coap_new_transaction(uint16_t mid, uint8_t *token,
                                          oc_endpoint_t *endpoint);
 
 void coap_send_transaction(coap_transaction_t *t);
+void coap_set_delayed_transaction_acked(coap_transaction_t *t);
+void coap_set_delayed_transaction_recieved(coap_transaction_t *t, uint16_t mid);
+
 void coap_clear_transaction(coap_transaction_t *t);
 coap_transaction_t *coap_get_transaction_by_mid(uint16_t mid);
 coap_transaction_t *coap_get_transaction_by_token(uint8_t *token,

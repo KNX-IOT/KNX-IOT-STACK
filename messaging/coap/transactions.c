@@ -207,6 +207,20 @@ coap_send_transaction(coap_transaction_t *t)
     coap_clear_transaction(t);
   }
 }
+
+void
+coap_set_delayed_transaction_acked(coap_transaction_t *t)
+{
+  t->retrans_timer.timer.interval = COAP_DELAYED_RESPONSE_TIMEOUT_TICKS;
+  t->retrans_counter = -1;
+}
+
+void
+coap_set_delayed_transaction_recieved(coap_transaction_t *t, uint16_t mid)
+{
+  t->mid = mid;
+}
+
 /*---------------------------------------------------------------------------*/
 void
 coap_clear_transaction(coap_transaction_t *t)
@@ -259,9 +273,14 @@ coap_check_transactions(void)
     next = t->next;
     if (oc_etimer_expired(&t->retrans_timer)) {
       ++(t->retrans_counter);
-      OC_DBG("Retransmitting %u (%u)", t->mid, t->retrans_counter);
       int removed = oc_list_length(transactions_list);
-      coap_send_transaction(t);
+      if (t->retrans_counter == 0) {
+        OC_DBG("Delayed response timeout %u", t->mid);
+        coap_clear_transaction(t);
+      } else {
+        OC_DBG("Retransmitting %u (%u)", t->mid, t->retrans_counter);
+        coap_send_transaction(t);
+      }
       if ((removed - oc_list_length(transactions_list)) > 1) {
         t = (coap_transaction_t *)oc_list_head(transactions_list);
         continue;
