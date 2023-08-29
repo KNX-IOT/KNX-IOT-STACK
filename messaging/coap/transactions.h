@@ -90,7 +90,6 @@ coap_transaction_t *coap_new_transaction(uint16_t mid, uint8_t *token,
                                          oc_endpoint_t *endpoint);
 
 void coap_send_transaction(coap_transaction_t *t);
-void coap_set_delayed_transaction_acked(coap_transaction_t *t);
 
 void coap_clear_transaction(coap_transaction_t *t);
 coap_transaction_t *coap_get_transaction_by_mid(uint16_t mid);
