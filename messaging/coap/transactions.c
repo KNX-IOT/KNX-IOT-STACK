@@ -213,10 +213,18 @@ coap_set_delayed_transaction_acked(coap_transaction_t *t)
 {
   t->retrans_timer.timer.interval = COAP_DELAYED_RESPONSE_TIMEOUT_TICKS;
   t->retrans_counter = -1;
+  OC_PROCESS_CONTEXT_BEGIN(transaction_handler_process);
+  oc_etimer_restart(&t->retrans_timer); /* interval updated above */
+  OC_PROCESS_CONTEXT_END(transaction_handler_process);
+  // We don't need this message buffer any more as the transaction has been
+  // ACKed by the server and we know it should give us a delayed response
+  // if (t->message)
+  //   oc_message_unref(t->message);
+  // t->message = NULL;
 }
 
 void
-coap_set_delayed_transaction_recieved(coap_transaction_t *t, uint16_t mid)
+coap_set_delayed_transaction_received(coap_transaction_t *t, uint16_t mid)
 {
   t->mid = mid;
 }

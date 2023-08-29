@@ -212,6 +212,8 @@ oc_oscore_recv_message(oc_message_t *message)
                                       (int32_t)oscore_ctx->auth_at_index);
         // oc_string_copy_from_char(&message->endpoint.serial_number,
         //                         (char *)oscore_ctx->token_id);
+        oc_endpoint_set_oscore_id(&message->endpoint, oscore_ctx->token_id, 
+                                  SERIAL_NUM_SIZE);
 
         // PRINT("using send key!!\n");
         // key = oscore_ctx->sendkey;
@@ -646,7 +648,6 @@ oc_oscore_send_message(oc_message_t *msg)
       oc_byte_string_len(entry->osc_rid));
   }
   // Search for OSCORE context using addressing information
-
   PRINT("oc_oscore_send_message : SID ");
   oc_char_println_hex(message->endpoint.oscore_id,
                       message->endpoint.oscore_id_len);

@@ -341,10 +341,10 @@ coap_receive(oc_message_t *msg)
           return 0;
         }
 #endif
-        if (message->code == EMPTY_ACK_RESPONSE) {
-          OC_DBG("Empty ACK, keeping transaction for delayed response");
+        if (message->code == COAP_NO_ERROR) {
+          OC_DBG("Empty ACK, keeping transaction for delayed response, code %d", message->code);
           coap_set_delayed_transaction_acked(transaction);
-        } else {
+        } else if (message->type != COAP_TYPE_CON) {
           coap_clear_transaction(transaction);
         }
       }
@@ -820,9 +820,11 @@ coap_receive(oc_message_t *msg)
       if (message->type == COAP_TYPE_CON) {
         OC_DBG("Got message CON?");
         coap_transaction_t *t = coap_get_transaction_by_token(message->token, message->token_len);
-        coap_set_delayed_transaction_recieved(t, message);
+        if (t){
+          coap_set_delayed_transaction_received(t, message->mid);
+        }
         coap_send_empty_response(COAP_TYPE_ACK, message->mid, NULL, 0, 0,
-                                 &msg->endpoint);
+                                  &msg->endpoint);
       } else if (message->type == COAP_TYPE_ACK) {
       } else if (message->type == COAP_TYPE_RST) {
 #ifdef OC_SERVER
