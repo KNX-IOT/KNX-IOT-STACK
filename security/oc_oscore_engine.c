@@ -647,6 +647,7 @@ oc_oscore_send_message(oc_message_t *msg)
       oc_byte_string_len(entry->osc_rid));
   }
   // Search for OSCORE context using addressing information
+
   PRINT("oc_oscore_send_message : SID ");
   oc_char_println_hex(message->endpoint.oscore_id,
                       message->endpoint.oscore_id_len);

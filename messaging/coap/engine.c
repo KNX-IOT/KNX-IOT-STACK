@@ -341,6 +341,7 @@ coap_receive(oc_message_t *msg)
           return 0;
         }
 #endif
+
         coap_clear_transaction(transaction);
       }
       transaction = NULL;
@@ -814,7 +815,7 @@ coap_receive(oc_message_t *msg)
 
       if (message->type == COAP_TYPE_CON) {
         coap_send_empty_response(COAP_TYPE_ACK, message->mid, NULL, 0, 0,
-                                  &msg->endpoint);
+                                 &msg->endpoint);
       } else if (message->type == COAP_TYPE_ACK) {
       } else if (message->type == COAP_TYPE_RST) {
 #ifdef OC_SERVER

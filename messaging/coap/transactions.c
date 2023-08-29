@@ -260,14 +260,9 @@ coap_check_transactions(void)
     next = t->next;
     if (oc_etimer_expired(&t->retrans_timer)) {
       ++(t->retrans_counter);
+      OC_DBG("Retransmitting %u (%u)", t->mid, t->retrans_counter);
       int removed = oc_list_length(transactions_list);
-      if (t->retrans_counter == 0) {
-        OC_DBG("Delayed response timeout %u", t->mid);
-        coap_clear_transaction(t);
-      } else {
-        OC_DBG("Retransmitting %u (%u)", t->mid, t->retrans_counter);
-        coap_send_transaction(t);
-      }
+      coap_send_transaction(t);
       if ((removed - oc_list_length(transactions_list)) > 1) {
         t = (coap_transaction_t *)oc_list_head(transactions_list);
         continue;
