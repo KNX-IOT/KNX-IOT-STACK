@@ -223,7 +223,7 @@ oc_oscore_recv_message(oc_message_t *message)
       oscore_send_error(oscore_pkt, UNAUTHORIZED_4_01, &message->endpoint);
       goto oscore_recv_error;
     }
-    
+
     // copy the serial number as return token, so that the reply can find
     // the context again.
     OC_DBG_OSCORE(
@@ -235,7 +235,7 @@ oc_oscore_recv_message(oc_message_t *message)
                                   (int32_t)oscore_ctx->auth_at_index);
     // oc_string_copy_from_char(&message->endpoint.serial_number,
     //                         (char *)oscore_ctx->token_id);
-    oc_endpoint_set_oscore_id(&message->endpoint, oscore_ctx->token_id, 
+    oc_endpoint_set_oscore_id(&message->endpoint, oscore_ctx->token_id,
                               SERIAL_NUM_SIZE);
 
     // PRINT("using send key!!\n");

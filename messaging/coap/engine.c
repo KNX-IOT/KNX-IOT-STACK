@@ -288,7 +288,8 @@ coap_receive(oc_message_t *msg)
     {
       transaction = coap_get_transaction_by_mid(message->mid);
       if (transaction == NULL)
-        transaction = coap_get_transaction_by_token(message->token, message->token_len);
+        transaction =
+          coap_get_transaction_by_token(message->token, message->token_len);
       if (transaction) {
 #ifdef OC_CLIENT
         uint8_t echo_value[COAP_ECHO_LEN];
