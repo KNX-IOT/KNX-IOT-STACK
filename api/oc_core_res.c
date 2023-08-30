@@ -430,10 +430,10 @@ oc_core_set_device_hwt(size_t device_index, const char *hardwaretype)
     return -1;
   }
   hwt_len = strlen(hardwaretype);
-  if (strlen(hardwaretype) > 6) {
+  //if (strlen(hardwaretype) > 6) {
     // truncate the hardware type
-    hwt_len = 6;
-  }
+    //hwt_len = 6;
+  //}
 
   oc_free_string(&oc_device_info[device_index].hwt);
   oc_new_string(&oc_device_info[device_index].hwt, hardwaretype, hwt_len);
