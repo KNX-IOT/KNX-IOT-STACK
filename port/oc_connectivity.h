@@ -123,6 +123,7 @@ struct oc_message_s
   size_t read_offset;
 #endif /* OC_TCP */
   uint8_t encrypted;
+  void (*soft_ref_cb)(struct oc_message_s *);
 };
 
 /**

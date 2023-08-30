@@ -19,12 +19,23 @@
 
 #include "port/oc_clock.h"
 #include "oc_knx_sec.h"
+#include "oc_config.h"
+#include "messaging/coap/constants.h"
+#include "oc_api.h"
 
 #ifndef OC_MAX_REPLAY_RECORDS
 #define OC_MAX_REPLAY_RECORDS (20)
 #endif
 
-struct oc_replay_record
+#ifndef OC_MAX_MESSAGE_RECORDS
+#define OC_MAX_MESSAGE_RECORDS (2)
+#endif
+
+#ifndef OC_REPLAY_RECORD_TIMEOUT
+#define OC_REPLAY_RECORD_TIMEOUT (5)
+#endif
+
+static struct oc_replay_record
 {
   uint64_t rx_ssn;        /// most recent received SSN of client
   oc_string_t rx_kid;     /// byte string holding the KID of the client
@@ -33,10 +44,14 @@ struct oc_replay_record
   oc_clock_time_t time;   /// time of last received packet
   uint32_t window; /// bitfield indicating received SSNs through bit position
   bool in_use;     /// whether this structure is in use & has valid data
-};
+} replay_records[OC_MAX_REPLAY_RECORDS] = { 0 };
 
-// this is the list of synchronised clients
-static struct oc_replay_record replay_records[OC_MAX_REPLAY_RECORDS] = { 0 };
+static struct oc_cached_message_record
+{
+  uint16_t token_len;
+  uint8_t token[COAP_TOKEN_LEN];
+  struct oc_message_s *message;
+} message_records[OC_MAX_MESSAGE_RECORDS] = { 0 };
 
 // make record available for reuse
 static void
@@ -211,4 +226,82 @@ oc_replay_free_client(oc_string_t rx_kid)
       free_record(rec);
     }
   }
+}
+
+struct oc_message_s *
+oc_replay_find_msg_by_token(uint16_t token_len, uint8_t *token)
+{
+  for (int i = 0; i < OC_MAX_MESSAGE_RECORDS; ++i) {
+    if (message_records[i].message == NULL)
+      continue;
+
+    if (message_records[i].token_len == token_len) {
+      if (memcmp(token, message_records[i].token, token_len) == 0)
+        return message_records[i].message;
+    }
+  }
+  return NULL;
+}
+
+static struct oc_cached_message_record *
+find_record_by_msg(struct oc_message_s *msg)
+{
+  if (msg == NULL)
+    return NULL;
+
+  for (int i = 0; i < OC_MAX_MESSAGE_RECORDS; ++i)
+    if (message_records[i].message = msg)
+      return message_records + i;
+  return NULL;
+}
+
+static struct oc_cached_message_record *
+find_empty_msg_record()
+{
+  for (int i = 0; i < OC_MAX_MESSAGE_RECORDS; ++i)
+    if (message_records[i].message == NULL)
+      return message_records + i;
+  return NULL;
+}
+
+static oc_event_callback_retval_t
+oc_replay_free_msg_handler(void *msg)
+{
+  struct oc_cached_message_record *rec = find_record_by_msg(msg);
+  if (msg) {
+    // OC_DBG("Freeing tracked message %p with token:", msg);
+    // OC_LOGbytes(rec->token, rec->token_len);
+    rec->token_len = 0;
+    rec->message = NULL;
+    oc_message_unref(msg);
+  }
+  return OC_EVENT_DONE;
+}
+
+void
+oc_replay_message_unref(struct oc_message_s *msg)
+{
+  oc_replay_free_msg_handler(msg);
+  // OC_DBG("Removing callback...");
+  oc_remove_delayed_callback(msg, oc_replay_free_msg_handler);
+}
+
+void
+oc_replay_message_track(struct oc_message_s *msg, uint16_t token_len,
+                        uint8_t *token)
+{
+  struct oc_cached_message_record *rec = find_empty_msg_record();
+  if (rec == NULL)
+    return;
+  // OC_DBG("Tracking message %p with token:", msg);
+  // OC_LOGbytes(token, token_len);
+  oc_message_add_ref(msg);
+  msg->soft_ref_cb = oc_replay_message_unref;
+
+  rec->token_len = token_len;
+  memcpy(rec->token, token, token_len);
+  rec->message = msg;
+
+  oc_set_delayed_callback(msg, oc_replay_free_msg_handler,
+                          OC_REPLAY_RECORD_TIMEOUT);
 }

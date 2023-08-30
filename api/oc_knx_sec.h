@@ -16,39 +16,6 @@
 /**
   @brief knx application level security
   @file
-
-
-  ## Replay algorithm
-
-  The Replay window has 2 functions:
-
-  - avoid replay attacks on the server side.
-  - verify the oscore serial number if not yet known.
-
-  Description of the implemented replay window algorithm.
-
-  The KNX servers keep a list endpoints that they have received a
-  'synchronized' message from. Upon boot, this list endpoints is empty, so
-  servers will respond to requests from all new client endpoints with `4.01
-  UNAUTHORISED` message containing an Echo option. The echo option is
-  OSCORE-encrypted, and its actual value is the local time of the server. Upon
-  receiving such a response, the client retransmits the request and includes the
-  Echo value that the server sent. This verifies that:
-
-  a) the client is reachable at the source IP address, preventing attackers
-  from attempting to bypass the de-duplication code by changing the source IP
-  address of packets.
-
-  b) the request is fresh - the server drops request where the
-  time stamp contained in the Echo option is older than a given threshold,
-  configurable within engine.c.
-
-  The handling of the replay is transparent to the higher layers.
-  So the return code `4.01 UNAUTHORISED` does not
-  reach the client callback. The only observable side-effect is that the first
-  request sent to a 'new' server will have a slightly longer latency: twice the
-  round-trip time, as opposed to just once.
-
 */
 
 #ifndef OC_KNX_SEC_INTERNAL_H

@@ -290,7 +290,7 @@ extern "C" {
 #ifndef OC_NO_LOG_BYTES
 #define OC_LOGbytes(bytes, length)                                             \
   do {                                                                         \
-    PRINT("DEBUG: %s <%s:%d>: ", __FILENAME__, __func__, __LINE__);            \
+    PRINT("D: %s <%s:%d>: ", __FILENAME__, __func__, __LINE__);                \
     uint16_t i;                                                                \
     for (i = 0; i < (length); i++)                                             \
       PRINT(" %02X", (bytes)[i]);                                              \
