@@ -207,6 +207,7 @@ coap_send_transaction(coap_transaction_t *t)
     coap_clear_transaction(t);
   }
 }
+
 /*---------------------------------------------------------------------------*/
 void
 coap_clear_transaction(coap_transaction_t *t)

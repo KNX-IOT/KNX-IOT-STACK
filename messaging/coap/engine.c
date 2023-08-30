@@ -281,6 +281,9 @@ coap_receive(oc_message_t *msg)
 #endif /* OC_TCP */
     {
       transaction = coap_get_transaction_by_mid(message->mid);
+      if (transaction == NULL)
+        transaction =
+          coap_get_transaction_by_token(message->token, message->token_len);
       if (transaction) {
 #ifdef OC_CLIENT
         // This block retransmits messages with included Echo options

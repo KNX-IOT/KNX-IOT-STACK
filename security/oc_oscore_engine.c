@@ -170,22 +170,6 @@ oc_oscore_recv_message(oc_message_t *message)
       oscore_ctx =
         oc_oscore_find_context_by_kid(oscore_ctx, message->endpoint.device,
                                       oscore_pkt->kid, oscore_pkt->kid_len);
-      if (oscore_ctx != NULL) {
-        // copy the serial number as return token, so that the reply can find
-        // the context again.
-        OC_DBG_OSCORE(
-          "--- setting endpoint serial number with found token & index");
-
-        // oc_endpoint_set_serial_number(&message->endpoint,
-        //                               (char *)oscore_ctx->token_id);
-        oc_endpoint_set_auth_at_index(&message->endpoint,
-                                      (int32_t)oscore_ctx->auth_at_index);
-        // oc_string_copy_from_char(&message->endpoint.serial_number,
-        //                         (char *)oscore_ctx->token_id);
-
-        // PRINT("using send key!!\n");
-        // key = oscore_ctx->sendkey;
-      }
     } else {
       /* If message is response */
       if (oscore_pkt->code > OC_FETCH) {
@@ -209,6 +193,23 @@ oc_oscore_recv_message(oc_message_t *message)
       oscore_send_error(oscore_pkt, UNAUTHORIZED_4_01, &message->endpoint);
       goto oscore_recv_error;
     }
+
+    // copy the serial number as return token, so that the reply can find
+    // the context again.
+    OC_DBG_OSCORE(
+      "--- setting endpoint serial number with found token & index");
+
+    // oc_endpoint_set_serial_number(&message->endpoint,
+    //                               (char *)oscore_ctx->token_id);
+    oc_endpoint_set_auth_at_index(&message->endpoint,
+                                  (int32_t)oscore_ctx->auth_at_index);
+    // oc_string_copy_from_char(&message->endpoint.serial_number,
+    //                         (char *)oscore_ctx->token_id);
+    oc_endpoint_set_oscore_id(&message->endpoint, oscore_ctx->token_id,
+                              SERIAL_NUM_SIZE);
+
+    // PRINT("using send key!!\n");
+    // key = oscore_ctx->sendkey;
 
     /* Use recipient key for decryption */
     // if (key == NULL) {
