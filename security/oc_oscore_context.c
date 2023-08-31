@@ -366,7 +366,8 @@ oc_oscore_add_context(size_t device, const char *senderid, int senderid_size,
   oc_char_println_hex(senderid, senderid_size);
   PRINT("  rid size  : %d ", recipientid_size);
   oc_char_println_hex(recipientid, recipientid_size);
-  PRINT("  ctx size  : %d\n", osc_ctx_size);
+  PRINT("  ctx size  : %d", osc_ctx_size);
+  oc_char_println_hex(osc_ctx, osc_ctx_size);
   PRINT("  ms size   : %d ", mastersecret_size);
   oc_char_println_hex(mastersecret, mastersecret_size);
 

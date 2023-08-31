@@ -749,8 +749,8 @@ oc_oscore_send_message(oc_message_t *msg)
     /* Use sender key for encryption */
     uint8_t *key = oscore_ctx->sendkey;
 
-    uint8_t piv[OSCORE_PIV_LEN], piv_len = 0, kid[OSCORE_CTXID_LEN],
-                                 kid_len = 0, nonce[OSCORE_AEAD_NONCE_LEN],
+    uint8_t piv[OSCORE_PIV_LEN], piv_len = 0, kid[OSCORE_CTXID_LEN], kid_len = 0,
+        ctx_id[OSCORE_IDCTX_LEN], ctx_id_len = 0, nonce[OSCORE_AEAD_NONCE_LEN],
                                  AAD[OSCORE_AAD_MAX_LEN], AAD_len = 0;
 
     /* If CoAP message is request */
@@ -802,6 +802,10 @@ oc_oscore_send_message(oc_message_t *msg)
       /* Use context-sendid as kid */
       memcpy(kid, oscore_ctx->sendid, oscore_ctx->sendid_len);
       kid_len = oscore_ctx->sendid_len;
+
+      /* use idctx as context_id */
+      memcpy(ctx_id, oscore_ctx->idctx, oscore_ctx->idctx_len);
+      ctx_id_len = oscore_ctx->idctx_len;
 
       /* Compute nonce using partial IV and context->sendid */
       oc_oscore_AEAD_nonce(oscore_ctx->sendid, oscore_ctx->sendid_len, piv,
@@ -938,11 +942,11 @@ oc_oscore_send_message(oc_message_t *msg)
     /* Set the OSCORE option */
     if ((coap_pkt->code >= OC_GET && coap_pkt->code <= OC_DELETE)) {
       // requests encode the PIV
-      coap_set_header_oscore(coap_pkt, piv, piv_len, kid, kid_len, NULL, 0);
+      coap_set_header_oscore(coap_pkt, piv, piv_len, kid, kid_len, ctx_id, ctx_id_len);
     } else {
       // responses use the (cached) piv of the matching request, stored in the
       // ep/clientcb
-      coap_set_header_oscore(coap_pkt, NULL, 0, kid, kid_len, NULL, 0);
+      coap_set_header_oscore(coap_pkt, NULL, 0, kid, kid_len, ctx_id, ctx_id_len);
     }
 
     /* Reflect the Observe option (if present in the CoAP packet) */
