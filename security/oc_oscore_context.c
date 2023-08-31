@@ -32,6 +32,21 @@
 OC_LIST(contexts);
 OC_MEMB(ctx_s, oc_oscore_context_t, 20);
 
+void oc_oscore_free_lru_recipient_context(void)
+{
+  oc_oscore_context_t *ctx, *lru_ctx;
+  ctx = lru_ctx = oc_list_head(contexts);
+
+  while(ctx != NULL)
+  {
+    if (ctx->sendid_len == 0 && ctx->last_used < lru_ctx->last_used)
+      lru_ctx = ctx;
+
+    ctx = ctx->next;
+  }
+  oc_oscore_free_context(lru_ctx);
+}
+
 // checking against receiver in contexts
 oc_oscore_context_t *
 oc_oscore_find_context_by_kid(oc_oscore_context_t *ctx, size_t device_index,
@@ -55,6 +70,39 @@ oc_oscore_find_context_by_kid(oc_oscore_context_t *ctx, size_t device_index,
     if (kid_len == ctx->recvid_len && memcmp(kid, ctx->recvid, kid_len) == 0) {
       PRINT("oc_oscore_find_context_by_kid FOUND  auth/at index: %d\n",
             ctx->auth_at_index);
+      ctx->last_used = oc_clock_time();
+      return ctx;
+    }
+    ctx = ctx->next;
+  }
+  return ctx;
+}
+
+oc_oscore_context_t *
+oc_oscore_find_context_by_kid_idctx(oc_oscore_context_t *ctx, size_t device_index,
+                              uint8_t *kid, uint8_t kid_len, uint8_t *kid_ctx, uint8_t kid_ctx_len)
+{
+  if (!ctx) {
+    ctx = (oc_oscore_context_t *)oc_list_head(contexts);
+  }
+
+  if (kid_len == 0)
+    return NULL;
+
+  PRINT("oc_oscore_find_context_by_kid : dev=%d  kid:(%d) :", (int)device_index,
+        kid_len);
+  oc_char_println_hex((char *)(kid), kid_len);
+
+  while (ctx != NULL) {
+    PRINT("  ---> recvid:");
+    oc_char_println_hex((char *)(ctx->recvid), ctx->recvid_len);
+
+    if (kid_len == ctx->recvid_len && memcmp(kid, ctx->recvid, kid_len) == 0
+      && kid_ctx_len == ctx->idctx_len && memcmp(kid_ctx, ctx->idctx, kid_ctx_len) == 0
+    ) {
+      PRINT("oc_oscore_find_context_by_kid_idctx FOUND  auth/at index: %d\n",
+            ctx->auth_at_index);
+      ctx->last_used = oc_clock_time();
       return ctx;
     }
     ctx = ctx->next;
@@ -121,6 +169,7 @@ oc_oscore_find_context_by_token_mid(size_t device, uint8_t *token,
     if (memcmp(oscore_id, ctx->sendid, oscore_id_len) == 0) {
       PRINT("oc_oscore_find_context_by_token_mid FOUND auth/at index: %d\n",
             ctx->auth_at_index);
+      ctx->last_used = oc_clock_time();
       return ctx;
     }
     ctx = ctx->next;
@@ -163,6 +212,7 @@ oc_oscore_find_context_by_oscore_id(size_t device, char *oscore_id,
             ctx->auth_at_index);
       OC_DBG_OSCORE("    Common IV:");
       OC_LOGbytes_OSCORE(ctx->commoniv, OSCORE_COMMON_IV_LEN);
+      ctx->last_used = oc_clock_time();
       return ctx;
     }
     ctx = ctx->next;
@@ -205,6 +255,7 @@ oc_oscore_find_context_by_rid(size_t device, char *rid, size_t rid_len)
             ctx->auth_at_index);
       OC_DBG_OSCORE("    Common IV:");
       OC_LOGbytes_OSCORE(ctx->commoniv, OSCORE_COMMON_IV_LEN);
+      ctx->last_used = oc_clock_time();
       return ctx;
     }
     ctx = ctx->next;
@@ -231,6 +282,7 @@ oc_oscore_find_context_by_group_address(size_t device, uint32_t group_address)
           "   oc_oscore_find_context_by_group_address : find: %u value: %u\n",
           group_address, group_value);
         if (group_address == group_value) {
+          ctx->last_used = oc_clock_time();
           return ctx;
         }
       }
@@ -305,6 +357,7 @@ oc_oscore_add_context(size_t device, const char *senderid, int senderid_size,
   ctx->device = device;
   ctx->ssn = ssn;
   ctx->auth_at_index = auth_at_index;
+  ctx->last_used = oc_clock_time();
 
   PRINT("  device    : %d\n", (int)device);
   PRINT("  desc      : %s\n", desc);
