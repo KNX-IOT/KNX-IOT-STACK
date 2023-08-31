@@ -32,13 +32,13 @@
 OC_LIST(contexts);
 OC_MEMB(ctx_s, oc_oscore_context_t, 20);
 
-void oc_oscore_free_lru_recipient_context(void)
+void
+oc_oscore_free_lru_recipient_context(void)
 {
   oc_oscore_context_t *ctx, *lru_ctx;
   ctx = lru_ctx = oc_list_head(contexts);
 
-  while(ctx != NULL)
-  {
+  while (ctx != NULL) {
     if (ctx->sendid_len == 0 && ctx->last_used < lru_ctx->last_used)
       lru_ctx = ctx;
 
@@ -79,8 +79,10 @@ oc_oscore_find_context_by_kid(oc_oscore_context_t *ctx, size_t device_index,
 }
 
 oc_oscore_context_t *
-oc_oscore_find_context_by_kid_idctx(oc_oscore_context_t *ctx, size_t device_index,
-                              uint8_t *kid, uint8_t kid_len, uint8_t *kid_ctx, uint8_t kid_ctx_len)
+oc_oscore_find_context_by_kid_idctx(oc_oscore_context_t *ctx,
+                                    size_t device_index, uint8_t *kid,
+                                    uint8_t kid_len, uint8_t *kid_ctx,
+                                    uint8_t kid_ctx_len)
 {
   if (!ctx) {
     ctx = (oc_oscore_context_t *)oc_list_head(contexts);
@@ -97,9 +99,9 @@ oc_oscore_find_context_by_kid_idctx(oc_oscore_context_t *ctx, size_t device_inde
     PRINT("  ---> recvid:");
     oc_char_println_hex((char *)(ctx->recvid), ctx->recvid_len);
 
-    if (kid_len == ctx->recvid_len && memcmp(kid, ctx->recvid, kid_len) == 0
-      && kid_ctx_len == ctx->idctx_len && memcmp(kid_ctx, ctx->idctx, kid_ctx_len) == 0
-    ) {
+    if (kid_len == ctx->recvid_len && memcmp(kid, ctx->recvid, kid_len) == 0 &&
+        kid_ctx_len == ctx->idctx_len &&
+        memcmp(kid_ctx, ctx->idctx, kid_ctx_len) == 0) {
       PRINT("oc_oscore_find_context_by_kid_idctx FOUND  auth/at index: %d\n",
             ctx->auth_at_index);
       ctx->last_used = oc_clock_time();

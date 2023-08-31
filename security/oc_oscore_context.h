@@ -155,10 +155,10 @@ oc_oscore_context_t *oc_oscore_add_context(
 
 /**
  * @brief Free the least recently used recipient context
- * 
+ *
  * The use times are updated when the contexts are created or found using the
  * find_context_by_* functions
- * 
+ *
  */
 void oc_oscore_free_lru_recipient_context(void);
 
@@ -172,8 +172,9 @@ oc_oscore_context_t *oc_oscore_find_context_by_kid(oc_oscore_context_t *ctx,
                                                    size_t device, uint8_t *kid,
                                                    uint8_t kid_len);
 
-oc_oscore_context_t * oc_oscore_find_context_by_kid_idctx(oc_oscore_context_t *ctx, size_t device_index,
-                              uint8_t *kid, uint8_t kid_len, uint8_t *kid_ctx, uint8_t kid_ctx_len);
+oc_oscore_context_t *oc_oscore_find_context_by_kid_idctx(
+  oc_oscore_context_t *ctx, size_t device_index, uint8_t *kid, uint8_t kid_len,
+  uint8_t *kid_ctx, uint8_t kid_ctx_len);
 
 oc_oscore_context_t *oc_oscore_find_context_by_token_mid(
   size_t device, uint8_t *token, uint8_t token_len, uint16_t mid,

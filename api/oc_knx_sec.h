@@ -191,15 +191,15 @@ int oc_core_find_at_entry_with_context_id(size_t device_index,
 
 /**
  * @brief Find an entry with a given OSCORE ID
- * 
+ *
  * @param device_index The device index
  * @param osc_id the oscore ID to search for
  * @param osc_id_len length of the context
  * @return int -1 : no entry with that oscore id
  * @return int >= index of found entry
  */
-int
-oc_core_find_at_entry_with_osc_id(size_t device_index, uint8_t *osc_id, size_t osc_id_len);
+int oc_core_find_at_entry_with_osc_id(size_t device_index, uint8_t *osc_id,
+                                      size_t osc_id_len);
 
 /**
  * @brief find empty slot

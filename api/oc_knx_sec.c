@@ -1451,12 +1451,12 @@ oc_core_find_at_entry_with_id(size_t device_index, char *id)
 }
 
 int
-oc_core_find_at_entry_with_osc_id(size_t device_index, uint8_t *osc_id, size_t osc_id_len)
+oc_core_find_at_entry_with_osc_id(size_t device_index, uint8_t *osc_id,
+                                  size_t osc_id_len)
 {
   for (int i = 0; i < G_AT_MAX_ENTRIES; i++) {
-    if (oc_byte_string_len(g_at_entries[i].osc_id) == osc_id_len
-        && memcmp(oc_string(g_at_entries[i].osc_id), osc_id, osc_id_len) == 0)
-    {
+    if (oc_byte_string_len(g_at_entries[i].osc_id) == osc_id_len &&
+        memcmp(oc_string(g_at_entries[i].osc_id), osc_id, osc_id_len) == 0) {
       return i;
     }
   }
@@ -1697,10 +1697,10 @@ oc_init_oscore_from_storage(size_t device_index, bool from_storage)
         // the spake key, however, is for receiving only, and the osc_id is
         // already inside receiver_id.
 
-        // posts to auth/at set id into the sender id, so the created contexts 
-        // are only usable for sending. recipient contexts are created dynamically 
-        // with the key from the access token matching the key ID, and with the
-        // context id within the received request
+        // posts to auth/at set id into the sender id, so the created contexts
+        // are only usable for sending. recipient contexts are created
+        // dynamically with the key from the access token matching the key ID,
+        // and with the context id within the received request
       } else {
         OC_DBG_OSCORE("oc_init_oscore: no oscore context");
       }
