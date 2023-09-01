@@ -20,7 +20,7 @@
 
 #include "messaging/coap/oscore_constants.h"
 #include "oc_helpers.h"
-#include "oc_clock.h"
+#include "port/oc_clock.h"
 #include "oc_uuid.h"
 #include <inttypes.h>
 #include <stdbool.h>
