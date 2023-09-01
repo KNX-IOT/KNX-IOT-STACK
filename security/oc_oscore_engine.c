@@ -198,6 +198,7 @@ oc_oscore_recv_message(oc_message_t *message)
 
         // if context is null, free one & try adding again
         if (!oscore_ctx) {
+          oc_oscore_free_lru_recipient_context();
           oscore_ctx = oc_oscore_add_context(
             0, oc_string(at_entry->osc_rid), /* sender id (empty string) */
             oc_byte_string_len(
