@@ -763,7 +763,7 @@ oc_core_auth_at_post_handler(oc_request_t *request,
     OC_WRN("update scope only");
   } else {
     // update the oscore context
-    oc_set_delayed_callback_ms((void*)device_index, init_contexts_no_storage, 10);
+    oc_set_delayed_callback_ms((void*)device_index, init_contexts_no_storage, 1000);
   }
   PRINT("oc_core_auth_at_post_handler - end\n");
   oc_send_cbor_response_no_payload_size(request, return_status);
@@ -785,7 +785,7 @@ oc_core_auth_at_delete_handler(oc_request_t *request,
 
   size_t device_index = request->resource->device;
 
-  oc_set_delayed_callback_ms((void*)device_index, delete_at_table, 10);
+  oc_set_delayed_callback_ms((void*)device_index, delete_at_table, 1000);
 
   PRINT("oc_core_auth_at_delete_handler - end\n");
   oc_send_cbor_response_no_payload_size(request, OC_STATUS_DELETED);
