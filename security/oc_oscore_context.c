@@ -306,7 +306,8 @@ oc_oscore_free_all_contexts()
   oc_list_init(contexts);
 }
 
-void oc_oscore_free_sender_contexts()
+void
+oc_oscore_free_sender_contexts()
 {
   oc_oscore_context_t *ctx = (oc_oscore_context_t *)oc_list_head(contexts);
   while (ctx != NULL) {
@@ -317,7 +318,8 @@ void oc_oscore_free_sender_contexts()
   }
 }
 
-void oc_oscore_free_contexts_at_id(int auth_at_index)
+void
+oc_oscore_free_contexts_at_id(int auth_at_index)
 {
   oc_oscore_context_t *ctx = (oc_oscore_context_t *)oc_list_head(contexts);
   while (ctx != NULL) {

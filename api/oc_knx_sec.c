@@ -1000,7 +1000,7 @@ oc_core_auth_at_x_delete_handler(oc_request_t *request,
     PRINT("oc_core_auth_at_x_delete_handler: index in structure not found\n");
     return;
   }
-  
+
   // actual delete of the context id so that this entry is seen as empty
   oc_at_delete_entry(device_index, index);
   // do the persistent storage
