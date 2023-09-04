@@ -88,7 +88,7 @@ allocate_message(struct oc_memb *pool)
       message = (oc_message_t *)((uint8_t *)pool->mem + offset);
 
       if (message->ref_count == 1 && message->soft_ref_cb != NULL) {
-        OC_WRN("Freeing echo retransmission candidate %p");
+        //OC_WRN("Freeing echo retransmission candidate %p");
         message->soft_ref_cb(message);
         // we know that was the last reference, so now we can allocate
         // a new message successfully

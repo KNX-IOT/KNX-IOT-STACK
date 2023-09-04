@@ -293,7 +293,7 @@ oc_core_find_group_object_table_group_entry(int index, int entry)
 }
 
 int
-oc_core_find_group_object_table_url(char *url)
+oc_core_find_group_object_table_url(const char *url)
 {
   int i;
   size_t url_len = strlen(url);
@@ -307,7 +307,7 @@ oc_core_find_group_object_table_url(char *url)
 }
 
 int
-oc_core_find_next_group_object_table_url(char *url, int cur_index)
+oc_core_find_next_group_object_table_url(const char *url, int cur_index)
 {
   if (cur_index == -1) {
     return -1;

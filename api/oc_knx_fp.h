@@ -338,7 +338,7 @@ int oc_core_find_next_group_object_table_index(uint32_t group_address,
  * @param url The url to find
  * @return int The index in the table or -1
  */
-int oc_core_find_group_object_table_url(char *url);
+int oc_core_find_group_object_table_url(const char *url);
 
 /**
  * @brief find next index in the group address table via url
@@ -347,7 +347,7 @@ int oc_core_find_group_object_table_url(char *url);
  * @param cur_index  The current index to start from.
  * @return int The index in the table or -1
  */
-int oc_core_find_next_group_object_table_url(char *url, int cur_index);
+int oc_core_find_next_group_object_table_url(const char *url, int cur_index);
 
 /**
  * @brief retrieve the cflags from the entry table
