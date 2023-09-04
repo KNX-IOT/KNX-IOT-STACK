@@ -1006,7 +1006,9 @@ oc_core_auth_at_x_delete_handler(oc_request_t *request,
   // do the persistent storage
   oc_at_dump_entry(device_index, index);
   // delete the related oscore contexts
+#ifdef OC_OSCORE
   oc_oscore_free_contexts_at_id(index);
+#endif
 
   PRINT("oc_core_auth_at_x_delete_handler - done\n");
   oc_send_cbor_response_no_payload_size(request, OC_STATUS_DELETED);
