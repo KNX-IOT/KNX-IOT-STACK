@@ -128,6 +128,13 @@ void oc_oscore_free_all_contexts();
 void oc_oscore_free_sender_contexts();
 
 /**
+ * @brief Free contexts with a given auth_at index
+ * 
+ * @param auth_at_index the index
+ */
+void oc_oscore_free_contexts_at_id(int auth_at_index);
+
+/**
  * @brief creates an OSCORE context (e.g. the internal structure for
  encoding/decoding)
  *

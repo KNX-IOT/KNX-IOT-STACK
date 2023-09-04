@@ -317,6 +317,17 @@ void oc_oscore_free_sender_contexts()
   }
 }
 
+void oc_oscore_free_contexts_at_id(int auth_at_index)
+{
+  oc_oscore_context_t *ctx = (oc_oscore_context_t *)oc_list_head(contexts);
+  while (ctx != NULL) {
+    oc_oscore_context_t *next = ctx->next;
+    if (ctx->auth_at_index == auth_at_index)
+      oc_oscore_free_context(ctx);
+    ctx = next;
+  }
+}
+
 void
 oc_oscore_free_context(oc_oscore_context_t *ctx)
 {

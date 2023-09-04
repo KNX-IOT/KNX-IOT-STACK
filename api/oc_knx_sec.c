@@ -1000,12 +1000,14 @@ oc_core_auth_at_x_delete_handler(oc_request_t *request,
     PRINT("oc_core_auth_at_x_delete_handler: index in structure not found\n");
     return;
   }
+  
   // actual delete of the context id so that this entry is seen as empty
   oc_at_delete_entry(device_index, index);
   // do the persistent storage
   oc_at_dump_entry(device_index, index);
-  // remove the key by reinitializing all used oscore keys.
-  oc_init_oscore_from_storage(device_index, false);
+  // delete the related oscore contexts
+  oc_oscore_free_contexts_at_id(index);
+
   PRINT("oc_core_auth_at_x_delete_handler - done\n");
   oc_send_cbor_response_no_payload_size(request, OC_STATUS_DELETED);
 }
