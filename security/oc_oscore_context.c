@@ -306,6 +306,17 @@ oc_oscore_free_all_contexts()
   oc_list_init(contexts);
 }
 
+void oc_oscore_free_sender_contexts()
+{
+  oc_oscore_context_t *ctx = (oc_oscore_context_t *)oc_list_head(contexts);
+  while (ctx != NULL) {
+    oc_oscore_context_t *next = ctx->next;
+    if (ctx->recvid_len == 0)
+      oc_oscore_free_context(ctx);
+    ctx = next;
+  }
+}
+
 void
 oc_oscore_free_context(oc_oscore_context_t *ctx)
 {

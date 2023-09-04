@@ -763,7 +763,7 @@ oc_core_auth_at_post_handler(oc_request_t *request,
     OC_WRN("update scope only");
   } else {
     // update the oscore context
-    oc_set_delayed_callback_ms((void*)device_index, init_contexts_no_storage, 1000);
+    oc_set_delayed_callback_ms((void*)device_index, init_contexts_no_storage, 10);
   }
   PRINT("oc_core_auth_at_post_handler - end\n");
   oc_send_cbor_response_no_payload_size(request, return_status);
@@ -785,7 +785,7 @@ oc_core_auth_at_delete_handler(oc_request_t *request,
 
   size_t device_index = request->resource->device;
 
-  oc_set_delayed_callback_ms((void*)device_index, delete_at_table, 1000);
+  oc_set_delayed_callback_ms((void*)device_index, delete_at_table, 10);
 
   PRINT("oc_core_auth_at_delete_handler - end\n");
   oc_send_cbor_response_no_payload_size(request, OC_STATUS_DELETED);
@@ -1683,10 +1683,8 @@ oc_init_oscore_from_storage(size_t device_index, bool from_storage)
   (void)device_index;
 #else /* OC_OSCORE */
   int i;
-  OC_DBG_OSCORE("oc_init_oscore deleting old contexts!!");
-
-  // deleting all contexts!!
-  oc_oscore_free_all_contexts();
+  OC_DBG_OSCORE("oc_init_oscore deleting old sender contexts!!");
+  oc_oscore_free_sender_contexts();
 
   OC_DBG_OSCORE("oc_init_oscore adding OSCORE context...");
   for (i = 0; i < G_AT_MAX_ENTRIES; i++) {

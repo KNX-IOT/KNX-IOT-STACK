@@ -122,6 +122,12 @@ void oc_oscore_free_context(oc_oscore_context_t *ctx);
 void oc_oscore_free_all_contexts();
 
 /**
+ * @brief free all OSCORE sender contexts
+ *
+ */
+void oc_oscore_free_sender_contexts();
+
+/**
  * @brief creates an OSCORE context (e.g. the internal structure for
  encoding/decoding)
  *
