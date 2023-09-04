@@ -526,6 +526,7 @@ oc_core_auth_at_get_handler(oc_request_t *request,
 static oc_event_callback_retval_t init_contexts_no_storage(void* device_p)
 {
   int device_index = (int) device_p;
+  OC_DBG("Delayed Init Contexts Callback firing...")
   oc_init_oscore_from_storage(device_index, false);
   return OC_EVENT_DONE;
 }
@@ -533,6 +534,7 @@ static oc_event_callback_retval_t init_contexts_no_storage(void* device_p)
 static oc_event_callback_retval_t delete_at_table(void* device_p)
 {
   int device_index = (int) device_p;
+  OC_DBG("Delayed Delete Contexts Callback firing...")
   oc_delete_at_table(device_index);
   return OC_EVENT_DONE;
 }
@@ -761,7 +763,7 @@ oc_core_auth_at_post_handler(oc_request_t *request,
     OC_WRN("update scope only");
   } else {
     // update the oscore context
-    oc_set_delayed_callback_ms((void*)device_index, init_contexts_no_storage, 0);
+    oc_set_delayed_callback_ms((void*)device_index, init_contexts_no_storage, 10);
   }
   PRINT("oc_core_auth_at_post_handler - end\n");
   oc_send_cbor_response_no_payload_size(request, return_status);
@@ -783,7 +785,7 @@ oc_core_auth_at_delete_handler(oc_request_t *request,
 
   size_t device_index = request->resource->device;
 
-  oc_set_delayed_callback_ms((void*)device_index, delete_at_table, 0);
+  oc_set_delayed_callback_ms((void*)device_index, delete_at_table, 10);
 
   PRINT("oc_core_auth_at_delete_handler - end\n");
   oc_send_cbor_response_no_payload_size(request, OC_STATUS_DELETED);
