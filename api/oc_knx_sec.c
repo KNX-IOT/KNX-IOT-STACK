@@ -768,7 +768,6 @@ oc_core_auth_at_delete_handler(oc_request_t *request,
   }
 
   size_t device_index = request->resource->device;
-
   oc_delete_at_table(device_index);
 
   PRINT("oc_core_auth_at_delete_handler - end\n");
@@ -1001,12 +1000,16 @@ oc_core_auth_at_x_delete_handler(oc_request_t *request,
     PRINT("oc_core_auth_at_x_delete_handler: index in structure not found\n");
     return;
   }
+
   // actual delete of the context id so that this entry is seen as empty
   oc_at_delete_entry(device_index, index);
   // do the persistent storage
   oc_at_dump_entry(device_index, index);
-  // remove the key by reinitializing all used oscore keys.
-  oc_init_oscore_from_storage(device_index, false);
+  // delete the related oscore contexts
+#ifdef OC_OSCORE
+  oc_oscore_free_contexts_at_id(index);
+#endif
+
   PRINT("oc_core_auth_at_x_delete_handler - done\n");
   oc_send_cbor_response_no_payload_size(request, OC_STATUS_DELETED);
 }
@@ -1451,6 +1454,19 @@ oc_core_find_at_entry_with_id(size_t device_index, char *id)
 }
 
 int
+oc_core_find_at_entry_with_osc_id(size_t device_index, uint8_t *osc_id,
+                                  size_t osc_id_len)
+{
+  for (int i = 0; i < G_AT_MAX_ENTRIES; i++) {
+    if (oc_byte_string_len(g_at_entries[i].osc_id) == osc_id_len &&
+        memcmp(oc_string(g_at_entries[i].osc_id), osc_id, osc_id_len) == 0) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+int
 oc_core_find_at_entry_empty_slot(size_t device_index)
 {
   for (int i = 0; i < G_AT_MAX_ENTRIES; i++) {
@@ -1570,10 +1586,6 @@ oc_oscore_set_auth_mac(char *client_senderid, int client_senderid_size,
                             shared_key, shared_key_size);
 }
 
-// This looks very similar to oc_oscore_set_auth_mac, but has some very
-// particular differences. The key identifier is the same as before (serial
-// number), but the sender & receiver IDs are swapped. Here, the sender ID is
-// client_recipientid, referring to the MAC. And the receiver ID is emtpy string
 void
 oc_oscore_set_auth_device(char *client_senderid, int client_senderid_size,
                           char *client_recipientid, int client_recipientid_size,
@@ -1658,10 +1670,8 @@ oc_init_oscore_from_storage(size_t device_index, bool from_storage)
   (void)device_index;
 #else /* OC_OSCORE */
   int i;
-  OC_DBG_OSCORE("oc_init_oscore deleting old contexts!!");
-
-  // deleting all contexts!!
-  oc_oscore_free_all_contexts();
+  OC_DBG_OSCORE("oc_init_oscore deleting old sender contexts!!");
+  oc_oscore_free_sender_contexts();
 
   OC_DBG_OSCORE("oc_init_oscore adding OSCORE context...");
   for (i = 0; i < G_AT_MAX_ENTRIES; i++) {
@@ -1688,22 +1698,10 @@ oc_init_oscore_from_storage(size_t device_index, bool from_storage)
         // the spake key, however, is for receiving only, and the osc_id is
         // already inside receiver_id.
 
-        // by default, posts to auth/at set id into the sender id, so the
-        // created contexts are only usable for sending. so we must create
-        // contexts for receiving with ids swapped
-
-        ctx = oc_oscore_add_context(
-          device_index, oc_string(g_at_entries[i].osc_rid),
-          oc_byte_string_len(g_at_entries[i].osc_rid),
-          oc_string(g_at_entries[i].osc_id),
-          oc_byte_string_len(g_at_entries[i].osc_id), ssn, "desc",
-          oc_string(g_at_entries[i].osc_ms),
-          oc_byte_string_len(g_at_entries[i].osc_ms),
-          oc_string(g_at_entries[i].osc_contextid),
-          oc_byte_string_len(g_at_entries[i].osc_contextid), i, from_storage);
-        if (ctx == NULL) {
-          OC_ERR("  failed to load index= %d", i);
-        }
+        // posts to auth/at set id into the sender id, so the created contexts
+        // are only usable for sending. recipient contexts are created
+        // dynamically with the key from the access token matching the key ID,
+        // and with the context id within the received request
       } else {
         OC_DBG_OSCORE("oc_init_oscore: no oscore context");
       }

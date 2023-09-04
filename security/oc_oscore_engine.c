@@ -167,9 +167,55 @@ oc_oscore_recv_message(oc_message_t *message)
       OC_DBG_OSCORE("--- got kid from incoming message");
       OC_LOGbytes(oscore_pkt->kid, oscore_pkt->kid_len);
       OC_DBG_OSCORE("### searching for OSCORE context by kid ###");
-      oscore_ctx =
-        oc_oscore_find_context_by_kid(oscore_ctx, message->endpoint.device,
-                                      oscore_pkt->kid, oscore_pkt->kid_len);
+      oscore_ctx = oc_oscore_find_context_by_kid_idctx(
+        oscore_ctx, message->endpoint.device, oscore_pkt->kid,
+        oscore_pkt->kid_len, oscore_pkt->kid_ctx, oscore_pkt->kid_ctx_len);
+
+      if (!oscore_ctx) {
+        // we do not have a cached context, so we have to make one
+
+        // find auth/at entry with corresponding kid
+        int idx = oc_core_find_at_entry_with_osc_id(0, oscore_pkt->kid,
+                                                    oscore_pkt->kid_len);
+        if (idx == -1) {
+          OC_ERR("***Could not find Access Token matching KID, returning "
+                 "UNAUTHORIZED***");
+          oscore_send_error(oscore_pkt, UNAUTHORIZED_4_01, &message->endpoint);
+          goto oscore_recv_error;
+        }
+        oc_auth_at_t *at_entry = oc_get_auth_at_entry(0, idx);
+
+        // create oscore recipient context from that entry
+        oscore_ctx = oc_oscore_add_context(
+          0, oc_string(at_entry->osc_rid), /* sender id (empty string) */
+          oc_byte_string_len(
+            at_entry->osc_rid),        /* sender id len (ought to be 0)*/
+          oc_string(at_entry->osc_id), /* recipient id */
+          oc_byte_string_len(at_entry->osc_id), /* recipient id len */
+          0, "desc", oc_string(at_entry->osc_ms),
+          oc_byte_string_len(at_entry->osc_ms), oscore_pkt->kid_ctx,
+          oscore_pkt->kid_ctx_len, idx, false);
+
+        // if context is null, free one & try adding again
+        if (!oscore_ctx) {
+          oc_oscore_free_lru_recipient_context();
+          oscore_ctx = oc_oscore_add_context(
+            0, oc_string(at_entry->osc_rid), /* sender id (empty string) */
+            oc_byte_string_len(
+              at_entry->osc_rid),        /* sender id len (ought to be 0)*/
+            oc_string(at_entry->osc_id), /* recipient id */
+            oc_byte_string_len(at_entry->osc_id), /* recipient id len */
+            0, "desc", oc_string(at_entry->osc_ms),
+            oc_byte_string_len(at_entry->osc_ms), oscore_pkt->kid_ctx,
+            oscore_pkt->kid_ctx_len, idx, false);
+          if (!oscore_ctx) {
+            OC_ERR("***Could not create oscore recipient context!***");
+            oscore_send_error(oscore_pkt, UNAUTHORIZED_4_01,
+                              &message->endpoint);
+            goto oscore_recv_error;
+          }
+        }
+      }
     } else {
       /* If message is response */
       if (oscore_pkt->code > OC_FETCH) {
@@ -699,9 +745,10 @@ oc_oscore_send_message(oc_message_t *msg)
     /* Use sender key for encryption */
     uint8_t *key = oscore_ctx->sendkey;
 
-    uint8_t piv[OSCORE_PIV_LEN], piv_len = 0, kid[OSCORE_CTXID_LEN],
-                                 kid_len = 0, nonce[OSCORE_AEAD_NONCE_LEN],
-                                 AAD[OSCORE_AAD_MAX_LEN], AAD_len = 0;
+    uint8_t piv[OSCORE_PIV_LEN],
+      piv_len = 0, kid[OSCORE_CTXID_LEN], kid_len = 0, ctx_id[OSCORE_IDCTX_LEN],
+      ctx_id_len = 0, nonce[OSCORE_AEAD_NONCE_LEN], AAD[OSCORE_AAD_MAX_LEN],
+      AAD_len = 0;
 
     /* If CoAP message is request */
     if ((coap_pkt->code >= OC_GET && coap_pkt->code <= OC_DELETE)
@@ -752,6 +799,10 @@ oc_oscore_send_message(oc_message_t *msg)
       /* Use context-sendid as kid */
       memcpy(kid, oscore_ctx->sendid, oscore_ctx->sendid_len);
       kid_len = oscore_ctx->sendid_len;
+
+      /* use idctx as context_id */
+      memcpy(ctx_id, oscore_ctx->idctx, oscore_ctx->idctx_len);
+      ctx_id_len = oscore_ctx->idctx_len;
 
       /* Compute nonce using partial IV and context->sendid */
       oc_oscore_AEAD_nonce(oscore_ctx->sendid, oscore_ctx->sendid_len, piv,
@@ -888,11 +939,13 @@ oc_oscore_send_message(oc_message_t *msg)
     /* Set the OSCORE option */
     if ((coap_pkt->code >= OC_GET && coap_pkt->code <= OC_DELETE)) {
       // requests encode the PIV
-      coap_set_header_oscore(coap_pkt, piv, piv_len, kid, kid_len, NULL, 0);
+      coap_set_header_oscore(coap_pkt, piv, piv_len, kid, kid_len, ctx_id,
+                             ctx_id_len);
     } else {
       // responses use the (cached) piv of the matching request, stored in the
       // ep/clientcb
-      coap_set_header_oscore(coap_pkt, NULL, 0, kid, kid_len, NULL, 0);
+      coap_set_header_oscore(coap_pkt, NULL, 0, kid, kid_len, ctx_id,
+                             ctx_id_len);
     }
 
     /* Reflect the Observe option (if present in the CoAP packet) */

@@ -20,6 +20,7 @@
 
 #include "messaging/coap/oscore_constants.h"
 #include "oc_helpers.h"
+#include "port/oc_clock.h"
 #include "oc_uuid.h"
 #include <inttypes.h>
 #include <stdbool.h>
@@ -81,8 +82,8 @@ typedef struct oc_oscore_context_t
   uint8_t recvkey[OSCORE_KEY_LEN]; /**< derived recipient key */
   /* Common IV */
   uint8_t commoniv[OSCORE_COMMON_IV_LEN];
-  /* Replay Window */
-  // TODO make the replay window configurable from CMake
+  /* Time of last use, for runtime caching of recipient contexts */
+  oc_clock_time_t last_used;
 } oc_oscore_context_t;
 
 /**
@@ -121,6 +122,19 @@ void oc_oscore_free_context(oc_oscore_context_t *ctx);
 void oc_oscore_free_all_contexts();
 
 /**
+ * @brief free all OSCORE sender contexts
+ *
+ */
+void oc_oscore_free_sender_contexts();
+
+/**
+ * @brief Free contexts with a given auth_at index
+ *
+ * @param auth_at_index the index
+ */
+void oc_oscore_free_contexts_at_id(int auth_at_index);
+
+/**
  * @brief creates an OSCORE context (e.g. the internal structure for
  encoding/decoding)
  *
@@ -152,6 +166,15 @@ oc_oscore_context_t *oc_oscore_add_context(
   const char *mastersecret, int mastersecret_size, const char *token_id,
   int token_id_size, int auth_at_index, bool from_storage);
 
+/**
+ * @brief Free the least recently used recipient context
+ *
+ * The use times are updated when the contexts are created or found using the
+ * find_context_by_* functions
+ *
+ */
+void oc_oscore_free_lru_recipient_context(void);
+
 oc_oscore_context_t *oc_oscore_find_context_by_serial_number(
   size_t device, char *serial_number);
 
@@ -161,6 +184,10 @@ oc_oscore_context_t *oc_oscore_find_context_by_group_address(
 oc_oscore_context_t *oc_oscore_find_context_by_kid(oc_oscore_context_t *ctx,
                                                    size_t device, uint8_t *kid,
                                                    uint8_t kid_len);
+
+oc_oscore_context_t *oc_oscore_find_context_by_kid_idctx(
+  oc_oscore_context_t *ctx, size_t device_index, uint8_t *kid, uint8_t kid_len,
+  uint8_t *kid_ctx, uint8_t kid_ctx_len);
 
 oc_oscore_context_t *oc_oscore_find_context_by_token_mid(
   size_t device, uint8_t *token, uint8_t token_len, uint16_t mid,
