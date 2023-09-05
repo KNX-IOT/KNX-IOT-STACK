@@ -189,7 +189,7 @@ void oc_do_s_mode_read(int64_t group_address);
  * is calling this function)
  * @param rp the "st" value to send e.g. "w" | "rp" | "r"
  */
-void oc_do_s_mode_with_scope(int scope, char *resource_url, char *rp);
+void oc_do_s_mode_with_scope(int scope, const char *resource_url, char *rp);
 
 /**
  * @brief sends (transmits) an s-mode message
@@ -212,7 +212,8 @@ void oc_do_s_mode_with_scope(int scope, char *resource_url, char *rp);
  * is calling this function)
  * @param rp the "st" value to send e.g. "w" | "rp" | "r"
  */
-void oc_do_s_mode_with_scope_no_check(int scope, char *resource_url, char *rp);
+void oc_do_s_mode_with_scope_no_check(int scope, const char *resource_url,
+                                      char *rp);
 
 /** @} */ // end of doc_module_tag_s_mode_client
 

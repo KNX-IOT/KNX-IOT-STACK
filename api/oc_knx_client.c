@@ -72,7 +72,7 @@ static void oc_send_s_mode(oc_endpoint_t *endpoint, char *path,
                            uint32_t sia_value, uint32_t group_address, char *rp,
                            uint8_t *value_data, int value_size);
 
-static int oc_s_mode_get_resource_value(char *resource_url, char *rp,
+static int oc_s_mode_get_resource_value(const char *resource_url, char *rp,
                                         uint8_t *buf, int buf_size);
 
 // ----------------------------------------------------------------------------
@@ -392,7 +392,7 @@ discovery_ia_cb(const char *payload, int len, oc_endpoint_t *endpoint,
 }
 
 int
-oc_knx_client_do_broker_request(char *resource_url, uint32_t ia,
+oc_knx_client_do_broker_request(const char *resource_url, uint32_t ia,
                                 char *destination, char *rp)
 {
   char query[20];
@@ -577,7 +577,7 @@ oc_send_s_mode(oc_endpoint_t *endpoint, char *path, uint32_t sia_value,
 }
 
 static int
-oc_s_mode_get_resource_value(char *resource_url, char *rp, uint8_t *buf,
+oc_s_mode_get_resource_value(const char *resource_url, char *rp, uint8_t *buf,
                              int buf_size)
 {
   (void)rp;
@@ -676,7 +676,7 @@ oc_do_s_mode_read(int64_t group_address)
 // note: this function does not check the transmit flag
 // the caller of this function needs to check if the flag is set.
 void
-oc_do_s_mode_with_scope_and_check(int scope, char *resource_url, char *rp,
+oc_do_s_mode_with_scope_and_check(int scope, const char *resource_url, char *rp,
                                   bool check)
 {
   int value_size;
@@ -808,14 +808,14 @@ oc_do_s_mode_with_scope_and_check(int scope, char *resource_url, char *rp,
 // note: this function does not check the transmit flag
 // the caller of this function needs to check if the flag is set.
 void
-oc_do_s_mode_with_scope_no_check(int scope, char *resource_url, char *rp)
+oc_do_s_mode_with_scope_no_check(int scope, const char *resource_url, char *rp)
 {
   oc_do_s_mode_with_scope_and_check(scope, resource_url, rp, false);
 }
 
 // note: this function does check the transmit flag
 void
-oc_do_s_mode_with_scope(int scope, char *resource_url, char *rp)
+oc_do_s_mode_with_scope(int scope, const char *resource_url, char *rp)
 {
   oc_do_s_mode_with_scope_and_check(scope, resource_url, rp, true);
 }
