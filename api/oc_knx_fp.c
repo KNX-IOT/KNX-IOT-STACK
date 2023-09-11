@@ -1537,7 +1537,7 @@ oc_core_get_recipient_index_url_or_path(int index)
 
     } else {
       // do .knx
-      // spec 1.1. change this to /g
+      // spec 1.1. change this to /k
       PRINT("      oc_core_get_recipient_index_url_or_path (default) %s\n",
             ".knx");
       return ".knx";

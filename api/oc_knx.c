@@ -639,14 +639,14 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
     // if so, then return with bad request
     oc_endpoint_t *origin = request->origin;
     if (origin != NULL) {
-      PRINT(".knx post : origin of message:");
+      PRINT("k post : origin of message:");
       PRINTipaddr(*origin);
       PRINT("\n");
     }
 
     oc_endpoint_t *my_ep = oc_connectivity_get_endpoints(0);
     if (my_ep != NULL) {
-      PRINT(".knx post : myself:");
+      PRINT("k post : myself:");
       PRINTipaddr(*my_ep);
       PRINT("\n");
     }
@@ -773,7 +773,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
   bool st_read = false;
   // handle the request
   // loop over the group addresses of the /fp/r
-  PRINT(" .knx : origin:%s sia: %d ga: %d st: %s\n", ip_address,
+  PRINT(" k : origin:%s sia: %d ga: %d st: %s\n", ip_address,
         g_received_notification.sia, g_received_notification.ga,
         oc_string_checked(g_received_notification.st));
   if (strcmp(oc_string(g_received_notification.st), "w") == 0) {
@@ -800,7 +800,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
   }
 
   int index = oc_core_find_group_object_table_index(g_received_notification.ga);
-  PRINT(" .knx : index %d\n", index);
+  PRINT(" k : index %d\n", index);
   if (index == -1) {
     // if nothing is found (initially) then return a bad request.
     oc_send_cbor_response(request, OC_IGNORE);
@@ -817,12 +817,14 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
   oc_ri_new_request_from_request(new_request, *request, response_buffer,
                                  response_obj);
   new_request.request_payload = oc_s_mode_get_value(request);
+  // new style
+  new_request.uri_path = "k";
   new_request.uri_path = ".knx";
   new_request.uri_path_len = 4;
 
   while (index != -1) {
     oc_string_t myurl = oc_core_find_group_object_table_url_from_index(index);
-    PRINT(" .knx : url  %s\n", oc_string_checked(myurl));
+    PRINT(" k : url  %s\n", oc_string_checked(myurl));
     if (oc_string_len(myurl) > 0) {
       // get the resource to do the fake post on
       const oc_resource_t *my_resource = oc_ri_get_app_resource_by_uri(
@@ -912,7 +914,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
 
   // don't send anything back on a multi cast message
   if (request->origin && (request->origin->flags & MULTICAST)) {
-    PRINT(" .knx : Multicast - not sending response\n");
+    PRINT(" k : Multicast - not sending response\n");
     oc_send_cbor_response(request, OC_IGNORE);
     return;
   }
@@ -939,18 +941,18 @@ oc_create_knx_knx_resource(int resource_idx, size_t device)
                             oc_core_knx_knx_post_handler, 0, 1, "urn:knx:g.s");
 }
 
-OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_g, knx_fingerprint, 0, "/g",
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_g, knx_fingerprint, 0, "/k",
                                      OC_IF_LI | OC_IF_G, APPLICATION_CBOR,
                                      OC_DISCOVERABLE,
                                      oc_core_knx_knx_get_handler, 0,
                                      oc_core_knx_knx_post_handler, 0, NULL,
                                      OC_SIZE_MANY(1), "urn:knx:g.s");
 void
-oc_create_knx_g_resource(int resource_idx, size_t device)
+oc_create_knx_k_resource(int resource_idx, size_t device)
 {
-  OC_DBG("oc_create_knx_g_resource (g)\n");
+  OC_DBG("oc_create_knx_k_resource (g)\n");
 
-  oc_core_populate_resource(resource_idx, device, "/g", OC_IF_LI | OC_IF_G,
+  oc_core_populate_resource(resource_idx, device, "/k", OC_IF_LI | OC_IF_G,
                             APPLICATION_CBOR, OC_DISCOVERABLE,
                             oc_core_knx_knx_get_handler, 0,
                             oc_core_knx_knx_post_handler, 0, 1, "urn:knx:g.s");

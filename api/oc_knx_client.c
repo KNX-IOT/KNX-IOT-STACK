@@ -435,6 +435,9 @@ oc_is_redirected_request(oc_request_t *request)
   if (strncmp(".knx", request->uri_path, request->uri_path_len) == 0) {
     return true;
   }
+  if (strncmp("k", request->uri_path, request->uri_path_len) == 0) {
+    return true;
+  }
   if (strncmp("/p", request->uri_path, request->uri_path_len) == 0) {
     return true;
   }
@@ -504,6 +507,10 @@ oc_issue_s_mode(int scope, int sia_value, uint32_t grpid,
   group_mcast.group_address = group_address;
   oc_send_s_mode(&group_mcast, "/.knx", sia_value, group_address, rp,
                  value_data, value_size);
+
+  // new spec 1.1
+  //oc_send_s_mode(&group_mcast, "k", sia_value, group_address, rp,
+  //               value_data, value_size);
 }
 
 static void
