@@ -283,6 +283,7 @@ oc_oscore_recv_message(oc_message_t *message)
       message->endpoint.piv_len = oscore_pkt->piv_len;
 
       OC_DBG_OSCORE("---got Partial IV from incoming message");
+      OC_DBG_OSCORE("---  Caching PIV for later use...");
       OC_LOGbytes_OSCORE(message->endpoint.piv, message->endpoint.piv_len);
 
       /* Compute nonce using received piv and context->recvid */
@@ -893,12 +894,12 @@ oc_oscore_send_message(oc_message_t *msg)
       OC_LOGbytes_OSCORE(AAD, AAD_len);
 
       /* Copy partial IV into incoming oc_message_t (*msg), if valid */
-      /*
       if (msg_valid) {
         memcpy(msg->endpoint.piv, piv, piv_len);
         msg->endpoint.piv_len = piv_len;
+        OC_DBG_OSCORE("--- Caching PIV for later use...");
+        OC_LOGbytes_OSCORE(msg->endpoint.piv, msg->endpoint.piv_len);
       }
-      */
     }
 
     /* Move CoAP payload to offset 2*COAP_MAX_HEADER_SIZE to accommodate for
