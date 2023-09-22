@@ -822,12 +822,10 @@ oc_oscore_send_message(oc_message_t *msg)
       OC_DBG_OSCORE("---");
 
       /* Copy partial IV into incoming oc_message_t (*msg), if valid */
-      /*
       if (msg_valid) {
         memcpy(msg->endpoint.piv, piv, piv_len);
         msg->endpoint.piv_len = piv_len;
       }
-      */
     } else {
       /* We are dealing with a response */
 
@@ -895,10 +893,12 @@ oc_oscore_send_message(oc_message_t *msg)
       OC_LOGbytes_OSCORE(AAD, AAD_len);
 
       /* Copy partial IV into incoming oc_message_t (*msg), if valid */
+      /*
       if (msg_valid) {
         memcpy(msg->endpoint.piv, piv, piv_len);
         msg->endpoint.piv_len = piv_len;
       }
+      */
     }
 
     /* Move CoAP payload to offset 2*COAP_MAX_HEADER_SIZE to accommodate for
