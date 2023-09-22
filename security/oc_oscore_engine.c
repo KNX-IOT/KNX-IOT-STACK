@@ -864,15 +864,14 @@ oc_oscore_send_message(oc_message_t *msg)
         oc_oscore_AEAD_nonce(oscore_ctx->recvid, oscore_ctx->recvid_len, piv,
                              piv_len, oscore_ctx->commoniv, nonce,
                              OSCORE_AEAD_NONCE_LEN);
-        /* Compute nonce using partial IV and sender ID of the sender ( = receiver
-        * ID )*/
+        /* Compute nonce using partial IV and sender ID of the sender ( =
+         * receiver ID )*/
         OC_DBG_OSCORE(
           "---computed AEAD nonce using new Partial IV (SSN) and Sender ID");
         OC_LOGbytes_OSCORE(nonce, OSCORE_AEAD_NONCE_LEN);
 
-        oc_oscore_compose_AAD(oscore_ctx->recvid, oscore_ctx->recvid_len,
-                              piv, piv_len,
-                              AAD, &AAD_len);
+        oc_oscore_compose_AAD(oscore_ctx->recvid, oscore_ctx->recvid_len, piv,
+                              piv_len, AAD, &AAD_len);
       } else {
         // other responses reuse the PIV from the request
         OC_DBG_OSCORE("---request_piv");
@@ -881,8 +880,8 @@ oc_oscore_send_message(oc_message_t *msg)
                              message->endpoint.piv, message->endpoint.piv_len,
                              oscore_ctx->commoniv, nonce,
                              OSCORE_AEAD_NONCE_LEN);
-        /* Compute nonce using partial IV and sender ID of the sender ( = receiver
-        * ID )*/
+        /* Compute nonce using partial IV and sender ID of the sender ( =
+         * receiver ID )*/
         OC_DBG_OSCORE(
           "---computed AEAD nonce using new Partial IV (SSN) and Sender ID");
         OC_LOGbytes_OSCORE(nonce, OSCORE_AEAD_NONCE_LEN);
