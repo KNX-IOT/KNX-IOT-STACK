@@ -859,31 +859,40 @@ oc_oscore_send_message(oc_message_t *msg)
 
       if (is_empty_ack || is_separate_response) {
         // empty acks and separate responses use a new PIV
+        OC_DBG_OSCORE("---piv");
+        OC_LOGbytes_OSCORE(piv, piv_len);
         oc_oscore_AEAD_nonce(oscore_ctx->recvid, oscore_ctx->recvid_len, piv,
                              piv_len, oscore_ctx->commoniv, nonce,
                              OSCORE_AEAD_NONCE_LEN);
+        /* Compute nonce using partial IV and sender ID of the sender ( = receiver
+        * ID )*/
+        OC_DBG_OSCORE(
+          "---computed AEAD nonce using new Partial IV (SSN) and Sender ID");
+        OC_LOGbytes_OSCORE(nonce, OSCORE_AEAD_NONCE_LEN);
+
+        oc_oscore_compose_AAD(oscore_ctx->recvid, oscore_ctx->recvid_len,
+                              piv, piv_len,
+                              AAD, &AAD_len);
       } else {
         // other responses reuse the PIV from the request
+        OC_DBG_OSCORE("---request_piv");
+        OC_LOGbytes_OSCORE(message->endpoint.piv, message->endpoint.piv_len);
         oc_oscore_AEAD_nonce(oscore_ctx->recvid, oscore_ctx->recvid_len,
                              message->endpoint.piv, message->endpoint.piv_len,
                              oscore_ctx->commoniv, nonce,
                              OSCORE_AEAD_NONCE_LEN);
+        /* Compute nonce using partial IV and sender ID of the sender ( = receiver
+        * ID )*/
+        OC_DBG_OSCORE(
+          "---computed AEAD nonce using new Partial IV (SSN) and Sender ID");
+        OC_LOGbytes_OSCORE(nonce, OSCORE_AEAD_NONCE_LEN);
+
+        oc_oscore_compose_AAD(oscore_ctx->recvid, oscore_ctx->recvid_len,
+                              message->endpoint.piv, message->endpoint.piv_len,
+                              AAD, &AAD_len);
       }
 
-      /* Compute nonce using partial IV and sender ID of the sender ( = receiver
-       * ID )*/
-      OC_DBG_OSCORE(
-        "---computed AEAD nonce using new Partial IV (SSN) and Sender ID");
-      OC_LOGbytes_OSCORE(nonce, OSCORE_AEAD_NONCE_LEN);
-
-      OC_DBG_OSCORE("---request_piv");
-      OC_LOGbytes_OSCORE(message->endpoint.piv, message->endpoint.piv_len);
-
-      /* Compose AAD using request_piv and context->recvid */
-      oc_oscore_compose_AAD(oscore_ctx->recvid, oscore_ctx->recvid_len,
-                            message->endpoint.piv, message->endpoint.piv_len,
-                            AAD, &AAD_len);
-      OC_DBG_OSCORE("---composed AAD using request_piv and Recipient ID");
+      OC_DBG_OSCORE("---composed AAD using piv and Recipient ID");
       OC_LOGbytes_OSCORE(AAD, AAD_len);
 
       /* Copy partial IV into incoming oc_message_t (*msg), if valid */
