@@ -846,32 +846,30 @@ oc_oscore_send_message(oc_message_t *msg)
       coap_transaction_t *transaction =
         coap_get_transaction_by_token(coap_pkt->token, coap_pkt->token_len);
 
-      bool is_initial_transmission = transaction && transaction->retrans_counter == 0;
-      bool is_empty_ack            =  coap_pkt->type == COAP_TYPE_ACK && coap_pkt->token_len == 0;
-      bool is_separate_response    = coap_pkt->type == COAP_TYPE_CON;
+      bool is_initial_transmission =
+        transaction && transaction->retrans_counter == 0;
+      bool is_empty_ack =
+        coap_pkt->type == COAP_TYPE_ACK && coap_pkt->token_len == 0;
+      bool is_separate_response = coap_pkt->type == COAP_TYPE_CON;
       bool is_not_transaction = !transaction;
 
-      if  (is_initial_transmission
-        || is_empty_ack
-        || is_separate_response
-        || is_not_transaction)
+      if (is_initial_transmission || is_empty_ack || is_separate_response ||
+          is_not_transaction)
         increment_ssn_in_context(oscore_ctx);
 
-      if (is_empty_ack || is_separate_response)
-      {
+      if (is_empty_ack || is_separate_response) {
         // empty acks and separate responses use a new PIV
-        oc_oscore_AEAD_nonce(oscore_ctx->recvid, oscore_ctx->recvid_len,
-                            piv, piv_len,
-                            oscore_ctx->commoniv, nonce, OSCORE_AEAD_NONCE_LEN);
-      }
-      else
-      {
+        oc_oscore_AEAD_nonce(oscore_ctx->recvid, oscore_ctx->recvid_len, piv,
+                             piv_len, oscore_ctx->commoniv, nonce,
+                             OSCORE_AEAD_NONCE_LEN);
+      } else {
         // other responses reuse the PIV from the request
         oc_oscore_AEAD_nonce(oscore_ctx->recvid, oscore_ctx->recvid_len,
-                            message->endpoint.piv, message->endpoint.piv_len,
-                            oscore_ctx->commoniv, nonce, OSCORE_AEAD_NONCE_LEN);
+                             message->endpoint.piv, message->endpoint.piv_len,
+                             oscore_ctx->commoniv, nonce,
+                             OSCORE_AEAD_NONCE_LEN);
       }
-      
+
       /* Compute nonce using partial IV and sender ID of the sender ( = receiver
        * ID )*/
       OC_DBG_OSCORE(
@@ -959,16 +957,18 @@ oc_oscore_send_message(oc_message_t *msg)
       coap_set_header_max_age(coap_pkt, 0);
     }
 
-    bool is_request = coap_pkt->type == COAP_TYPE_CON && coap_pkt->type == COAP_TYPE_NON;
-    bool is_empty_ack            =  coap_pkt->type == COAP_TYPE_ACK && coap_pkt->token_len == 0;
-    bool is_separate_response    = coap_pkt->type == COAP_TYPE_CON;
+    bool is_request =
+      coap_pkt->type == COAP_TYPE_CON && coap_pkt->type == COAP_TYPE_NON;
+    bool is_empty_ack =
+      coap_pkt->type == COAP_TYPE_ACK && coap_pkt->token_len == 0;
+    bool is_separate_response = coap_pkt->type == COAP_TYPE_CON;
     /* Set the OSCORE option */
     if (is_request || is_empty_ack || is_separate_response) {
       coap_set_header_oscore(coap_pkt, piv, piv_len, kid, kid_len, ctx_id,
                              ctx_id_len);
     } else {
-      // other responses use the (cached) piv of the matching request, stored in the
-      // ep/clientcb
+      // other responses use the (cached) piv of the matching request, stored in
+      // the ep/clientcb
       coap_set_header_oscore(coap_pkt, NULL, 0, kid, kid_len, ctx_id,
                              ctx_id_len);
     }
