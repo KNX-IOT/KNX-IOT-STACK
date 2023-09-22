@@ -857,12 +857,23 @@ oc_oscore_send_message(oc_message_t *msg)
         || is_not_transaction)
         increment_ssn_in_context(oscore_ctx);
 
+      if (is_empty_ack || is_separate_response)
+      {
+        // empty acks and separate responses use a new PIV
+        oc_oscore_AEAD_nonce(oscore_ctx->recvid, oscore_ctx->recvid_len,
+                            piv, piv_len,
+                            oscore_ctx->commoniv, nonce, OSCORE_AEAD_NONCE_LEN);
+      }
+      else
+      {
+        // other responses reuse the PIV from the request
+        oc_oscore_AEAD_nonce(oscore_ctx->recvid, oscore_ctx->recvid_len,
+                            message->endpoint.piv, message->endpoint.piv_len,
+                            oscore_ctx->commoniv, nonce, OSCORE_AEAD_NONCE_LEN);
+      }
+      
       /* Compute nonce using partial IV and sender ID of the sender ( = receiver
        * ID )*/
-      oc_oscore_AEAD_nonce(oscore_ctx->recvid, oscore_ctx->recvid_len,
-                           message->endpoint.piv, message->endpoint.piv_len,
-                           oscore_ctx->commoniv, nonce, OSCORE_AEAD_NONCE_LEN);
-
       OC_DBG_OSCORE(
         "---computed AEAD nonce using new Partial IV (SSN) and Sender ID");
       OC_LOGbytes_OSCORE(nonce, OSCORE_AEAD_NONCE_LEN);
