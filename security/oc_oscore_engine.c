@@ -862,7 +862,7 @@ oc_oscore_send_message(oc_message_t *msg)
         // empty acks and separate responses use a new PIV
         OC_DBG_OSCORE("---piv");
         OC_LOGbytes_OSCORE(piv, piv_len);
-        oc_oscore_AEAD_nonce(oscore_ctx->recvid, oscore_ctx->recvid_len, piv,
+        oc_oscore_AEAD_nonce(oscore_ctx->sendid, oscore_ctx->sendid_len, piv,
                              piv_len, oscore_ctx->commoniv, nonce,
                              OSCORE_AEAD_NONCE_LEN);
         /* Compute nonce using partial IV and sender ID of the sender ( =
