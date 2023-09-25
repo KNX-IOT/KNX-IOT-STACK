@@ -887,14 +887,21 @@ oc_oscore_send_message(oc_message_t *msg)
 
       }
       // AAD always uses the request PIV
-      if (is_empty_ack)
+
+      // this if should only fire when the client is sending the acknowledgement
+      // for the confirmable, separate response of the server
+      if (is_empty_ack && false)
+      {
         oc_oscore_compose_AAD(oscore_ctx->sendid, oscore_ctx->sendid_len,
                             message->endpoint.piv, message->endpoint.piv_len,
                             AAD, &AAD_len);
+      }
       else
+      {
         oc_oscore_compose_AAD(oscore_ctx->recvid, oscore_ctx->recvid_len,
                             message->endpoint.piv, message->endpoint.piv_len,
                             AAD, &AAD_len);
+      }
       OC_DBG_OSCORE("---composed AAD using request piv and Recipient ID");
       OC_LOGbytes_OSCORE(AAD, AAD_len);
 
