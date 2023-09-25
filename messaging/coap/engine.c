@@ -880,7 +880,7 @@ coap_receive(oc_message_t *msg)
 #endif /* OC_CLIENT */
 
       if (message->type == COAP_TYPE_CON) {
-        coap_send_empty_response(COAP_TYPE_ACK, message->mid, NULL, 0, 0,
+        coap_send_empty_response(COAP_TYPE_ACK, message->mid, message->token, message->token_len, 0,
                                  &msg->endpoint);
       } else if (message->type == COAP_TYPE_ACK) {
       } else if (message->type == COAP_TYPE_RST) {
