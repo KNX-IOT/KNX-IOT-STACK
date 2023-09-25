@@ -887,7 +887,12 @@ oc_oscore_send_message(oc_message_t *msg)
 
       }
       // AAD always uses the request PIV
-      oc_oscore_compose_AAD(oscore_ctx->recvid, oscore_ctx->recvid_len,
+      if (is_empty_ack)
+        oc_oscore_compose_AAD(oscore_ctx->sendid, oscore_ctx->sendid_len,
+                            message->endpoint.piv, message->endpoint.piv_len,
+                            AAD, &AAD_len);
+      else
+        oc_oscore_compose_AAD(oscore_ctx->recvid, oscore_ctx->recvid_len,
                             message->endpoint.piv, message->endpoint.piv_len,
                             AAD, &AAD_len);
       OC_DBG_OSCORE("---composed AAD using request piv and Recipient ID");
