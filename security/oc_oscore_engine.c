@@ -850,7 +850,7 @@ oc_oscore_send_message(oc_message_t *msg)
       bool is_initial_transmission =
         transaction && transaction->retrans_counter == 0;
       bool is_empty_ack =
-        coap_pkt->type == COAP_TYPE_ACK && coap_pkt->token_len == 0;
+        coap_pkt->type == COAP_TYPE_ACK && coap_pkt->code == 0;
       bool is_separate_response = coap_pkt->type == COAP_TYPE_CON;
       bool is_not_transaction = !transaction;
 
@@ -969,7 +969,7 @@ oc_oscore_send_message(oc_message_t *msg)
     bool is_request =
       coap_pkt->type == COAP_TYPE_CON && coap_pkt->type == COAP_TYPE_NON;
     bool is_empty_ack =
-      coap_pkt->type == COAP_TYPE_ACK && coap_pkt->token_len == 0;
+      coap_pkt->type == COAP_TYPE_ACK && coap_pkt->code == 0;
     bool is_separate_response = coap_pkt->type == COAP_TYPE_CON;
     /* Set the OSCORE option */
     if (is_request || is_empty_ack || is_separate_response) {
