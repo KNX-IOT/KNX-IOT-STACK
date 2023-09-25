@@ -902,6 +902,9 @@ oc_oscore_send_message(oc_message_t *msg)
       }
     }
 
+    // store the inner CoAP code
+    uint8_t inner_code = coap_pkt->code;
+
     /* Move CoAP payload to offset 2*COAP_MAX_HEADER_SIZE to accommodate for
        Outer+Inner CoAP options in the OSCORE packet.
     */
@@ -969,7 +972,7 @@ oc_oscore_send_message(oc_message_t *msg)
     bool is_request =
       coap_pkt->type == COAP_TYPE_CON && coap_pkt->type == COAP_TYPE_NON;
     bool is_empty_ack =
-      coap_pkt->type == COAP_TYPE_ACK && coap_pkt->code == 0;
+      coap_pkt->type == COAP_TYPE_ACK && inner_code == 0;
     bool is_separate_response = coap_pkt->type == COAP_TYPE_CON;
     /* Set the OSCORE option */
     if (is_request || is_empty_ack || is_separate_response) {
