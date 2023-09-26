@@ -836,13 +836,6 @@ oc_oscore_send_message(oc_message_t *msg)
         msg->endpoint.request_piv_len = piv_len;
       }
     } else {
-      /* We are dealing with a response */
-
-      /* Request was not protected by OSCORE */
-      if (message->endpoint.request_piv_len == 0) {
-        OC_DBG("request was not protected by OSCORE");
-        goto oscore_send_dispatch;
-      }
       OC_DBG("### protecting outgoing response ###");
 
       /* Use context->SSN as partial IV */
