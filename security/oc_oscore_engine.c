@@ -893,6 +893,7 @@ oc_oscore_send_message(oc_message_t *msg)
       // for the confirmable, separate response of the server
       if (is_empty_ack && msg->endpoint.rx_msg_is_response)
       {
+        OC_DBG_OSCORE("--- is empty ACK, using details from the request");
         oc_oscore_compose_AAD(oscore_ctx->sendid, oscore_ctx->sendid_len,
                             message->endpoint.request_piv, message->endpoint.request_piv_len,
                             AAD, &AAD_len);
