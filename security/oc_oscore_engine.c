@@ -159,6 +159,11 @@ oc_oscore_recv_message(oc_message_t *message)
       }
     }
 
+    if (oscore_pkt->code >= OC_GET && oscore_pkt->code <= OC_DELETE)
+      message->endpoint.rx_msg_is_response = false;
+    else
+      message->endpoint.rx_msg_is_response = true;
+
     uint8_t *request_piv = NULL, request_piv_len = 0;
 
     /* If OSCORE packet contains kid... */
@@ -890,7 +895,7 @@ oc_oscore_send_message(oc_message_t *msg)
 
       // this if should only fire when the client is sending the acknowledgement
       // for the confirmable, separate response of the server
-      if (is_empty_ack && false)
+      if (is_empty_ack && msg->endpoint.rx_msg_is_response)
       {
         oc_oscore_compose_AAD(oscore_ctx->sendid, oscore_ctx->sendid_len,
                             message->endpoint.piv, message->endpoint.piv_len,
