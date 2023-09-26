@@ -913,8 +913,8 @@ oc_oscore_send_message(oc_message_t *msg)
       OC_DBG_OSCORE("---composed AAD using request piv and Recipient ID");
       OC_LOGbytes_OSCORE(AAD, AAD_len);
 
-      /* Copy partial IV into incoming oc_message_t (*msg), if valid */
-      if (msg_valid) {
+      /* Copy partial IV into incoming oc_message_t (*msg), if valid and if message is request */
+      if (msg_valid && coap_pkt->code >= OC_GET && coap_pkt->code <= OC_DELETE) {
         memcpy(msg->endpoint.request_piv, piv, piv_len);
         msg->endpoint.request_piv_len = piv_len;
         OC_DBG_OSCORE("--- Caching PIV for later use...");
