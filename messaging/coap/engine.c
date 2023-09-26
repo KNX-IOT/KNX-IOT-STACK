@@ -486,7 +486,7 @@ coap_receive(oc_message_t *msg)
         oc_new_byte_string(&kid, msg->endpoint.kid, msg->endpoint.kid_len);
         oc_new_byte_string(&kid_ctx, msg->endpoint.kid_ctx,
                            msg->endpoint.kid_ctx_len);
-        oscore_read_piv(msg->endpoint.piv, msg->endpoint.piv_len, &ssn);
+        oscore_read_piv(msg->endpoint.request_piv, msg->endpoint.request_piv_len, &ssn);
 
         client_is_sync = oc_replay_check_client(ssn, kid, kid_ctx);
       }

@@ -283,17 +283,20 @@ oc_oscore_recv_message(oc_message_t *message)
         OC_LOGbytes_OSCORE(AAD, AAD_len);
       }
 
-      /* Copy received piv into oc_message_t->endpoint */
-      memcpy(message->endpoint.piv, oscore_pkt->piv, oscore_pkt->piv_len);
-      message->endpoint.piv_len = oscore_pkt->piv_len;
+      /* Copy received piv into oc_message_t->endpoint for requests */
+      if (oscore_pkt->code >= OC_GET && oscore_pkt->code <= OC_DELETE)
+      {
+        memcpy(message->endpoint.request_piv, oscore_pkt->piv, oscore_pkt->piv_len);
+        message->endpoint.request_piv_len = oscore_pkt->piv_len;
+      }
 
       OC_DBG_OSCORE("---got Partial IV from incoming message");
       OC_DBG_OSCORE("---  Caching PIV for later use...");
-      OC_LOGbytes_OSCORE(message->endpoint.piv, message->endpoint.piv_len);
+      OC_LOGbytes_OSCORE(message->endpoint.request_piv, message->endpoint.request_piv_len);
 
       /* Compute nonce using received piv and context->recvid */
       oc_oscore_AEAD_nonce(oscore_ctx->recvid, oscore_ctx->recvid_len,
-                           message->endpoint.piv, message->endpoint.piv_len,
+                           oscore_pkt->piv, oscore_pkt->piv_len,
                            oscore_ctx->commoniv, nonce, OSCORE_AEAD_NONCE_LEN);
 
       OC_DBG_OSCORE(
@@ -307,11 +310,11 @@ oc_oscore_recv_message(oc_message_t *message)
       OC_LOGbytes_OSCORE(request_piv, request_piv_len);
 
       /* If oc_message_t->endpoint.piv_len == 0 */
-      if (message->endpoint.piv_len == 0) {
+      if (message->endpoint.request_piv_len == 0) {
         /* Copy request_piv from client cb/transaction into
          * oc_message_t->endpoint */
-        memcpy(message->endpoint.piv, request_piv, request_piv_len);
-        message->endpoint.piv_len = request_piv_len;
+        memcpy(message->endpoint.request_piv, request_piv, request_piv_len);
+        message->endpoint.request_piv_len = request_piv_len;
 
         /* Compute nonce using request_piv and context->sendid */
         oc_oscore_AEAD_nonce(oscore_ctx->sendid, oscore_ctx->sendid_len,
@@ -829,14 +832,14 @@ oc_oscore_send_message(oc_message_t *msg)
 
       /* Copy partial IV into incoming oc_message_t (*msg), if valid */
       if (msg_valid) {
-        memcpy(msg->endpoint.piv, piv, piv_len);
-        msg->endpoint.piv_len = piv_len;
+        memcpy(msg->endpoint.request_piv, piv, piv_len);
+        msg->endpoint.request_piv_len = piv_len;
       }
     } else {
       /* We are dealing with a response */
 
       /* Request was not protected by OSCORE */
-      if (message->endpoint.piv_len == 0) {
+      if (message->endpoint.request_piv_len == 0) {
         OC_DBG("request was not protected by OSCORE");
         goto oscore_send_dispatch;
       }
@@ -879,9 +882,9 @@ oc_oscore_send_message(oc_message_t *msg)
       } else {
         // other responses reuse the PIV from the request
         OC_DBG_OSCORE("---request_piv");
-        OC_LOGbytes_OSCORE(message->endpoint.piv, message->endpoint.piv_len);
+        OC_LOGbytes_OSCORE(message->endpoint.request_piv, message->endpoint.request_piv_len);
         oc_oscore_AEAD_nonce(oscore_ctx->recvid, oscore_ctx->recvid_len,
-                             message->endpoint.piv, message->endpoint.piv_len,
+                             message->endpoint.request_piv, message->endpoint.request_piv_len,
                              oscore_ctx->commoniv, nonce,
                              OSCORE_AEAD_NONCE_LEN);
         /* Compute nonce using partial IV and sender ID of the sender ( =
@@ -898,13 +901,13 @@ oc_oscore_send_message(oc_message_t *msg)
       if (is_empty_ack && msg->endpoint.rx_msg_is_response)
       {
         oc_oscore_compose_AAD(oscore_ctx->sendid, oscore_ctx->sendid_len,
-                            message->endpoint.piv, message->endpoint.piv_len,
+                            message->endpoint.request_piv, message->endpoint.request_piv_len,
                             AAD, &AAD_len);
       }
       else
       {
         oc_oscore_compose_AAD(oscore_ctx->recvid, oscore_ctx->recvid_len,
-                            message->endpoint.piv, message->endpoint.piv_len,
+                            message->endpoint.request_piv, message->endpoint.request_piv_len,
                             AAD, &AAD_len);
       }
       OC_DBG_OSCORE("---composed AAD using request piv and Recipient ID");
@@ -912,10 +915,10 @@ oc_oscore_send_message(oc_message_t *msg)
 
       /* Copy partial IV into incoming oc_message_t (*msg), if valid */
       if (msg_valid) {
-        memcpy(msg->endpoint.piv, piv, piv_len);
-        msg->endpoint.piv_len = piv_len;
+        memcpy(msg->endpoint.request_piv, piv, piv_len);
+        msg->endpoint.request_piv_len = piv_len;
         OC_DBG_OSCORE("--- Caching PIV for later use...");
-        OC_LOGbytes_OSCORE(msg->endpoint.piv, msg->endpoint.piv_len);
+        OC_LOGbytes_OSCORE(msg->endpoint.request_piv, msg->endpoint.request_piv_len);
       }
     }
 
