@@ -309,13 +309,15 @@ oc_oscore_recv_message(oc_message_t *message)
       OC_DBG_OSCORE("---got request_piv from client callback");
       OC_LOGbytes_OSCORE(request_piv, request_piv_len);
 
-      /* If oc_message_t->endpoint.piv_len == 0 */
-      if (oscore_pkt->piv_len == 0) {
+      if (message->endpoint.request_piv_len == 0)
+      {
         /* Copy request_piv from client cb/transaction into
          * oc_message_t->endpoint */
         memcpy(message->endpoint.request_piv, request_piv, request_piv_len);
         message->endpoint.request_piv_len = request_piv_len;
+      }
 
+      if (oscore_pkt->piv_len == 0) {
         /* Compute nonce using request_piv and context->sendid */
         oc_oscore_AEAD_nonce(oscore_ctx->sendid, oscore_ctx->sendid_len,
                              request_piv, request_piv_len, oscore_ctx->commoniv,
@@ -894,6 +896,10 @@ oc_oscore_send_message(oc_message_t *msg)
       if (is_empty_ack && msg->endpoint.rx_msg_is_response)
       {
         OC_DBG_OSCORE("--- is empty ACK, using details from the request");
+        // BUG IS HERE! request_piv_len is zero, probably because this is a different endpoint
+        // than the one created for the request.
+
+        // so where piv???
         oc_oscore_compose_AAD(oscore_ctx->sendid, oscore_ctx->sendid_len,
                             message->endpoint.request_piv, message->endpoint.request_piv_len,
                             AAD, &AAD_len);
