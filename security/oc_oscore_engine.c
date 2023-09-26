@@ -283,16 +283,16 @@ oc_oscore_recv_message(oc_message_t *message)
         OC_LOGbytes_OSCORE(AAD, AAD_len);
       }
 
+      OC_DBG_OSCORE("---got Partial IV from incoming message");
+      OC_LOGbytes_OSCORE(oscore_pkt->piv, oscore_pkt->piv_len);
+
       /* Copy received piv into oc_message_t->endpoint for requests */
       if (oscore_pkt->code >= OC_GET && oscore_pkt->code <= OC_DELETE)
       {
         memcpy(message->endpoint.request_piv, oscore_pkt->piv, oscore_pkt->piv_len);
         message->endpoint.request_piv_len = oscore_pkt->piv_len;
+        OC_DBG_OSCORE("---  Caching PIV for later use...");
       }
-
-      OC_DBG_OSCORE("---got Partial IV from incoming message");
-      OC_DBG_OSCORE("---  Caching PIV for later use...");
-      OC_LOGbytes_OSCORE(message->endpoint.request_piv, message->endpoint.request_piv_len);
 
       /* Compute nonce using received piv and context->recvid */
       oc_oscore_AEAD_nonce(oscore_ctx->recvid, oscore_ctx->recvid_len,
@@ -310,7 +310,7 @@ oc_oscore_recv_message(oc_message_t *message)
       OC_LOGbytes_OSCORE(request_piv, request_piv_len);
 
       /* If oc_message_t->endpoint.piv_len == 0 */
-      if (message->endpoint.request_piv_len == 0) {
+      if (oscore_pkt->piv_len == 0) {
         /* Copy request_piv from client cb/transaction into
          * oc_message_t->endpoint */
         memcpy(message->endpoint.request_piv, request_piv, request_piv_len);
