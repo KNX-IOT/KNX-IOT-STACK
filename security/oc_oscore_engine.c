@@ -159,11 +159,14 @@ oc_oscore_recv_message(oc_message_t *message)
       }
     }
 
+    // needed for encrypting final ack of separate response
+    /*
     if (oscore_pkt->code >= OC_GET && oscore_pkt->code <= OC_DELETE)
       message->endpoint.rx_msg_is_response = false;
     else
       message->endpoint.rx_msg_is_response = true;
-
+    */
+   
     uint8_t *request_piv = NULL, request_piv_len = 0;
 
     /* If OSCORE packet contains kid... */
@@ -309,13 +312,18 @@ oc_oscore_recv_message(oc_message_t *message)
       OC_DBG_OSCORE("---got request_piv from client callback");
       OC_LOGbytes_OSCORE(request_piv, request_piv_len);
 
+      // the final ack of a separate response sequence is sent unencrypted
+      // if the request_piv_length in the endpoint is 0. So, we cannot copy
+      // it here in this case.
+      /*
       if (message->endpoint.request_piv_len == 0)
       {
-        /* Copy request_piv from client cb/transaction into
-         * oc_message_t->endpoint */
+        // Copy request_piv from client cb/transaction into
+        // oc_message_t->endpoint
         memcpy(message->endpoint.request_piv, request_piv, request_piv_len);
         message->endpoint.request_piv_len = request_piv_len;
       }
+      */
 
       if (oscore_pkt->piv_len == 0) {
         /* Compute nonce using request_piv and context->sendid */
@@ -838,6 +846,13 @@ oc_oscore_send_message(oc_message_t *msg)
         msg->endpoint.request_piv_len = piv_len;
       }
     } else {
+      /* We are dealing with a response */
+
+      /* Request was not protected by OSCORE */
+      if (message->endpoint.request_piv_len == 0) {
+        OC_DBG("request was not protected by OSCORE");
+        goto oscore_send_dispatch;
+      }
       OC_DBG("### protecting outgoing response ###");
 
       /* Use context->SSN as partial IV */
@@ -890,7 +905,11 @@ oc_oscore_send_message(oc_message_t *msg)
 
       }
       // AAD always uses the request PIV
-
+      
+      // This block, alongside endpoint.rx_msg_is_response, is needed for encrypting
+      // the final ack of a separate response sequence. For now, we have decided to 
+      // send that ack in plaintext, so this is all commented out
+      /*
       if (is_empty_ack && msg->endpoint.rx_msg_is_response)
       {
         // only fires when the client is sending the acknowledgement
@@ -912,6 +931,7 @@ oc_oscore_send_message(oc_message_t *msg)
                             AAD, &AAD_len);
       }
       else
+      */
       {
         oc_oscore_compose_AAD(oscore_ctx->recvid, oscore_ctx->recvid_len,
                             message->endpoint.request_piv, message->endpoint.request_piv_len,
