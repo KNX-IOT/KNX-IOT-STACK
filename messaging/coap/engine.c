@@ -486,7 +486,8 @@ coap_receive(oc_message_t *msg)
         oc_new_byte_string(&kid, msg->endpoint.kid, msg->endpoint.kid_len);
         oc_new_byte_string(&kid_ctx, msg->endpoint.kid_ctx,
                            msg->endpoint.kid_ctx_len);
-        oscore_read_piv(msg->endpoint.request_piv, msg->endpoint.request_piv_len, &ssn);
+        oscore_read_piv(msg->endpoint.request_piv,
+                        msg->endpoint.request_piv_len, &ssn);
 
         client_is_sync = oc_replay_check_client(ssn, kid, kid_ctx);
       }
@@ -880,8 +881,8 @@ coap_receive(oc_message_t *msg)
 #endif /* OC_CLIENT */
 
       if (message->type == COAP_TYPE_CON) {
-        coap_send_empty_response(COAP_TYPE_ACK, message->mid, message->token, message->token_len, 0,
-                                 &msg->endpoint);
+        coap_send_empty_response(COAP_TYPE_ACK, message->mid, message->token,
+                                 message->token_len, 0, &msg->endpoint);
       } else if (message->type == COAP_TYPE_ACK) {
       } else if (message->type == COAP_TYPE_RST) {
 #ifdef OC_SERVER

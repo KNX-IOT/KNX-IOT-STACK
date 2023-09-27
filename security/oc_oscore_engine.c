@@ -166,7 +166,7 @@ oc_oscore_recv_message(oc_message_t *message)
     else
       message->endpoint.rx_msg_is_response = true;
     */
-   
+
     uint8_t *request_piv = NULL, request_piv_len = 0;
 
     /* If OSCORE packet contains kid... */
@@ -290,9 +290,9 @@ oc_oscore_recv_message(oc_message_t *message)
       OC_LOGbytes_OSCORE(oscore_pkt->piv, oscore_pkt->piv_len);
 
       /* Copy received piv into oc_message_t->endpoint for requests */
-      if (oscore_pkt->code >= OC_GET && oscore_pkt->code <= OC_DELETE)
-      {
-        memcpy(message->endpoint.request_piv, oscore_pkt->piv, oscore_pkt->piv_len);
+      if (oscore_pkt->code >= OC_GET && oscore_pkt->code <= OC_DELETE) {
+        memcpy(message->endpoint.request_piv, oscore_pkt->piv,
+               oscore_pkt->piv_len);
         message->endpoint.request_piv_len = oscore_pkt->piv_len;
         OC_DBG_OSCORE("---  Caching PIV for later use...");
       }
@@ -892,31 +892,34 @@ oc_oscore_send_message(oc_message_t *msg)
       } else {
         // other responses reuse the PIV from the request
         OC_DBG_OSCORE("---request_piv");
-        OC_LOGbytes_OSCORE(message->endpoint.request_piv, message->endpoint.request_piv_len);
-        oc_oscore_AEAD_nonce(oscore_ctx->recvid, oscore_ctx->recvid_len,
-                             message->endpoint.request_piv, message->endpoint.request_piv_len,
-                             oscore_ctx->commoniv, nonce,
-                             OSCORE_AEAD_NONCE_LEN);
+        OC_LOGbytes_OSCORE(message->endpoint.request_piv,
+                           message->endpoint.request_piv_len);
+        oc_oscore_AEAD_nonce(
+          oscore_ctx->recvid, oscore_ctx->recvid_len,
+          message->endpoint.request_piv, message->endpoint.request_piv_len,
+          oscore_ctx->commoniv, nonce, OSCORE_AEAD_NONCE_LEN);
         /* Compute nonce using partial IV and sender ID of the sender ( =
          * receiver ID )*/
         OC_DBG_OSCORE(
           "---computed AEAD nonce using new Partial IV (SSN) and Sender ID");
         OC_LOGbytes_OSCORE(nonce, OSCORE_AEAD_NONCE_LEN);
-
       }
       // AAD always uses the request PIV
-      
-      // This block, alongside endpoint.rx_msg_is_response, is needed for encrypting
-      // the final ack of a separate response sequence. For now, we have decided to 
-      // send that ack in plaintext, so this is all commented out
+
+      // This block, alongside endpoint.rx_msg_is_response, is needed for
+      // encrypting the final ack of a separate response sequence. For now, we
+      // have decided to send that ack in plaintext, so this is all commented
+      // out
       /*
       if (is_empty_ack && msg->endpoint.rx_msg_is_response)
       {
         // only fires when the client is sending the acknowledgement
         // for the confirmable, separate response of the server
         OC_DBG_OSCORE("--- is empty ACK, using details from the request");
-        // We have already sent an ACK for the original request, so the transaction 
-        // is gone and the other side cannot find the keying material. so for this
+        // We have already sent an ACK for the original request, so the
+      transaction
+        // is gone and the other side cannot find the keying material. so for
+      this
         // message only we include it again.
         memcpy(kid, oscore_ctx->sendid, oscore_ctx->sendid_len);
         kid_len = oscore_ctx->sendid_len;
@@ -927,25 +930,28 @@ oc_oscore_send_message(oc_message_t *msg)
         OC_LOGbytes_OSCORE(kid, kid_len);
 
         oc_oscore_compose_AAD(oscore_ctx->sendid, oscore_ctx->sendid_len,
-                            message->endpoint.request_piv, message->endpoint.request_piv_len,
-                            AAD, &AAD_len);
+                            message->endpoint.request_piv,
+      message->endpoint.request_piv_len, AAD, &AAD_len);
       }
       else
       */
       {
         oc_oscore_compose_AAD(oscore_ctx->recvid, oscore_ctx->recvid_len,
-                            message->endpoint.request_piv, message->endpoint.request_piv_len,
-                            AAD, &AAD_len);
+                              message->endpoint.request_piv,
+                              message->endpoint.request_piv_len, AAD, &AAD_len);
       }
       OC_DBG_OSCORE("---composed AAD using request piv and Recipient ID");
       OC_LOGbytes_OSCORE(AAD, AAD_len);
 
-      /* Copy partial IV into incoming oc_message_t (*msg), if valid and if message is request */
-      if (msg_valid && coap_pkt->code >= OC_GET && coap_pkt->code <= OC_DELETE) {
+      /* Copy partial IV into incoming oc_message_t (*msg), if valid and if
+       * message is request */
+      if (msg_valid && coap_pkt->code >= OC_GET &&
+          coap_pkt->code <= OC_DELETE) {
         memcpy(msg->endpoint.request_piv, piv, piv_len);
         msg->endpoint.request_piv_len = piv_len;
         OC_DBG_OSCORE("--- Caching PIV for later use...");
-        OC_LOGbytes_OSCORE(msg->endpoint.request_piv, msg->endpoint.request_piv_len);
+        OC_LOGbytes_OSCORE(msg->endpoint.request_piv,
+                           msg->endpoint.request_piv_len);
       }
     }
 
@@ -1018,8 +1024,7 @@ oc_oscore_send_message(oc_message_t *msg)
 
     bool is_request =
       coap_pkt->type == COAP_TYPE_CON && coap_pkt->type == COAP_TYPE_NON;
-    bool is_empty_ack =
-      coap_pkt->type == COAP_TYPE_ACK && inner_code == 0;
+    bool is_empty_ack = coap_pkt->type == COAP_TYPE_ACK && inner_code == 0;
     bool is_separate_response = coap_pkt->type == COAP_TYPE_CON;
     /* Set the OSCORE option */
     if (is_request || is_empty_ack || is_separate_response) {

@@ -104,7 +104,7 @@ typedef struct oc_endpoint_t
   uint8_t kid[OSCORE_CTXID_LEN];
   uint8_t kid_ctx_len;
   uint8_t kid_ctx[OSCORE_IDCTX_LEN];
-  //bool rx_msg_is_response;
+  // bool rx_msg_is_response;
 } oc_endpoint_t;
 
 #define oc_make_ipv4_endpoint(__name__, __flags__, __port__, ...)              \
