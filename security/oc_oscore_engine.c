@@ -904,6 +904,9 @@ oc_oscore_send_message(oc_message_t *msg)
         memcpy(ctx_id, oscore_ctx->idctx, oscore_ctx->idctx_len);
         ctx_id_len = oscore_ctx->idctx_len;
 
+        OC_DBG_OSCORE("--- Including KID:");
+        OC_LOGbytes_OSCORE(kid, kid_len);
+
         oc_oscore_compose_AAD(oscore_ctx->sendid, oscore_ctx->sendid_len,
                             message->endpoint.request_piv, message->endpoint.request_piv_len,
                             AAD, &AAD_len);
