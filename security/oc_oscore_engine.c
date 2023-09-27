@@ -891,15 +891,19 @@ oc_oscore_send_message(oc_message_t *msg)
       }
       // AAD always uses the request PIV
 
-      // this if should only fire when the client is sending the acknowledgement
-      // for the confirmable, separate response of the server
       if (is_empty_ack && msg->endpoint.rx_msg_is_response)
       {
+        // only fires when the client is sending the acknowledgement
+        // for the confirmable, separate response of the server
         OC_DBG_OSCORE("--- is empty ACK, using details from the request");
-        // BUG IS HERE! request_piv_len is zero, probably because this is a different endpoint
-        // than the one created for the request.
+        // We have already sent an ACK for the original request, so the transaction 
+        // is gone and the other side cannot find the keying material. so for this
+        // message only we include it again.
+        memcpy(kid, oscore_ctx->sendid, oscore_ctx->sendid_len);
+        kid_len = oscore_ctx->sendid_len;
+        memcpy(ctx_id, oscore_ctx->idctx, oscore_ctx->idctx_len);
+        ctx_id_len = oscore_ctx->idctx_len;
 
-        // so where piv???
         oc_oscore_compose_AAD(oscore_ctx->sendid, oscore_ctx->sendid_len,
                             message->endpoint.request_piv, message->endpoint.request_piv_len,
                             AAD, &AAD_len);
