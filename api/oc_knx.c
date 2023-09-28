@@ -24,6 +24,7 @@
 #include "oc_knx_sec.h"
 #include "oc_main.h"
 #include "oc_rep.h"
+#include "oc_base64.h"
 #include <stdio.h>
 #define __STDC_FORMAT_MACROS
 #include <inttypes.h>
@@ -685,19 +686,12 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
       // find the storage index, e.g. for this object
       oc_rep_t *object = rep->value.object;
 
-      object = rep->value.object;
       while (object != NULL) {
         switch (object->type) {
         case OC_REP_STRING: {
           if (object->iname == 6) {
             oc_free_string(&g_received_notification.st);
             oc_new_string(&g_received_notification.st,
-                          oc_string(object->value.string),
-                          oc_string_len(object->value.string));
-          }
-          if (object->iname == 1) {
-            oc_free_string(&g_received_notification.value);
-            oc_new_string(&g_received_notification.value,
                           oc_string(object->value.string),
                           oc_string_len(object->value.string));
           }
@@ -712,35 +706,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
           if (object->iname == 7) {
             g_received_notification.ga = (uint32_t)object->value.integer;
           }
-          if (object->iname == 1) {
-            oc_free_string(&g_received_notification.value);
-            char buf[20];
-            snprintf(buf, 20 - 1, "%d", (int)object->value.integer);
-            oc_new_string(&g_received_notification.value, buf, strlen(buf));
-          }
         } break;
-        case OC_REP_BOOL: {
-          if (object->iname == 1) {
-            oc_free_string(&g_received_notification.value);
-            if (object->value.boolean) {
-              oc_new_string(&g_received_notification.value, "true",
-                            strlen("true"));
-            } else {
-              oc_new_string(&g_received_notification.value, "false",
-                            strlen("false"));
-            }
-          }
-        } break;
-        case OC_REP_DOUBLE: {
-          if (object->iname == 1) {
-            oc_free_string(&g_received_notification.value);
-            char buf[20];
-            snprintf(buf, 20 - 1, "%f", object->value.double_p);
-            oc_new_string(&g_received_notification.value, buf, strlen(buf));
-          }
-        } break;
-        case OC_REP_NIL:
-          break;
         default:
           break;
         }
@@ -754,7 +720,25 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
     }
     rep = rep->next;
   }
-
+  // maximum base64 overhead, plus one byte for the null terminator
+  size_t base64_max_len = (request->_payload_len / 3 + 1) * 4 + 1;
+  int base64_len;
+  uint8_t *base64_buf = malloc(base64_max_len);
+  
+  oc_free_string(&g_received_notification.value);
+  base64_len = oc_base64_encode(request->_payload, request->_payload_len, base64_buf, base64_max_len);
+  if (base64_len < 0)
+  {
+    char* error_msg = "Base64 encoding error in library!";
+    oc_new_string(&g_received_notification.value, error_msg, strlen(error_msg));
+    OC_ERR("%s", error_msg);
+  }
+  else
+  {
+    // add null terminator
+    base64_buf[base64_len] = '0';
+    oc_new_string(&g_received_notification.value, base64_buf, base64_len);
+  }
   // gateway functionality: call back for all s-mode calls
   oc_gateway_t *my_gw = oc_get_gateway_cb();
   if (my_gw != NULL && my_gw->cb) {
