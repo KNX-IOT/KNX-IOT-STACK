@@ -507,8 +507,8 @@ oc_issue_s_mode(int scope, int sia_value, uint32_t grpid,
   group_mcast.group_address = group_address;
 
   // new spec 1.1
-  oc_send_s_mode(&group_mcast, "/k", sia_value, group_address, rp,
-                value_data, value_size);
+  oc_send_s_mode(&group_mcast, "/k", sia_value, group_address, rp, value_data,
+                 value_size);
 }
 
 static void
