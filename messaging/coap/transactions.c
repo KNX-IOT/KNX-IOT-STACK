@@ -189,7 +189,7 @@ coap_send_transaction(coap_transaction_t *t)
       oc_blockwise_scrub_buffers(false);
 #endif /* OC_BLOCK_WISE */
 #ifdef OC_SECURITY
-//#ifdef OC_OSCORE
+      //#ifdef OC_OSCORE
       if (t->message->endpoint.flags & SECURED) {
         oc_tls_close_connection(&t->message->endpoint);
       } else

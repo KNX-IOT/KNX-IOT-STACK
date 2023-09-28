@@ -926,8 +926,8 @@ oc_oscore_send_message(oc_message_t *msg)
   }
 oscore_send_dispatch:
   OC_DBG_OSCORE("#################################");
-  //if (!oc_tls_connected(&message->endpoint)) {
-  //}
+  // if (!oc_tls_connected(&message->endpoint)) {
+  // }
   message->endpoint.flags |= OSCORE_ENCRYPTED;
 
 #ifdef OC_CLIENT
