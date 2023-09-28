@@ -724,17 +724,15 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
   size_t base64_max_len = (request->_payload_len / 3 + 1) * 4 + 1;
   int base64_len;
   uint8_t *base64_buf = malloc(base64_max_len);
-  
+
   oc_free_string(&g_received_notification.value);
-  base64_len = oc_base64_encode(request->_payload, request->_payload_len, base64_buf, base64_max_len);
-  if (base64_len < 0)
-  {
-    char* error_msg = "Base64 encoding error in library!";
+  base64_len = oc_base64_encode(request->_payload, request->_payload_len,
+                                base64_buf, base64_max_len);
+  if (base64_len < 0) {
+    char *error_msg = "Base64 encoding error in library!";
     oc_new_string(&g_received_notification.value, error_msg, strlen(error_msg));
     OC_ERR("%s", error_msg);
-  }
-  else
-  {
+  } else {
     // add null terminator
     base64_buf[base64_len] = '0';
     oc_new_string(&g_received_notification.value, base64_buf, base64_len);
