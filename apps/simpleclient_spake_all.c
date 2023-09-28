@@ -73,7 +73,7 @@
  *   - issues a PUT on /dev/pm
  *     Note that performing a POST is identical as PUT.
  * - issuing a multicast s-mode commands
- *   issued through all coap nodes/.knx
+ *   issued through all coap nodes/k
  *   typical command:
  *
  */
