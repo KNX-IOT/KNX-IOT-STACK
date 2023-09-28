@@ -53,6 +53,11 @@ oc_add_resource_to_wk(const oc_resource_t *resource, oc_request_t *request,
     return false;
   }
 
+  if (*response_length > 0) {
+    /* frame the trailing comma */
+    matches = 1;
+  }
+
   if (matches > 0) {
     length = oc_rep_add_line_to_buffer(",\n");
     *response_length += length;
