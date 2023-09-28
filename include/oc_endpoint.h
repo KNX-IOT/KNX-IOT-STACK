@@ -98,12 +98,13 @@ typedef struct oc_endpoint_t
     auth_at_index; /**< auth at index +1 [1-max_indexes], 0 == error.
                     * Used for matching oscore context of response to request.
                     * Used for upper layers to check access interfaces. */
-  uint8_t piv[OSCORE_PIV_LEN]; /**< OSCORE partial iv */
-  uint8_t piv_len;             /**< OSCORE partial iv length */
+  uint8_t request_piv[OSCORE_PIV_LEN]; /**< OSCORE partial iv */
+  uint8_t request_piv_len;             /**< OSCORE partial iv length */
   uint8_t kid_len;
   uint8_t kid[OSCORE_CTXID_LEN];
   uint8_t kid_ctx_len;
   uint8_t kid_ctx[OSCORE_IDCTX_LEN];
+  // bool rx_msg_is_response;
 } oc_endpoint_t;
 
 #define oc_make_ipv4_endpoint(__name__, __flags__, __port__, ...)              \

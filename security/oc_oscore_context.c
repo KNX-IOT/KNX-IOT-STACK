@@ -146,8 +146,8 @@ oc_oscore_find_context_by_token_mid(size_t device, uint8_t *token,
       }
     }
     if (request_piv && request_piv_len) {
-      *request_piv = t->message->endpoint.piv;
-      *request_piv_len = t->message->endpoint.piv_len;
+      *request_piv = t->message->endpoint.request_piv;
+      *request_piv_len = t->message->endpoint.request_piv_len;
     }
     // serial_number = t->message->endpoint.serial_number;
     oscore_id = t->message->endpoint.oscore_id;
