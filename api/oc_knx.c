@@ -819,8 +819,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
   new_request.request_payload = oc_s_mode_get_value(request);
   // new style
   new_request.uri_path = "k";
-  new_request.uri_path = ".knx";
-  new_request.uri_path_len = 4;
+  new_request.uri_path_len = 1;
 
   while (index != -1) {
     oc_string_t myurl = oc_core_find_group_object_table_url_from_index(index);

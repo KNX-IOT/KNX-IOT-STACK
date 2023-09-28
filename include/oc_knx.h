@@ -14,7 +14,7 @@
 // limitations under the License.
 */
 /**
-  @brief implementation of /.well-known/knx and .knx resources
+  @brief implementation of /.well-known/knx and /k resources
   @file
 */
 
@@ -277,7 +277,7 @@ int oc_reset_device(size_t device_index, int reset_value);
  *
  * creates and handles the following resources:
  * - /a/lsm
- * - /.knx
+ * - /k
  * - /.well-known/knx
  * - /.well-known/knx/osn
  * - /.well-known/knx/f (fingerprint)
@@ -292,7 +292,7 @@ void oc_create_knx_resources(size_t device);
 
 /**
  * @brief runtime switch to ignore s-mode messages send by ourselves.
- * The .knx resource handles all incoming s-mode messages.
+ * The /k resource handles all incoming s-mode messages.
  * This switch can be used to ignore s-mode messages that are send by ourselves.
  *
  * note for the sniffer, all messages must be handled/reported.

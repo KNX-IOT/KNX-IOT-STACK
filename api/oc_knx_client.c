@@ -505,12 +505,10 @@ oc_issue_s_mode(int scope, int sia_value, uint32_t grpid,
   // set the group_address to the group address, since this field is used
   // to find the OSCORE context id
   group_mcast.group_address = group_address;
-  oc_send_s_mode(&group_mcast, "/.knx", sia_value, group_address, rp,
-                 value_data, value_size);
 
   // new spec 1.1
-  // oc_send_s_mode(&group_mcast, "k", sia_value, group_address, rp,
-  //               value_data, value_size);
+  oc_send_s_mode(&group_mcast, "/k", sia_value, group_address, rp,
+                value_data, value_size);
 }
 
 static void
