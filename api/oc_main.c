@@ -403,9 +403,9 @@ oc_main_shutdown(void)
 
   oc_ri_shutdown();
 
-#ifdef OC_OSCORE
+#ifdef OC_SECURITY
   oc_tls_shutdown();
-#endif
+#endif /* OC_SECURITY */
 
   oc_shutdown_all_devices();
 

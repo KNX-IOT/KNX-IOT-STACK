@@ -15,7 +15,8 @@
 */
 
 //#ifdef OC_SECURITY
-#ifdef OC_OSCORE
+#ifdef OC_SECURITY
+//#ifdef OC_OSCORE
 
 #include <stdarg.h>
 #include <stdint.h>
