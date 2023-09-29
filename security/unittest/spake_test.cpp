@@ -15,11 +15,11 @@ extern "C" {
 int calc_transcript_initiator(mbedtls_mpi *w0, mbedtls_mpi *w1, mbedtls_mpi *x,
                               mbedtls_ecp_point *X,
                               const uint8_t Y_enc[kPubKeySize],
-                              uint8_t K_main[32], bool use_testing_context);
+                              uint8_t K_main[32], char* idP, char* idV, char* ctx);
 
 int calc_transcript_responder(spake_data_t *spake_data,
                               const uint8_t X_enc[kPubKeySize],
-                              mbedtls_ecp_point *Y, bool use_testing_context);
+                              mbedtls_ecp_point *Y, char* idP, char* idV, char* ctx);
 }
 
 static mbedtls_entropy_context entropy_ctx;
