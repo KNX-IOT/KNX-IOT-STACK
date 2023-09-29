@@ -332,6 +332,10 @@ oc_add_function_blocks_to_response(oc_request_t *request, size_t device_index,
   }
 
   for (i = 0; i < g_array_size; i++) {
+    if (*response_length > 0) {
+      /* frame the trailing comma */
+      matches++;
+    }
 
     if (matches > 0) {
       length = oc_rep_add_line_to_buffer(",\n");
