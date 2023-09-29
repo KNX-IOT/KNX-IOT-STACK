@@ -258,12 +258,38 @@ int oc_spake_calc_transcript_initiator(mbedtls_mpi *w0, mbedtls_mpi *w1,
                                        const uint8_t shareV_enc[kPubKeySize],
                                        uint8_t K_main[32]);
 
-int oc_spake_calc_confirmP(uint8_t *K_main, uint8_t cA[32],
-                     uint8_t bytes_Y[kPubKeySize]);
+/**
+ * @brief Calculate the key confirmation message sent by the prover
+ * 
+ * @param K_main The main secret
+ * @param confirmP Output array to store the result
+ * @param bytes_shareV Public key of the verifier
+ * @return int 0 on success, mbedtls error otherwise
+ */
+int oc_spake_calc_confirmP(uint8_t *K_main, uint8_t confirmP[32],
+                     uint8_t bytes_shareV[kPubKeySize]);
 
-int oc_spake_calc_confirmV(uint8_t *K_main, uint8_t cB[32],
-                     uint8_t bytes_X[kPubKeySize]);
+/**
+ * @brief Calculate the key confirmation message sent by the verifier
+ * 
+ * @param K_main The main secret
+ * @param confirmV Output array to store the result
+ * @param bytes_shareP Public key of the prover
+ * @return int 0 on success, mbedtls error otherwise
+ */
+int oc_spake_calc_confirmV(uint8_t *K_main, uint8_t confirmV[32],
+                     uint8_t bytes_shareP[kPubKeySize]);
 
+/**
+ * @brief Calculate the shared encryption key from the shared
+ * symmetric secret K_main
+ * 
+ * @param K_main The shared secret output by the transcript
+ * @param K_shared Output array for the shared encryption key.
+ * This is the only output of the protocol that can be used
+ * as an encryption key
+ * @return int 
+ */
 int oc_spake_calc_K_shared(uint8_t *K_main, uint8_t K_shared[32]);
 
 void oc_spake_print_point(mbedtls_ecp_point *p);

@@ -644,37 +644,38 @@ oc_spake_calc_transcript_initiator(mbedtls_mpi *w0, mbedtls_mpi *w1,
 }
 
 int
-oc_spake_calc_confirmV(uint8_t *K_main, uint8_t cB[32], uint8_t bytes_shareP[kPubKeySize])
+oc_spake_calc_confirmV(uint8_t *K_main, uint8_t confirmV[32], uint8_t bytes_shareP[kPubKeySize])
 {
   // |KcA| + |KcB| = 16 bytes
-  uint8_t KcA_KcB[32];
-  mbedtls_hkdf(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), NULL, 0, K_main, 32,
+  uint8_t K_confirmP_K_confirmV[64];
+  int error;
+  error = mbedtls_hkdf(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), NULL, 0, K_main, 32,
                (const unsigned char *)"ConfirmationKeys",
-               strlen("ConfirmationKeys"), KcA_KcB, 32);
+               strlen("ConfirmationKeys"), K_confirmP_K_confirmV, 64);
 
-  // Calculate cB
-  // TODO this is wrong
-  mbedtls_md_hmac(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256),
-                  KcA_KcB + sizeof(KcA_KcB) / 2, sizeof(KcA_KcB) / 2, bytes_shareP,
-                  kPubKeySize, cB);
-  return 0;
+  if (error)
+    return error;
+  // Calculate confirmV
+  return mbedtls_md_hmac(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256),
+                  K_confirmP_K_confirmV + sizeof(K_confirmP_K_confirmV) / 2, sizeof(K_confirmP_K_confirmV) / 2, bytes_shareP,
+                  kPubKeySize, confirmV);
 }
 
 int
-oc_spake_calc_confirmP(uint8_t *K_main, uint8_t cA[32], uint8_t bytes_shareV[kPubKeySize])
+oc_spake_calc_confirmP(uint8_t *K_main, uint8_t confirmP[32], uint8_t bytes_shareV[kPubKeySize])
 {
   // |KcA| + |KcB| = 16 bytes
-  // TODO has the length of this changed?
-  uint8_t KcA_KcB[32];
-  mbedtls_hkdf(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), NULL, 0, K_main, 32,
+  uint8_t K_confirmP_K_confirmV[64];
+  int error;
+  error = mbedtls_hkdf(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), NULL, 0, K_main, 32,
                (const unsigned char *)"ConfirmationKeys",
-               strlen("ConfirmationKeys"), KcA_KcB, 32);
+               strlen("ConfirmationKeys"), K_confirmP_K_confirmV, 64);
+  if (error)
+    return error;
 
-  // Calculate cA
-  // TODO this is wrong
-  mbedtls_md_hmac(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), KcA_KcB,
-                  sizeof(KcA_KcB) / 2, bytes_shareV, kPubKeySize, cA);
-  return 0;
+  // Calculate confirmP
+  return mbedtls_md_hmac(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), K_confirmP_K_confirmV,
+                  sizeof(K_confirmP_K_confirmV) / 2, bytes_shareV, kPubKeySize, confirmP);
 }
 
 int oc_spake_calc_K_shared(uint8_t *K_main, uint8_t K_shared[32])
