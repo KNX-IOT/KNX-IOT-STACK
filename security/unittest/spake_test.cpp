@@ -58,8 +58,8 @@ protected:
 // Test Vector values from Spake2+ draft 04 - this is the only test vector that
 // uses null identities for A and B
 char Context[] = "SPAKE2+-P256-SHA256-HKDF draft-01";
-char A[] = "";
-char B[] = "";
+char idProver[] = "";
+char idVerifier[] = "";
 
 uint8_t bytes_w0[] = { 0xe6, 0x88, 0x7c, 0xf9, 0xbd, 0xfb, 0x75, 0x79,
                        0xc6, 0x9b, 0xf4, 0x79, 0x28, 0xa8, 0x45, 0x14,
@@ -233,7 +233,7 @@ TEST_F(Spake2Plus, CalculateSecretA)
   ASSERT_RET(mbedtls_mpi_read_binary(&x, bytes_x, sizeof(bytes_x)));
   ASSERT_RET(mbedtls_ecp_point_read_binary(&grp, &X, bytes_X, sizeof(bytes_X)));
 
-  ASSERT_RET(calc_transcript_initiator(&w0, &w1, &x, &X, bytes_Y, K_main, true));
+  ASSERT_RET(calc_transcript_initiator(&w0, &w1, &x, &X, bytes_Y, K_main, idProver, idVerifier, Context));
 
   EXPECT_TRUE(memcmp(Ka, K_main, 16) == 0);
   EXPECT_TRUE(memcmp(Ke, K_main + 16, 16) == 0);
@@ -266,7 +266,7 @@ TEST_F(Spake2Plus, CalculateSecretB)
                                            sizeof(bytes_L)));
   ASSERT_RET(mbedtls_ecp_point_read_binary(&grp, &Y, bytes_Y, sizeof(bytes_Y)));
 
-  ASSERT_RET(calc_transcript_responder(&spake_data, bytes_X, &Y, true));
+  ASSERT_RET(calc_transcript_responder(&spake_data, bytes_X, &Y, idProver, idVerifier, Context));
   EXPECT_TRUE(memcmp(Ka, spake_data.K_main, 16) == 0);
   EXPECT_TRUE(memcmp(Ke, spake_data.K_main + 16, 16) == 0);
 

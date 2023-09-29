@@ -504,7 +504,8 @@ cleanup:
 int
 calc_transcript_responder(spake_data_t *spake_data,
                           const uint8_t shareP_enc[kPubKeySize],
-                          mbedtls_ecp_point *shareV, bool use_testing_context)
+                          mbedtls_ecp_point *shareV, 
+                          char* idProver, char* idVerifier, char* context)
 {
   int ret = 0;
   mbedtls_ecp_point Z, V, shareP;
@@ -527,16 +528,9 @@ calc_transcript_responder(spake_data_t *spake_data,
                                   mbedtls_ctr_drbg_random, ctr_drbg_ctx));
 
   // calculate transcript
-  // Context
-  if (use_testing_context) {
-    ttlen += encode_string("SPAKE2+-P256-SHA256-HKDF draft-01", ttbuf + ttlen);
-  } else {
-    ttlen += encode_string(SPAKE_CONTEXT, ttbuf + ttlen);
-  }
-  // null idProver
-  ttlen += encode_string("", ttbuf + ttlen);
-  // null idVerifier
-  ttlen += encode_string("", ttbuf + ttlen);
+  ttlen += encode_string(context, ttbuf + ttlen);
+  ttlen += encode_string(idProver, ttbuf + ttlen);
+  ttlen += encode_string(idVerifier, ttbuf + ttlen);
   // M
   mbedtls_ecp_point M;
   mbedtls_ecp_point_init(&M);
@@ -576,14 +570,14 @@ oc_spake_calc_transcript_responder(spake_data_t *spake_data,
                                    mbedtls_ecp_point *shareV)
 {
 
-  return calc_transcript_responder(spake_data, shareP_enc, shareV, false);
+  return calc_transcript_responder(spake_data, shareP_enc, shareV, "", "", SPAKE_CONTEXT);
 }
 
 int
 calc_transcript_initiator(mbedtls_mpi *w0, mbedtls_mpi *w1, mbedtls_mpi *x,
                           mbedtls_ecp_point *shareP,
                           const uint8_t shareV_enc[kPubKeySize], uint8_t K_main[32],
-                          bool use_testing_context)
+                          char* idProver, char* idVerifier, char* context)
 
 {
   int ret;
@@ -603,16 +597,9 @@ calc_transcript_initiator(mbedtls_mpi *w0, mbedtls_mpi *w1, mbedtls_mpi *x,
   MBEDTLS_MPI_CHK(calculate_ZV_N(&V, w1, &Y, w0));
 
   // calculate transcript
-  // Context
-  if (use_testing_context) {
-    ttlen += encode_string("SPAKE2+-P256-SHA256-HKDF draft-01", ttbuf + ttlen);
-  } else {
-    ttlen += encode_string(SPAKE_CONTEXT, ttbuf + ttlen);
-  }
-  // null idProver
-  ttlen += encode_string("", ttbuf + ttlen);
-  // null idVerifier
-  ttlen += encode_string("", ttbuf + ttlen);
+  ttlen += encode_string(context, ttbuf + ttlen);
+  ttlen += encode_string(idProver, ttbuf + ttlen);
+  ttlen += encode_string(idVerifier, ttbuf + ttlen);
   // M
   mbedtls_ecp_point M;
   mbedtls_ecp_point_init(&M);
@@ -653,7 +640,7 @@ oc_spake_calc_transcript_initiator(mbedtls_mpi *w0, mbedtls_mpi *w1,
                                    uint8_t K_main[32])
 {
 
-  return calc_transcript_initiator(w0, w1, x, X, Y_enc, K_main, false);
+  return calc_transcript_initiator(w0, w1, x, X, Y_enc, K_main, "", "", SPAKE_CONTEXT);
 }
 
 int
@@ -676,6 +663,7 @@ int
 oc_spake_calc_confirmP(uint8_t *K_main, uint8_t cA[32], uint8_t bytes_shareV[kPubKeySize])
 {
   // |KcA| + |KcB| = 16 bytes
+  // TODO has the length of this changed?
   uint8_t KcA_KcB[32];
   mbedtls_hkdf(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), NULL, 0, K_main, 16,
                (const unsigned char *)"ConfirmationKeys",
