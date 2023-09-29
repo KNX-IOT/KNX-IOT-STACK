@@ -265,7 +265,7 @@ TEST_F(Spake2Plus, CalculateSecretB)
   ASSERT_RET(mbedtls_ecp_point_read_binary(&grp, &Y, bytes_Y, sizeof(bytes_Y)));
 
   ASSERT_RET(calc_transcript_responder(&spake_data, bytes_X, &Y, idProver, idVerifier, Context));
-  EXPECT_TRUE(memcmp(Ka, spake_data.K_main, 16) == 0);
+  EXPECT_TRUE(memcmp(Ka, spake_data.K_man, 16) == 0);
   EXPECT_TRUE(memcmp(Ke, spake_data.K_main + 16, 16) == 0);
 
   mbedtls_mpi_free(&spake_data.y);
