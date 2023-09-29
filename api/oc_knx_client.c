@@ -62,7 +62,7 @@ oc_spake_cb_t m_spake_cb = NULL;
 #ifdef OC_SPAKE
 static mbedtls_mpi w0, w1, privA;
 static mbedtls_ecp_point pA, pubA;
-static uint8_t Ka_Ke[MAX_SECRET_LEN];
+static uint8_t K_main[MAX_SECRET_LEN];
 static oc_spake_context_t g_spake_ctx;
 #endif
 
@@ -102,7 +102,7 @@ finish_spake_handshake(oc_client_response_t *data)
   }
 
   // shared_key is 16-byte array - NOT NULL TERMINATED
-  uint8_t *shared_key = Ka_Ke + 16;
+  uint8_t *shared_key = K_main + 16;
   int shared_key_len = 16;
 
   update_tokens(shared_key, shared_key_len);
@@ -167,12 +167,12 @@ do_credential_verification(oc_client_response_t *data)
   mbedtls_ecp_group_init(&grp);
   mbedtls_ecp_group_load(&grp, MBEDTLS_ECP_DP_SECP256R1);
 
-  oc_spake_calc_transcript_initiator(&w0, &w1, &privA, &pA, pB_bytes, Ka_Ke);
-  oc_spake_calc_cA(Ka_Ke, cA, pB_bytes);
+  oc_spake_calc_transcript_initiator(&w0, &w1, &privA, &pA, pB_bytes, K_main);
+  oc_spake_calc_cA(K_main, cA, pB_bytes);
 
   mbedtls_ecp_point_write_binary(&grp, &pA, MBEDTLS_ECP_PF_UNCOMPRESSED,
                                  &len_pA, pA_bytes, kPubKeySize);
-  oc_spake_calc_cB(Ka_Ke, local_cB, pA_bytes);
+  oc_spake_calc_cB(K_main, local_cB, pA_bytes);
 
   mbedtls_ecp_group_free(&grp);
 

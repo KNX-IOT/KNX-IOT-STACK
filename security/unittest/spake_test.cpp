@@ -15,7 +15,7 @@ extern "C" {
 int calc_transcript_initiator(mbedtls_mpi *w0, mbedtls_mpi *w1, mbedtls_mpi *x,
                               mbedtls_ecp_point *X,
                               const uint8_t Y_enc[kPubKeySize],
-                              uint8_t Ka_Ke[32], bool use_testing_context);
+                              uint8_t K_main[32], bool use_testing_context);
 
 int calc_transcript_responder(spake_data_t *spake_data,
                               const uint8_t X_enc[kPubKeySize],
@@ -216,12 +216,12 @@ TEST_F(Spake2Plus, CalculatePublicB)
 TEST_F(Spake2Plus, CalculateSecretA)
 {
   // =================================
-  // Checks values of Z, V, TT & Ka_Ke
+  // Checks values of Z, V, TT & K_main
   // for Party A (the initiator)
   // =================================
   mbedtls_mpi w0, w1, x;
   mbedtls_ecp_point X;
-  uint8_t Ka_Ke[32];
+  uint8_t K_main[32];
 
   mbedtls_mpi_init(&w0);
   mbedtls_mpi_init(&w1);
@@ -233,10 +233,10 @@ TEST_F(Spake2Plus, CalculateSecretA)
   ASSERT_RET(mbedtls_mpi_read_binary(&x, bytes_x, sizeof(bytes_x)));
   ASSERT_RET(mbedtls_ecp_point_read_binary(&grp, &X, bytes_X, sizeof(bytes_X)));
 
-  ASSERT_RET(calc_transcript_initiator(&w0, &w1, &x, &X, bytes_Y, Ka_Ke, true));
+  ASSERT_RET(calc_transcript_initiator(&w0, &w1, &x, &X, bytes_Y, K_main, true));
 
-  EXPECT_TRUE(memcmp(Ka, Ka_Ke, 16) == 0);
-  EXPECT_TRUE(memcmp(Ke, Ka_Ke + 16, 16) == 0);
+  EXPECT_TRUE(memcmp(Ka, K_main, 16) == 0);
+  EXPECT_TRUE(memcmp(Ke, K_main + 16, 16) == 0);
 
   mbedtls_mpi_free(&w0);
   mbedtls_mpi_free(&w1);
@@ -247,7 +247,7 @@ TEST_F(Spake2Plus, CalculateSecretA)
 TEST_F(Spake2Plus, CalculateSecretB)
 {
   // =================================
-  // Checks values of Z, V, TT & Ka_Ke
+  // Checks values of Z, V, TT & K_main
   // for Party B (the responder)
   // =================================
 
@@ -267,8 +267,8 @@ TEST_F(Spake2Plus, CalculateSecretB)
   ASSERT_RET(mbedtls_ecp_point_read_binary(&grp, &Y, bytes_Y, sizeof(bytes_Y)));
 
   ASSERT_RET(calc_transcript_responder(&spake_data, bytes_X, &Y, true));
-  EXPECT_TRUE(memcmp(Ka, spake_data.Ka_Ke, 16) == 0);
-  EXPECT_TRUE(memcmp(Ke, spake_data.Ka_Ke + 16, 16) == 0);
+  EXPECT_TRUE(memcmp(Ka, spake_data.K_main, 16) == 0);
+  EXPECT_TRUE(memcmp(Ke, spake_data.K_main + 16, 16) == 0);
 
   mbedtls_mpi_free(&spake_data.y);
   mbedtls_mpi_free(&spake_data.w0);
@@ -278,22 +278,22 @@ TEST_F(Spake2Plus, CalculateSecretB)
 
 TEST_F(Spake2Plus, CalculateConfirmationA)
 {
-  uint8_t Ka_Ke[32];
+  uint8_t K_main[32];
   uint8_t calculated_cA[32];
-  memcpy(Ka_Ke, Ka, 16);
-  memcpy(Ka_Ke + 16, Ke, 16);
+  memcpy(K_main, Ka, 16);
+  memcpy(K_main + 16, Ke, 16);
 
-  ASSERT_RET(oc_spake_calc_cA(Ka_Ke, calculated_cA, bytes_Y));
+  ASSERT_RET(oc_spake_calc_cA(K_main, calculated_cA, bytes_Y));
   EXPECT_TRUE(memcmp(cA, calculated_cA, 32) == 0);
 }
 
 TEST_F(Spake2Plus, CalculateConfirmationB)
 {
-  uint8_t Ka_Ke[32];
+  uint8_t K_main[32];
   uint8_t calculated_cB[32];
-  memcpy(Ka_Ke, Ka, 16);
-  memcpy(Ka_Ke + 16, Ke, 16);
+  memcpy(K_main, Ka, 16);
+  memcpy(K_main + 16, Ke, 16);
 
-  ASSERT_RET(oc_spake_calc_cB(Ka_Ke, calculated_cB, bytes_X));
+  ASSERT_RET(oc_spake_calc_cB(K_main, calculated_cB, bytes_X));
   EXPECT_TRUE(memcmp(cB, calculated_cB, 32) == 0);
 }

@@ -503,24 +503,24 @@ cleanup:
 
 int
 calc_transcript_responder(spake_data_t *spake_data,
-                          const uint8_t X_enc[kPubKeySize],
-                          mbedtls_ecp_point *Y, bool use_testing_context)
+                          const uint8_t shareP_enc[kPubKeySize],
+                          mbedtls_ecp_point *shareV, bool use_testing_context)
 {
   int ret = 0;
-  mbedtls_ecp_point Z, V, X;
+  mbedtls_ecp_point Z, V, shareP;
   uint8_t ttbuf[2048];
   size_t ttlen = 0;
 
   mbedtls_ecp_point_init(&Z);
   mbedtls_ecp_point_init(&V);
-  mbedtls_ecp_point_init(&X);
+  mbedtls_ecp_point_init(&shareP);
 
-  mbedtls_ecp_point_read_binary(&grp, &X, X_enc, kPubKeySize);
+  mbedtls_ecp_point_read_binary(&grp, &shareP, shareP_enc, kPubKeySize);
   // abort if X is the point at infinity
-  MBEDTLS_MPI_CHK(mbedtls_ecp_is_zero(&X));
+  MBEDTLS_MPI_CHK(mbedtls_ecp_is_zero(&shareP));
 
   // Z = h*y*(X - w0*M)
-  MBEDTLS_MPI_CHK(calculate_Z_M(&Z, &spake_data->y, &X, &spake_data->w0));
+  MBEDTLS_MPI_CHK(calculate_Z_M(&Z, &spake_data->y, &shareP, &spake_data->w0));
 
   // V = h*y*L, where L = w1*P
   MBEDTLS_MPI_CHK(mbedtls_ecp_mul(&grp, &V, &spake_data->y, &spake_data->L,
@@ -550,9 +550,9 @@ calc_transcript_responder(spake_data_t *spake_data,
     mbedtls_ecp_point_read_binary(&grp, &N, bytes_N, sizeof(bytes_N)));
   ttlen += encode_point(&grp, &N, ttbuf + ttlen);
   // X
-  ttlen += encode_point(&grp, &X, ttbuf + ttlen);
+  ttlen += encode_point(&grp, &shareP, ttbuf + ttlen);
   // Y
-  ttlen += encode_point(&grp, Y, ttbuf + ttlen);
+  ttlen += encode_point(&grp, shareV, ttbuf + ttlen);
   // Z
   ttlen += encode_point(&grp, &Z, ttbuf + ttlen);
   // V
@@ -561,28 +561,28 @@ calc_transcript_responder(spake_data_t *spake_data,
   ttlen += encode_mpi(&spake_data->w0, ttbuf + ttlen);
 
   // calculate hash
-  mbedtls_sha256(ttbuf, ttlen, spake_data->Ka_Ke, 0);
+  mbedtls_sha256(ttbuf, ttlen, spake_data->K_main, 0);
 
 cleanup:
   mbedtls_ecp_point_free(&Z);
   mbedtls_ecp_point_free(&V);
-  mbedtls_ecp_point_free(&X);
+  mbedtls_ecp_point_free(&shareP);
   return ret;
 }
 
 int
 oc_spake_calc_transcript_responder(spake_data_t *spake_data,
-                                   const uint8_t X_enc[kPubKeySize],
-                                   mbedtls_ecp_point *Y)
+                                   const uint8_t shareP_enc[kPubKeySize],
+                                   mbedtls_ecp_point *shareV)
 {
 
-  return calc_transcript_responder(spake_data, X_enc, Y, false);
+  return calc_transcript_responder(spake_data, shareP_enc, shareV, false);
 }
 
 int
 calc_transcript_initiator(mbedtls_mpi *w0, mbedtls_mpi *w1, mbedtls_mpi *x,
-                          mbedtls_ecp_point *X,
-                          const uint8_t Y_enc[kPubKeySize], uint8_t Ka_Ke[32],
+                          mbedtls_ecp_point *shareP,
+                          const uint8_t shareV_enc[kPubKeySize], uint8_t K_main[32],
                           bool use_testing_context)
 
 {
@@ -594,7 +594,7 @@ calc_transcript_initiator(mbedtls_mpi *w0, mbedtls_mpi *w1, mbedtls_mpi *x,
   mbedtls_ecp_point_init(&Z);
   mbedtls_ecp_point_init(&V);
 
-  mbedtls_ecp_point_read_binary(&grp, &Y, Y_enc, kPubKeySize);
+  mbedtls_ecp_point_read_binary(&grp, &Y, shareV_enc, kPubKeySize);
 
   // Z = h*x*(Y - w0*N)
   MBEDTLS_MPI_CHK(calculate_ZV_N(&Z, x, &Y, w0));
@@ -626,7 +626,7 @@ calc_transcript_initiator(mbedtls_mpi *w0, mbedtls_mpi *w1, mbedtls_mpi *x,
     mbedtls_ecp_point_read_binary(&grp, &N, bytes_N, sizeof(bytes_N)));
   ttlen += encode_point(&grp, &N, ttbuf + ttlen);
   // X
-  ttlen += encode_point(&grp, X, ttbuf + ttlen);
+  ttlen += encode_point(&grp, shareP, ttbuf + ttlen);
   // Y
   ttlen += encode_point(&grp, &Y, ttbuf + ttlen);
   // Z
@@ -637,7 +637,7 @@ calc_transcript_initiator(mbedtls_mpi *w0, mbedtls_mpi *w1, mbedtls_mpi *x,
   ttlen += encode_mpi(w0, ttbuf + ttlen);
 
   // calculate hash
-  mbedtls_sha256(ttbuf, ttlen, Ka_Ke, 0);
+  mbedtls_sha256(ttbuf, ttlen, K_main, 0);
 
 cleanup:
   mbedtls_ecp_point_free(&Y);
@@ -650,18 +650,18 @@ int
 oc_spake_calc_transcript_initiator(mbedtls_mpi *w0, mbedtls_mpi *w1,
                                    mbedtls_mpi *x, mbedtls_ecp_point *X,
                                    const uint8_t Y_enc[kPubKeySize],
-                                   uint8_t Ka_Ke[32])
+                                   uint8_t K_main[32])
 {
 
-  return calc_transcript_initiator(w0, w1, x, X, Y_enc, Ka_Ke, false);
+  return calc_transcript_initiator(w0, w1, x, X, Y_enc, K_main, false);
 }
 
 int
-oc_spake_calc_cB(uint8_t *Ka_Ke, uint8_t cB[32], uint8_t bytes_X[kPubKeySize])
+oc_spake_calc_cB(uint8_t *K_main, uint8_t cB[32], uint8_t bytes_X[kPubKeySize])
 {
   // |KcA| + |KcB| = 16 bytes
   uint8_t KcA_KcB[32];
-  mbedtls_hkdf(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), NULL, 0, Ka_Ke, 16,
+  mbedtls_hkdf(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), NULL, 0, K_main, 16,
                (const unsigned char *)"ConfirmationKeys",
                strlen("ConfirmationKeys"), KcA_KcB, 32);
 
@@ -673,11 +673,11 @@ oc_spake_calc_cB(uint8_t *Ka_Ke, uint8_t cB[32], uint8_t bytes_X[kPubKeySize])
 }
 
 int
-oc_spake_calc_cA(uint8_t *Ka_Ke, uint8_t cA[32], uint8_t bytes_Y[kPubKeySize])
+oc_spake_calc_cA(uint8_t *K_main, uint8_t cA[32], uint8_t bytes_Y[kPubKeySize])
 {
   // |KcA| + |KcB| = 16 bytes
   uint8_t KcA_KcB[32];
-  mbedtls_hkdf(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), NULL, 0, Ka_Ke, 16,
+  mbedtls_hkdf(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), NULL, 0, K_main, 16,
                (const unsigned char *)"ConfirmationKeys",
                strlen("ConfirmationKeys"), KcA_KcB, 32);
 
