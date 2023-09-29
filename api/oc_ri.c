@@ -1537,6 +1537,13 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
                                          response_buffer.content_format);
         }
       }
+      else {
+        // For EITT test 5.1.1.4
+        if (response_buffer.content_format == APPLICATION_LINK_FORMAT) {
+          coap_set_header_content_format(response,
+                                         response_buffer.content_format);
+        }
+      }
 
       if (response_buffer.max_age > 0) {
         coap_set_header_max_age(response, response_buffer.max_age);
