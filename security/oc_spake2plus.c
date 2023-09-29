@@ -407,7 +407,7 @@ cleanup:
 // shareP = pubA + w0 * M
 int
 oc_spake_calc_shareP(mbedtls_ecp_point *shareP, const mbedtls_ecp_point *pubA,
-                 const mbedtls_mpi *w0)
+                     const mbedtls_mpi *w0)
 {
   return calculate_pX(shareP, pubA, w0, bytes_M, sizeof(bytes_M));
 }
@@ -415,7 +415,7 @@ oc_spake_calc_shareP(mbedtls_ecp_point *shareP, const mbedtls_ecp_point *pubA,
 // shareV = pubB + w0 * N
 int
 oc_spake_calc_shareV(mbedtls_ecp_point *shareV, const mbedtls_ecp_point *pubB,
-                 const mbedtls_mpi *w0)
+                     const mbedtls_mpi *w0)
 {
   return calculate_pX(shareV, pubB, w0, bytes_N, sizeof(bytes_N));
 }
@@ -504,8 +504,8 @@ cleanup:
 int
 calc_transcript_responder(spake_data_t *spake_data,
                           const uint8_t shareP_enc[kPubKeySize],
-                          mbedtls_ecp_point *shareV, 
-                          char* idProver, char* idVerifier, char* context)
+                          mbedtls_ecp_point *shareV, char *idProver,
+                          char *idVerifier, char *context)
 {
   int ret = 0;
   mbedtls_ecp_point Z, V, shareP;
@@ -570,14 +570,16 @@ oc_spake_calc_transcript_responder(spake_data_t *spake_data,
                                    mbedtls_ecp_point *shareV)
 {
 
-  return calc_transcript_responder(spake_data, shareP_enc, shareV, "", "", SPAKE_CONTEXT);
+  return calc_transcript_responder(spake_data, shareP_enc, shareV, "", "",
+                                   SPAKE_CONTEXT);
 }
 
 int
 calc_transcript_initiator(mbedtls_mpi *w0, mbedtls_mpi *w1, mbedtls_mpi *x,
                           mbedtls_ecp_point *shareP,
-                          const uint8_t shareV_enc[kPubKeySize], uint8_t K_main[32],
-                          char* idProver, char* idVerifier, char* context)
+                          const uint8_t shareV_enc[kPubKeySize],
+                          uint8_t K_main[32], char *idProver, char *idVerifier,
+                          char *context)
 
 {
   int ret;
@@ -640,49 +642,55 @@ oc_spake_calc_transcript_initiator(mbedtls_mpi *w0, mbedtls_mpi *w1,
                                    uint8_t K_main[32])
 {
 
-  return calc_transcript_initiator(w0, w1, x, X, Y_enc, K_main, "", "", SPAKE_CONTEXT);
+  return calc_transcript_initiator(w0, w1, x, X, Y_enc, K_main, "", "",
+                                   SPAKE_CONTEXT);
 }
 
 int
-oc_spake_calc_confirmV(uint8_t *K_main, uint8_t confirmV[32], uint8_t bytes_shareP[kPubKeySize])
+oc_spake_calc_confirmV(uint8_t *K_main, uint8_t confirmV[32],
+                       uint8_t bytes_shareP[kPubKeySize])
 {
   // |KcA| + |KcB| = 16 bytes
   uint8_t K_confirmP_K_confirmV[64];
   int error;
-  error = mbedtls_hkdf(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), NULL, 0, K_main, 32,
-               (const unsigned char *)"ConfirmationKeys",
-               strlen("ConfirmationKeys"), K_confirmP_K_confirmV, 64);
+  error = mbedtls_hkdf(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), NULL, 0,
+                       K_main, 32, (const unsigned char *)"ConfirmationKeys",
+                       strlen("ConfirmationKeys"), K_confirmP_K_confirmV, 64);
 
   if (error)
     return error;
   // Calculate confirmV
-  return mbedtls_md_hmac(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256),
-                  K_confirmP_K_confirmV + sizeof(K_confirmP_K_confirmV) / 2, sizeof(K_confirmP_K_confirmV) / 2, bytes_shareP,
-                  kPubKeySize, confirmV);
+  return mbedtls_md_hmac(
+    mbedtls_md_info_from_type(MBEDTLS_MD_SHA256),
+    K_confirmP_K_confirmV + sizeof(K_confirmP_K_confirmV) / 2,
+    sizeof(K_confirmP_K_confirmV) / 2, bytes_shareP, kPubKeySize, confirmV);
 }
 
 int
-oc_spake_calc_confirmP(uint8_t *K_main, uint8_t confirmP[32], uint8_t bytes_shareV[kPubKeySize])
+oc_spake_calc_confirmP(uint8_t *K_main, uint8_t confirmP[32],
+                       uint8_t bytes_shareV[kPubKeySize])
 {
   // |KcA| + |KcB| = 16 bytes
   uint8_t K_confirmP_K_confirmV[64];
   int error;
-  error = mbedtls_hkdf(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), NULL, 0, K_main, 32,
-               (const unsigned char *)"ConfirmationKeys",
-               strlen("ConfirmationKeys"), K_confirmP_K_confirmV, 64);
+  error = mbedtls_hkdf(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), NULL, 0,
+                       K_main, 32, (const unsigned char *)"ConfirmationKeys",
+                       strlen("ConfirmationKeys"), K_confirmP_K_confirmV, 64);
   if (error)
     return error;
 
   // Calculate confirmP
-  return mbedtls_md_hmac(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), K_confirmP_K_confirmV,
-                  sizeof(K_confirmP_K_confirmV) / 2, bytes_shareV, kPubKeySize, confirmP);
+  return mbedtls_md_hmac(
+    mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), K_confirmP_K_confirmV,
+    sizeof(K_confirmP_K_confirmV) / 2, bytes_shareV, kPubKeySize, confirmP);
 }
 
-int oc_spake_calc_K_shared(uint8_t *K_main, uint8_t K_shared[32])
+int
+oc_spake_calc_K_shared(uint8_t *K_main, uint8_t K_shared[32])
 {
-  mbedtls_hkdf(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), NULL, 0, K_main, 32,
-               (const unsigned char *)"SharedKey",
-               strlen("SharedKey"), K_shared, 32);
+  mbedtls_hkdf(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), NULL, 0, K_main,
+               32, (const unsigned char *)"SharedKey", strlen("SharedKey"),
+               K_shared, 32);
 }
 
 #endif // OC_SPAKE

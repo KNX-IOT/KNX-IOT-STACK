@@ -214,7 +214,7 @@ int oc_spake_gen_keypair(mbedtls_mpi *y, mbedtls_ecp_point *pub_y);
  * @param w0 the w0 parameter, derived using the out-of-band secret
  */
 int oc_spake_calc_shareP(mbedtls_ecp_point *pA, const mbedtls_ecp_point *pubA,
-                     const mbedtls_mpi *w0);
+                         const mbedtls_mpi *w0);
 
 /**
  * @brief Calculate the Public Share of Party B, the KNX device
@@ -224,7 +224,7 @@ int oc_spake_calc_shareP(mbedtls_ecp_point *pA, const mbedtls_ecp_point *pubA,
  * @param w0 the w0 parameter, derived using the out-of-band secret
  */
 int oc_spake_calc_shareV(mbedtls_ecp_point *pB, const mbedtls_ecp_point *pubB,
-                     const mbedtls_mpi *w0);
+                         const mbedtls_mpi *w0);
 
 int oc_spake_encode_pubkey(mbedtls_ecp_point *P, uint8_t out[kPubKeySize]);
 
@@ -254,41 +254,42 @@ int oc_spake_calc_transcript_responder(spake_data_t *spake_data,
  * @return int 0 on success, mbedtls error code on failure
  */
 int oc_spake_calc_transcript_initiator(mbedtls_mpi *w0, mbedtls_mpi *w1,
-                                       mbedtls_mpi *x, mbedtls_ecp_point *shareP,
+                                       mbedtls_mpi *x,
+                                       mbedtls_ecp_point *shareP,
                                        const uint8_t shareV_enc[kPubKeySize],
                                        uint8_t K_main[32]);
 
 /**
  * @brief Calculate the key confirmation message sent by the prover
- * 
+ *
  * @param K_main The main secret
  * @param confirmP Output array to store the result
  * @param bytes_shareV Public key of the verifier
  * @return int 0 on success, mbedtls error otherwise
  */
 int oc_spake_calc_confirmP(uint8_t *K_main, uint8_t confirmP[32],
-                     uint8_t bytes_shareV[kPubKeySize]);
+                           uint8_t bytes_shareV[kPubKeySize]);
 
 /**
  * @brief Calculate the key confirmation message sent by the verifier
- * 
+ *
  * @param K_main The main secret
  * @param confirmV Output array to store the result
  * @param bytes_shareP Public key of the prover
  * @return int 0 on success, mbedtls error otherwise
  */
 int oc_spake_calc_confirmV(uint8_t *K_main, uint8_t confirmV[32],
-                     uint8_t bytes_shareP[kPubKeySize]);
+                           uint8_t bytes_shareP[kPubKeySize]);
 
 /**
  * @brief Calculate the shared encryption key from the shared
  * symmetric secret K_main
- * 
+ *
  * @param K_main The shared secret output by the transcript
  * @param K_shared Output array for the shared encryption key.
  * This is the only output of the protocol that can be used
  * as an encryption key
- * @return int 
+ * @return int
  */
 int oc_spake_calc_K_shared(uint8_t *K_main, uint8_t K_shared[32]);
 
