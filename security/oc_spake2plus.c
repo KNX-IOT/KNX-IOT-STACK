@@ -661,7 +661,7 @@ oc_spake_calc_confirmV(uint8_t *K_main, uint8_t cB[32], uint8_t bytes_shareP[kPu
 {
   // |KcA| + |KcB| = 16 bytes
   uint8_t KcA_KcB[32];
-  mbedtls_hkdf(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), NULL, 0, K_main, 6,
+  mbedtls_hkdf(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), NULL, 0, K_main, 16,
                (const unsigned char *)"ConfirmationKeys",
                strlen("ConfirmationKeys"), KcA_KcB, 32);
 
