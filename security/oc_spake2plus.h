@@ -264,7 +264,7 @@ int oc_spake_calc_confirmP(uint8_t *K_main, uint8_t cA[32],
 int oc_spake_calc_confirmV(uint8_t *K_main, uint8_t cB[32],
                      uint8_t bytes_X[kPubKeySize]);
 
-int oc_spake_calc_K_shared(uint8_t *K_main, uint8_t K_shared[16]);
+int oc_spake_calc_K_shared(uint8_t *K_main, uint8_t K_shared[32]);
 
 void oc_spake_print_point(mbedtls_ecp_point *p);
 

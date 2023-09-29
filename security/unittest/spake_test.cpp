@@ -220,6 +220,7 @@ TEST_F(Spake2Plus, CalculateSecretA)
   mbedtls_mpi w0, w1, x;
   mbedtls_ecp_point X;
   uint8_t K_main[32];
+  uint8_t shared_key[32];
 
   mbedtls_mpi_init(&w0);
   mbedtls_mpi_init(&w1);
@@ -233,6 +234,9 @@ TEST_F(Spake2Plus, CalculateSecretA)
 
   ASSERT_RET(calc_transcript_initiator(&w0, &w1, &x, &X, bytes_shareV, K_main, idProver, idVerifier, Context));
   ASSERT_RET(memcmp(bytes_K_main, K_main, sizeof(bytes_K_main)));
+
+  ASSERT_RET(oc_spake_calc_K_shared(K_main, shared_key));
+  ASSERT_RET(memcmp(shared_key, K_shared, sizeof(K_shared)));
 
   mbedtls_mpi_free(&w0);
   mbedtls_mpi_free(&w1);
@@ -249,6 +253,7 @@ TEST_F(Spake2Plus, CalculateSecretB)
 
   // input: y, Y, w0, L
   spake_data_t spake_data;
+  uint8_t shared_key[32];
   mbedtls_ecp_point Y;
   mbedtls_mpi_init(&spake_data.y);
   mbedtls_mpi_init(&spake_data.w0);
@@ -264,6 +269,9 @@ TEST_F(Spake2Plus, CalculateSecretB)
 
   ASSERT_RET(calc_transcript_responder(&spake_data, bytes_shareP, &Y, idProver, idVerifier, Context));
   ASSERT_RET(memcmp(bytes_K_main, spake_data.K_main, sizeof(bytes_K_main)));
+
+  ASSERT_RET(oc_spake_calc_K_shared(spake_data.K_main, shared_key));
+  ASSERT_RET(memcmp(shared_key, K_shared, sizeof(K_shared)));
 
   mbedtls_mpi_free(&spake_data.y);
   mbedtls_mpi_free(&spake_data.w0);

@@ -648,11 +648,12 @@ oc_spake_calc_confirmV(uint8_t *K_main, uint8_t cB[32], uint8_t bytes_shareP[kPu
 {
   // |KcA| + |KcB| = 16 bytes
   uint8_t KcA_KcB[32];
-  mbedtls_hkdf(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), NULL, 0, K_main, 16,
+  mbedtls_hkdf(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), NULL, 0, K_main, 32,
                (const unsigned char *)"ConfirmationKeys",
                strlen("ConfirmationKeys"), KcA_KcB, 32);
 
   // Calculate cB
+  // TODO this is wrong
   mbedtls_md_hmac(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256),
                   KcA_KcB + sizeof(KcA_KcB) / 2, sizeof(KcA_KcB) / 2, bytes_shareP,
                   kPubKeySize, cB);
@@ -665,19 +666,22 @@ oc_spake_calc_confirmP(uint8_t *K_main, uint8_t cA[32], uint8_t bytes_shareV[kPu
   // |KcA| + |KcB| = 16 bytes
   // TODO has the length of this changed?
   uint8_t KcA_KcB[32];
-  mbedtls_hkdf(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), NULL, 0, K_main, 16,
+  mbedtls_hkdf(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), NULL, 0, K_main, 32,
                (const unsigned char *)"ConfirmationKeys",
                strlen("ConfirmationKeys"), KcA_KcB, 32);
 
   // Calculate cA
+  // TODO this is wrong
   mbedtls_md_hmac(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), KcA_KcB,
                   sizeof(KcA_KcB) / 2, bytes_shareV, kPubKeySize, cA);
   return 0;
 }
 
-int oc_spake_calc_K_shared(uint8_t *K_main, uint8_t K_shared[16])
+int oc_spake_calc_K_shared(uint8_t *K_main, uint8_t K_shared[32])
 {
-
+  mbedtls_hkdf(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), NULL, 0, K_main, 32,
+               (const unsigned char *)"SharedKey",
+               strlen("SharedKey"), K_shared, 32);
 }
 
 #endif // OC_SPAKE
