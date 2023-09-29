@@ -168,11 +168,11 @@ do_credential_verification(oc_client_response_t *data)
   mbedtls_ecp_group_load(&grp, MBEDTLS_ECP_DP_SECP256R1);
 
   oc_spake_calc_transcript_initiator(&w0, &w1, &privA, &pA, pB_bytes, K_main);
-  oc_spake_calc_cA(K_main, cA, pB_bytes);
+  oc_spake_calc_confirmP(K_main, cA, pB_bytes);
 
   mbedtls_ecp_point_write_binary(&grp, &pA, MBEDTLS_ECP_PF_UNCOMPRESSED,
                                  &len_pA, pA_bytes, kPubKeySize);
-  oc_spake_calc_cB(K_main, local_cB, pA_bytes);
+  oc_spake_calc_confirmV(K_main, local_cB, pA_bytes);
 
   mbedtls_ecp_group_free(&grp);
 
@@ -238,7 +238,7 @@ do_credential_exchange(oc_client_response_t *data)
   oc_spake_calc_w0_w1(g_spake_ctx.spake_password, 32, salt, it, &w0, &w1);
 
   oc_spake_gen_keypair(&privA, &pubA);
-  oc_spake_calc_pA(&pA, &pubA, &w0);
+  oc_spake_calc_shareP(&pA, &pubA, &w0);
   uint8_t bytes_pA[kPubKeySize];
   oc_spake_encode_pubkey(&pA, bytes_pA);
 

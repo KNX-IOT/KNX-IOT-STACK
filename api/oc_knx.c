@@ -1503,7 +1503,7 @@ oc_core_knx_spake_separate_post_handler(void *req_p)
     // next step: calculate pB, encode it into the struct
     mbedtls_ecp_point pB;
     mbedtls_ecp_point_init(&pB);
-    if (ret = oc_spake_calc_pB(&pB, &spake_data.pub_y, &spake_data.w0)) {
+    if (ret = oc_spake_calc_shareV(&pB, &spake_data.pub_y, &spake_data.w0)) {
       OC_ERR("oc_spake_calc_pB failed with code %d", ret);
       mbedtls_ecp_point_free(&pB);
       goto error;
@@ -1521,7 +1521,7 @@ oc_core_knx_spake_separate_post_handler(void *req_p)
       goto error;
     }
 
-    oc_spake_calc_cB(spake_data.K_main, g_pase.cb, g_pase.pa);
+    oc_spake_calc_confirmV(spake_data.K_main, g_pase.cb, g_pase.pa);
     mbedtls_ecp_point_free(&pB);
 
     oc_rep_begin_root_object();
@@ -1541,12 +1541,12 @@ oc_core_knx_spake_separate_post_handler(void *req_p)
     OC_DBG_SPAKE("KaKe & pB Bytes");
     OC_LOGbytes_OSCORE(spake_data.K_main, 32);
     OC_LOGbytes_OSCORE(g_pase.pb, sizeof(g_pase.pb));
-    oc_spake_calc_cA(spake_data.K_main, expected_ca, g_pase.pb);
+    oc_spake_calc_confirmP(spake_data.K_main, expected_ca, g_pase.pb);
     OC_DBG_SPAKE("cA:");
     OC_LOGbytes_OSCORE(expected_ca, 32);
 
     if (memcmp(expected_ca, g_pase.ca, sizeof(g_pase.ca)) != 0) {
-      OC_ERR("oc_spake_calc_cA failed");
+      OC_ERR("oc_spake_calc_confirmP failed");
       goto error;
     }
 

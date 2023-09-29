@@ -395,7 +395,7 @@ calculate_pX(mbedtls_ecp_point *pX, const mbedtls_ecp_point *pubX,
   MBEDTLS_MPI_CHK(mbedtls_ecp_point_read_binary(&grp, &L, bytes_L, len_L));
   MBEDTLS_MPI_CHK(mbedtls_mpi_read_string(&one, 10, "1"));
 
-  // pA = 1 * pubA + w0 * M
+  // shareP = 1 * pubA + w0 * M
   MBEDTLS_MPI_CHK(mbedtls_ecp_muladd(&grp, pX, &one, pubX, wX, &L));
 
 cleanup:
@@ -404,20 +404,20 @@ cleanup:
   return ret;
 }
 
-// pA = pubA + w0 * M
+// shareP = pubA + w0 * M
 int
-oc_spake_calc_pA(mbedtls_ecp_point *pA, const mbedtls_ecp_point *pubA,
+oc_spake_calc_shareP(mbedtls_ecp_point *shareP, const mbedtls_ecp_point *pubA,
                  const mbedtls_mpi *w0)
 {
-  return calculate_pX(pA, pubA, w0, bytes_M, sizeof(bytes_M));
+  return calculate_pX(shareP, pubA, w0, bytes_M, sizeof(bytes_M));
 }
 
-// pB = pubB + w0 * N
+// shareV = pubB + w0 * N
 int
-oc_spake_calc_pB(mbedtls_ecp_point *pB, const mbedtls_ecp_point *pubB,
+oc_spake_calc_shareV(mbedtls_ecp_point *shareV, const mbedtls_ecp_point *pubB,
                  const mbedtls_mpi *w0)
 {
-  return calculate_pX(pB, pubB, w0, bytes_N, sizeof(bytes_N));
+  return calculate_pX(shareV, pubB, w0, bytes_N, sizeof(bytes_N));
 }
 
 // generic formula for
@@ -657,23 +657,23 @@ oc_spake_calc_transcript_initiator(mbedtls_mpi *w0, mbedtls_mpi *w1,
 }
 
 int
-oc_spake_calc_cB(uint8_t *K_main, uint8_t cB[32], uint8_t bytes_X[kPubKeySize])
+oc_spake_calc_confirmV(uint8_t *K_main, uint8_t cB[32], uint8_t bytes_shareP[kPubKeySize])
 {
   // |KcA| + |KcB| = 16 bytes
   uint8_t KcA_KcB[32];
-  mbedtls_hkdf(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), NULL, 0, K_main, 16,
+  mbedtls_hkdf(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), NULL, 0, K_main, 6,
                (const unsigned char *)"ConfirmationKeys",
                strlen("ConfirmationKeys"), KcA_KcB, 32);
 
   // Calculate cB
   mbedtls_md_hmac(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256),
-                  KcA_KcB + sizeof(KcA_KcB) / 2, sizeof(KcA_KcB) / 2, bytes_X,
+                  KcA_KcB + sizeof(KcA_KcB) / 2, sizeof(KcA_KcB) / 2, bytes_shareP,
                   kPubKeySize, cB);
   return 0;
 }
 
 int
-oc_spake_calc_cA(uint8_t *K_main, uint8_t cA[32], uint8_t bytes_Y[kPubKeySize])
+oc_spake_calc_confirmP(uint8_t *K_main, uint8_t cA[32], uint8_t bytes_shareV[kPubKeySize])
 {
   // |KcA| + |KcB| = 16 bytes
   uint8_t KcA_KcB[32];
@@ -683,8 +683,13 @@ oc_spake_calc_cA(uint8_t *K_main, uint8_t cA[32], uint8_t bytes_Y[kPubKeySize])
 
   // Calculate cA
   mbedtls_md_hmac(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), KcA_KcB,
-                  sizeof(KcA_KcB) / 2, bytes_Y, kPubKeySize, cA);
+                  sizeof(KcA_KcB) / 2, bytes_shareV, kPubKeySize, cA);
   return 0;
+}
+
+int oc_spake_calc_K_shared(uint8_t *K_main, uint8_t K_shared[16])
+{
+
 }
 
 #endif // OC_SPAKE

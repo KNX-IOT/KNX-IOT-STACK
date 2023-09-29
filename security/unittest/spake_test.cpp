@@ -170,7 +170,7 @@ TEST_F(Spake2Plus, CalculatePublicA)
                              &ctr_drbg_ctx));
 
   // X = pubA + w0*M
-  ASSERT_RET(oc_spake_calc_pA(&X, &pubA, &w0));
+  ASSERT_RET(oc_spake_calc_shareP(&X, &pubA, &w0));
   ASSERT_RET(mbedtls_ecp_point_write_binary(
     &grp, &X, MBEDTLS_ECP_PF_UNCOMPRESSED, &cmplen, cmpbuf, sizeof(cmpbuf)));
 
@@ -203,7 +203,7 @@ TEST_F(Spake2Plus, CalculatePublicB)
                              &ctr_drbg_ctx));
 
   // Y = pubB + w0*N
-  ASSERT_RET(oc_spake_calc_pB(&Y, &pubB, &w0));
+  ASSERT_RET(oc_spake_calc_shareV(&Y, &pubB, &w0));
   ASSERT_RET(mbedtls_ecp_point_write_binary(
     &grp, &Y, MBEDTLS_ECP_PF_UNCOMPRESSED, &cmplen, cmpbuf, sizeof(cmpbuf)));
   // check the value of Y is correct
@@ -283,7 +283,7 @@ TEST_F(Spake2Plus, CalculateConfirmationA)
   memcpy(K_main, Ka, 16);
   memcpy(K_main + 16, Ke, 16);
 
-  ASSERT_RET(oc_spake_calc_cA(K_main, calculated_cA, bytes_Y));
+  ASSERT_RET(oc_spake_calc_confirmP(K_main, calculated_cA, bytes_Y));
   EXPECT_TRUE(memcmp(cA, calculated_cA, 32) == 0);
 }
 
@@ -294,6 +294,6 @@ TEST_F(Spake2Plus, CalculateConfirmationB)
   memcpy(K_main, Ka, 16);
   memcpy(K_main + 16, Ke, 16);
 
-  ASSERT_RET(oc_spake_calc_cB(K_main, calculated_cB, bytes_X));
+  ASSERT_RET(oc_spake_calc_confirmV(K_main, calculated_cB, bytes_X));
   EXPECT_TRUE(memcmp(cB, calculated_cB, 32) == 0);
 }
