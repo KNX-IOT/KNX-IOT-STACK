@@ -300,8 +300,9 @@ oc_add_function_blocks_to_response(oc_request_t *request, size_t device_index,
         !(resource->properties & OC_DISCOVERABLE)) {
       continue;
     }
-    
-    if (!oc_filter_resource_by_rt(resource, request) || !oc_filter_resource_by_if(resource, request)) {
+
+    if (!oc_filter_resource_by_rt(resource, request) ||
+        !oc_filter_resource_by_if(resource, request)) {
       continue;
     }
 

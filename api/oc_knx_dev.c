@@ -829,8 +829,8 @@ oc_create_dev_dev_resource(int resource_idx, size_t device)
   // note that this resource is listed in /.well-known/core so it should have
   // the full rt with urn:knx prefix
   oc_core_populate_resource(
-    resource_idx, device, "/dev", OC_IF_LI, APPLICATION_LINK_FORMAT, OC_DISCOVERABLE,
-    oc_core_dev_dev_get_handler, 0, 0, 0, 1, "urn:knx:fb.0");
+    resource_idx, device, "/dev", OC_IF_LI, APPLICATION_LINK_FORMAT,
+    OC_DISCOVERABLE, oc_core_dev_dev_get_handler, 0, 0, 0, 1, "urn:knx:fb.0");
 }
 
 // -----------------------------------------------------------------------------
