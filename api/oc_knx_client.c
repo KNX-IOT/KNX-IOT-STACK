@@ -105,7 +105,7 @@ finish_spake_handshake(oc_client_response_t *data)
   uint8_t *shared_key[32];
   oc_spake_calc_K_shared(K_main, shared_key);
 
-  update_tokens(shared_key, sizeof(shared_key));
+  update_tokens(shared_key, 32);
 
   // free up the memory used by the handshake
   mbedtls_mpi_free(&w0);
@@ -118,7 +118,7 @@ finish_spake_handshake(oc_client_response_t *data)
   if (m_spake_cb) {
     m_spake_cb(
       0, oc_string(g_spake_ctx.serial_number), oc_string(g_spake_ctx.oscore_id),
-      oc_byte_string_len(g_spake_ctx.oscore_id), shared_key, sizeof(shared_key));
+      oc_byte_string_len(g_spake_ctx.oscore_id), shared_key, 32);
   }
 }
 

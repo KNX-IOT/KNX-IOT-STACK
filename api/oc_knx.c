@@ -1564,7 +1564,7 @@ oc_core_knx_spake_separate_post_handler(void *req_p)
     PRINT("CLIENT: pase.id length: %d\n", (int)oc_byte_string_len(g_pase.id));
     oc_oscore_set_auth_device(oc_string(g_pase.id),
                               oc_byte_string_len(g_pase.id), "", 0, shared_key,
-                              (int)sizeof(shared_key));
+                              32);
 
     // empty payload
     oc_send_empty_separate_response(&spake_separate_rsp, OC_STATUS_CHANGED);

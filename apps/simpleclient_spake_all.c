@@ -143,7 +143,7 @@ get_dev_pm(oc_client_response_t *data)
     PRINT("  get_dev_pm received : %d\n", rep->value.boolean);
   }
 
-  if (oc_init_put("/dev/pm", data->endpoint, NULL, &put_dev_pm, LOW_QOS,
+  if (oc_init_put("/dev/pm", data->endpoint, NULL, &put_dev_pm, HIGH_QOS,
                   NULL)) {
 
     cbor_encode_boolean(&g_encoder, true);
@@ -171,7 +171,7 @@ do_pm(void *ep)
   }
   oc_endpoint_t *endpoint = ep;
   endpoint->flags |= SECURED | OSCORE;
-  oc_do_get("/dev/pm", endpoint, NULL, callback, LOW_QOS, NULL);
+  oc_do_get("/dev/pm", endpoint, NULL, callback, HIGH_QOS, NULL);
   return OC_EVENT_CONTINUE;
 }
 
