@@ -507,15 +507,18 @@ oc_wkcore_discovery_handler(oc_request_t *request,
     matches = oc_process_resources(request, device, &response_length);
   }
 
-  oc_add_resource_to_wk(oc_core_get_resource_by_index(OC_DEV, device_index),
-                        request, device_index, &response_length, matches, 0);
+  oc_filter_resource(oc_core_get_resource_by_index(OC_DEV, device_index),
+                     request, device_index, &response_length, matches, 0);
 
-  oc_add_resource_to_wk(
-    oc_core_get_resource_by_index(OC_KNX_AUTH, device_index), request,
+  oc_filter_resource(oc_core_get_resource_by_index(OC_KNX_AUTH, device_index),
+                     request, device_index, &response_length, matches, 0);
+
+  oc_filter_resource(oc_core_get_resource_by_index(OC_KNX_SWU, device_index),
+                     request, device_index, &response_length, matches, 0);
+
+  oc_filter_resource(
+    oc_core_get_resource_by_index(OC_KNX_DOT_KNX, device_index), request,
     device_index, &response_length, matches, 0);
-
-  oc_add_resource_to_wk(oc_core_get_resource_by_index(OC_KNX_SWU, device_index),
-                        request, device_index, &response_length, matches, 0);
 
   // optional, not yet implemented
   // oc_add_resource_to_wk(oc_core_get_resource_by_index(OC_SUB, device_index),
@@ -538,8 +541,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
     request->response->response_buffer->response_length = response_length;
     request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
   } else if (request->origin && (request->origin->flags & MULTICAST) == 0) {
-    request->response->response_buffer->code =
-      oc_status_code(OC_STATUS_BAD_REQUEST);
+    request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
   } else {
     request->response->response_buffer->code = OC_IGNORE;
   }
