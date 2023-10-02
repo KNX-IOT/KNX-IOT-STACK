@@ -101,11 +101,11 @@ finish_spake_handshake(oc_client_response_t *data)
     return;
   }
 
-  // shared_key is 16-byte array - NOT NULL TERMINATED
-  uint8_t *shared_key = K_main + 16;
-  int shared_key_len = 16;
+  // shared_key is 32-byte array - NOT NULL TERMINATED
+  uint8_t *shared_key[32];
+  oc_spake_calc_K_shared(K_main, shared_key);
 
-  update_tokens(shared_key, shared_key_len);
+  update_tokens(shared_key, sizeof(shared_key));
 
   // free up the memory used by the handshake
   mbedtls_mpi_free(&w0);
@@ -113,11 +113,12 @@ finish_spake_handshake(oc_client_response_t *data)
   mbedtls_mpi_free(&privA);
   mbedtls_ecp_point_free(&pA);
   mbedtls_ecp_point_free(&pubA);
+  memset(K_main, 0, sizeof(K_main));
 
   if (m_spake_cb) {
     m_spake_cb(
       0, oc_string(g_spake_ctx.serial_number), oc_string(g_spake_ctx.oscore_id),
-      oc_byte_string_len(g_spake_ctx.oscore_id), shared_key, shared_key_len);
+      oc_byte_string_len(g_spake_ctx.oscore_id), shared_key, sizeof(shared_key));
   }
 }
 
