@@ -24,6 +24,8 @@ int calc_transcript_responder(spake_data_t *spake_data,
                               char *ctx);
 }
 
+int oc_spake_calc_K_shared_256(uint8_t *K_main, uint8_t K_shared[32]);
+
 static mbedtls_entropy_context entropy_ctx;
 static mbedtls_ctr_drbg_context ctr_drbg_ctx;
 static mbedtls_ecp_group grp;
@@ -241,7 +243,7 @@ TEST_F(Spake2Plus, CalculateSecretA)
                                        idProver, idVerifier, Context));
   ASSERT_RET(memcmp(bytes_K_main, K_main, sizeof(bytes_K_main)));
 
-  ASSERT_RET(oc_spake_calc_K_shared(K_main, shared_key));
+  ASSERT_RET(oc_spake_calc_K_shared_256(K_main, shared_key));
   ASSERT_RET(memcmp(shared_key, K_shared, sizeof(K_shared)));
 
   mbedtls_mpi_free(&w0);
@@ -278,7 +280,7 @@ TEST_F(Spake2Plus, CalculateSecretB)
                                        idVerifier, Context));
   ASSERT_RET(memcmp(bytes_K_main, spake_data.K_main, sizeof(bytes_K_main)));
 
-  ASSERT_RET(oc_spake_calc_K_shared(spake_data.K_main, shared_key));
+  ASSERT_RET(oc_spake_calc_K_shared_256(spake_data.K_main, shared_key));
   ASSERT_RET(memcmp(shared_key, K_shared, sizeof(K_shared)));
 
   mbedtls_mpi_free(&spake_data.y);

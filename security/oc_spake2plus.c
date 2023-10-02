@@ -686,7 +686,15 @@ oc_spake_calc_confirmP(uint8_t *K_main, uint8_t confirmP[32],
 }
 
 int
-oc_spake_calc_K_shared(uint8_t *K_main, uint8_t K_shared[32])
+oc_spake_calc_K_shared(uint8_t *K_main, uint8_t K_shared[16])
+{
+  mbedtls_hkdf(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), NULL, 0, K_main,
+               32, (const unsigned char *)"SharedKey", strlen("SharedKey"),
+               K_shared, 16);
+}
+
+int
+oc_spake_calc_K_shared_256(uint8_t *K_main, uint8_t K_shared[32])
 {
   mbedtls_hkdf(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), NULL, 0, K_main,
                32, (const unsigned char *)"SharedKey", strlen("SharedKey"),

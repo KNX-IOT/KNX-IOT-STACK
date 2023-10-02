@@ -1551,7 +1551,8 @@ oc_core_knx_spake_separate_post_handler(void *req_p)
     }
 
     // shared_key is 16-byte array - NOT NULL TERMINATED
-    uint8_t *shared_key[32];
+    uint8_t shared_key[16];
+    uint8_t shared_key_len = sizeof(shared_key);
     oc_spake_calc_K_shared(spake_data.K_main, shared_key);
 
     // set thet /auth/at entry with the calculated shared key
@@ -1564,7 +1565,7 @@ oc_core_knx_spake_separate_post_handler(void *req_p)
     PRINT("CLIENT: pase.id length: %d\n", (int)oc_byte_string_len(g_pase.id));
     oc_oscore_set_auth_device(oc_string(g_pase.id),
                               oc_byte_string_len(g_pase.id), "", 0, shared_key,
-                              32);
+                              shared_key_len);
 
     // empty payload
     oc_send_empty_separate_response(&spake_separate_rsp, OC_STATUS_CHANGED);

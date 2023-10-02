@@ -291,7 +291,7 @@ int oc_spake_calc_confirmV(uint8_t *K_main, uint8_t confirmV[32],
  * as an encryption key
  * @return int
  */
-int oc_spake_calc_K_shared(uint8_t *K_main, uint8_t K_shared[32]);
+int oc_spake_calc_K_shared(uint8_t *K_main, uint8_t K_shared[16]);
 
 void oc_spake_print_point(mbedtls_ecp_point *p);
 
