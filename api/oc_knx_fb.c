@@ -326,8 +326,8 @@ oc_add_function_blocks_to_response(oc_request_t *request, size_t device_index,
           counter++;
         }
       } else {
-      /* regular functional block, framing by functional block numbers &
-       * instances*/
+        /* regular functional block, framing by functional block numbers &
+         * instances*/
         if ((strncmp(t, ":dpa", 4) == 0) ||
             (strncmp(t, "urn:knx:dpa", 11) == 0)) {
           int fp_int = get_fp_from_dp(t);
