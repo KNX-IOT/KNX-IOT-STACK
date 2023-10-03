@@ -24,8 +24,6 @@ int calc_transcript_responder(spake_data_t *spake_data,
                               char *ctx);
 }
 
-int oc_spake_calc_K_shared_256(uint8_t *K_main, uint8_t K_shared[32]);
-
 static mbedtls_entropy_context entropy_ctx;
 static mbedtls_ctr_drbg_context ctr_drbg_ctx;
 static mbedtls_ecp_group grp;

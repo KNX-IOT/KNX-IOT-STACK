@@ -293,9 +293,12 @@ int oc_spake_calc_confirmV(uint8_t *K_main, uint8_t confirmV[32],
  */
 int oc_spake_calc_K_shared(uint8_t *K_main, uint8_t K_shared[16]);
 
+// Private declarations (only for testing)
 void oc_spake_print_point(mbedtls_ecp_point *p);
 
 void oc_spake_print_mpi(mbedtls_mpi *m);
+
+int oc_spake_calc_K_shared_256(uint8_t *K_main, uint8_t K_shared[32]);
 
 #ifdef __cplusplus
 }
