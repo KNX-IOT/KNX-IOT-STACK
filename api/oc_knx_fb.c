@@ -316,8 +316,7 @@ oc_add_function_blocks_to_response(oc_request_t *request, size_t device_index,
         if (netip_added == false) {
           /* add only once, this is not the first entry, so add the ,\n */
           if (*response_length > 0) {
-            length =
-              oc_rep_add_line_to_buffer(",\n");
+            length = oc_rep_add_line_to_buffer(",\n");
             *response_length += length;
           }
           length = oc_rep_add_line_to_buffer("</f/netip>;rt=\":fb.11\";ct=40");
@@ -326,9 +325,9 @@ oc_add_function_blocks_to_response(oc_request_t *request, size_t device_index,
           netip_added = true;
           counter++;
         }
-      } 
+      }
       /* regular functional block, framing by functional block numbers &
-        * instances*/
+       * instances*/
       if ((strncmp(t, ":dpa", 4) == 0) ||
           (strncmp(t, "urn:knx:dpa", 11) == 0)) {
         int fp_int = get_fp_from_dp(t);
