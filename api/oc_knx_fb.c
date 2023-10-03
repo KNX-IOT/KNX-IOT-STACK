@@ -312,25 +312,30 @@ oc_add_function_blocks_to_response(oc_request_t *request, size_t device_index,
       if ((strncmp(t, ":dpa.11.", 8) == 0) ||
           (strncmp(t, "urn:knx:dpa.11.", 15) == 0)) {
         /* specific functional block iot_router : /f/netip */
+        // add the functional block only once..
         if (netip_added == false) {
-          /* add only once */
+          /* add only once, this is not the first entry, so add the ,\n */
+          if (*response_length > 0) {
+            length =
+              oc_rep_add_line_to_buffer(",\n");
+            *response_length += length;
+          }
           length = oc_rep_add_line_to_buffer("</f/netip>;rt=\":fb.11\";ct=40");
           *response_length += length;
           matches++;
           netip_added = true;
           counter++;
         }
-      } else {
-        /* regular functional block, framing by functional block numbers &
-         * instances*/
-        if ((strncmp(t, ":dpa", 4) == 0) ||
-            (strncmp(t, "urn:knx:dpa", 11) == 0)) {
-          int fp_int = get_fp_from_dp(t);
-          int instance = resource->fb_instance;
-          if ((fp_int > 0) && (is_in_g_array(fp_int, instance) == false)) {
-            store_in_array(fp_int, instance);
-            counter++;
-          }
+      } 
+      /* regular functional block, framing by functional block numbers &
+        * instances*/
+      if ((strncmp(t, ":dpa", 4) == 0) ||
+          (strncmp(t, "urn:knx:dpa", 11) == 0)) {
+        int fp_int = get_fp_from_dp(t);
+        int instance = resource->fb_instance;
+        if ((fp_int > 0) && (is_in_g_array(fp_int, instance) == false)) {
+          store_in_array(fp_int, instance);
+          counter++;
         }
       }
     }
