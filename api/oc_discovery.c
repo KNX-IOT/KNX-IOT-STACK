@@ -385,10 +385,11 @@ oc_wkcore_discovery_handler(oc_request_t *request,
         APPLICATION_LINK_FORMAT;
       if (request->origin && (request->origin->flags & MULTICAST) == 0) {
         request->response->response_buffer->code =
-          oc_status_code(OC_STATUS_BAD_REQUEST);
+          oc_status_code(OC_STATUS_NOT_FOUND);
       } else {
         request->response->response_buffer->code = OC_IGNORE;
       }
+      return;
     }
   }
 
