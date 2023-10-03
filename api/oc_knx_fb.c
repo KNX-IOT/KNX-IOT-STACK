@@ -325,16 +325,17 @@ oc_add_function_blocks_to_response(oc_request_t *request, size_t device_index,
           netip_added = true;
           counter++;
         }
-      }
-      /* regular functional block, framing by functional block numbers &
-       * instances*/
-      if ((strncmp(t, ":dpa", 4) == 0) ||
-          (strncmp(t, "urn:knx:dpa", 11) == 0)) {
-        int fp_int = get_fp_from_dp(t);
-        int instance = resource->fb_instance;
-        if ((fp_int > 0) && (is_in_g_array(fp_int, instance) == false)) {
-          store_in_array(fp_int, instance);
-          counter++;
+      } else {
+        /* regular functional block, framing by functional block numbers &
+         * instances*/
+        if ((strncmp(t, ":dpa", 4) == 0) ||
+            (strncmp(t, "urn:knx:dpa", 11) == 0)) {
+          int fp_int = get_fp_from_dp(t);
+          int instance = resource->fb_instance;
+          if ((fp_int > 0) && (is_in_g_array(fp_int, instance) == false)) {
+            store_in_array(fp_int, instance);
+            counter++;
+          }
         }
       }
     }
