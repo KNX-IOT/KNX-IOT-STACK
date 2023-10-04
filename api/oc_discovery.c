@@ -243,6 +243,8 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   (void)iface_mask;
   size_t response_length = 0;
   int matches = 0;
+  bool empty_query = true;
+  bool query_match = false;
   int framed_bytes;
 
   /* check if the accept header is link-format */
@@ -274,22 +276,31 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   value_len = -1;
   oc_init_query_iterator();
   while (oc_iterate_query(request, &key, &key_len, &value, &value_len) > 0) {
+    empty_query = false;
     if (strncmp(key, "rt", key_len) == 0) {
       rt_request = value;
       rt_len = (int)value_len;
+      query_match = true;
     }
     if (strncmp(key, "ep", key_len) == 0) {
       ep_request = value;
       ep_len = (int)value_len;
+      query_match = true;
     }
     if (strncmp(key, "if", key_len) == 0) {
       if_request = value;
       if_len = (int)value_len;
+      query_match = true;
     }
     if (strncmp(key, "d", key_len) == 0) {
       d_request = value;
       d_len = (int)value_len;
+      query_match = true;
     }
+  }
+  if (!empty_query && !query_match) {
+    request->response->response_buffer->code = OC_IGNORE;
+    return;
   }
 
   // get the device structure from the request.
