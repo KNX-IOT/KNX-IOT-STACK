@@ -498,10 +498,14 @@ oc_wkcore_discovery_handler(oc_request_t *request,
       frame_ep = true;
     }
     if (frame_ep) {
-      response_length = response_length =
-        frame_sn(oc_string(device->serialnumber), device->iid, device->ia);
+      response_length = frame_sn(oc_string(device->serialnumber), device->iid, device->ia);
+      request->response->response_buffer->response_length = response_length;
+      request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
+      request->response->response_buffer->content_format =
+        APPLICATION_LINK_FORMAT;
       matches = 1;
     }
+    return;
   }
 
   if (rt_len > 0 || if_len > 0) {
