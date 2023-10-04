@@ -440,18 +440,26 @@ oc_wkcore_discovery_handler(oc_request_t *request,
       // now do the extra work to check the iid
       // do this with string compare, otherwise we have to create an uint64 from
       // string
-      int iid_str_len = ep_len - 10;
-      char *iid_str = oc_strnchr(&ep_request[10], '.', iid_str_len);
+      int iid_str_len = 10;
+      char *iid_str = oc_strnchr(ep_request, '.', iid_str_len);
       if (iid_str) {
         char iid_dev[20];
         oc_conv_uint64_to_hex_string(iid_dev, device->iid);
-        if (strncmp(iid_dev, iid_str + 1, iid_str_len - 1) == 0) {
-          response_length = response_length =
-            frame_sn(oc_string(device->serialnumber), device->iid, device->ia);
+        if (strncmp(iid_dev, iid_str + 1, iid_str_len) == 0) {
+          response_length = frame_sn(oc_string(device->serialnumber), device->iid, device->ia);
+          request->response->response_buffer->response_length = response_length;
+          request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
+          request->response->response_buffer->content_format =
+            APPLICATION_LINK_FORMAT;
           matches = 1;
+          return;
         }
       }
     }
+    /* should ignore this request*/
+    // PRINT(" oc_wkcore_discovery_handler IA HANDLING: IGNORE\n");
+    request->response->response_buffer->code = OC_IGNORE;
+    return;
   }
 
   /* handle serial number spec 1.0 */
