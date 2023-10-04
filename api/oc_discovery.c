@@ -356,7 +356,8 @@ oc_wkcore_discovery_handler(oc_request_t *request,
       return;
     }
     if (strncmp(d_request, "urn:knx:g.s.*", 13) == 0) {
-      // Quote from EITT: "Must fail since the response would likely be excessively large"
+      // Quote from EITT: "Must fail since the response would likely be
+      // excessively large"
       request->response->response_buffer->content_format =
         APPLICATION_LINK_FORMAT;
       request->response->response_buffer->code =
@@ -459,9 +460,11 @@ oc_wkcore_discovery_handler(oc_request_t *request,
         char iid_dev[20];
         oc_conv_uint64_to_hex_string(iid_dev, device->iid);
         if (strncmp(iid_dev, iid_str + 1, iid_str_len) == 0) {
-          response_length = frame_sn(oc_string(device->serialnumber), device->iid, device->ia);
+          response_length =
+            frame_sn(oc_string(device->serialnumber), device->iid, device->ia);
           request->response->response_buffer->response_length = response_length;
-          request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
+          request->response->response_buffer->code =
+            oc_status_code(OC_STATUS_OK);
           request->response->response_buffer->content_format =
             APPLICATION_LINK_FORMAT;
           matches = 1;
@@ -509,9 +512,11 @@ oc_wkcore_discovery_handler(oc_request_t *request,
     /* request for all devices via serial number wild card*/
     char *ep_serialnumber = ep_request + 9;
 
-    if (strncmp(ep_serialnumber, "*", 1) == 0 || strncmp(oc_string(device->serialnumber), ep_serialnumber,
+    if (strncmp(ep_serialnumber, "*", 1) == 0 ||
+        strncmp(oc_string(device->serialnumber), ep_serialnumber,
                 strlen(oc_string(device->serialnumber))) == 0) {
-      response_length = frame_sn(oc_string(device->serialnumber), device->iid, device->ia);
+      response_length =
+        frame_sn(oc_string(device->serialnumber), device->iid, device->ia);
       request->response->response_buffer->response_length = response_length;
       request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
       request->response->response_buffer->content_format =
@@ -531,22 +536,25 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   }
 
   if (oc_filter_resource(oc_core_get_resource_by_index(OC_DEV, device_index),
-                     request, device_index, &response_length, matches, 0)) {
+                         request, device_index, &response_length, matches, 0)) {
     matches++;
   }
 
-  if (oc_filter_resource(oc_core_get_resource_by_index(OC_KNX_AUTH, device_index),
-                     request, device_index, &response_length, matches, 0)) {
+  if (oc_filter_resource(
+        oc_core_get_resource_by_index(OC_KNX_AUTH, device_index), request,
+        device_index, &response_length, matches, 0)) {
     matches++;
   }
 
-  if (oc_filter_resource(oc_core_get_resource_by_index(OC_KNX_SWU, device_index),
-                     request, device_index, &response_length, matches, 0)) {
+  if (oc_filter_resource(
+        oc_core_get_resource_by_index(OC_KNX_SWU, device_index), request,
+        device_index, &response_length, matches, 0)) {
     matches++;
   }
 
-  if (oc_filter_resource(oc_core_get_resource_by_index(OC_KNX_DOT_KNX, device_index),
-                     request, device_index, &response_length, matches, 0)) {
+  if (oc_filter_resource(
+        oc_core_get_resource_by_index(OC_KNX_DOT_KNX, device_index), request,
+        device_index, &response_length, matches, 0)) {
     matches++;
   }
 

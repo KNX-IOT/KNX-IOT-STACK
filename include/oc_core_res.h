@@ -459,7 +459,8 @@ void oc_core_bind_dpt_resource(int core_resource, size_t device_index,
  * @param request the request to scan
  * @return 1 if truncated, 0 otherwise
  */
-int oc_filter_resource_by_urn(const oc_resource_t *resource, oc_request_t *request);
+int oc_filter_resource_by_urn(const oc_resource_t *resource,
+                              oc_request_t *request);
 
 /**
  * @brief filter if the query parameters of the request contains the resource
