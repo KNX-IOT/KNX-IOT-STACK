@@ -487,23 +487,17 @@ oc_wkcore_discovery_handler(oc_request_t *request,
     /* new style release 1.1 */
     /* request for all devices via serial number wild card*/
     char *ep_serialnumber = ep_request + 9;
-    bool frame_ep = false;
 
-    if (strncmp(ep_serialnumber, "*", 1) == 0) {
-      /* matches wild card*/
-      frame_ep = true;
-    }
-    if (strncmp(oc_string(device->serialnumber), ep_serialnumber,
+    if (strncmp(ep_serialnumber, "*", 1) == 0 || strncmp(oc_string(device->serialnumber), ep_serialnumber,
                 strlen(oc_string(device->serialnumber))) == 0) {
-      frame_ep = true;
-    }
-    if (frame_ep) {
       response_length = frame_sn(oc_string(device->serialnumber), device->iid, device->ia);
       request->response->response_buffer->response_length = response_length;
       request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
       request->response->response_buffer->content_format =
         APPLICATION_LINK_FORMAT;
       matches = 1;
+    } else {
+      request->response->response_buffer->code = OC_IGNORE;
     }
     return;
   }
