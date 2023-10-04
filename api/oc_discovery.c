@@ -345,18 +345,12 @@ oc_wkcore_discovery_handler(oc_request_t *request,
       return;
     }
     // create the response
-    bool added = oc_add_points_in_group_object_table_to_response(
+    oc_add_points_in_group_object_table_to_response(
       request, device_index, group_address, &response_length, matches);
-    if (added) {
-      request->response->response_buffer->content_format =
-        APPLICATION_LINK_FORMAT;
-      request->response->response_buffer->response_length = response_length;
-      request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
-    } else {
-      request->response->response_buffer->code =
-        oc_status_code(OC_STATUS_BAD_REQUEST);
-    }
-
+    request->response->response_buffer->content_format =
+      APPLICATION_LINK_FORMAT;
+    request->response->response_buffer->response_length = response_length;
+    request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
     return;
   }
 
