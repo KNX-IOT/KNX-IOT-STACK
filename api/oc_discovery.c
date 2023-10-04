@@ -344,6 +344,14 @@ oc_wkcore_discovery_handler(oc_request_t *request,
         oc_status_code(OC_STATUS_BAD_REQUEST);
       return;
     }
+    if (strncmp(d_request, "urn:knx:g.s.*", 13) == 0) {
+      // Quote from EITT: "Must fail since the response would likely be excessively large"
+      request->response->response_buffer->content_format =
+        APPLICATION_LINK_FORMAT;
+      request->response->response_buffer->code =
+        oc_status_code(OC_STATUS_BAD_REQUEST);
+      return;
+    }
     // create the response
     oc_add_points_in_group_object_table_to_response(
       request, device_index, group_address, &response_length, matches);
