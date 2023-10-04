@@ -221,6 +221,7 @@ frame_sn(char *serial_number, uint64_t iid, uint32_t ia)
   response_length = response_length + framed_bytes;
 
   framed_bytes = oc_rep_add_line_to_buffer(" knx://ia.");
+  response_length = response_length + framed_bytes;
   char text_hex[20];
   oc_conv_uint64_to_hex_string(text_hex, iid);
   framed_bytes = oc_rep_add_line_to_buffer(text_hex);
