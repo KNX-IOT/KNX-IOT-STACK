@@ -356,7 +356,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
       return;
     }
     if (strncmp(d_request, "urn:knx:g.s.*", 13) == 0) {
-      // Quote from EITT: "Must fail since the response would likely be
+      // Quote from EITT test 5.1.1.8: "Must fail since the response would likely be
       // excessively large"
       request->response->response_buffer->content_format =
         APPLICATION_LINK_FORMAT;
