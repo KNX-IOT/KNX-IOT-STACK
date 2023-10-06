@@ -564,10 +564,12 @@ oc_wkcore_discovery_handler(oc_request_t *request,
 
   if (request->origin && (request->origin->flags & MULTICAST) == 0) {
     // only for unicast
-    bool added = oc_add_function_blocks_to_response(request, device_index,
-                                                    &response_length, matches);
-    if (added) {
-      matches++;
+    if (oc_filter_functional_blocks(request)) {
+      bool added = oc_add_function_blocks_to_response(request, device_index,
+                                                      &response_length, matches);
+      if (added) {
+        matches++;
+      }
     }
   }
 
