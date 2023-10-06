@@ -356,8 +356,8 @@ oc_wkcore_discovery_handler(oc_request_t *request,
       return;
     }
     if (strncmp(d_request, "urn:knx:g.s.*", 13) == 0) {
-      // Quote from EITT test 5.1.1.8: "Must fail since the response would likely be
-      // excessively large"
+      // Quote from EITT test 5.1.1.8: "Must fail since the response would
+      // likely be excessively large"
       request->response->response_buffer->content_format =
         APPLICATION_LINK_FORMAT;
       request->response->response_buffer->code =
@@ -565,8 +565,8 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   if (request->origin && (request->origin->flags & MULTICAST) == 0) {
     // only for unicast
     if (oc_filter_functional_blocks(request)) {
-      bool added = oc_add_function_blocks_to_response(request, device_index,
-                                                      &response_length, matches);
+      bool added = oc_add_function_blocks_to_response(
+        request, device_index, &response_length, matches);
       if (added) {
         matches++;
       }
