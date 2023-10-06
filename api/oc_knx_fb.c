@@ -283,6 +283,10 @@ oc_count_functional_blocks(size_t device_index)
 bool
 oc_filter_functional_blocks(oc_request_t *request)
 {
+  if (request->query_len == 0) {
+    return true;
+  }
+
   char *value = NULL;
   size_t value_len;
   char *key;
