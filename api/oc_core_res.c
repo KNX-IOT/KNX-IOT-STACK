@@ -772,20 +772,18 @@ oc_core_get_resource_by_uri(const char *uri, size_t device)
 int
 oc_filter_resource_by_urn(const oc_resource_t *resource, oc_request_t *request)
 {
+  char *value = NULL;
+  size_t value_len;
+  char *key;
+  size_t key_len;
   int truncate = 0;
-  bool more_query_params = false;
-  char *rt = NULL;
-  int rt_len = -1;
   oc_init_query_iterator();
-  do {
-    more_query_params =
-      oc_iterate_query_get_values(request, "rt", &rt, &rt_len);
-
-    if (rt_len > 0 && strncmp(rt, "urn:knx", 7) == 0) {
+  while (oc_iterate_query(request, &key, &key_len, &value, &value_len) > 0) {
+    if (strncmp(value, "urn:knx", 7) == 0) {
       truncate = 1;
       break;
     }
-  } while (more_query_params);
+  }
   return truncate;
 }
 

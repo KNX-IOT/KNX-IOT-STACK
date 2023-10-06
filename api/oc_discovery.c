@@ -165,8 +165,6 @@ oc_filter_resource(const oc_resource_t *resource, oc_request_t *request,
 {
   (void)device_index; /* variable not used */
 
-  truncate = oc_filter_resource_by_urn(resource, request);
-
   if (!oc_filter_resource_by_rt(resource, request)) {
     return false;
   }
@@ -178,6 +176,8 @@ oc_filter_resource(const oc_resource_t *resource, oc_request_t *request,
   if (!(resource->properties & OC_DISCOVERABLE)) {
     return false;
   }
+
+  truncate = oc_filter_resource_by_urn(resource, request);
 
   return oc_add_resource_to_wk(resource, request, device_index, response_length,
                                matches, truncate);
