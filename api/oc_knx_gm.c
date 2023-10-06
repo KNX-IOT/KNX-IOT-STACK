@@ -1334,8 +1334,8 @@ oc_core_f_netip_mcast_put_handler(oc_request_t *request,
     if (rep->type == OC_REP_INT) {
       if (rep->iname == 1) {
         PRINT("  oc_core_f_netip_mcast_put_handler (mcast) : %d\n",
-              (int)rep->value.integer);
-        g_mcast = (int)rep->value.integer;
+              (uint32_t)rep->value.integer);
+        g_mcast = (uint32_t)rep->value.integer;
         dump_mcast();
       }
     }
