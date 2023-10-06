@@ -769,6 +769,24 @@ oc_core_get_resource_by_uri(const char *uri, size_t device)
   return &core_resources[res];
 }
 
+int
+oc_filter_resource_by_urn(const oc_resource_t *resource, oc_request_t *request)
+{
+  char *value = NULL;
+  size_t value_len;
+  char *key;
+  size_t key_len;
+  int truncate = 0;
+  oc_init_query_iterator();
+  while (oc_iterate_query(request, &key, &key_len, &value, &value_len) > 0) {
+    if (strncmp(value, "urn:knx", 7) == 0) {
+      truncate = 1;
+      break;
+    }
+  }
+  return truncate;
+}
+
 bool
 oc_filter_resource_by_rt(const oc_resource_t *resource, oc_request_t *request)
 {

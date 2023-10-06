@@ -64,6 +64,14 @@ void oc_create_knx_fb_resources(size_t device);
  */
 int oc_count_functional_blocks(size_t device_index);
 
+/**
+ * @brief check if functional blocks should be added to the response
+ * @param request the request
+ * @return true
+ * @return false
+ */
+bool oc_filter_functional_blocks(oc_request_t *request);
+
 #ifdef __cplusplus
 }
 #endif
