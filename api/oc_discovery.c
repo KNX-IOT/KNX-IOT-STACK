@@ -298,7 +298,15 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   }
 
   if (request->query_len > 0 && !query_match) {
-    request->response->response_buffer->code = OC_IGNORE;
+    if (request->origin && (request->origin->flags & MULTICAST) == 0) {
+      // for unicast
+      request->response->response_buffer->content_format =
+        APPLICATION_LINK_FORMAT;
+      request->response->response_buffer->response_length = response_length;
+      request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
+    } else {
+      request->response->response_buffer->code = OC_IGNORE;
+    }
     return;
   }
 
