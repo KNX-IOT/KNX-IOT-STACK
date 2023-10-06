@@ -243,7 +243,6 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   (void)iface_mask;
   size_t response_length = 0;
   int matches = 0;
-  bool empty_query = true;
   bool query_match = false;
   int framed_bytes;
 
@@ -276,7 +275,6 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   value_len = -1;
   oc_init_query_iterator();
   while (oc_iterate_query(request, &key, &key_len, &value, &value_len) > 0) {
-    empty_query = false;
     if (strncmp(key, "rt", key_len) == 0) {
       rt_request = value;
       rt_len = (int)value_len;
@@ -298,7 +296,8 @@ oc_wkcore_discovery_handler(oc_request_t *request,
       query_match = true;
     }
   }
-  if (!empty_query && !query_match) {
+
+  if (request->query_len > 0 && !query_match) {
     request->response->response_buffer->code = OC_IGNORE;
     return;
   }
