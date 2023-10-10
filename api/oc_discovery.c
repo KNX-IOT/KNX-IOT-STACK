@@ -421,15 +421,11 @@ oc_wkcore_discovery_handler(oc_request_t *request,
     char *if_ia_s = if_request + 11;
     int if_ia_i = atoi(if_ia_s);
     if (if_ia_i == device->ia) {
-      /* return the ll entry: </dev/ia>;rt="dpt.value2Ucount";ct=50 */
       framed_bytes =
         oc_rep_add_line_to_buffer("</dev/sna>;rt=\"dpa.0.57\";ct=50,");
       response_length = response_length + framed_bytes;
       framed_bytes =
         oc_rep_add_line_to_buffer("</dev/da>;rt=\"dpa.0.58\";ct=50,");
-      response_length = response_length + framed_bytes;
-      framed_bytes =
-        oc_rep_add_line_to_buffer("</dev/ia>;rt=\"dpt.value2Ucount\";ct=50");
       response_length = response_length + framed_bytes;
 
       request->response->response_buffer->response_length = response_length;
