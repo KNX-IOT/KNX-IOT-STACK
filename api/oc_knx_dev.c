@@ -262,7 +262,7 @@ oc_core_dev_model_get_handler(oc_request_t *request,
   oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
 }
 
-OC_CORE_CREATE_CONST_RESOURCE_LINKED(dev_model, dev_ia, 0, "/dev/model",
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(dev_model, dev_hostname, 0, "/dev/model",
                                      OC_IF_D, APPLICATION_CBOR, OC_DISCOVERABLE,
                                      oc_core_dev_model_get_handler, 0, 0, 0,
                                      "urn:knx:dpt.utf8", OC_SIZE_MANY(1),
@@ -1412,7 +1412,6 @@ oc_create_knx_device_resources(size_t device_index)
   oc_create_dev_fwv_resource(OC_DEV_FWV, device_index);
   oc_create_dev_hwt_resource(OC_DEV_HWT, device_index);
   oc_create_dev_model_resource(OC_DEV_MODEL, device_index);
-  oc_create_dev_ia_resource(OC_DEV_IA, device_index);
   oc_create_dev_hostname_resource(OC_DEV_HOSTNAME, device_index);
   oc_create_dev_iid_resource(OC_DEV_IID, device_index);
   oc_create_dev_pm_resource(OC_DEV_PM, device_index);
