@@ -1394,6 +1394,8 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
      */
     response_buffer.response_length = 0;
     response_buffer.code = oc_status_code(OC_STATUS_METHOD_NOT_ALLOWED);
+    // For EITT test 5.2.3.1b
+    response_buffer.content_format = APPLICATION_CBOR;
   } else if (!authorized) {
     OC_WRN("ocri: Subject not authorized");
     /* If the requestor (subject) does not have access granted via an
@@ -1539,8 +1541,8 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
                                          response_buffer.content_format);
         }
       } else {
-        // For EITT test 5.1.1.4
-        if (response_buffer.content_format == APPLICATION_LINK_FORMAT) {
+        // For EITT test 5.1.1.4 & 5.2.3.1b
+        if (response_buffer.content_format == APPLICATION_LINK_FORMAT || response_buffer.content_format == APPLICATION_CBOR) {
           coap_set_header_content_format(response,
                                          response_buffer.content_format);
         }
