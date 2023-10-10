@@ -1008,38 +1008,6 @@ oc_create_knx_fingerprint_resource(int resource_idx, size_t device)
 // ----------------------------------------------------------------------------
 
 static void
-oc_core_knx_ia_get_handler(oc_request_t *request,
-                           oc_interface_mask_t iface_mask, void *data)
-{
-  (void)data;
-  (void)iface_mask;
-  PRINT("oc_core_knx_ia_get_handler\n");
-
-  /* check if the accept header is cbor-format */
-  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
-    request->response->response_buffer->code =
-      oc_status_code(OC_STATUS_BAD_REQUEST);
-    return;
-  }
-  size_t device_index = request->resource->device;
-  oc_device_info_t *device = oc_core_get_device_info(device_index);
-  if (device != NULL) {
-    oc_rep_begin_root_object();
-    oc_rep_i_set_int(root, 12, (int64_t)device->ia);
-    oc_rep_i_set_int(root, 26, (int64_t)device->iid);
-    if (device->fid > 0) {
-      // only frame it when it is set...
-      oc_rep_i_set_int(root, 25, (int64_t)device->fid);
-    }
-    oc_rep_end_root_object();
-
-    PRINT("oc_core_knx_ia_get_handler - done\n");
-    oc_send_cbor_response(request, OC_STATUS_OK);
-  }
-  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
-}
-
-static void
 oc_core_knx_ia_post_handler(oc_request_t *request,
                             oc_interface_mask_t iface_mask, void *data)
 {
@@ -1110,7 +1078,7 @@ oc_core_knx_ia_post_handler(oc_request_t *request,
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_ia, knx_osn, 0, "/.well-known/knx/ia",
                                      OC_IF_C, APPLICATION_CBOR, OC_DISCOVERABLE,
-                                     oc_core_knx_ia_get_handler, 0,
+                                     NULL, 0,
                                      oc_core_knx_ia_post_handler, 0, NULL,
                                      OC_SIZE_ZERO());
 
@@ -1120,7 +1088,7 @@ oc_create_knx_ia(int resource_idx, size_t device)
   OC_DBG("oc_create_knx_ia\n");
   oc_core_populate_resource(resource_idx, device, "/.well-known/knx/ia",
                             OC_IF_C, APPLICATION_CBOR, OC_DISCOVERABLE,
-                            oc_core_knx_ia_get_handler, 0,
+                            NULL, 0,
                             oc_core_knx_ia_post_handler, 0, 0, "");
 }
 
