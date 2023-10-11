@@ -653,7 +653,7 @@ oc_knx_swu_bytes_get_handler(oc_request_t *request,
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_swu_pkgbytes, knx_swu_pkgqurl, 0,
-                                     "/swu/bytes", OC_IF_SWU | OC_IF_D,
+                                     "/swu/pkgbytes", OC_IF_SWU | OC_IF_D,
                                      APPLICATION_CBOR, OC_DISCOVERABLE,
                                      oc_knx_swu_bytes_get_handler, 0, 0, 0,
                                      "urn:knx:dpt.value4UCount",
@@ -662,9 +662,10 @@ void
 oc_create_knx_swu_pkgbytes_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_swu_pkgbytes_resource\n");
-  oc_core_populate_resource(
-    resource_idx, device, "/swu/bytes", OC_IF_SWU | OC_IF_D, APPLICATION_CBOR,
-    OC_DISCOVERABLE, oc_knx_swu_bytes_get_handler, 0, 0, 0, 0);
+  oc_core_populate_resource(resource_idx, device, "/swu/pkgbytes",
+                            OC_IF_SWU | OC_IF_D, APPLICATION_CBOR,
+                            OC_DISCOVERABLE, oc_knx_swu_bytes_get_handler, 0, 0,
+                            0, 0);
 
   oc_core_bind_dpt_resource(resource_idx, device, "urn:knx:dpt.value4UCount");
 }

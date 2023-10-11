@@ -525,7 +525,7 @@ int
 oc_core_set_device_fid(size_t device_index, uint64_t fid)
 {
   if (device_index >= (int)oc_core_get_num_devices()) {
-    OC_ERR("  device_index %d to large\n", (int)device_index);
+    OC_ERR("  device_index %d too large\n", (int)device_index);
     return -1;
   }
   oc_device_info[device_index].fid = fid;
