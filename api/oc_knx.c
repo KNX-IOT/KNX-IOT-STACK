@@ -1054,11 +1054,6 @@ oc_core_knx_ia_post_handler(oc_request_t *request,
     }
     rep = rep->next;
   }
-  if (fid_set) {
-    OC_ERR("fid set in request: returning error!");
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
-    return;
-  }
 
   if (iid_set && ia_set) {
     // do the run time installation
