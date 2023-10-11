@@ -269,7 +269,7 @@ oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     oc_rep_begin_root_object();
 
     // TODO note need to figure out how to fill in the correct response values
-    oc_rep_set_int(root, code, 5);
+    oc_rep_set_int(root, code, 0);
     oc_rep_set_int(root, time, 2);
     oc_rep_end_root_object();
 
