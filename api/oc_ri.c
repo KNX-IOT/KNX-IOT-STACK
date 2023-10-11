@@ -1542,7 +1542,8 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
         }
       } else {
         // For EITT test 5.1.1.4 & 5.2.3.1b
-        if (response_buffer.content_format == APPLICATION_LINK_FORMAT || response_buffer.content_format == APPLICATION_CBOR) {
+        if (response_buffer.content_format == APPLICATION_LINK_FORMAT ||
+            response_buffer.content_format == APPLICATION_CBOR) {
           coap_set_header_content_format(response,
                                          response_buffer.content_format);
         }

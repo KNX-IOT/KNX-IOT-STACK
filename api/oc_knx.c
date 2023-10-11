@@ -1073,17 +1073,15 @@ oc_core_knx_ia_post_handler(oc_request_t *request,
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_ia, knx_osn, 0, "/.well-known/knx/ia",
                                      OC_IF_C, APPLICATION_CBOR, OC_DISCOVERABLE,
-                                     NULL, 0,
-                                     oc_core_knx_ia_post_handler, 0, NULL,
-                                     OC_SIZE_ZERO());
+                                     NULL, 0, oc_core_knx_ia_post_handler, 0,
+                                     NULL, OC_SIZE_ZERO());
 
 void
 oc_create_knx_ia(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_ia\n");
   oc_core_populate_resource(resource_idx, device, "/.well-known/knx/ia",
-                            OC_IF_C, APPLICATION_CBOR, OC_DISCOVERABLE,
-                            NULL, 0,
+                            OC_IF_C, APPLICATION_CBOR, OC_DISCOVERABLE, NULL, 0,
                             oc_core_knx_ia_post_handler, 0, 0, "");
 }
 
