@@ -1445,7 +1445,7 @@ oc_core_knx_spake_separate_post_handler(void *req_p)
     // next step: calculate pB, encode it into the struct
     mbedtls_ecp_point pB;
     mbedtls_ecp_point_init(&pB);
-    if (ret = oc_spake_calc_pB(&pB, &spake_data.pub_y, &spake_data.w0)) {
+    if (ret = oc_spake_calc_shareV(&pB, &spake_data.pub_y, &spake_data.w0)) {
       OC_ERR("oc_spake_calc_pB failed with code %d", ret);
       mbedtls_ecp_point_free(&pB);
       goto error;
@@ -1463,7 +1463,7 @@ oc_core_knx_spake_separate_post_handler(void *req_p)
       goto error;
     }
 
-    oc_spake_calc_cB(spake_data.Ka_Ke, g_pase.cb, g_pase.pa);
+    oc_spake_calc_confirmV(spake_data.K_main, g_pase.cb, g_pase.pa);
     mbedtls_ecp_point_free(&pB);
 
     oc_rep_begin_root_object();
@@ -1481,20 +1481,21 @@ oc_core_knx_spake_separate_post_handler(void *req_p)
     uint8_t expected_ca[32];
 
     OC_DBG_SPAKE("KaKe & pB Bytes");
-    OC_LOGbytes_OSCORE(spake_data.Ka_Ke, 32);
+    OC_LOGbytes_OSCORE(spake_data.K_main, 32);
     OC_LOGbytes_OSCORE(g_pase.pb, sizeof(g_pase.pb));
-    oc_spake_calc_cA(spake_data.Ka_Ke, expected_ca, g_pase.pb);
+    oc_spake_calc_confirmP(spake_data.K_main, expected_ca, g_pase.pb);
     OC_DBG_SPAKE("cA:");
     OC_LOGbytes_OSCORE(expected_ca, 32);
 
     if (memcmp(expected_ca, g_pase.ca, sizeof(g_pase.ca)) != 0) {
-      OC_ERR("oc_spake_calc_cA failed");
+      OC_ERR("oc_spake_calc_confirmP failed");
       goto error;
     }
 
     // shared_key is 16-byte array - NOT NULL TERMINATED
-    uint8_t *shared_key = spake_data.Ka_Ke + 16;
-    size_t shared_key_len = 16;
+    uint8_t shared_key[16];
+    uint8_t shared_key_len = sizeof(shared_key);
+    oc_spake_calc_K_shared(spake_data.K_main, shared_key);
 
     // set thet /auth/at entry with the calculated shared key
     // size_t device_index = request->resource->device;
@@ -1506,13 +1507,13 @@ oc_core_knx_spake_separate_post_handler(void *req_p)
     PRINT("CLIENT: pase.id length: %d\n", (int)oc_byte_string_len(g_pase.id));
     oc_oscore_set_auth_device(oc_string(g_pase.id),
                               oc_byte_string_len(g_pase.id), "", 0, shared_key,
-                              (int)shared_key_len);
+                              shared_key_len);
 
     // empty payload
     oc_send_empty_separate_response(&spake_separate_rsp, OC_STATUS_CHANGED);
 
     // handshake completed successfully - clear state
-    memset(spake_data.Ka_Ke, 0, sizeof(spake_data.Ka_Ke));
+    memset(spake_data.K_main, 0, sizeof(spake_data.K_main));
     mbedtls_ecp_point_free(&spake_data.L);
     mbedtls_ecp_point_free(&spake_data.pub_y);
     mbedtls_mpi_free(&spake_data.w0);
@@ -1534,7 +1535,7 @@ oc_core_knx_spake_separate_post_handler(void *req_p)
   }
 error:
   // be paranoid: wipe all global data after an error
-  memset(spake_data.Ka_Ke, 0, sizeof(spake_data.Ka_Ke));
+  memset(spake_data.K_main, 0, sizeof(spake_data.K_main));
   mbedtls_ecp_point_free(&spake_data.L);
   mbedtls_ecp_point_free(&spake_data.pub_y);
   mbedtls_mpi_free(&spake_data.w0);

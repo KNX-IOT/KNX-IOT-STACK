@@ -361,6 +361,7 @@ oc_oscore_add_context(size_t device, const char *senderid, int senderid_size,
     OC_ERR("No sender or recipient ID or Master secret");
     return NULL;
   }
+
   if (mastersecret_size != OSCORE_IDCTX_LEN) {
     OC_ERR("master secret size is != %d : %d", OSCORE_IDCTX_LEN,
            mastersecret_size);
