@@ -138,7 +138,7 @@ typedef struct oc_group_object_table_t
  *        "id": "1",
  *        "ia": 5,
  *        "ga":[2305, 2401],
- *        "path": ".knx",
+ *        "path": "k",
  *    },
  *    {
  *        "id": "2",

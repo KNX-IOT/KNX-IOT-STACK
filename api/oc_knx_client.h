@@ -125,7 +125,7 @@ bool oc_set_s_mode_response_cb(oc_s_mode_response_cb_t my_func);
 oc_s_mode_response_cb_t oc_get_s_mode_response_cb();
 
 /**
- * @brief checks if the request is a redirected request from /.knx or /p
+ * @brief checks if the request is a redirected request from /k or /p
  * when that happened, extra information can be in the CBOR object
  *
  * @param request the request to be checked
@@ -172,7 +172,7 @@ void oc_do_s_mode_read(int64_t group_address);
 /**
  * @brief sends (transmits) an s-mode message
  * the value comes from the GET of the resource indicated by the resource_url
- * the path is ".knx"
+ * the path is "k"
  * the sia (sender individual address) is taken from the device
  * the ga is coming from the group address table that is listing the resource
  * url (path) the url of the resource to obtain the value from.
@@ -194,7 +194,7 @@ void oc_do_s_mode_with_scope(int scope, const char *resource_url, char *rp);
 /**
  * @brief sends (transmits) an s-mode message
  * the value comes from the GET of the resource indicated by the resource_url
- * the path is ".knx"
+ * the path is "k"
  * the sia (sender individual address) is taken from the device
  * the ga is coming from the group address table that is listing the resource
  * url (path) the url of the resource to obtain the value from.

@@ -755,7 +755,7 @@ bool oc_ri_is_app_resource_valid(const oc_resource_t *resource);
 /**
  * @brief create a new request from the old request
  * is used internally only for redirection of:
- * - .knx
+ * - k
  * - p
  *
  * @param new_request the original request
