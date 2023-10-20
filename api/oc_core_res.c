@@ -577,6 +577,7 @@ oc_core_add_device(const char *name, const char *version, const char *base,
     oc_abort("Insufficient memory");
   }
   memset(&oc_device_info[device_count], 0, sizeof(oc_device_info_t));
+  oc_device_info[device_count].ia = 0xffff;
 
 #endif /* OC_DYNAMIC_ALLOCATION */
 
