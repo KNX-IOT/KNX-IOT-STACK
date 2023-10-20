@@ -1411,7 +1411,7 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
 
   char buf[2] = "";
   int zero = 0;
-  uint32_t ffff = 0xffff; 
+  uint32_t ffff = 0xffff;
 
   if (device_index >= oc_core_get_num_devices()) {
     PRINT("oc_knx_device_storage_reset: device_index %d to large\n",
