@@ -1440,7 +1440,7 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
     oc_storage_erase(KNX_STORAGE_HOSTNAME);
     // load state: unloaded, and programming mode is true
     oc_knx_lsm_set_state(device_index, LSM_S_UNLOADED);
-    // set the other data to null
+    // set the other data to KNX defaults
     device->ia = ffff;
     device->iid = zero;
     device->port = port;
@@ -1459,7 +1459,7 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
       specific default IA when this A_Restart is executed.Channel Number
       : Fixed : 00h */
     oc_storage_erase(KNX_STORAGE_IA);
-    // set the ia to zero
+    // set the ia to KNX defaults
     device->ia = ffff;
     // not sure if the programming mode needs to be reset
     oc_knx_device_set_programming_mode(device_index, false);
