@@ -1411,6 +1411,7 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
 
   char buf[2] = "";
   int zero = 0;
+  uint32_t ffff = 0xffff; 
 
   if (device_index >= oc_core_get_num_devices()) {
     PRINT("oc_knx_device_storage_reset: device_index %d to large\n",
@@ -1440,7 +1441,7 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
     // load state: unloaded, and programming mode is true
     oc_knx_lsm_set_state(device_index, LSM_S_UNLOADED);
     // set the other data to null
-    device->ia = zero;
+    device->ia = ffff;
     device->iid = zero;
     device->port = port;
     device->mport = mport;
@@ -1459,11 +1460,11 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
       : Fixed : 00h */
     oc_storage_erase(KNX_STORAGE_IA);
     // set the ia to zero
-    device->ia = zero;
+    device->ia = ffff;
     // not sure if the programming mode needs to be reset
     oc_knx_device_set_programming_mode(device_index, false);
     oc_device_info_t *device = oc_core_get_device_info(device_index);
-    device->ia = zero;
+    device->ia = ffff;
 
   } else if (reset_mode == 7) {
     /*
