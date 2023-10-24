@@ -1348,7 +1348,7 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 
   PRINT("oc_core_fp_r_post_handler - end\n");
   // oc_send_cbor_response(request, OC_STATUS_OK);
-  oc_send_cbor_response_no_payload_size(request, OC_STATUS_CHANGED);
+  oc_send_cbor_response_no_payload_size(request, OC_STATUS_CREATED);
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_fp_r, knx_fp_r_x, 0, "/fp/r",
@@ -1419,8 +1419,6 @@ oc_core_fp_r_x_get_handler(oc_request_t *request,
   if (g_grt[index].ia > 0) {
     oc_rep_i_set_int(root, 26, g_grt[index].iid);
   }
-  // path- 112
-  oc_rep_i_set_text_string(root, 112, oc_string(g_grt[index].path));
   // url- 10
   oc_rep_i_set_text_string(root, 10, oc_string(g_grt[index].url));
   // at - 14
