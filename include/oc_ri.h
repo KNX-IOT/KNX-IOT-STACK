@@ -386,6 +386,7 @@ typedef enum {
   OC_KNX_P_OSCORE_REPLWDO,  /**< oscore replay window*/
   OC_KNX_P_OSCORE_OSNDELAY, /**< oscore osn delay*/
   OC_KNX_F_OSCORE,          /**< oscore/f */
+  OC_KNX_SUB,               /**< delete all device subscriptions */
   OC_KNX_A_SEN,             /**< a/sen resource */
   OC_KNX_AUTH,              /**< auth list all sub resources */
   OC_KNX_AUTH_AT,           /**< auth/at resource listing auth/at/X */
