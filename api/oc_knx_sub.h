@@ -1,5 +1,4 @@
 /*
-// Copyright (c) 2016 Intel Corporation
 // Copyright (c) 2021-2023 Cascoda Ltd
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
