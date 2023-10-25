@@ -921,7 +921,7 @@ oc_core_dev_da_get_handler(oc_request_t *request,
   oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
 }
 
-OC_CORE_CREATE_CONST_RESOURCE_LINKED(dev_da, dev_port, 0, "/dev/da", OC_IF_P,
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(dev_da, dev_fid, 0, "/dev/da", OC_IF_P,
                                      APPLICATION_CBOR, OC_DISCOVERABLE,
                                      oc_core_dev_da_get_handler, 0, 0, 0,
                                      "urn:knx:dpa.0.58", OC_SIZE_MANY(1),
@@ -936,6 +936,87 @@ oc_create_dev_da_resource(int resource_idx, size_t device)
     oc_core_dev_da_get_handler, 0, 0, 0, 1, "urn:knx:dpa.0.58");
 
   oc_core_bind_dpt_resource(resource_idx, device, "urn:knx:dpt.value1Ucount");
+}
+
+// -----------------------------------------------------------------------------
+
+static void
+oc_core_dev_fid_get_handler(oc_request_t *request,
+                            oc_interface_mask_t iface_mask, void *data)
+{
+  (void)data;
+  (void)iface_mask;
+
+  /* check if the accept header is CBOR-format */
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
+    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    return;
+  }
+
+  size_t device_index = request->resource->device;
+  oc_device_info_t *device = oc_core_get_device_info(device_index);
+  if (device != NULL) {
+    oc_rep_begin_root_object();
+    oc_rep_i_set_int(root, 1, device->fid);
+    oc_rep_end_root_object();
+
+    oc_send_cbor_response(request, OC_STATUS_OK);
+    return;
+  }
+
+  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+}
+
+static void
+oc_core_dev_fid_put_handler(oc_request_t *request,
+                            oc_interface_mask_t iface_mask, void *data)
+{
+  (void)data;
+  (void)iface_mask;
+
+  /* check if the accept header is CBOR-format */
+  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
+    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    return;
+  }
+
+  size_t device_index = request->resource->device;
+  oc_rep_t *rep = request->request_payload;
+  while (rep != NULL) {
+    if (rep->type == OC_REP_INT) {
+      if (rep->iname == 1) {
+        PRINT("  oc_core_dev_fid_put_handler received : %" PRIu64 "\n",
+              rep->value.integer);
+        oc_core_set_device_fid(device_index, (uint64_t)rep->value.integer);
+        uint64_t temp = (uint64_t)rep->value.integer;
+        oc_storage_write(KNX_STORAGE_FID, (uint8_t *)&temp, sizeof(temp));
+        oc_send_cbor_response_no_payload_size(request, OC_STATUS_CHANGED);
+        return;
+      }
+    }
+    rep = rep->next;
+  }
+
+  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+}
+
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(dev_fid, dev_port, 0, "/dev/fid", OC_IF_P,
+                                     APPLICATION_CBOR, OC_DISCOVERABLE,
+                                     oc_core_dev_fid_get_handler,
+                                     oc_core_dev_fid_put_handler, 0, 0,
+                                     "urn:knx:dpt.value8Ucount",
+                                     OC_SIZE_ZERO());
+
+void
+oc_create_dev_fid_resource(int resource_idx, size_t device)
+{
+  OC_DBG("oc_create_dev_fid_resource\n");
+  oc_core_populate_resource(resource_idx, device, "/dev/fid", OC_IF_P,
+                            APPLICATION_CBOR, OC_DISCOVERABLE,
+                            oc_core_dev_fid_get_handler,
+                            oc_core_dev_fid_put_handler, 0, 0, 0);
+
+  oc_core_bind_dpt_resource(resource_idx, device, "urn:knx:dpt.value8Ucount");
 }
 
 // -----------------------------------------------------------------------------
@@ -1540,6 +1621,7 @@ oc_create_knx_device_resources(size_t device_index)
   oc_create_dev_ipv6_resource(OC_DEV_IPV6, device_index);
   oc_create_dev_sa_resource(OC_DEV_SA, device_index);
   oc_create_dev_da_resource(OC_DEV_DA, device_index);
+  oc_create_dev_fid_resource(OC_DEV_FID, device_index);
   oc_create_dev_port_resource(OC_DEV_PORT, device_index);
   oc_create_dev_mport_resource(OC_DEV_MPORT, device_index);
   oc_create_dev_mid_resource(OC_DEV_MID, device_index);

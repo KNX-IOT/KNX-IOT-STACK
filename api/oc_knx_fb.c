@@ -344,7 +344,6 @@ oc_add_function_blocks_to_response(oc_request_t *request, size_t device_index,
 
   const oc_resource_t *resource = oc_ri_get_app_resources();
   for (; resource; resource = resource->next) {
-    PRINT("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA %s\n", oc_string(resource->uri));
     if (resource->device != device_index ||
         !(resource->properties & OC_DISCOVERABLE)) {
       continue;
@@ -358,7 +357,6 @@ oc_add_function_blocks_to_response(oc_request_t *request, size_t device_index,
     oc_string_array_t types = resource->types;
     for (i = 0; i < (int)oc_string_array_get_allocated_size(types); i++) {
       char *t = oc_string_array_get_item(types, i);
-      PRINT("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT %s\n", t);
       if ((strncmp(t, ":dpa.11.", 8) == 0) ||
           (strncmp(t, "urn:knx:dpa.11.", 15) == 0)) {
         /* specific functional block iot_router : /f/netip */
@@ -378,8 +376,6 @@ oc_add_function_blocks_to_response(oc_request_t *request, size_t device_index,
       } else {
         /* regular functional block, framing by functional block numbers &
          * instances*/
-        PRINT("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB %s\n",
-              oc_string(resource->uri));
         if ((strncmp(t, ":dpa", 4) == 0) ||
             (strncmp(t, "urn:knx:dpa", 11) == 0)) {
           int fp_int = get_fp_from_dp(t);
@@ -394,7 +390,6 @@ oc_add_function_blocks_to_response(oc_request_t *request, size_t device_index,
   }
 
   for (i = 0; i < g_array_size; i++) {
-    PRINT("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC\n");
     if (*response_length > 0) {
       /* frame the trailing comma */
       matches++;

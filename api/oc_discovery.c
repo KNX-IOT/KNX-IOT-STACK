@@ -561,9 +561,11 @@ oc_wkcore_discovery_handler(oc_request_t *request,
     matches++;
   }
 
-  // optional, not yet implemented
-  // oc_add_resource_to_wk(oc_core_get_resource_by_index(OC_SUB, device_index),
-  //                      request, device_index, &response_length, matches);
+  if (oc_filter_resource(
+        oc_core_get_resource_by_index(OC_KNX_SUB, device_index), request,
+        device_index, &response_length, matches, 0)) {
+    matches++;
+  }
 
   if (request->origin && (request->origin->flags & MULTICAST) == 0) {
     // only for unicast

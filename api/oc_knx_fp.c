@@ -517,11 +517,13 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
         oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
         return;
       }
-      PRINT("  storing at index: %d\n", index);
+
+      bool id_only = true;
       object = rep->value.object;
       while (object != NULL) {
         switch (object->type) {
         case OC_REP_STRING: {
+          id_only = false;
           if (object->iname == 11) {
             oc_free_string(&g_got[index].href);
             oc_new_string(&g_got[index].href, oc_string(object->value.string),
@@ -535,10 +537,12 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
           }
           if (oc_string_len(object->name) == 0 && object->iname == 8) {
             // cflags (8)
+            id_only = false;
             g_got[index].cflags = object->value.integer;
           }
         } break;
         case OC_REP_INT_ARRAY: {
+          id_only = false;
           if (object->iname == 8) {
             g_got[index].cflags = OC_CFLAG_NONE;
             int64_t *arr = oc_int_array(object->value.array);
@@ -583,7 +587,14 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 
         object = object->next;
       } // next object in array
-      status_ok = oc_fp_p_check_and_save(index, device_index, status_ok);
+      if (id_only) {
+        PRINT("  only found id in request, deleting entry at index: %d\n",
+              index);
+        oc_delete_group_object_table_entry(index);
+      } else {
+        PRINT("  storing at index: %d\n", index);
+        status_ok = oc_fp_p_check_and_save(index, device_index, status_ok);
+      }
     }
     default:
       break;
@@ -1348,7 +1359,7 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 
   PRINT("oc_core_fp_r_post_handler - end\n");
   // oc_send_cbor_response(request, OC_STATUS_OK);
-  oc_send_cbor_response_no_payload_size(request, OC_STATUS_CHANGED);
+  oc_send_cbor_response_no_payload_size(request, return_status);
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_fp_r, knx_fp_r_x, 0, "/fp/r",
@@ -1419,8 +1430,6 @@ oc_core_fp_r_x_get_handler(oc_request_t *request,
   if (g_grt[index].ia > 0) {
     oc_rep_i_set_int(root, 26, g_grt[index].iid);
   }
-  // path- 112
-  oc_rep_i_set_text_string(root, 112, oc_string(g_grt[index].path));
   // url- 10
   oc_rep_i_set_text_string(root, 10, oc_string(g_grt[index].url));
   // at - 14

@@ -265,7 +265,7 @@ oc_core_knx_f_oscore_get_handler(oc_request_t *request,
   }
 }
 
-OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_f_oscore, knx_a_sen, 0, "/f/oscore",
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_f_oscore, sub, 0, "/f/oscore",
                                      OC_IF_LI, APPLICATION_LINK_FORMAT,
                                      OC_DISCOVERABLE,
                                      oc_core_knx_f_oscore_get_handler, 0, 0, 0,

@@ -340,12 +340,13 @@ typedef enum {
   OC_DEV_IPV6,        /**< IPV6 */
   OC_DEV_SA,          /**< /dev/sa subnet address */
   OC_DEV_DA,          /**< /dev/da device address */
+  OC_DEV_FID,         /**< /dev/fid the fabric ID */
   OC_DEV_PORT,        /**< /dev/port the coap port number */
   OC_DEV_MPORT,       /**< /dev/mport the multicast port number */
-  OC_DEV_MID,         /**< /dev/mid the manufacturer id */
+  OC_DEV_MID,         /**< /dev/mid the manufacturer ID */
   OC_DEV,             /**< core link */
-  OC_APP,             /**< application id (list) */
-  OC_APP_X,           /**< application id entry */
+  OC_APP,             /**< application ID (list) */
+  OC_APP_X,           /**< application ID entry */
   OC_KNX_SPAKE,       /**< spake */
   OC_KNX_IDEVID,      /**< IDevID */
   OC_KNX_LDEVID,      /**< LDevID */
@@ -386,6 +387,7 @@ typedef enum {
   OC_KNX_P_OSCORE_REPLWDO,  /**< oscore replay window*/
   OC_KNX_P_OSCORE_OSNDELAY, /**< oscore osn delay*/
   OC_KNX_F_OSCORE,          /**< oscore/f */
+  OC_KNX_SUB,               /**< delete all device subscriptions */
   OC_KNX_A_SEN,             /**< a/sen resource */
   OC_KNX_AUTH,              /**< auth list all sub resources */
   OC_KNX_AUTH_AT,           /**< auth/at resource listing auth/at/X */

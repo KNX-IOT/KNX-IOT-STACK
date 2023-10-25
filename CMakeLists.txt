@@ -104,6 +104,7 @@ set(API_SOURCES
     ${PROJECT_SOURCE_DIR}/api/oc_knx_p.c
     ${PROJECT_SOURCE_DIR}/api/oc_knx_sec.c
     ${PROJECT_SOURCE_DIR}/api/oc_knx_swu.c
+    ${PROJECT_SOURCE_DIR}/api/oc_knx_sub.c
     ${PROJECT_SOURCE_DIR}/api/c-timestamp/timestamp_compare.c
     ${PROJECT_SOURCE_DIR}/api/c-timestamp/timestamp_format.c
     ${PROJECT_SOURCE_DIR}/api/c-timestamp/timestamp_parse.c

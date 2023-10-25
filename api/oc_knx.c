@@ -488,10 +488,6 @@ oc_core_knx_lsm_post_handler(oc_request_t *request,
       lsm_cb->cb(device_index, oc_knx_lsm_state(device_index), lsm_cb->data);
     }
 
-    oc_rep_begin_root_object();
-    oc_rep_i_set_int(root, 3, (int)oc_knx_lsm_state(device_index));
-    oc_rep_end_root_object();
-
     if (oc_is_device_in_runtime(device_index)) {
       oc_register_group_multicasts();
       oc_init_datapoints_at_initialization();
@@ -501,6 +497,12 @@ oc_core_knx_lsm_post_handler(oc_request_t *request,
                             device->ia, device->pm);
       }
     }
+
+    oc_rep_new(request->response->response_buffer->buffer,
+               (int)request->response->response_buffer->buffer_size);
+    oc_rep_begin_root_object();
+    oc_rep_i_set_int(root, 3, (int)oc_knx_lsm_state(device_index));
+    oc_rep_end_root_object();
 
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
     return;
@@ -997,7 +999,6 @@ oc_core_knx_ia_post_handler(oc_request_t *request,
   bool error = false;
   bool ia_set = false;
   bool iid_set = false;
-  bool fid_set = false;
 
   /* check if the accept header is CBOR-format */
   if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
@@ -1023,7 +1024,6 @@ oc_core_knx_ia_post_handler(oc_request_t *request,
         oc_core_set_device_fid(device_index, (uint64_t)rep->value.integer);
         uint64_t temp = (uint64_t)rep->value.integer;
         oc_storage_write(KNX_STORAGE_FID, (uint8_t *)&temp, sizeof(temp));
-        fid_set = true;
       } else if (rep->iname == 26) {
         PRINT("  oc_core_knx_ia_post_handler received 26 (iid): %" PRIu64 "\n",
               (uint64_t)rep->value.integer);
