@@ -588,10 +588,10 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
         object = object->next;
       } // next object in array
       if (id_only) {
-        PRINT("  only found id in request, deleting entry at index: %d\n", index);
+        PRINT("  only found id in request, deleting entry at index: %d\n",
+              index);
         oc_delete_group_object_table_entry(index);
-      }
-      else {
+      } else {
         PRINT("  storing at index: %d\n", index);
         status_ok = oc_fp_p_check_and_save(index, device_index, status_ok);
       }

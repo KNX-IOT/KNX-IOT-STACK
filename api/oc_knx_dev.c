@@ -942,7 +942,7 @@ oc_create_dev_da_resource(int resource_idx, size_t device)
 
 static void
 oc_core_dev_fid_get_handler(oc_request_t *request,
-                           oc_interface_mask_t iface_mask, void *data)
+                            oc_interface_mask_t iface_mask, void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -1002,16 +1002,19 @@ oc_core_dev_fid_put_handler(oc_request_t *request,
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(dev_fid, dev_port, 0, "/dev/fid", OC_IF_P,
                                      APPLICATION_CBOR, OC_DISCOVERABLE,
-                                     oc_core_dev_fid_get_handler, oc_core_dev_fid_put_handler, 0, 0,
-                                     "urn:knx:dpt.value8Ucount", OC_SIZE_ZERO());
+                                     oc_core_dev_fid_get_handler,
+                                     oc_core_dev_fid_put_handler, 0, 0,
+                                     "urn:knx:dpt.value8Ucount",
+                                     OC_SIZE_ZERO());
 
 void
 oc_create_dev_fid_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_dev_fid_resource\n");
-  oc_core_populate_resource(
-    resource_idx, device, "/dev/fid", OC_IF_P, APPLICATION_CBOR, OC_DISCOVERABLE,
-    oc_core_dev_fid_get_handler, oc_core_dev_fid_put_handler, 0, 0, 0);
+  oc_core_populate_resource(resource_idx, device, "/dev/fid", OC_IF_P,
+                            APPLICATION_CBOR, OC_DISCOVERABLE,
+                            oc_core_dev_fid_get_handler,
+                            oc_core_dev_fid_put_handler, 0, 0, 0);
 
   oc_core_bind_dpt_resource(resource_idx, device, "urn:knx:dpt.value8Ucount");
 }

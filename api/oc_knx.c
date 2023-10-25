@@ -498,7 +498,8 @@ oc_core_knx_lsm_post_handler(oc_request_t *request,
       }
     }
 
-    oc_rep_new(request->response->response_buffer->buffer, (int)request->response->response_buffer->buffer_size);
+    oc_rep_new(request->response->response_buffer->buffer,
+               (int)request->response->response_buffer->buffer_size);
     oc_rep_begin_root_object();
     oc_rep_i_set_int(root, 3, (int)oc_knx_lsm_state(device_index));
     oc_rep_end_root_object();
