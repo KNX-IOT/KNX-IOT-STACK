@@ -19,4 +19,10 @@
 #include "oc_core_res.h"
 #include "oc_api.h"
 
+/**
+ * @brief Creation of the /sub resource.
+ *
+ * @param resource_idx the resource index
+ * @param device the device to which the resource belongs
+ */
 void oc_create_sub_resource(int resource_idx, size_t device);
