@@ -998,7 +998,6 @@ oc_core_knx_ia_post_handler(oc_request_t *request,
   bool error = false;
   bool ia_set = false;
   bool iid_set = false;
-  bool fid_set = false;
 
   /* check if the accept header is CBOR-format */
   if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
@@ -1024,7 +1023,6 @@ oc_core_knx_ia_post_handler(oc_request_t *request,
         oc_core_set_device_fid(device_index, (uint64_t)rep->value.integer);
         uint64_t temp = (uint64_t)rep->value.integer;
         oc_storage_write(KNX_STORAGE_FID, (uint8_t *)&temp, sizeof(temp));
-        fid_set = true;
       } else if (rep->iname == 26) {
         PRINT("  oc_core_knx_ia_post_handler received 26 (iid): %" PRIu64 "\n",
               (uint64_t)rep->value.integer);

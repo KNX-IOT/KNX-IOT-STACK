@@ -340,12 +340,13 @@ typedef enum {
   OC_DEV_IPV6,        /**< IPV6 */
   OC_DEV_SA,          /**< /dev/sa subnet address */
   OC_DEV_DA,          /**< /dev/da device address */
+  OC_DEV_FID,         /**< /dev/fid the fabric ID */
   OC_DEV_PORT,        /**< /dev/port the coap port number */
   OC_DEV_MPORT,       /**< /dev/mport the multicast port number */
-  OC_DEV_MID,         /**< /dev/mid the manufacturer id */
+  OC_DEV_MID,         /**< /dev/mid the manufacturer ID */
   OC_DEV,             /**< core link */
-  OC_APP,             /**< application id (list) */
-  OC_APP_X,           /**< application id entry */
+  OC_APP,             /**< application ID (list) */
+  OC_APP_X,           /**< application ID entry */
   OC_KNX_SPAKE,       /**< spake */
   OC_KNX_IDEVID,      /**< IDevID */
   OC_KNX_LDEVID,      /**< LDevID */
