@@ -13,11 +13,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 */
+/**
+@brief knx /sub resource implementations
+@file
+*/
+#ifndef OC_KNX_SUB_INTERNAL_H
+#define OC_KNX_SUB_INTERNAL_H
 
-#include "oc_helpers.h"
-#include "oc_ri.h"
-#include "oc_core_res.h"
-#include "oc_api.h"
+#include <stddef.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @brief Creation of the /sub resource.
@@ -26,3 +33,9 @@
  * @param device the device to which the resource belongs
  */
 void oc_create_sub_resource(int resource_idx, size_t device);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* OC_KNX_SUB_INTERNAL_H */
