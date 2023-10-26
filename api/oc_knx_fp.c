@@ -891,10 +891,14 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       }
       g_gpt[index].id = id;
 
+      bool id_only = true;
       object = rep->value.object;
       while (object != NULL) {
         switch (object->type) {
         case OC_REP_INT: {
+          if (object->iname != 0) {
+            id_only = false;
+          }
           if (object->iname == 12) {
             g_gpt[index].ia = (int)object->value.integer;
           }
@@ -909,6 +913,7 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
           }
         } break;
         case OC_REP_STRING: {
+          id_only = false;
           if (object->iname == 112) {
             oc_free_string(&g_gpt[index].path);
             oc_new_string(&g_gpt[index].path, oc_string(object->value.string),
@@ -926,6 +931,7 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
           }
         } break;
         case OC_REP_INT_ARRAY: {
+          id_only = false;
           if (object->iname == 7) {
             // g_got[index].id = object->value.integer;
             int64_t *arr = oc_int_array(object->value.array);
@@ -954,39 +960,44 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
         }
         object = object->next;
       }
+      if (id_only) {
+          PRINT("  only found id in request, deleting entry at index: %d\n",
+                index);
+          oc_delete_group_rp_table_entry(index, GPT_STORE, g_gpt, GRT_MAX_ENTRIES);
+      }
+      else {
+        oc_print_group_rp_table_entry(index, GPT_STORE, g_gpt,
+                                      oc_core_get_publisher_table_size());
+        bool do_save = true;
+        if (oc_string_len(g_gpt[index].url) > OC_MAX_URL_LENGTH) {
+          // do_save = false;
+          OC_ERR("  url is longer than %d \n", (int)OC_MAX_URL_LENGTH);
+        }
+        if (oc_string_len(g_gpt[index].path) > OC_MAX_URL_LENGTH) {
+          // do_save = false;
+          OC_ERR("  path is longer than %d \n", (int)OC_MAX_URL_LENGTH);
+        }
+
+        oc_print_group_rp_table_entry(index, GPT_STORE, g_gpt,
+                                      oc_core_get_publisher_table_size());
+        if (do_save) {
+          oc_dump_group_rp_table_entry(index, GPT_STORE, g_gpt,
+                                      oc_core_get_publisher_table_size());
+        }
+      }
     } break;
     case OC_REP_NIL:
       break;
     default:
       break;
     }
-
-    oc_print_group_rp_table_entry(index, GPT_STORE, g_gpt,
-                                  oc_core_get_publisher_table_size());
-    bool do_save = true;
-    if (oc_string_len(g_gpt[index].url) > OC_MAX_URL_LENGTH) {
-      // do_save = false;
-      OC_ERR("  url is longer than %d \n", (int)OC_MAX_URL_LENGTH);
-    }
-    if (oc_string_len(g_gpt[index].path) > OC_MAX_URL_LENGTH) {
-      // do_save = false;
-      OC_ERR("  path is longer than %d \n", (int)OC_MAX_URL_LENGTH);
-    }
-
-    oc_print_group_rp_table_entry(index, GPT_STORE, g_gpt,
-                                  oc_core_get_publisher_table_size());
-    if (do_save) {
-      oc_dump_group_rp_table_entry(index, GPT_STORE, g_gpt,
-                                   oc_core_get_publisher_table_size());
-    }
-
     rep = rep->next;
   };
 
   oc_knx_increase_fingerprint();
   PRINT("oc_core_fp_p_post_handler - end\n");
   // oc_send_cbor_response(request, OC_STATUS_OK);
-  oc_send_cbor_response_no_payload_size(request, OC_STATUS_CHANGED);
+  oc_send_cbor_response_no_payload_size(request, return_status);
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_fp_p, knx_fp_p_x, 0, "/fp/p",
