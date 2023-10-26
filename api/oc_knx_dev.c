@@ -1354,6 +1354,7 @@ oc_core_ap_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     return;
   }
 
+  // Add /ap/pv
   size_t device_index = request->resource->device;
   const oc_resource_t *resource =
     oc_core_get_resource_by_index(OC_APP_X, device_index);
@@ -1362,6 +1363,15 @@ oc_core_ap_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     oc_add_resource_to_wk(resource, request, device_index, &response_length,
                           matches, true);
   }
+
+  // Add /a/lsm
+  resource = oc_core_get_resource_by_index(OC_KNX_LSM, device_index);
+  if (resource) {
+    PRINT("URL %s\n", oc_string(resource->uri));
+    oc_add_resource_to_wk(resource, request, device_index, &response_length,
+                          matches, true);
+  }
+
   if (response_length > 0) {
     oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
     return;
