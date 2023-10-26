@@ -72,7 +72,8 @@ static int oc_core_find_used_nr_in_rp_table(oc_group_rp_table_t *rp_table,
                                             int max_size);
 
 static void oc_delete_group_rp_table_entry(int entry, char *Store,
-                               oc_group_rp_table_t *rp_table, int max_size);
+                                           oc_group_rp_table_t *rp_table,
+                                           int max_size);
 
 // -----------------------------------------------------------------------------
 
@@ -961,11 +962,11 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
         object = object->next;
       }
       if (id_only) {
-          PRINT("  only found id in request, deleting entry at index: %d\n",
-                index);
-          oc_delete_group_rp_table_entry(index, GPT_STORE, g_gpt, GRT_MAX_ENTRIES);
-      }
-      else {
+        PRINT("  only found id in request, deleting entry at index: %d\n",
+              index);
+        oc_delete_group_rp_table_entry(index, GPT_STORE, g_gpt,
+                                       GRT_MAX_ENTRIES);
+      } else {
         oc_print_group_rp_table_entry(index, GPT_STORE, g_gpt,
                                       oc_core_get_publisher_table_size());
         bool do_save = true;
@@ -982,7 +983,7 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
                                       oc_core_get_publisher_table_size());
         if (do_save) {
           oc_dump_group_rp_table_entry(index, GPT_STORE, g_gpt,
-                                      oc_core_get_publisher_table_size());
+                                       oc_core_get_publisher_table_size());
         }
       }
     } break;
@@ -1352,11 +1353,11 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
         object = object->next;
       }
       if (id_only) {
-          PRINT("  only found id in request, deleting entry at index: %d\n",
-                index);
-          oc_delete_group_rp_table_entry(index, GRT_STORE, g_grt, GRT_MAX_ENTRIES);
-      }
-      else {
+        PRINT("  only found id in request, deleting entry at index: %d\n",
+              index);
+        oc_delete_group_rp_table_entry(index, GRT_STORE, g_grt,
+                                       GRT_MAX_ENTRIES);
+      } else {
         bool do_save = true;
         if (oc_string_len(g_grt[index].url) > OC_MAX_URL_LENGTH) {
           // do_save = false;
@@ -1370,7 +1371,8 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
         oc_print_group_rp_table_entry(index, GRT_STORE, g_grt, GRT_MAX_ENTRIES);
         if (do_save) {
           PRINT("  storing at %d\n", index);
-          oc_dump_group_rp_table_entry(index, GRT_STORE, g_grt, GRT_MAX_ENTRIES);
+          oc_dump_group_rp_table_entry(index, GRT_STORE, g_grt,
+                                       GRT_MAX_ENTRIES);
         }
       }
     }

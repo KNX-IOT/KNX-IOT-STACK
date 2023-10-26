@@ -379,8 +379,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
         APPLICATION_LINK_FORMAT;
       request->response->response_buffer->response_length = response_length;
       request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
-    }
-    else {
+    } else {
       request->response->response_buffer->code = OC_IGNORE;
     }
     return;

@@ -737,11 +737,10 @@ oc_core_auth_at_post_handler(oc_request_t *request,
         object = object->next;
       } // while (inner object)
       if (id_only) {
-          PRINT("  only found id in request, deleting entry at index: %d\n",
-                index);
-          oc_at_delete_entry(device_index, index);
-      }
-      else{
+        PRINT("  only found id in request, deleting entry at index: %d\n",
+              index);
+        oc_at_delete_entry(device_index, index);
+      } else {
         PRINT("  storage index: %d (%s)\n", index, oc_string_checked(*at));
         // show the entry on screen
         oc_print_auth_at_entry(device_index, index);
@@ -749,7 +748,7 @@ oc_core_auth_at_post_handler(oc_request_t *request,
         // dump the entry to persistent storage
         oc_at_dump_entry(device_index, index);
       }
-    }   // if type == object
+    } // if type == object
     rep = rep->next;
   } // while (rep)
 
