@@ -1449,7 +1449,7 @@ oc_knx_device_storage_read(size_t device_index)
 
   uint32_t ia;
   int temp_size;
-  char tempstring[20];
+  char tempstring[255];
   bool pm;
 
   PRINT("Loading Device Config from Persistent storage\n");
@@ -1472,7 +1472,7 @@ oc_knx_device_storage_read(size_t device_index)
   }
 
   /* HOST NAME */
-  temp_size = oc_storage_read(KNX_STORAGE_HOSTNAME, (uint8_t *)&tempstring, 20);
+  temp_size = oc_storage_read(KNX_STORAGE_HOSTNAME, (uint8_t *)&tempstring, 255);
   if (temp_size > 1) {
     tempstring[temp_size] = 0;
     oc_core_set_device_hostname(device_index, tempstring);
