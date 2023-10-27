@@ -216,7 +216,7 @@ oc_core_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     rep = rep->next;
   }
 
-  oc_send_cbor_response(request, OC_STATUS_OK);
+  oc_send_cbor_response(request, OC_STATUS_CHANGED);
   PRINT("oc_core_p_post_handler - end\n");
 }
 
