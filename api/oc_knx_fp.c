@@ -1288,7 +1288,7 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 
         case OC_REP_INT: {
           if (object->iname != 0) {
-            id_only == false;
+            id_only = false;
           }
           if (object->iname == 12) {
             g_grt[index].ia = (int)object->value.integer;
@@ -1305,7 +1305,7 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
         } break;
 
         case OC_REP_STRING: {
-          id_only == false;
+          id_only = false;
           if (object->iname == 112) {
             oc_free_string(&g_grt[index].path);
             oc_new_string(&g_grt[index].path, oc_string(object->value.string),
@@ -1323,7 +1323,7 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
           }
         } break;
         case OC_REP_INT_ARRAY: {
-          id_only == false;
+          id_only = false;
           if (object->iname == 7) {
             // g_got[index].id = object->value.integer;
             int64_t *arr = oc_int_array(object->value.array);
