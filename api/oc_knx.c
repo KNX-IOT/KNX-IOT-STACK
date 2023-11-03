@@ -1290,7 +1290,10 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
 
   oc_rep_t *rep = request->request_payload;
 
-  int *valid_request = malloc(sizeof(int));
+  int *valid_request = (int *)malloc(sizeof(int));
+  if (valid_request == NULL) {
+    return;
+  }
   // check input
   // note: no check if there are multiple byte strings in the request payload
   while (rep != NULL) {
@@ -1367,7 +1370,6 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
 
   PRINT("oc_core_knx_spake_post_handler valid_request: %d\n", *valid_request);
   oc_indicate_separate_response(request, &spake_separate_rsp);
-  // TODO missing pointer cast warning here
   oc_set_delayed_callback((void *)valid_request,
                           &oc_core_knx_spake_separate_post_handler, 0);
 }
@@ -1375,7 +1377,6 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
 static oc_event_callback_retval_t
 oc_core_knx_spake_separate_post_handler(void *req_p)
 {
-  // TODO cast of pointer of different size
   int *valid_request_ptr = (int *)req_p;
   int valid_request = *valid_request_ptr;
   free(req_p);
