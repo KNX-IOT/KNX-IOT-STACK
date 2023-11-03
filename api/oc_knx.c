@@ -1290,20 +1290,20 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
 
   oc_rep_t *rep = request->request_payload;
 
-  int valid_request = 0;
+  int *valid_request = malloc(sizeof(int));
   // check input
   // note: no check if there are multiple byte strings in the request payload
   while (rep != NULL) {
     switch (rep->type) {
     case OC_REP_BYTE_STRING: {
       if (rep->iname == SPAKE_PA_SHARE_P) {
-        valid_request = SPAKE_PA_SHARE_P;
+        *valid_request = SPAKE_PA_SHARE_P;
       }
       if (rep->iname == SPAKE_CA_CONFIRM_P) {
-        valid_request = SPAKE_CA_CONFIRM_P;
+        *valid_request = SPAKE_CA_CONFIRM_P;
       }
       if (rep->iname == SPAKE_RND) {
-        valid_request = SPAKE_RND;
+        *valid_request = SPAKE_RND;
       }
     } break;
     default:
@@ -1312,12 +1312,12 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     rep = rep->next;
   }
 
-  if (valid_request == 0) {
+  if (*valid_request == 0) {
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
   }
   rep = request->request_payload;
 
-  if (valid_request == SPAKE_RND) {
+  if (*valid_request == SPAKE_RND) {
     // set the default id, in preparation for the response
     // this gets overwritten if the ID is present in the
     // request payload handled below
@@ -1365,7 +1365,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
     rep = rep->next;
   }
 
-  PRINT("oc_core_knx_spake_post_handler valid_request: %d\n", valid_request);
+  PRINT("oc_core_knx_spake_post_handler valid_request: %d\n", *valid_request);
   oc_indicate_separate_response(request, &spake_separate_rsp);
   // TODO missing pointer cast warning here
   oc_set_delayed_callback((void *)valid_request,
@@ -1376,7 +1376,9 @@ static oc_event_callback_retval_t
 oc_core_knx_spake_separate_post_handler(void *req_p)
 {
   // TODO cast of pointer of different size
-  int valid_request = (int)req_p;
+  int *valid_request_ptr = (int *)req_p;
+  int valid_request = *valid_request_ptr;
+  free(req_p);
   PRINT("oc_core_knx_spake_separate_post_handler\n");
 
   if (!spake_separate_rsp.active) {
