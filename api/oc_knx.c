@@ -739,6 +739,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
     base64_buf[base64_len] = '0';
     oc_new_string(&g_received_notification.value, base64_buf, base64_len);
   }
+  free(base64_buf);
   // gateway functionality: call back for all s-mode calls
   oc_gateway_t *my_gw = oc_get_gateway_cb();
   if (my_gw != NULL && my_gw->cb) {
