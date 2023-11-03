@@ -761,22 +761,22 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
   PRINT(" k : origin:%s sia: %d ga: %d st: %s\n", ip_address,
         g_received_notification.sia, g_received_notification.ga,
         oc_string_checked(g_received_notification.st));
-  if (strcmp(oc_string(g_received_notification.st), "w") == 0) {
+  if (strcmp(oc_string_checked(g_received_notification.st), "w") == 0) {
     // case_1 :
     // Received from bus: -st w, any ga ==> @receiver:
     // cflags = w -> overwrite object value
     st_write = true;
-  } else if (strcmp(oc_string(g_received_notification.st), "a") == 0) {
+  } else if (strcmp(oc_string_checked(g_received_notification.st), "a") == 0) {
     // Case 2) spec 1.1
     // Received from bus: -st rp, any ga
     //@receiver: cflags = u -> overwrite object value
     st_rep = true;
-  } else if (strcmp(oc_string(g_received_notification.st), "rp") == 0) {
+  } else if (strcmp(oc_string_checked(g_received_notification.st), "rp") == 0) {
     // Case 2) spec 1.0
     // Received from bus: -st a (rp), any ga
     //@receiver: cflags = u -> overwrite object value
     st_rep = true;
-  } else if (strcmp(oc_string(g_received_notification.st), "r") == 0) {
+  } else if (strcmp(oc_string_checked(g_received_notification.st), "r") == 0) {
     // Case 4)
     // @sender: cflags = r
     // Received from bus: -st r
