@@ -1612,6 +1612,7 @@ py_oc_rep_to_json(oc_rep_t *rep, char *buf, size_t buf_size, bool pretty_print)
 void
 oc_print_rep_as_json(oc_rep_t *rep, bool pretty_print)
 {
+#ifdef OC_PRINT
   char *json;
   size_t json_size;
   json_size = oc_rep_to_json(rep, NULL, 0, pretty_print);
@@ -1620,4 +1621,5 @@ oc_print_rep_as_json(oc_rep_t *rep, bool pretty_print)
   PRINT("oc_print_rep_as_json:\n");
   PRINT("%s\n", json);
   free(json);
+#endif
 }
