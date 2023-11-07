@@ -1369,8 +1369,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
 
   PRINT("oc_core_knx_spake_post_handler valid_request: %d\n", valid_request);
   oc_indicate_separate_response(request, &spake_separate_rsp);
-  oc_set_delayed_callback(NULL,
-                          &oc_core_knx_spake_separate_post_handler, 0);
+  oc_set_delayed_callback(NULL, &oc_core_knx_spake_separate_post_handler, 0);
 }
 
 static oc_event_callback_retval_t

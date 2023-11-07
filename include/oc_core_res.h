@@ -53,25 +53,24 @@ extern "C" {
   resource_name, next_resource, device_index, uri, iface_mask, content_format, \
   properties, get_cb, put_cb, post_cb, delete_cb, dpt, num_resource_types,     \
   ...)                                                                         \
-  _Pragma("warning(disable:4090)");\
+  _Pragma("warning(disable:4090)");                                            \
   oc_ri_internal_expand_call(                                                  \
     oc_ri_create_const_resource_internal, core_resource_##next_resource,       \
     core_resource_##resource_name, device_index, NULL, uri, dpt, iface_mask,   \
     content_format, properties, get_cb, put_cb, post_cb, delete_cb, NULL, 0,   \
-    0, num_resource_types, __VA_ARGS__)\
-    _Pragma("warning(default:4090)")
+    0, num_resource_types, __VA_ARGS__) _Pragma("warning(default:4090)")
 #else
 #define OC_CORE_CREATE_CONST_RESOURCE_INTERNAL(                                \
   resource_name, next_resource, device_index, uri, iface_mask, content_format, \
   properties, get_cb, put_cb, post_cb, delete_cb, dpt, num_resource_types,     \
   ...)                                                                         \
-  _Pragma("GCC diagnostic push");\
-  _Pragma("GCC diagnostic ignored \"-Wdiscarded-array-qualifiers\"");\
+  _Pragma("GCC diagnostic push");                                              \
+  _Pragma("GCC diagnostic ignored \"-Wdiscarded-array-qualifiers\"");          \
   oc_ri_create_const_resource_internal(                                        \
     core_resource_##next_resource, core_resource_##resource_name,              \
     device_index, NULL, uri, dpt, iface_mask, content_format, properties,      \
     get_cb, put_cb, post_cb, delete_cb, NULL, 0, 0, num_resource_types,        \
-    __VA_ARGS__);\
+    __VA_ARGS__);                                                              \
   _Pragma("GCC diagnostic pop")
 #endif
 /**
