@@ -331,6 +331,8 @@ oc_print_uint64_t(uint64_t number, enum StringRepresentation rep)
     oc_conv_uint64_to_hex_string(str, number);
 
   printf("%s", str);
+
+  return 0;
 }
 
 int

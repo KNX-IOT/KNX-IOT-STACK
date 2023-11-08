@@ -43,17 +43,19 @@
 
 // ---------------------------Variables --------------------------------------
 
-oc_group_object_notification_t g_received_notification;
+static oc_group_object_notification_t g_received_notification;
 
-uint64_t g_fingerprint = 0;
-uint64_t g_osn = 0;
+static uint64_t g_fingerprint = 0;
+static uint64_t g_osn = 0;
 
-oc_pase_t g_pase;
+static oc_pase_t g_pase;
 
-oc_string_t g_idevid;
-oc_string_t g_ldevid;
+static oc_string_t g_idevid;
+static oc_string_t g_ldevid;
 
-bool g_ignore_smessage_from_self = false;
+static bool g_ignore_smessage_from_self = false;
+
+static int valid_request = 0;
 
 // ----------------------------------------------------------------------------
 
@@ -739,6 +741,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
     base64_buf[base64_len] = '0';
     oc_new_string(&g_received_notification.value, base64_buf, base64_len);
   }
+  free(base64_buf);
   // gateway functionality: call back for all s-mode calls
   oc_gateway_t *my_gw = oc_get_gateway_cb();
   if (my_gw != NULL && my_gw->cb) {
@@ -760,22 +763,22 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
   PRINT(" k : origin:%s sia: %d ga: %d st: %s\n", ip_address,
         g_received_notification.sia, g_received_notification.ga,
         oc_string_checked(g_received_notification.st));
-  if (strcmp(oc_string(g_received_notification.st), "w") == 0) {
+  if (strcmp(oc_string_checked(g_received_notification.st), "w") == 0) {
     // case_1 :
     // Received from bus: -st w, any ga ==> @receiver:
     // cflags = w -> overwrite object value
     st_write = true;
-  } else if (strcmp(oc_string(g_received_notification.st), "a") == 0) {
+  } else if (strcmp(oc_string_checked(g_received_notification.st), "a") == 0) {
     // Case 2) spec 1.1
     // Received from bus: -st rp, any ga
     //@receiver: cflags = u -> overwrite object value
     st_rep = true;
-  } else if (strcmp(oc_string(g_received_notification.st), "rp") == 0) {
+  } else if (strcmp(oc_string_checked(g_received_notification.st), "rp") == 0) {
     // Case 2) spec 1.0
     // Received from bus: -st a (rp), any ga
     //@receiver: cflags = u -> overwrite object value
     st_rep = true;
-  } else if (strcmp(oc_string(g_received_notification.st), "r") == 0) {
+  } else if (strcmp(oc_string_checked(g_received_notification.st), "r") == 0) {
     // Case 4)
     // @sender: cflags = r
     // Received from bus: -st r
@@ -1290,7 +1293,6 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
 
   oc_rep_t *rep = request->request_payload;
 
-  int valid_request = 0;
   // check input
   // note: no check if there are multiple byte strings in the request payload
   while (rep != NULL) {
@@ -1367,16 +1369,13 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
 
   PRINT("oc_core_knx_spake_post_handler valid_request: %d\n", valid_request);
   oc_indicate_separate_response(request, &spake_separate_rsp);
-  // TODO missing pointer cast warning here
-  oc_set_delayed_callback((void *)valid_request,
-                          &oc_core_knx_spake_separate_post_handler, 0);
+  oc_set_delayed_callback(NULL, &oc_core_knx_spake_separate_post_handler, 0);
 }
 
 static oc_event_callback_retval_t
 oc_core_knx_spake_separate_post_handler(void *req_p)
 {
-  // TODO cast of pointer of different size
-  int valid_request = (int)req_p;
+  (void)req_p;
   PRINT("oc_core_knx_spake_separate_post_handler\n");
 
   if (!spake_separate_rsp.active) {
