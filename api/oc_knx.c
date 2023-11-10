@@ -532,13 +532,13 @@ oc_create_knx_lsm_resource(int resource_idx, size_t device)
 // ----------------------------------------------------------------------------
 
 static void
-oc_core_knx_knx_get_handler(oc_request_t *request,
-                            oc_interface_mask_t iface_mask, void *data)
+oc_core_knx_k_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
+                          void *data)
 {
   (void)data;
   (void)iface_mask;
 
-  PRINT("oc_core_knx_knx_get_handler\n");
+  PRINT("oc_core_knx_k_get_handler\n");
 
   /* check if the accept header is cbor-format */
   if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
@@ -578,7 +578,7 @@ oc_core_knx_knx_get_handler(oc_request_t *request,
 
   oc_send_cbor_response(request, OC_STATUS_OK);
 
-  PRINT("oc_core_knx_knx_get_handler - done\n");
+  PRINT("oc_core_knx_k_get_handler - done\n");
 }
 
 // ----------------------------------------------------------------------------
@@ -615,8 +615,8 @@ oc_reset_g_received_notification()
  {sia: 5678, es: {st: write, ga: 1, value: 100 }}
 */
 static void
-oc_core_knx_knx_post_handler(oc_request_t *request,
-                             oc_interface_mask_t iface_mask, void *data)
+oc_core_knx_k_post_handler(oc_request_t *request,
+                           oc_interface_mask_t iface_mask, void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -624,7 +624,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
   oc_rep_t *rep_value = NULL;
   char ip_address[100];
 
-  PRINT("KNX KNX Post Handler");
+  PRINT("KNX K POST Handler");
   PRINT("Decoded Payload:\n");
   oc_print_rep_as_json(request->request_payload, true);
 
@@ -830,12 +830,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
         // to be discussed:
         // get value, since the w only should be send if the value is updated
         // (e.g. different)
-
-        // if (my_resource->put_handler.cb) {
-        //  my_resource->put_handler.cb(&new_request, iface_mask, data);
-
-        // if (my_resource->post_handler.cb) {
-        //  my_resource->post_handler.cb(&new_request, iface_mask, data);
+        // calling the put handler, since datapoints are implementing GET/PUT
         if (my_resource->put_handler.cb) {
           my_resource->put_handler.cb(&new_request, iface_mask,
                                       my_resource->put_handler.user_data);
@@ -857,9 +852,10 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
         // Case 2)
         // Received from bus: -st rp , any ga
         // @receiver : cflags = u->overwrite object value
-        if (my_resource->post_handler.cb) {
-          my_resource->post_handler.cb(&new_request, iface_mask,
-                                       my_resource->post_handler.user_data);
+        // calling the put handler, since datapoints are implementing GET/PUT
+        if (my_resource->put_handler.cb) {
+          my_resource->put_handler.cb(&new_request, iface_mask,
+                                      my_resource->put_handler.user_data);
           if ((cflags & OC_CFLAG_TRANSMISSION) > 0) {
             PRINT(
               "   (case3) (RP-UPDATE) sending WRITE due to TRANSMIT flag \n");
@@ -911,9 +907,8 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_dot_knx, knx_g, 0, "/.knx",
                                      OC_IF_LI | OC_IF_G, APPLICATION_CBOR,
-                                     OC_DISCOVERABLE,
-                                     oc_core_knx_knx_get_handler, 0,
-                                     oc_core_knx_knx_post_handler, 0, NULL,
+                                     OC_DISCOVERABLE, oc_core_knx_k_get_handler,
+                                     0, oc_core_knx_k_post_handler, 0, NULL,
                                      OC_SIZE_MANY(1), "urn:knx:g.s");
 
 void
@@ -923,15 +918,14 @@ oc_create_knx_knx_resource(int resource_idx, size_t device)
 
   oc_core_populate_resource(resource_idx, device, "/.knx", OC_IF_LI | OC_IF_G,
                             APPLICATION_CBOR, OC_DISCOVERABLE,
-                            oc_core_knx_knx_get_handler, 0,
-                            oc_core_knx_knx_post_handler, 0, 1, "urn:knx:g.s");
+                            oc_core_knx_k_get_handler, 0,
+                            oc_core_knx_k_post_handler, 0, 1, "urn:knx:g.s");
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_g, knx_fingerprint, 0, "/k",
                                      OC_IF_LI | OC_IF_G, APPLICATION_CBOR,
-                                     OC_DISCOVERABLE,
-                                     oc_core_knx_knx_get_handler, 0,
-                                     oc_core_knx_knx_post_handler, 0, NULL,
+                                     OC_DISCOVERABLE, oc_core_knx_k_get_handler,
+                                     0, oc_core_knx_k_post_handler, 0, NULL,
                                      OC_SIZE_MANY(1), "urn:knx:g.s");
 void
 oc_create_knx_k_resource(int resource_idx, size_t device)
@@ -940,8 +934,8 @@ oc_create_knx_k_resource(int resource_idx, size_t device)
 
   oc_core_populate_resource(resource_idx, device, "/k", OC_IF_LI | OC_IF_G,
                             APPLICATION_CBOR, OC_DISCOVERABLE,
-                            oc_core_knx_knx_get_handler, 0,
-                            oc_core_knx_knx_post_handler, 0, 1, "urn:knx:g.s");
+                            oc_core_knx_k_get_handler, 0,
+                            oc_core_knx_k_post_handler, 0, 1, "urn:knx:g.s");
 }
 
 int
