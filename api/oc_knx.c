@@ -530,8 +530,8 @@ oc_create_knx_lsm_resource(int resource_idx, size_t device)
 // ----------------------------------------------------------------------------
 
 static void
-oc_core_knx_k_get_handler(oc_request_t *request,
-                            oc_interface_mask_t iface_mask, void *data)
+oc_core_knx_k_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
+                          void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -614,7 +614,7 @@ oc_reset_g_received_notification()
 */
 static void
 oc_core_knx_k_post_handler(oc_request_t *request,
-                             oc_interface_mask_t iface_mask, void *data)
+                           oc_interface_mask_t iface_mask, void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -851,7 +851,7 @@ oc_core_knx_k_post_handler(oc_request_t *request,
         // @receiver : cflags = u->overwrite object value
         // calling the put handler, since datapoints are implementing GET/PUT
         if (my_resource->put_handler.cb) {
-            my_resource->put_handler.cb(&new_request, iface_mask,
+          my_resource->put_handler.cb(&new_request, iface_mask,
                                       my_resource->put_handler.user_data);
           if ((cflags & OC_CFLAG_TRANSMISSION) > 0) {
             PRINT(
@@ -904,9 +904,8 @@ oc_core_knx_k_post_handler(oc_request_t *request,
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_dot_knx, knx_g, 0, "/.knx",
                                      OC_IF_LI | OC_IF_G, APPLICATION_CBOR,
-                                     OC_DISCOVERABLE,
-                                     oc_core_knx_k_get_handler, 0,
-                                     oc_core_knx_k_post_handler, 0, NULL,
+                                     OC_DISCOVERABLE, oc_core_knx_k_get_handler,
+                                     0, oc_core_knx_k_post_handler, 0, NULL,
                                      OC_SIZE_MANY(1), "urn:knx:g.s");
 
 void
@@ -922,9 +921,8 @@ oc_create_knx_knx_resource(int resource_idx, size_t device)
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_g, knx_fingerprint, 0, "/k",
                                      OC_IF_LI | OC_IF_G, APPLICATION_CBOR,
-                                     OC_DISCOVERABLE,
-                                     oc_core_knx_k_get_handler, 0,
-                                     oc_core_knx_k_post_handler, 0, NULL,
+                                     OC_DISCOVERABLE, oc_core_knx_k_get_handler,
+                                     0, oc_core_knx_k_post_handler, 0, NULL,
                                      OC_SIZE_MANY(1), "urn:knx:g.s");
 void
 oc_create_knx_k_resource(int resource_idx, size_t device)
