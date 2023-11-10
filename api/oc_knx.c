@@ -613,7 +613,7 @@ oc_reset_g_received_notification()
  {sia: 5678, es: {st: write, ga: 1, value: 100 }}
 */
 static void
-oc_core_knx_knx_post_handler(oc_request_t *request,
+oc_core_knx_knx_put_handler(oc_request_t *request,
                              oc_interface_mask_t iface_mask, void *data)
 {
   (void)data;
@@ -622,7 +622,7 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
   oc_rep_t *rep_value = NULL;
   char ip_address[100];
 
-  PRINT("KNX KNX Post Handler");
+  PRINT("KNX KNX PUT Handler");
   PRINT("Decoded Payload:\n");
   oc_print_rep_as_json(request->request_payload, true);
 
@@ -827,12 +827,6 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
         // to be discussed:
         // get value, since the w only should be send if the value is updated
         // (e.g. different)
-
-        // if (my_resource->put_handler.cb) {
-        //  my_resource->put_handler.cb(&new_request, iface_mask, data);
-
-        // if (my_resource->post_handler.cb) {
-        //  my_resource->post_handler.cb(&new_request, iface_mask, data);
         if (my_resource->put_handler.cb) {
           my_resource->put_handler.cb(&new_request, iface_mask,
                                       my_resource->put_handler.user_data);
@@ -854,8 +848,8 @@ oc_core_knx_knx_post_handler(oc_request_t *request,
         // Case 2)
         // Received from bus: -st rp , any ga
         // @receiver : cflags = u->overwrite object value
-        if (my_resource->post_handler.cb) {
-          my_resource->post_handler.cb(&new_request, iface_mask,
+        if (my_resource->put_handler.cb) {
+            my_resource->put_handler.cb(&new_request, iface_mask,
                                        my_resource->post_handler.user_data);
           if ((cflags & OC_CFLAG_TRANSMISSION) > 0) {
             PRINT(
