@@ -140,7 +140,7 @@ find_empty_slot_in_group_object_table(int id)
   }
   /* empty slot */
   for (int i = 0; i < GOT_MAX_ENTRIES; i++) {
-    if (g_got[i].id == -1) {
+    if (g_got[i].ga_len == 0) {
       return i;
     }
   }
@@ -164,7 +164,7 @@ oc_core_set_group_object_table(int index, oc_group_object_table_t entry)
   g_got[index].ga_len = 0;
   uint32_t *new_array = (uint32_t *)malloc(entry.ga_len * sizeof(uint32_t));
 
-  if ((new_array != NULL) && (entry.id > -1)) {
+  if ((new_array != NULL) && (entry.ga_len > 0)) {
     for (int i = 0; i < entry.ga_len; i++) {
 #pragma warning(suppress : 6386)
       new_array[i] = entry.ga[i];
@@ -212,7 +212,7 @@ oc_core_find_nr_used_in_group_object_table()
 {
   int counter = 0;
   for (int i = 0; i < GOT_MAX_ENTRIES; i++) {
-    if (g_got[i].id > -1) {
+    if (g_got[i].ga_len > 0) {
       counter++;
     }
   }
@@ -225,7 +225,7 @@ oc_core_find_group_object_table_index(uint32_t group_address)
   int i, j;
   for (i = 0; i < GOT_MAX_ENTRIES; i++) {
 
-    if (g_got[i].id > -1) {
+    if (g_got[i].ga_len != 0) {
       for (j = 0; j < g_got[i].ga_len; j++) {
         if (group_address == g_got[i].ga[j]) {
           return i;
@@ -247,7 +247,7 @@ oc_core_find_next_group_object_table_index(uint32_t group_address,
   int i, j;
   for (i = cur_index + 1; i < GOT_MAX_ENTRIES; i++) {
 
-    if (g_got[i].id > -1) {
+    if (g_got[i].ga_len != 0) {
       for (j = 0; j < g_got[i].ga_len; j++) {
         if (group_address == g_got[i].ga[j]) {
           return i;
@@ -395,7 +395,7 @@ oc_core_fp_g_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   /* example entry: </fp/g/1>;ct=60   (cbor)*/
   for (i = 0; i < GOT_MAX_ENTRIES; i++) {
 
-    if (g_got[i].id > -1) {
+    if (g_got[i].ga_len > 0) {
       // index  in use
       PRINT("  . adding %d\n", i);
       if (response_length > 0) {
@@ -656,7 +656,7 @@ oc_core_fp_g_x_get_handler(oc_request_t *request,
     return;
   }
 
-  if (&g_got[index].id == -1) {
+  if (&g_got[index].ga_len == 0) {
     // it is empty
     oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
     return;
@@ -753,7 +753,7 @@ oc_core_find_publisher_table_index(uint32_t group_address)
   int i, j;
   for (i = 0; i < GPT_MAX_ENTRIES; i++) {
 
-    if (g_gpt[i].id > -1) {
+    if (g_gpt[i].ga_len != 0) {
       for (j = 0; j < g_gpt[i].ga_len; j++) {
         if (group_address == g_gpt[i].ga[j]) {
           return i;
@@ -817,7 +817,7 @@ oc_core_fp_p_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   /* example entry: </fp/p/1>;ct=60 */
   for (i = 0; i < oc_core_get_publisher_table_size(); i++) {
 
-    if (g_gpt[i].id > -1) {
+    if (g_gpt[i].ga_len != 0) {
       // index  in use
 
       if (response_length > 0) {
@@ -1044,7 +1044,7 @@ oc_core_fp_p_x_get_handler(oc_request_t *request,
     return;
   }
 
-  if (g_gpt[index].id == -1) {
+  if (g_gpt[index].ga_len == 0) {
     /* it is empty */
     oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
     return;
@@ -1202,7 +1202,7 @@ oc_core_fp_r_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   /* example entry: </fp/r/1>;ct=60 (cbor) */
   for (i = 0; i < GRT_MAX_ENTRIES; i++) {
 
-    if (g_grt[i].id > -1) {
+    if (g_grt[i].ga_len != 0) {
       // index  in use
 
       if (response_length > 0) {
@@ -1434,7 +1434,7 @@ oc_core_fp_r_x_get_handler(oc_request_t *request,
     return;
   }
 
-  if (g_grt[index].id == -1) {
+  if (g_grt[index].ga_len == 0) {
     // it is empty
     oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
     return;
@@ -1652,7 +1652,7 @@ oc_print_cflags(oc_cflag_mask_t cflags)
 void
 oc_print_group_object_table_entry(int entry)
 {
-  if (g_got[entry].id == -1) {
+  if (g_got[entry].ga_len == 0) {
     return;
   }
 
@@ -1851,7 +1851,7 @@ oc_print_group_rp_table_entry(int entry, char *Store,
                               oc_group_rp_table_t *rp_table, int max_size)
 {
   (void)max_size;
-  if (rp_table[entry].id == -1) {
+  if (rp_table[entry].ga_len == 0) {
     return;
   }
   PRINT("  %s [%d] --> [%d]\n", Store, entry, rp_table[entry].ga_len);
@@ -1882,7 +1882,7 @@ oc_print_reduced_group_rp_table_entry(int entry, char *Store,
                                       int max_size)
 {
   (void)max_size;
-  if (rp_table[entry].id == -1) {
+  if (rp_table[entry].ga_len == 0) {
     return;
   }
   printf("  %s [%d] --> [%d]\n", Store, entry, rp_table[entry].ga_len);
@@ -2161,7 +2161,7 @@ find_empty_slot_in_rp_table(int id, oc_group_rp_table_t *rp_table, int max_size)
 
   // empty slot
   for (int i = 0; i < max_size; i++) {
-    if (rp_table[i].id == -1) {
+    if (rp_table[i].ga_len == 0) {
       return i;
     }
   }
@@ -2175,7 +2175,7 @@ oc_core_find_used_nr_in_rp_table(oc_group_rp_table_t *rp_table, int max_size)
   PRINT("Deleting Group Recipient Table from Persistent storage\n");
 
   for (int i = 0; i < max_size; i++) {
-    if (rp_table[i].id > -1) {
+    if (rp_table[i].ga_len > 0) {
       counter++;
     }
   }
@@ -2200,7 +2200,7 @@ oc_core_add_rp_entry(int index, oc_group_rp_table_t *rp_table,
   // Copy group addresses
   rp_table[index].ga_len = 0;
   uint32_t *new_array = (uint32_t *)malloc(entry.ga_len * sizeof(uint32_t));
-  if ((new_array != NULL) && (entry.id > -1)) {
+  if ((new_array != NULL) && (entry.ga_len > 0)) {
     for (int i = 0; i < entry.ga_len; i++) {
 #pragma warning(suppress : 6386)
       new_array[i] = entry.ga[i];
@@ -2398,7 +2398,7 @@ oc_add_points_in_group_object_table_to_response(oc_request_t *request,
 
   int index;
   for (index = 0; index < GOT_MAX_ENTRIES; index++) {
-    if (g_got[index].id > -1) {
+    if (g_got[index].ga_len > 0) {
       if (is_in_array(group_address, g_got[index].ga, g_got[index].ga_len)) {
         // add the resource
         // note, not checked if the resource is already there...
