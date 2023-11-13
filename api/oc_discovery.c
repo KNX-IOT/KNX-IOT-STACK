@@ -395,6 +395,22 @@ oc_wkcore_discovery_handler(oc_request_t *request,
          the ep=urn:knx:sn.* and if=urn:knx:if.pm concatenation. since that only
          needs to respond when the device is in programming mode
       */
+      // if unicast & serial number is wrong, return error
+      if (ep_request != 0 && ep_len > 9 &&
+        strncmp(ep_request, "knx://sn.", 9) == 0) {
+        char *ep_serialnumber = ep_request + 9;
+
+        if (strncmp(oc_string(device->serialnumber), ep_serialnumber,
+                    strlen(oc_string(device->serialnumber))) != 0) {
+          if (request->origin && (request->origin->flags & MULTICAST) == 0) {
+            request->response->response_buffer->code =
+              oc_status_code(OC_STATUS_NOT_FOUND);
+          } else {
+            request->response->response_buffer->code = OC_IGNORE;
+          }
+          return;
+        }
+      } else {
       response_length =
         frame_sn(oc_string(device->serialnumber), device->iid, device->ia);
       matches = 1;
@@ -405,6 +421,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
       request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
 
       PRINT(" oc_wkcore_discovery_handler PM HANDLING: OK\n");
+      }
     } else {
       /* device is not in programming mode so ignore this request*/
       request->response->response_buffer->content_format =
