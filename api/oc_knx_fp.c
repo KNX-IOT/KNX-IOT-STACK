@@ -1452,17 +1452,17 @@ oc_core_fp_r_x_get_handler(oc_request_t *request,
     oc_rep_i_set_int(root, 13, g_grt[index].grpid);
   }
   // fid - 25
-  if (g_grt[index].ia > 0) {
+  if (g_grt[index].fid > 0) {
     oc_rep_i_set_int(root, 25, g_grt[index].fid);
   }
   // iid - 26
-  if (g_grt[index].ia > 0) {
+  if (g_grt[index].iid > 0) {
     oc_rep_i_set_int(root, 26, g_grt[index].iid);
   }
   // url- 10
   oc_rep_i_set_text_string(root, 10, oc_string(g_grt[index].url));
   // at - 14
-  if (oc_string_len(g_gpt[index].at) > 0) {
+  if (oc_string_len(g_grt[index].at) > 0) {
     oc_rep_i_set_text_string(root, 14, oc_string(g_grt[index].at));
   }
   // ga - 7
