@@ -656,7 +656,7 @@ oc_core_fp_g_x_get_handler(oc_request_t *request,
     return;
   }
 
-  if (&g_got[index].id == -1) {
+  if (g_got[index].id == -1) {
     // it is empty
     oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
     return;
