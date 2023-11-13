@@ -365,8 +365,6 @@ oc_wkcore_discovery_handler(oc_request_t *request,
     if (strncmp(d_request, "urn:knx:g.s.*", 13) == 0) {
       // Quote from EITT test 5.1.1.8: "Must fail since the response would
       // likely be excessively large"
-      request->response->response_buffer->content_format =
-        APPLICATION_LINK_FORMAT;
       request->response->response_buffer->code =
         oc_status_code(OC_STATUS_BAD_REQUEST);
       return;
@@ -424,8 +422,6 @@ oc_wkcore_discovery_handler(oc_request_t *request,
       }
     } else {
       /* device is not in programming mode so ignore this request*/
-      request->response->response_buffer->content_format =
-        APPLICATION_LINK_FORMAT;
       if (request->origin && (request->origin->flags & MULTICAST) == 0) {
         request->response->response_buffer->code =
           oc_status_code(OC_STATUS_NOT_FOUND);
@@ -599,14 +595,14 @@ oc_wkcore_discovery_handler(oc_request_t *request,
     }
   }
 
-  request->response->response_buffer->content_format = APPLICATION_LINK_FORMAT;
-
   if (matches > 0 && response_length > 0) {
     PRINT("  oc_wkcore_discovery_handler response_length %d'\n",
           (int)response_length);
+    request->response->response_buffer->content_format = APPLICATION_LINK_FORMAT;
     request->response->response_buffer->response_length = response_length;
     request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
   } else if (request->origin && (request->origin->flags & MULTICAST) == 0) {
+    request->response->response_buffer->content_format = APPLICATION_LINK_FORMAT;
     request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
   } else {
     request->response->response_buffer->code = OC_IGNORE;
