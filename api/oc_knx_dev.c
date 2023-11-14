@@ -457,7 +457,7 @@ oc_core_dev_hostname_get_handler(oc_request_t *request,
 
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
-  if (device != NULL && oc_string(device->hostname) != NULL) {
+  if (device != NULL) {
     oc_rep_begin_root_object();
     oc_rep_i_set_text_string(root, 1, oc_string(device->hostname));
     oc_rep_end_root_object();
