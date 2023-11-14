@@ -215,7 +215,7 @@ get_o_1_1(oc_request_t *request, oc_interface_mask_t interfaces,
   PRINT("-- Begin get_dpa_421_61: interface %d\n", interfaces);
   /* check if the accept header is CBOR */
   if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
-    oc_send_response_no_format(request, OC_STATUS_BAD_OPTION));
+    oc_send_response_no_format(request, OC_STATUS_BAD_OPTION);
     return;
   }
 
@@ -268,7 +268,7 @@ get_o_1_1(oc_request_t *request, oc_interface_mask_t interfaces,
       oc_rep_end_root_object();
     } else {
       /* device is NULL */
-      oc_send_response_no_format(request, OC_STATUS_BAD_OPTION));
+      oc_send_response_no_format(request, OC_STATUS_BAD_OPTION);
     }
     oc_send_cbor_response(request, OC_STATUS_OK);
     return;
@@ -288,7 +288,7 @@ get_o_1_1(oc_request_t *request, oc_interface_mask_t interfaces,
   if (error_state == false) {
     oc_send_cbor_response(request, oc_status_code);
   } else {
-    oc_send_response_no_format(request, OC_STATUS_BAD_OPTION));
+    oc_send_response_no_format(request, OC_STATUS_BAD_OPTION);
   }
   PRINT("-- End get_dpa_421_61\n");
 }
