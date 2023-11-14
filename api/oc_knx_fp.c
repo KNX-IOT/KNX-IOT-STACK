@@ -1511,8 +1511,6 @@ oc_core_fp_r_x_del_handler(oc_request_t *request,
     return;
   }
 
-  PRINT(" deleting %d\n", index);
-
   int id = oc_uri_get_wildcard_value_as_int(
     oc_string(request->resource->uri), oc_string_len(request->resource->uri),
     request->uri_path, request->uri_path_len);
