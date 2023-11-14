@@ -1270,7 +1270,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
   // check if the state is unloaded
   size_t device_index = request->resource->device;
   if (oc_knx_lsm_state(device_index) != LSM_S_UNLOADED) {
-    PRINT(" not in unloading state\n");
+    PRINT(" not in unloaded state\n");
     oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
     return;
   }
