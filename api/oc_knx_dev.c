@@ -432,7 +432,7 @@ oc_core_dev_hostname_put_handler(oc_request_t *request,
           my_hostname->cb(device_index, rep->value.string, my_hostname->data);
         }
 
-        oc_send_response_no_format(request, OC_STATUS_OK);
+        oc_send_response_no_format(request, OC_STATUS_CHANGED);
         return;
       }
     }
