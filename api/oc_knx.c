@@ -960,6 +960,15 @@ oc_core_knx_fingerprint_get_handler(oc_request_t *request,
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
+
+  // check if the state is unloaded
+  size_t device_index = request->resource->device;
+  if (oc_knx_lsm_state(device_index) != LSM_S_LOADED) {
+    PRINT(" not in loaded state\n");
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
+    return;
+  }
+
   // cbor_encode_uint(&g_encoder, g_fingerprint);
   oc_rep_begin_root_object();
   oc_rep_i_set_int(root, 1, g_fingerprint);
