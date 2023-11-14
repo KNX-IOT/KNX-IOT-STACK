@@ -115,7 +115,7 @@ oc_core_p_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   if (added) {
     oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
   } else {
-    oc_send_linkformat_response(request, OC_STATUS_INTERNAL_SERVER_ERROR, 0);
+    oc_send_response_no_format(request, OC_STATUS_INTERNAL_SERVER_ERROR);
   }
 
   PRINT("oc_core_p_get_handler - end\n");
@@ -166,7 +166,7 @@ oc_core_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   }
   if (error) {
     PRINT("oc_core_p_post_handler - end\n");
-    oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
+    oc_send_response_no_format(request, OC_STATUS_INTERNAL_SERVER_ERROR);
     return;
   }
 

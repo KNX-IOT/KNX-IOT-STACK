@@ -115,13 +115,6 @@ oc_send_cbor_response(oc_request_t *request, oc_status_t response_code)
 }
 
 void
-oc_send_cbor_response_no_payload_size(oc_request_t *request,
-                                      oc_status_t response_code)
-{
-  oc_send_cbor_response_with_payload_size(request, response_code, 0);
-}
-
-void
 oc_send_cbor_response_with_payload_size(oc_request_t *request,
                                         oc_status_t response_code,
                                         size_t payload_size)
@@ -566,7 +559,11 @@ oc_send_separate_response_with_length(oc_separate_response_t *handle,
   response_buffer.buffer = handle->response_state->buffer;
   response_buffer.response_length = length;
   response_buffer.code = oc_status_code(response_code);
-  response_buffer.content_format = APPLICATION_CBOR;
+  if (length > 0) {
+    response_buffer.content_format = APPLICATION_CBOR;
+  } else {
+    response_buffer.content_format = CONTENT_NONE;
+  }
 
   coap_separate_t *cur = oc_list_head(handle->requests), *next = NULL;
   coap_packet_t response[1];

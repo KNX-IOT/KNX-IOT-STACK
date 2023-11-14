@@ -46,7 +46,7 @@ oc_core_dev_sn_get_handler(oc_request_t *request,
 
   /* check if the accept header is CBOR-format */
   if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
     return;
   }
 
@@ -63,14 +63,14 @@ oc_core_dev_sn_get_handler(oc_request_t *request,
     return;
   }
 
-  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+  oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(dev_sn, dev_hwv, 0, "/dev/sn", OC_IF_D,
                                      APPLICATION_CBOR, OC_DISCOVERABLE,
                                      oc_core_dev_sn_get_handler, 0, 0, 0,
                                      "urn:knx:dpt.serNum", OC_SIZE_MANY(1),
-                                     "urn:knx:dpa:0.11")
+                                     "urn:knx:dpa:0.11");
 
 void
 oc_create_dev_sn_resource(int resource_idx, size_t device)
@@ -96,7 +96,7 @@ oc_core_dev_hwv_get_handler(oc_request_t *request,
 
   /* check if the accept header is CBOR-format */
   if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
     return;
   }
   PRINT("oc_core_dev_hwv_get_handler\n");
@@ -116,7 +116,7 @@ oc_core_dev_hwv_get_handler(oc_request_t *request,
     oc_send_cbor_response(request, OC_STATUS_OK);
     return;
   }
-  oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
+  oc_send_response_no_format(request, OC_STATUS_INTERNAL_SERVER_ERROR);
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(dev_hwv, dev_fwv, 0, "/dev/hwv", OC_IF_D,
@@ -146,7 +146,7 @@ oc_core_dev_fwv_get_handler(oc_request_t *request,
 
   /* check if the accept header is CBOR-format */
   if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
     return;
   }
 
@@ -168,7 +168,7 @@ oc_core_dev_fwv_get_handler(oc_request_t *request,
     return;
   }
 
-  oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
+  oc_send_response_no_format(request, OC_STATUS_INTERNAL_SERVER_ERROR);
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(dev_fwv, dev_hwt, 0, "/dev/fwv", OC_IF_D,
@@ -200,7 +200,7 @@ oc_core_dev_hwt_get_handler(oc_request_t *request,
 
   /* check if the accept header is CBOR-format */
   if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
     return;
   }
 
@@ -213,7 +213,7 @@ oc_core_dev_hwt_get_handler(oc_request_t *request,
     oc_send_cbor_response(request, OC_STATUS_OK);
     return;
   }
-  oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
+  oc_send_response_no_format(request, OC_STATUS_INTERNAL_SERVER_ERROR);
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(dev_hwt, dev_model, 0, "/dev/hwt", OC_IF_D,
@@ -246,7 +246,7 @@ oc_core_dev_model_get_handler(oc_request_t *request,
 
   /* check if the accept header is CBOR-format */
   if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
     return;
   }
 
@@ -259,7 +259,7 @@ oc_core_dev_model_get_handler(oc_request_t *request,
     oc_send_cbor_response(request, OC_STATUS_OK);
     return;
   }
-  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+  oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(dev_model, dev_ia, 0, "/dev/model",
@@ -292,7 +292,7 @@ oc_core_dev_ia_get_handler(oc_request_t *request,
   /* check if the accept header is CBOR-format */
   if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     OC_ERR("invalid request");
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
     return;
   }
 
@@ -311,7 +311,7 @@ oc_core_dev_ia_get_handler(oc_request_t *request,
     oc_send_cbor_response(request, OC_STATUS_OK);
     return;
   }
-  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+  oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
 }
 
 static void
@@ -327,7 +327,7 @@ oc_core_dev_ia_put_handler(oc_request_t *request,
 
   /* check if the accept header is CBOR-format */
   if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
     return;
   }
 
@@ -363,7 +363,7 @@ oc_core_dev_ia_put_handler(oc_request_t *request,
   }
   if (fid_set) {
     OC_ERR("fid set in request: returning error!");
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
     return;
   }
 
@@ -374,10 +374,9 @@ oc_core_dev_ia_put_handler(oc_request_t *request,
       oc_init_datapoints_at_initialization();
     }
 
-    // oc_send_cbor_response(request, OC_STATUS_CHANGED);
-    oc_send_cbor_response_no_payload_size(request, OC_STATUS_CHANGED);
+    oc_send_response_no_format(request, OC_STATUS_CHANGED);
   } else {
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
   }
 }
 
@@ -411,7 +410,7 @@ oc_core_dev_hostname_put_handler(oc_request_t *request,
 
   /* check if the accept header is CBOR-format */
   if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
     return;
   }
 
@@ -433,15 +432,14 @@ oc_core_dev_hostname_put_handler(oc_request_t *request,
           my_hostname->cb(device_index, rep->value.string, my_hostname->data);
         }
 
-        // oc_send_cbor_response(request, OC_STATUS_OK);
-        oc_send_cbor_response_no_payload_size(request, OC_STATUS_OK);
+        oc_send_response_no_format(request, OC_STATUS_OK);
         return;
       }
     }
     rep = rep->next;
   }
 
-  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+  oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
 }
 
 static void
@@ -453,7 +451,7 @@ oc_core_dev_hostname_get_handler(oc_request_t *request,
 
   /* check if the accept header is CBOR-format */
   if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
     return;
   }
 
@@ -500,7 +498,7 @@ oc_core_dev_iid_put_handler(oc_request_t *request,
 
   /* check if the accept header is CBOR-format */
   if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
     return;
   }
 
@@ -515,8 +513,7 @@ oc_core_dev_iid_put_handler(oc_request_t *request,
         // make the value persistent
         oc_storage_write(KNX_STORAGE_IID, (uint8_t *)&rep->value.integer,
                          sizeof(uint64_t));
-        // oc_send_cbor_response(request, OC_STATUS_CHANGED);
-        oc_send_cbor_response_no_payload_size(request, OC_STATUS_CHANGED);
+        oc_send_response_no_format(request, OC_STATUS_CHANGED);
 
         // do the run time installation
         if (oc_is_device_in_runtime(device_index)) {
@@ -532,7 +529,7 @@ oc_core_dev_iid_put_handler(oc_request_t *request,
     rep = rep->next;
   }
 
-  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+  oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
 }
 
 static void
@@ -544,7 +541,7 @@ oc_core_dev_iid_get_handler(oc_request_t *request,
 
   /* check if the accept header is CBOR-format */
   if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
     return;
   }
 
@@ -559,7 +556,7 @@ oc_core_dev_iid_get_handler(oc_request_t *request,
     return;
   }
 
-  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+  oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(dev_iid, dev_pm, 0, "/dev/iid", OC_IF_P,
@@ -596,7 +593,7 @@ oc_core_dev_ipv6_get_handler(oc_request_t *request,
 
   /* check if the accept header is CBOR-format */
   if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
     return;
   }
 
@@ -635,7 +632,7 @@ oc_core_dev_ipv6_get_handler(oc_request_t *request,
   oc_endpoint_t *my_ep = oc_connectivity_get_endpoints(device_index);
   if (my_ep == NULL) {
     // hmm something is wrong, no IPV6 endpoint
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
   }
 
   if (check_if_query_pn_exist(request, &pn_value, &ps_value)) {
@@ -692,7 +689,7 @@ oc_core_dev_pm_get_handler(oc_request_t *request,
 
   /* check if the accept header is CBOR-format */
   if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
     return;
   }
 
@@ -709,7 +706,7 @@ oc_core_dev_pm_get_handler(oc_request_t *request,
     return;
   }
 
-  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+  oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
 }
 
 static void
@@ -810,7 +807,7 @@ oc_core_dev_dev_get_handler(oc_request_t *request,
   if (matches > 0) {
     oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
   } else {
-    oc_send_linkformat_response(request, OC_STATUS_INTERNAL_SERVER_ERROR, 0);
+    oc_send_response_no_format(request, OC_STATUS_INTERNAL_SERVER_ERROR);
   }
 
   PRINT("oc_core_dev_dev_get_handler - end\n");
@@ -853,7 +850,7 @@ oc_core_dev_sa_get_handler(oc_request_t *request,
 
   /* check if the accept header is CBOR-format */
   if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
     return;
   }
 
@@ -869,7 +866,7 @@ oc_core_dev_sa_get_handler(oc_request_t *request,
     return;
   }
 
-  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+  oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(dev_sa, dev_da, 0, "/dev/sna", OC_IF_P,
@@ -901,7 +898,7 @@ oc_core_dev_da_get_handler(oc_request_t *request,
 
   /* check if the accept header is CBOR-format */
   if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
     return;
   }
 
@@ -917,7 +914,7 @@ oc_core_dev_da_get_handler(oc_request_t *request,
     return;
   }
 
-  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+  oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(dev_da, dev_fid, 0, "/dev/da", OC_IF_P,
@@ -948,7 +945,7 @@ oc_core_dev_fid_get_handler(oc_request_t *request,
 
   /* check if the accept header is CBOR-format */
   if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
     return;
   }
 
@@ -963,7 +960,7 @@ oc_core_dev_fid_get_handler(oc_request_t *request,
     return;
   }
 
-  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+  oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
 }
 
 static void
@@ -975,7 +972,7 @@ oc_core_dev_fid_put_handler(oc_request_t *request,
 
   /* check if the accept header is CBOR-format */
   if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
     return;
   }
 
@@ -989,14 +986,14 @@ oc_core_dev_fid_put_handler(oc_request_t *request,
         oc_core_set_device_fid(device_index, (uint64_t)rep->value.integer);
         uint64_t temp = (uint64_t)rep->value.integer;
         oc_storage_write(KNX_STORAGE_FID, (uint8_t *)&temp, sizeof(temp));
-        oc_send_cbor_response_no_payload_size(request, OC_STATUS_CHANGED);
+        oc_send_response_no_format(request, OC_STATUS_CHANGED);
         return;
       }
     }
     rep = rep->next;
   }
 
-  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+  oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(dev_fid, dev_port, 0, "/dev/fid", OC_IF_P,
@@ -1029,7 +1026,7 @@ oc_core_dev_port_get_handler(oc_request_t *request,
 
   /* check if the accept header is CBOR-format */
   if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
     return;
   }
 
@@ -1043,7 +1040,7 @@ oc_core_dev_port_get_handler(oc_request_t *request,
     return;
   }
 
-  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+  oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
 }
 
 static void
@@ -1055,7 +1052,7 @@ oc_core_dev_port_put_handler(oc_request_t *request,
 
   /* check if the accept header is CBOR-format */
   if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
     return;
   }
 
@@ -1071,12 +1068,12 @@ oc_core_dev_port_put_handler(oc_request_t *request,
     PRINT("  oc_core_dev_port_put_handler received : %d\n",
           (int)rep->value.integer);
     device->port = (uint32_t)rep->value.integer;
-    oc_send_cbor_response_no_payload_size(request, OC_STATUS_CHANGED);
+    oc_send_response_no_format(request, OC_STATUS_CHANGED);
     oc_storage_write(KNX_STORAGE_PORT, (uint8_t *)&(rep->value.integer), 1);
     return;
   }
 
-  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+  oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(dev_port, dev_mport, 0, "/dev/port",
@@ -1109,7 +1106,7 @@ oc_core_dev_mport_get_handler(oc_request_t *request,
 
   /* check if the accept header is CBOR-format */
   if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
     return;
   }
 
@@ -1123,7 +1120,7 @@ oc_core_dev_mport_get_handler(oc_request_t *request,
     return;
   }
 
-  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+  oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
 }
 
 static void
@@ -1135,7 +1132,7 @@ oc_core_dev_mport_put_handler(oc_request_t *request,
 
   /* check if the accept header is CBOR-format */
   if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
     return;
   }
 
@@ -1151,13 +1148,12 @@ oc_core_dev_mport_put_handler(oc_request_t *request,
     PRINT("  oc_core_dev_mport_put_handler received : %d\n",
           (int)rep->value.integer);
     device->mport = (uint32_t)rep->value.integer;
-    // oc_send_cbor_response(request, OC_STATUS_CHANGED);
-    oc_send_cbor_response_no_payload_size(request, OC_STATUS_CHANGED);
+    oc_send_response_no_format(request, OC_STATUS_CHANGED);
     oc_storage_write(KNX_STORAGE_MPORT, (uint8_t *)&(rep->value.integer), 1);
     return;
   }
 
-  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+  oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(dev_mport, dev_mid, 0, "/dev/mport",
@@ -1232,7 +1228,7 @@ oc_core_ap_x_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 
   /* check if the accept header is CBOR-format */
   if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
     return;
   }
 
@@ -1252,7 +1248,7 @@ oc_core_ap_x_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     return;
   }
 
-  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+  oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
 }
 
 static void
@@ -1264,7 +1260,7 @@ oc_core_ap_x_put_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 
   /* check if the accept header is CBOR-format */
   if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
     return;
   }
 
@@ -1280,7 +1276,7 @@ oc_core_ap_x_put_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     int64_t *arr = oc_int_array(rep->value.array);
     int array_size = (int)oc_int_array_size(rep->value.array);
     if (array_size != 3) {
-      oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+      oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
       return;
     }
     device->ap.major = (int)arr[0];
@@ -1290,11 +1286,11 @@ oc_core_ap_x_put_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     // write to persistent storage
     oc_core_dump_ap(device_index);
 
-    oc_send_cbor_response_no_payload_size(request, OC_STATUS_CHANGED);
+    oc_send_response_no_format(request, OC_STATUS_CHANGED);
     return;
   }
 
-  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+  oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(app_x, knx_spake, 0, "/ap/pv", OC_IF_P,
@@ -1332,7 +1328,7 @@ oc_core_ap_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 
   /* check if the accept header is link-format */
   if (oc_check_accept_header(request, APPLICATION_LINK_FORMAT) == false) {
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
     return;
   }
 
@@ -1375,7 +1371,7 @@ oc_core_ap_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
     return;
   } else {
-    oc_send_linkformat_response(request, OC_STATUS_INTERNAL_SERVER_ERROR, 0);
+    oc_send_response_no_format(request, OC_STATUS_INTERNAL_SERVER_ERROR);
   }
 }
 
@@ -1407,7 +1403,7 @@ oc_core_dev_mid_get_handler(oc_request_t *request,
 
   /* check if the accept header is CBOR-format */
   if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
     return;
   }
 
@@ -1421,7 +1417,7 @@ oc_core_dev_mid_get_handler(oc_request_t *request,
     return;
   }
 
-  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+  oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(dev_mid, dev, 0, "/dev/mid", OC_IF_P,

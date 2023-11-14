@@ -144,12 +144,11 @@ oc_knx_swu_protocol_put_handler(oc_request_t *request,
     PRINT("  oc_knx_swu_protocol_put_handler received : %d\n",
           (int)rep->value.integer);
 
-    // oc_send_cbor_response(request, OC_STATUS_OK);
-    oc_send_cbor_response_no_payload_size(request, OC_STATUS_CHANGED);
+    oc_send_response_no_format(request, OC_STATUS_CHANGED);
     return;
   }
 
-  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+  oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_swu_protocol, knx_swu_maxdefer, 0,
@@ -214,12 +213,11 @@ oc_knx_swu_maxdefer_put_handler(oc_request_t *request,
     g_swu_max_defer = (int)rep->value.integer;
     oc_storage_write(KNX_STORAGE_SWU_MAX_DEFER, (uint8_t *)&g_swu_max_defer,
                      sizeof(g_swu_max_defer));
-    // oc_send_cbor_response(request, OC_STATUS_OK);
-    oc_send_cbor_response_no_payload_size(request, OC_STATUS_OK);
+    oc_send_response_no_format(request, OC_STATUS_OK);
     return;
   }
 
-  oc_send_json_response(request, OC_STATUS_BAD_REQUEST);
+  oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_swu_maxdefer, knx_swu_method, 0,
@@ -288,8 +286,7 @@ oc_knx_swu_method_put_handler(oc_request_t *request,
     g_swu_update_method = (int)rep->value.integer;
     oc_storage_write(KNX_STORAGE_SWU_METHOD, (uint8_t *)&g_swu_update_method,
                      sizeof(g_swu_update_method));
-    // oc_send_cbor_response(request, OC_STATUS_OK);
-    oc_send_cbor_response_no_payload_size(request, OC_STATUS_OK);
+    oc_send_response_no_format(request, OC_STATUS_OK);
     return;
   }
 
@@ -448,12 +445,12 @@ oc_knx_swu_update_put_handler(oc_request_t *request,
   if ((rep != NULL) && (rep->type == OC_REP_INT)) {
     PRINT("  oc_knx_swu_update_put_handler received : %d\n",
           (int)rep->value.integer);
-    oc_send_cbor_response_no_payload_size(request, OC_STATUS_OK);
+    oc_send_response_no_format(request, OC_STATUS_OK);
     // oc_send_cbor_response(request, OC_STATUS_OK);
     return;
   }
 
-  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+  oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_swu_update, knx_swu_pkgv, 0,
@@ -565,7 +562,7 @@ oc_knx_swu_a_put_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   PRINT("block_size: %d\n", block_size);
   PRINT("block_offset: %d\n", block_offset);
   // if (block_size == 0) {
-  //  oc_send_response(request, OC_STATUS_BAD_REQUEST);
+  //  oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
   //  return;
   //}
   size_t device_index = request->resource->device;
@@ -609,7 +606,7 @@ oc_knx_swu_a_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     return;
   }
 
-  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+  oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_swu_pkgcmd, knx_swu_pkgbytes, 0,
@@ -707,12 +704,11 @@ oc_knx_swu_pkgqurl_put_handler(oc_request_t *request,
     PRINT("  oc_knx_swu_pkgqurl_put_handler received : %s\n",
           oc_string_checked(rep->value.string));
 
-    // oc_send_cbor_response(request, OC_STATUS_OK);
-    oc_send_cbor_response_no_payload_size(request, OC_STATUS_OK);
+    oc_send_response_no_format(request, OC_STATUS_OK);
     return;
   }
 
-  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+  oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_swu_pkgqurl, knx_swu_pkgnames, 0,
@@ -806,7 +802,7 @@ oc_core_knx_swu_get_handler(oc_request_t *request,
   if (matches > 0) {
     oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
   } else {
-    oc_send_linkformat_response(request, OC_STATUS_INTERNAL_SERVER_ERROR, 0);
+    oc_send_response_no_format(request, OC_STATUS_INTERNAL_SERVER_ERROR);
   }
 }
 

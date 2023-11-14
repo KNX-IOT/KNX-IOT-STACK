@@ -991,23 +991,6 @@ void oc_send_cbor_response(oc_request_t *request, oc_status_t response_code);
 
 /**
  * @brief Called after the response to a GET, PUT, POST or DELETE call has been
- * prepared completed. will respond with CBOR, no payload expected.
- *
- * The function oc_send_response is called at the end of a
- * oc_request_callback_t to inform the caller about the status of the requested
- * action.
- *
- * Note that OC_STATUS_BAD_REQUEST for multicast will not send a response (e.g.
- * threated as OC_IGNORE)
- *
- * @param request the request being responded to
- * @param response_code the status of the response
- */
-void oc_send_cbor_response_no_payload_size(oc_request_t *request,
-                                           oc_status_t response_code);
-
-/**
- * @brief Called after the response to a GET, PUT, POST or DELETE call has been
  * prepared completed. will respond with CBOR.
  *
  * The function oc_send_response is called at the end of a
