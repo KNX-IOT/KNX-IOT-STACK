@@ -151,11 +151,10 @@ oc_send_linkformat_response(oc_request_t *request, oc_status_t response_code,
 }
 
 void
-oc_send_response_no_format(oc_request_t *request, oc_status_t response_code,
-                            size_t response_length)
+oc_send_response_no_format(oc_request_t *request, oc_status_t response_code)
 {
   request->response->response_buffer->content_format = CONTENT_NONE;
-  request->response->response_buffer->response_length = response_length;
+  request->response->response_buffer->response_length = 0;
   request->response->response_buffer->code = oc_status_code(response_code);
 }
 

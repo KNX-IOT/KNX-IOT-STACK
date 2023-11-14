@@ -721,7 +721,7 @@ oc_core_dev_pm_put_handler(oc_request_t *request,
 
   /* check if the accept header is CBOR-format */
   if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
     return;
   }
 
@@ -743,8 +743,7 @@ oc_core_dev_pm_put_handler(oc_request_t *request,
         else
           device->pm = rep->value.boolean;
 
-        // oc_send_cbor_response(request, OC_STATUS_CHANGED);
-        oc_send_cbor_response_no_payload_size(request, OC_STATUS_CHANGED);
+        oc_send_response_no_format(request, OC_STATUS_CHANGED);
 
         knx_publish_service(oc_string(device->serialnumber), device->iid,
                             device->ia, device->pm);
@@ -755,7 +754,7 @@ oc_core_dev_pm_put_handler(oc_request_t *request,
     rep = rep->next;
   }
 
-  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+  oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(dev_pm, dev_ipv6, 0, "/dev/pm", OC_IF_P,
