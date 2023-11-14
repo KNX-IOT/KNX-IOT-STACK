@@ -484,7 +484,7 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   size_t device_index = request->resource->device;
   if (oc_knx_lsm_state(device_index) != LSM_S_LOADING) {
     OC_ERR(" not in loading state\n");
-    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
+    oc_send_response_no_format(request, OC_STATUS_METHOD_NOT_ALLOWED);
     return;
   }
 
@@ -686,18 +686,18 @@ oc_core_fp_g_x_del_handler(oc_request_t *request,
   (void)iface_mask;
   PRINT("oc_core_fp_g_x_del_handler\n");
 
+  size_t device_index = request->resource->device;
+  if (oc_knx_lsm_state(device_index) != LSM_S_LOADING) {
+    OC_ERR(" not in loading state\n");
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
+    return;
+  }
+
   int id = oc_uri_get_wildcard_value_as_int(
     oc_string(request->resource->uri), oc_string_len(request->resource->uri),
     request->uri_path, request->uri_path_len);
   int index = oc_core_find_index_in_group_object_table_from_id(id);
   PRINT("  id=%d index = %d\n", id, index);
-
-  size_t device_index = request->resource->device;
-  if (oc_knx_lsm_state(device_index) != LSM_S_LOADING) {
-    PRINT(" not in loading state\n");
-    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
-    return;
-  }
 
   PRINT(" deleting %d\n", index);
 
@@ -862,6 +862,14 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
+
+  size_t device_index = request->resource->device;
+  if (oc_knx_lsm_state(device_index) != LSM_S_LOADING) {
+    OC_ERR(" not in loading state\n");
+    oc_send_response_no_format(request, OC_STATUS_METHOD_NOT_ALLOWED);
+    return;
+  }
+
   oc_print_rep_as_json(request->request_payload, true);
 
   int index = -1;
@@ -1103,6 +1111,13 @@ oc_core_fp_p_x_del_handler(oc_request_t *request,
   (void)iface_mask;
   PRINT("oc_core_fp_p_x_del_handler\n");
 
+  size_t device_index = request->resource->device;
+  if (oc_knx_lsm_state(device_index) != LSM_S_LOADING) {
+    OC_ERR(" not in loading state\n");
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
+    return;
+  }
+
   int id = oc_uri_get_wildcard_value_as_int(
     oc_string(request->resource->uri), oc_string_len(request->resource->uri),
     request->uri_path, request->uri_path_len);
@@ -1242,6 +1257,13 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
+    return;
+  }
+
+  size_t device_index = request->resource->device;
+  if (oc_knx_lsm_state(device_index) != LSM_S_LOADING) {
+    OC_ERR(" not in loading state\n");
+    oc_send_response_no_format(request, OC_STATUS_METHOD_NOT_ALLOWED);
     return;
   }
 
@@ -1481,6 +1503,15 @@ oc_core_fp_r_x_del_handler(oc_request_t *request,
   (void)data;
   (void)iface_mask;
   PRINT("oc_core_fp_r_x_del_handler\n");
+
+  size_t device_index = request->resource->device;
+  if (oc_knx_lsm_state(device_index) != LSM_S_LOADING) {
+    OC_ERR(" not in loading state\n");
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
+    return;
+  }
+
+  PRINT(" deleting %d\n", index);
 
   int id = oc_uri_get_wildcard_value_as_int(
     oc_string(request->resource->uri), oc_string_len(request->resource->uri),

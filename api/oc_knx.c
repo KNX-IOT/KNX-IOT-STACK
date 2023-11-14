@@ -964,7 +964,7 @@ oc_core_knx_fingerprint_get_handler(oc_request_t *request,
   // check if the state is unloaded
   size_t device_index = request->resource->device;
   if (oc_knx_lsm_state(device_index) != LSM_S_LOADED) {
-    PRINT(" not in loaded state\n");
+    OC_ERR(" not in loaded state\n");
     oc_send_response_no_format(request, OC_STATUS_SERVICE_UNAVAILABLE);
     return;
   }
@@ -1277,7 +1277,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
   // check if the state is unloaded
   size_t device_index = request->resource->device;
   if (oc_knx_lsm_state(device_index) != LSM_S_UNLOADED) {
-    PRINT(" not in unloaded state\n");
+    OC_ERR(" not in unloaded state\n");
     oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
     return;
   }
