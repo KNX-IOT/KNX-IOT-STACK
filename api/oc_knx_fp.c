@@ -652,7 +652,7 @@ oc_core_fp_g_x_get_handler(oc_request_t *request,
   int index = oc_core_find_index_in_group_object_table_from_id(id);
   PRINT("  id=%d index = %d\n", id, index);
   if (index == -1) {
-    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
+    oc_send_response_no_format(request, OC_STATUS_NOT_FOUND);
     return;
   }
 
@@ -1047,7 +1047,7 @@ oc_core_fp_p_x_get_handler(oc_request_t *request,
   PRINT("  id:%d index = %d\n", id, index);
 
   if (index == -1) {
-    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
+    oc_send_response_no_format(request, OC_STATUS_NOT_FOUND);
     return;
   }
 
@@ -1450,7 +1450,7 @@ oc_core_fp_r_x_get_handler(oc_request_t *request,
   PRINT("  id:%d index = %d\n", id, index);
 
   if (index == -1) {
-    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
+    oc_send_response_no_format(request, OC_STATUS_NOT_FOUND);
     return;
   }
 
