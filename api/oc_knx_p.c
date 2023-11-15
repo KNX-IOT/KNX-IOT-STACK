@@ -198,15 +198,17 @@ oc_core_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
                                          response_obj);
 
           new_request.request_payload = value;
-          new_request.uri_path = "/p";
-          new_request.uri_path_len = 4;
+          new_request.uri_path = oc_string(*myurl);
+          new_request.uri_path_len = oc_string_len(*myurl);
 
           const oc_resource_t *my_resource = oc_ri_get_app_resource_by_uri(
             oc_string(*myurl), oc_string_len(*myurl), device_index);
           if (my_resource) {
             // this should not be the request..
-            if (my_resource->post_handler.cb) {
-              my_resource->post_handler.cb(&new_request, iface_mask, NULL);
+            // Reason for changing POST to PUT:
+            // POST is not mandatory for parameters & datapoints
+            if (my_resource->put_handler.cb) {
+              my_resource->put_handler.cb(&new_request, iface_mask, NULL);
             }
           }
         }
@@ -216,7 +218,7 @@ oc_core_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     rep = rep->next;
   }
 
-  oc_send_cbor_response(request, OC_STATUS_CHANGED);
+  oc_send_response_no_format(request, OC_STATUS_CHANGED);
   PRINT("oc_core_p_post_handler - end\n");
 }
 
