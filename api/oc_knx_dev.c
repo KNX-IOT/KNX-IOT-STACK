@@ -1078,7 +1078,8 @@ oc_core_dev_port_put_handler(oc_request_t *request,
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(dev_port, dev_mport, 0, "/dev/port",
                                      OC_IF_P, APPLICATION_CBOR, OC_DISCOVERABLE,
-                                     oc_core_dev_port_get_handler, oc_core_dev_port_put_handler, 0, 0,
+                                     oc_core_dev_port_get_handler,
+                                     oc_core_dev_port_put_handler, 0, 0,
                                      "urn:knx:dpt.value2Ucount",
                                      OC_SIZE_ZERO());
 

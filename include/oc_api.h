@@ -1049,8 +1049,8 @@ void oc_send_linkformat_response(oc_request_t *request,
  * @param response_code the request being responded to
  * @param response_length the framed response length
  */
-void
-oc_send_response_no_format(oc_request_t *request, oc_status_t response_code);
+void oc_send_response_no_format(oc_request_t *request,
+                                oc_status_t response_code);
 
 /**
  * @brief retrieve the payload from the request, no processing

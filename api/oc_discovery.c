@@ -386,7 +386,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
       */
       // if unicast & serial number is wrong, return error
       if (ep_request != 0 && ep_len > 9 &&
-        strncmp(ep_request, "knx://sn.", 9) == 0) {
+          strncmp(ep_request, "knx://sn.", 9) == 0) {
         char *ep_serialnumber = ep_request + 9;
 
         if (strncmp(oc_string(device->serialnumber), ep_serialnumber,
@@ -399,13 +399,13 @@ oc_wkcore_discovery_handler(oc_request_t *request,
           return;
         }
       } else {
-      response_length =
-        frame_sn(oc_string(device->serialnumber), device->iid, device->ia);
-      matches = 1;
+        response_length =
+          frame_sn(oc_string(device->serialnumber), device->iid, device->ia);
+        matches = 1;
 
-      oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
+        oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
 
-      PRINT(" oc_wkcore_discovery_handler PM HANDLING: OK\n");
+        PRINT(" oc_wkcore_discovery_handler PM HANDLING: OK\n");
       }
     } else {
       /* device is not in programming mode so ignore this request*/
@@ -578,7 +578,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   } else if (request->origin && (request->origin->flags & MULTICAST) == 0) {
     oc_send_response_no_format(request, OC_STATUS_OK);
   } else {
-      oc_ignore_request(request);
+    oc_ignore_request(request);
   }
 }
 
