@@ -562,7 +562,7 @@ oc_send_separate_response_with_length(oc_separate_response_t *handle,
   if (length > 0) {
     response_buffer.content_format = APPLICATION_CBOR;
   } else {
-    response_buffer.content_format = APPLICATION_CBOR;
+    response_buffer.content_format = CONTENT_NONE;
   }
 
   coap_separate_t *cur = oc_list_head(handle->requests), *next = NULL;
