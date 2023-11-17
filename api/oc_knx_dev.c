@@ -1451,7 +1451,7 @@ oc_knx_device_storage_read(size_t device_index)
   PRINT("Loading Device Config from Persistent storage\n");
 
   if (device_index >= oc_core_get_num_devices()) {
-    PRINT("device_index %d to large\n", (int)device_index);
+    PRINT("device_index %d too large\n", (int)device_index);
     return;
   }
 
@@ -1502,7 +1502,7 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
   uint32_t ffff = 0xffff;
 
   if (device_index >= oc_core_get_num_devices()) {
-    PRINT("oc_knx_device_storage_reset: device_index %d to large\n",
+    PRINT("oc_knx_device_storage_reset: device_index %d too large\n",
           (int)device_index);
     return;
   }
@@ -1585,7 +1585,7 @@ oc_knx_device_in_programming_mode(size_t device_index)
 {
 
   if (device_index >= oc_core_get_num_devices()) {
-    PRINT("device_index %d to large\n", (int)device_index);
+    PRINT("device_index %d too large\n", (int)device_index);
     return false;
   }
 

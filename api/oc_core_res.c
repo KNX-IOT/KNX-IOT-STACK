@@ -350,7 +350,7 @@ int
 oc_core_set_device_fwv(size_t device_index, int major, int minor, int minor2)
 {
   if (device_index >= (int)oc_core_get_num_devices()) {
-    OC_ERR("device_index %d to large\n", (int)device_index);
+    OC_ERR("device_index %d too large\n", (int)device_index);
     return -1;
   }
   oc_device_info[device_index].fwv.major = major;
@@ -363,7 +363,7 @@ int
 oc_core_set_device_hwv(size_t device_index, int major, int minor, int minor2)
 {
   if (device_index >= (int)oc_core_get_num_devices()) {
-    OC_ERR("device_index %d to large\n", (int)device_index);
+    OC_ERR("device_index %d too large\n", (int)device_index);
     return -1;
   }
 
@@ -377,7 +377,7 @@ int
 oc_core_set_device_ap(size_t device_index, int major, int minor, int minor2)
 {
   if (device_index >= (int)oc_core_get_num_devices()) {
-    OC_ERR("device_index %d to large\n", (int)device_index);
+    OC_ERR("device_index %d too large\n", (int)device_index);
     return -1;
   }
 
@@ -391,7 +391,7 @@ int
 oc_core_set_device_mid(size_t device_index, uint32_t mid)
 {
   if (device_index >= (int)oc_core_get_num_devices()) {
-    OC_ERR("device_index %d to large\n", (int)device_index);
+    OC_ERR("device_index %d too large\n", (int)device_index);
     return -1;
   }
   oc_device_info[device_index].mid = mid;
@@ -402,7 +402,7 @@ int
 oc_core_set_device_ia(size_t device_index, uint32_t ia)
 {
   if (device_index >= (int)oc_core_get_num_devices()) {
-    OC_ERR("device_index %d to large\n", (int)device_index);
+    OC_ERR("device_index %d too large\n", (int)device_index);
     return -1;
   }
   oc_device_info[device_index].ia = ia;
@@ -427,7 +427,7 @@ oc_core_set_device_hwt(size_t device_index, const char *hardwaretype)
 {
   int hwt_len = 0;
   if (device_index >= (int)oc_core_get_num_devices()) {
-    OC_ERR("device_index %d to large\n", (int)device_index);
+    OC_ERR("device_index %d too large\n", (int)device_index);
     return -1;
   }
   hwt_len = strlen(hardwaretype);
@@ -446,7 +446,7 @@ int
 oc_core_set_device_pm(size_t device_index, bool pm)
 {
   if (device_index >= (int)oc_core_get_num_devices()) {
-    OC_ERR("  device_index %d to large\n", (int)device_index);
+    OC_ERR("  device_index %d too large\n", (int)device_index);
     return -1;
   }
 
@@ -459,7 +459,7 @@ int
 oc_core_set_device_model(size_t device_index, const char *model)
 {
   if (device_index >= (int)oc_core_get_num_devices()) {
-    OC_ERR("  device_index %d to large\n", (int)device_index);
+    OC_ERR("  device_index %d too large\n", (int)device_index);
     return -1;
   }
   oc_free_string(&oc_device_info[device_index].model);
@@ -472,7 +472,7 @@ int
 oc_core_set_device_hostname(size_t device_index, const char *host_name)
 {
   if (device_index >= (int)oc_core_get_num_devices()) {
-    OC_ERR("  device_index %d to large\n", (int)device_index);
+    OC_ERR("  device_index %d too large\n", (int)device_index);
     return -1;
   }
   oc_free_string(&oc_device_info[device_index].hostname);
@@ -486,7 +486,7 @@ int
 oc_core_set_device_iid(size_t device_index, uint64_t iid)
 {
   if (device_index >= (int)oc_core_get_num_devices()) {
-    OC_ERR("  device_index %d to large\n", (int)device_index);
+    OC_ERR("  device_index %d too large\n", (int)device_index);
     return -1;
   }
   oc_device_info[device_index].iid = iid;
@@ -502,7 +502,7 @@ uint64_t
 oc_core_get_device_iid(size_t device_index)
 {
   if (device_index >= (int)oc_core_get_num_devices()) {
-    OC_ERR("  device_index %d to large\n", (int)device_index);
+    OC_ERR("  device_index %d too large\n", (int)device_index);
     return -1;
   }
 

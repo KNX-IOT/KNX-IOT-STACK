@@ -151,7 +151,7 @@ int
 oc_core_set_group_object_table(int index, oc_group_object_table_t entry)
 {
   if (index >= oc_core_get_group_object_table_total_size()) {
-    OC_ERR("index to large index:%d %d", index,
+    OC_ERR("index too large index:%d %d", index,
            oc_core_get_group_object_table_total_size());
   }
   g_got[index].cflags = entry.cflags;
@@ -2214,7 +2214,7 @@ oc_core_add_rp_entry(int index, oc_group_rp_table_t *rp_table,
                      int rp_table_size, oc_group_rp_table_t entry)
 {
   if (index >= rp_table_size) {
-    OC_ERR("recipient table index is to large: index(%d) max_size(%d)", index,
+    OC_ERR("recipient table index is too large: index(%d) max_size(%d)", index,
            rp_table_size);
   }
 
