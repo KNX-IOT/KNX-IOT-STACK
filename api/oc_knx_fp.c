@@ -71,6 +71,10 @@ int find_empty_slot_in_rp_table(int id, oc_group_rp_table_t *rp_table,
 static int oc_core_find_used_nr_in_rp_table(oc_group_rp_table_t *rp_table,
                                             int max_size);
 
+static void oc_delete_group_rp_table_entry(int entry, char *Store,
+                                           oc_group_rp_table_t *rp_table,
+                                           int max_size);
+
 // -----------------------------------------------------------------------------
 
 int
@@ -136,7 +140,7 @@ find_empty_slot_in_group_object_table(int id)
   }
   /* empty slot */
   for (int i = 0; i < GOT_MAX_ENTRIES; i++) {
-    if (g_got[i].ga_len == 0) {
+    if (g_got[i].id == -1) {
       return i;
     }
   }
@@ -160,7 +164,7 @@ oc_core_set_group_object_table(int index, oc_group_object_table_t entry)
   g_got[index].ga_len = 0;
   uint32_t *new_array = (uint32_t *)malloc(entry.ga_len * sizeof(uint32_t));
 
-  if ((new_array != NULL) && (entry.ga_len > 0)) {
+  if ((new_array != NULL) && (entry.id > -1)) {
     for (int i = 0; i < entry.ga_len; i++) {
 #pragma warning(suppress : 6386)
       new_array[i] = entry.ga[i];
@@ -208,7 +212,7 @@ oc_core_find_nr_used_in_group_object_table()
 {
   int counter = 0;
   for (int i = 0; i < GOT_MAX_ENTRIES; i++) {
-    if (g_got[i].ga_len > 0) {
+    if (g_got[i].id > -1) {
       counter++;
     }
   }
@@ -221,7 +225,7 @@ oc_core_find_group_object_table_index(uint32_t group_address)
   int i, j;
   for (i = 0; i < GOT_MAX_ENTRIES; i++) {
 
-    if (g_got[i].ga_len != 0) {
+    if (g_got[i].id > -1) {
       for (j = 0; j < g_got[i].ga_len; j++) {
         if (group_address == g_got[i].ga[j]) {
           return i;
@@ -243,7 +247,7 @@ oc_core_find_next_group_object_table_index(uint32_t group_address,
   int i, j;
   for (i = cur_index + 1; i < GOT_MAX_ENTRIES; i++) {
 
-    if (g_got[i].ga_len != 0) {
+    if (g_got[i].id > -1) {
       for (j = 0; j < g_got[i].ga_len; j++) {
         if (group_address == g_got[i].ga[j]) {
           return i;
@@ -391,7 +395,7 @@ oc_core_fp_g_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   /* example entry: </fp/g/1>;ct=60   (cbor)*/
   for (i = 0; i < GOT_MAX_ENTRIES; i++) {
 
-    if (g_got[i].ga_len > 0) {
+    if (g_got[i].id > -1) {
       // index  in use
       PRINT("  . adding %d\n", i);
       if (response_length > 0) {
@@ -652,7 +656,7 @@ oc_core_fp_g_x_get_handler(oc_request_t *request,
     return;
   }
 
-  if (&g_got[index].ga_len == 0) {
+  if (g_got[index].id == -1) {
     // it is empty
     oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
     return;
@@ -749,7 +753,7 @@ oc_core_find_publisher_table_index(uint32_t group_address)
   int i, j;
   for (i = 0; i < GPT_MAX_ENTRIES; i++) {
 
-    if (g_gpt[i].ga_len != 0) {
+    if (g_gpt[i].id > -1) {
       for (j = 0; j < g_gpt[i].ga_len; j++) {
         if (group_address == g_gpt[i].ga[j]) {
           return i;
@@ -813,7 +817,7 @@ oc_core_fp_p_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   /* example entry: </fp/p/1>;ct=60 */
   for (i = 0; i < oc_core_get_publisher_table_size(); i++) {
 
-    if (g_gpt[i].ga_len != 0) {
+    if (g_gpt[i].id > -1) {
       // index  in use
 
       if (response_length > 0) {
@@ -888,10 +892,14 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       }
       g_gpt[index].id = id;
 
+      bool id_only = true;
       object = rep->value.object;
       while (object != NULL) {
         switch (object->type) {
         case OC_REP_INT: {
+          if (object->iname != 0) {
+            id_only = false;
+          }
           if (object->iname == 12) {
             g_gpt[index].ia = (int)object->value.integer;
           }
@@ -906,6 +914,7 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
           }
         } break;
         case OC_REP_STRING: {
+          id_only = false;
           if (object->iname == 112) {
             oc_free_string(&g_gpt[index].path);
             oc_new_string(&g_gpt[index].path, oc_string(object->value.string),
@@ -923,6 +932,7 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
           }
         } break;
         case OC_REP_INT_ARRAY: {
+          id_only = false;
           if (object->iname == 7) {
             // g_got[index].id = object->value.integer;
             int64_t *arr = oc_int_array(object->value.array);
@@ -951,39 +961,44 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
         }
         object = object->next;
       }
+      if (id_only) {
+        PRINT("  only found id in request, deleting entry at index: %d\n",
+              index);
+        oc_delete_group_rp_table_entry(index, GPT_STORE, g_gpt,
+                                       GRT_MAX_ENTRIES);
+      } else {
+        oc_print_group_rp_table_entry(index, GPT_STORE, g_gpt,
+                                      oc_core_get_publisher_table_size());
+        bool do_save = true;
+        if (oc_string_len(g_gpt[index].url) > OC_MAX_URL_LENGTH) {
+          // do_save = false;
+          OC_ERR("  url is longer than %d \n", (int)OC_MAX_URL_LENGTH);
+        }
+        if (oc_string_len(g_gpt[index].path) > OC_MAX_URL_LENGTH) {
+          // do_save = false;
+          OC_ERR("  path is longer than %d \n", (int)OC_MAX_URL_LENGTH);
+        }
+
+        oc_print_group_rp_table_entry(index, GPT_STORE, g_gpt,
+                                      oc_core_get_publisher_table_size());
+        if (do_save) {
+          oc_dump_group_rp_table_entry(index, GPT_STORE, g_gpt,
+                                       oc_core_get_publisher_table_size());
+        }
+      }
     } break;
     case OC_REP_NIL:
       break;
     default:
       break;
     }
-
-    oc_print_group_rp_table_entry(index, GPT_STORE, g_gpt,
-                                  oc_core_get_publisher_table_size());
-    bool do_save = true;
-    if (oc_string_len(g_gpt[index].url) > OC_MAX_URL_LENGTH) {
-      // do_save = false;
-      OC_ERR("  url is longer than %d \n", (int)OC_MAX_URL_LENGTH);
-    }
-    if (oc_string_len(g_gpt[index].path) > OC_MAX_URL_LENGTH) {
-      // do_save = false;
-      OC_ERR("  path is longer than %d \n", (int)OC_MAX_URL_LENGTH);
-    }
-
-    oc_print_group_rp_table_entry(index, GPT_STORE, g_gpt,
-                                  oc_core_get_publisher_table_size());
-    if (do_save) {
-      oc_dump_group_rp_table_entry(index, GPT_STORE, g_gpt,
-                                   oc_core_get_publisher_table_size());
-    }
-
     rep = rep->next;
   };
 
   oc_knx_increase_fingerprint();
   PRINT("oc_core_fp_p_post_handler - end\n");
   // oc_send_cbor_response(request, OC_STATUS_OK);
-  oc_send_cbor_response_no_payload_size(request, OC_STATUS_CHANGED);
+  oc_send_cbor_response_no_payload_size(request, return_status);
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_fp_p, knx_fp_p_x, 0, "/fp/p",
@@ -1029,7 +1044,7 @@ oc_core_fp_p_x_get_handler(oc_request_t *request,
     return;
   }
 
-  if (g_gpt[index].ga_len == 0) {
+  if (g_gpt[index].id == -1) {
     /* it is empty */
     oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
     return;
@@ -1187,7 +1202,7 @@ oc_core_fp_r_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   /* example entry: </fp/r/1>;ct=60 (cbor) */
   for (i = 0; i < GRT_MAX_ENTRIES; i++) {
 
-    if (g_grt[i].ga_len != 0) {
+    if (g_grt[i].id > -1) {
       // index  in use
 
       if (response_length > 0) {
@@ -1264,14 +1279,17 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
         oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
         return;
       }
-      PRINT("  storing at %d\n", index);
       g_grt[index].id = id;
 
+      bool id_only = true;
       object = rep->value.object;
       while (object != NULL) {
         switch (object->type) {
 
         case OC_REP_INT: {
+          if (object->iname != 0) {
+            id_only = false;
+          }
           if (object->iname == 12) {
             g_grt[index].ia = (int)object->value.integer;
           }
@@ -1287,6 +1305,7 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
         } break;
 
         case OC_REP_STRING: {
+          id_only = false;
           if (object->iname == 112) {
             oc_free_string(&g_grt[index].path);
             oc_new_string(&g_grt[index].path, oc_string(object->value.string),
@@ -1304,6 +1323,7 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
           }
         } break;
         case OC_REP_INT_ARRAY: {
+          id_only = false;
           if (object->iname == 7) {
             // g_got[index].id = object->value.integer;
             int64_t *arr = oc_int_array(object->value.array);
@@ -1332,25 +1352,34 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
         }
         object = object->next;
       }
+      if (id_only) {
+        PRINT("  only found id in request, deleting entry at index: %d\n",
+              index);
+        oc_delete_group_rp_table_entry(index, GRT_STORE, g_grt,
+                                       GRT_MAX_ENTRIES);
+      } else {
+        bool do_save = true;
+        if (oc_string_len(g_grt[index].url) > OC_MAX_URL_LENGTH) {
+          // do_save = false;
+          OC_ERR("  url is longer than %d \n", (int)OC_MAX_URL_LENGTH);
+        }
+        if (oc_string_len(g_grt[index].path) > OC_MAX_URL_LENGTH) {
+          // do_save = false;
+          OC_ERR("  path is longer than %d \n", (int)OC_MAX_URL_LENGTH);
+        }
+
+        oc_print_group_rp_table_entry(index, GRT_STORE, g_grt, GRT_MAX_ENTRIES);
+        if (do_save) {
+          PRINT("  storing at %d\n", index);
+          oc_dump_group_rp_table_entry(index, GRT_STORE, g_grt,
+                                       GRT_MAX_ENTRIES);
+        }
+      }
     }
     case OC_REP_NIL:
       break;
     default:
       break;
-    }
-    bool do_save = true;
-    if (oc_string_len(g_grt[index].url) > OC_MAX_URL_LENGTH) {
-      // do_save = false;
-      OC_ERR("  url is longer than %d \n", (int)OC_MAX_URL_LENGTH);
-    }
-    if (oc_string_len(g_grt[index].path) > OC_MAX_URL_LENGTH) {
-      // do_save = false;
-      OC_ERR("  path is longer than %d \n", (int)OC_MAX_URL_LENGTH);
-    }
-
-    oc_print_group_rp_table_entry(index, GRT_STORE, g_grt, GRT_MAX_ENTRIES);
-    if (do_save) {
-      oc_dump_group_rp_table_entry(index, GRT_STORE, g_grt, GRT_MAX_ENTRIES);
     }
     rep = rep->next;
   };
@@ -1405,7 +1434,7 @@ oc_core_fp_r_x_get_handler(oc_request_t *request,
     return;
   }
 
-  if (g_grt[index].ga_len == 0) {
+  if (g_grt[index].id == -1) {
     // it is empty
     oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
     return;
@@ -1623,7 +1652,7 @@ oc_print_cflags(oc_cflag_mask_t cflags)
 void
 oc_print_group_object_table_entry(int entry)
 {
-  if (g_got[entry].ga_len == 0) {
+  if (g_got[entry].id == -1) {
     return;
   }
 
@@ -1822,7 +1851,7 @@ oc_print_group_rp_table_entry(int entry, char *Store,
                               oc_group_rp_table_t *rp_table, int max_size)
 {
   (void)max_size;
-  if (rp_table[entry].ga_len == 0) {
+  if (rp_table[entry].id == -1) {
     return;
   }
   PRINT("  %s [%d] --> [%d]\n", Store, entry, rp_table[entry].ga_len);
@@ -1853,7 +1882,7 @@ oc_print_reduced_group_rp_table_entry(int entry, char *Store,
                                       int max_size)
 {
   (void)max_size;
-  if (rp_table[entry].ga_len == 0) {
+  if (rp_table[entry].id == -1) {
     return;
   }
   printf("  %s [%d] --> [%d]\n", Store, entry, rp_table[entry].ga_len);
@@ -2098,6 +2127,7 @@ oc_delete_group_rp_table()
   }
 #endif /*  OC_PUBLISHER_TABLE */
 }
+
 void
 oc_free_group_rp_table()
 {
@@ -2131,7 +2161,7 @@ find_empty_slot_in_rp_table(int id, oc_group_rp_table_t *rp_table, int max_size)
 
   // empty slot
   for (int i = 0; i < max_size; i++) {
-    if (rp_table[i].ga_len == 0) {
+    if (rp_table[i].id == -1) {
       return i;
     }
   }
@@ -2145,7 +2175,7 @@ oc_core_find_used_nr_in_rp_table(oc_group_rp_table_t *rp_table, int max_size)
   PRINT("Deleting Group Recipient Table from Persistent storage\n");
 
   for (int i = 0; i < max_size; i++) {
-    if (rp_table[i].ga_len > 0) {
+    if (rp_table[i].id > -1) {
       counter++;
     }
   }
@@ -2170,7 +2200,7 @@ oc_core_add_rp_entry(int index, oc_group_rp_table_t *rp_table,
   // Copy group addresses
   rp_table[index].ga_len = 0;
   uint32_t *new_array = (uint32_t *)malloc(entry.ga_len * sizeof(uint32_t));
-  if ((new_array != NULL) && (entry.ga_len > 0)) {
+  if ((new_array != NULL) && (entry.id > -1)) {
     for (int i = 0; i < entry.ga_len; i++) {
 #pragma warning(suppress : 6386)
       new_array[i] = entry.ga[i];
@@ -2368,7 +2398,7 @@ oc_add_points_in_group_object_table_to_response(oc_request_t *request,
 
   int index;
   for (index = 0; index < GOT_MAX_ENTRIES; index++) {
-    if (g_got[index].ga_len > 0) {
+    if (g_got[index].id > -1) {
       if (is_in_array(group_address, g_got[index].ga, g_got[index].ga_len)) {
         // add the resource
         // note, not checked if the resource is already there...

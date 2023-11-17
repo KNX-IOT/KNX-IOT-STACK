@@ -572,14 +572,15 @@ oc_core_auth_at_post_handler(oc_request_t *request,
           return;
         }
       }
-      PRINT("  storage index: %d (%s)\n", index, oc_string_checked(*at));
       oc_free_string(&(g_at_entries[index].id));
       oc_new_string(&g_at_entries[index].id, oc_string(*at),
                     oc_string_len(*at));
 
+      bool id_only = true;
       object = rep->value.object;
       while (object != NULL) {
         if (object->type == OC_REP_STRING_ARRAY) {
+          id_only = false;
           // scope
           if (object->iname == 9) {
             // scope: array of interfaces as string
@@ -597,6 +598,7 @@ oc_core_auth_at_post_handler(oc_request_t *request,
             scope_updated = true;
           }
         } else if (object->type == OC_REP_INT_ARRAY) {
+          id_only = false;
           // scope
           if (object->iname == 9) {
             g_at_entries[index].scope = OC_IF_NONE;
@@ -631,6 +633,9 @@ oc_core_auth_at_post_handler(oc_request_t *request,
             }
           }
         } else if (object->type == OC_REP_STRING) {
+          if (object->iname != 0) {
+            id_only = false;
+          }
           if (object->iname == 2) {
             // sub
             oc_free_string(&(g_at_entries[index].sub));
@@ -646,12 +651,14 @@ oc_core_auth_at_post_handler(oc_request_t *request,
           //                oc_string_len(object->value.string));
           //}
         } else if (object->type == OC_REP_INT) {
+          id_only = false;
           if (object->iname == 38) {
             // profile (38 ("coap_dtls" ==1 or "coap_oscore" == 2))
             PRINT("   profile %d\n", (int)object->value.integer);
             g_at_entries[index].profile = (int)object->value.integer;
           }
         } else if (object->type == OC_REP_OBJECT) {
+          id_only = false;
           // level of cnf or sub.
           subobject = object->value.object;
           int subobject_nr = object->iname;
@@ -729,12 +736,19 @@ oc_core_auth_at_post_handler(oc_request_t *request,
         }
         object = object->next;
       } // while (inner object)
-    }   // if type == object
-    // show the entry on screen
-    oc_print_auth_at_entry(device_index, index);
+      if (id_only) {
+        PRINT("  only found id in request, deleting entry at index: %d\n",
+              index);
+        oc_at_delete_entry(device_index, index);
+      } else {
+        PRINT("  storage index: %d (%s)\n", index, oc_string_checked(*at));
+        // show the entry on screen
+        oc_print_auth_at_entry(device_index, index);
 
-    // dump the entry to persistent storage
-    oc_at_dump_entry(device_index, index);
+        // dump the entry to persistent storage
+        oc_at_dump_entry(device_index, index);
+      }
+    } // if type == object
     rep = rep->next;
   } // while (rep)
 

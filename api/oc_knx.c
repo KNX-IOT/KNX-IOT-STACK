@@ -43,17 +43,19 @@
 
 // ---------------------------Variables --------------------------------------
 
-oc_group_object_notification_t g_received_notification;
+static oc_group_object_notification_t g_received_notification;
 
-uint64_t g_fingerprint = 0;
-uint64_t g_osn = 0;
+static uint64_t g_fingerprint = 0;
+static uint64_t g_osn = 0;
 
-oc_pase_t g_pase;
+static oc_pase_t g_pase;
 
-oc_string_t g_idevid;
-oc_string_t g_ldevid;
+static oc_string_t g_idevid;
+static oc_string_t g_ldevid;
 
-bool g_ignore_smessage_from_self = false;
+static bool g_ignore_smessage_from_self = false;
+
+static int valid_request = 0;
 
 // ----------------------------------------------------------------------------
 
@@ -530,8 +532,8 @@ oc_create_knx_lsm_resource(int resource_idx, size_t device)
 // ----------------------------------------------------------------------------
 
 static void
-oc_core_knx_k_get_handler(oc_request_t *request,
-                            oc_interface_mask_t iface_mask, void *data)
+oc_core_knx_k_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
+                          void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -614,7 +616,7 @@ oc_reset_g_received_notification()
 */
 static void
 oc_core_knx_k_post_handler(oc_request_t *request,
-                             oc_interface_mask_t iface_mask, void *data)
+                           oc_interface_mask_t iface_mask, void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -622,7 +624,7 @@ oc_core_knx_k_post_handler(oc_request_t *request,
   oc_rep_t *rep_value = NULL;
   char ip_address[100];
 
-  PRINT("KNX K POST Handler");
+  PRINT("KNX K POST Handler\n");
   PRINT("Decoded Payload:\n");
   oc_print_rep_as_json(request->request_payload, true);
 
@@ -640,6 +642,8 @@ oc_core_knx_k_post_handler(oc_request_t *request,
   if (g_ignore_smessage_from_self) {
     // check if incoming message is from myself.
     // if so, then return with bad request
+    // Note: The same device can have multiple IP addresses,
+    // so all endpoints for this device need to be compared against.
     oc_endpoint_t *origin = request->origin;
     if (origin != NULL) {
       PRINT("k post : origin of message:");
@@ -648,16 +652,18 @@ oc_core_knx_k_post_handler(oc_request_t *request,
     }
 
     oc_endpoint_t *my_ep = oc_connectivity_get_endpoints(0);
-    if (my_ep != NULL) {
-      PRINT("k post : myself:");
-      PRINTipaddr(*my_ep);
+    oc_endpoint_t *ep_i = NULL;
+
+    for (ep_i = my_ep; ep_i != NULL; ep_i = ep_i->next) {
+      PRINTipaddr(*ep_i);
       PRINT("\n");
-    }
-    if (oc_endpoint_compare_address(origin, my_ep) == 0) {
-      if (origin->addr.ipv6.port == my_ep->addr.ipv6.port) {
-        request->response->response_buffer->code = oc_status_code(OC_IGNORE);
-        PRINT(" same address and port: not handling message");
-        return;
+
+      if (oc_endpoint_compare_address(origin, ep_i) == 0) {
+        if (origin->addr.ipv6.port == ep_i->addr.ipv6.port) {
+          request->response->response_buffer->code = oc_status_code(OC_IGNORE);
+          PRINT(" same address and port: not handling message");
+          return;
+        }
       }
     }
   }
@@ -739,6 +745,7 @@ oc_core_knx_k_post_handler(oc_request_t *request,
     base64_buf[base64_len] = '0';
     oc_new_string(&g_received_notification.value, base64_buf, base64_len);
   }
+  free(base64_buf);
   // gateway functionality: call back for all s-mode calls
   oc_gateway_t *my_gw = oc_get_gateway_cb();
   if (my_gw != NULL && my_gw->cb) {
@@ -760,22 +767,22 @@ oc_core_knx_k_post_handler(oc_request_t *request,
   PRINT(" k : origin:%s sia: %d ga: %d st: %s\n", ip_address,
         g_received_notification.sia, g_received_notification.ga,
         oc_string_checked(g_received_notification.st));
-  if (strcmp(oc_string(g_received_notification.st), "w") == 0) {
+  if (strcmp(oc_string_checked(g_received_notification.st), "w") == 0) {
     // case_1 :
     // Received from bus: -st w, any ga ==> @receiver:
     // cflags = w -> overwrite object value
     st_write = true;
-  } else if (strcmp(oc_string(g_received_notification.st), "a") == 0) {
+  } else if (strcmp(oc_string_checked(g_received_notification.st), "a") == 0) {
     // Case 2) spec 1.1
     // Received from bus: -st rp, any ga
     //@receiver: cflags = u -> overwrite object value
     st_rep = true;
-  } else if (strcmp(oc_string(g_received_notification.st), "rp") == 0) {
+  } else if (strcmp(oc_string_checked(g_received_notification.st), "rp") == 0) {
     // Case 2) spec 1.0
     // Received from bus: -st a (rp), any ga
     //@receiver: cflags = u -> overwrite object value
     st_rep = true;
-  } else if (strcmp(oc_string(g_received_notification.st), "r") == 0) {
+  } else if (strcmp(oc_string_checked(g_received_notification.st), "r") == 0) {
     // Case 4)
     // @sender: cflags = r
     // Received from bus: -st r
@@ -851,7 +858,7 @@ oc_core_knx_k_post_handler(oc_request_t *request,
         // @receiver : cflags = u->overwrite object value
         // calling the put handler, since datapoints are implementing GET/PUT
         if (my_resource->put_handler.cb) {
-            my_resource->put_handler.cb(&new_request, iface_mask,
+          my_resource->put_handler.cb(&new_request, iface_mask,
                                       my_resource->put_handler.user_data);
           if ((cflags & OC_CFLAG_TRANSMISSION) > 0) {
             PRINT(
@@ -904,9 +911,8 @@ oc_core_knx_k_post_handler(oc_request_t *request,
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_dot_knx, knx_g, 0, "/.knx",
                                      OC_IF_LI | OC_IF_G, APPLICATION_CBOR,
-                                     OC_DISCOVERABLE,
-                                     oc_core_knx_k_get_handler, 0,
-                                     oc_core_knx_k_post_handler, 0, NULL,
+                                     OC_DISCOVERABLE, oc_core_knx_k_get_handler,
+                                     0, oc_core_knx_k_post_handler, 0, NULL,
                                      OC_SIZE_MANY(1), "urn:knx:g.s");
 
 void
@@ -922,9 +928,8 @@ oc_create_knx_knx_resource(int resource_idx, size_t device)
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_g, knx_fingerprint, 0, "/k",
                                      OC_IF_LI | OC_IF_G, APPLICATION_CBOR,
-                                     OC_DISCOVERABLE,
-                                     oc_core_knx_k_get_handler, 0,
-                                     oc_core_knx_k_post_handler, 0, NULL,
+                                     OC_DISCOVERABLE, oc_core_knx_k_get_handler,
+                                     0, oc_core_knx_k_post_handler, 0, NULL,
                                      OC_SIZE_MANY(1), "urn:knx:g.s");
 void
 oc_create_knx_k_resource(int resource_idx, size_t device)
@@ -1286,7 +1291,6 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
 
   oc_rep_t *rep = request->request_payload;
 
-  int valid_request = 0;
   // check input
   // note: no check if there are multiple byte strings in the request payload
   while (rep != NULL) {
@@ -1363,16 +1367,13 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
 
   PRINT("oc_core_knx_spake_post_handler valid_request: %d\n", valid_request);
   oc_indicate_separate_response(request, &spake_separate_rsp);
-  // TODO missing pointer cast warning here
-  oc_set_delayed_callback((void *)valid_request,
-                          &oc_core_knx_spake_separate_post_handler, 0);
+  oc_set_delayed_callback(NULL, &oc_core_knx_spake_separate_post_handler, 0);
 }
 
 static oc_event_callback_retval_t
 oc_core_knx_spake_separate_post_handler(void *req_p)
 {
-  // TODO cast of pointer of different size
-  int valid_request = (int)req_p;
+  (void)req_p;
   PRINT("oc_core_knx_spake_separate_post_handler\n");
 
   if (!spake_separate_rsp.active) {

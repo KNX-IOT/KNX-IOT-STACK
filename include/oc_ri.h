@@ -134,7 +134,8 @@ typedef enum {
  *
  */
 typedef enum {
-  OC_DISCOVERABLE = (1 << 0), /**< discoverable */
+  OC_UNDISCOVERABLE = 0,      /**< parameter */
+  OC_DISCOVERABLE = (1 << 0), /**< datapoint */
   OC_OBSERVABLE = (1 << 1),   /**< observable */
   OC_SECURE = (1 << 4),       /**< secure */
   OC_PERIODIC = (1 << 6),     /**< periodical update */

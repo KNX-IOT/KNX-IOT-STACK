@@ -1354,6 +1354,7 @@ oc_core_ap_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     return;
   }
 
+  // Add /ap/pv
   size_t device_index = request->resource->device;
   const oc_resource_t *resource =
     oc_core_get_resource_by_index(OC_APP_X, device_index);
@@ -1362,6 +1363,15 @@ oc_core_ap_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     oc_add_resource_to_wk(resource, request, device_index, &response_length,
                           matches, true);
   }
+
+  // Add /a/lsm
+  resource = oc_core_get_resource_by_index(OC_KNX_LSM, device_index);
+  if (resource) {
+    PRINT("URL %s\n", oc_string(resource->uri));
+    oc_add_resource_to_wk(resource, request, device_index, &response_length,
+                          matches, true);
+  }
+
   if (response_length > 0) {
     oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
     return;
@@ -1439,7 +1449,7 @@ oc_knx_device_storage_read(size_t device_index)
 
   uint32_t ia;
   int temp_size;
-  char tempstring[20];
+  char tempstring[255];
   bool pm;
 
   PRINT("Loading Device Config from Persistent storage\n");
@@ -1462,7 +1472,8 @@ oc_knx_device_storage_read(size_t device_index)
   }
 
   /* HOST NAME */
-  temp_size = oc_storage_read(KNX_STORAGE_HOSTNAME, (uint8_t *)&tempstring, 20);
+  temp_size =
+    oc_storage_read(KNX_STORAGE_HOSTNAME, (uint8_t *)&tempstring, 255);
   if (temp_size > 1) {
     tempstring[temp_size] = 0;
     oc_core_set_device_hostname(device_index, tempstring);

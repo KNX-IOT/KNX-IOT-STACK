@@ -372,12 +372,16 @@ oc_wkcore_discovery_handler(oc_request_t *request,
       return;
     }
     // create the response
-    oc_add_points_in_group_object_table_to_response(
+    bool ret = oc_add_points_in_group_object_table_to_response(
       request, device_index, group_address, &response_length, matches);
-    request->response->response_buffer->content_format =
-      APPLICATION_LINK_FORMAT;
-    request->response->response_buffer->response_length = response_length;
-    request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
+    if (ret) {
+      request->response->response_buffer->content_format =
+        APPLICATION_LINK_FORMAT;
+      request->response->response_buffer->response_length = response_length;
+      request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
+    } else {
+      request->response->response_buffer->code = OC_IGNORE;
+    }
     return;
   }
 
