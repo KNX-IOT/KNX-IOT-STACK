@@ -310,7 +310,6 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
 
-  PRINT("qlen %d\nflag %d\n", request->query_len, request->origin->flags);
   /* handle multicast with no queries */
   if (request->query_len == 0 && request->origin &&
       (request->origin->flags & MULTICAST) != 0) {
