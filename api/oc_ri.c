@@ -1319,7 +1319,7 @@ oc_ri_invoke_coap_entity_handler(void *request, void *response, uint8_t *buffer,
     oc_rep_new(response_buffer.buffer, (int)response_buffer.buffer_size);
 
     if (!oc_knx_sec_check_acl(method, cur_resource, endpoint)) {
-      method_impl = false;
+      authorized = false;
     } else
 
 #ifdef OC_SECURITY
