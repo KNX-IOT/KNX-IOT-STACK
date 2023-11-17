@@ -251,8 +251,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
       request->accept != APPLICATION_JSON && request->accept != CONTENT_NONE) {
     /* handle bad request..
     note below layer ignores this message if it is a multi cast request */
-    request->response->response_buffer->code =
-      oc_status_code(OC_STATUS_BAD_REQUEST);
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
     return;
   }
 
@@ -300,12 +299,9 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   if (request->query_len > 0 && !query_match) {
     if (request->origin && (request->origin->flags & MULTICAST) == 0) {
       // for unicast
-      request->response->response_buffer->content_format =
-        APPLICATION_LINK_FORMAT;
-      request->response->response_buffer->response_length = response_length;
-      request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
+      oc_send_response_no_format(request, OC_STATUS_OK);
     } else {
-      request->response->response_buffer->code = OC_IGNORE;
+      oc_ignore_request(request);
     }
     return;
   }
@@ -313,6 +309,15 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   // get the device structure from the request.
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
+
+  /* handle multicast with no queries */
+  if (request->query_len == 0 && request->origin &&
+      (request->origin->flags & MULTICAST) != 0) {
+    response_length =
+      frame_sn(oc_string(device->serialnumber), device->iid, device->ia);
+    oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
+    return;
+  }
 
   // handle query parameters: l=ps l=total
   if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
@@ -358,29 +363,22 @@ oc_wkcore_discovery_handler(oc_request_t *request,
       /* handle bad request..
       note below layer ignores this message if it is a multi cast request */
       PRINT(" not loaded!");
-      request->response->response_buffer->code =
-        oc_status_code(OC_STATUS_BAD_REQUEST);
+      oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
       return;
     }
     if (strncmp(d_request, "urn:knx:g.s.*", 13) == 0) {
       // Quote from EITT test 5.1.1.8: "Must fail since the response would
       // likely be excessively large"
-      request->response->response_buffer->content_format =
-        APPLICATION_LINK_FORMAT;
-      request->response->response_buffer->code =
-        oc_status_code(OC_STATUS_BAD_REQUEST);
+      oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
       return;
     }
     // create the response
     bool ret = oc_add_points_in_group_object_table_to_response(
       request, device_index, group_address, &response_length, matches);
     if (ret) {
-      request->response->response_buffer->content_format =
-        APPLICATION_LINK_FORMAT;
-      request->response->response_buffer->response_length = response_length;
-      request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
+      oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
     } else {
-      request->response->response_buffer->code = OC_IGNORE;
+      oc_send_response_no_format(request, OC_STATUS_OK);
     }
     return;
   }
@@ -395,25 +393,35 @@ oc_wkcore_discovery_handler(oc_request_t *request,
          the ep=urn:knx:sn.* and if=urn:knx:if.pm concatenation. since that only
          needs to respond when the device is in programming mode
       */
-      response_length =
-        frame_sn(oc_string(device->serialnumber), device->iid, device->ia);
-      matches = 1;
+      // if unicast & serial number is wrong, return error
+      if (ep_request != 0 && ep_len > 9 &&
+          strncmp(ep_request, "knx://sn.", 9) == 0) {
+        char *ep_serialnumber = ep_request + 9;
 
-      request->response->response_buffer->response_length = response_length;
-      request->response->response_buffer->content_format =
-        APPLICATION_LINK_FORMAT;
-      request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
+        if (strncmp(oc_string(device->serialnumber), ep_serialnumber,
+                    strlen(oc_string(device->serialnumber))) != 0) {
+          if (request->origin && (request->origin->flags & MULTICAST) == 0) {
+            oc_send_response_no_format(request, OC_STATUS_NOT_FOUND);
+          } else {
+            oc_ignore_request(request);
+          }
+          return;
+        }
+      } else {
+        response_length =
+          frame_sn(oc_string(device->serialnumber), device->iid, device->ia);
+        matches = 1;
 
-      PRINT(" oc_wkcore_discovery_handler PM HANDLING: OK\n");
+        oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
+
+        PRINT(" oc_wkcore_discovery_handler PM HANDLING: OK\n");
+      }
     } else {
       /* device is not in programming mode so ignore this request*/
-      request->response->response_buffer->content_format =
-        APPLICATION_LINK_FORMAT;
       if (request->origin && (request->origin->flags & MULTICAST) == 0) {
-        request->response->response_buffer->code =
-          oc_status_code(OC_STATUS_NOT_FOUND);
+        oc_send_response_no_format(request, OC_STATUS_NOT_FOUND);
       } else {
-        request->response->response_buffer->code = OC_IGNORE;
+        oc_ignore_request(request);
       }
       return;
     }
@@ -432,17 +440,14 @@ oc_wkcore_discovery_handler(oc_request_t *request,
         oc_rep_add_line_to_buffer("</dev/da>;rt=\"dpa.0.58\";ct=50,");
       response_length = response_length + framed_bytes;
 
-      request->response->response_buffer->response_length = response_length;
-      request->response->response_buffer->content_format =
-        APPLICATION_LINK_FORMAT;
-      request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
+      oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
 
       PRINT(" oc_wkcore_discovery_handler IA HANDLING: OK\n");
       return;
     } else {
       /* should ignore this request*/
       // PRINT(" oc_wkcore_discovery_handler IA HANDLING: IGNORE\n");
-      request->response->response_buffer->code = OC_IGNORE;
+      oc_ignore_request(request);
       return;
     }
   }
@@ -469,19 +474,14 @@ oc_wkcore_discovery_handler(oc_request_t *request,
         if (strncmp(iid_dev, iid_str + 1, iid_str_len) == 0) {
           response_length =
             frame_sn(oc_string(device->serialnumber), device->iid, device->ia);
-          request->response->response_buffer->response_length = response_length;
-          request->response->response_buffer->code =
-            oc_status_code(OC_STATUS_OK);
-          request->response->response_buffer->content_format =
-            APPLICATION_LINK_FORMAT;
-          matches = 1;
+          oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
           return;
         }
       }
     }
     /* should ignore this request*/
     // PRINT(" oc_wkcore_discovery_handler IA HANDLING: IGNORE\n");
-    request->response->response_buffer->code = OC_IGNORE;
+    oc_ignore_request(request);
     return;
   }
 
@@ -524,13 +524,9 @@ oc_wkcore_discovery_handler(oc_request_t *request,
                 strlen(oc_string(device->serialnumber))) == 0) {
       response_length =
         frame_sn(oc_string(device->serialnumber), device->iid, device->ia);
-      request->response->response_buffer->response_length = response_length;
-      request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
-      request->response->response_buffer->content_format =
-        APPLICATION_LINK_FORMAT;
-      matches = 1;
+      oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
     } else {
-      request->response->response_buffer->code = OC_IGNORE;
+      oc_ignore_request(request);
     }
     return;
   }
@@ -582,17 +578,14 @@ oc_wkcore_discovery_handler(oc_request_t *request,
     }
   }
 
-  request->response->response_buffer->content_format = APPLICATION_LINK_FORMAT;
-
   if (matches > 0 && response_length > 0) {
     PRINT("  oc_wkcore_discovery_handler response_length %d'\n",
           (int)response_length);
-    request->response->response_buffer->response_length = response_length;
-    request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
+    oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
   } else if (request->origin && (request->origin->flags & MULTICAST) == 0) {
-    request->response->response_buffer->code = oc_status_code(OC_STATUS_OK);
+    oc_send_response_no_format(request, OC_STATUS_OK);
   } else {
-    request->response->response_buffer->code = OC_IGNORE;
+    oc_ignore_request(request);
   }
 }
 

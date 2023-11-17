@@ -645,7 +645,8 @@ coap_oscore_parse_options(void *packet, uint8_t *data, uint32_t data_len,
       coap_pkt->content_format =
         (uint16_t)coap_parse_int_option(current_option, option_length);
       OC_DBG("  Content-Format [%u]", coap_pkt->content_format);
-      if (coap_pkt->content_format != APPLICATION_OSCORE &&
+      if (coap_pkt->payload_len > 0 &&
+          coap_pkt->content_format != APPLICATION_OSCORE &&
           coap_pkt->content_format != APPLICATION_CBOR &&
           coap_pkt->content_format != APPLICATION_LINK_FORMAT &&
           coap_pkt->content_format != APPLICATION_OCTET_STREAM &&

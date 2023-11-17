@@ -235,7 +235,7 @@ get_dpa_352_51(oc_request_t *request, oc_interface_mask_t interfaces,
   PRINT("-- Begin get_dpa_352_51\n");
   /* check if the accept header is CBOR */
   if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
-    oc_send_response(request, OC_STATUS_BAD_OPTION);
+    oc_send_response_no_format(request, OC_STATUS_BAD_OPTION);
     return;
   }
   // handle the query parameter m
@@ -288,7 +288,7 @@ get_dpa_352_51(oc_request_t *request, oc_interface_mask_t interfaces,
       oc_rep_end_root_object();
     } else {
       /* device is NULL */
-      oc_send_cbor_response(request, OC_STATUS_BAD_OPTION);
+      oc_send_response_no_format(request, OC_STATUS_BAD_OPTION);
     }
     oc_send_cbor_response(request, OC_STATUS_OK);
     return;
@@ -308,7 +308,7 @@ get_dpa_352_51(oc_request_t *request, oc_interface_mask_t interfaces,
   if (error_state == false) {
     oc_send_cbor_response(request, oc_status_code);
   } else {
-    oc_send_response(request, OC_STATUS_BAD_OPTION);
+    oc_send_response_no_format(request, OC_STATUS_BAD_OPTION);
   }
   PRINT("-- End get_dpa_352_51\n");
 }
@@ -338,7 +338,7 @@ get_dpa_352_51_1(oc_request_t *request, oc_interface_mask_t interfaces,
   PRINT("-- Begin get_dpa_352_51_1\n");
   /* check if the accept header is CBOR */
   if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
-    oc_send_response(request, OC_STATUS_BAD_OPTION);
+    oc_send_response_no_format(request, OC_STATUS_BAD_OPTION);
     return;
   }
   // check the query parameter m with the various values
@@ -390,7 +390,7 @@ get_dpa_352_51_1(oc_request_t *request, oc_interface_mask_t interfaces,
       oc_rep_end_root_object();
     } else {
       /* device is NULL */
-      oc_send_cbor_response(request, OC_STATUS_BAD_OPTION);
+      oc_send_response_no_format(request, OC_STATUS_BAD_OPTION);
     }
     oc_send_cbor_response(request, OC_STATUS_OK);
     return;
@@ -411,7 +411,7 @@ get_dpa_352_51_1(oc_request_t *request, oc_interface_mask_t interfaces,
   if (error_state == false) {
     oc_send_cbor_response(request, oc_status_code);
   } else {
-    oc_send_response(request, OC_STATUS_BAD_OPTION);
+    oc_send_response_no_format(request, OC_STATUS_BAD_OPTION);
   }
   PRINT("-- End get_dpa_352_51_1\n");
 }
@@ -440,7 +440,7 @@ get_dpa_352_52(oc_request_t *request, oc_interface_mask_t interfaces,
   PRINT("-- Begin get_dpa_352_52\n");
   /* check if the accept header is CBOR */
   if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
-    oc_send_response(request, OC_STATUS_BAD_OPTION);
+    oc_send_response_no_format(request, OC_STATUS_BAD_OPTION);
     return;
   }
   // check the query parameter m with the various values
@@ -492,7 +492,7 @@ get_dpa_352_52(oc_request_t *request, oc_interface_mask_t interfaces,
       oc_rep_end_root_object();
     } else {
       /* device is NULL */
-      oc_send_cbor_response(request, OC_STATUS_BAD_OPTION);
+      oc_send_response_no_format(request, OC_STATUS_BAD_OPTION);
     }
     oc_send_cbor_response(request, OC_STATUS_OK);
     return;
@@ -512,7 +512,7 @@ get_dpa_352_52(oc_request_t *request, oc_interface_mask_t interfaces,
   if (error_state == false) {
     oc_send_cbor_response(request, oc_status_code);
   } else {
-    oc_send_response(request, OC_STATUS_BAD_OPTION);
+    oc_send_response_no_format(request, OC_STATUS_BAD_OPTION);
   }
   PRINT("-- End get_dpa_352_52\n");
 }
@@ -542,7 +542,7 @@ get_dpa_353_52(oc_request_t *request, oc_interface_mask_t interfaces,
   /* check if the accept header is CBOR */
   if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
     PRINT(" accept %d", request->accept);
-    oc_send_response(request, OC_STATUS_BAD_OPTION);
+    oc_send_response_no_format(request, OC_STATUS_BAD_OPTION);
     return;
   }
   // check the query parameter m with the various values
@@ -594,7 +594,7 @@ get_dpa_353_52(oc_request_t *request, oc_interface_mask_t interfaces,
       oc_rep_end_root_object();
     } else {
       /* device is NULL */
-      oc_send_cbor_response(request, OC_STATUS_BAD_OPTION);
+      oc_send_response_no_format(request, OC_STATUS_BAD_OPTION);
     }
     oc_send_cbor_response(request, OC_STATUS_OK);
     return;
@@ -612,7 +612,7 @@ get_dpa_353_52(oc_request_t *request, oc_interface_mask_t interfaces,
   if (error_state == false) {
     oc_send_cbor_response(request, oc_status_code);
   } else {
-    oc_send_response(request, OC_STATUS_BAD_OPTION);
+    oc_send_response_no_format(request, OC_STATUS_BAD_OPTION);
   }
   PRINT("-- End get_dpa_353_52\n");
 }
@@ -659,7 +659,7 @@ put_dpa_352_51(oc_request_t *request, oc_interface_mask_t interfaces,
   }
 
   PRINT("  Returning Error \n");
-  oc_send_response(request, OC_STATUS_BAD_REQUEST);
+  oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
   PRINT("-- End put_dpa_352_51\n");
 }
 
@@ -707,7 +707,7 @@ put_dpa_352_51_1(oc_request_t *request, oc_interface_mask_t interfaces,
   }
 
   PRINT("  Returning Error \n");
-  oc_send_response(request, OC_STATUS_BAD_REQUEST);
+  oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
   PRINT("-- End put_dpa_352_51_1\n");
 }
 
@@ -756,7 +756,7 @@ put_dpa_352_52(oc_request_t *request, oc_interface_mask_t interfaces,
   /* if the input is ok, then process the input document and assign the global
    * variables */
   PRINT("  Returning Error \n");
-  oc_send_response(request, OC_STATUS_BAD_REQUEST);
+  oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
   PRINT("-- End put_dpa_352_52\n");
 }
 
@@ -798,7 +798,7 @@ put_dpa_353_52(oc_request_t *request, oc_interface_mask_t interfaces,
     }
     rep = rep->next;
   }
-  oc_send_response(request, OC_STATUS_BAD_REQUEST);
+  oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
   PRINT("-- End put_dpa_353_52\n");
 }
 

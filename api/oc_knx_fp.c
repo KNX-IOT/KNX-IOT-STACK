@@ -151,7 +151,7 @@ int
 oc_core_set_group_object_table(int index, oc_group_object_table_t entry)
 {
   if (index >= oc_core_get_group_object_table_total_size()) {
-    OC_ERR("index to large index:%d %d", index,
+    OC_ERR("index too large index:%d %d", index,
            oc_core_get_group_object_table_total_size());
   }
   g_got[index].cflags = entry.cflags;
@@ -418,7 +418,7 @@ oc_core_fp_g_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   if (response_length > 0) {
     oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
   } else {
-    oc_send_linkformat_response(request, OC_STATUS_OK, 0);
+    oc_send_response_no_format(request, OC_STATUS_OK);
   }
 
   PRINT("oc_core_fp_g_get_handler - end\n");
@@ -477,14 +477,14 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 
   /* check if the accept header is cbor-format */
   if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
     return;
   }
 
   size_t device_index = request->resource->device;
   if (oc_knx_lsm_state(device_index) != LSM_S_LOADING) {
     OC_ERR(" not in loading state\n");
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    oc_send_response_no_format(request, OC_STATUS_METHOD_NOT_ALLOWED);
     return;
   }
 
@@ -504,7 +504,7 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       id = oc_table_find_id_from_rep(object);
       if (id == -1) {
         OC_ERR("  ERROR id %d", index);
-        oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+        oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
         return;
       }
       index = oc_core_find_index_in_group_object_table_from_id(id);
@@ -518,7 +518,7 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       index = find_empty_slot_in_group_object_table(id);
       if (index == -1) {
         OC_ERR("  ERROR index %d", index);
-        oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+        oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
         return;
       }
 
@@ -609,10 +609,10 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   PRINT("oc_core_fp_g_post_handler status=%d - end\n", (int)status_ok);
   if (status_ok) {
     oc_knx_increase_fingerprint();
-    oc_send_cbor_response_no_payload_size(request, return_status);
+    oc_send_response_no_format(request, return_status);
     return;
   }
-  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+  oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_fp_g, knx_fp_g_x, 0, "/fp/g",
@@ -652,13 +652,13 @@ oc_core_fp_g_x_get_handler(oc_request_t *request,
   int index = oc_core_find_index_in_group_object_table_from_id(id);
   PRINT("  id=%d index = %d\n", id, index);
   if (index == -1) {
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    oc_send_response_no_format(request, OC_STATUS_NOT_FOUND);
     return;
   }
 
   if (g_got[index].id == -1) {
     // it is empty
-    oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
+    oc_send_response_no_format(request, OC_STATUS_INTERNAL_SERVER_ERROR);
     return;
   }
 
@@ -686,23 +686,23 @@ oc_core_fp_g_x_del_handler(oc_request_t *request,
   (void)iface_mask;
   PRINT("oc_core_fp_g_x_del_handler\n");
 
+  size_t device_index = request->resource->device;
+  if (oc_knx_lsm_state(device_index) != LSM_S_LOADING) {
+    OC_ERR(" not in loading state\n");
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
+    return;
+  }
+
   int id = oc_uri_get_wildcard_value_as_int(
     oc_string(request->resource->uri), oc_string_len(request->resource->uri),
     request->uri_path, request->uri_path_len);
   int index = oc_core_find_index_in_group_object_table_from_id(id);
   PRINT("  id=%d index = %d\n", id, index);
 
-  size_t device_index = request->resource->device;
-  if (oc_knx_lsm_state(device_index) != LSM_S_LOADING) {
-    PRINT(" not in loading state\n");
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
-    return;
-  }
-
   PRINT(" deleting %d\n", index);
 
   if (index >= GOT_MAX_ENTRIES) {
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
     return;
   }
 
@@ -715,7 +715,7 @@ oc_core_fp_g_x_del_handler(oc_request_t *request,
   oc_knx_increase_fingerprint();
 
   PRINT("oc_core_fp_g_x_del_handler - end\n");
-  oc_send_cbor_response_no_payload_size(request, OC_STATUS_DELETED);
+  oc_send_response_no_format(request, OC_STATUS_DELETED);
 }
 
 #ifdef OC_PUBLISHER_TABLE
@@ -840,7 +840,7 @@ oc_core_fp_p_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   if (response_length > 0) {
     oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
   } else {
-    oc_send_linkformat_response(request, OC_STATUS_OK, 0);
+    oc_send_response_no_format(request, OC_STATUS_OK);
   }
 
   PRINT("oc_core_fp_p_get_handler - end\n");
@@ -862,6 +862,14 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
+
+  size_t device_index = request->resource->device;
+  if (oc_knx_lsm_state(device_index) != LSM_S_LOADING) {
+    OC_ERR(" not in loading state\n");
+    oc_send_response_no_format(request, OC_STATUS_METHOD_NOT_ALLOWED);
+    return;
+  }
+
   oc_print_rep_as_json(request->request_payload, true);
 
   int index = -1;
@@ -887,7 +895,7 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
                                           oc_core_get_publisher_table_size());
       if (index == -1) {
         PRINT("  ERROR index %d\n", index);
-        oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+        oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
         return;
       }
       g_gpt[index].id = id;
@@ -997,8 +1005,7 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 
   oc_knx_increase_fingerprint();
   PRINT("oc_core_fp_p_post_handler - end\n");
-  // oc_send_cbor_response(request, OC_STATUS_OK);
-  oc_send_cbor_response_no_payload_size(request, return_status);
+  oc_send_response_no_format(request, return_status);
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_fp_p, knx_fp_p_x, 0, "/fp/p",
@@ -1040,13 +1047,13 @@ oc_core_fp_p_x_get_handler(oc_request_t *request,
   PRINT("  id:%d index = %d\n", id, index);
 
   if (index == -1) {
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    oc_send_response_no_format(request, OC_STATUS_NOT_FOUND);
     return;
   }
 
   if (g_gpt[index].id == -1) {
     /* it is empty */
-    oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
+    oc_send_response_no_format(request, OC_STATUS_INTERNAL_SERVER_ERROR);
     return;
   }
 
@@ -1104,6 +1111,13 @@ oc_core_fp_p_x_del_handler(oc_request_t *request,
   (void)iface_mask;
   PRINT("oc_core_fp_p_x_del_handler\n");
 
+  size_t device_index = request->resource->device;
+  if (oc_knx_lsm_state(device_index) != LSM_S_LOADING) {
+    OC_ERR(" not in loading state\n");
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
+    return;
+  }
+
   int id = oc_uri_get_wildcard_value_as_int(
     oc_string(request->resource->uri), oc_string_len(request->resource->uri),
     request->uri_path, request->uri_path_len);
@@ -1111,7 +1125,7 @@ oc_core_fp_p_x_del_handler(oc_request_t *request,
     id, g_gpt, oc_core_get_publisher_table_size());
 
   if (index >= oc_core_get_publisher_table_size()) {
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
     return;
   }
 
@@ -1131,7 +1145,7 @@ oc_core_fp_p_x_del_handler(oc_request_t *request,
   oc_knx_increase_fingerprint();
   PRINT("oc_core_fp_p_x_del_handler - end\n");
 
-  oc_send_cbor_response_no_payload_size(request, OC_STATUS_DELETED);
+  oc_send_response_no_format(request, OC_STATUS_DELETED);
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_fp_p_x, knx_fp_r, 0, "/fp/p/*",
@@ -1225,7 +1239,7 @@ oc_core_fp_r_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   if (response_length > 0) {
     oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
   } else {
-    oc_send_linkformat_response(request, OC_STATUS_OK, 0);
+    oc_send_response_no_format(request, OC_STATUS_OK);
   }
 
   PRINT("oc_core_fp_r_get_handler - end\n");
@@ -1246,6 +1260,13 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     return;
   }
 
+  size_t device_index = request->resource->device;
+  if (oc_knx_lsm_state(device_index) != LSM_S_LOADING) {
+    OC_ERR(" not in loading state\n");
+    oc_send_response_no_format(request, OC_STATUS_METHOD_NOT_ALLOWED);
+    return;
+  }
+
   oc_print_rep_as_json(request->request_payload, true);
 
   int index = -1;
@@ -1260,7 +1281,7 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       id = oc_table_find_id_from_rep(object);
       if (id == -1) {
         OC_ERR("  ERROR id %d", index);
-        oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+        oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
         return;
       }
       index = oc_core_find_index_in_rp_table_from_id(
@@ -1276,7 +1297,7 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
                                           oc_core_get_recipient_table_size());
       if (index == -1) {
         OC_ERR("  ERROR index %d", index);
-        oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+        oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
         return;
       }
       g_grt[index].id = id;
@@ -1387,8 +1408,7 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   oc_knx_increase_fingerprint();
 
   PRINT("oc_core_fp_r_post_handler - end\n");
-  // oc_send_cbor_response(request, OC_STATUS_OK);
-  oc_send_cbor_response_no_payload_size(request, return_status);
+  oc_send_response_no_format(request, return_status);
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_fp_r, knx_fp_r_x, 0, "/fp/r",
@@ -1430,13 +1450,13 @@ oc_core_fp_r_x_get_handler(oc_request_t *request,
   PRINT("  id:%d index = %d\n", id, index);
 
   if (index == -1) {
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    oc_send_response_no_format(request, OC_STATUS_NOT_FOUND);
     return;
   }
 
   if (g_grt[index].id == -1) {
     // it is empty
-    oc_send_cbor_response(request, OC_STATUS_INTERNAL_SERVER_ERROR);
+    oc_send_response_no_format(request, OC_STATUS_INTERNAL_SERVER_ERROR);
     return;
   }
 
@@ -1452,17 +1472,17 @@ oc_core_fp_r_x_get_handler(oc_request_t *request,
     oc_rep_i_set_int(root, 13, g_grt[index].grpid);
   }
   // fid - 25
-  if (g_grt[index].ia > 0) {
+  if (g_grt[index].fid > 0) {
     oc_rep_i_set_int(root, 25, g_grt[index].fid);
   }
   // iid - 26
-  if (g_grt[index].ia > 0) {
+  if (g_grt[index].iid > 0) {
     oc_rep_i_set_int(root, 26, g_grt[index].iid);
   }
   // url- 10
   oc_rep_i_set_text_string(root, 10, oc_string(g_grt[index].url));
   // at - 14
-  if (oc_string_len(g_gpt[index].at) > 0) {
+  if (oc_string_len(g_grt[index].at) > 0) {
     oc_rep_i_set_text_string(root, 14, oc_string(g_grt[index].at));
   }
   // ga - 7
@@ -1484,6 +1504,13 @@ oc_core_fp_r_x_del_handler(oc_request_t *request,
   (void)iface_mask;
   PRINT("oc_core_fp_r_x_del_handler\n");
 
+  size_t device_index = request->resource->device;
+  if (oc_knx_lsm_state(device_index) != LSM_S_LOADING) {
+    OC_ERR(" not in loading state\n");
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
+    return;
+  }
+
   int id = oc_uri_get_wildcard_value_as_int(
     oc_string(request->resource->uri), oc_string_len(request->resource->uri),
     request->uri_path, request->uri_path_len);
@@ -1491,7 +1518,7 @@ oc_core_fp_r_x_del_handler(oc_request_t *request,
     oc_core_find_index_in_rp_table_from_id(id, g_grt, GRT_MAX_ENTRIES);
 
   if (index >= GRT_MAX_ENTRIES) {
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
     return;
   }
   PRINT("oc_core_fp_r_x_del_handler: deleting id %d at index %d\n", id, index);
@@ -1512,7 +1539,7 @@ oc_core_fp_r_x_del_handler(oc_request_t *request,
 
   PRINT("oc_core_fp_r_x_del_handler - end\n");
 
-  oc_send_cbor_response_no_payload_size(request, OC_STATUS_DELETED);
+  oc_send_response_no_format(request, OC_STATUS_DELETED);
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_fp_r_x, knx_p, 0, "/fp/r/*",
@@ -2187,7 +2214,7 @@ oc_core_add_rp_entry(int index, oc_group_rp_table_t *rp_table,
                      int rp_table_size, oc_group_rp_table_t entry)
 {
   if (index >= rp_table_size) {
-    OC_ERR("recipient table index is to large: index(%d) max_size(%d)", index,
+    OC_ERR("recipient table index is too large: index(%d) max_size(%d)", index,
            rp_table_size);
   }
 

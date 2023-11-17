@@ -283,7 +283,7 @@ oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   }
 
   PRINT(" invalid command\n");
-  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+  oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
   return;
 }
 
@@ -426,7 +426,7 @@ oc_core_knx_lsm_get_handler(oc_request_t *request,
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device == NULL) {
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
     return;
   }
   oc_lsm_state_t lsm = oc_knx_lsm_state(device_index);
@@ -458,7 +458,7 @@ oc_core_knx_lsm_post_handler(oc_request_t *request,
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device == NULL) {
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
     return;
   }
 
@@ -510,7 +510,7 @@ oc_core_knx_lsm_post_handler(oc_request_t *request,
     return;
   }
 
-  oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+  oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_lsm, knx_dot_knx, 0, "/a/lsm", OC_IF_C,
@@ -550,7 +550,7 @@ oc_core_knx_k_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device == NULL) {
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
     return;
   }
 
@@ -905,8 +905,7 @@ oc_core_knx_k_post_handler(oc_request_t *request,
     return;
   }
   // send the response
-  // oc_send_cbor_response(request, OC_STATUS_OK);
-  oc_send_cbor_response_no_payload_size(request, OC_STATUS_OK);
+  oc_send_response_no_format(request, OC_STATUS_OK);
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_dot_knx, knx_g, 0, "/.knx",
@@ -965,6 +964,15 @@ oc_core_knx_fingerprint_get_handler(oc_request_t *request,
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
+
+  // check if the state is loaded
+  size_t device_index = request->resource->device;
+  if (oc_knx_lsm_state(device_index) != LSM_S_LOADED) {
+    OC_ERR(" not in loaded state\n");
+    oc_send_response_no_format(request, OC_STATUS_SERVICE_UNAVAILABLE);
+    return;
+  }
+
   // cbor_encode_uint(&g_encoder, g_fingerprint);
   oc_rep_begin_root_object();
   oc_rep_i_set_int(root, 1, g_fingerprint);
@@ -1003,7 +1011,7 @@ oc_core_knx_ia_post_handler(oc_request_t *request,
 
   /* check if the accept header is CBOR-format */
   if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
     return;
   }
 
@@ -1046,10 +1054,9 @@ oc_core_knx_ia_post_handler(oc_request_t *request,
       knx_publish_service(oc_string(device->serialnumber), device->iid,
                           device->ia, device->pm);
     }
-    // oc_send_cbor_response(request, OC_STATUS_CHANGED);
-    oc_send_cbor_response_no_payload_size(request, OC_STATUS_CHANGED);
+    oc_send_response_no_format(request, OC_STATUS_CHANGED);
   } else {
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
   }
 }
 
@@ -1274,8 +1281,8 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
   // check if the state is unloaded
   size_t device_index = request->resource->device;
   if (oc_knx_lsm_state(device_index) != LSM_S_UNLOADED) {
-    PRINT(" not in unloading state\n");
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    OC_ERR(" not in unloaded state\n");
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
     return;
   }
 
@@ -1313,7 +1320,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
   }
 
   if (valid_request == 0) {
-    oc_send_cbor_response(request, OC_STATUS_BAD_REQUEST);
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
   }
   rep = request->request_payload;
 

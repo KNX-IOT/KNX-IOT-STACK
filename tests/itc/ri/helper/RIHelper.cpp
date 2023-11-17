@@ -226,7 +226,7 @@ RIHelper::postLightCb(oc_request_t *request, oc_interface_mask_t interface,
       PRINT("value: %d\n", state);
       break;
     default:
-      oc_send_response(request, OC_STATUS_BAD_REQUEST);
+      oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
       return;
       break;
     }
