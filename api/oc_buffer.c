@@ -291,3 +291,13 @@ oc_get_incoming_message_with_ptr(uint8_t *data)
   }
   return NULL;
 }
+
+int oc_buffer_num_free_incoming()
+{
+  return oc_memb_numfree(&oc_incoming_buffers);
+}
+
+int oc_buffer_num_free_outgoing()
+{
+  return oc_memb_numfree(&oc_outgoing_buffers);
+}
