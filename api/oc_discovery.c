@@ -310,6 +310,14 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   size_t device_index = request->resource->device;
   oc_device_info_t *device = oc_core_get_device_info(device_index);
 
+  PRINT("qlen %d\nflag %d\n", request->query_len, request->origin->flags);
+  /* handle multicast with no queries */
+  if (request->query_len == 0 && request->origin && (request->origin->flags & MULTICAST) != 0) {
+    response_length = frame_sn(oc_string(device->serialnumber), device->iid, device->ia);
+    oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
+    return;
+  }
+
   // handle query parameters: l=ps l=total
   if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
     // example : < / fp / r / ? l = total>; total = 22; ps = 5
@@ -466,7 +474,6 @@ oc_wkcore_discovery_handler(oc_request_t *request,
           response_length =
             frame_sn(oc_string(device->serialnumber), device->iid, device->ia);
           oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
-          matches = 1;
           return;
         }
       }
@@ -517,7 +524,6 @@ oc_wkcore_discovery_handler(oc_request_t *request,
       response_length =
         frame_sn(oc_string(device->serialnumber), device->iid, device->ia);
       oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
-      matches = 1;
     } else {
       oc_ignore_request(request);
     }
