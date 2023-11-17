@@ -312,8 +312,10 @@ oc_wkcore_discovery_handler(oc_request_t *request,
 
   PRINT("qlen %d\nflag %d\n", request->query_len, request->origin->flags);
   /* handle multicast with no queries */
-  if (request->query_len == 0 && request->origin && (request->origin->flags & MULTICAST) != 0) {
-    response_length = frame_sn(oc_string(device->serialnumber), device->iid, device->ia);
+  if (request->query_len == 0 && request->origin &&
+      (request->origin->flags & MULTICAST) != 0) {
+    response_length =
+      frame_sn(oc_string(device->serialnumber), device->iid, device->ia);
     oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
     return;
   }
