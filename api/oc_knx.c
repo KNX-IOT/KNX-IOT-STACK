@@ -624,7 +624,7 @@ oc_core_knx_k_post_handler(oc_request_t *request,
   oc_rep_t *rep_value = NULL;
   char ip_address[100];
 
-  PRINT("KNX K POST Handler");
+  PRINT("KNX K POST Handler\n");
   PRINT("Decoded Payload:\n");
   oc_print_rep_as_json(request->request_payload, true);
 
@@ -642,6 +642,8 @@ oc_core_knx_k_post_handler(oc_request_t *request,
   if (g_ignore_smessage_from_self) {
     // check if incoming message is from myself.
     // if so, then return with bad request
+    // Note: The same device can have multiple IP addresses,
+    // so all endpoints for this device need to be compared against.
     oc_endpoint_t *origin = request->origin;
     if (origin != NULL) {
       PRINT("k post : origin of message:");
@@ -650,16 +652,18 @@ oc_core_knx_k_post_handler(oc_request_t *request,
     }
 
     oc_endpoint_t *my_ep = oc_connectivity_get_endpoints(0);
-    if (my_ep != NULL) {
-      PRINT("k post : myself:");
-      PRINTipaddr(*my_ep);
+    oc_endpoint_t *ep_i = NULL;
+
+    for (ep_i = my_ep; ep_i != NULL; ep_i = ep_i->next) {
+      PRINTipaddr(*ep_i);
       PRINT("\n");
-    }
-    if (oc_endpoint_compare_address(origin, my_ep) == 0) {
-      if (origin->addr.ipv6.port == my_ep->addr.ipv6.port) {
-        request->response->response_buffer->code = oc_status_code(OC_IGNORE);
-        PRINT(" same address and port: not handling message");
-        return;
+
+      if (oc_endpoint_compare_address(origin, ep_i) == 0) {
+        if (origin->addr.ipv6.port == ep_i->addr.ipv6.port) {
+          request->response->response_buffer->code = oc_status_code(OC_IGNORE);
+          PRINT(" same address and port: not handling message");
+          return;
+        }
       }
     }
   }
