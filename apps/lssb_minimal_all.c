@@ -238,7 +238,7 @@ get_o_1_1(oc_request_t *request, oc_interface_mask_t interfaces,
           snprintf(mystring, 99, "urn:knx:sn:%s%s",
                    oc_string(device->serialnumber),
                    oc_string(request->resource->uri));
-          oc_rep_i_set_text_string(root, 9, mystring);
+          oc_rep_i_set_text_string(root, 0, mystring);
         }
         // resource types
         if ((strncmp(m, "rt", m_len) == 0) | (strncmp(m, "*", m_len) == 0)) {
