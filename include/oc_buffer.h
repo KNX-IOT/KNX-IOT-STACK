@@ -91,6 +91,22 @@ void oc_recv_message(oc_message_t *message);
 void oc_send_message(oc_message_t *message);
 
 /**
+ * @brief Get the number of incoming buffers. If this reaches zero, the KNX-IoT
+ * stack will drop further received UDP messages
+ *
+ * @return int the number of buffers
+ */
+int oc_buffer_num_free_incoming();
+
+/**
+ * @brief Get the number of outgoing buffers. If this is zero and you attempt
+ * to send out a message, it will be silently dropped
+ *
+ * @return int the number of buffers
+ */
+int oc_buffer_num_free_outgoing();
+
+/**
  * @brief close all tls session for the specific device
  *
  * @param device the device index
