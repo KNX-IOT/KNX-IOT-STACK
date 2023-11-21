@@ -299,7 +299,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   if (request->query_len > 0 && !query_match) {
     if (request->origin && (request->origin->flags & MULTICAST) == 0) {
       // for unicast
-      oc_send_response_no_format(request, OC_STATUS_OK);
+      oc_send_linkformat_response(request, OC_STATUS_OK, 0);
     } else {
       oc_ignore_request(request);
     }
@@ -378,7 +378,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
     if (ret) {
       oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
     } else {
-      oc_send_response_no_format(request, OC_STATUS_OK);
+      oc_send_linkformat_response(request, OC_STATUS_OK, 0);
     }
     return;
   }
@@ -583,7 +583,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
           (int)response_length);
     oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
   } else if (request->origin && (request->origin->flags & MULTICAST) == 0) {
-    oc_send_response_no_format(request, OC_STATUS_OK);
+    oc_send_linkformat_response(request, OC_STATUS_OK, 0);
   } else {
     oc_ignore_request(request);
   }
