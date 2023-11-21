@@ -768,10 +768,10 @@ bool oc_ri_is_app_resource_valid(const oc_resource_t *resource);
  * @return true new request valid
  * @return false new request invalid
  */
-bool oc_ri_new_request_from_request(oc_request_t new_request,
-                                    oc_request_t request,
-                                    oc_response_buffer_t response_buffer,
-                                    oc_response_t response_obj);
+bool oc_ri_new_request_from_request(oc_request_t *new_request,
+                                    oc_request_t *request,
+                                    oc_response_buffer_t *response_buffer,
+                                    oc_response_t *response_obj);
 
 #ifdef __cplusplus
 }

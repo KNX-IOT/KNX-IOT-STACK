@@ -805,8 +805,8 @@ oc_core_knx_k_post_handler(oc_request_t *request,
   memset(&response_buffer, 0, sizeof(oc_response_buffer_t));
   oc_response_t response_obj;
   memset(&response_obj, 0, sizeof(oc_response_t));
-  oc_ri_new_request_from_request(new_request, *request, response_buffer,
-                                 response_obj);
+  oc_ri_new_request_from_request(&new_request, request, &response_buffer,
+                                 &response_obj);
   new_request.request_payload = oc_s_mode_get_value(request);
   // new style
   new_request.uri_path = "k";
