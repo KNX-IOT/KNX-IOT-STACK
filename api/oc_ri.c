@@ -364,8 +364,8 @@ oc_ri_new_request_from_request(oc_request_t *new_request, oc_request_t *request,
   response_buffer->max_age = 0;
 
   response_obj->separate_response = NULL;
-  response_obj->response_buffer = &response_buffer;
-  new_request->response = &response_obj;
+  response_obj->response_buffer = response_buffer;
+  new_request->response = response_obj;
 
   return true;
 }
