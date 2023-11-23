@@ -266,9 +266,11 @@ oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   // CHANGED and with payload containing Error Code and Process Time in seconds
   // as defined 691 for the Response to a Master Reset Request for KNX Classic
   // devices, see [10].
-  if (error == false) {
-
-    // oc_rep_begin_root_object ();
+  if (error == true) {
+    PRINT(" invalid command\n");
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
+    return;
+  } else if (cmd == RESET_DEVICE) {
     oc_rep_begin_root_object();
 
     // TODO note need to figure out how to fill in the correct response values
@@ -281,10 +283,6 @@ oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
     return;
   }
-
-  PRINT(" invalid command\n");
-  oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
-  return;
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx, knx_fp_g, 0, "/.well-known/knx",
