@@ -475,27 +475,27 @@ oc_core_auth_at_get_handler(oc_request_t *request,
   }
 
   // handle query parameters: l=ps l=total
-  if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
-    // example : < / fp / r / ? l = total>; total = 22; ps = 5
+  // if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
+  //   // example : < / fp / r / ? l = total>; total = 22; ps = 5
 
-    length = oc_frame_query_l("/auth/at", ps_exists, total_exists);
-    response_length += length;
-    if (ps_exists) {
-      length = oc_rep_add_line_to_buffer(";ps=");
-      response_length += length;
-      length = oc_frame_integer(oc_core_get_at_table_size());
-      response_length += length;
-    }
-    if (total_exists) {
-      length = oc_rep_add_line_to_buffer(";total=");
-      response_length += length;
-      length = oc_frame_integer(oc_core_find_nr_used_in_auth_at_table());
-      response_length += length;
-    }
+  //   length = oc_frame_query_l("/auth/at", ps_exists, total_exists);
+  //   response_length += length;
+  //   if (ps_exists) {
+  //     length = oc_rep_add_line_to_buffer(";ps=");
+  //     response_length += length;
+  //     length = oc_frame_integer(oc_core_get_at_table_size());
+  //     response_length += length;
+  //   }
+  //   if (total_exists) {
+  //     length = oc_rep_add_line_to_buffer(";total=");
+  //     response_length += length;
+  //     length = oc_frame_integer(oc_core_find_nr_used_in_auth_at_table());
+  //     response_length += length;
+  //   }
 
-    oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
-    return;
-  }
+  //   oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
+  //   return;
+  // }
 
   /* example entry: </auth/at/token-id>;ct=50 */
   for (i = 0; i < G_AT_MAX_ENTRIES; i++) {

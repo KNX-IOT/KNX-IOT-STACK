@@ -77,37 +77,37 @@ oc_core_p_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   size_t device_index = request->resource->device;
 
   // handle query parameters: l=ps l=total
-  if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
-    // example : < /p > l = total>;total=22;ps=5
-    length = oc_frame_query_l("/p", ps_exists, total_exists);
+  // if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
+  //   // example : < /p > l = total>;total=22;ps=5
+  //   length = oc_frame_query_l("/p", ps_exists, total_exists);
 
-    // count the discoverable resources
-    int matches = 0;
-    const oc_resource_t *resource = oc_ri_get_app_resources();
-    for (; resource; resource = resource->next) {
-      if (resource->device != device_index ||
-          (resource->properties & OC_DISCOVERABLE)) {
-        continue;
-      }
-      matches++;
-    }
+  //   // count the discoverable resources
+  //   int matches = 0;
+  //   const oc_resource_t *resource = oc_ri_get_app_resources();
+  //   for (; resource; resource = resource->next) {
+  //     if (resource->device != device_index ||
+  //         (resource->properties & OC_DISCOVERABLE)) {
+  //       continue;
+  //     }
+  //     matches++;
+  //   }
 
-    response_length += length;
-    if (ps_exists) {
-      length = oc_rep_add_line_to_buffer(";ps=");
-      response_length += length;
-      length = oc_frame_integer(matches);
-      response_length += length;
-    }
-    if (total_exists) {
-      length = oc_rep_add_line_to_buffer(";total=");
-      response_length += length;
-      length = oc_frame_integer(matches);
-      response_length += length;
-    }
-    oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
-    return;
-  }
+  //   response_length += length;
+  //   if (ps_exists) {
+  //     length = oc_rep_add_line_to_buffer(";ps=");
+  //     response_length += length;
+  //     length = oc_frame_integer(matches);
+  //     response_length += length;
+  //   }
+  //   if (total_exists) {
+  //     length = oc_rep_add_line_to_buffer(";total=");
+  //     response_length += length;
+  //     length = oc_frame_integer(matches);
+  //     response_length += length;
+  //   }
+  //   oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
+  //   return;
+  // }
 
   bool added = oc_add_data_points_to_response(request, device_index,
                                               &response_length, matches);

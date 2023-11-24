@@ -454,27 +454,27 @@ oc_core_fp_gm_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   }
 
   // handle query parameters: l=ps l=total
-  if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
-    // example : < / fp / r / ? l = total>; total = 22; ps = 5
+  // if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
+  //   // example : < / fp / r / ? l = total>; total = 22; ps = 5
 
-    length = oc_frame_query_l("/fp/gm", ps_exists, total_exists);
-    response_length += length;
-    if (ps_exists) {
-      length = oc_rep_add_line_to_buffer(";ps=");
-      response_length += length;
-      length = oc_frame_integer(oc_core_get_group_mapping_table_size());
-      response_length += length;
-    }
-    if (total_exists) {
-      length = oc_rep_add_line_to_buffer(";total=");
-      response_length += length;
-      length = oc_frame_integer(oc_core_find_nr_used_in_group_mapping_table());
-      response_length += length;
-    }
+  //   length = oc_frame_query_l("/fp/gm", ps_exists, total_exists);
+  //   response_length += length;
+  //   if (ps_exists) {
+  //     length = oc_rep_add_line_to_buffer(";ps=");
+  //     response_length += length;
+  //     length = oc_frame_integer(oc_core_get_group_mapping_table_size());
+  //     response_length += length;
+  //   }
+  //   if (total_exists) {
+  //     length = oc_rep_add_line_to_buffer(";total=");
+  //     response_length += length;
+  //     length = oc_frame_integer(oc_core_find_nr_used_in_group_mapping_table());
+  //     response_length += length;
+  //   }
 
-    oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
-    return;
-  }
+  //   oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
+  //   return;
+  // }
 
   /* example entry: </fp/gm/1>;ct=60 (cbor)*/
   for (i = 0; i < oc_core_get_group_mapping_table_size(); i++) {
@@ -1418,26 +1418,26 @@ oc_core_f_netip_get_handler(oc_request_t *request,
 #ifdef OC_IOT_ROUTER
 
   // handle query parameters: l=ps l=total
-  if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
-    // example : < / fp / r / ? l = total>; total = 22; ps = 5
+  // if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
+  //   // example : < / fp / r / ? l = total>; total = 22; ps = 5
 
-    length = oc_frame_query_l("/fp/gm", ps_exists, total_exists);
-    response_length += length;
-    if (ps_exists) {
-      length = oc_rep_add_line_to_buffer(";ps=");
-      response_length += length;
-      length = oc_frame_integer(5);
-      response_length += length;
-    }
-    if (total_exists) {
-      length = oc_rep_add_line_to_buffer(";total=");
-      response_length += length;
-      length = oc_frame_integer(5);
-      response_length += length;
-    }
-    oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
-    return;
-  }
+  //   length = oc_frame_query_l("/fp/gm", ps_exists, total_exists);
+  //   response_length += length;
+  //   if (ps_exists) {
+  //     length = oc_rep_add_line_to_buffer(";ps=");
+  //     response_length += length;
+  //     length = oc_frame_integer(5);
+  //     response_length += length;
+  //   }
+  //   if (total_exists) {
+  //     length = oc_rep_add_line_to_buffer(";total=");
+  //     response_length += length;
+  //     length = oc_frame_integer(5);
+  //     response_length += length;
+  //   }
+  //   oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
+  //   return;
+  // }
 
   length = oc_rep_add_line_to_buffer("</p/netip/mcast>");
   response_length += length;

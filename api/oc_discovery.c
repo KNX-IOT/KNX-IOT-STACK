@@ -320,35 +320,35 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   }
 
   // handle query parameters: l=ps l=total
-  if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
-    // example : < / fp / r / ? l = total>; total = 22; ps = 5
+  // if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
+  //   // example : < / fp / r / ? l = total>; total = 22; ps = 5
 
-    length = oc_frame_query_l("/.well-known/core", ps_exists, total_exists);
-    response_length += length;
-    // count the application functional blocks
-    int nr_functional_blocks = oc_count_functional_blocks(device_index);
-    // add the others that always be there
-    // - dev
-    // - swu
-    // - auth
-    // and the <ep> entry
-    nr_functional_blocks += 4;
-    if (ps_exists) {
-      length = oc_rep_add_line_to_buffer(";ps=");
-      response_length += length;
-      length = oc_frame_integer(nr_functional_blocks);
-      response_length += length;
-    }
-    if (total_exists) {
-      length = oc_rep_add_line_to_buffer(";total=");
-      response_length += length;
-      length = oc_frame_integer(nr_functional_blocks);
-      response_length += length;
-    }
+  //   length = oc_frame_query_l("/.well-known/core", ps_exists, total_exists);
+  //   response_length += length;
+  //   // count the application functional blocks
+  //   int nr_functional_blocks = oc_count_functional_blocks(device_index);
+  //   // add the others that always be there
+  //   // - dev
+  //   // - swu
+  //   // - auth
+  //   // and the <ep> entry
+  //   nr_functional_blocks += 4;
+  //   if (ps_exists) {
+  //     length = oc_rep_add_line_to_buffer(";ps=");
+  //     response_length += length;
+  //     length = oc_frame_integer(nr_functional_blocks);
+  //     response_length += length;
+  //   }
+  //   if (total_exists) {
+  //     length = oc_rep_add_line_to_buffer(";total=");
+  //     response_length += length;
+  //     length = oc_frame_integer(nr_functional_blocks);
+  //     response_length += length;
+  //   }
 
-    oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
-    return;
-  }
+  //   oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
+  //   return;
+  // }
 
   /* if device is belongs to a group address
      ?d=urn:knx:g.s.[ga]

@@ -598,33 +598,33 @@ oc_core_dev_ipv6_get_handler(oc_request_t *request,
   }
 
   // handle query parameters: l=ps l=total
-  if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
-    // example : < / fp / r / ? l = total>; total = 22; ps = 5
-    int length;
-    int response_length = 0;
+  // if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
+  //   // example : < / fp / r / ? l = total>; total = 22; ps = 5
+  //   int length;
+  //   int response_length = 0;
 
-    // get the device structure from the request.
-    size_t device_index = request->resource->device;
+  //   // get the device structure from the request.
+  //   size_t device_index = request->resource->device;
 
-    length = oc_frame_query_l("/dev/ipv6", ps_exists, total_exists);
-    response_length += length;
-    // count the application functional blocks
-    if (ps_exists) {
-      length = oc_rep_add_line_to_buffer(";ps=");
-      response_length += length;
-      length = oc_frame_integer(1);
-      response_length += length;
-    }
-    if (total_exists) {
-      length = oc_rep_add_line_to_buffer(";total=");
-      response_length += length;
-      length = oc_frame_integer(1);
-      response_length += length;
-    }
+  //   length = oc_frame_query_l("/dev/ipv6", ps_exists, total_exists);
+  //   response_length += length;
+  //   // count the application functional blocks
+  //   if (ps_exists) {
+  //     length = oc_rep_add_line_to_buffer(";ps=");
+  //     response_length += length;
+  //     length = oc_frame_integer(1);
+  //     response_length += length;
+  //   }
+  //   if (total_exists) {
+  //     length = oc_rep_add_line_to_buffer(";total=");
+  //     response_length += length;
+  //     length = oc_frame_integer(1);
+  //     response_length += length;
+  //   }
 
-    oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
-    return;
-  }
+  //   oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
+  //   return;
+  // }
 
   // get the device
   size_t device_index = request->resource->device;
@@ -1335,21 +1335,21 @@ oc_core_ap_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   }
 
   // handle query parameters: l=ps l=total
-  if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
-    // example : < /ap > l = total>;total=22;ps=5
-    length = oc_frame_query_l("/ap", ps_exists, total_exists);
-    response_length += length;
-    if (ps_exists) {
-      length = oc_rep_add_line_to_buffer(";ps=1");
-      response_length += length;
-    }
-    if (total_exists) {
-      length = oc_rep_add_line_to_buffer(";total=1");
-      response_length += length;
-    }
-    oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
-    return;
-  }
+  // if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
+  //   // example : < /ap > l = total>;total=22;ps=5
+  //   length = oc_frame_query_l("/ap", ps_exists, total_exists);
+  //   response_length += length;
+  //   if (ps_exists) {
+  //     length = oc_rep_add_line_to_buffer(";ps=1");
+  //     response_length += length;
+  //   }
+  //   if (total_exists) {
+  //     length = oc_rep_add_line_to_buffer(";total=1");
+  //     response_length += length;
+  //   }
+  //   oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
+  //   return;
+  // }
 
   // Add /ap/pv
   size_t device_index = request->resource->device;

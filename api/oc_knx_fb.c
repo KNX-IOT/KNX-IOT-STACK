@@ -152,29 +152,29 @@ oc_core_fb_x_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   size_t device_index = request->resource->device;
 
   // handle query parameters: l=ps l=total
-  if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
-    // example : < / fp / r / ? l = total>; total = 22; ps = 5
+  // if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
+  //   // example : < / fp / r / ? l = total>; total = 22; ps = 5
 
-    length = oc_frame_query_l("/fp/gm", ps_exists, total_exists);
-    response_length += length;
-    if (ps_exists) {
-      length = oc_rep_add_line_to_buffer(";ps=");
-      response_length += length;
-      length = oc_frame_integer(
-        oc_core_count_dp_in_fb(device_index, instance, fb_value));
-      response_length += length;
-    }
-    if (total_exists) {
-      length = oc_rep_add_line_to_buffer(";total=");
-      response_length += length;
-      length = oc_frame_integer(
-        oc_core_count_dp_in_fb(device_index, instance, fb_value));
-      response_length += length;
-    }
+  //   length = oc_frame_query_l("/fp/gm", ps_exists, total_exists);
+  //   response_length += length;
+  //   if (ps_exists) {
+  //     length = oc_rep_add_line_to_buffer(";ps=");
+  //     response_length += length;
+  //     length = oc_frame_integer(
+  //       oc_core_count_dp_in_fb(device_index, instance, fb_value));
+  //     response_length += length;
+  //   }
+  //   if (total_exists) {
+  //     length = oc_rep_add_line_to_buffer(";total=");
+  //     response_length += length;
+  //     length = oc_frame_integer(
+  //       oc_core_count_dp_in_fb(device_index, instance, fb_value));
+  //     response_length += length;
+  //   }
 
-    oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
-    return;
-  }
+  //   oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
+  //   return;
+  // }
 
   // do the actual creation of the payload, e.g. the data points per functional
   // block instance
@@ -471,27 +471,27 @@ oc_core_fb_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   size_t device_index = request->resource->device;
 
   // handle query parameters: l=ps l=total
-  if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
-    // example : < / fp / r / ? l = total>; total = 22; ps = 5
+  // if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
+  //   // example : < / fp / r / ? l = total>; total = 22; ps = 5
 
-    length = oc_frame_query_l("/auth/at", ps_exists, total_exists);
-    response_length += length;
-    if (ps_exists) {
-      length = oc_rep_add_line_to_buffer(";ps=");
-      response_length += length;
-      length = oc_frame_integer(g_nr_functional_blocks);
-      response_length += length;
-    }
-    if (total_exists) {
-      length = oc_rep_add_line_to_buffer(";total=");
-      response_length += length;
-      length = oc_frame_integer(g_nr_functional_blocks);
-      response_length += length;
-    }
+  //   length = oc_frame_query_l("/auth/at", ps_exists, total_exists);
+  //   response_length += length;
+  //   if (ps_exists) {
+  //     length = oc_rep_add_line_to_buffer(";ps=");
+  //     response_length += length;
+  //     length = oc_frame_integer(g_nr_functional_blocks);
+  //     response_length += length;
+  //   }
+  //   if (total_exists) {
+  //     length = oc_rep_add_line_to_buffer(";total=");
+  //     response_length += length;
+  //     length = oc_frame_integer(g_nr_functional_blocks);
+  //     response_length += length;
+  //   }
 
-    oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
-    return;
-  }
+  //   oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
+  //   return;
+  // }
 
   bool added = oc_add_function_blocks_to_response(request, device_index,
                                                   &response_length, matches);
