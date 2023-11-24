@@ -27,6 +27,10 @@
 extern "C" {
 #endif
 
+#ifndef PAGE_SIZE
+#define PAGE_SIZE 50
+#endif
+
 /**
  * @brief helper function to check if query parameter l exists
  *
@@ -53,7 +57,7 @@ int check_if_query_l_exist(oc_request_t *request, bool *ps_exists,
  * @param total_exists frame total
  * @return total bytes framed
  */
-int oc_frame_query_l(char *url, bool ps_exists, bool total_exists);
+int oc_frame_query_l(char *url, bool ps_exists, bool total_exists, int total);
 
 /**
  * @brief helper function to check if query parameter pn or ps exists

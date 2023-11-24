@@ -34,7 +34,7 @@ check_if_query_l_exist(oc_request_t *request, bool *ps_exists,
   // handle query parameters
   if (oc_query_values_available(request)) {
     // check if l exist
-    if (oc_query_value_exists(request, "l")) {
+    if (oc_query_value_exists(request, "l") > -1) {
       // find out if l=ps and or l=total
       bool more_query_params;
       char *value = NULL;
@@ -67,7 +67,7 @@ check_if_query_l_exist(oc_request_t *request, bool *ps_exists,
 }
 
 int
-oc_frame_query_l(char *url, bool ps_exists, bool total_exists)
+oc_frame_query_l(char *url, bool ps_exists, bool total_exists, int total)
 {
   // example : < / fp / r / ? l = total>; total = 22; ps = 5
   // spec 1.1. : no query arguments anymore in the url
@@ -82,21 +82,18 @@ oc_frame_query_l(char *url, bool ps_exists, bool total_exists)
   length = oc_rep_add_line_to_buffer(">");
   response_length += length;
 
-  /*
-  if (ps_exists && total_exists) {
-    length = oc_rep_add_line_to_buffer("?l=ps;l=total>");
+  if (ps_exists) {
+    length = oc_rep_add_line_to_buffer(";ps=");
     response_length += length;
-  } else if (ps_exists) {
-    length = oc_rep_add_line_to_buffer("?l=ps>");
-    response_length += length;
-  } else if (total_exists) {
-    length = oc_rep_add_line_to_buffer("?l=total>");
-    response_length += length;
-  } else {
-    length = oc_rep_add_line_to_buffer(">");
+    length = oc_frame_integer(PAGE_SIZE);
     response_length += length;
   }
-  */
+  if (total_exists) {
+    length = oc_rep_add_line_to_buffer(";total=");
+    response_length += length;
+    length = oc_frame_integer(total);
+    response_length += length;
+  }
 
   return response_length;
 }
@@ -119,13 +116,14 @@ check_if_query_pn_exist(oc_request_t *request, int *pn_value, int *ps_value)
 
   // handle query parameters
   if (oc_query_values_available(request)) {
+    oc_init_query_iterator();
     // check if pn exist
-    if (oc_query_value_exists(request, "pn")) {
+    if (oc_query_value_exists(request, "pn") > -1) {
       oc_iterate_query_get_values(request, "pn", &value, &value_len);
       *pn_value = atoi(value);
     }
     oc_init_query_iterator();
-    if (oc_query_value_exists(request, "ps")) {
+    if (oc_query_value_exists(request, "ps") > -1) {
       oc_iterate_query_get_values(request, "ps", &value, &value_len);
       *ps_value = atoi(value);
     }
