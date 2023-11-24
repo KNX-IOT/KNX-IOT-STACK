@@ -101,17 +101,18 @@ oc_frame_query_l(char *url, bool ps_exists, bool total_exists, int total)
 int
 check_if_query_pn_exist(oc_request_t *request, int *pn_value, int *ps_value)
 {
+  (void) ps_value;
   char *value = NULL;
   int value_len = -1;
 
   if (pn_value == NULL) {
     return 0;
   }
-  if (ps_value == NULL) {
-    return 0;
-  }
+  // if (ps_value == NULL) {
+  //   return 0;
+  // }
 
-  *ps_value = -1;
+  // *ps_value = -1;
   *pn_value = -1;
 
   // handle query parameters
@@ -129,9 +130,9 @@ check_if_query_pn_exist(oc_request_t *request, int *pn_value, int *ps_value)
     }
   } /* query available */
 
-  if (*ps_value > -1) {
-    return 1;
-  }
+  // if (*ps_value > -1) {
+  //   return 1;
+  // }
   if (*pn_value > -1) {
     return 1;
   }

@@ -586,6 +586,7 @@ oc_core_dev_ipv6_get_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
+
   bool ps_exists = false;
   bool total_exists = false;
   int ps_value = -1;
@@ -789,7 +790,7 @@ oc_core_dev_dev_get_handler(oc_request_t *request,
   bool total_exists = false;
   int total = (int)OC_DEV;
   int first_resource = OC_DEV_SN;
-  int query_ps = -1;
+  // int query_ps = -1;
   int query_pn = -1;
 
   PRINT("oc_core_dev_dev_get_handler\n");
@@ -812,11 +813,11 @@ oc_core_dev_dev_get_handler(oc_request_t *request,
   }
 
   // handle query with page number (pn)
-  if (check_if_query_pn_exist(request, &query_pn, &query_ps)) {
-    first_resource += (query_ps > -1) ?  query_pn * query_ps : query_pn * PAGE_SIZE;
+  if (check_if_query_pn_exist(request, &query_pn, NULL)) {
+    first_resource += query_pn * PAGE_SIZE;
   }
 
-  for (i = first_resource; i < total; i++) {
+  for (i = first_resource; i < first_resource + PAGE_SIZE; i++) {
     const oc_resource_t *resource =
       oc_core_get_resource_by_index(i, device_index);
     if (oc_filter_resource(resource, request, device_index, &response_length,
