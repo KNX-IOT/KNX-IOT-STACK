@@ -586,11 +586,34 @@ oc_core_dev_ipv6_get_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
+  int i;
 
+  int ps = 1;
   bool ps_exists = false;
   bool total_exists = false;
-  int ps_value = -1;
-  int pn_value = -1;
+  int total = 0;
+  int first_resource = OC_DEV_SN;
+  // int query_ps = -1;
+  int query_pn = -1;
+
+  // get the device
+  size_t device_index = request->resource->device;
+
+  oc_endpoint_t *my_ep = oc_connectivity_get_endpoints(device_index);
+  // Calculate total endpoints
+  while (my_ep != NULL) {
+    my_ep = my_ep->next;
+    total++;
+  }
+  my_ep = oc_connectivity_get_endpoints(device_index);
+
+  // handle query parameters: l=ps l=total
+  if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
+    // example : < /dev > l = total>;total=22;ps=5
+    size_t response_length = oc_frame_query_l(oc_string(request->resource->uri), ps_exists, ps, total_exists, total);
+    oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
+    return;
+  }
 
   /* check if the accept header is CBOR-format */
   if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
@@ -598,66 +621,28 @@ oc_core_dev_ipv6_get_handler(oc_request_t *request,
     return;
   }
 
-  // handle query parameters: l=ps l=total
-  // if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
-  //   // example : < / fp / r / ? l = total>; total = 22; ps = 5
-  //   int length;
-  //   int response_length = 0;
+  if (check_if_query_pn_exist(request, &query_pn, NULL)) {
+    // skip ${query_qn} endpoints and return the next one
+    for (i = 0; i < query_pn; i++) {
+      if (my_ep != NULL) {
+        my_ep = my_ep->next;
+      } else {
+        oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
+        return;
+      }
+    }
+  }
 
-  //   // get the device structure from the request.
-  //   size_t device_index = request->resource->device;
-
-  //   length = oc_frame_query_l("/dev/ipv6", ps_exists, total_exists);
-  //   response_length += length;
-  //   // count the application functional blocks
-  //   if (ps_exists) {
-  //     length = oc_rep_add_line_to_buffer(";ps=");
-  //     response_length += length;
-  //     length = oc_frame_integer(1);
-  //     response_length += length;
-  //   }
-  //   if (total_exists) {
-  //     length = oc_rep_add_line_to_buffer(";total=");
-  //     response_length += length;
-  //     length = oc_frame_integer(1);
-  //     response_length += length;
-  //   }
-
-  //   oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
-  //   return;
-  // }
-
-  // get the device
-  size_t device_index = request->resource->device;
-  // frame only the first one...
-  oc_endpoint_t *my_ep = oc_connectivity_get_endpoints(device_index);
   if (my_ep == NULL) {
-    // hmm something is wrong, no IPV6 endpoint
     oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
+    return;
   }
 
-  if (check_if_query_pn_exist(request, &pn_value, &ps_value)) {
-    // return the list..
-    // this is an array of endpoints.
-    // we are only framing the first one (the one that is being used).
-    // start array
-    oc_rep_start_links_array();
-    // start object in array
-    oc_rep_start_object(oc_rep_array(links), obj);
-    // frame the entry
-    oc_rep_i_set_byte_string(obj, 1, my_ep->addr.ipv6.address,
-                             sizeof(my_ep->addr.ipv6.address));
-    // end object
-    oc_rep_end_object(oc_rep_array(links), obj);
-    // end array
-    oc_rep_end_links_array();
-  } else {
-    // return the single entry.
-    oc_rep_begin_root_object();
-    oc_rep_i_set_byte_string(root, 1, my_ep->addr.ipv6.address,
-                             sizeof(my_ep->addr.ipv6.address));
-    oc_rep_end_root_object();
-  }
+  // return the single entry.
+  oc_rep_begin_root_object();
+  oc_rep_i_set_byte_string(root, 1, my_ep->addr.ipv6.address,
+                            sizeof(my_ep->addr.ipv6.address));
+  oc_rep_end_root_object();
 
   oc_send_cbor_response(request, OC_STATUS_OK);
   return;
@@ -807,7 +792,7 @@ oc_core_dev_dev_get_handler(oc_request_t *request,
   // handle query parameters: l=ps l=total
   if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
     // example : < /dev > l = total>;total=22;ps=5
-    response_length = oc_frame_query_l(oc_string(request->resource->uri), ps_exists, total_exists, total);
+    response_length = oc_frame_query_l(oc_string(request->resource->uri), ps_exists, PAGE_SIZE, total_exists, total);
     oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
     return;
   }

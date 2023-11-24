@@ -67,7 +67,7 @@ check_if_query_l_exist(oc_request_t *request, bool *ps_exists,
 }
 
 int
-oc_frame_query_l(char *url, bool ps_exists, bool total_exists, int total)
+oc_frame_query_l(char *url, bool ps_exists, int ps, bool total_exists, int total)
 {
   // example : < / fp / r / ? l = total>; total = 22; ps = 5
   // spec 1.1. : no query arguments anymore in the url
@@ -85,7 +85,7 @@ oc_frame_query_l(char *url, bool ps_exists, bool total_exists, int total)
   if (ps_exists) {
     length = oc_rep_add_line_to_buffer(";ps=");
     response_length += length;
-    length = oc_frame_integer(PAGE_SIZE);
+    length = oc_frame_integer(ps);
     response_length += length;
   }
   if (total_exists) {
