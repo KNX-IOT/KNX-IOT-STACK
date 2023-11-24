@@ -358,7 +358,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
     int group_address = atoi(&d_request[12]);
     PRINT(" group address: %d\n", group_address);
     // if not loaded the we can just return
-    oc_lsm_state_t lsm = oc_knx_lsm_state(device_index);
+    oc_lsm_state_t lsm = oc_a_lsm_state(device_index);
     if (lsm != LSM_S_LOADED) {
       /* handle bad request..
       note below layer ignores this message if it is a multi cast request */

@@ -348,10 +348,10 @@ typedef enum {
   OC_DEV,             /**< core link */
   OC_APP,             /**< application ID (list) */
   OC_APP_X,           /**< application ID entry */
+  OC_A_LSM,         /**< load state machine */
   OC_KNX_SPAKE,       /**< spake */
   OC_KNX_IDEVID,      /**< IDevID */
   OC_KNX_LDEVID,      /**< LDevID */
-  OC_KNX_LSM,         /**< load state machine */
   OC_KNX_DOT_KNX,     /**< .knx resource */
   OC_KNX_G,           /**< g (renamed) .knx resource */
   OC_KNX_FINGERPRINT, /**< FINGERPRINT value of loaded contents */

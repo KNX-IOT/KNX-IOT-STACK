@@ -530,7 +530,7 @@ oc_core_fp_gm_post_handler(oc_request_t *request,
   }
   // check loading state
   size_t device_index = request->resource->device;
-  if (oc_knx_lsm_state(device_index) != LSM_S_LOADING) {
+  if (oc_a_lsm_state(device_index) != LSM_S_LOADING) {
     OC_ERR(" not in loading state\n");
     oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
     return;

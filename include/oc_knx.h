@@ -125,7 +125,7 @@ typedef enum {
  * created
  * @return the lsm state
  */
-oc_lsm_state_t oc_knx_lsm_state(size_t device_index);
+oc_lsm_state_t oc_a_lsm_state(size_t device_index);
 
 /**
  * @brief retrieve the current lsm state
@@ -135,7 +135,7 @@ oc_lsm_state_t oc_knx_lsm_state(size_t device_index);
  * @param new_state the new lsm_state
  * @return 0 == success
  */
-int oc_knx_lsm_set_state(size_t device_index, oc_lsm_event_t new_state);
+int oc_a_lsm_set_state(size_t device_index, oc_lsm_event_t new_state);
 
 /**
  * @brief convert the load state machine (lsm) event to string

@@ -482,7 +482,7 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   }
 
   size_t device_index = request->resource->device;
-  if (oc_knx_lsm_state(device_index) != LSM_S_LOADING) {
+  if (oc_a_lsm_state(device_index) != LSM_S_LOADING) {
     OC_ERR(" not in loading state\n");
     oc_send_response_no_format(request, OC_STATUS_METHOD_NOT_ALLOWED);
     return;
@@ -687,7 +687,7 @@ oc_core_fp_g_x_del_handler(oc_request_t *request,
   PRINT("oc_core_fp_g_x_del_handler\n");
 
   size_t device_index = request->resource->device;
-  if (oc_knx_lsm_state(device_index) != LSM_S_LOADING) {
+  if (oc_a_lsm_state(device_index) != LSM_S_LOADING) {
     OC_ERR(" not in loading state\n");
     oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
     return;
@@ -864,7 +864,7 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   }
 
   size_t device_index = request->resource->device;
-  if (oc_knx_lsm_state(device_index) != LSM_S_LOADING) {
+  if (oc_a_lsm_state(device_index) != LSM_S_LOADING) {
     OC_ERR(" not in loading state\n");
     oc_send_response_no_format(request, OC_STATUS_METHOD_NOT_ALLOWED);
     return;
@@ -1112,7 +1112,7 @@ oc_core_fp_p_x_del_handler(oc_request_t *request,
   PRINT("oc_core_fp_p_x_del_handler\n");
 
   size_t device_index = request->resource->device;
-  if (oc_knx_lsm_state(device_index) != LSM_S_LOADING) {
+  if (oc_a_lsm_state(device_index) != LSM_S_LOADING) {
     OC_ERR(" not in loading state\n");
     oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
     return;
@@ -1261,7 +1261,7 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   }
 
   size_t device_index = request->resource->device;
-  if (oc_knx_lsm_state(device_index) != LSM_S_LOADING) {
+  if (oc_a_lsm_state(device_index) != LSM_S_LOADING) {
     OC_ERR(" not in loading state\n");
     oc_send_response_no_format(request, OC_STATUS_METHOD_NOT_ALLOWED);
     return;
@@ -1505,7 +1505,7 @@ oc_core_fp_r_x_del_handler(oc_request_t *request,
   PRINT("oc_core_fp_r_x_del_handler\n");
 
   size_t device_index = request->resource->device;
-  if (oc_knx_lsm_state(device_index) != LSM_S_LOADING) {
+  if (oc_a_lsm_state(device_index) != LSM_S_LOADING) {
     OC_ERR(" not in loading state\n");
     oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
     return;
