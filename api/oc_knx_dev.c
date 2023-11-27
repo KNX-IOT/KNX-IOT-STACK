@@ -800,11 +800,10 @@ oc_core_dev_dev_get_handler(oc_request_t *request,
   // handle query with page number (pn)
   if (check_if_query_pn_exist(request, &query_pn, NULL)) {
     first_resource += query_pn * PAGE_SIZE;
-  }
-
-  if (first_resource >= last_resource) {
-    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
-    return;
+    if (first_resource >= last_resource) {
+      oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
+      return;
+    }
   }
 
   if (last_resource > first_resource + PAGE_SIZE) {
@@ -1370,11 +1369,10 @@ oc_core_ap_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   // handle query with page number (pn)
   if (check_if_query_pn_exist(request, &query_pn, NULL)) {
     first_resource += query_pn * PAGE_SIZE;
-  }
-
-  if (first_resource >= last_resource) {
-    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
-    return;
+    if (first_resource >= last_resource) {
+      oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
+      return;
+    }
   }
 
   if (last_resource > first_resource + PAGE_SIZE) {
