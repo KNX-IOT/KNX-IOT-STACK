@@ -445,7 +445,7 @@ oc_core_find_nr_used_in_auth_at_table()
 {
   int counter = 0;
   for (int i = 0; i < oc_core_get_at_table_size(); i++) {
-    if (oc_string_len(g_at_entries[i].id) == 0) {
+    if (oc_string_len(g_at_entries[i].id) > 0) {
       counter++;
     }
   }
@@ -463,8 +463,15 @@ oc_core_auth_at_get_handler(oc_request_t *request,
   size_t response_length = 0;
   int i;
   int length = 0;
-  bool ps_exists;
-  bool total_exists;
+
+  bool ps_exists = false;
+  bool total_exists = false;
+  int total = oc_core_find_nr_used_in_auth_at_table();
+  int first_entry = 0; // inclusive
+  int last_entry = G_AT_MAX_ENTRIES; // exclusive
+  // int query_ps = -1;
+  int query_pn = -1;
+
   PRINT("oc_core_auth_at_get_handler\n");
 
   /* check if the accept header is link-format */
@@ -475,30 +482,28 @@ oc_core_auth_at_get_handler(oc_request_t *request,
   }
 
   // handle query parameters: l=ps l=total
-  // if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
-  //   // example : < / fp / r / ? l = total>; total = 22; ps = 5
+  if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
+    // example : < /dev > l = total>;total=22;ps=5
+    response_length = oc_frame_query_l(oc_string(request->resource->uri), ps_exists, PAGE_SIZE, total_exists, total);
+    oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
+    return;
+  }
 
-  //   length = oc_frame_query_l("/auth/at", ps_exists, total_exists);
-  //   response_length += length;
-  //   if (ps_exists) {
-  //     length = oc_rep_add_line_to_buffer(";ps=");
-  //     response_length += length;
-  //     length = oc_frame_integer(oc_core_get_at_table_size());
-  //     response_length += length;
-  //   }
-  //   if (total_exists) {
-  //     length = oc_rep_add_line_to_buffer(";total=");
-  //     response_length += length;
-  //     length = oc_frame_integer(oc_core_find_nr_used_in_auth_at_table());
-  //     response_length += length;
-  //   }
+  // handle query with page number (pn)
+  if (check_if_query_pn_exist(request, &query_pn, NULL)) {
+    first_entry += query_pn * PAGE_SIZE;
+    if (first_entry >= last_entry) {
+      oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
+      return;
+    }
+  }
 
-  //   oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
-  //   return;
-  // }
+  if (last_entry > first_entry + PAGE_SIZE) {
+    last_entry = first_entry + PAGE_SIZE;
+  }
 
   /* example entry: </auth/at/token-id>;ct=50 */
-  for (i = 0; i < G_AT_MAX_ENTRIES; i++) {
+  for (i = first_entry; i < last_entry; i++) {
     if (oc_string_len(g_at_entries[i].id) > 0) {
       // index  in use
       if (response_length > 0) {
@@ -519,6 +524,7 @@ oc_core_auth_at_get_handler(oc_request_t *request,
   } else {
     oc_send_response_no_format(request, OC_STATUS_INTERNAL_SERVER_ERROR);
   }
+
   PRINT("oc_core_auth_at_get_handler - end\n");
 }
 
