@@ -412,7 +412,7 @@ oc_core_fp_g_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 
   // handle query with page number (pn)
   if (check_if_query_pn_exist(request, &query_pn, NULL)) {
-    first_entry = query_pn * PAGE_SIZE;
+    first_entry += query_pn * PAGE_SIZE;
     if (first_entry >= last_entry) {
       oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
       return;
@@ -838,7 +838,7 @@ oc_core_fp_p_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 
   // handle query with page number (pn)
   if (check_if_query_pn_exist(request, &query_pn, NULL)) {
-    first_entry = query_pn * PAGE_SIZE;
+    first_entry += query_pn * PAGE_SIZE;
     if (first_entry >= last_entry) {
       oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
       return;
@@ -1241,7 +1241,7 @@ oc_core_fp_r_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 
   // handle query with page number (pn)
   if (check_if_query_pn_exist(request, &query_pn, NULL)) {
-    first_entry = query_pn * PAGE_SIZE;
+    first_entry += query_pn * PAGE_SIZE;
     if (first_entry >= last_entry) {
       oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
       return;

@@ -772,9 +772,9 @@ oc_core_dev_dev_get_handler(oc_request_t *request,
 
   bool ps_exists = false;
   bool total_exists = false;
-  int total = (int)OC_DEV;
-  int first_resource = (int)OC_DEV_SN; // inclusive
-  int last_resource = (int)OC_DEV; // exclusive
+  int total = (int)OC_DEV - (int)OC_DEV_SN;
+  int first_entry = (int)OC_DEV_SN; // inclusive
+  int last_entry = (int)OC_DEV; // exclusive
   // int query_ps = -1;
   int query_pn = -1;
 
@@ -799,18 +799,18 @@ oc_core_dev_dev_get_handler(oc_request_t *request,
 
   // handle query with page number (pn)
   if (check_if_query_pn_exist(request, &query_pn, NULL)) {
-    first_resource += query_pn * PAGE_SIZE;
-    if (first_resource >= last_resource) {
+    first_entry += query_pn * PAGE_SIZE;
+    if (first_entry >= last_entry) {
       oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
       return;
     }
   }
 
-  if (last_resource > first_resource + PAGE_SIZE) {
-    last_resource = first_resource + PAGE_SIZE;
+  if (last_entry > first_entry + PAGE_SIZE) {
+    last_entry = first_entry + PAGE_SIZE;
   }
 
-  for (i = first_resource; i < last_resource; i++) {
+  for (i = first_entry; i < last_entry; i++) {
     const oc_resource_t *resource =
       oc_core_get_resource_by_index(i, device_index);
     if (oc_filter_resource(resource, request, device_index, &response_length,
@@ -1342,9 +1342,9 @@ oc_core_ap_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 
   bool ps_exists = false;
   bool total_exists = false;
-  int total = 2;
-  int first_resource = (int)OC_APP_X; // inclusive
-  int last_resource = (int)OC_KNX_SPAKE; // exclusive
+  int total = (int)OC_KNX_SPAKE - (int)OC_APP_X;
+  int first_entry = (int)OC_APP_X; // inclusive
+  int last_entry = (int)OC_KNX_SPAKE; // exclusive
   // int query_ps = -1;
   int query_pn = -1;
 
@@ -1368,18 +1368,18 @@ oc_core_ap_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 
   // handle query with page number (pn)
   if (check_if_query_pn_exist(request, &query_pn, NULL)) {
-    first_resource += query_pn * PAGE_SIZE;
-    if (first_resource >= last_resource) {
+    first_entry += query_pn * PAGE_SIZE;
+    if (first_entry >= last_entry) {
       oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
       return;
     }
   }
 
-  if (last_resource > first_resource + PAGE_SIZE) {
-    last_resource = first_resource + PAGE_SIZE;
+  if (last_entry > first_entry + PAGE_SIZE) {
+    last_entry = first_entry + PAGE_SIZE;
   }
 
-  for (i = first_resource; i < last_resource; i++) {
+  for (i = first_entry; i < last_entry; i++) {
     const oc_resource_t *resource =
       oc_core_get_resource_by_index(i, device_index);
     if (oc_filter_resource(resource, request, device_index, &response_length,
