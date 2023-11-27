@@ -1065,14 +1065,48 @@ oc_core_knx_auth_get_handler(oc_request_t *request,
   size_t response_length = 0;
   int i;
   int matches = 0;
+
+  bool ps_exists = false;
+  bool total_exists = false;
+  int total = (int)OC_KNX_AUTH - (int)OC_KNX_A_SEN;
+  int first_entry = (int)OC_KNX_A_SEN; // inclusive
+  int last_entry = (int)OC_KNX_AUTH; // exclusive
+  // int query_ps = -1;
+  int query_pn = -1;
+
+  PRINT("oc_core_knx_auth_get_handler\n");
+
   /* check if the accept header is cbor-format */
   if (oc_check_accept_header(request, APPLICATION_LINK_FORMAT) == false) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
+
   size_t device_index = request->resource->device;
-  for (i = (int)OC_KNX_A_SEN; i < (int)OC_KNX_AUTH; i++) {
+
+  // handle query parameters: l=ps l=total
+  if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
+    // example : < /dev > l = total>;total=22;ps=5
+    response_length = oc_frame_query_l(oc_string(request->resource->uri), ps_exists, PAGE_SIZE, total_exists, total);
+    oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
+    return;
+  }
+
+  // handle query with page number (pn)
+  if (check_if_query_pn_exist(request, &query_pn, NULL)) {
+    first_entry += query_pn * PAGE_SIZE;
+    if (first_entry >= last_entry) {
+      oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
+      return;
+    }
+  }
+
+  if (last_entry > first_entry + PAGE_SIZE) {
+    last_entry = first_entry + PAGE_SIZE;
+  }
+
+  for (i = first_entry; i < last_entry; i++) {
     const oc_resource_t *resource =
       oc_core_get_resource_by_index(i, device_index);
     if (oc_filter_resource(resource, request, device_index, &response_length,
@@ -1085,6 +1119,8 @@ oc_core_knx_auth_get_handler(oc_request_t *request,
   } else {
     oc_send_response_no_format(request, OC_STATUS_INTERNAL_SERVER_ERROR);
   }
+
+  PRINT("oc_core_knx_auth_get_handler - end\n");
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_auth, knx_auth_at, 0, "/auth",
