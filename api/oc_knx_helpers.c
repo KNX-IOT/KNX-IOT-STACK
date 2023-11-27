@@ -123,11 +123,11 @@ check_if_query_pn_exist(oc_request_t *request, int *pn_value, int *ps_value)
       oc_iterate_query_get_values(request, "pn", &value, &value_len);
       *pn_value = atoi(value);
     }
-    oc_init_query_iterator();
-    if (oc_query_value_exists(request, "ps") > -1) {
-      oc_iterate_query_get_values(request, "ps", &value, &value_len);
-      *ps_value = atoi(value);
-    }
+    // oc_init_query_iterator();
+    // if (oc_query_value_exists(request, "ps") > -1) {
+    //   oc_iterate_query_get_values(request, "ps", &value, &value_len);
+    //   *ps_value = atoi(value);
+    // }
   } /* query available */
 
   // if (*ps_value > -1) {

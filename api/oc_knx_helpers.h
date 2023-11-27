@@ -56,7 +56,7 @@ int check_if_query_l_exist(oc_request_t *request, bool *ps_exists,
  * @param ps_exists frame ps
  * @param ps page size
  * @param total_exists frame total
- * @param total items
+ * @param total total items
  * @return total bytes framed
  */
 int oc_frame_query_l(char *url, bool ps_exists, int ps, bool total_exists, int total);

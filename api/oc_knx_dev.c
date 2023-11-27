@@ -626,14 +626,14 @@ oc_core_dev_ipv6_get_handler(oc_request_t *request,
       if (my_ep != NULL) {
         my_ep = my_ep->next;
       } else {
-        oc_send_response_no_format(request, OC_STATUS_INTERNAL_SERVER_ERROR);
+        oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
         return;
       }
     }
   }
 
   if (my_ep == NULL) {
-    oc_send_response_no_format(request, OC_STATUS_INTERNAL_SERVER_ERROR);
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
     return;
   }
 
@@ -800,6 +800,11 @@ oc_core_dev_dev_get_handler(oc_request_t *request,
   // handle query with page number (pn)
   if (check_if_query_pn_exist(request, &query_pn, NULL)) {
     first_resource += query_pn * PAGE_SIZE;
+  }
+
+  if (first_resource >= last_resource) {
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
+    return;
   }
 
   if (last_resource > first_resource + PAGE_SIZE) {
@@ -1365,6 +1370,11 @@ oc_core_ap_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   // handle query with page number (pn)
   if (check_if_query_pn_exist(request, &query_pn, NULL)) {
     first_resource += query_pn * PAGE_SIZE;
+  }
+
+  if (first_resource >= last_resource) {
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
+    return;
   }
 
   if (last_resource > first_resource + PAGE_SIZE) {
