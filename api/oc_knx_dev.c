@@ -592,8 +592,12 @@ oc_core_dev_ipv6_get_handler(oc_request_t *request,
   bool ps_exists = false;
   bool total_exists = false;
   int total = 0;
+  int first_entry = 0; // inclusive
+  int last_entry = 0; // exclusive
   // int query_ps = -1;
   int query_pn = -1;
+
+  PRINT("oc_core_dev_ipv6_get_handler\n");
 
   // get the device
   size_t device_index = request->resource->device;
@@ -604,6 +608,7 @@ oc_core_dev_ipv6_get_handler(oc_request_t *request,
     my_ep = my_ep->next;
     total++;
   }
+  last_entry = total;
 
   // handle query parameters: l=ps l=total
   if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
@@ -622,20 +627,16 @@ oc_core_dev_ipv6_get_handler(oc_request_t *request,
   my_ep = oc_connectivity_get_endpoints(device_index);
   // handle query with page number (pn)
   if (check_if_query_pn_exist(request, &query_pn, NULL)) {
-    // skip ${query_qn} endpoints and return the next one
-    for (i = 0; i < query_pn; i++) {
-      if (my_ep != NULL) {
-        my_ep = my_ep->next;
-      } else {
-        oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
-        return;
-      }
+    first_entry = query_pn * ps;
+    if (first_entry >= last_entry) {
+      oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
+      return;
     }
-  }
-
-  if (my_ep == NULL) {
-    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
-    return;
+  
+    // skip endpoints and return the next one
+    for (i = 0; i < first_entry; i++) {
+      my_ep = my_ep->next;
+    }
   }
 
   // return the single entry.
@@ -645,7 +646,8 @@ oc_core_dev_ipv6_get_handler(oc_request_t *request,
   oc_rep_end_root_object();
 
   oc_send_cbor_response(request, OC_STATUS_OK);
-  return;
+
+  PRINT("oc_core_dev_ipv6_get_handler - end\n");
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(dev_ipv6, dev_sa, 0, "/dev/ipv6", OC_IF_P,

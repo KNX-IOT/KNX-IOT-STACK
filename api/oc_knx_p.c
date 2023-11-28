@@ -90,6 +90,7 @@ oc_core_p_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       total++;
     }
   }
+  last_entry = total;
 
   // handle query parameters: l=ps l=total
   if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
@@ -102,20 +103,16 @@ oc_core_p_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   my_p = oc_ri_get_app_resources();
   // handle query with page number (pn)
   if (check_if_query_pn_exist(request, &query_pn, NULL)) {
-    // skip ${query_qn} endpoints and return the next one
-    for (i = 0; i < query_pn; i++) {
-      if (oc_string(my_p->uri) != NULL) {
-        my_p = my_p->next;
-      } else {
-        oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
-        return;
-      }
+    first_entry = query_pn * PAGE_SIZE;
+    if (first_entry >= last_entry) {
+      oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
+      return;
     }
-  }
 
-  if (oc_string(my_p->uri) == NULL) {
-    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
-    return;
+    // skip endpoints and return the next one
+    for (i = 0; i < first_entry; i++) {
+      my_p = my_p->next;
+    }
   }
 
   bool added = oc_add_data_points_to_response(request, my_p, device_index,
