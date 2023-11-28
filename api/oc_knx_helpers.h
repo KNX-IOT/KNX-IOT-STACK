@@ -28,7 +28,7 @@ extern "C" {
 #endif
 
 #ifndef PAGE_SIZE
-#define PAGE_SIZE 50
+#define PAGE_SIZE 20
 #endif
 
 /**

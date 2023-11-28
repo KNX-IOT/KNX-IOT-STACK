@@ -604,7 +604,6 @@ oc_core_dev_ipv6_get_handler(oc_request_t *request,
     my_ep = my_ep->next;
     total++;
   }
-  my_ep = oc_connectivity_get_endpoints(device_index);
 
   // handle query parameters: l=ps l=total
   if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
@@ -620,6 +619,8 @@ oc_core_dev_ipv6_get_handler(oc_request_t *request,
     return;
   }
 
+  my_ep = oc_connectivity_get_endpoints(device_index);
+  // handle query with page number (pn)
   if (check_if_query_pn_exist(request, &query_pn, NULL)) {
     // skip ${query_qn} endpoints and return the next one
     for (i = 0; i < query_pn; i++) {
