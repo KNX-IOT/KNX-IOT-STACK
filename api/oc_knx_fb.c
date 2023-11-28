@@ -110,8 +110,15 @@ oc_core_fb_x_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   int i;
   int matches = 0;
   int length;
-  bool ps_exists;
-  bool total_exists;
+
+  bool ps_exists = false;
+  bool total_exists = false;
+  int total = 0;
+  int first_entry = 0; // inclusive
+  int last_entry = 0; // exclusive
+  // int query_ps = -1;
+  int query_pn = -1;
+
   PRINT("oc_core_fb_x_get_handler\n");
 
   /* check if the accept header is link-format */
@@ -151,34 +158,30 @@ oc_core_fb_x_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   PRINT("  instance: %d\n", instance);
   size_t device_index = request->resource->device;
 
+  total = oc_core_count_dp_in_fb(device_index, instance, fb_value);
+  last_entry = total;
+
   // handle query parameters: l=ps l=total
-  // if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
-  //   // example : < / fp / r / ? l = total>; total = 22; ps = 5
+  if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
+    // example : < /dev > l = total>;total=22;ps=5
+    response_length = oc_frame_query_l(oc_string(request->resource->uri), ps_exists, PAGE_SIZE, total_exists, total);
+    oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
+    return;
+  }
 
-  //   length = oc_frame_query_l("/fp/gm", ps_exists, total_exists);
-  //   response_length += length;
-  //   if (ps_exists) {
-  //     length = oc_rep_add_line_to_buffer(";ps=");
-  //     response_length += length;
-  //     length = oc_frame_integer(
-  //       oc_core_count_dp_in_fb(device_index, instance, fb_value));
-  //     response_length += length;
-  //   }
-  //   if (total_exists) {
-  //     length = oc_rep_add_line_to_buffer(";total=");
-  //     response_length += length;
-  //     length = oc_frame_integer(
-  //       oc_core_count_dp_in_fb(device_index, instance, fb_value));
-  //     response_length += length;
-  //   }
-
-  //   oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
-  //   return;
-  // }
+  // handle query with page number (pn)
+  if (check_if_query_pn_exist(request, &query_pn, NULL)) {
+    first_entry += query_pn * PAGE_SIZE;
+    if (first_entry >= last_entry) {
+      oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
+      return;
+    }
+  }
 
   // do the actual creation of the payload, e.g. the data points per functional
   // block instance
   const oc_resource_t *resource = oc_ri_get_app_resources();
+  int skipped = 0;
   for (; resource; resource = resource->next) {
     if (resource->device != device_index ||
         !(resource->properties & OC_DISCOVERABLE)) {
@@ -200,9 +203,16 @@ oc_core_fb_x_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       }
     }
     if (frame_resource) {
-      oc_add_resource_to_wk(resource, request, device_index, &response_length,
-                            matches, 1);
-      matches++;
+      if (skipped < first_entry) {
+        skipped++;
+      } else {
+        oc_add_resource_to_wk(resource, request, device_index, &response_length,
+                              matches, 1);
+        matches++;
+        if (matches >= PAGE_SIZE) {
+          break;
+        }
+      }
     }
   }
 
