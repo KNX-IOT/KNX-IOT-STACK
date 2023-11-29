@@ -48,7 +48,8 @@ void oc_create_discovery_resource(int resource_idx, size_t device);
  * @return false resource not added to the response
  */
 bool oc_filter_resource(const oc_resource_t *resource, oc_request_t *request,
-                        size_t device_index, size_t *response_length, int *skipped, int first_entry);
+                        size_t device_index, size_t *response_length,
+                        int *skipped, int first_entry);
 /**
  * @brief add the resource to the response in application link format
  *

@@ -26,8 +26,10 @@
 // -----------------------------------------------------------------------------
 
 bool
-oc_add_data_points_to_response(oc_request_t *request, const oc_resource_t *resource, size_t device_index,
-                               size_t *response_length, int matches, int page_size)
+oc_add_data_points_to_response(oc_request_t *request,
+                               const oc_resource_t *resource,
+                               size_t device_index, size_t *response_length,
+                               int matches, int page_size)
 {
   (void)request;
   int length = 0;
@@ -36,8 +38,7 @@ oc_add_data_points_to_response(oc_request_t *request, const oc_resource_t *resou
     if (resource->device != device_index) {
       continue;
     }
-    oc_add_resource_to_wk(resource, request, device_index, response_length,
-                          1);
+    oc_add_resource_to_wk(resource, request, device_index, response_length, 1);
     matches++;
   }
 
@@ -65,10 +66,11 @@ oc_core_p_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   bool total_exists = false;
   int total = 0;
   int first_entry = 0; // inclusive
-  int last_entry = 0; // exclusive
+  int last_entry = 0;  // exclusive
   // int query_ps = -1;
   int query_pn = -1;
-  bool more_request_needed = false; // If more requests (pages) are needed to get the full list
+  bool more_request_needed =
+    false; // If more requests (pages) are needed to get the full list
 
   PRINT("oc_core_p_get_handler\n");
 
@@ -96,7 +98,9 @@ oc_core_p_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   // handle query parameters: l=ps l=total
   if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
     // example : < /p > l = total>;total=22;ps=5
-    response_length = oc_frame_query_l(oc_string(request->resource->uri), ps_exists, PAGE_SIZE, total_exists, total);
+    response_length =
+      oc_frame_query_l(oc_string(request->resource->uri), ps_exists, PAGE_SIZE,
+                       total_exists, total);
     oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
     return;
   }
@@ -120,13 +124,14 @@ oc_core_p_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     more_request_needed = true;
   }
 
-  bool added = oc_add_data_points_to_response(request, my_p, device_index,
-                                              &response_length, matches, PAGE_SIZE);
+  bool added = oc_add_data_points_to_response(
+    request, my_p, device_index, &response_length, matches, PAGE_SIZE);
 
   if (added) {
     if (more_request_needed) {
       int next_page_num = query_pn > -1 ? query_pn + 1 : 1;
-      response_length += add_next_page_indicator(oc_string(request->resource->uri), next_page_num);
+      response_length += add_next_page_indicator(
+        oc_string(request->resource->uri), next_page_num);
     }
     oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
   } else {

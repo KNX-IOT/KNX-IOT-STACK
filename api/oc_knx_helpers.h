@@ -41,7 +41,7 @@ extern "C" {
  * @return true == l exists (with either ps or total or both)
  */
 bool check_if_query_l_exist(oc_request_t *request, bool *ps_exists,
-                           bool *total_exists);
+                            bool *total_exists);
 
 /**
  * @brief helper function to frame url part of query response:
@@ -59,7 +59,8 @@ bool check_if_query_l_exist(oc_request_t *request, bool *ps_exists,
  * @param total total items
  * @return total bytes framed
  */
-int oc_frame_query_l(char *url, bool ps_exists, int ps, bool total_exists, int total);
+int oc_frame_query_l(char *url, bool ps_exists, int ps, bool total_exists,
+                     int total);
 
 /**
  * @brief helper function to check if query parameter pn or ps exists
@@ -71,11 +72,12 @@ int oc_frame_query_l(char *url, bool ps_exists, int ps, bool total_exists, int t
  * @return true == pn or ps exists
  */
 bool check_if_query_pn_exist(oc_request_t *request, int *pn_value,
-                            int *ps_value);
+                             int *ps_value);
 
 /**
- * @brief helper function to frame next page indicator, if more requests (pages) are needed to get the full list
- * 
+ * @brief helper function to frame next page indicator, if more requests (pages)
+ * are needed to get the full list
+ *
  * @param url the url to be framed
  * @param next_page_num the next page number to be framed
  * @return total bytes framed

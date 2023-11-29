@@ -115,10 +115,11 @@ oc_core_fb_x_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   bool total_exists = false;
   int total = 0;
   int first_entry = 0; // inclusive
-  int last_entry = 0; // exclusive
+  int last_entry = 0;  // exclusive
   // int query_ps = -1;
   int query_pn = -1;
-  bool more_request_needed = false; // If more requests (pages) are needed to get the full list
+  bool more_request_needed =
+    false; // If more requests (pages) are needed to get the full list
 
   PRINT("oc_core_fb_x_get_handler\n");
 
@@ -165,7 +166,9 @@ oc_core_fb_x_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   // handle query parameters: l=ps l=total
   if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
     // example : < /f/* > l = total>;total=22;ps=5
-    response_length = oc_frame_query_l(oc_string(request->resource->uri), ps_exists, PAGE_SIZE, total_exists, total);
+    response_length =
+      oc_frame_query_l(oc_string(request->resource->uri), ps_exists, PAGE_SIZE,
+                       total_exists, total);
     oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
     return;
   }
@@ -224,7 +227,8 @@ oc_core_fb_x_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   if (matches > 0) {
     if (more_request_needed) {
       int next_page_num = query_pn > -1 ? query_pn + 1 : 1;
-      response_length += add_next_page_indicator(oc_string(request->resource->uri), next_page_num);
+      response_length += add_next_page_indicator(
+        oc_string(request->resource->uri), next_page_num);
     }
     oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
   } else {
@@ -349,7 +353,9 @@ oc_filter_functional_blocks(oc_request_t *request)
 
 bool
 oc_add_function_blocks_to_response(oc_request_t *request, size_t device_index,
-                                   size_t *response_length, int *matches, int *skipped, int first_entry, int last_entry)
+                                   size_t *response_length, int *matches,
+                                   int *skipped, int first_entry,
+                                   int last_entry)
 {
   (void)request;
   int length = 0;
@@ -383,7 +389,8 @@ oc_add_function_blocks_to_response(oc_request_t *request, size_t device_index,
               length = oc_rep_add_line_to_buffer(",\n");
               *response_length += length;
             }
-            length = oc_rep_add_line_to_buffer("</f/netip>;rt=\":fb.11\";ct=40");
+            length =
+              oc_rep_add_line_to_buffer("</f/netip>;rt=\":fb.11\";ct=40");
             *response_length += length;
             (*matches)++;
             netip_added = true;
@@ -480,10 +487,11 @@ oc_core_fb_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   bool total_exists = false;
   int total = 0;
   int first_entry = 0; // inclusive
-  int last_entry = 0; // exclusive
+  int last_entry = 0;  // exclusive
   // int query_ps = -1;
   int query_pn = -1;
-  bool more_request_needed = false; // If more requests (pages) are needed to get the full list
+  bool more_request_needed =
+    false; // If more requests (pages) are needed to get the full list
 
   PRINT("oc_core_fb_get_handler\n");
 
@@ -502,7 +510,9 @@ oc_core_fb_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   // handle query parameters: l=ps l=total
   if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
     // example : < /f > l = total>;total=22;ps=5
-    response_length = oc_frame_query_l(oc_string(request->resource->uri), ps_exists, PAGE_SIZE, total_exists, total);
+    response_length =
+      oc_frame_query_l(oc_string(request->resource->uri), ps_exists, PAGE_SIZE,
+                       total_exists, total);
     oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
     return;
   }
@@ -520,13 +530,15 @@ oc_core_fb_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     more_request_needed = true;
   }
 
-  bool added = oc_add_function_blocks_to_response(request, device_index,
-                                                  &response_length, &matches, &skipped, first_entry, last_entry);
+  bool added = oc_add_function_blocks_to_response(
+    request, device_index, &response_length, &matches, &skipped, first_entry,
+    last_entry);
 
   if (added) {
     if (more_request_needed) {
       int next_page_num = query_pn > -1 ? query_pn + 1 : 1;
-      response_length += add_next_page_indicator(oc_string(request->resource->uri), next_page_num);
+      response_length += add_next_page_indicator(
+        oc_string(request->resource->uri), next_page_num);
     }
     oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
   } else {

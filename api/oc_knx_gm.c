@@ -468,7 +468,8 @@ oc_core_fp_gm_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   //   if (total_exists) {
   //     length = oc_rep_add_line_to_buffer(";total=");
   //     response_length += length;
-  //     length = oc_frame_integer(oc_core_find_nr_used_in_group_mapping_table());
+  //     length =
+  //     oc_frame_integer(oc_core_find_nr_used_in_group_mapping_table());
   //     response_length += length;
   //   }
 

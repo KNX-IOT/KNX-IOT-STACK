@@ -389,11 +389,12 @@ oc_core_fp_g_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   bool ps_exists = false;
   bool total_exists = false;
   int total = oc_core_find_nr_used_in_group_object_table();
-  int first_entry = 0; // inclusive
+  int first_entry = 0;              // inclusive
   int last_entry = GOT_MAX_ENTRIES; // exclusive
   // int query_ps = -1;
   int query_pn = -1;
-  bool more_request_needed = false; // If more requests (pages) are needed to get the full list
+  bool more_request_needed =
+    false; // If more requests (pages) are needed to get the full list
 
   PRINT("oc_core_fp_g_get_handler\n");
 
@@ -407,7 +408,9 @@ oc_core_fp_g_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   // handle query parameters: l=ps l=total
   if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
     // example : < /fp/g > l = total>;total=22;ps=5
-    response_length = oc_frame_query_l(oc_string(request->resource->uri), ps_exists, PAGE_SIZE, total_exists, total);
+    response_length =
+      oc_frame_query_l(oc_string(request->resource->uri), ps_exists, PAGE_SIZE,
+                       total_exists, total);
     oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
     return;
   }
@@ -457,7 +460,8 @@ oc_core_fp_g_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   if (response_length > 0) {
     if (more_request_needed) {
       int next_page_num = query_pn > -1 ? query_pn + 1 : 1;
-      response_length += add_next_page_indicator(oc_string(request->resource->uri), next_page_num);
+      response_length += add_next_page_indicator(
+        oc_string(request->resource->uri), next_page_num);
     }
     oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
   } else {
@@ -827,11 +831,12 @@ oc_core_fp_p_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   bool ps_exists = false;
   bool total_exists = false;
   int total = oc_core_find_nr_used_in_group_publisher_table();
-  int first_entry = 0; // inclusive
+  int first_entry = 0;              // inclusive
   int last_entry = GPT_MAX_ENTRIES; // exclusive
   // int query_ps = -1;
   int query_pn = -1;
-  bool more_request_needed = false; // If more requests (pages) are needed to get the full list
+  bool more_request_needed =
+    false; // If more requests (pages) are needed to get the full list
 
   PRINT("oc_core_fp_p_get_handler\n");
 
@@ -845,7 +850,9 @@ oc_core_fp_p_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   // handle query parameters: l=ps l=total
   if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
     // example : < /fp/p > l = total>;total=22;ps=5
-    response_length = oc_frame_query_l(oc_string(request->resource->uri), ps_exists, PAGE_SIZE, total_exists, total);
+    response_length =
+      oc_frame_query_l(oc_string(request->resource->uri), ps_exists, PAGE_SIZE,
+                       total_exists, total);
     oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
     return;
   }
@@ -895,7 +902,8 @@ oc_core_fp_p_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   if (response_length > 0) {
     if (more_request_needed) {
       int next_page_num = query_pn > -1 ? query_pn + 1 : 1;
-      response_length += add_next_page_indicator(oc_string(request->resource->uri), next_page_num);
+      response_length += add_next_page_indicator(
+        oc_string(request->resource->uri), next_page_num);
     }
     oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
   } else {
@@ -1242,11 +1250,12 @@ oc_core_fp_r_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   bool ps_exists = false;
   bool total_exists = false;
   int total = oc_core_find_nr_used_in_group_recipient_table();
-  int first_entry = 0; // inclusive
+  int first_entry = 0;              // inclusive
   int last_entry = GRT_MAX_ENTRIES; // exclusive
   // int query_ps = -1;
   int query_pn = -1;
-  bool more_request_needed = false; // If more requests (pages) are needed to get the full list
+  bool more_request_needed =
+    false; // If more requests (pages) are needed to get the full list
 
   PRINT("oc_core_fp_r_get_handler\n");
 
@@ -1260,7 +1269,9 @@ oc_core_fp_r_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   // handle query parameters: l=ps l=total
   if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
     // example : < /fp/r > l = total>;total=22;ps=5
-    response_length = oc_frame_query_l(oc_string(request->resource->uri), ps_exists, PAGE_SIZE, total_exists, total);
+    response_length =
+      oc_frame_query_l(oc_string(request->resource->uri), ps_exists, PAGE_SIZE,
+                       total_exists, total);
     oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
     return;
   }
@@ -1310,7 +1321,8 @@ oc_core_fp_r_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   if (response_length > 0) {
     if (more_request_needed) {
       int next_page_num = query_pn > -1 ? query_pn + 1 : 1;
-      response_length += add_next_page_indicator(oc_string(request->resource->uri), next_page_num);
+      response_length += add_next_page_indicator(
+        oc_string(request->resource->uri), next_page_num);
     }
     oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
   } else {
@@ -2509,8 +2521,7 @@ oc_add_points_in_group_object_table_to_response(oc_request_t *request,
         oc_add_resource_to_wk(oc_ri_get_app_resource_by_uri(
                                 oc_string(g_got[index].href),
                                 oc_string_len(g_got[index].href), device_index),
-                              request, device_index, response_length,
-                              1);
+                              request, device_index, response_length, 1);
         return_value = true;
       }
     }

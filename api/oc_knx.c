@@ -406,8 +406,8 @@ oc_lsm_event_to_state(oc_lsm_event_t lsm_e, size_t device_index)
 }
 
 static void
-oc_core_a_lsm_get_handler(oc_request_t *request,
-                            oc_interface_mask_t iface_mask, void *data)
+oc_core_a_lsm_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
+                          void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -440,7 +440,7 @@ oc_core_a_lsm_get_handler(oc_request_t *request,
 
 static void
 oc_core_a_lsm_post_handler(oc_request_t *request,
-                             oc_interface_mask_t iface_mask, void *data)
+                           oc_interface_mask_t iface_mask, void *data)
 {
   (void)data;
   (void)iface_mask;

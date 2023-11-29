@@ -67,7 +67,8 @@ check_if_query_l_exist(oc_request_t *request, bool *ps_exists,
 }
 
 int
-oc_frame_query_l(char *url, bool ps_exists, int ps, bool total_exists, int total)
+oc_frame_query_l(char *url, bool ps_exists, int ps, bool total_exists,
+                 int total)
 {
   // example : < / fp / r / ? l = total>; total = 22; ps = 5
   // spec 1.1. : no query arguments anymore in the url
@@ -101,7 +102,7 @@ oc_frame_query_l(char *url, bool ps_exists, int ps, bool total_exists, int total
 bool
 check_if_query_pn_exist(oc_request_t *request, int *pn_value, int *ps_value)
 {
-  (void) ps_value;
+  (void)ps_value;
   char *value = NULL;
   int value_len = -1;
 

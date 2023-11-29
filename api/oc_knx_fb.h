@@ -51,7 +51,9 @@ extern "C" {
  */
 bool oc_add_function_blocks_to_response(oc_request_t *request,
                                         size_t device_index,
-                                        size_t *response_length, int *matches, int *skipped, int first_entry, int last_entry);
+                                        size_t *response_length, int *matches,
+                                        int *skipped, int first_entry,
+                                        int last_entry);
 
 /**
  *@brief Creation of the KNX function block resources.

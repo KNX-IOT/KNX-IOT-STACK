@@ -786,10 +786,11 @@ oc_core_knx_swu_get_handler(oc_request_t *request,
   bool total_exists = false;
   int total = (int)OC_KNX_SWU - (int)OC_KNX_SWU_PROTOCOL;
   int first_entry = (int)OC_KNX_SWU_PROTOCOL; // inclusive
-  int last_entry = (int)OC_KNX_SWU; // exclusive
+  int last_entry = (int)OC_KNX_SWU;           // exclusive
   // int query_ps = -1;
   int query_pn = -1;
-  bool more_request_needed = false; // If more requests (pages) are needed to get the full list
+  bool more_request_needed =
+    false; // If more requests (pages) are needed to get the full list
 
   /* check if the accept header is cbor-format */
   if (oc_check_accept_header(request, APPLICATION_LINK_FORMAT) == false) {
@@ -803,7 +804,9 @@ oc_core_knx_swu_get_handler(oc_request_t *request,
   // handle query parameters: l=ps l=total
   if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
     // example : < /swu > l = total>;total=22;ps=5
-    response_length = oc_frame_query_l(oc_string(request->resource->uri), ps_exists, PAGE_SIZE, total_exists, total);
+    response_length =
+      oc_frame_query_l(oc_string(request->resource->uri), ps_exists, PAGE_SIZE,
+                       total_exists, total);
     oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
     return;
   }
@@ -825,7 +828,8 @@ oc_core_knx_swu_get_handler(oc_request_t *request,
   for (i = first_entry; i < last_entry; i++) {
     const oc_resource_t *resource =
       oc_core_get_resource_by_index(i, device_index);
-    if (oc_filter_resource(resource, request, device_index, &response_length, &i, i)) {
+    if (oc_filter_resource(resource, request, device_index, &response_length,
+                           &i, i)) {
       matches++;
     }
   }
@@ -833,7 +837,8 @@ oc_core_knx_swu_get_handler(oc_request_t *request,
   if (matches > 0) {
     if (more_request_needed) {
       int next_page_num = query_pn > -1 ? query_pn + 1 : 1;
-      response_length += add_next_page_indicator(oc_string(request->resource->uri), next_page_num);
+      response_length += add_next_page_indicator(
+        oc_string(request->resource->uri), next_page_num);
     }
     oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
   } else {
