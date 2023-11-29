@@ -841,7 +841,7 @@ oc_core_knx_swu_get_handler(oc_request_t *request,
   }
 }
 
-OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_swu, knx_p_oscore_replwdo, 0, "/swu",
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_swu, sub, 0, "/swu",
                                      OC_IF_SWU | OC_IF_LI,
                                      APPLICATION_LINK_FORMAT, OC_DISCOVERABLE,
                                      oc_core_knx_swu_get_handler, 0, 0, 0, NULL,

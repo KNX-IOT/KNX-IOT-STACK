@@ -385,11 +385,11 @@ typedef enum {
   OC_KNX_SWU_PKG,           /**< sw package */
 #endif
   OC_KNX_SWU,               /**< swu top level */
-  OC_KNX_P_OSCORE_REPLWDO,  /**< oscore replay window*/
-  OC_KNX_P_OSCORE_OSNDELAY, /**< oscore osn delay*/
-  OC_KNX_F_OSCORE,          /**< oscore/f */
   OC_KNX_SUB,               /**< delete all device subscriptions */
   OC_KNX_A_SEN,             /**< a/sen resource */
+  OC_KNX_AUTH_O_REPLWDO,  /**< oscore replay window*/
+  OC_KNX_AUTH_O_OSNDELAY, /**< oscore osn delay*/
+  OC_KNX_AUTH_O,          /**< auth/o oscore functional block properties list*/
   OC_KNX_AUTH_AT,           /**< auth/at resource listing auth/at/X */
   OC_KNX_AUTH_AT_X,         /**< auth/at/X resources */
   OC_KNX_AUTH,              /**< auth list all sub resources */

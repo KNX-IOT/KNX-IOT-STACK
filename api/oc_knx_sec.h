@@ -313,9 +313,9 @@ uint64_t oc_oscore_get_osndelay();
  *
  *
  * creates the following resources:
- * - /f/oscore
- * - /p/oscore/rplwdo
- * - /p/oscore/osndelay
+ * - /auth/o
+ * - /auth/o/rplwdo
+ * - /auth/o/osndelay
  * - /auth
  * optional:
  * - a/sen
