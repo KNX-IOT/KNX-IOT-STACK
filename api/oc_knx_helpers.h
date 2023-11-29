@@ -74,6 +74,15 @@ bool check_if_query_pn_exist(oc_request_t *request, int *pn_value,
                             int *ps_value);
 
 /**
+ * @brief helper function to frame next page indicator, if more requests (pages) are needed to get the full list
+ * 
+ * @param url the url to be framed
+ * @param next_page_num the next page number to be framed
+ * @return total bytes framed
+ */
+int add_next_page_indicator(char *url, int next_page_num);
+
+/**
  * @brief helper function to frame an integer in the response:
  * @param value the value to be framed, max 9 chars
  * @return total bytes framed

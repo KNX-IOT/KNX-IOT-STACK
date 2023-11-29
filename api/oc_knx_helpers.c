@@ -140,6 +140,33 @@ check_if_query_pn_exist(oc_request_t *request, int *pn_value, int *ps_value)
 }
 
 int
+add_next_page_indicator(char *url, int next_page_num)
+{
+  // example : </p?pn=1>;rt="p.next";ct=40
+  int response_length = 0;
+  int length;
+  char next_page_str[20];
+  sprintf(next_page_str, "%d", next_page_num);
+
+  length = oc_rep_add_line_to_buffer(",\n<");
+  response_length += length;
+  length = oc_rep_add_line_to_buffer(url);
+  response_length += length;
+  length = oc_rep_add_line_to_buffer("?pn=");
+  response_length += length;
+  length = oc_rep_add_line_to_buffer(next_page_str);
+  response_length += length;
+  length = oc_rep_add_line_to_buffer(">;rt=\"");
+  response_length += length;
+  length = oc_rep_add_line_to_buffer(url);
+  response_length += length;
+  length = oc_rep_add_line_to_buffer(".next\";ct=40");
+  response_length += length;
+
+  return response_length;
+}
+
+int
 oc_frame_integer(int value)
 {
   char string[10];
