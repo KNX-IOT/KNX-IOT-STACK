@@ -55,8 +55,7 @@ knx_publish_service(char *serial_no, uint64_t iid, uint32_t ia, bool pm)
 
     // make sure that the serial number is used in lower case
     strncpy(serial_no_lowercase, serial_no, 19);
-    for(int i = 0; i < strlen(serial_no_lowercase); ++i)
-    {
+    for (int i = 0; i < strlen(serial_no_lowercase); ++i) {
       serial_no_lowercase[i] = tolower(serial_no_lowercase[i]);
     }
 
@@ -67,7 +66,8 @@ knx_publish_service(char *serial_no, uint64_t iid, uint32_t ia, bool pm)
              serial_no_lowercase);
 
     char *installation_format_string = "--subtype=_ia%x-%x._sub._knx._udp";
-    snprintf(installation_subtype, sizeof(installation_subtype), installation_format_string, ia, iid);
+    snprintf(installation_subtype, sizeof(installation_subtype),
+             installation_format_string, ia, iid);
 
     char *pm_subtype;
     if (pm)
