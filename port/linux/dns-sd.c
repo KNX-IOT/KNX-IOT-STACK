@@ -69,24 +69,34 @@ knx_publish_service(char *serial_no, uint64_t iid, uint32_t ia, bool pm)
     snprintf(installation_subtype, sizeof(installation_subtype),
              installation_format_string, ia, iid);
 
-    char *pm_subtype;
-    if (pm)
-      pm_subtype = "--subtype=_pm._sub._knx._udp";
-    else
-      pm_subtype = "";
-
+    char *pm_subtype = "--subtype=_pm._sub._knx._udp";
     uint16_t port = get_ip_context_for_device(0)->port;
     snprintf(port_str, sizeof(port_str), "%d", port);
 
     int error;
-    error = execlp("avahi-publish-service", "avahi-publish-service",
-                   installation_subtype, // installation & ia (sub type)
-                   serial_format_string, // serial number (sub type)
-                   pm_subtype,           // programming mode (sub type)
-                   serial_no,            // service name = serial number
-                   "_knx._udp",          // service type
-                   port_str,             // port
-                   (char *)NULL);
+
+    if (pm)
+    {
+      error = execlp("avahi-publish-service", "avahi-publish-service",
+                    installation_subtype, // installation & ia (sub type)
+                    serial_format_string, // serial number (sub type)
+                    pm_subtype,           // programming mode (sub type)
+                    serial_no,            // service name = serial number
+                    "_knx._udp",          // service type
+                    port_str,             // port
+                    (char *)NULL);
+    }
+    else
+    {
+      error = execlp("avahi-publish-service", "avahi-publish-service",
+                    installation_subtype, // installation & ia (sub type)
+                    serial_format_string, // serial number (sub type)
+                    // no programming mode subtype
+                    serial_no,            // service name = serial number
+                    "_knx._udp",          // service type
+                    port_str,             // port
+                    (char *)NULL);
+    }
 
     if (error == -1) {
       OC_ERR("Failed to execute avahi-publish-service: %s", strerror(errno));
