@@ -118,6 +118,7 @@ oc_core_fb_x_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   int last_entry = 0; // exclusive
   // int query_ps = -1;
   int query_pn = -1;
+  bool more_request_needed = false; // If more requests (pages) are needed to get the full list
 
   PRINT("oc_core_fb_x_get_handler\n");
 
@@ -178,6 +179,10 @@ oc_core_fb_x_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     }
   }
 
+  if (last_entry > first_entry + PAGE_SIZE) {
+    more_request_needed = true;
+  }
+
   // do the actual creation of the payload, e.g. the data points per functional
   // block instance
   const oc_resource_t *resource = oc_ri_get_app_resources();
@@ -217,6 +222,10 @@ oc_core_fb_x_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   }
 
   if (matches > 0) {
+    if (more_request_needed) {
+      int next_page_num = query_pn > -1 ? query_pn + 1 : 1;
+      response_length += add_next_page_indicator(oc_string(request->resource->uri), next_page_num);
+    }
     oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
   } else {
     oc_send_response_no_format(request, OC_STATUS_INTERNAL_SERVER_ERROR);
@@ -474,6 +483,7 @@ oc_core_fb_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   int last_entry = 0; // exclusive
   // int query_ps = -1;
   int query_pn = -1;
+  bool more_request_needed = false; // If more requests (pages) are needed to get the full list
 
   PRINT("oc_core_fb_get_handler\n");
 
@@ -506,10 +516,18 @@ oc_core_fb_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     }
   }
 
+  if (last_entry > first_entry + PAGE_SIZE) {
+    more_request_needed = true;
+  }
+
   bool added = oc_add_function_blocks_to_response(request, device_index,
                                                   &response_length, &matches, &skipped, first_entry, last_entry);
 
   if (added) {
+    if (more_request_needed) {
+      int next_page_num = query_pn > -1 ? query_pn + 1 : 1;
+      response_length += add_next_page_indicator(oc_string(request->resource->uri), next_page_num);
+    }
     oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
   } else {
     oc_send_response_no_format(request, OC_STATUS_INTERNAL_SERVER_ERROR);

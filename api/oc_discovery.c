@@ -265,6 +265,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   bool finished = false;
   bool query_match = false;
   int framed_bytes;
+  bool more_request_needed = false; // If more requests (pages) are needed to get the full list
 
   /* check if the accept header is link-format */
   if (request->accept != APPLICATION_LINK_FORMAT &&
@@ -371,6 +372,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
 
   if (last_entry > first_entry + PAGE_SIZE) {
     last_entry = first_entry + PAGE_SIZE;
+    more_request_needed = true;
   }
 
   if (request->query_len > 0 && !query_match) {
@@ -591,6 +593,10 @@ oc_wkcore_discovery_handler(oc_request_t *request,
   }
 
   if (matches > 0 && response_length > 0) {
+    if (more_request_needed) {
+      int next_page_num = query_pn > -1 ? query_pn + 1 : 1;
+      response_length += add_next_page_indicator(oc_string(request->resource->uri), next_page_num);
+    }
     PRINT("  oc_wkcore_discovery_handler response_length %d'\n",
           (int)response_length);
     oc_send_linkformat_response(request, OC_STATUS_OK, response_length);

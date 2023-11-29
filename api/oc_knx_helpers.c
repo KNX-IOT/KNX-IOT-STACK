@@ -158,6 +158,9 @@ add_next_page_indicator(char *url, int next_page_num)
   response_length += length;
   length = oc_rep_add_line_to_buffer(">;rt=\"");
   response_length += length;
+  if (url[0] == '/') {
+    url++;
+  }
   length = oc_rep_add_line_to_buffer(url);
   response_length += length;
   length = oc_rep_add_line_to_buffer(".next\";ct=40");
