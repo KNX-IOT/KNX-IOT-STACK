@@ -75,27 +75,24 @@ knx_publish_service(char *serial_no, uint64_t iid, uint32_t ia, bool pm)
 
     int error;
 
-    if (pm)
-    {
+    if (pm) {
       error = execlp("avahi-publish-service", "avahi-publish-service",
-                    installation_subtype, // installation & ia (sub type)
-                    serial_format_string, // serial number (sub type)
-                    pm_subtype,           // programming mode (sub type)
-                    serial_no,            // service name = serial number
-                    "_knx._udp",          // service type
-                    port_str,             // port
-                    (char *)NULL);
-    }
-    else
-    {
+                     installation_subtype, // installation & ia (sub type)
+                     serial_format_string, // serial number (sub type)
+                     pm_subtype,           // programming mode (sub type)
+                     serial_no,            // service name = serial number
+                     "_knx._udp",          // service type
+                     port_str,             // port
+                     (char *)NULL);
+    } else {
       error = execlp("avahi-publish-service", "avahi-publish-service",
-                    installation_subtype, // installation & ia (sub type)
-                    serial_format_string, // serial number (sub type)
-                    // no programming mode subtype
-                    serial_no,            // service name = serial number
-                    "_knx._udp",          // service type
-                    port_str,             // port
-                    (char *)NULL);
+                     installation_subtype, // installation & ia (sub type)
+                     serial_format_string, // serial number (sub type)
+                     // no programming mode subtype
+                     serial_no,   // service name = serial number
+                     "_knx._udp", // service type
+                     port_str,    // port
+                     (char *)NULL);
     }
 
     if (error == -1) {
