@@ -612,7 +612,7 @@ oc_core_dev_ipv6_get_handler(oc_request_t *request,
 
   // handle query parameters: l=ps l=total
   if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
-    // example : < /dev > l = total>;total=22;ps=5
+    // example : < /dev/ipv6 > l = total>;total=22;ps=5
     size_t response_length = oc_frame_query_l(oc_string(request->resource->uri), ps_exists, ps, total_exists, total);
     oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
     return;
@@ -816,8 +816,7 @@ oc_core_dev_dev_get_handler(oc_request_t *request,
   for (i = first_entry; i < last_entry; i++) {
     const oc_resource_t *resource =
       oc_core_get_resource_by_index(i, device_index);
-    if (oc_filter_resource(resource, request, device_index, &response_length,
-                           matches, 1)) {
+    if (oc_filter_resource(resource, request, device_index, &response_length, 0, 0)) {
       matches++;
     }
   }
@@ -1363,7 +1362,7 @@ oc_core_ap_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 
   // handle query parameters: l=ps l=total
   if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
-    // example : < /dev > l = total>;total=22;ps=5
+    // example : < /ap > l = total>;total=22;ps=5
     response_length = oc_frame_query_l(oc_string(request->resource->uri), ps_exists, PAGE_SIZE, total_exists, total);
     oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
     return;
@@ -1385,8 +1384,7 @@ oc_core_ap_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   for (i = first_entry; i < last_entry; i++) {
     const oc_resource_t *resource =
       oc_core_get_resource_by_index(i, device_index);
-    if (oc_filter_resource(resource, request, device_index, &response_length,
-                           matches, 1)) {
+    if (oc_filter_resource(resource, request, device_index, &response_length, 0, 0)) {
       matches++;
     }
   }

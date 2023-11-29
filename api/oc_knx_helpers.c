@@ -17,15 +17,15 @@
 #include "oc_api.h"
 #include "oc_knx_helpers.h"
 
-int
+bool
 check_if_query_l_exist(oc_request_t *request, bool *ps_exists,
                        bool *total_exists)
 {
   if (ps_exists == NULL) {
-    return 0;
+    return false;
   }
   if (total_exists == NULL) {
-    return 0;
+    return false;
   }
 
   *ps_exists = false;
@@ -58,12 +58,12 @@ check_if_query_l_exist(oc_request_t *request, bool *ps_exists,
   }   /* query available */
 
   if (*ps_exists == true) {
-    return 1;
+    return true;
   }
   if (*total_exists == true) {
-    return 1;
+    return true;
   }
-  return 0;
+  return false;
 }
 
 int
@@ -98,7 +98,7 @@ oc_frame_query_l(char *url, bool ps_exists, int ps, bool total_exists, int total
   return response_length;
 }
 
-int
+bool
 check_if_query_pn_exist(oc_request_t *request, int *pn_value, int *ps_value)
 {
   (void) ps_value;
@@ -106,10 +106,10 @@ check_if_query_pn_exist(oc_request_t *request, int *pn_value, int *ps_value)
   int value_len = -1;
 
   if (pn_value == NULL) {
-    return 0;
+    return false;
   }
   // if (ps_value == NULL) {
-  //   return 0;
+  //   return false;
   // }
 
   // *ps_value = -1;
@@ -131,12 +131,12 @@ check_if_query_pn_exist(oc_request_t *request, int *pn_value, int *ps_value)
   } /* query available */
 
   // if (*ps_value > -1) {
-  //   return 1;
+  //   return true;
   // }
   if (*pn_value > -1) {
-    return 1;
+    return true;
   }
-  return 0;
+  return false;
 }
 
 int

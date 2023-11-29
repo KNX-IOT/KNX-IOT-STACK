@@ -37,7 +37,7 @@ oc_add_data_points_to_response(oc_request_t *request, const oc_resource_t *resou
       continue;
     }
     oc_add_resource_to_wk(resource, request, device_index, response_length,
-                          matches, 1);
+                          1);
     matches++;
   }
 
@@ -94,7 +94,7 @@ oc_core_p_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 
   // handle query parameters: l=ps l=total
   if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
-    // example : < /dev > l = total>;total=22;ps=5
+    // example : < /p > l = total>;total=22;ps=5
     response_length = oc_frame_query_l(oc_string(request->resource->uri), ps_exists, PAGE_SIZE, total_exists, total);
     oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
     return;

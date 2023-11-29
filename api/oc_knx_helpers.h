@@ -38,9 +38,9 @@ extern "C" {
  * @param request the request
  * @param ps_exists return value if l=ps exists
  * @param total_exists return value if l=total exists
- * @return int 1 == l exists (with either ps or total or both)
+ * @return true == l exists (with either ps or total or both)
  */
-int check_if_query_l_exist(oc_request_t *request, bool *ps_exists,
+bool check_if_query_l_exist(oc_request_t *request, bool *ps_exists,
                            bool *total_exists);
 
 /**
@@ -68,9 +68,9 @@ int oc_frame_query_l(char *url, bool ps_exists, int ps, bool total_exists, int t
  * @param request the request
  * @param pn_value return -1 if not exist otherwise value
  * @param ps_value return -1 if not exist otherwise value
- * @return int 1 == pn or ps exists
+ * @return true == pn or ps exists
  */
-int check_if_query_pn_exist(oc_request_t *request, int *pn_value,
+bool check_if_query_pn_exist(oc_request_t *request, int *pn_value,
                             int *ps_value);
 
 /**
