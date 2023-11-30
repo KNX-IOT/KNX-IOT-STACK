@@ -668,8 +668,8 @@ oc_core_fp_gm_post_handler(oc_request_t *request,
         oc_delete_group_mapping_table_entry(index);
         do_save = false;
       }
-    }   // case
-    }   // switch (over all objects)
+    } // case
+    } // switch (over all objects)
     rep = rep->next;
   }
 
