@@ -906,24 +906,7 @@ oc_core_knx_k_post_handler(oc_request_t *request,
   oc_send_response_no_format(request, OC_STATUS_OK);
 }
 
-OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_dot_knx, knx_g, 0, "/.knx",
-                                     OC_IF_LI | OC_IF_G, APPLICATION_CBOR,
-                                     OC_DISCOVERABLE, oc_core_knx_k_get_handler,
-                                     0, oc_core_knx_k_post_handler, 0, NULL,
-                                     OC_SIZE_MANY(1), "urn:knx:g.s");
-
-void
-oc_create_knx_knx_resource(int resource_idx, size_t device)
-{
-  OC_DBG("oc_create_knx_knx_resource (.knx)\n");
-
-  oc_core_populate_resource(resource_idx, device, "/.knx", OC_IF_LI | OC_IF_G,
-                            APPLICATION_CBOR, OC_DISCOVERABLE,
-                            oc_core_knx_k_get_handler, 0,
-                            oc_core_knx_k_post_handler, 0, 1, "urn:knx:g.s");
-}
-
-OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_g, knx_fingerprint, 0, "/k",
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_k, knx_fingerprint, 0, "/k",
                                      OC_IF_LI | OC_IF_G, APPLICATION_CBOR,
                                      OC_DISCOVERABLE, oc_core_knx_k_get_handler,
                                      0, oc_core_knx_k_post_handler, 0, NULL,
@@ -1142,7 +1125,7 @@ oc_core_knx_ldevid_get_handler(oc_request_t *request,
   PRINT("oc_core_knx_ldevid_get_handler- done\n");
 }
 
-OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_ldevid, knx_dot_knx, 0,
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_ldevid, knx_k, 0,
                                      "/.well-known/knx/ldevid", OC_IF_D,
                                      APPLICATION_PKCS7_CMC_REQUEST,
                                      OC_DISCOVERABLE,
@@ -1677,8 +1660,7 @@ oc_create_knx_resources(size_t device_index)
   }
 
   oc_create_a_lsm_resource(OC_A_LSM, device_index);
-  oc_create_knx_knx_resource(OC_KNX_DOT_KNX, device_index);
-  oc_create_knx_knx_resource(OC_KNX_G, device_index);
+  oc_create_knx_k_resource(OC_KNX_K, device_index);
   oc_create_knx_fingerprint_resource(OC_KNX_FINGERPRINT, device_index);
   oc_create_knx_ia(OC_KNX_IA, device_index);
   oc_create_knx_osn_resource(OC_KNX_OSN, device_index);

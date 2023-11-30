@@ -26,7 +26,7 @@
 #include "oc_knx_helpers.h"
 
 uint64_t g_oscore_replaywindow = 32;
-uint64_t g_oscore_osndelay = 0;
+uint64_t g_oscore_osndelay = 1000;
 
 /** the list of connections */
 //#define G_OCM_MAX_ENTRIES 20
@@ -138,7 +138,7 @@ oc_core_knx_auth_o_osndelay_put_handler(oc_request_t *request,
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_auth_o_osndelay, knx_auth_o, 0,
-                                     "/auth/o/osndelay", OC_IF_D,
+                                     "/auth/o/osndelay", OC_IF_P,
                                      APPLICATION_CBOR, OC_DISCOVERABLE,
                                      oc_core_knx_auth_o_osndelay_get_handler,
                                      oc_core_knx_auth_o_osndelay_put_handler, 0,
@@ -212,7 +212,7 @@ oc_core_knx_auth_o_replwdo_put_handler(oc_request_t *request,
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_auth_o_replwdo, knx_auth_o_osndelay, 0,
-                                     "/auth/o/replwdo", OC_IF_D,
+                                     "/auth/o/replwdo", OC_IF_P,
                                      APPLICATION_CBOR, OC_DISCOVERABLE,
                                      oc_core_knx_auth_o_replwdo_get_handler,
                                      oc_core_knx_auth_o_replwdo_put_handler, 0,

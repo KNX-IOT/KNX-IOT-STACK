@@ -102,15 +102,18 @@ void
 oc_send_cbor_response(oc_request_t *request, oc_status_t response_code)
 {
   if (request && request->response && request->response->response_buffer) {
-    request->response->response_buffer->content_format = APPLICATION_CBOR;
+    int length = 0;
     if ((response_code == OC_STATUS_OK) ||
         (response_code == OC_STATUS_CHANGED)) {
-      request->response->response_buffer->response_length = response_length();
-    } else {
-      request->response->response_buffer->response_length = 0;
+      length = response_length();
     }
-
-    request->response->response_buffer->code = oc_status_code(response_code);
+    if (length > 0) {
+      request->response->response_buffer->content_format = APPLICATION_CBOR;
+      request->response->response_buffer->response_length = length;
+      request->response->response_buffer->code = oc_status_code(response_code);
+    } else {
+      oc_send_response_no_format(request, response_code);
+    }
   }
 }
 
