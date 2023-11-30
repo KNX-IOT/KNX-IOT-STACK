@@ -26,7 +26,7 @@
 #include "oc_knx_helpers.h"
 
 uint64_t g_oscore_replaywindow = 32;
-uint64_t g_oscore_osndelay = 0;
+uint64_t g_oscore_osndelay = 1000;
 
 /** the list of connections */
 //#define G_OCM_MAX_ENTRIES 20
