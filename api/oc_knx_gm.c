@@ -570,9 +570,12 @@ oc_core_fp_gm_post_handler(oc_request_t *request,
       g_gm_entries[index].id = id;
 
       // parse the response
+      bool id_only = true;
+      bool do_safe = true;
       object = rep->value.object;
       while (object != NULL) {
         if (object->type == OC_REP_INT_ARRAY) {
+          id_only = false;
           // ga
           if (object->iname == 7) {
             int64_t *array = 0;
@@ -604,12 +607,16 @@ oc_core_fp_gm_post_handler(oc_request_t *request,
             }
           }
         } else if (object->type == OC_REP_INT) {
+          if (object->iname != 0) {
+            id_only = false;
+          }
           if (object->iname == 116) {
             // dataType (116)
             PRINT("   dataType %d\n", (int)object->value.integer);
             g_gm_entries[index].dataType = (int)object->value.integer;
           }
         } else if (object->type == OC_REP_OBJECT) {
+          id_only = false;
           // level of s
           s_object = object->value.object;
           int s_object_nr = object->iname;
@@ -655,20 +662,26 @@ oc_core_fp_gm_post_handler(oc_request_t *request,
         }
         object = object->next;
       } // while (inner object)
+      if (id_only) {
+        PRINT("  only found id in request, deleting entry at index: %d\n",
+              index);
+        oc_delete_group_mapping_table_entry(index);
+        do_safe = false;
+      }
     }   // case
     }   // switch (over all objects)
     rep = rep->next;
   }
 
-  for (int i = 0; i < oc_core_get_group_mapping_table_size(); i++) {
-    if (g_gm_entries[i].ga_len != 0) {
-      oc_dump_group_mapping_table_entry(i);
+  if (do_safe) {
+    for (int i = 0; i < oc_core_get_group_mapping_table_size(); i++) {
+      if (g_gm_entries[i].ga_len != 0) {
+        oc_dump_group_mapping_table_entry(i);
+      }
     }
   }
 
-  request->response->response_buffer->content_format = APPLICATION_CBOR;
-  request->response->response_buffer->code = oc_status_code(return_status);
-  request->response->response_buffer->response_length = response_length;
+  oc_send_response_no_format(request, return_status);
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_fp_gm, knx_fp_gm_x, 0, "/fp/gm",
