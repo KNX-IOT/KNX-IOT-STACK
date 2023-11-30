@@ -46,6 +46,8 @@ set(KNX_SPAKE_MIN_IT "1000" CACHE STRING "Minimum number of SHA256 iterations us
 set(KNX_SPAKE_MAX_IT "100000" CACHE STRING "Maximum number of SHA256 iterations used within the SPAKE2+ handshake")
 mark_as_advanced(KNX_SPAKE_MIN_IT KNX_SPAKE_MAX_IT)
 
+set(KNX_PAGE_SIZE "" CACHE STRING "Default page size for pagination")
+
 include(tools/clang-tidy.cmake)
 
 if(KNX_BUILTIN_MBEDTLS)
@@ -216,6 +218,10 @@ endif()
 
 if(NOT ${KNX_GRT_MAX_ENTRIES} EQUAL "")
     add_compile_definitions(GRT_MAX_ENTRIES=${KNX_GRT_MAX_ENTRIES})
+endif()
+
+if(NOT ${KNX_PAGE_SIZE} EQUAL "")
+    add_compile_definitions(PAGE_SIZE=${KNX_PAGE_SIZE})
 endif()
 
 # Client and server versions

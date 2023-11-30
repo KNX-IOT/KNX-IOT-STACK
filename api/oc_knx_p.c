@@ -26,21 +26,19 @@
 // -----------------------------------------------------------------------------
 
 bool
-oc_add_data_points_to_response(oc_request_t *request, size_t device_index,
-                               size_t *response_length, int matches)
+oc_add_data_points_to_response(oc_request_t *request,
+                               const oc_resource_t *resource,
+                               size_t device_index, size_t *response_length,
+                               int matches, int page_size)
 {
   (void)request;
   int length = 0;
 
-  const oc_resource_t *resource = oc_ri_get_app_resources();
-  for (; resource; resource = resource->next) {
-    if (resource->device != device_index ||
-        (resource->properties & OC_DISCOVERABLE)) {
+  for (; resource && matches < page_size; resource = resource->next) {
+    if (resource->device != device_index) {
       continue;
     }
-    // add the none discoverable resource that belongs to this device
-    oc_add_resource_to_wk(resource, request, device_index, response_length,
-                          matches, 1);
+    oc_add_resource_to_wk(resource, request, device_index, response_length, 1);
     matches++;
   }
 
@@ -60,11 +58,19 @@ oc_core_p_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 {
   (void)data;
   (void)iface_mask;
+  int i;
   size_t response_length = 0;
   int matches = 0;
-  int length = 0;
+
   bool ps_exists = false;
   bool total_exists = false;
+  int total = 0;
+  int first_entry = 0; // inclusive
+  int last_entry = 0;  // exclusive
+  // int query_ps = -1;
+  int query_pn = -1;
+  bool more_request_needed =
+    false; // If more requests (pages) are needed to get the full list
 
   PRINT("oc_core_p_get_handler\n");
 
@@ -74,45 +80,59 @@ oc_core_p_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
+
   size_t device_index = request->resource->device;
+
+  const oc_resource_t *my_p = oc_ri_get_app_resources();
+  // Calculate total properties
+  for (; my_p; my_p = my_p->next) {
+    if (my_p->device != device_index) {
+      continue;
+    }
+    if (oc_string(my_p->uri) != NULL) {
+      total++;
+    }
+  }
+  last_entry = total;
 
   // handle query parameters: l=ps l=total
   if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
     // example : < /p > l = total>;total=22;ps=5
-    length = oc_frame_query_l("/p", ps_exists, total_exists);
-
-    // count the discoverable resources
-    int matches = 0;
-    const oc_resource_t *resource = oc_ri_get_app_resources();
-    for (; resource; resource = resource->next) {
-      if (resource->device != device_index ||
-          (resource->properties & OC_DISCOVERABLE)) {
-        continue;
-      }
-      matches++;
-    }
-
-    response_length += length;
-    if (ps_exists) {
-      length = oc_rep_add_line_to_buffer(";ps=");
-      response_length += length;
-      length = oc_frame_integer(matches);
-      response_length += length;
-    }
-    if (total_exists) {
-      length = oc_rep_add_line_to_buffer(";total=");
-      response_length += length;
-      length = oc_frame_integer(matches);
-      response_length += length;
-    }
+    response_length =
+      oc_frame_query_l(oc_string(request->resource->uri), ps_exists, PAGE_SIZE,
+                       total_exists, total);
     oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
     return;
   }
 
-  bool added = oc_add_data_points_to_response(request, device_index,
-                                              &response_length, matches);
+  my_p = oc_ri_get_app_resources();
+  // handle query with page number (pn)
+  if (check_if_query_pn_exist(request, &query_pn, NULL)) {
+    first_entry = query_pn * PAGE_SIZE;
+    if (first_entry >= last_entry) {
+      oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
+      return;
+    }
+
+    // skip endpoints and return the next one
+    for (i = 0; i < first_entry; i++) {
+      my_p = my_p->next;
+    }
+  }
+
+  if (last_entry > first_entry + PAGE_SIZE) {
+    more_request_needed = true;
+  }
+
+  bool added = oc_add_data_points_to_response(
+    request, my_p, device_index, &response_length, matches, PAGE_SIZE);
 
   if (added) {
+    if (more_request_needed) {
+      int next_page_num = query_pn > -1 ? query_pn + 1 : 1;
+      response_length += add_next_page_indicator(
+        oc_string(request->resource->uri), next_page_num);
+    }
     oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
   } else {
     oc_send_response_no_format(request, OC_STATUS_INTERNAL_SERVER_ERROR);

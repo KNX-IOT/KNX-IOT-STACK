@@ -16,6 +16,7 @@
 
 #include "oc_api.h"
 #include "api/oc_knx_swu.h"
+#include "api/oc_knx_helpers.h"
 #include "oc_discovery.h"
 #include "oc_core_res.h"
 #include <stdio.h>
@@ -713,7 +714,7 @@ oc_knx_swu_pkgqurl_put_handler(oc_request_t *request,
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_swu_pkgqurl, knx_swu_pkgnames, 0,
                                      "/swu/pkgqurl", OC_IF_SWU | OC_IF_D,
-                                     OC_DISCOVERABLE, APPLICATION_CBOR,
+                                     APPLICATION_CBOR, OC_DISCOVERABLE,
                                      oc_knx_swu_pkgqurl_get_handler,
                                      oc_knx_swu_pkgqurl_put_handler, 0, 0,
                                      "urn:knx:dpt.url", OC_SIZE_ZERO());
@@ -723,8 +724,8 @@ oc_create_knx_swu_pkgqurl_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_swu_pkgqurl_resource\n");
   oc_core_populate_resource(resource_idx, device, "/swu/pkgqurl",
-                            OC_IF_SWU | OC_IF_D, OC_DISCOVERABLE,
-                            APPLICATION_CBOR, oc_knx_swu_pkgqurl_get_handler,
+                            OC_IF_SWU | OC_IF_D, APPLICATION_CBOR,
+                            OC_DISCOVERABLE, oc_knx_swu_pkgqurl_get_handler,
                             oc_knx_swu_pkgqurl_put_handler, 0, 0, 0);
 
   oc_core_bind_dpt_resource(resource_idx, device, "urn:knx:dpt.url");
@@ -781,6 +782,16 @@ oc_core_knx_swu_get_handler(oc_request_t *request,
   int i;
   int matches = 0;
 
+  bool ps_exists = false;
+  bool total_exists = false;
+  int total = (int)OC_KNX_SWU - (int)OC_KNX_SWU_PROTOCOL;
+  int first_entry = (int)OC_KNX_SWU_PROTOCOL; // inclusive
+  int last_entry = (int)OC_KNX_SWU;           // exclusive
+  // int query_ps = -1;
+  int query_pn = -1;
+  bool more_request_needed =
+    false; // If more requests (pages) are needed to get the full list
+
   /* check if the accept header is cbor-format */
   if (oc_check_accept_header(request, APPLICATION_LINK_FORMAT) == false) {
     request->response->response_buffer->code =
@@ -790,23 +801,52 @@ oc_core_knx_swu_get_handler(oc_request_t *request,
 
   size_t device_index = request->resource->device;
 
-  for (i = (int)OC_KNX_SWU_PROTOCOL; i < (int)OC_KNX_SWU; i++) {
+  // handle query parameters: l=ps l=total
+  if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
+    // example : < /swu > l = total>;total=22;ps=5
+    response_length =
+      oc_frame_query_l(oc_string(request->resource->uri), ps_exists, PAGE_SIZE,
+                       total_exists, total);
+    oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
+    return;
+  }
+
+  // handle query with page number (pn)
+  if (check_if_query_pn_exist(request, &query_pn, NULL)) {
+    first_entry += query_pn * PAGE_SIZE;
+    if (first_entry >= last_entry) {
+      oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
+      return;
+    }
+  }
+
+  if (last_entry > first_entry + PAGE_SIZE) {
+    last_entry = first_entry + PAGE_SIZE;
+    more_request_needed = true;
+  }
+
+  for (i = first_entry; i < last_entry; i++) {
     const oc_resource_t *resource =
       oc_core_get_resource_by_index(i, device_index);
     if (oc_filter_resource(resource, request, device_index, &response_length,
-                           matches, 1)) {
+                           &i, i)) {
       matches++;
     }
   }
 
   if (matches > 0) {
+    if (more_request_needed) {
+      int next_page_num = query_pn > -1 ? query_pn + 1 : 1;
+      response_length += add_next_page_indicator(
+        oc_string(request->resource->uri), next_page_num);
+    }
     oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
   } else {
     oc_send_response_no_format(request, OC_STATUS_INTERNAL_SERVER_ERROR);
   }
 }
 
-OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_swu, knx_p_oscore_replwdo, 0, "/swu",
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_swu, sub, 0, "/swu",
                                      OC_IF_SWU | OC_IF_LI,
                                      APPLICATION_LINK_FORMAT, OC_DISCOVERABLE,
                                      oc_core_knx_swu_get_handler, 0, 0, 0, NULL,

@@ -586,10 +586,38 @@ oc_core_dev_ipv6_get_handler(oc_request_t *request,
 {
   (void)data;
   (void)iface_mask;
+  int i;
+
+  int ps = 1;
   bool ps_exists = false;
   bool total_exists = false;
-  int ps_value = -1;
-  int pn_value = -1;
+  int total = 0;
+  int first_entry = 0; // inclusive
+  int last_entry = 0;  // exclusive
+  // int query_ps = -1;
+  int query_pn = -1;
+
+  PRINT("oc_core_dev_ipv6_get_handler\n");
+
+  // get the device
+  size_t device_index = request->resource->device;
+
+  oc_endpoint_t *my_ep = oc_connectivity_get_endpoints(device_index);
+  // Calculate total endpoints
+  while (my_ep != NULL) {
+    my_ep = my_ep->next;
+    total++;
+  }
+  last_entry = total;
+
+  // handle query parameters: l=ps l=total
+  if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
+    // example : < /dev/ipv6 > l = total>;total=22;ps=5
+    size_t response_length = oc_frame_query_l(
+      oc_string(request->resource->uri), ps_exists, ps, total_exists, total);
+    oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
+    return;
+  }
 
   /* check if the accept header is CBOR-format */
   if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
@@ -597,69 +625,30 @@ oc_core_dev_ipv6_get_handler(oc_request_t *request,
     return;
   }
 
-  // handle query parameters: l=ps l=total
-  if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
-    // example : < / fp / r / ? l = total>; total = 22; ps = 5
-    int length;
-    int response_length = 0;
-
-    // get the device structure from the request.
-    size_t device_index = request->resource->device;
-
-    length = oc_frame_query_l("/dev/ipv6", ps_exists, total_exists);
-    response_length += length;
-    // count the application functional blocks
-    if (ps_exists) {
-      length = oc_rep_add_line_to_buffer(";ps=");
-      response_length += length;
-      length = oc_frame_integer(1);
-      response_length += length;
-    }
-    if (total_exists) {
-      length = oc_rep_add_line_to_buffer(";total=");
-      response_length += length;
-      length = oc_frame_integer(1);
-      response_length += length;
+  my_ep = oc_connectivity_get_endpoints(device_index);
+  // handle query with page number (pn)
+  if (check_if_query_pn_exist(request, &query_pn, NULL)) {
+    first_entry = query_pn * ps;
+    if (first_entry >= last_entry) {
+      oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
+      return;
     }
 
-    oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
-    return;
+    // skip endpoints and return the next one
+    for (i = 0; i < first_entry; i++) {
+      my_ep = my_ep->next;
+    }
   }
 
-  // get the device
-  size_t device_index = request->resource->device;
-  // frame only the first one...
-  oc_endpoint_t *my_ep = oc_connectivity_get_endpoints(device_index);
-  if (my_ep == NULL) {
-    // hmm something is wrong, no IPV6 endpoint
-    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
-  }
-
-  if (check_if_query_pn_exist(request, &pn_value, &ps_value)) {
-    // return the list..
-    // this is an array of endpoints.
-    // we are only framing the first one (the one that is being used).
-    // start array
-    oc_rep_start_links_array();
-    // start object in array
-    oc_rep_start_object(oc_rep_array(links), obj);
-    // frame the entry
-    oc_rep_i_set_byte_string(obj, 1, my_ep->addr.ipv6.address,
-                             sizeof(my_ep->addr.ipv6.address));
-    // end object
-    oc_rep_end_object(oc_rep_array(links), obj);
-    // end array
-    oc_rep_end_links_array();
-  } else {
-    // return the single entry.
-    oc_rep_begin_root_object();
-    oc_rep_i_set_byte_string(root, 1, my_ep->addr.ipv6.address,
-                             sizeof(my_ep->addr.ipv6.address));
-    oc_rep_end_root_object();
-  }
+  // return the single entry.
+  oc_rep_begin_root_object();
+  oc_rep_i_set_byte_string(root, 1, my_ep->addr.ipv6.address,
+                           sizeof(my_ep->addr.ipv6.address));
+  oc_rep_end_root_object();
 
   oc_send_cbor_response(request, OC_STATUS_OK);
-  return;
+
+  PRINT("oc_core_dev_ipv6_get_handler - end\n");
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(dev_ipv6, dev_sa, 0, "/dev/ipv6", OC_IF_P,
@@ -784,6 +773,17 @@ oc_core_dev_dev_get_handler(oc_request_t *request,
   size_t response_length = 0;
   int i;
   int matches = 0;
+
+  bool ps_exists = false;
+  bool total_exists = false;
+  int total = (int)OC_DEV - (int)OC_DEV_SN;
+  int first_entry = (int)OC_DEV_SN; // inclusive
+  int last_entry = (int)OC_DEV;     // exclusive
+  // int query_ps = -1;
+  int query_pn = -1;
+  bool more_request_needed =
+    false; // If more requests (pages) are needed to get the full list
+
   PRINT("oc_core_dev_dev_get_handler\n");
 
   /* check if the accept header is link-format */
@@ -795,16 +795,45 @@ oc_core_dev_dev_get_handler(oc_request_t *request,
 
   size_t device_index = request->resource->device;
 
-  for (i = (int)OC_DEV_SN; i < (int)OC_DEV; i++) {
+  // handle query parameters: l=ps l=total
+  if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
+    // example : < /dev > l = total>;total=22;ps=5
+    response_length =
+      oc_frame_query_l(oc_string(request->resource->uri), ps_exists, PAGE_SIZE,
+                       total_exists, total);
+    oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
+    return;
+  }
+
+  // handle query with page number (pn)
+  if (check_if_query_pn_exist(request, &query_pn, NULL)) {
+    first_entry += query_pn * PAGE_SIZE;
+    if (first_entry >= last_entry) {
+      oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
+      return;
+    }
+  }
+
+  if (last_entry > first_entry + PAGE_SIZE) {
+    last_entry = first_entry + PAGE_SIZE;
+    more_request_needed = true;
+  }
+
+  for (i = first_entry; i < last_entry; i++) {
     const oc_resource_t *resource =
       oc_core_get_resource_by_index(i, device_index);
     if (oc_filter_resource(resource, request, device_index, &response_length,
-                           matches, 1)) {
+                           &i, i)) {
       matches++;
     }
   }
 
   if (matches > 0) {
+    if (more_request_needed) {
+      int next_page_num = query_pn > -1 ? query_pn + 1 : 1;
+      response_length += add_next_page_indicator(
+        oc_string(request->resource->uri), next_page_num);
+    }
     oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
   } else {
     oc_send_response_no_format(request, OC_STATUS_INTERNAL_SERVER_ERROR);
@@ -1295,7 +1324,7 @@ oc_core_ap_x_put_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
 }
 
-OC_CORE_CREATE_CONST_RESOURCE_LINKED(app_x, knx_spake, 0, "/ap/pv", OC_IF_P,
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(app_x, a_lsm, 0, "/ap/pv", OC_IF_P,
                                      APPLICATION_CBOR, OC_DISCOVERABLE,
                                      oc_core_ap_x_get_handler,
                                      oc_core_ap_x_put_handler, 0, 0,
@@ -1324,9 +1353,18 @@ oc_core_ap_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   size_t response_length = 0;
   int i;
   int matches = 0;
-  int length = 0;
-  bool ps_exists;
-  bool total_exists;
+
+  bool ps_exists = false;
+  bool total_exists = false;
+  int total = (int)OC_KNX_SPAKE - (int)OC_APP_X;
+  int first_entry = (int)OC_APP_X;    // inclusive
+  int last_entry = (int)OC_KNX_SPAKE; // exclusive
+  // int query_ps = -1;
+  int query_pn = -1;
+  bool more_request_needed =
+    false; // If more requests (pages) are needed to get the full list
+
+  PRINT("oc_core_ap_get_handler\n");
 
   /* check if the accept header is link-format */
   if (oc_check_accept_header(request, APPLICATION_LINK_FORMAT) == false) {
@@ -1334,47 +1372,53 @@ oc_core_ap_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     return;
   }
 
+  size_t device_index = request->resource->device;
+
   // handle query parameters: l=ps l=total
   if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
     // example : < /ap > l = total>;total=22;ps=5
-    length = oc_frame_query_l("/ap", ps_exists, total_exists);
-    response_length += length;
-    if (ps_exists) {
-      length = oc_rep_add_line_to_buffer(";ps=1");
-      response_length += length;
-    }
-    if (total_exists) {
-      length = oc_rep_add_line_to_buffer(";total=1");
-      response_length += length;
-    }
+    response_length =
+      oc_frame_query_l(oc_string(request->resource->uri), ps_exists, PAGE_SIZE,
+                       total_exists, total);
     oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
     return;
   }
 
-  // Add /ap/pv
-  size_t device_index = request->resource->device;
-  const oc_resource_t *resource =
-    oc_core_get_resource_by_index(OC_APP_X, device_index);
-  if (resource) {
-    PRINT("URL %s\n", oc_string(resource->uri));
-    oc_add_resource_to_wk(resource, request, device_index, &response_length,
-                          matches, true);
+  // handle query with page number (pn)
+  if (check_if_query_pn_exist(request, &query_pn, NULL)) {
+    first_entry += query_pn * PAGE_SIZE;
+    if (first_entry >= last_entry) {
+      oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
+      return;
+    }
   }
 
-  // Add /a/lsm
-  resource = oc_core_get_resource_by_index(OC_KNX_LSM, device_index);
-  if (resource) {
-    PRINT("URL %s\n", oc_string(resource->uri));
-    oc_add_resource_to_wk(resource, request, device_index, &response_length,
-                          matches, true);
+  if (last_entry > first_entry + PAGE_SIZE) {
+    last_entry = first_entry + PAGE_SIZE;
+    more_request_needed = true;
   }
 
-  if (response_length > 0) {
+  for (i = first_entry; i < last_entry; i++) {
+    const oc_resource_t *resource =
+      oc_core_get_resource_by_index(i, device_index);
+    if (oc_filter_resource(resource, request, device_index, &response_length,
+                           &i, i)) {
+      matches++;
+    }
+  }
+
+  if (matches > 0) {
+    if (more_request_needed) {
+      int next_page_num = query_pn > -1 ? query_pn + 1 : 1;
+      response_length += add_next_page_indicator(
+        oc_string(request->resource->uri), next_page_num);
+    }
     oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
-    return;
   } else {
     oc_send_response_no_format(request, OC_STATUS_INTERNAL_SERVER_ERROR);
   }
+
+  PRINT("oc_core_ap_get_handler - end\n");
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(app, app_x, 0, "/ap", OC_IF_P,
@@ -1528,7 +1572,7 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
     oc_storage_write(KNX_STORAGE_MPORT, (char *)&mport, sizeof(uint32_t));
     oc_storage_erase(KNX_STORAGE_HOSTNAME);
     // load state: unloaded, and programming mode is true
-    oc_knx_lsm_set_state(device_index, LSM_S_UNLOADED);
+    oc_a_lsm_set_state(device_index, LSM_S_UNLOADED);
     // set the other data to KNX defaults
     device->ia = ffff;
     device->iid = zero;
@@ -1572,7 +1616,7 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
 
     oc_knx_device_set_programming_mode(device_index, false);
     // load state: unloaded
-    oc_knx_lsm_set_state(device_index, LSM_S_UNLOADED);
+    oc_a_lsm_set_state(device_index, LSM_S_UNLOADED);
   }
 
   oc_reset_t *my_reset_cb = oc_get_reset_cb();

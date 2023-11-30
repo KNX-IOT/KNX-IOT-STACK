@@ -43,12 +43,17 @@ extern "C" {
  * @param device_index the device index
  * @param response_length the current response length
  * @param matches number of matches (so far)
+ * @param skipped number of entries already skipped
+ * @param first_entry first entry to be included
+ * @param last_entry last entry to be included (exclusive)
  * @return true
  * @return false
  */
 bool oc_add_function_blocks_to_response(oc_request_t *request,
                                         size_t device_index,
-                                        size_t *response_length, int matches);
+                                        size_t *response_length, int *matches,
+                                        int *skipped, int first_entry,
+                                        int last_entry);
 
 /**
  *@brief Creation of the KNX function block resources.

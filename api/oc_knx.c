@@ -266,9 +266,11 @@ oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   // CHANGED and with payload containing Error Code and Process Time in seconds
   // as defined 691 for the Response to a Master Reset Request for KNX Classic
   // devices, see [10].
-  if (error == false) {
-
-    // oc_rep_begin_root_object ();
+  if (error == true) {
+    PRINT(" invalid command\n");
+    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
+    return;
+  } else if (cmd == RESET_DEVICE) {
     oc_rep_begin_root_object();
 
     // TODO note need to figure out how to fill in the correct response values
@@ -281,10 +283,6 @@ oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
     return;
   }
-
-  PRINT(" invalid command\n");
-  oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
-  return;
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx, knx_fp_g, 0, "/.well-known/knx",
@@ -307,7 +305,7 @@ oc_create_knx_resource(int resource_idx, size_t device)
 // ----------------------------------------------------------------------------
 
 oc_lsm_state_t
-oc_knx_lsm_state(size_t device_index)
+oc_a_lsm_state(size_t device_index)
 {
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device == NULL) {
@@ -322,7 +320,7 @@ oc_knx_lsm_state(size_t device_index)
  * function will store the new state
  */
 int
-oc_knx_lsm_set_state(size_t device_index, oc_lsm_event_t new_state)
+oc_a_lsm_set_state(size_t device_index, oc_lsm_event_t new_state)
 {
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device == NULL) {
@@ -390,31 +388,31 @@ oc_lsm_event_to_state(oc_lsm_event_t lsm_e, size_t device_index)
     return true;
   }
   if (lsm_e == LSM_E_STARTLOADING) {
-    oc_knx_lsm_set_state(device_index, LSM_S_LOADING);
+    oc_a_lsm_set_state(device_index, LSM_S_LOADING);
     return true;
   }
   if (lsm_e == LSM_E_LOADCOMPLETE) {
-    oc_knx_lsm_set_state(device_index, LSM_S_LOADED);
+    oc_a_lsm_set_state(device_index, LSM_S_LOADED);
     return true;
   }
   if (lsm_e == LSM_E_UNLOAD) {
     // do a reset
     oc_delete_group_rp_table();
     oc_delete_group_object_table();
-    oc_knx_lsm_set_state(device_index, LSM_S_UNLOADED);
+    oc_a_lsm_set_state(device_index, LSM_S_UNLOADED);
     return true;
   }
   return false;
 }
 
 static void
-oc_core_knx_lsm_get_handler(oc_request_t *request,
-                            oc_interface_mask_t iface_mask, void *data)
+oc_core_a_lsm_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
+                          void *data)
 {
   (void)data;
   (void)iface_mask;
 
-  PRINT("oc_core_knx_lsm_get_handler\n");
+  PRINT("oc_core_a_lsm_get_handler\n");
 
   /* check if the accept header is cbor-format */
   if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
@@ -429,7 +427,7 @@ oc_core_knx_lsm_get_handler(oc_request_t *request,
     oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
     return;
   }
-  oc_lsm_state_t lsm = oc_knx_lsm_state(device_index);
+  oc_lsm_state_t lsm = oc_a_lsm_state(device_index);
 
   oc_rep_begin_root_object();
   oc_rep_i_set_int(root, 3, lsm);
@@ -437,12 +435,12 @@ oc_core_knx_lsm_get_handler(oc_request_t *request,
 
   oc_send_cbor_response(request, OC_STATUS_OK);
 
-  PRINT("oc_core_knx_lsm_get_handler - done\n");
+  PRINT("oc_core_a_lsm_get_handler - done\n");
 }
 
 static void
-oc_core_knx_lsm_post_handler(oc_request_t *request,
-                             oc_interface_mask_t iface_mask, void *data)
+oc_core_a_lsm_post_handler(oc_request_t *request,
+                           oc_interface_mask_t iface_mask, void *data)
 {
   (void)data;
   (void)iface_mask;
@@ -487,7 +485,7 @@ oc_core_knx_lsm_post_handler(oc_request_t *request,
     oc_loadstate_t *lsm_cb = oc_get_lsm_change_cb();
 
     if (lsm_cb->cb != NULL) {
-      lsm_cb->cb(device_index, oc_knx_lsm_state(device_index), lsm_cb->data);
+      lsm_cb->cb(device_index, oc_a_lsm_state(device_index), lsm_cb->data);
     }
 
     if (oc_is_device_in_runtime(device_index)) {
@@ -503,7 +501,7 @@ oc_core_knx_lsm_post_handler(oc_request_t *request,
     oc_rep_new(request->response->response_buffer->buffer,
                (int)request->response->response_buffer->buffer_size);
     oc_rep_begin_root_object();
-    oc_rep_i_set_int(root, 3, (int)oc_knx_lsm_state(device_index));
+    oc_rep_i_set_int(root, 3, (int)oc_a_lsm_state(device_index));
     oc_rep_end_root_object();
 
     oc_send_cbor_response(request, OC_STATUS_CHANGED);
@@ -513,20 +511,20 @@ oc_core_knx_lsm_post_handler(oc_request_t *request,
   oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
 }
 
-OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_lsm, knx_dot_knx, 0, "/a/lsm", OC_IF_C,
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(a_lsm, knx_spake, 0, "/a/lsm", OC_IF_C,
                                      APPLICATION_CBOR, OC_DISCOVERABLE,
-                                     oc_core_knx_lsm_get_handler, 0,
-                                     oc_core_knx_lsm_post_handler, 0, NULL,
+                                     oc_core_a_lsm_get_handler, 0,
+                                     oc_core_a_lsm_post_handler, 0, NULL,
                                      OC_SIZE_ZERO());
 
 void
-oc_create_knx_lsm_resource(int resource_idx, size_t device)
+oc_create_a_lsm_resource(int resource_idx, size_t device)
 {
-  OC_DBG("oc_create_knx_lsm_resource\n");
+  OC_DBG("oc_create_a_lsm_resource\n");
   // "/a/lsm"
   oc_core_populate_resource(
     resource_idx, device, "/a/lsm", OC_IF_C, APPLICATION_CBOR, OC_DISCOVERABLE,
-    oc_core_knx_lsm_get_handler, 0, oc_core_knx_lsm_post_handler, 0, 0);
+    oc_core_a_lsm_get_handler, 0, oc_core_a_lsm_post_handler, 0, 0);
 }
 
 // ----------------------------------------------------------------------------
@@ -967,7 +965,7 @@ oc_core_knx_fingerprint_get_handler(oc_request_t *request,
 
   // check if the state is loaded
   size_t device_index = request->resource->device;
-  if (oc_knx_lsm_state(device_index) != LSM_S_LOADED) {
+  if (oc_a_lsm_state(device_index) != LSM_S_LOADED) {
     OC_ERR(" not in loaded state\n");
     oc_send_response_no_format(request, OC_STATUS_SERVICE_UNAVAILABLE);
     return;
@@ -1144,7 +1142,7 @@ oc_core_knx_ldevid_get_handler(oc_request_t *request,
   PRINT("oc_core_knx_ldevid_get_handler- done\n");
 }
 
-OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_ldevid, knx_lsm, 0,
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_ldevid, knx_dot_knx, 0,
                                      "/.well-known/knx/ldevid", OC_IF_D,
                                      APPLICATION_PKCS7_CMC_REQUEST,
                                      OC_DISCOVERABLE,
@@ -1280,7 +1278,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
   }
   // check if the state is unloaded
   size_t device_index = request->resource->device;
-  if (oc_knx_lsm_state(device_index) != LSM_S_UNLOADED) {
+  if (oc_a_lsm_state(device_index) != LSM_S_UNLOADED) {
     OC_ERR(" not in unloaded state\n");
     oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
     return;
@@ -1678,7 +1676,7 @@ oc_create_knx_resources(size_t device_index)
     return;
   }
 
-  oc_create_knx_lsm_resource(OC_KNX_LSM, device_index);
+  oc_create_a_lsm_resource(OC_A_LSM, device_index);
   oc_create_knx_knx_resource(OC_KNX_DOT_KNX, device_index);
   oc_create_knx_knx_resource(OC_KNX_G, device_index);
   oc_create_knx_fingerprint_resource(OC_KNX_FINGERPRINT, device_index);

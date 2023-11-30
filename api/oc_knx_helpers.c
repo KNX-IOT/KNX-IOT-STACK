@@ -17,15 +17,15 @@
 #include "oc_api.h"
 #include "oc_knx_helpers.h"
 
-int
+bool
 check_if_query_l_exist(oc_request_t *request, bool *ps_exists,
                        bool *total_exists)
 {
   if (ps_exists == NULL) {
-    return 0;
+    return false;
   }
   if (total_exists == NULL) {
-    return 0;
+    return false;
   }
 
   *ps_exists = false;
@@ -34,7 +34,7 @@ check_if_query_l_exist(oc_request_t *request, bool *ps_exists,
   // handle query parameters
   if (oc_query_values_available(request)) {
     // check if l exist
-    if (oc_query_value_exists(request, "l")) {
+    if (oc_query_value_exists(request, "l") > -1) {
       // find out if l=ps and or l=total
       bool more_query_params;
       char *value = NULL;
@@ -58,16 +58,17 @@ check_if_query_l_exist(oc_request_t *request, bool *ps_exists,
   }   /* query available */
 
   if (*ps_exists == true) {
-    return 1;
+    return true;
   }
   if (*total_exists == true) {
-    return 1;
+    return true;
   }
-  return 0;
+  return false;
 }
 
 int
-oc_frame_query_l(char *url, bool ps_exists, bool total_exists)
+oc_frame_query_l(char *url, bool ps_exists, int ps, bool total_exists,
+                 int total)
 {
   // example : < / fp / r / ? l = total>; total = 22; ps = 5
   // spec 1.1. : no query arguments anymore in the url
@@ -82,62 +83,91 @@ oc_frame_query_l(char *url, bool ps_exists, bool total_exists)
   length = oc_rep_add_line_to_buffer(">");
   response_length += length;
 
-  /*
-  if (ps_exists && total_exists) {
-    length = oc_rep_add_line_to_buffer("?l=ps;l=total>");
+  if (ps_exists) {
+    length = oc_rep_add_line_to_buffer(";ps=");
     response_length += length;
-  } else if (ps_exists) {
-    length = oc_rep_add_line_to_buffer("?l=ps>");
-    response_length += length;
-  } else if (total_exists) {
-    length = oc_rep_add_line_to_buffer("?l=total>");
-    response_length += length;
-  } else {
-    length = oc_rep_add_line_to_buffer(">");
+    length = oc_frame_integer(ps);
     response_length += length;
   }
-  */
+  if (total_exists) {
+    length = oc_rep_add_line_to_buffer(";total=");
+    response_length += length;
+    length = oc_frame_integer(total);
+    response_length += length;
+  }
 
   return response_length;
 }
 
-int
+bool
 check_if_query_pn_exist(oc_request_t *request, int *pn_value, int *ps_value)
 {
+  (void)ps_value;
   char *value = NULL;
   int value_len = -1;
 
   if (pn_value == NULL) {
-    return 0;
+    return false;
   }
-  if (ps_value == NULL) {
-    return 0;
-  }
+  // if (ps_value == NULL) {
+  //   return false;
+  // }
 
-  *ps_value = -1;
+  // *ps_value = -1;
   *pn_value = -1;
 
   // handle query parameters
   if (oc_query_values_available(request)) {
+    oc_init_query_iterator();
     // check if pn exist
-    if (oc_query_value_exists(request, "pn")) {
+    if (oc_query_value_exists(request, "pn") > -1) {
       oc_iterate_query_get_values(request, "pn", &value, &value_len);
       *pn_value = atoi(value);
     }
-    oc_init_query_iterator();
-    if (oc_query_value_exists(request, "ps")) {
-      oc_iterate_query_get_values(request, "ps", &value, &value_len);
-      *ps_value = atoi(value);
-    }
+    // oc_init_query_iterator();
+    // if (oc_query_value_exists(request, "ps") > -1) {
+    //   oc_iterate_query_get_values(request, "ps", &value, &value_len);
+    //   *ps_value = atoi(value);
+    // }
   } /* query available */
 
-  if (*ps_value > -1) {
-    return 1;
-  }
+  // if (*ps_value > -1) {
+  //   return true;
+  // }
   if (*pn_value > -1) {
-    return 1;
+    return true;
   }
-  return 0;
+  return false;
+}
+
+int
+add_next_page_indicator(char *url, int next_page_num)
+{
+  // example : </p?pn=1>;rt="p.next";ct=40
+  int response_length = 0;
+  int length;
+  char next_page_str[20];
+  sprintf(next_page_str, "%d", next_page_num);
+
+  length = oc_rep_add_line_to_buffer(",\n<");
+  response_length += length;
+  length = oc_rep_add_line_to_buffer(url);
+  response_length += length;
+  length = oc_rep_add_line_to_buffer("?pn=");
+  response_length += length;
+  length = oc_rep_add_line_to_buffer(next_page_str);
+  response_length += length;
+  length = oc_rep_add_line_to_buffer(">;rt=\"");
+  response_length += length;
+  if (url[0] == '/') {
+    url++;
+  }
+  length = oc_rep_add_line_to_buffer(url);
+  response_length += length;
+  length = oc_rep_add_line_to_buffer(".next\";ct=40");
+  response_length += length;
+
+  return response_length;
 }
 
 int

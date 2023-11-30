@@ -348,10 +348,10 @@ typedef enum {
   OC_DEV,             /**< core link */
   OC_APP,             /**< application ID (list) */
   OC_APP_X,           /**< application ID entry */
+  OC_A_LSM,           /**< load state machine */
   OC_KNX_SPAKE,       /**< spake */
   OC_KNX_IDEVID,      /**< IDevID */
   OC_KNX_LDEVID,      /**< LDevID */
-  OC_KNX_LSM,         /**< load state machine */
   OC_KNX_DOT_KNX,     /**< .knx resource */
   OC_KNX_G,           /**< g (renamed) .knx resource */
   OC_KNX_FINGERPRINT, /**< FINGERPRINT value of loaded contents */
@@ -384,15 +384,15 @@ typedef enum {
 #if 0                  // THIS SHOULD BE IMPLEMENTED IF INCLUDED
   OC_KNX_SWU_PKG,           /**< sw package */
 #endif
-  OC_KNX_SWU,               /**< swu top level */
-  OC_KNX_P_OSCORE_REPLWDO,  /**< oscore replay window*/
-  OC_KNX_P_OSCORE_OSNDELAY, /**< oscore osn delay*/
-  OC_KNX_F_OSCORE,          /**< oscore/f */
-  OC_KNX_SUB,               /**< delete all device subscriptions */
-  OC_KNX_A_SEN,             /**< a/sen resource */
-  OC_KNX_AUTH,              /**< auth list all sub resources */
-  OC_KNX_AUTH_AT,           /**< auth/at resource listing auth/at/X */
-  OC_KNX_AUTH_AT_X,         /**< auth/at/X resources */
+  OC_KNX_SWU,             /**< swu top level */
+  OC_KNX_SUB,             /**< delete all device subscriptions */
+  OC_KNX_A_SEN,           /**< a/sen resource */
+  OC_KNX_AUTH_O_REPLWDO,  /**< oscore replay window*/
+  OC_KNX_AUTH_O_OSNDELAY, /**< oscore osn delay*/
+  OC_KNX_AUTH_O,          /**< auth/o oscore functional block properties list*/
+  OC_KNX_AUTH_AT,         /**< auth/at resource listing auth/at/X */
+  OC_KNX_AUTH_AT_X,       /**< auth/at/X resources */
+  OC_KNX_AUTH,            /**< auth list all sub resources */
 #ifdef OC_IOT_ROUTER
   OC_KNX_FP_GM,   /**< FP/GM */
   OC_KNX_FP_GM_X, /**< FP/GM/X */

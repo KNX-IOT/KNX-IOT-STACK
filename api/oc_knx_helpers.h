@@ -27,6 +27,10 @@
 extern "C" {
 #endif
 
+#ifndef PAGE_SIZE
+#define PAGE_SIZE 20
+#endif
+
 /**
  * @brief helper function to check if query parameter l exists
  *
@@ -34,10 +38,10 @@ extern "C" {
  * @param request the request
  * @param ps_exists return value if l=ps exists
  * @param total_exists return value if l=total exists
- * @return int 1 == l exists (with either ps or total or both)
+ * @return true == l exists (with either ps or total or both)
  */
-int check_if_query_l_exist(oc_request_t *request, bool *ps_exists,
-                           bool *total_exists);
+bool check_if_query_l_exist(oc_request_t *request, bool *ps_exists,
+                            bool *total_exists);
 
 /**
  * @brief helper function to frame url part of query response:
@@ -50,10 +54,13 @@ int check_if_query_l_exist(oc_request_t *request, bool *ps_exists,
  *
  * @param url the url to be framed
  * @param ps_exists frame ps
+ * @param ps page size
  * @param total_exists frame total
+ * @param total total items
  * @return total bytes framed
  */
-int oc_frame_query_l(char *url, bool ps_exists, bool total_exists);
+int oc_frame_query_l(char *url, bool ps_exists, int ps, bool total_exists,
+                     int total);
 
 /**
  * @brief helper function to check if query parameter pn or ps exists
@@ -62,10 +69,20 @@ int oc_frame_query_l(char *url, bool ps_exists, bool total_exists);
  * @param request the request
  * @param pn_value return -1 if not exist otherwise value
  * @param ps_value return -1 if not exist otherwise value
- * @return int 1 == pn or ps exists
+ * @return true == pn or ps exists
  */
-int check_if_query_pn_exist(oc_request_t *request, int *pn_value,
-                            int *ps_value);
+bool check_if_query_pn_exist(oc_request_t *request, int *pn_value,
+                             int *ps_value);
+
+/**
+ * @brief helper function to frame next page indicator, if more requests (pages)
+ * are needed to get the full list
+ *
+ * @param url the url to be framed
+ * @param next_page_num the next page number to be framed
+ * @return total bytes framed
+ */
+int add_next_page_indicator(char *url, int next_page_num);
 
 /**
  * @brief helper function to frame an integer in the response:
