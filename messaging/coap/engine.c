@@ -113,7 +113,7 @@ oc_coap_check_if_duplicate(uint16_t mid, uint8_t device)
   for (i = 0; i < OC_REQUEST_HISTORY_SIZE; i++) {
     if (history[i] == mid && history_dev[i] == device) {
       OC_DBG("dropping duplicate request");
-      OC_DBG("message ID: %d, history[%d]: %d", mid, i, history[i]);
+      OC_DBG("message ID: %d, history[%d]: %d", mid, int(i), history[i]);
       return true;
     }
   }
