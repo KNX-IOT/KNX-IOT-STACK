@@ -38,7 +38,7 @@
 #include <inttypes.h>
 
 int basic_resources[] = {
-  OC_DEV, OC_KNX_DOT_KNX, OC_KNX_SWU, OC_KNX_SUB, OC_KNX_AUTH
+  OC_DEV, OC_KNX_K, OC_KNX_SWU, OC_KNX_SUB, OC_KNX_AUTH
 }; // must be in response if implemented and passed filtering
 
 bool
