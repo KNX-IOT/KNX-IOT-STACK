@@ -280,7 +280,7 @@ oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 
     PRINT("oc_core_knx_post_handler %d - end\n",
           oc_rep_get_encoded_payload_size());
-    oc_send_cbor_response(request, OC_STATUS_CHANGED);
+    oc_send_response_no_format(request, OC_STATUS_CHANGED);
     return;
   }
 }
@@ -504,7 +504,7 @@ oc_core_a_lsm_post_handler(oc_request_t *request,
     oc_rep_i_set_int(root, 3, (int)oc_a_lsm_state(device_index));
     oc_rep_end_root_object();
 
-    oc_send_cbor_response(request, OC_STATUS_CHANGED);
+    oc_send_response_no_format(request, OC_STATUS_CHANGED);
     return;
   }
 
