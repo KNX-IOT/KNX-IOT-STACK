@@ -520,6 +520,7 @@ oc_core_fp_gm_post_handler(oc_request_t *request,
   oc_rep_t *sec_object = NULL;
   oc_status_t return_status = OC_STATUS_BAD_REQUEST;
   int id = -1;
+  bool do_save = true;
 
   PRINT("oc_core_fp_gm_post_handler\n");
 
@@ -571,7 +572,6 @@ oc_core_fp_gm_post_handler(oc_request_t *request,
 
       // parse the response
       bool id_only = true;
-      bool do_safe = true;
       object = rep->value.object;
       while (object != NULL) {
         if (object->type == OC_REP_INT_ARRAY) {
@@ -666,14 +666,14 @@ oc_core_fp_gm_post_handler(oc_request_t *request,
         PRINT("  only found id in request, deleting entry at index: %d\n",
               index);
         oc_delete_group_mapping_table_entry(index);
-        do_safe = false;
+        do_save = false;
       }
     }   // case
     }   // switch (over all objects)
     rep = rep->next;
   }
 
-  if (do_safe) {
+  if (do_save) {
     for (int i = 0; i < oc_core_get_group_mapping_table_size(); i++) {
       if (g_gm_entries[i].ga_len != 0) {
         oc_dump_group_mapping_table_entry(i);
