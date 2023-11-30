@@ -900,7 +900,7 @@ oc_core_f_netip_fra_put_handler(oc_request_t *request,
     rep = rep->next;
   }
 
-  oc_send_response_no_format(request, OC_STATUS_CHANGED);
+  oc_send_cbor_response(request, OC_STATUS_CHANGED);
   PRINT("oc_core_f_netip_fra_put_handler - end\n");
 }
 
@@ -1020,7 +1020,7 @@ oc_core_f_netip_tol_put_handler(oc_request_t *request,
     rep = rep->next;
   }
 
-  oc_send_response_no_format(request, OC_STATUS_CHANGED);
+  oc_send_cbor_response(request, OC_STATUS_CHANGED);
   PRINT("oc_core_f_netip_tol_put_handler - end\n");
 }
 
@@ -1115,7 +1115,7 @@ oc_core_f_netip_key_put_handler(oc_request_t *request,
     rep = rep->next;
   }
 
-  oc_send_response_no_format(request, OC_STATUS_CHANGED);
+  oc_send_cbor_response(request, OC_STATUS_CHANGED);
   PRINT("oc_core_f_netip_key_put_handler - end\n");
 }
 
@@ -1238,7 +1238,7 @@ oc_core_f_netip_ttl_put_handler(oc_request_t *request,
     rep = rep->next;
   }
 
-  oc_send_response_no_format(request, OC_STATUS_CHANGED);
+  oc_send_cbor_response(request, OC_STATUS_CHANGED);
   PRINT("oc_core_f_netip_ttl_put_handler - end\n");
 }
 
@@ -1356,7 +1356,7 @@ oc_core_f_netip_mcast_put_handler(oc_request_t *request,
     rep = rep->next;
   }
 
-  oc_send_response_no_format(request, OC_STATUS_CHANGED);
+  oc_send_cbor_response(request, OC_STATUS_CHANGED);
   PRINT("oc_core_f_netip_mcast_put_handler - end\n");
 }
 

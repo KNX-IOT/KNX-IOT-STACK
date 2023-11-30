@@ -650,7 +650,7 @@ put_dpa_352_51(oc_request_t *request, oc_interface_mask_t interfaces,
       if (rep->iname == 1) {
         PRINT("  put_dpa_352_51 received : %d\n", rep->value.boolean);
         g_352_51_state = rep->value.boolean;
-        oc_send_response_no_format(request, OC_STATUS_CHANGED);
+        oc_send_cbor_response(request, OC_STATUS_CHANGED);
         PRINT("-- End put_dpa_352_51\n");
         return;
       }
@@ -698,7 +698,7 @@ put_dpa_352_51_1(oc_request_t *request, oc_interface_mask_t interfaces,
       if (rep->iname == 1) {
         PRINT("  put_dpa_352_51_1 received : %d\n", rep->value.boolean);
         g_352_51_1_state = rep->value.boolean;
-        oc_send_response_no_format(request, OC_STATUS_CHANGED);
+        oc_send_cbor_response(request, OC_STATUS_CHANGED);
         PRINT("-- End put_dpa_352_51_1\n");
         return;
       }
@@ -745,7 +745,7 @@ put_dpa_352_52(oc_request_t *request, oc_interface_mask_t interfaces,
       if (rep->iname == 1) {
         PRINT("  put_dpa_352_52 received : %d\n", rep->value.boolean);
         g_352_52_state = rep->value.boolean;
-        oc_send_response_no_format(request, OC_STATUS_CHANGED);
+        oc_send_cbor_response(request, OC_STATUS_CHANGED);
         PRINT("-- End put_dpa_352_52\n");
         return;
       }
@@ -791,7 +791,7 @@ put_dpa_353_52(oc_request_t *request, oc_interface_mask_t interfaces,
       if (rep->iname == 1) {
         PRINT("  put_dpa_353_52 received : %d\n", rep->value.boolean);
         g_353_52_state = rep->value.boolean;
-        oc_send_response_no_format(request, OC_STATUS_CHANGED);
+        oc_send_cbor_response(request, OC_STATUS_CHANGED);
         PRINT("-- End put_dpa_353_52\n");
         return;
       }

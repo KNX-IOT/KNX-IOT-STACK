@@ -26,7 +26,7 @@
 #include "oc_knx_helpers.h"
 
 uint64_t g_oscore_replaywindow = 32;
-uint64_t g_oscore_osndelay = 1000; // ms
+uint64_t g_oscore_osndelay = 0;
 
 /** the list of connections */
 //#define G_OCM_MAX_ENTRIES 20
@@ -127,7 +127,7 @@ oc_core_knx_auth_o_osndelay_put_handler(oc_request_t *request,
         PRINT("  oc_core_knx_auth_o_osndelay_put_handler type: %d value %d\n",
               (int)rep->type, (int)rep->value.integer);
         g_oscore_osndelay = rep->value.integer;
-        oc_send_response_no_format(request, OC_STATUS_CHANGED);
+        oc_send_cbor_response(request, OC_STATUS_CHANGED);
         return;
       }
     }
@@ -201,7 +201,7 @@ oc_core_knx_auth_o_replwdo_put_handler(oc_request_t *request,
         PRINT("  oc_core_knx_auth_o_replwdo_put_handler type: %d value %d\n",
               rep->type, (int)rep->value.integer);
         g_oscore_replaywindow = rep->value.integer;
-        oc_send_response_no_format(request, OC_STATUS_CHANGED);
+        oc_send_cbor_response(request, OC_STATUS_CHANGED);
         return;
       }
     }
@@ -1015,7 +1015,7 @@ oc_core_auth_at_x_post_handler(oc_request_t *request,
   /* input was set, so create the response*/
   if (changed == true) {
     PRINT("  cmd %d\n", cmd);
-    oc_send_response_no_format(request, OC_STATUS_CHANGED);
+    oc_send_cbor_response(request, OC_STATUS_CHANGED);
     return;
   }
   oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);

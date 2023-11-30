@@ -308,7 +308,7 @@ put_o_1_1(oc_request_t *request, oc_interface_mask_t interfaces,
       if (rep->iname == 1) {
         PRINT("  put_dpa_417_61 received : %d\n", rep->value.boolean);
         g_mystate = rep->value.boolean;
-        oc_send_response_no_format(request, OC_STATUS_CHANGED);
+        oc_send_cbor_response(request, OC_STATUS_CHANGED);
         PRINT("-- End put_dpa_417_61\n");
         return;
       }
