@@ -52,7 +52,8 @@ oc_oscore_get_next_ssn()
   return g_ssn;
 }
 
-bool oc_oscore_is_g_ssn_in_use()
+bool
+oc_oscore_is_g_ssn_in_use()
 {
   return g_ssn_in_use;
 }

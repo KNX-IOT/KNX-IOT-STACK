@@ -76,7 +76,6 @@
 #include "coap_signal.h"
 #endif
 
-
 OC_PROCESS(coap_engine, "CoAP Engine");
 
 #ifdef OC_BLOCK_WISE
@@ -305,8 +304,7 @@ coap_receive(oc_message_t *msg)
           // or the SSN is reused leading to unnecessary echo requests
           // and vulnerability to nonce reuse attacks
 #ifdef OC_OSCORE
-          if (oc_oscore_is_g_ssn_in_use())
-          {
+          if (oc_oscore_is_g_ssn_in_use()) {
             uint64_t ssn = oc_oscore_get_next_ssn();
             ssn++;
             oc_oscore_set_next_ssn(ssn);
@@ -388,8 +386,7 @@ coap_receive(oc_message_t *msg)
             // or the SSN is reused leading to unnecessary echo requests
             // and vulnerability to nonce reuse attacks
 #ifdef OC_OSCORE
-            if (oc_oscore_is_g_ssn_in_use())
-            {
+            if (oc_oscore_is_g_ssn_in_use()) {
               uint64_t ssn = oc_oscore_get_next_ssn();
               ssn++;
               oc_oscore_set_next_ssn(ssn);
