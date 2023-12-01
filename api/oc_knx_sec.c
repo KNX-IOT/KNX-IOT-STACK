@@ -1103,9 +1103,9 @@ oc_core_knx_auth_get_handler(oc_request_t *request,
 
   bool ps_exists = false;
   bool total_exists = false;
-  int total = (int)OC_KNX_AUTH - (int)OC_KNX_A_SEN;
-  int first_entry = (int)OC_KNX_A_SEN; // inclusive
-  int last_entry = (int)OC_KNX_AUTH;   // exclusive
+  int total = (int)OC_KNX_AUTH_AT_X - (int)OC_KNX_AUTH_O;
+  int first_entry = (int)OC_KNX_AUTH_O; // inclusive
+  int last_entry = (int)OC_KNX_AUTH_AT_X;   // exclusive
   // int query_ps = -1;
   int query_pn = -1;
   bool more_request_needed =
