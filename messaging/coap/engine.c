@@ -61,6 +61,7 @@
 
 #ifdef OC_OSCORE
 #include "security/oc_tls.h"
+#include "security/oc_oscore.h"
 #endif
 
 #ifdef OC_BLOCK_WISE
@@ -75,7 +76,6 @@
 #include "coap_signal.h"
 #endif
 
-#include "security/oc_oscore.h"
 
 OC_PROCESS(coap_engine, "CoAP Engine");
 
@@ -304,12 +304,14 @@ coap_receive(oc_message_t *msg)
           // g_ssn should be incremented for echo retransmissions,
           // or the SSN is reused leading to unnecessary echo requests
           // and vulnerability to nonce reuse attacks
+#ifdef OC_OSCORE
           if (oc_oscore_is_g_ssn_in_use())
           {
             uint64_t ssn = oc_oscore_get_next_ssn();
             ssn++;
             oc_oscore_set_next_ssn(ssn);
           }
+#endif
           coap_packet_t retransmitted_pkt[1];
           coap_udp_parse_message(retransmitted_pkt, transaction->message->data,
                                  (uint16_t)transaction->message->length);
@@ -385,12 +387,14 @@ coap_receive(oc_message_t *msg)
             // g_ssn should be incremented for echo retransmissions,
             // or the SSN is reused leading to unnecessary echo requests
             // and vulnerability to nonce reuse attacks
+#ifdef OC_OSCORE
             if (oc_oscore_is_g_ssn_in_use())
             {
               uint64_t ssn = oc_oscore_get_next_ssn();
               ssn++;
               oc_oscore_set_next_ssn(ssn);
             }
+#endif
 
             // a little bit naughty - modify the old client callback to refer to
             // the new (retransmitted) packet
