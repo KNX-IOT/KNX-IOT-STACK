@@ -17,15 +17,15 @@
 #include "oc_api.h"
 #include "oc_knx_helpers.h"
 
-bool
+int
 check_if_query_l_exist(oc_request_t *request, bool *ps_exists,
                        bool *total_exists)
 {
   if (ps_exists == NULL) {
-    return false;
+    return 0;
   }
   if (total_exists == NULL) {
-    return false;
+    return 0;
   }
 
   *ps_exists = false;
@@ -54,16 +54,19 @@ check_if_query_l_exist(oc_request_t *request, bool *ps_exists,
           }
         }
       } while (more_query_params);
+      if (*ps_exists == false && *total_exists == false) {
+        return -1;
+      }
     } /* query l exists */
   }   /* query available */
 
   if (*ps_exists == true) {
-    return true;
+    return 1;
   }
   if (*total_exists == true) {
-    return true;
+    return 1;
   }
-  return false;
+  return 0;
 }
 
 int
