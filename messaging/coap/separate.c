@@ -114,8 +114,11 @@ coap_separate_accept(void *request, oc_separate_response_t *separate_response,
     /* store correct response type */
     separate_store->type = COAP_TYPE_CON;
 
-    memcpy(separate_store->token, coap_req->token, coap_req->token_len);
-    separate_store->token_len = coap_req->token_len;
+    // only include token for secured responses
+    if (endpoint->flags & OSCORE){
+      memcpy(separate_store->token, coap_req->token, coap_req->token_len);
+      separate_store->token_len = coap_req->token_len;
+    }
 
     oc_new_string(&separate_store->uri, coap_req->uri_path,
                   coap_req->uri_path_len);
