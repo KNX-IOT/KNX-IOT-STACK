@@ -565,7 +565,7 @@ oc_core_auth_at_get_handler(oc_request_t *request,
         length = oc_rep_add_line_to_buffer(",\n");
         response_length += length;
       }
-      length = oc_rep_add_line_to_buffer("<auth/at/");
+      length = oc_rep_add_line_to_buffer("</auth/at/");
       response_length += length;
       length = oc_rep_add_line_to_buffer(oc_string(g_at_entries[i].id));
       response_length += length;
