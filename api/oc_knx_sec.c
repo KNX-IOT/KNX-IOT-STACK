@@ -261,12 +261,17 @@ oc_core_knx_auth_o_get_handler(oc_request_t *request,
   size_t device_index = request->resource->device;
 
   // handle query parameters: l=ps l=total
-  if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
+  int l_exist = check_if_query_l_exist(request, &ps_exists, &total_exists);
+  if (l_exist == 1) {
     // example : < /dev > l = total>;total=22;ps=5
     response_length =
       oc_frame_query_l(oc_string(request->resource->uri), ps_exists, PAGE_SIZE,
                        total_exists, total);
     oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
+    return;
+  }
+  if (l_exist == -1) {
+    oc_send_response_no_format(request, OC_STATUS_NOT_FOUND);
     return;
   }
 
@@ -524,12 +529,17 @@ oc_core_auth_at_get_handler(oc_request_t *request,
   }
 
   // handle query parameters: l=ps l=total
-  if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
+  int l_exist = check_if_query_l_exist(request, &ps_exists, &total_exists);
+  if (l_exist == 1) {
     // example : < /auth/at > l = total>;total=22;ps=5
     response_length =
       oc_frame_query_l(oc_string(request->resource->uri), ps_exists, PAGE_SIZE,
                        total_exists, total);
     oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
+    return;
+  }
+  if (l_exist == -1) {
+    oc_send_response_no_format(request, OC_STATUS_NOT_FOUND);
     return;
   }
 
@@ -607,6 +617,17 @@ oc_core_auth_at_post_handler(oc_request_t *request,
   rep = request->request_payload;
   while (rep != NULL) {
     if (rep->type == OC_REP_OBJECT) {
+      // Check if payload valid
+      object = rep->value.object;
+      while (object != NULL) {
+        if (object->type == OC_REP_MIXED_ARRAY) {
+          PRINT("  mixed array as scope is not allowed!\n");
+          oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
+          return;
+        }
+        object = object->next;
+      }
+
       object = rep->value.object;
       oc_string_t *at = find_access_token_from_payload(object);
       if (at == NULL) {
@@ -909,22 +930,24 @@ oc_core_auth_at_x_get_handler(oc_request_t *request,
   // if (oc_string_len(g_at_entries[index].aud) > 0) {
   //  oc_rep_i_set_text_string(root, 3, oc_string(g_at_entries[index].aud));
   //}
-  // the scope as list of cflags or group object table entries
-  int nr_entries = oc_total_interface_in_mask(g_at_entries[index].scope);
-  if (nr_entries > 0) {
-    // interface list
-    oc_string_array_t cflags_entries;
-    oc_new_string_array(&cflags_entries, (size_t)nr_entries);
-    int framed = oc_get_interface_in_mask_in_string_array(
-      g_at_entries[index].scope, nr_entries, cflags_entries);
-    PRINT("  entries in cflags %d framed: %d \n", nr_entries, framed);
-    oc_rep_i_set_string_array(root, 9, cflags_entries);
-    oc_free_string_array(&cflags_entries);
-  } else {
+  if (g_at_entries[index].ga_len > 0) {
     // group object list
     // taking input of int64 array
     oc_rep_i_set_int_array(root, 9, g_at_entries[index].ga,
                            g_at_entries[index].ga_len);
+  } else {
+    // the scope as list of cflags or group object table entries
+    int nr_entries = oc_total_interface_in_mask(g_at_entries[index].scope);
+    if (nr_entries > 0) {
+      // interface list
+      oc_string_array_t cflags_entries;
+      oc_new_string_array(&cflags_entries, (size_t)nr_entries);
+      int framed = oc_get_interface_in_mask_in_string_array(
+        g_at_entries[index].scope, nr_entries, cflags_entries);
+      PRINT("  entries in cflags %d framed: %d \n", nr_entries, framed);
+      oc_rep_i_set_string_array(root, 9, cflags_entries);
+      oc_free_string_array(&cflags_entries);
+    }
   }
   if (g_at_entries[index].profile == OC_PROFILE_COAP_DTLS) {
     if (oc_string_len(g_at_entries[index].sub) > 0) {
@@ -1103,9 +1126,9 @@ oc_core_knx_auth_get_handler(oc_request_t *request,
 
   bool ps_exists = false;
   bool total_exists = false;
-  int total = (int)OC_KNX_AUTH - (int)OC_KNX_A_SEN;
-  int first_entry = (int)OC_KNX_A_SEN; // inclusive
-  int last_entry = (int)OC_KNX_AUTH;   // exclusive
+  int total = (int)OC_KNX_AUTH_AT_X - (int)OC_KNX_AUTH_O;
+  int first_entry = (int)OC_KNX_AUTH_O;   // inclusive
+  int last_entry = (int)OC_KNX_AUTH_AT_X; // exclusive
   // int query_ps = -1;
   int query_pn = -1;
   bool more_request_needed =
@@ -1123,12 +1146,17 @@ oc_core_knx_auth_get_handler(oc_request_t *request,
   size_t device_index = request->resource->device;
 
   // handle query parameters: l=ps l=total
-  if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
+  int l_exist = check_if_query_l_exist(request, &ps_exists, &total_exists);
+  if (l_exist == 1) {
     // example : < /auth > l = total>;total=22;ps=5
     response_length =
       oc_frame_query_l(oc_string(request->resource->uri), ps_exists, PAGE_SIZE,
                        total_exists, total);
     oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
+    return;
+  }
+  if (l_exist == -1) {
+    oc_send_response_no_format(request, OC_STATUS_NOT_FOUND);
     return;
   }
 

@@ -802,12 +802,17 @@ oc_core_knx_swu_get_handler(oc_request_t *request,
   size_t device_index = request->resource->device;
 
   // handle query parameters: l=ps l=total
-  if (check_if_query_l_exist(request, &ps_exists, &total_exists)) {
+  int l_exist = check_if_query_l_exist(request, &ps_exists, &total_exists);
+  if (l_exist == 1) {
     // example : < /swu > l = total>;total=22;ps=5
     response_length =
       oc_frame_query_l(oc_string(request->resource->uri), ps_exists, PAGE_SIZE,
                        total_exists, total);
     oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
+    return;
+  }
+  if (l_exist == -1) {
+    oc_send_response_no_format(request, OC_STATUS_NOT_FOUND);
     return;
   }
 

@@ -38,10 +38,12 @@ extern "C" {
  * @param request the request
  * @param ps_exists return value if l=ps exists
  * @param total_exists return value if l=total exists
- * @return true == l exists (with either ps or total or both)
+ * @return 1 == l exists (with either ps or total or both)
+ * @return -1 == invalid l parameters
+ * @return 0 == l doesn't exist
  */
-bool check_if_query_l_exist(oc_request_t *request, bool *ps_exists,
-                            bool *total_exists);
+int check_if_query_l_exist(oc_request_t *request, bool *ps_exists,
+                           bool *total_exists);
 
 /**
  * @brief helper function to frame url part of query response:
@@ -63,13 +65,13 @@ int oc_frame_query_l(char *url, bool ps_exists, int ps, bool total_exists,
                      int total);
 
 /**
- * @brief helper function to check if query parameter pn or ps exists
+ * @brief helper function to check if query parameter pn exists
  *
  * example: /dev/ipv6?pn=0&ps=3
  * @param request the request
  * @param pn_value return -1 if not exist otherwise value
  * @param ps_value return -1 if not exist otherwise value
- * @return true == pn or ps exists
+ * @return true == pn exists
  */
 bool check_if_query_pn_exist(oc_request_t *request, int *pn_value,
                              int *ps_value);
