@@ -30,6 +30,7 @@ OC_PROCESS_NAME(oc_oscore_handler);
 
 void oc_oscore_set_next_ssn(uint64_t ssn);
 uint64_t oc_oscore_get_next_ssn();
+bool oc_oscore_is_g_ssn_in_use();
 
 #ifdef __cplusplus
 }

@@ -61,6 +61,7 @@
 
 #ifdef OC_OSCORE
 #include "security/oc_tls.h"
+#include "security/oc_oscore.h"
 #endif
 
 #ifdef OC_BLOCK_WISE
@@ -296,8 +297,19 @@ coap_receive(oc_message_t *msg)
         if (message->code == UNAUTHORIZED_4_01 && echo_len != 0) {
           // Received Unauthorised response - retransmit request,
           // but include Echo header included in this response
-          OC_WRN("Received Unauthorised Response with Echo option");
+          OC_DBG("Received Unauthorised Response with Echo option");
           OC_DBG("Retransmitting with included Echo...");
+
+          // g_ssn should be incremented for echo retransmissions,
+          // or the SSN is reused leading to unnecessary echo requests
+          // and vulnerability to nonce reuse attacks
+#ifdef OC_OSCORE
+          if (oc_oscore_is_g_ssn_in_use()) {
+            uint64_t ssn = oc_oscore_get_next_ssn();
+            ssn++;
+            oc_oscore_set_next_ssn(ssn);
+          }
+#endif
           coap_packet_t retransmitted_pkt[1];
           coap_udp_parse_message(retransmitted_pkt, transaction->message->data,
                                  (uint16_t)transaction->message->length);
@@ -370,6 +382,17 @@ coap_receive(oc_message_t *msg)
             }
             retransmitted_pkt->mid = coap_get_mid();
 
+            // g_ssn should be incremented for echo retransmissions,
+            // or the SSN is reused leading to unnecessary echo requests
+            // and vulnerability to nonce reuse attacks
+#ifdef OC_OSCORE
+            if (oc_oscore_is_g_ssn_in_use()) {
+              uint64_t ssn = oc_oscore_get_next_ssn();
+              ssn++;
+              oc_oscore_set_next_ssn(ssn);
+            }
+#endif
+
             // a little bit naughty - modify the old client callback to refer to
             // the new (retransmitted) packet
             client_cb->mid = retransmitted_pkt->mid;
@@ -387,6 +410,8 @@ coap_receive(oc_message_t *msg)
             retransmitted_message->length = coap_oscore_serialize_message(
               retransmitted_pkt, retransmitted_message->data, true, true, true);
 
+            OC_DBG("Received Unauthorised Response with Echo option");
+            OC_DBG("Retransmitting with included Echo...");
             coap_send_message(retransmitted_message);
             // unref original message
             oc_message_unref(original_message);
