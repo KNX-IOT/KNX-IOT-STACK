@@ -457,6 +457,8 @@ oc_add_function_blocks_to_response(oc_request_t *request, size_t device_index,
       *response_length += length;
       length = oc_rep_add_line_to_buffer("\";");
       *response_length += length;
+      length = oc_rep_add_line_to_buffer("if=\":if.ll\";");
+      *response_length += length;
       /* content type application link format*/
       length = oc_rep_add_line_to_buffer("ct=40");
       *response_length += length;
