@@ -43,7 +43,7 @@ extern "C" {
  * @return 0 == l doesn't exist
  */
 int check_if_query_l_exist(oc_request_t *request, bool *ps_exists,
-                            bool *total_exists);
+                           bool *total_exists);
 
 /**
  * @brief helper function to frame url part of query response:
