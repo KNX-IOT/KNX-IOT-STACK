@@ -617,6 +617,17 @@ oc_core_auth_at_post_handler(oc_request_t *request,
   rep = request->request_payload;
   while (rep != NULL) {
     if (rep->type == OC_REP_OBJECT) {
+      // Check if payload valid
+      object = rep->value.object;
+      while (object != NULL) {
+        if (object->type == OC_REP_MIXED_ARRAY) {
+          PRINT("  mixed array as scope is not allowed!\n");
+          oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
+          return;
+        }
+        object = object->next;
+      }
+
       object = rep->value.object;
       oc_string_t *at = find_access_token_from_payload(object);
       if (at == NULL) {
