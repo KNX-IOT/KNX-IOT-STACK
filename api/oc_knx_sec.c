@@ -930,22 +930,24 @@ oc_core_auth_at_x_get_handler(oc_request_t *request,
   // if (oc_string_len(g_at_entries[index].aud) > 0) {
   //  oc_rep_i_set_text_string(root, 3, oc_string(g_at_entries[index].aud));
   //}
-  // the scope as list of cflags or group object table entries
-  int nr_entries = oc_total_interface_in_mask(g_at_entries[index].scope);
-  if (nr_entries > 0) {
-    // interface list
-    oc_string_array_t cflags_entries;
-    oc_new_string_array(&cflags_entries, (size_t)nr_entries);
-    int framed = oc_get_interface_in_mask_in_string_array(
-      g_at_entries[index].scope, nr_entries, cflags_entries);
-    PRINT("  entries in cflags %d framed: %d \n", nr_entries, framed);
-    oc_rep_i_set_string_array(root, 9, cflags_entries);
-    oc_free_string_array(&cflags_entries);
-  } else {
+  if (g_at_entries[index].ga_len > 0) {
     // group object list
     // taking input of int64 array
     oc_rep_i_set_int_array(root, 9, g_at_entries[index].ga,
                            g_at_entries[index].ga_len);
+  } else {
+    // the scope as list of cflags or group object table entries
+    int nr_entries = oc_total_interface_in_mask(g_at_entries[index].scope);
+    if (nr_entries > 0) {
+      // interface list
+      oc_string_array_t cflags_entries;
+      oc_new_string_array(&cflags_entries, (size_t)nr_entries);
+      int framed = oc_get_interface_in_mask_in_string_array(
+        g_at_entries[index].scope, nr_entries, cflags_entries);
+      PRINT("  entries in cflags %d framed: %d \n", nr_entries, framed);
+      oc_rep_i_set_string_array(root, 9, cflags_entries);
+      oc_free_string_array(&cflags_entries);
+    }
   }
   if (g_at_entries[index].profile == OC_PROFILE_COAP_DTLS) {
     if (oc_string_len(g_at_entries[index].sub) > 0) {
