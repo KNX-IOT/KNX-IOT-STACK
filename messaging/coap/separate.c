@@ -138,7 +138,7 @@ coap_separate_accept(void *request, oc_separate_response_t *separate_response,
     // ACK with empty code (0)
     // only include token for secured responses
     coap_udp_init_message(ack, COAP_TYPE_ACK, 0, coap_req->mid);
-    if (endpoint->flags & OSCORE){
+    if (endpoint->flags & OSCORE) {
       ack->token_len = separate_store->token_len;
       memcpy(ack->token, separate_store->token, ack->token_len);
     }
