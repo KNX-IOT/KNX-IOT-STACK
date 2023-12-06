@@ -565,7 +565,7 @@ oc_core_auth_at_get_handler(oc_request_t *request,
         length = oc_rep_add_line_to_buffer(",\n");
         response_length += length;
       }
-      length = oc_rep_add_line_to_buffer("<auth/at/");
+      length = oc_rep_add_line_to_buffer("</auth/at/");
       response_length += length;
       length = oc_rep_add_line_to_buffer(oc_string(g_at_entries[i].id));
       response_length += length;
@@ -1874,6 +1874,8 @@ oc_if_method_allowed_according_to_mask(oc_interface_mask_t iface_mask,
 {
   if (iface_mask & OC_IF_I) {
     // logical input
+    if (method == OC_GET)
+      return true;
     if (method == OC_POST)
       return true;
     if (method == OC_PUT)
