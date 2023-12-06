@@ -1874,6 +1874,8 @@ oc_if_method_allowed_according_to_mask(oc_interface_mask_t iface_mask,
 {
   if (iface_mask & OC_IF_I) {
     // logical input
+    if (method == OC_GET)
+      return true;
     if (method == OC_POST)
       return true;
     if (method == OC_PUT)
