@@ -462,16 +462,12 @@ oc_core_fp_g_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     }
   }
 
-  if (response_length > 0) {
-    if (more_request_needed) {
-      int next_page_num = query_pn > -1 ? query_pn + 1 : 1;
-      response_length += add_next_page_indicator(
-        oc_string(request->resource->uri), next_page_num);
-    }
-    oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
-  } else {
-    oc_send_response_no_format(request, OC_STATUS_OK);
+  if (more_request_needed) {
+    int next_page_num = query_pn > -1 ? query_pn + 1 : 1;
+    response_length += add_next_page_indicator(
+      oc_string(request->resource->uri), next_page_num);
   }
+  oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
 
   PRINT("oc_core_fp_g_get_handler - end\n");
 }
@@ -909,16 +905,12 @@ oc_core_fp_p_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     }
   }
 
-  if (response_length > 0) {
-    if (more_request_needed) {
-      int next_page_num = query_pn > -1 ? query_pn + 1 : 1;
-      response_length += add_next_page_indicator(
-        oc_string(request->resource->uri), next_page_num);
-    }
-    oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
-  } else {
-    oc_send_response_no_format(request, OC_STATUS_OK);
+  if (more_request_needed) {
+    int next_page_num = query_pn > -1 ? query_pn + 1 : 1;
+    response_length += add_next_page_indicator(
+      oc_string(request->resource->uri), next_page_num);
   }
+  oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
 
   PRINT("oc_core_fp_p_get_handler - end\n");
 }
@@ -1333,16 +1325,12 @@ oc_core_fp_r_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     }
   }
 
-  if (response_length > 0) {
-    if (more_request_needed) {
-      int next_page_num = query_pn > -1 ? query_pn + 1 : 1;
-      response_length += add_next_page_indicator(
-        oc_string(request->resource->uri), next_page_num);
-    }
-    oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
-  } else {
-    oc_send_response_no_format(request, OC_STATUS_OK);
+  if (more_request_needed) {
+    int next_page_num = query_pn > -1 ? query_pn + 1 : 1;
+    response_length += add_next_page_indicator(
+      oc_string(request->resource->uri), next_page_num);
   }
+  oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
 
   PRINT("oc_core_fp_r_get_handler - end\n");
 }
