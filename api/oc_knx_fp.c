@@ -749,8 +749,8 @@ oc_core_fp_g_x_del_handler(oc_request_t *request,
 
   PRINT(" deleting %d\n", index);
 
-  if (index >= GOT_MAX_ENTRIES) {
-    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
+  if (index == -1) {
+    oc_send_response_no_format(request, OC_STATUS_NOT_FOUND);
     return;
   }
 
@@ -1193,8 +1193,8 @@ oc_core_fp_p_x_del_handler(oc_request_t *request,
   int index = oc_core_find_index_in_rp_table_from_id(
     id, g_gpt, oc_core_get_publisher_table_size());
 
-  if (index >= oc_core_get_publisher_table_size()) {
-    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
+  if (index == -1) {
+    oc_send_response_no_format(request, OC_STATUS_NOT_FOUND);
     return;
   }
 
@@ -1601,8 +1601,8 @@ oc_core_fp_r_x_del_handler(oc_request_t *request,
   int index =
     oc_core_find_index_in_rp_table_from_id(id, g_grt, GRT_MAX_ENTRIES);
 
-  if (index >= GRT_MAX_ENTRIES) {
-    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
+  if (index == -1) {
+    oc_send_response_no_format(request, OC_STATUS_NOT_FOUND);
     return;
   }
   PRINT("oc_core_fp_r_x_del_handler: deleting id %d at index %d\n", id, index);
