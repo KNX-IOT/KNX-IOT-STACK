@@ -1198,15 +1198,9 @@ oc_core_fp_p_x_del_handler(oc_request_t *request,
     return;
   }
 
-  g_gpt[index].id = 0;
-  oc_free_string(&g_gpt[index].url);
-  oc_new_string(&g_gpt[index].url, "", 0);
-  oc_free_string(&g_gpt[index].at);
-  oc_new_string(&g_gpt[index].at, "", 0);
-  // oc_free_int_array(g_gpt[index].ga);
-  free(g_gpt[index].ga);
-  g_gpt[index].ga = NULL;
-  g_gpt[index].ga_len = 0;
+  // delete the entry
+  oc_delete_group_rp_table_entry(index, GPT_STORE, g_gpt,
+                                       GPT_MAX_ENTRIES);
 
   // make the change persistent
   oc_dump_group_rp_table_entry(index, GPT_STORE, g_gpt,
@@ -1613,15 +1607,9 @@ oc_core_fp_r_x_del_handler(oc_request_t *request,
   }
   PRINT("oc_core_fp_r_x_del_handler: deleting id %d at index %d\n", id, index);
 
-  g_grt[index].id = 0;
-  oc_free_string(&g_grt[index].url);
-  oc_new_string(&g_grt[index].url, "", 0);
-  oc_free_string(&g_grt[index].at);
-  oc_new_string(&g_grt[index].at, "", 0);
-  // oc_free_int_array(g_grt[index].ga);
-  free(g_grt[index].ga);
-  g_grt[index].ga = NULL;
-  g_grt[index].ga_len = 0;
+  // delete the entry
+  oc_delete_group_rp_table_entry(index, GRT_STORE, g_grt,
+                                       GRT_MAX_ENTRIES);
 
   // make the change persistent
   oc_dump_group_rp_table_entry(index, GRT_STORE, g_grt, GRT_MAX_ENTRIES);
