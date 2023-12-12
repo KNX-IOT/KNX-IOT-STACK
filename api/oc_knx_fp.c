@@ -464,8 +464,8 @@ oc_core_fp_g_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 
   if (more_request_needed) {
     int next_page_num = query_pn > -1 ? query_pn + 1 : 1;
-    response_length += add_next_page_indicator(
-      oc_string(request->resource->uri), next_page_num);
+    response_length +=
+      add_next_page_indicator(oc_string(request->resource->uri), next_page_num);
   }
   oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
 
@@ -907,8 +907,8 @@ oc_core_fp_p_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 
   if (more_request_needed) {
     int next_page_num = query_pn > -1 ? query_pn + 1 : 1;
-    response_length += add_next_page_indicator(
-      oc_string(request->resource->uri), next_page_num);
+    response_length +=
+      add_next_page_indicator(oc_string(request->resource->uri), next_page_num);
   }
   oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
 
@@ -1199,8 +1199,7 @@ oc_core_fp_p_x_del_handler(oc_request_t *request,
   }
 
   // delete the entry
-  oc_delete_group_rp_table_entry(index, GPT_STORE, g_gpt,
-                                       GPT_MAX_ENTRIES);
+  oc_delete_group_rp_table_entry(index, GPT_STORE, g_gpt, GPT_MAX_ENTRIES);
 
   // make the change persistent
   oc_dump_group_rp_table_entry(index, GPT_STORE, g_gpt,
@@ -1321,8 +1320,8 @@ oc_core_fp_r_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 
   if (more_request_needed) {
     int next_page_num = query_pn > -1 ? query_pn + 1 : 1;
-    response_length += add_next_page_indicator(
-      oc_string(request->resource->uri), next_page_num);
+    response_length +=
+      add_next_page_indicator(oc_string(request->resource->uri), next_page_num);
   }
   oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
 
@@ -1608,8 +1607,7 @@ oc_core_fp_r_x_del_handler(oc_request_t *request,
   PRINT("oc_core_fp_r_x_del_handler: deleting id %d at index %d\n", id, index);
 
   // delete the entry
-  oc_delete_group_rp_table_entry(index, GRT_STORE, g_grt,
-                                       GRT_MAX_ENTRIES);
+  oc_delete_group_rp_table_entry(index, GRT_STORE, g_grt, GRT_MAX_ENTRIES);
 
   // make the change persistent
   oc_dump_group_rp_table_entry(index, GRT_STORE, g_grt, GRT_MAX_ENTRIES);
