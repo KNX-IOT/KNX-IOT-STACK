@@ -444,7 +444,7 @@ oc_core_fp_g_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
         response_length += length;
       }
 
-      length = oc_rep_add_line_to_buffer("<fp/g/");
+      length = oc_rep_add_line_to_buffer("</fp/g/");
       response_length += length;
       char string[10];
       sprintf((char *)&string, "%d>", g_got[i].id);
@@ -887,7 +887,7 @@ oc_core_fp_p_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
         response_length += length;
       }
 
-      length = oc_rep_add_line_to_buffer("<fp/p/");
+      length = oc_rep_add_line_to_buffer("</fp/p/");
       response_length += length;
       char string[10];
       sprintf((char *)&string, "%d>", g_gpt[i].id);
@@ -1307,7 +1307,7 @@ oc_core_fp_r_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
         response_length += length;
       }
 
-      length = oc_rep_add_line_to_buffer("<fp/r/");
+      length = oc_rep_add_line_to_buffer("</fp/r/");
       response_length += length;
       char string[10];
       sprintf((char *)&string, "%d>", g_grt[i].id);
