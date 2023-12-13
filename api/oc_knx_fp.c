@@ -571,12 +571,15 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       }
 
       bool id_only = true;
+      int mandatory_items = 0; // Needs to be 4 for creating new entry, i.e. id, ga, cflag & href
       object = rep->value.object;
       while (object != NULL) {
         switch (object->type) {
         case OC_REP_STRING: {
           id_only = false;
           if (object->iname == 11) {
+            // href (11)
+            mandatory_items++;
             oc_free_string(&g_got[index].href);
             oc_new_string(&g_got[index].href, oc_string(object->value.string),
                           oc_string_len(object->value.string));
@@ -585,10 +588,12 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
         case OC_REP_INT: {
           if (oc_string_len(object->name) == 0 && object->iname == 0) {
             // id (0)
+            mandatory_items++;
             g_got[index].id = (int)object->value.integer;
           }
           if (oc_string_len(object->name) == 0 && object->iname == 8) {
             // cflags (8)
+            mandatory_items++;
             id_only = false;
             g_got[index].cflags = object->value.integer;
           }
@@ -596,6 +601,8 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
         case OC_REP_INT_ARRAY: {
           id_only = false;
           if (object->iname == 8) {
+            // cflags (8)
+            mandatory_items++;
             g_got[index].cflags = OC_CFLAG_NONE;
             int64_t *arr = oc_int_array(object->value.array);
             for (int i = 0; i < (int)oc_int_array_size(object->value.array);
@@ -614,6 +621,8 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
             }
           }
           if (object->iname == 7) {
+            // ga (7)
+            mandatory_items++;
             int64_t *arr = oc_int_array(object->value.array);
             int array_size = (int)oc_int_array_size(object->value.array);
             uint32_t *new_array =
@@ -643,6 +652,11 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
         PRINT("  only found id in request, deleting entry at index: %d\n",
               index);
         oc_delete_group_object_table_entry(index);
+      } else if (return_status == OC_STATUS_CREATED && mandatory_items != 4) {
+        PRINT("Mandatory items missing!\n");
+        oc_delete_group_object_table_entry(index);
+        oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
+        return;
       } else {
         PRINT("  storing at index: %d\n", index);
         status_ok = oc_fp_p_check_and_save(index, device_index, status_ok);
@@ -970,17 +984,23 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       g_gpt[index].id = id;
 
       bool id_only = true;
+      int mandatory_items = 0; // Needs to be 2 for creating entry, i.e. id & ga
+      bool identifier_exists = false; // Once of ia, grpid or url
       object = rep->value.object;
       while (object != NULL) {
         switch (object->type) {
         case OC_REP_INT: {
-          if (object->iname != 0) {
+          if (object->iname == 0) {
+            mandatory_items++;
+          } else {
             id_only = false;
           }
           if (object->iname == 12) {
+            identifier_exists = true;
             g_gpt[index].ia = (int)object->value.integer;
           }
           if (object->iname == 13) {
+            identifier_exists = true;
             g_gpt[index].grpid = (uint32_t)object->value.integer;
           }
           if (object->iname == 26) {
@@ -998,6 +1018,7 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
                           oc_string_len(object->value.string));
           }
           if (object->iname == 10) {
+            identifier_exists = true;
             oc_free_string(&g_gpt[index].url);
             oc_new_string(&g_gpt[index].url, oc_string(object->value.string),
                           oc_string_len(object->value.string));
@@ -1011,6 +1032,7 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
         case OC_REP_INT_ARRAY: {
           id_only = false;
           if (object->iname == 7) {
+            mandatory_items++;
             // g_got[index].id = object->value.integer;
             int64_t *arr = oc_int_array(object->value.array);
             int array_size = (int)oc_int_array_size(object->value.array);
@@ -1031,8 +1053,11 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
             }
           }
         } break;
-        case OC_REP_NIL:
-          break;
+        case OC_REP_NIL: {
+          if (object->iname == 7) {
+            mandatory_items++;
+          } 
+        } break;
         default:
           break;
         }
@@ -1043,6 +1068,12 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
               index);
         oc_delete_group_rp_table_entry(index, GPT_STORE, g_gpt,
                                        GPT_MAX_ENTRIES);
+      } else if (return_status == OC_STATUS_CREATED && (mandatory_items != 2 || !identifier_exists)) {
+        PRINT("Mandatory items missing!\n");
+        oc_delete_group_rp_table_entry(index, GPT_STORE, g_gpt,
+                                       GPT_MAX_ENTRIES);
+        oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
+        return;
       } else {
         oc_print_group_rp_table_entry(index, GPT_STORE, g_gpt,
                                       oc_core_get_publisher_table_size());
@@ -1386,18 +1417,24 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       g_grt[index].id = id;
 
       bool id_only = true;
+      int mandatory_items = 0; // Needs to be 2 for creating entry, i.e. id & ga
+      bool identifier_exists = false; // Once of ia, grpid or url
       object = rep->value.object;
       while (object != NULL) {
         switch (object->type) {
 
         case OC_REP_INT: {
-          if (object->iname != 0) {
+          if (object->iname == 0) {
+            mandatory_items++;
+          } else {
             id_only = false;
           }
           if (object->iname == 12) {
+            identifier_exists = true;
             g_grt[index].ia = (int)object->value.integer;
           }
           if (object->iname == 13) {
+            identifier_exists = true;
             g_grt[index].grpid = (uint32_t)object->value.integer;
           }
           if (object->iname == 26) {
@@ -1416,6 +1453,7 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
                           oc_string_len(object->value.string));
           }
           if (object->iname == 10) {
+            identifier_exists = true;
             oc_free_string(&g_grt[index].url);
             oc_new_string(&g_grt[index].url, oc_string(object->value.string),
                           oc_string_len(object->value.string));
@@ -1429,6 +1467,7 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
         case OC_REP_INT_ARRAY: {
           id_only = false;
           if (object->iname == 7) {
+            mandatory_items++;
             // g_got[index].id = object->value.integer;
             int64_t *arr = oc_int_array(object->value.array);
             int array_size = (int)oc_int_array_size(object->value.array);
@@ -1461,6 +1500,12 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
               index);
         oc_delete_group_rp_table_entry(index, GRT_STORE, g_grt,
                                        GRT_MAX_ENTRIES);
+      } else if (return_status == OC_STATUS_CREATED && (mandatory_items != 2 || !identifier_exists)) {
+        PRINT("Mandatory items missing!\n");
+        oc_delete_group_rp_table_entry(index, GRT_STORE, g_grt,
+                                       GRT_MAX_ENTRIES);
+        oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
+        return;
       } else {
         bool do_save = true;
         if (oc_string_len(g_grt[index].url) > OC_MAX_URL_LENGTH) {
