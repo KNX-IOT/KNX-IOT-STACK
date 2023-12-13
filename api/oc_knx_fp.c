@@ -444,7 +444,7 @@ oc_core_fp_g_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
         response_length += length;
       }
 
-      length = oc_rep_add_line_to_buffer("<fp/g/");
+      length = oc_rep_add_line_to_buffer("</fp/g/");
       response_length += length;
       char string[10];
       sprintf((char *)&string, "%d>", g_got[i].id);
@@ -462,16 +462,12 @@ oc_core_fp_g_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     }
   }
 
-  if (response_length > 0) {
-    if (more_request_needed) {
-      int next_page_num = query_pn > -1 ? query_pn + 1 : 1;
-      response_length += add_next_page_indicator(
-        oc_string(request->resource->uri), next_page_num);
-    }
-    oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
-  } else {
-    oc_send_response_no_format(request, OC_STATUS_OK);
+  if (more_request_needed) {
+    int next_page_num = query_pn > -1 ? query_pn + 1 : 1;
+    response_length +=
+      add_next_page_indicator(oc_string(request->resource->uri), next_page_num);
   }
+  oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
 
   PRINT("oc_core_fp_g_get_handler - end\n");
 }
@@ -753,8 +749,8 @@ oc_core_fp_g_x_del_handler(oc_request_t *request,
 
   PRINT(" deleting %d\n", index);
 
-  if (index >= GOT_MAX_ENTRIES) {
-    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
+  if (index == -1) {
+    oc_send_response_no_format(request, OC_STATUS_NOT_FOUND);
     return;
   }
 
@@ -891,7 +887,7 @@ oc_core_fp_p_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
         response_length += length;
       }
 
-      length = oc_rep_add_line_to_buffer("<fp/p/");
+      length = oc_rep_add_line_to_buffer("</fp/p/");
       response_length += length;
       char string[10];
       sprintf((char *)&string, "%d>", g_gpt[i].id);
@@ -909,16 +905,12 @@ oc_core_fp_p_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     }
   }
 
-  if (response_length > 0) {
-    if (more_request_needed) {
-      int next_page_num = query_pn > -1 ? query_pn + 1 : 1;
-      response_length += add_next_page_indicator(
-        oc_string(request->resource->uri), next_page_num);
-    }
-    oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
-  } else {
-    oc_send_response_no_format(request, OC_STATUS_OK);
+  if (more_request_needed) {
+    int next_page_num = query_pn > -1 ? query_pn + 1 : 1;
+    response_length +=
+      add_next_page_indicator(oc_string(request->resource->uri), next_page_num);
   }
+  oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
 
   PRINT("oc_core_fp_p_get_handler - end\n");
 }
@@ -1201,20 +1193,13 @@ oc_core_fp_p_x_del_handler(oc_request_t *request,
   int index = oc_core_find_index_in_rp_table_from_id(
     id, g_gpt, oc_core_get_publisher_table_size());
 
-  if (index >= oc_core_get_publisher_table_size()) {
-    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
+  if (index == -1) {
+    oc_send_response_no_format(request, OC_STATUS_NOT_FOUND);
     return;
   }
 
-  g_gpt[index].id = 0;
-  oc_free_string(&g_gpt[index].url);
-  oc_new_string(&g_gpt[index].url, "", 0);
-  oc_free_string(&g_gpt[index].at);
-  oc_new_string(&g_gpt[index].at, "", 0);
-  // oc_free_int_array(g_gpt[index].ga);
-  free(g_gpt[index].ga);
-  g_gpt[index].ga = NULL;
-  g_gpt[index].ga_len = 0;
+  // delete the entry
+  oc_delete_group_rp_table_entry(index, GPT_STORE, g_gpt, GPT_MAX_ENTRIES);
 
   // make the change persistent
   oc_dump_group_rp_table_entry(index, GPT_STORE, g_gpt,
@@ -1315,7 +1300,7 @@ oc_core_fp_r_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
         response_length += length;
       }
 
-      length = oc_rep_add_line_to_buffer("<fp/r/");
+      length = oc_rep_add_line_to_buffer("</fp/r/");
       response_length += length;
       char string[10];
       sprintf((char *)&string, "%d>", g_grt[i].id);
@@ -1333,16 +1318,12 @@ oc_core_fp_r_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     }
   }
 
-  if (response_length > 0) {
-    if (more_request_needed) {
-      int next_page_num = query_pn > -1 ? query_pn + 1 : 1;
-      response_length += add_next_page_indicator(
-        oc_string(request->resource->uri), next_page_num);
-    }
-    oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
-  } else {
-    oc_send_response_no_format(request, OC_STATUS_OK);
+  if (more_request_needed) {
+    int next_page_num = query_pn > -1 ? query_pn + 1 : 1;
+    response_length +=
+      add_next_page_indicator(oc_string(request->resource->uri), next_page_num);
   }
+  oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
 
   PRINT("oc_core_fp_r_get_handler - end\n");
 }
@@ -1619,21 +1600,14 @@ oc_core_fp_r_x_del_handler(oc_request_t *request,
   int index =
     oc_core_find_index_in_rp_table_from_id(id, g_grt, GRT_MAX_ENTRIES);
 
-  if (index >= GRT_MAX_ENTRIES) {
-    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
+  if (index == -1) {
+    oc_send_response_no_format(request, OC_STATUS_NOT_FOUND);
     return;
   }
   PRINT("oc_core_fp_r_x_del_handler: deleting id %d at index %d\n", id, index);
 
-  g_grt[index].id = 0;
-  oc_free_string(&g_grt[index].url);
-  oc_new_string(&g_grt[index].url, "", 0);
-  oc_free_string(&g_grt[index].at);
-  oc_new_string(&g_grt[index].at, "", 0);
-  // oc_free_int_array(g_grt[index].ga);
-  free(g_grt[index].ga);
-  g_grt[index].ga = NULL;
-  g_grt[index].ga_len = 0;
+  // delete the entry
+  oc_delete_group_rp_table_entry(index, GRT_STORE, g_grt, GRT_MAX_ENTRIES);
 
   // make the change persistent
   oc_dump_group_rp_table_entry(index, GRT_STORE, g_grt, GRT_MAX_ENTRIES);

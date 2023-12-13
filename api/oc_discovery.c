@@ -425,7 +425,7 @@ oc_wkcore_discovery_handler(oc_request_t *request,
     if (ret) {
       oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
     } else {
-      oc_send_linkformat_response(request, OC_STATUS_OK, 0);
+      oc_ignore_request(request);
     }
     return;
   }
