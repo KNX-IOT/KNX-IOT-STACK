@@ -571,7 +571,8 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       }
 
       bool id_only = true;
-      int mandatory_items = 0; // Needs to be 4 for creating new entry, i.e. id, ga, cflag & href
+      int mandatory_items =
+        0; // Needs to be 4 for creating new entry, i.e. id, ga, cflag & href
       object = rep->value.object;
       while (object != NULL) {
         switch (object->type) {
@@ -1056,7 +1057,7 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
         case OC_REP_NIL: {
           if (object->iname == 7) {
             mandatory_items++;
-          } 
+          }
         } break;
         default:
           break;
@@ -1068,7 +1069,8 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
               index);
         oc_delete_group_rp_table_entry(index, GPT_STORE, g_gpt,
                                        GPT_MAX_ENTRIES);
-      } else if (return_status == OC_STATUS_CREATED && (mandatory_items != 2 || !identifier_exists)) {
+      } else if (return_status == OC_STATUS_CREATED &&
+                 (mandatory_items != 2 || !identifier_exists)) {
         PRINT("Mandatory items missing!\n");
         oc_delete_group_rp_table_entry(index, GPT_STORE, g_gpt,
                                        GPT_MAX_ENTRIES);
@@ -1500,7 +1502,8 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
               index);
         oc_delete_group_rp_table_entry(index, GRT_STORE, g_grt,
                                        GRT_MAX_ENTRIES);
-      } else if (return_status == OC_STATUS_CREATED && (mandatory_items != 2 || !identifier_exists)) {
+      } else if (return_status == OC_STATUS_CREATED &&
+                 (mandatory_items != 2 || !identifier_exists)) {
         PRINT("Mandatory items missing!\n");
         oc_delete_group_rp_table_entry(index, GRT_STORE, g_grt,
                                        GRT_MAX_ENTRIES);
