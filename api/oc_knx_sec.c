@@ -1682,7 +1682,7 @@ oc_oscore_set_auth_shared(char *client_senderid, int client_senderid_size,
   // no context id
   oc_new_byte_string(&spake_entry.osc_rid, client_recipientid,
                      client_recipientid_size);
-  // not that HEX was NOT on the wire, but the byte string.
+  // note that HEX was NOT on the wire, but the byte string.
   // so we have to store the byte string
   oc_new_byte_string(&spake_entry.osc_id, client_senderid,
                      client_senderid_size);
