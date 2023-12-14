@@ -1672,7 +1672,11 @@ oc_oscore_set_auth_shared(char *client_senderid, int client_senderid_size,
   // this is the index in the table, so it is the full string
   oc_new_string(&spake_entry.id, client_senderid, client_senderid_size);
   spake_entry.ga_len = 0;
-  spake_entry.profile = OC_PROFILE_COAP_OSCORE;
+  if (strstr(client_senderid, "rkey") != NULL) {
+    spake_entry.profile = OC_PROFILE_COAP_PASE;
+  } else {
+    spake_entry.profile = OC_PROFILE_COAP_OSCORE;
+  }
   spake_entry.scope = OC_IF_SEC | OC_IF_D | OC_IF_P;
   oc_new_byte_string(&spake_entry.osc_ms, (char *)shared_key, shared_key_size);
   // no context id
