@@ -424,6 +424,8 @@ oc_wkcore_discovery_handler(oc_request_t *request,
       request, device_index, group_address, &response_length, matches);
     if (ret) {
       oc_send_linkformat_response(request, OC_STATUS_OK, response_length);
+    } else if (request->origin && (request->origin->flags & MULTICAST) == 0) {
+      oc_send_linkformat_response(request, OC_STATUS_OK, 0);
     } else {
       oc_ignore_request(request);
     }
