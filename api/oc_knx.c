@@ -903,7 +903,7 @@ oc_core_knx_k_post_handler(oc_request_t *request,
     return;
   }
   // send the response
-  oc_send_response_no_format(request, OC_STATUS_OK);
+  oc_send_response_no_format(request, OC_STATUS_CHANGED);
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_k, knx_fingerprint, 0, "/k",
