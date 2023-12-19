@@ -1082,43 +1082,10 @@ oc_core_dev_port_get_handler(oc_request_t *request,
   oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
 }
 
-static void
-oc_core_dev_port_put_handler(oc_request_t *request,
-                             oc_interface_mask_t iface_mask, void *data)
-{
-  (void)data;
-  (void)iface_mask;
-
-  /* check if the accept header is CBOR-format */
-  if (oc_check_accept_header(request, APPLICATION_CBOR) == false) {
-    oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
-    return;
-  }
-
-  size_t device_index = request->resource->device;
-  oc_device_info_t *device = oc_core_get_device_info(device_index);
-  oc_rep_t *rep = request->request_payload;
-  // debugging
-  if (rep != NULL) {
-    PRINT("  oc_core_dev_port_put_handler type: %d\n", rep->type);
-  }
-
-  if ((rep != NULL) && (rep->type == OC_REP_INT)) {
-    PRINT("  oc_core_dev_port_put_handler received : %d\n",
-          (int)rep->value.integer);
-    device->port = (uint32_t)rep->value.integer;
-    oc_send_response_no_format(request, OC_STATUS_CHANGED);
-    oc_storage_write(KNX_STORAGE_PORT, (uint8_t *)&(rep->value.integer), 1);
-    return;
-  }
-
-  oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
-}
-
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(dev_port, dev_mport, 0, "/dev/port",
                                      OC_IF_P, APPLICATION_CBOR, OC_DISCOVERABLE,
                                      oc_core_dev_port_get_handler,
-                                     oc_core_dev_port_put_handler, 0, 0,
+                                     0, 0, 0,
                                      "urn:knx:dpt.value2Ucount",
                                      OC_SIZE_ZERO());
 
@@ -1129,7 +1096,7 @@ oc_create_dev_port_resource(int resource_idx, size_t device)
   oc_core_populate_resource(resource_idx, device, "/dev/port", OC_IF_P,
                             APPLICATION_CBOR, OC_DISCOVERABLE,
                             oc_core_dev_port_get_handler,
-                            oc_core_dev_port_put_handler, 0, 0, 0);
+                            0, 0, 0, 0);
 
   oc_core_bind_dpt_resource(resource_idx, device, "urn:knx:dpt.value2Ucount");
 }
