@@ -1490,8 +1490,11 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
             }
           }
         } break;
-        case OC_REP_NIL:
-          break;
+        case OC_REP_NIL: {
+          if (object->iname == 7) {
+            mandatory_items++;
+          }
+        } break;
         default:
           break;
         }
