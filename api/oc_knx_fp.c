@@ -473,7 +473,7 @@ oc_core_fp_g_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 }
 
 static bool
-oc_fp_p_check_and_save(int index, size_t device_index, bool status_ok)
+oc_fp_g_check_and_save(int index, size_t device_index, bool status_ok)
 {
   bool do_save = true;
   if (status_ok == false) {
@@ -660,7 +660,7 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
         return;
       } else {
         PRINT("  storing at index: %d\n", index);
-        status_ok = oc_fp_p_check_and_save(index, device_index, status_ok);
+        status_ok = oc_fp_g_check_and_save(index, device_index, status_ok);
       }
     }
     default:
