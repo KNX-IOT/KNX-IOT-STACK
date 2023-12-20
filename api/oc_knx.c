@@ -62,6 +62,7 @@ static int valid_request = 0;
 enum SpakeKeys {
   SPAKE_ID = 0,
   SPAKE_SALT = 5,
+  SPAKE_PW = 8, // For device handover, not implemented yet
   SPAKE_PA_SHARE_P = 10,
   SPAKE_PB_SHARE_V = 11,
   SPAKE_PBKDF2 = 12,
@@ -1281,6 +1282,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
 
   // check input
   // note: no check if there are multiple byte strings in the request payload
+  valid_request = 0;
   while (rep != NULL) {
     switch (rep->type) {
     case OC_REP_BYTE_STRING: {
@@ -1302,6 +1304,7 @@ oc_core_knx_spake_post_handler(oc_request_t *request,
 
   if (valid_request == 0) {
     oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
+    return;
   }
   rep = request->request_payload;
 
