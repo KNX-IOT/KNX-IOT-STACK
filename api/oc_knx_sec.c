@@ -957,7 +957,8 @@ oc_core_auth_at_x_get_handler(oc_request_t *request,
       PRINT("    kid    : %s\n", oc_string_checked(g_at_entries[index].kid));
     }
   }
-  if (g_at_entries[index].profile == OC_PROFILE_COAP_OSCORE || g_at_entries[index].profile == OC_PROFILE_COAP_PASE) {
+  if (g_at_entries[index].profile == OC_PROFILE_COAP_OSCORE ||
+      g_at_entries[index].profile == OC_PROFILE_COAP_PASE) {
     // create cnf 98)
     oc_rep_i_set_key(&root_map, 8);
     CborEncoder cnf_map;
@@ -1241,7 +1242,8 @@ oc_print_auth_at_entry(size_t device_index, int index)
                 oc_string_checked(g_at_entries[index].kid));
         }
       }
-      if (g_at_entries[index].profile == OC_PROFILE_COAP_OSCORE || g_at_entries[index].profile == OC_PROFILE_COAP_PASE) {
+      if (g_at_entries[index].profile == OC_PROFILE_COAP_OSCORE ||
+          g_at_entries[index].profile == OC_PROFILE_COAP_PASE) {
         if (oc_string_len(g_at_entries[index].osc_ms) > 0) {
           PRINT("    osc:ms    (h) : (%d) ",
                 (int)oc_byte_string_len(g_at_entries[index].osc_ms));
@@ -1806,7 +1808,8 @@ oc_init_oscore_from_storage(size_t device_index, bool from_storage)
     if (oc_string_len(g_at_entries[i].id) > 0) {
       oc_print_auth_at_entry(device_index, i);
 
-      if (g_at_entries[i].profile == OC_PROFILE_COAP_OSCORE || g_at_entries[i].profile == OC_PROFILE_COAP_PASE) {
+      if (g_at_entries[i].profile == OC_PROFILE_COAP_OSCORE ||
+          g_at_entries[i].profile == OC_PROFILE_COAP_PASE) {
         uint64_t ssn = 0;
         oc_oscore_context_t *ctx = oc_oscore_add_context(
           device_index, oc_string(g_at_entries[i].osc_id),
