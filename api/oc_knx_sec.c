@@ -957,7 +957,8 @@ oc_core_auth_at_x_get_handler(oc_request_t *request,
       PRINT("    kid    : %s\n", oc_string_checked(g_at_entries[index].kid));
     }
   }
-  if (g_at_entries[index].profile == OC_PROFILE_COAP_OSCORE) {
+  if (g_at_entries[index].profile == OC_PROFILE_COAP_OSCORE ||
+      g_at_entries[index].profile == OC_PROFILE_COAP_PASE) {
     // create cnf 98)
     oc_rep_i_set_key(&root_map, 8);
     CborEncoder cnf_map;
@@ -1241,7 +1242,8 @@ oc_print_auth_at_entry(size_t device_index, int index)
                 oc_string_checked(g_at_entries[index].kid));
         }
       }
-      if (g_at_entries[index].profile == OC_PROFILE_COAP_OSCORE) {
+      if (g_at_entries[index].profile == OC_PROFILE_COAP_OSCORE ||
+          g_at_entries[index].profile == OC_PROFILE_COAP_PASE) {
         if (oc_string_len(g_at_entries[index].osc_ms) > 0) {
           PRINT("    osc:ms    (h) : (%d) ",
                 (int)oc_byte_string_len(g_at_entries[index].osc_ms));
@@ -1672,11 +1674,7 @@ oc_oscore_set_auth_shared(char *client_senderid, int client_senderid_size,
   // this is the index in the table, so it is the full string
   oc_new_string(&spake_entry.id, client_senderid, client_senderid_size);
   spake_entry.ga_len = 0;
-  if (strstr(client_senderid, "rkey") != NULL) {
-    spake_entry.profile = OC_PROFILE_COAP_PASE;
-  } else {
-    spake_entry.profile = OC_PROFILE_COAP_OSCORE;
-  }
+  spake_entry.profile = OC_PROFILE_COAP_PASE;
   spake_entry.scope = OC_IF_SEC | OC_IF_D | OC_IF_P;
   oc_new_byte_string(&spake_entry.osc_ms, (char *)shared_key, shared_key_size);
   // no context id
@@ -1810,7 +1808,8 @@ oc_init_oscore_from_storage(size_t device_index, bool from_storage)
     if (oc_string_len(g_at_entries[i].id) > 0) {
       oc_print_auth_at_entry(device_index, i);
 
-      if (g_at_entries[i].profile == OC_PROFILE_COAP_OSCORE) {
+      if (g_at_entries[i].profile == OC_PROFILE_COAP_OSCORE ||
+          g_at_entries[i].profile == OC_PROFILE_COAP_PASE) {
         uint64_t ssn = 0;
         oc_oscore_context_t *ctx = oc_oscore_add_context(
           device_index, oc_string(g_at_entries[i].osc_id),
