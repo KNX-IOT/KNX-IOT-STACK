@@ -1675,7 +1675,7 @@ oc_oscore_set_auth_shared(char *client_senderid, int client_senderid_size,
   oc_new_string(&spake_entry.id, client_senderid, client_senderid_size);
   spake_entry.ga_len = 0;
   spake_entry.profile = OC_PROFILE_COAP_PASE;
-  spake_entry.scope = OC_IF_SEC | OC_IF_D | OC_IF_P;
+  spake_entry.scope = OC_IF_SEC;
   oc_new_byte_string(&spake_entry.osc_ms, (char *)shared_key, shared_key_size);
   // no context id
   oc_new_byte_string(&spake_entry.osc_rid, client_recipientid,
