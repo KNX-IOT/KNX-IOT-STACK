@@ -831,8 +831,8 @@ oc_core_knx_k_post_handler(oc_request_t *request,
         // calling the put handler, since datapoints are implementing GET/PUT
 
         if (my_resource->put_handler.cb) {
-          oc_ri_new_request_from_request(&new_request, request, &response_buffer,
-                                        &response_obj);
+          oc_ri_new_request_from_request(&new_request, request,
+                                         &response_buffer, &response_obj);
           new_request.request_payload = oc_s_mode_get_value(request);
           new_request.uri_path = "k";
           new_request.uri_path_len = 1;
@@ -859,8 +859,8 @@ oc_core_knx_k_post_handler(oc_request_t *request,
         // @receiver : cflags = u->overwrite object value
         // calling the put handler, since datapoints are implementing GET/PUT
         if (my_resource->put_handler.cb) {
-          oc_ri_new_request_from_request(&new_request, request, &response_buffer,
-                                        &response_obj);
+          oc_ri_new_request_from_request(&new_request, request,
+                                         &response_buffer, &response_obj);
           new_request.request_payload = oc_s_mode_get_value(request);
           new_request.uri_path = "k";
           new_request.uri_path_len = 1;
@@ -892,8 +892,8 @@ oc_core_knx_k_post_handler(oc_request_t *request,
         PRINT("   (case3) (RP-UPDATE) sending RP due to READ flag \n");
 
         if (my_resource->get_handler.cb) {
-          oc_ri_new_request_from_request(&new_request, request, &response_buffer,
-                                        &response_obj);
+          oc_ri_new_request_from_request(&new_request, request,
+                                         &response_buffer, &response_obj);
           new_request.uri_path = oc_string(myurl);
           new_request.uri_path_len = oc_string_len(myurl);
           new_request.accept = request->accept;
