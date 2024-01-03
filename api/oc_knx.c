@@ -618,7 +618,6 @@ oc_core_knx_k_post_handler(oc_request_t *request,
                            oc_interface_mask_t iface_mask, void *data)
 {
   (void)data;
-  (void)iface_mask;
   oc_rep_t *rep = NULL;
   oc_rep_t *rep_value = NULL;
   char ip_address[100];
@@ -797,6 +796,8 @@ oc_core_knx_k_post_handler(oc_request_t *request,
     return;
   }
 
+  bool send_payload = false;
+
   // create the dummy request
   oc_request_t new_request;
   memset(&new_request, 0, sizeof(oc_request_t));
@@ -804,12 +805,6 @@ oc_core_knx_k_post_handler(oc_request_t *request,
   memset(&response_buffer, 0, sizeof(oc_response_buffer_t));
   oc_response_t response_obj;
   memset(&response_obj, 0, sizeof(oc_response_t));
-  oc_ri_new_request_from_request(&new_request, request, &response_buffer,
-                                 &response_obj);
-  new_request.request_payload = oc_s_mode_get_value(request);
-  // new style
-  new_request.uri_path = "k";
-  new_request.uri_path_len = 1;
 
   while (index != -1) {
     oc_string_t myurl = oc_core_find_group_object_table_url_from_index(index);
@@ -834,7 +829,14 @@ oc_core_knx_k_post_handler(oc_request_t *request,
         // get value, since the w only should be send if the value is updated
         // (e.g. different)
         // calling the put handler, since datapoints are implementing GET/PUT
+
         if (my_resource->put_handler.cb) {
+          oc_ri_new_request_from_request(&new_request, request, &response_buffer,
+                                        &response_obj);
+          new_request.request_payload = oc_s_mode_get_value(request);
+          new_request.uri_path = "k";
+          new_request.uri_path_len = 1;
+
           my_resource->put_handler.cb(&new_request, iface_mask,
                                       my_resource->put_handler.user_data);
           if ((cflags & OC_CFLAG_TRANSMISSION) > 0) {
@@ -857,6 +859,12 @@ oc_core_knx_k_post_handler(oc_request_t *request,
         // @receiver : cflags = u->overwrite object value
         // calling the put handler, since datapoints are implementing GET/PUT
         if (my_resource->put_handler.cb) {
+          oc_ri_new_request_from_request(&new_request, request, &response_buffer,
+                                        &response_obj);
+          new_request.request_payload = oc_s_mode_get_value(request);
+          new_request.uri_path = "k";
+          new_request.uri_path_len = 1;
+
           my_resource->put_handler.cb(&new_request, iface_mask,
                                       my_resource->put_handler.user_data);
           if ((cflags & OC_CFLAG_TRANSMISSION) > 0) {
@@ -875,6 +883,7 @@ oc_core_knx_k_post_handler(oc_request_t *request,
       if (((cflags & OC_CFLAG_READ) > 0) && (st_read)) {
         PRINT(" (case4) (R-READ) index %d handled due to flags %d\n", index,
               cflags);
+        send_payload = true;
         // Case 4)
         // @sender: cflags = r
         // Received from bus: -st r
@@ -882,12 +891,15 @@ oc_core_knx_k_post_handler(oc_request_t *request,
         // specifically: do not check the transmission flag
         PRINT("   (case3) (RP-UPDATE) sending RP due to READ flag \n");
 
-#ifdef OC_USE_MULTICAST_SCOPE_2
-        // oc_do_s_mode_with_scope_no_check(2, oc_string(myurl), "rp");
-        oc_do_s_mode_with_scope_no_check(2, oc_string(myurl), "a");
-#endif
-        // oc_do_s_mode_with_scope_no_check(5, oc_string(myurl), "rp");
-        oc_do_s_mode_with_scope_no_check(5, oc_string(myurl), "a");
+        if (my_resource->get_handler.cb) {
+          oc_ri_new_request_from_request(&new_request, request, &response_buffer,
+                                        &response_obj);
+          new_request.uri_path = oc_string(myurl);
+          new_request.uri_path_len = oc_string_len(myurl);
+          new_request.accept = request->accept;
+
+          my_resource->get_handler.cb(&new_request, iface_mask, NULL);
+        }
       }
     }
     // get the next index in the table to get the url from.
@@ -904,7 +916,11 @@ oc_core_knx_k_post_handler(oc_request_t *request,
     return;
   }
   // send the response
-  oc_send_response_no_format(request, OC_STATUS_CHANGED);
+  if (send_payload && oc_rep_get_encoded_payload_size() > 0) {
+    oc_send_cbor_response(request, OC_STATUS_OK);
+  } else {
+    oc_send_response_no_format(request, OC_STATUS_CHANGED);
+  }
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_k, knx_fingerprint, 0, "/k",
