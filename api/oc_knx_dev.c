@@ -778,7 +778,7 @@ oc_core_dev_sa_get_handler(oc_request_t *request,
   oc_device_info_t *device = oc_core_get_device_info(device_index);
   if (device != NULL) {
     oc_rep_begin_root_object();
-    uint8_t sa = 255;
+    uint8_t sa = (uint8_t)((device->ia) >> 8);
     oc_rep_i_set_int(root, 1, sa);
     oc_rep_end_root_object();
 
@@ -827,7 +827,7 @@ oc_core_dev_da_get_handler(oc_request_t *request,
   if (device != NULL) {
     oc_rep_begin_root_object();
 
-    uint8_t da = 255;
+    uint8_t da = (uint8_t)(device->ia);
     oc_rep_i_set_int(root, 1, da);
     oc_rep_end_root_object();
     oc_send_cbor_response(request, OC_STATUS_OK);
