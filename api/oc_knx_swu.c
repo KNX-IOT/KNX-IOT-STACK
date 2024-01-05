@@ -33,7 +33,7 @@ static int g_swu_max_defer = 0;
 
 /* UPDATE METHOD*/
 #define KNX_STORAGE_SWU_METHOD "swu_knx_method"
-static int g_swu_update_method = 0;
+static int g_swu_update_method = 2;
 
 /* PACKAGE names*/
 /* note will be initialized with "" during creation of the resource*/
@@ -115,10 +115,10 @@ oc_knx_swu_protocol_get_handler(oc_request_t *request,
 
   // Content-Format: "application/cbor"
   // Payload: [ 0 ]
-  CborEncoder arrayEncoder;
-  cbor_encoder_create_array(&g_encoder, &arrayEncoder, 1);
-  cbor_encode_int(&arrayEncoder, (int64_t)0);
-  cbor_encoder_close_container(&g_encoder, &arrayEncoder);
+  oc_rep_begin_root_object();
+  int64_t protocols[] = {0};
+  oc_rep_i_set_int_array(root, 1, protocols, 1);
+  oc_rep_end_root_object();
 
   oc_send_cbor_response(request, OC_STATUS_OK);
   return;
@@ -187,9 +187,11 @@ oc_knx_swu_maxdefer_get_handler(oc_request_t *request,
   /*
    max defer in seconds
   */
-  cbor_encode_int(&g_encoder, (int64_t)g_swu_max_defer);
+  oc_rep_begin_root_object();
+  oc_rep_i_set_int(root, 1, (int64_t)g_swu_max_defer);
+  oc_rep_end_root_object();
 
-  oc_send_json_response(request, OC_STATUS_OK);
+  oc_send_cbor_response(request, OC_STATUS_OK);
 }
 
 static void
@@ -260,9 +262,11 @@ oc_knx_swu_method_get_handler(oc_request_t *request,
   2: Both (Initial value).
   */
   /* we are only going to support PUSH */
-  cbor_encode_int(&g_encoder, (int64_t)g_swu_update_method);
+  oc_rep_begin_root_object();
+  oc_rep_i_set_int(root, 1, (int64_t)g_swu_update_method);
+  oc_rep_end_root_object();
 
-  oc_send_json_response(request, OC_STATUS_OK);
+  oc_send_cbor_response(request, OC_STATUS_OK);
 }
 
 static void
@@ -291,7 +295,7 @@ oc_knx_swu_method_put_handler(oc_request_t *request,
     return;
   }
 
-  oc_send_json_response(request, OC_STATUS_OK);
+  oc_send_cbor_response(request, OC_STATUS_OK);
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_swu_method, knx_lastupdate, 0,
@@ -327,9 +331,11 @@ oc_knx_swu_lastupdate_get_handler(oc_request_t *request,
   }
 
   // last update (time)
-  cbor_encode_text_stringz(&g_encoder, oc_string(g_swu_last_update));
+  oc_rep_begin_root_object();
+  oc_rep_i_set_text_string(root, 1, oc_string(g_swu_last_update));
+  oc_rep_end_root_object();
 
-  oc_send_json_response(request, OC_STATUS_OK);
+  oc_send_cbor_response(request, OC_STATUS_OK);
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_lastupdate, knx_swu_result, 0,
@@ -366,9 +372,12 @@ oc_knx_swu_result_get_handler(oc_request_t *request,
   }
 
   // g_swu_state
-  cbor_encode_int(&g_encoder, (int64_t)g_swu_result);
+  oc_rep_begin_root_object();
+  oc_rep_i_set_int(root, 1, (int64_t)g_swu_result);
+  oc_rep_end_root_object();
 
-  oc_send_json_response(request, OC_STATUS_OK);
+
+  oc_send_cbor_response(request, OC_STATUS_OK);
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_swu_result, knx_swu_state, 0,
@@ -404,9 +413,11 @@ oc_knx_swu_state_get_handler(oc_request_t *request,
   }
 
   // g_swu_state
-  cbor_encode_int(&g_encoder, (int64_t)g_swu_state);
+  oc_rep_begin_root_object();
+  oc_rep_i_set_int(root, 1, (int64_t)g_swu_state);
+  oc_rep_end_root_object();
 
-  oc_send_json_response(request, OC_STATUS_OK);
+  oc_send_cbor_response(request, OC_STATUS_OK);
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_swu_state, knx_swu_update, 0,
@@ -486,14 +497,12 @@ oc_knx_swu_pkgv_get_handler(oc_request_t *request,
     return;
   }
   // Payload: [ 1, 2, 3 ]
-  CborEncoder arrayEncoder;
-  cbor_encoder_create_array(&g_encoder, &arrayEncoder, 3);
-  cbor_encode_int(&arrayEncoder, (int64_t)g_swu_package_version.major);
-  cbor_encode_int(&arrayEncoder, (int64_t)g_swu_package_version.minor);
-  cbor_encode_int(&arrayEncoder, (int64_t)g_swu_package_version.patch);
-  cbor_encoder_close_container(&g_encoder, &arrayEncoder);
+  oc_rep_begin_root_object();
+  int64_t pkgv_arr[3] = {(int64_t)g_swu_package_version.major, (int64_t)g_swu_package_version.minor, (int64_t)g_swu_package_version.patch};
+  oc_rep_i_set_int_array(root, 1, pkgv_arr, 3);
+  oc_rep_end_root_object();
 
-  oc_send_json_response(request, OC_STATUS_OK);
+  oc_send_cbor_response(request, OC_STATUS_OK);
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_swu_pkgv, knx_swu_pkgcmd, 0,
@@ -576,7 +585,7 @@ oc_knx_swu_a_put_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     my_cb->cb(device_index, &s_delayed_response_swu, binary_size, block_offset,
               (uint8_t *)payload, len, my_cb->data);
   } else {
-    oc_send_json_response(request, OC_STATUS_OK);
+    oc_send_cbor_response(request, OC_STATUS_OK);
   }
 
   PRINT("  oc_knx_swu_a_put_handler : End\n");
@@ -645,9 +654,11 @@ oc_knx_swu_bytes_get_handler(oc_request_t *request,
   }
 
   // g_swu_package_bytes
-  cbor_encode_int(&g_encoder, (int64_t)g_swu_package_bytes);
+  oc_rep_begin_root_object();
+  oc_rep_i_set_int(root, 1, (int64_t)g_swu_package_bytes);
+  oc_rep_end_root_object();
 
-  oc_send_json_response(request, OC_STATUS_OK);
+  oc_send_cbor_response(request, OC_STATUS_OK);
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_swu_pkgbytes, knx_swu_pkgqurl, 0,
@@ -681,9 +692,11 @@ oc_knx_swu_pkgqurl_get_handler(oc_request_t *request,
       oc_status_code(OC_STATUS_BAD_REQUEST);
     return;
   }
-  cbor_encode_text_stringz(&g_encoder, oc_string(g_swu_qurl));
+  oc_rep_begin_root_object();
+  oc_rep_i_set_text_string(root, 1, oc_string(g_swu_qurl));
+  oc_rep_end_root_object();
 
-  oc_send_json_response(request, OC_STATUS_OK);
+  oc_send_cbor_response(request, OC_STATUS_OK);
 }
 
 static void
@@ -745,10 +758,9 @@ oc_knx_swu_pkgname_get_handler(oc_request_t *request,
     return;
   }
 
-  CborEncoder arrayEncoder;
-  cbor_encoder_create_array(&g_encoder, &arrayEncoder, 1);
-  cbor_encode_text_stringz(&arrayEncoder, oc_string(g_swu_package_name));
-  cbor_encoder_close_container(&g_encoder, &arrayEncoder);
+  oc_rep_begin_root_object();
+  oc_rep_i_set_text_string(root, 1, oc_string(g_swu_package_name));
+  oc_rep_end_root_object();
 
   oc_send_cbor_response(request, OC_STATUS_OK);
 }
@@ -892,7 +904,7 @@ oc_create_knx_swu_resources(size_t device_index)
     oc_create_knx_swu_resource(OC_KNX_SWU, device_index);
   }
   oc_swu_set_package_name("");
-  oc_swu_set_last_update("");
+  oc_swu_set_last_update("1970-01-01T00:00:00.00Z");
   oc_swu_set_package_version(0, 0, 0);
 }
 
