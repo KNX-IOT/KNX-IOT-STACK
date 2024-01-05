@@ -116,7 +116,7 @@ oc_knx_swu_protocol_get_handler(oc_request_t *request,
   // Content-Format: "application/cbor"
   // Payload: [ 0 ]
   oc_rep_begin_root_object();
-  int64_t protocols[] = {0};
+  int64_t protocols[] = { 0 };
   oc_rep_i_set_int_array(root, 1, protocols, 1);
   oc_rep_end_root_object();
 
@@ -376,7 +376,6 @@ oc_knx_swu_result_get_handler(oc_request_t *request,
   oc_rep_i_set_int(root, 1, (int64_t)g_swu_result);
   oc_rep_end_root_object();
 
-
   oc_send_cbor_response(request, OC_STATUS_OK);
 }
 
@@ -498,7 +497,9 @@ oc_knx_swu_pkgv_get_handler(oc_request_t *request,
   }
   // Payload: [ 1, 2, 3 ]
   oc_rep_begin_root_object();
-  int64_t pkgv_arr[3] = {(int64_t)g_swu_package_version.major, (int64_t)g_swu_package_version.minor, (int64_t)g_swu_package_version.patch};
+  int64_t pkgv_arr[3] = { (int64_t)g_swu_package_version.major,
+                          (int64_t)g_swu_package_version.minor,
+                          (int64_t)g_swu_package_version.patch };
   oc_rep_i_set_int_array(root, 1, pkgv_arr, 3);
   oc_rep_end_root_object();
 
