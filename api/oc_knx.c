@@ -900,6 +900,12 @@ oc_core_knx_k_post_handler(oc_request_t *request,
 
           my_resource->get_handler.cb(&new_request, iface_mask, NULL);
         }
+#ifdef OC_USE_MULTICAST_SCOPE_2
+        // oc_do_s_mode_with_scope_no_check(2, oc_string(myurl), "rp");
+        oc_do_s_mode_with_scope_no_check(2, oc_string(myurl), "a");
+#endif
+        // oc_do_s_mode_with_scope_no_check(5, oc_string(myurl), "rp");
+        oc_do_s_mode_with_scope_no_check(5, oc_string(myurl), "a");
       }
     }
     // get the next index in the table to get the url from.
