@@ -599,6 +599,29 @@ oc_s_mode_notification_to_json(char *buffer, size_t buffer_size,
   return true;
 }
 
+bool
+oc_s_mode_notification_to_json_decoded_value(
+  char *buffer, size_t buffer_size, oc_group_object_notification_t notification)
+{
+  // { 5: { 6: <st>, 7: <ga>, 1: <value> } }
+  // { "s": { "st": <st>,  "ga": <ga>, "value": <value> } }
+  char value_temp[300];
+  memcpy(&value_temp, oc_string(notification.value),
+         oc_string_len(notification.value));
+
+  oc_base64_decode(value_temp, oc_string_len(notification.value));
+
+  int size = snprintf(
+    buffer, buffer_size,
+    "{\"sia\": %d, \"s\":{\"st\": \"%s\", \"ga\":%d, \"value\": %s } }",
+    notification.sia, oc_string_checked(notification.st), notification.ga,
+    value_temp);
+  if ((int)size > buffer_size) {
+    return false;
+  }
+  return true;
+}
+
 void
 oc_reset_g_received_notification()
 {
@@ -747,8 +770,18 @@ oc_core_knx_k_post_handler(oc_request_t *request,
   // gateway functionality: call back for all s-mode calls
   oc_gateway_t *my_gw = oc_get_gateway_cb();
   if (my_gw != NULL && my_gw->cb) {
-    // call the gateway function
-    my_gw->cb(device_index, ip_address, &g_received_notification, my_gw->data);
+    if (my_gw->data) {
+      // call the gateway function
+      my_gw->cb(device_index, ip_address, &g_received_notification,
+                my_gw->data);
+    } else {
+      // if data is NULL, pass json payload as data
+      char buffer[300];
+      memset(buffer, 300, 0);
+      oc_rep_to_json(request->request_payload, (char *)&buffer, 300, true);
+
+      my_gw->cb(device_index, ip_address, &g_received_notification, buffer);
+    }
   }
 
   if (oc_is_device_in_runtime(device_index) == false) {
