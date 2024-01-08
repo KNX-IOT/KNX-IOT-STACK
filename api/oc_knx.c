@@ -600,13 +600,14 @@ oc_s_mode_notification_to_json(char *buffer, size_t buffer_size,
 }
 
 bool
-oc_s_mode_notification_to_json_decoded_value(char *buffer, size_t buffer_size,
-                               oc_group_object_notification_t notification)
+oc_s_mode_notification_to_json_decoded_value(
+  char *buffer, size_t buffer_size, oc_group_object_notification_t notification)
 {
   // { 5: { 6: <st>, 7: <ga>, 1: <value> } }
   // { "s": { "st": <st>,  "ga": <ga>, "value": <value> } }
   char value_temp[300];
-  memcpy(&value_temp, oc_string(notification.value), oc_string_len(notification.value));
+  memcpy(&value_temp, oc_string(notification.value),
+         oc_string_len(notification.value));
 
   oc_base64_decode(value_temp, oc_string_len(notification.value));
 
@@ -771,7 +772,8 @@ oc_core_knx_k_post_handler(oc_request_t *request,
   if (my_gw != NULL && my_gw->cb) {
     if (my_gw->data) {
       // call the gateway function
-      my_gw->cb(device_index, ip_address, &g_received_notification, my_gw->data);
+      my_gw->cb(device_index, ip_address, &g_received_notification,
+                my_gw->data);
     } else {
       // if data is NULL, pass json payload as data
       char buffer[300];
