@@ -95,24 +95,31 @@ extern bool oc_ri_invoke_coap_entity_handler(void *request, void *response,
 // are compared to the ones in the last 25 messages. If a
 // match is found, the message is dropped as it must be
 // a duplicate.
-#define OC_REQUEST_HISTORY_SIZE (25)
+#define OC_REQUEST_HISTORY_SIZE (75)
+/*
 static uint16_t history[OC_REQUEST_HISTORY_SIZE];
 static uint8_t history_dev[OC_REQUEST_HISTORY_SIZE];
+*/
 static uint8_t idx;
+
+static struct {
+  uint16_t mid;
+  uint16_t port;
+  uint8_t dev;
+  uint8_t address[16];
+} history[OC_REQUEST_HISTORY_SIZE];
 
 #ifndef OC_ECHO_FRESHNESS_TIME
 #define OC_ECHO_FRESHNESS_TIME (10 * OC_CLOCK_CONF_TICKS_PER_SECOND)
 #endif
 
-// cache of previously seen senders - they have responded with a valid Echo
-// response when asked to do so
-
 bool
-oc_coap_check_if_duplicate(uint16_t mid, uint8_t device)
+oc_coap_check_if_duplicate(uint16_t mid, uint8_t device, uint16_t port, uint8_t address[16])
 {
   size_t i;
   for (i = 0; i < OC_REQUEST_HISTORY_SIZE; i++) {
-    if (history[i] == mid && history_dev[i] == device) {
+    if (history[i].mid == mid && history[i].dev == device && history[i].port == port
+      && (memcmp(history[i].address, address, 16) == 0)) {
       OC_DBG("dropping duplicate request");
       OC_DBG("message ID: %d, history[%d]: %d", mid, (int)i, history[i]);
       return true;
@@ -464,11 +471,13 @@ coap_receive(oc_message_t *msg)
         } else {
 #ifdef OC_REQUEST_HISTORY
           if (oc_coap_check_if_duplicate(message->mid,
-                                         (uint8_t)msg->endpoint.device)) {
+                                         (uint8_t)msg->endpoint.device, msg->endpoint.addr.ipv6.port, msg->endpoint.addr.ipv6.address)) {
             return 0;
           }
-          history[idx] = message->mid;
-          history_dev[idx] = (uint8_t)msg->endpoint.device;
+          history[idx].mid = message->mid;
+          history[idx].dev = (uint8_t)msg->endpoint.device;
+          history[idx].port = msg->endpoint.addr.ipv6.port;
+          memcpy(history[idx].address, msg->endpoint.addr.ipv6.address, 16);
           idx = (idx + 1) % OC_REQUEST_HISTORY_SIZE;
 #endif /* OC_REQUEST_HISTORY */
           // TODO
