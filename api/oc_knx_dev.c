@@ -1403,6 +1403,11 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
   (void)device_index;
   (void)reset_mode;
 
+  oc_factory_presets_t *presets = oc_get_factory_presets_cb();
+  if (presets && presets->cb) {
+    presets->cb(0, presets->data);
+  }
+
   char buf[2] = "";
   int zero = 0;
   uint32_t ffff = 0xffff;
