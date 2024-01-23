@@ -24,7 +24,7 @@
 #include "port/dns-sd.h"
 #ifdef OC_IOT_ROUTER
 #include "api/oc_knx_gm.h"
-#endif 
+#endif
 
 #include "oc_core_res.h"
 #include "oc_discovery.h"
@@ -1456,7 +1456,7 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
     oc_delete_at_table(device_index);
 #ifdef OC_IOT_ROUTER
     oc_delete_group_mapping_table();
-#endif 
+#endif
     oc_knx_device_set_programming_mode(device_index, false);
 
   } else if (reset_mode == 3) {
@@ -1487,7 +1487,7 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
     oc_reset_at_table(device_index, reset_mode);
 #ifdef OC_IOT_ROUTER
     oc_delete_group_mapping_table();
-#endif 
+#endif
 
     oc_knx_device_set_programming_mode(device_index, false);
     // load state: unloaded
