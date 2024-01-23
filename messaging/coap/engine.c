@@ -102,7 +102,8 @@ static uint8_t history_dev[OC_REQUEST_HISTORY_SIZE];
 */
 static uint8_t idx;
 
-static struct {
+static struct
+{
   uint16_t mid;
   uint16_t port;
   uint8_t dev;
@@ -114,12 +115,14 @@ static struct {
 #endif
 
 bool
-oc_coap_check_if_duplicate(uint16_t mid, uint8_t device, uint16_t port, uint8_t address[16])
+oc_coap_check_if_duplicate(uint16_t mid, uint8_t device, uint16_t port,
+                           uint8_t address[16])
 {
   size_t i;
   for (i = 0; i < OC_REQUEST_HISTORY_SIZE; i++) {
-    if (history[i].mid == mid && history[i].dev == device && history[i].port == port
-      && (memcmp(history[i].address, address, 16) == 0)) {
+    if (history[i].mid == mid && history[i].dev == device &&
+        history[i].port == port &&
+        (memcmp(history[i].address, address, 16) == 0)) {
       OC_DBG("dropping duplicate request");
       OC_DBG("message ID: %d, history[%d]: %d", mid, (int)i, history[i]);
       return true;
@@ -471,7 +474,9 @@ coap_receive(oc_message_t *msg)
         } else {
 #ifdef OC_REQUEST_HISTORY
           if (oc_coap_check_if_duplicate(message->mid,
-                                         (uint8_t)msg->endpoint.device, msg->endpoint.addr.ipv6.port, msg->endpoint.addr.ipv6.address)) {
+                                         (uint8_t)msg->endpoint.device,
+                                         msg->endpoint.addr.ipv6.port,
+                                         msg->endpoint.addr.ipv6.address)) {
             return 0;
           }
           history[idx].mid = message->mid;

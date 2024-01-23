@@ -158,8 +158,9 @@ oc_oscore_recv_message(oc_message_t *message)
 
     if (oscore_pkt->transport_type == COAP_TRANSPORT_UDP &&
         oscore_pkt->code <= OC_FETCH) {
-      if (oc_coap_check_if_duplicate(oscore_pkt->mid,
-                                     message->endpoint.device, message->endpoint.addr.ipv6.port, message->endpoint.addr.ipv6.address)) {
+      if (oc_coap_check_if_duplicate(oscore_pkt->mid, message->endpoint.device,
+                                     message->endpoint.addr.ipv6.port,
+                                     message->endpoint.addr.ipv6.address)) {
         OC_DBG("dropping duplicate request");
         goto oscore_recv_error;
       }
