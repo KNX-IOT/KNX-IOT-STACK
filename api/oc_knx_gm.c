@@ -1,5 +1,5 @@
 /*
- // Copyright (c) 2021-2023 Cascoda Ltd
+ // Copyright (c) 2021-2024 Cascoda Ltd
  //
  // Licensed under the Apache License, Version 2.0 (the "License");
  // you may not use this file except in compliance with the License.
@@ -831,6 +831,12 @@ load_fra(void)
   // }
 }
 
+void
+erase_fra(void)
+{
+  oc_storage_erase(GM_STORE_FRA);
+}
+
 static void
 oc_core_f_netip_fra_get_handler(oc_request_t *request,
                                 oc_interface_mask_t iface_mask, void *data)
@@ -950,6 +956,12 @@ load_tol(void)
   //  device->ia = ia;
   //  PRINT("  ia (storage) %d\n", ia);
   //}
+}
+
+void
+erase_tol(void)
+{
+  oc_storage_erase(GM_STORE_TOL);
 }
 
 static void
@@ -1078,6 +1090,12 @@ load_key(void)
   }
 }
 
+void
+erase_key(void)
+{
+  oc_storage_erase(GM_STORE_KEY);
+}
+
 static void
 oc_core_f_netip_key_put_handler(oc_request_t *request,
                                 oc_interface_mask_t iface_mask, void *data)
@@ -1167,6 +1185,12 @@ load_ttl(void)
   //  device->ia = ia;
   //  PRINT("  ia (storage) %d\n", ia);
   //}
+}
+
+void
+erase_ttl(void)
+{
+  oc_storage_erase(GM_STORE_TTL);
 }
 
 static void
@@ -1285,6 +1309,12 @@ load_mcast(void)
 
   temp_size =
     oc_storage_read(GM_STORE_MCAST, (uint8_t *)&g_mcast, sizeof(g_mcast));
+}
+
+void
+erase_mcast(void)
+{
+  oc_storage_erase(GM_STORE_MCAST);
 }
 
 static void
@@ -1546,6 +1576,14 @@ oc_delete_group_mapping_table()
     oc_delete_group_mapping_table_entry(i);
     oc_print_group_mapping_table_entry(i);
   }
+  // delete all data of netip
+
+  erase_ttl();
+  erase_tol();
+  erase_fra();
+  erase_mcast();
+  erase_key();
+
 #endif /* OC_IOT_ROUTER */
 }
 
