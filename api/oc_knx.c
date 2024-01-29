@@ -108,6 +108,10 @@ restart_device(size_t device_index)
   // switch off safe state
   // ??
 
+  // oc_knx_device_storage_read(device_index);
+  // oc_init_oscore_from_storage(device_index, true);
+  oc_init_datapoints_at_initialization();
+
   oc_restart_t *my_restart = oc_get_restart_cb();
   if (my_restart && my_restart->cb) {
     // do a restart on application level
@@ -252,7 +256,9 @@ oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   size_t device_index = request->resource->device;
 
   if (cmd == RESTART_DEVICE) {
-    restart_device(device_index);
+    cached_device_index = device_index;
+    cached_value = value;
+    oc_set_delayed_callback_ms(NULL, restart_device, 100);
     error = false;
   } else if (cmd == RESET_DEVICE) {
     // oc_reset_device(device_index, value);
