@@ -90,34 +90,6 @@ convert_cmd(char *cmd)
 }
 
 int
-restart_device(size_t device_index)
-{
-  PRINT("restart device\n");
-
-  // reset the programming mode
-  oc_device_info_t *device = oc_core_get_device_info(device_index);
-  if (device == NULL) {
-    OC_ERR("device not found %d", (int)device_index);
-  } else {
-    device->pm = false;
-  }
-
-  // clear run time errors
-  // ??
-
-  // switch off safe state
-  // ??
-
-  oc_restart_t *my_restart = oc_get_restart_cb();
-  if (my_restart && my_restart->cb) {
-    // do a restart on application level
-    my_restart->cb(device_index, my_restart->data);
-  }
-
-  return 0;
-}
-
-int
 oc_reset_device(size_t device_index, int value)
 {
   PRINT("reset device: %d\n", value);
@@ -199,6 +171,38 @@ delayed_reset(void *context)
   return OC_EVENT_DONE;
 }
 
+int
+delayed_restart(void *context)
+{
+  PRINT("restart device\n");
+
+  // reset the programming mode
+  oc_device_info_t *device = oc_core_get_device_info(cached_device_index);
+  if (device == NULL) {
+    OC_ERR("device not found %d", (int)cached_device_index);
+  } else {
+    device->pm = false;
+  }
+
+  // clear run time errors
+  // ??
+
+  // switch off safe state
+  // ??
+
+  // oc_knx_device_storage_read(cached_device_index);
+  // oc_init_oscore_from_storage(cached_device_index, true);
+  oc_init_datapoints_at_initialization();
+
+  oc_restart_t *my_restart = oc_get_restart_cb();
+  if (my_restart && my_restart->cb) {
+    // do a restart on application level
+    my_restart->cb(cached_device_index, my_restart->data);
+  }
+
+  return 0;
+}
+
 static void
 oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
                          void *data)
@@ -252,7 +256,9 @@ oc_core_knx_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   size_t device_index = request->resource->device;
 
   if (cmd == RESTART_DEVICE) {
-    restart_device(device_index);
+    cached_device_index = device_index;
+    cached_value = value;
+    oc_set_delayed_callback_ms(NULL, delayed_restart, 100);
     error = false;
   } else if (cmd == RESET_DEVICE) {
     // oc_reset_device(device_index, value);
