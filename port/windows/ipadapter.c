@@ -701,10 +701,10 @@ network_event_thread(void *data)
   dev->event_server_handle = server6_event;
 
 //#ifdef OC_SECURITY
-#ifdef OC_SECURITY
+#ifdef OC_OSCORE
   WSAEVENT secure6_event = WSACreateEvent();
   OC_WSAEVENTSELECT(dev->secure_sock, secure6_event, FD_READ);
-#endif /* OC_SECURITY */
+#endif /* OC_OSCORE */
 
 #ifdef OC_IPV4
   WSAEVENT mcast4_event = WSACreateEvent();
@@ -735,7 +735,7 @@ network_event_thread(void *data)
   DWORD SERVER6 = events_list_size;
   events_list[events_list_size] = server6_event;
   events_list_size++;
-#if defined(OC_SECURITY)
+#if defined(OC_OSCORE)
   //#if defined(OC_OSCORE)
   DWORD SECURE6 = events_list_size;
   events_list[events_list_size] = secure6_event;
@@ -751,14 +751,14 @@ network_event_thread(void *data)
   events_list[events_list_size] = secure4_event;
   events_list_size++;
 #endif                 /* OC_IPV4 */
-#elif defined(OC_IPV4) /* OC_SECURITY */
+#elif defined(OC_IPV4) /* OC_OSCORE */
   DWORD MCAST4 = events_list_size;
   events_list[events_list_size] = mcast4_event;
   events_list_size++;
   DWORD SERVER4 = events_list_size;
   events_list[events_list_size] = server4_event;
   events_list_size++;
-#endif                 /* !OC_SECURITY */
+#endif                 /* !OC_OSCORE */
 
   DWORD i, index;
 
