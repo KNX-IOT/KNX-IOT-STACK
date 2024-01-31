@@ -846,7 +846,7 @@ network_event_thread(void *data)
 #endif /* OC_IPV4 */
 
 //#ifdef OC_SECURITY
-#ifdef OC_SECURITY /* receiving from a secure socket */
+#ifdef OC_OSCORE /* receiving from a secure socket */
         if (i == SECURE6) {
           int count = recv_msg(dev->secure_sock, message->data, OC_PDU_SIZE,
                                &message->endpoint, false);
@@ -872,7 +872,7 @@ network_event_thread(void *data)
           message->encrypted = 1;
         }
 #endif /* OC_IPV4 */
-#endif /* OC_SECURITY */
+#endif /* OC_OSCORE */
       common:
 #ifdef OC_DEBUG
         PRINT("Incoming message of size %zd bytes from ", message->length);
@@ -1138,7 +1138,7 @@ oc_send_buffer(oc_message_t *message)
 #endif /* OC_TCP */
 
 //#ifdef OC_SECURITY
-#ifdef OC_SECURITY /*  not using secured socket to send*/
+#ifdef OC_OSCORE /*  not using secured socket to send*/
   if (message->endpoint.flags & SECURED) {
 #ifdef OC_IPV4
     if (message->endpoint.flags & IPV4) {
@@ -1150,7 +1150,7 @@ oc_send_buffer(oc_message_t *message)
     send_sock = dev->secure_sock;
 #endif /* !OC_IPV4 */
   } else
-#endif /* OC_SECURITY */
+#endif /* OC_OSCORE */
 #ifdef OC_IPV4
     if (message->endpoint.flags & IPV4) {
     send_sock = dev->server4_sock;
