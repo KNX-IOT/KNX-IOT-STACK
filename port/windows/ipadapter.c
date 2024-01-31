@@ -849,7 +849,7 @@ network_event_thread(void *data)
 #ifdef OC_OSCORE /* receiving from a secure socket */
         if (i == SECURE6) {
           int count = recv_msg(dev->secure_sock, message->data, OC_PDU_SIZE,
-                               &message->endpoint, false, message->mcast_dest);
+                               &message->endpoint, false, &message->mcast_dest);
           if (count < 0) {
             oc_message_unref(message);
             continue;
