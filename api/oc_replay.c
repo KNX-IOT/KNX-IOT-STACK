@@ -187,7 +187,13 @@ oc_replay_check_client(uint64_t rx_ssn, oc_string_t rx_kid,
       // slide the window and accept the packet
       rec->rx_ssn = rx_ssn;
       // ssn_diff is negative in this side of the if
-      rec->window = rec->window << (-ssn_diff);
+      // note that shifting by an amount greater than the size of the type
+      // is undefined behaviour, so we must zero the window manually here
+      if (-ssn_diff >= sizeof(rec->window) * 8)
+        rec->window = 0;
+      else
+        rec->window = rec->window << (-ssn_diff);
+
       // set bit 1, indicating ssn rec->rx_ssn has been received
       rec->window |= 1;
       return true;
