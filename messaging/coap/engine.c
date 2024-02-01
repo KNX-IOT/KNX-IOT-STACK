@@ -516,7 +516,7 @@ coap_receive(oc_message_t *msg)
         }
       }
 
-#ifdef OC_REPLAY_PROTECTION
+#if defined(OC_REPLAY_PROTECTION) && defined(OC_OSCORE)
       bool client_is_sync = true;
       oc_string_t kid = { 0 };
       oc_string_t kid_ctx = { 0 };
