@@ -515,8 +515,9 @@ coap_receive(oc_message_t *msg)
           is_myself = true;
         }
       }
-
+      PRINT("BEFORE\n");
 #if defined(OC_REPLAY_PROTECTION) && defined(OC_OSCORE)
+      PRINT("AFTER\n");
       bool client_is_sync = true;
       oc_string_t kid = { 0 };
       oc_string_t kid_ctx = { 0 };
@@ -528,6 +529,7 @@ coap_receive(oc_message_t *msg)
                            msg->endpoint.kid_ctx_len);
         oscore_read_piv(msg->endpoint.request_piv,
                         msg->endpoint.request_piv_len, &ssn);
+        PRINT("ssn = %llx\n", ssn);
 
         client_is_sync = oc_replay_check_client(ssn, kid, kid_ctx);
       }

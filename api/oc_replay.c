@@ -164,34 +164,47 @@ oc_replay_check_client(uint64_t rx_ssn, oc_string_t rx_kid,
   // received message matched existing record, so this record is useful &
   // should be kept around - thus we update the time here
   rec->time = oc_clock_time();
+  PRINT("record ssn = %llx\n", rec->rx_ssn);
+  PRINT("KEYID = %s\n", oc_string(rx_kid));
+  PRINT("REC->WIN: %llx\n", rec->window);
 
   int64_t ssn_diff = rec->rx_ssn - rx_ssn;
 
   if (ssn_diff >= 0) {
+    PRINT("ssn_diff = %llx >= 0\n", ssn_diff);
     // ensure it is not too old
-    if (ssn_diff > sizeof(rec->window) * 8)
+    if (ssn_diff > sizeof(rec->window) * 8) {
+      PRINT("false reason 1: too old\n");
       return false;
+    }
 
     // received SSN is within the window - see if it has been received before
     if (rec->window & (1 << ssn_diff)) {
       // received before, so this is a replay
+      PRINT("false reason 2: is replay\n");
       return false;
     } else {
       // not received before, so remember that this SSN has been seen before
       rec->window |= 1 << ssn_diff;
+      PRINT("true 1\n");
       return true;
     }
   } else {
+    PRINT("ssn_diff = %llx\n", ssn_diff);
     uint64_t rplwdo = oc_oscore_get_rplwdo();
+    PRINT("replwdo = %llx\n", rplwdo);
     if (-ssn_diff <= rplwdo) {
+      PRINT("-ssn_diff <= rplwdo\n");
       // slide the window and accept the packet
       rec->rx_ssn = rx_ssn;
       // ssn_diff is negative in this side of the if
       rec->window = rec->window << (-ssn_diff);
       // set bit 1, indicating ssn rec->rx_ssn has been received
       rec->window |= 1;
+      PRINT("true 2\n");
       return true;
     } else {
+      PRINT("false reason 3: out of window\n");
       return false;
     }
   }
