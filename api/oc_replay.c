@@ -166,7 +166,7 @@ oc_replay_check_client(uint64_t rx_ssn, oc_string_t rx_kid,
   rec->time = oc_clock_time();
   PRINT("record ssn = %llx\n", rec->rx_ssn);
   PRINT("KEYID = %s\n", oc_string(rx_kid));
-  PRINT("REC->WIN: %llx\n", rec->window);
+  PRINT("REC->WIN before: %llx\n", rec->window);
 
   int64_t ssn_diff = rec->rx_ssn - rx_ssn;
 
@@ -190,11 +190,11 @@ oc_replay_check_client(uint64_t rx_ssn, oc_string_t rx_kid,
       return true;
     }
   } else {
-    PRINT("ssn_diff = %llx\n", ssn_diff);
+    PRINT("ssn_diff = dec: %d, hex: %llx\n", ssn_diff, ssn_diff);
     uint64_t rplwdo = oc_oscore_get_rplwdo();
     PRINT("replwdo = %llx\n", rplwdo);
     if (-ssn_diff <= rplwdo) {
-      PRINT("-ssn_diff <= rplwdo\n");
+      PRINT("-ssn_diff <= rplwdo, shifting bitfield by %d\n", ssn_diff);
       // slide the window and accept the packet
       rec->rx_ssn = rx_ssn;
       // ssn_diff is negative in this side of the if
@@ -207,6 +207,7 @@ oc_replay_check_client(uint64_t rx_ssn, oc_string_t rx_kid,
 
       // set bit 1, indicating ssn rec->rx_ssn has been received
       rec->window |= 1;
+      PRINT("REC->WIN before: %llx\n", rec->window);
       PRINT("true 2\n");
       return true;
     } else {
