@@ -30,7 +30,7 @@ set(OC_LOG_TO_FILE_ENABLED OFF CACHE BOOL "redirect debug messages to file")
 set(CLANG_TIDY_ENABLED OFF CACHE BOOL "Enable clang-tidy analysis during compilation.")
 set(OC_USE_STORAGE ON CACHE BOOL "Persistent storage of data.")
 set(OC_USE_MULTICAST_SCOPE_2 ON CACHE BOOL "devices send also group multicast events with scope2.")
-set(OC_REPLAY_PROTECTION_ENABLED OFF CACHE BOOL "Enable replay protection using the Echo option")
+set(OC_REPLAY_PROTECTION_ENABLED ON CACHE BOOL "Enable replay protection using the Echo option")
 
 set(KNX_BUILTIN_MBEDTLS ON CACHE BOOL "Use built-in mbedTLS, as opposed to external lib from different project")
 set(KNX_BUILTIN_TINYCBOR ON CACHE BOOL "Use built-in TinyCBOR, as opposed to external lib from different project")
