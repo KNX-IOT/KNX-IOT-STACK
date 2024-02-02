@@ -665,7 +665,7 @@ oc_do_s_mode_read(int64_t group_address)
         (uint32_t)group_address, sia_value, iid);
 
   // find the grpid that belongs to the group address
-  grpid = oc_find_grpid_in_publisher_table(group_address);
+  grpid = oc_find_grpid_in_recipient_table(group_address);
   if (grpid > 0) {
 #ifdef OC_USE_MULTICAST_SCOPE_2
     oc_issue_s_mode(2, sia_value, grpid, group_address, iid, "r", 0, 0);
