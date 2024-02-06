@@ -1030,7 +1030,7 @@ oc_oscore_send_message(oc_message_t *msg)
     }
 
     bool is_request =
-      coap_pkt->type == COAP_TYPE_CON || coap_pkt->type == COAP_TYPE_NON;
+      coap_pkt->code >= OC_GET && coap_pkt->code <= OC_FETCH;
     bool is_empty_ack = coap_pkt->type == COAP_TYPE_ACK && inner_code == 0;
     bool is_separate_response = coap_pkt->type == COAP_TYPE_CON;
     /* Set the OSCORE option */
