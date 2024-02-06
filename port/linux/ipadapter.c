@@ -819,10 +819,10 @@ oc_udp_receive_message(ip_context_t *dev, fd_set *fds, oc_message_t *message)
   }
 #endif /* OC_IPV4 */
 
-#ifdef OC_SECURITY
+#ifdef OC_OSCORE
   if (FD_ISSET(dev->secure_sock, fds)) {
     int count = recv_msg(dev->secure_sock, message->data, OC_PDU_SIZE,
-                         &message->endpoint, false);
+                         &message->endpoint, false, &message->mcast_dest);
     if (count < 0) {
       return ADAPTER_STATUS_ERROR;
     }
@@ -846,7 +846,7 @@ oc_udp_receive_message(ip_context_t *dev, fd_set *fds, oc_message_t *message)
     return ADAPTER_STATUS_RECEIVE;
   }
 #endif /* OC_IPV4 */
-#endif /* OC_SECURITY */
+#endif /* OC_OSCORE */
 
   return ADAPTER_STATUS_NONE;
 }
@@ -1064,8 +1064,7 @@ oc_send_buffer(oc_message_t *message)
   }
 #endif /* OC_TCP */
 
-//#ifdef OC_SECURITY
-#ifdef OC_SECURITY
+#ifdef OC_OSCORE
   if (message->endpoint.flags & SECURED) {
 #ifdef OC_IPV4
     if (message->endpoint.flags & IPV4) {

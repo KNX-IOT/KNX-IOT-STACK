@@ -41,6 +41,7 @@ set(KNX_GAMT_MAX_ENTRIES "" CACHE STRING "Maximum number of group address mappin
 set(KNX_GOT_MAX_ENTRIES "" CACHE STRING "Maximum number of group object table entries")
 set(KNX_GPT_MAX_ENTRIES "" CACHE STRING "Maximum number of group publisher table entries")
 set(KNX_GRT_MAX_ENTRIES "" CACHE STRING "Maximum number of group recipient table entries")
+set(KNX_SEC_MAX_ENTRIES "" CACHE STRING "Maximum number of group security table (auth/at) entries")
 
 set(KNX_SPAKE_MIN_IT "1000" CACHE STRING "Minimum number of SHA256 iterations used within the SPAKE2+ handshake")
 set(KNX_SPAKE_MAX_IT "100000" CACHE STRING "Maximum number of SHA256 iterations used within the SPAKE2+ handshake")
@@ -218,6 +219,10 @@ endif()
 
 if(NOT ${KNX_GRT_MAX_ENTRIES} EQUAL "")
     add_compile_definitions(GRT_MAX_ENTRIES=${KNX_GRT_MAX_ENTRIES})
+endif()
+
+if(NOT ${KNX_SEC_MAX_ENTRIES} EQUAL "")
+    add_compile_definitions(G_AT_MAX_ENTRIES=${KNX_SEC_MAX_ENTRIES})
 endif()
 
 if(NOT ${KNX_PAGE_SIZE} EQUAL "")

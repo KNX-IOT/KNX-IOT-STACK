@@ -34,7 +34,9 @@ uint64_t g_oscore_osndelay = 1000;
 
 /** the list of oscore profiles */
 #define AT_STORE "at_store"
+#ifndef G_AT_MAX_ENTRIES
 #define G_AT_MAX_ENTRIES 20
+#endif
 oc_auth_at_t g_at_entries[G_AT_MAX_ENTRIES];
 
 // ----------------------------------------------------------------------------
