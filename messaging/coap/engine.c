@@ -529,7 +529,11 @@ coap_receive(oc_message_t *msg)
         oscore_read_piv(msg->endpoint.request_piv,
                         msg->endpoint.request_piv_len, &ssn);
 
-        client_is_sync = oc_replay_check_client(ssn, kid, kid_ctx);
+        if (msg->endpoint.flags & MULTICAST) {
+          client_is_sync = oc_replay_check_client(ssn, kid, kid_ctx, true);
+        } else {
+          client_is_sync = oc_replay_check_client(ssn, kid, kid_ctx, false);
+        }
       }
 
       // Server-side logic for sending responses with an echo option,

@@ -117,7 +117,7 @@ get_record(oc_string_t rx_kid, oc_string_t rx_kid_ctx)
 // return false if no entry found, or if SSN is outside replay window
 bool
 oc_replay_check_client(uint64_t rx_ssn, oc_string_t rx_kid,
-                       oc_string_t rx_kid_ctx)
+                       oc_string_t rx_kid_ctx, bool is_mcast)
 {
   /*
   With CoAP over UDP, you cannot guarantee messages are received in order.
@@ -158,9 +158,14 @@ oc_replay_check_client(uint64_t rx_ssn, oc_string_t rx_kid,
   */
 
   struct oc_replay_record *rec = get_record(rx_kid, rx_kid_ctx);
-  if (rec == NULL)
-    return false;
-
+  if (rec == NULL) {
+    if (is_mcast) {
+      oc_replay_add_client(rx_ssn, rx_kid, rx_kid_ctx);
+      return true;
+    } else {
+      return false;
+    }
+  }
   // received message matched existing record, so this record is useful &
   // should be kept around - thus we update the time here
   rec->time = oc_clock_time();
