@@ -159,12 +159,16 @@ oc_replay_check_client(uint64_t rx_ssn, oc_string_t rx_kid,
 
   struct oc_replay_record *rec = get_record(rx_kid, rx_kid_ctx);
   if (rec == NULL) {
+#if OC_TRUST_FIRST_MCAST
     if (is_mcast) {
       oc_replay_add_client(rx_ssn, rx_kid, rx_kid_ctx);
       return true;
     } else {
       return false;
     }
+#else
+    return false;
+#endif
   }
   // received message matched existing record, so this record is useful &
   // should be kept around - thus we update the time here
