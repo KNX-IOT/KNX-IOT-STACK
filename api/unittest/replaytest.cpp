@@ -15,40 +15,40 @@ TEST(ReplayProtection, OutOfOrderFrames)
   oc_replay_add_client(6, kid, kid_ctx);
 
   // receive some valid frames, shifting the window
-  EXPECT_TRUE(oc_replay_check_client(7, kid, kid_ctx));
-  EXPECT_TRUE(oc_replay_check_client(8, kid, kid_ctx));
+  EXPECT_TRUE(oc_replay_check_client(7, kid, kid_ctx, false));
+  EXPECT_TRUE(oc_replay_check_client(8, kid, kid_ctx, false));
 
   // replay the frames
-  EXPECT_FALSE(oc_replay_check_client(6, kid, kid_ctx));
-  EXPECT_FALSE(oc_replay_check_client(7, kid, kid_ctx));
-  EXPECT_FALSE(oc_replay_check_client(8, kid, kid_ctx));
+  EXPECT_FALSE(oc_replay_check_client(6, kid, kid_ctx, false));
+  EXPECT_FALSE(oc_replay_check_client(7, kid, kid_ctx, false));
+  EXPECT_FALSE(oc_replay_check_client(8, kid, kid_ctx, false));
 
   // receive some valid frames out of order
-  EXPECT_TRUE(oc_replay_check_client(4, kid, kid_ctx));
-  EXPECT_TRUE(oc_replay_check_client(2, kid, kid_ctx));
-  EXPECT_TRUE(oc_replay_check_client(5, kid, kid_ctx));
-  EXPECT_TRUE(oc_replay_check_client(3, kid, kid_ctx));
+  EXPECT_TRUE(oc_replay_check_client(4, kid, kid_ctx, false));
+  EXPECT_TRUE(oc_replay_check_client(2, kid, kid_ctx, false));
+  EXPECT_TRUE(oc_replay_check_client(5, kid, kid_ctx, false));
+  EXPECT_TRUE(oc_replay_check_client(3, kid, kid_ctx, false));
 
   // replay the frames some more
-  EXPECT_FALSE(oc_replay_check_client(6, kid, kid_ctx));
-  EXPECT_FALSE(oc_replay_check_client(7, kid, kid_ctx));
-  EXPECT_FALSE(oc_replay_check_client(8, kid, kid_ctx));
-  EXPECT_FALSE(oc_replay_check_client(2, kid, kid_ctx));
-  EXPECT_FALSE(oc_replay_check_client(3, kid, kid_ctx));
-  EXPECT_FALSE(oc_replay_check_client(4, kid, kid_ctx));
+  EXPECT_FALSE(oc_replay_check_client(6, kid, kid_ctx, false));
+  EXPECT_FALSE(oc_replay_check_client(7, kid, kid_ctx, false));
+  EXPECT_FALSE(oc_replay_check_client(8, kid, kid_ctx, false));
+  EXPECT_FALSE(oc_replay_check_client(2, kid, kid_ctx, false));
+  EXPECT_FALSE(oc_replay_check_client(3, kid, kid_ctx, false));
+  EXPECT_FALSE(oc_replay_check_client(4, kid, kid_ctx, false));
 
   // shift the window by a lot
-  EXPECT_TRUE(oc_replay_check_client(20, kid, kid_ctx));
+  EXPECT_TRUE(oc_replay_check_client(20, kid, kid_ctx, false));
 
   // replays should still be detected
-  EXPECT_FALSE(oc_replay_check_client(6, kid, kid_ctx));
-  EXPECT_FALSE(oc_replay_check_client(7, kid, kid_ctx));
-  EXPECT_FALSE(oc_replay_check_client(8, kid, kid_ctx));
+  EXPECT_FALSE(oc_replay_check_client(6, kid, kid_ctx, false));
+  EXPECT_FALSE(oc_replay_check_client(7, kid, kid_ctx, false));
+  EXPECT_FALSE(oc_replay_check_client(8, kid, kid_ctx, false));
 
   // some more valid out-of-order frames
-  EXPECT_TRUE(oc_replay_check_client(17, kid, kid_ctx));
-  EXPECT_TRUE(oc_replay_check_client(18, kid, kid_ctx));
-  EXPECT_TRUE(oc_replay_check_client(19, kid, kid_ctx));
+  EXPECT_TRUE(oc_replay_check_client(17, kid, kid_ctx, false));
+  EXPECT_TRUE(oc_replay_check_client(18, kid, kid_ctx, false));
+  EXPECT_TRUE(oc_replay_check_client(19, kid, kid_ctx, false));
 }
 
 TEST(ReplayProtection, MultipleClients)
@@ -78,20 +78,20 @@ TEST(ReplayProtection, MultipleClients)
 
   // for every added client, test out a new valid packet & a replayed packet
 
-  EXPECT_FALSE(oc_replay_check_client(5, kid1, empty));
-  EXPECT_TRUE(oc_replay_check_client(6, kid1, empty));
-  EXPECT_FALSE(oc_replay_check_client(5, kid2, empty));
-  EXPECT_TRUE(oc_replay_check_client(6, kid2, empty));
+  EXPECT_FALSE(oc_replay_check_client(5, kid1, empty, false));
+  EXPECT_TRUE(oc_replay_check_client(6, kid1, empty, false));
+  EXPECT_FALSE(oc_replay_check_client(5, kid2, empty, false));
+  EXPECT_TRUE(oc_replay_check_client(6, kid2, empty, false));
 
-  EXPECT_FALSE(oc_replay_check_client(5, kid1, con1));
-  EXPECT_TRUE(oc_replay_check_client(6, kid1, con1));
-  EXPECT_FALSE(oc_replay_check_client(5, kid1, con2));
-  EXPECT_TRUE(oc_replay_check_client(6, kid1, con2));
+  EXPECT_FALSE(oc_replay_check_client(5, kid1, con1, false));
+  EXPECT_TRUE(oc_replay_check_client(6, kid1, con1, false));
+  EXPECT_FALSE(oc_replay_check_client(5, kid1, con2, false));
+  EXPECT_TRUE(oc_replay_check_client(6, kid1, con2, false));
 
-  EXPECT_FALSE(oc_replay_check_client(5, kid3, con2));
-  EXPECT_TRUE(oc_replay_check_client(6, kid3, con2));
-  EXPECT_FALSE(oc_replay_check_client(5, kid4, con2));
-  EXPECT_TRUE(oc_replay_check_client(6, kid4, con2));
+  EXPECT_FALSE(oc_replay_check_client(5, kid3, con2, false));
+  EXPECT_TRUE(oc_replay_check_client(6, kid3, con2, false));
+  EXPECT_FALSE(oc_replay_check_client(5, kid4, con2, false));
+  EXPECT_TRUE(oc_replay_check_client(6, kid4, con2, false));
 }
 
 TEST(ReplayProtection, TimeBasedFree)
@@ -110,7 +110,7 @@ TEST(ReplayProtection, TimeBasedFree)
   // check 20 most recently added values - should still be readable
   for (int i = 20; i < 30; ++i) {
     (*oc_string(kid))--;
-    EXPECT_TRUE(oc_replay_check_client(6, kid, empty));
+    EXPECT_TRUE(oc_replay_check_client(6, kid, empty, false));
   }
 }
 
@@ -125,8 +125,8 @@ TEST(ReplayProtection, RplWdo)
 
   oc_replay_add_client(5, kid, empty);
   // outside the upper bound of the replay window
-  EXPECT_FALSE(oc_replay_check_client(55, kid, empty));
+  EXPECT_FALSE(oc_replay_check_client(55, kid, empty, false));
   // fake an update to the replay window upper bound
   g_oscore_replaywindow = 64;
-  EXPECT_TRUE(oc_replay_check_client(55, kid, empty));
+  EXPECT_TRUE(oc_replay_check_client(55, kid, empty, false));
 }
