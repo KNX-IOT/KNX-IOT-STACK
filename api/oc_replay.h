@@ -46,12 +46,13 @@ void oc_replay_add_client(uint64_t rx_ssn, oc_string_t rx_kid,
  * @param rx_ssn Sender Sequence Number of newly received OSCORE request
  * @param rx_kid Key Identifier of received request
  * @param rx_kid_ctx Key ID Context of received request
+ * @param is_mcast Whether received message is multicast
  * @return true Client is synchronised, you may accept the frame with the given
  * SSN
  * @return false Client is not synchronised, you must challenge the frame
  */
 bool oc_replay_check_client(uint64_t rx_ssn, oc_string_t rx_kid,
-                            oc_string_t rx_kid_ctx);
+                            oc_string_t rx_kid_ctx, bool is_mcast);
 
 /**
  * @brief Free all clients with a given KID. Should be used whenever the

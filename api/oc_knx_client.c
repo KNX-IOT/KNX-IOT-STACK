@@ -736,6 +736,8 @@ oc_do_s_mode_with_scope_and_check(int scope, const char *resource_url, char *rp,
     return;
   }
 
+  oc_notify_observers(my_resource);
+
   value_size = oc_s_mode_get_resource_value(resource_url, rp, buffer, 50);
 
   // get the sender ia
