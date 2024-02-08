@@ -341,6 +341,20 @@ oc_spake_calc_w0_w1(const char *pw, size_t len_salt, const uint8_t *salt,
   MBEDTLS_MPI_CHK(mbedtls_mpi_mod_mpi(w0, &w0s, &grp.N));
   MBEDTLS_MPI_CHK(mbedtls_mpi_mod_mpi(w1, &w1s, &grp.N));
 
+  
+#ifdef OC_DEBUG_OSCORE
+  size_t len_mpi = mbedtls_mpi_size(w0);
+  uint8_t *mpi_buf = malloc(len_mpi);
+  mbedtls_mpi_write_binary(w0, mpi_buf, len_mpi);
+  OC_DBG_SPAKE("Value of w0: ");
+  OC_LOGbytes_SPAKE(mpi_buf, len_mpi);
+
+  len_mpi = mbedtls_mpi_size(w1);
+  mbedtls_mpi_write_binary(w1, mpi_buf, len_mpi);
+  OC_DBG_SPAKE("Value of w1: ");
+  OC_LOGbytes_SPAKE(mpi_buf, len_mpi);
+#endif
+
 cleanup:
   mbedtls_md_free(&ctx);
   mbedtls_mpi_free(&w0s);
