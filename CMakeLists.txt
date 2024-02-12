@@ -31,7 +31,7 @@ set(CLANG_TIDY_ENABLED OFF CACHE BOOL "Enable clang-tidy analysis during compila
 set(OC_USE_STORAGE ON CACHE BOOL "Persistent storage of data.")
 set(OC_USE_MULTICAST_SCOPE_2 ON CACHE BOOL "devices send also group multicast events with scope2.")
 set(OC_REPLAY_PROTECTION_ENABLED ON CACHE BOOL "Enable replay protection using the Echo option")
-set(OC_TRUST_FIRST_MCAST ON CACHE BOOL "Trust first multicast message from an unsynchronised client")
+set(OC_TRUST_FIRST_MCAST_ENABLED ON CACHE BOOL "Trust first multicast message from an unsynchronised client")
 
 set(KNX_BUILTIN_MBEDTLS ON CACHE BOOL "Use built-in mbedTLS, as opposed to external lib from different project")
 set(KNX_BUILTIN_TINYCBOR ON CACHE BOOL "Use built-in TinyCBOR, as opposed to external lib from different project")
@@ -188,8 +188,13 @@ endif()
 if(OC_DEBUG_OSCORE_ENABLED)
     target_compile_definitions(kis-common INTERFACE OC_DEBUG_OSCORE)
 endif()
+
 if(OC_REPLAY_PROTECTION_ENABLED)
     target_compile_definitions(kis-common INTERFACE OC_REPLAY_PROTECTION)
+endif()
+
+if(OC_TRUST_FIRST_MCAST_ENABLED)
+    target_compile_definitions(kis-common INTERFACE OC_TRUST_FIRST_MCAST)
 endif()
 
 
