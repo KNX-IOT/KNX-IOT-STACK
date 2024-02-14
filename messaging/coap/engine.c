@@ -502,6 +502,7 @@ coap_receive(oc_message_t *msg)
       // check if incoming message is from myself.
       // if so, then return with bad request
       oc_endpoint_t *my_ep = oc_connectivity_get_endpoints(0);
+      oc_endpoint_t *ep_i = NULL;
 #ifdef OC_DEBUG
       if (my_ep != NULL) {
         PRINT("engine : myself:");
@@ -509,10 +510,15 @@ coap_receive(oc_message_t *msg)
         PRINT("\n");
       }
 #endif /* OC_DEBUG */
-      if (oc_endpoint_compare_address(&msg->endpoint, my_ep) == 0) {
-        if (msg->endpoint.addr.ipv6.port == my_ep->addr.ipv6.port) {
-          OC_DBG(" same address and port: not handling message");
-          is_myself = true;
+      for (ep_i = my_ep; ep_i != NULL; ep_i = ep_i->next) {
+        PRINTipaddr(*ep_i);
+        PRINT("\n");
+
+        if (oc_endpoint_compare_address(&msg->endpoint, ep_i) == 0) {
+          if (msg->endpoint.addr.ipv6.port == ep_i->addr.ipv6.port) {
+            OC_DBG(" same address and port: not handling message");
+            is_myself = true;
+          }
         }
       }
 
