@@ -1244,7 +1244,7 @@ void oc_send_empty_separate_response(oc_separate_response_t *handle,
  *  - the number observers notified on success
  *  - `0` on failure could also mean no registered observers
  */
-int oc_notify_observers(oc_resource_t *resource);
+int oc_notify_observers(const oc_resource_t *resource);
 
 #ifdef __cplusplus
 }
