@@ -684,7 +684,7 @@ oc_send_empty_separate_response(oc_separate_response_t *handle,
 }
 
 int
-oc_notify_observers(oc_resource_t *resource)
+oc_notify_observers(const oc_resource_t *resource)
 {
   return coap_notify_observers(resource, NULL, NULL);
 }
