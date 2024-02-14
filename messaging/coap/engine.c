@@ -521,7 +521,6 @@ coap_receive(oc_message_t *msg)
           }
         }
       }
-      PRINT("is_myself? %d\n", is_myself);
 
 #if defined(OC_REPLAY_PROTECTION) && defined(OC_OSCORE)
       bool client_is_sync = true;
