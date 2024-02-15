@@ -29,6 +29,8 @@ extern "C" {
 
 /**
  * @brief open the storage
+ * NOTE: this function doesn't do anything on embedded devices, so there is no
+ * need to call it in that situation.
  *
  * @param store the storage (path)
  * @return int
