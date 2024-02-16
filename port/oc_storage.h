@@ -29,8 +29,7 @@ extern "C" {
 
 /**
  * @brief open the storage
- * NOTE: this function doesn't do anything on embedded devices, so there is no
- * need to call it in that situation.
+ * NOTE: For embedded devices, this function doesn't do anything. However, it needs to be called for hosted/virtual devices.
  *
  * @param store the storage (path)
  * @return int
