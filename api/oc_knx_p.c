@@ -242,7 +242,7 @@ oc_core_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     }
     rep = rep->next;
   }
-
+  oc_knx_increase_fingerprint();
   oc_send_response_no_format(request, OC_STATUS_CHANGED);
   PRINT("oc_core_p_post_handler - end\n");
 }
