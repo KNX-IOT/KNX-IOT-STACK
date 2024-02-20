@@ -394,13 +394,12 @@ discovery_ia_cb(const char *payload, int len, oc_endpoint_t *endpoint,
 }
 
 int
-oc_knx_client_do_broker_request(const char *resource_url, uint32_t ia,
+oc_knx_client_do_broker_request(const char *resource_url, uint64_t iid, uint32_t ia,
                                 char *destination, char *rp)
 {
   char query[20];
 
-  // TODO: do the new discovery here
-  snprintf(query, 20, "if=urn:knx:ia.%d", ia);
+  snprintf(query, 20, "ep=knx://ia.%llu.%lu", iid, ia);
 
   // not sure if we should use a malloc here, what would happen if there are no
   // devices found? because that causes a memory leak
@@ -775,7 +774,7 @@ oc_do_s_mode_with_scope_and_check(int scope, const char *resource_url, char *rp,
       PRINT("    handling: index %d\n", index);
       for (int j = 0; j < ga_len; j++) {
         group_address = oc_core_find_group_object_table_group_entry(index, j);
-        PRINT("      ga : %d\n", group_address);
+        PRINT("      ga : %lu\n", group_address);
         // Check if any other GOT entries have the same GA with "w" flag
         int other_index = oc_core_find_group_object_table_index(group_address);
         while (other_index != -1) {
@@ -838,7 +837,7 @@ oc_do_s_mode_with_scope_and_check(int scope, const char *resource_url, char *rp,
               uint32_t ia = oc_core_get_recipient_ia(jr);
               if (ia > 0) {
                 // ia == 0 is reserved, so only send with ia > 0
-                oc_knx_client_do_broker_request(resource_url, ia, url, rp);
+                oc_knx_client_do_broker_request(resource_url, iid, ia, url, rp);
               }
             }
           }

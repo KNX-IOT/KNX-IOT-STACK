@@ -175,7 +175,7 @@ typedef struct oc_group_object_table_t
 typedef struct oc_group_rp_table_t
 {
   int id;           /**< contents of id*/
-  int ia;           /**< contents of ia (internal address)*/
+  int ia;           /**< contents of ia (individual address)*/
   int64_t iid;      /**< contents of installation id */
   int64_t fid;      /**< contents of fabric id */
   uint32_t grpid;   /**< the multicast group id */
