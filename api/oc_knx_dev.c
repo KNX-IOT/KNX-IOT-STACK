@@ -717,7 +717,7 @@ oc_core_dev_dev_get_handler(oc_request_t *request,
     const oc_resource_t *resource =
       oc_core_get_resource_by_index(i, device_index);
     if (oc_filter_resource(resource, request, device_index, &response_length,
-                           &i, i)) {
+                           &i, i, 1)) {
       matches++;
     }
   }
@@ -1266,7 +1266,7 @@ oc_core_ap_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     const oc_resource_t *resource =
       oc_core_get_resource_by_index(i, device_index);
     if (oc_filter_resource(resource, request, device_index, &response_length,
-                           &i, i)) {
+                           &i, i, 1)) {
       matches++;
     }
   }

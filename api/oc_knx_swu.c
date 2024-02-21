@@ -847,7 +847,7 @@ oc_core_knx_swu_get_handler(oc_request_t *request,
     const oc_resource_t *resource =
       oc_core_get_resource_by_index(i, device_index);
     if (oc_filter_resource(resource, request, device_index, &response_length,
-                           &i, i)) {
+                           &i, i, 1)) {
       matches++;
     }
   }
