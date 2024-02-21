@@ -248,7 +248,7 @@ oc_core_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_p, knx_f, 0, "/p",
-                                     OC_IF_LI | OC_IF_C | OC_IF_B,
+                                     OC_IF_LI | OC_IF_D | OC_IF_C | OC_IF_B,
                                      APPLICATION_LINK_FORMAT, 0,
                                      oc_core_p_get_handler, 0,
                                      oc_core_p_post_handler, 0, NULL,
@@ -260,7 +260,7 @@ oc_create_p_resource(int resource_idx, size_t device)
   // note that this resource is listed in /.well-known/core so it should have
   // the full rt with urn:knx prefix
   oc_core_populate_resource(resource_idx, device, "/p",
-                            OC_IF_LI | OC_IF_C | OC_IF_B,
+                            OC_IF_LI | OC_IF_D | OC_IF_C | OC_IF_B,
                             APPLICATION_LINK_FORMAT, 0, oc_core_p_get_handler,
                             0, oc_core_p_post_handler, 0, 1, "urn:knx:fb.0");
 }

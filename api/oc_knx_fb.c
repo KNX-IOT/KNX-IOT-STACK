@@ -244,7 +244,7 @@ oc_core_fb_x_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_f_x, knx_swu_protocol, 0, "/f/*",
-                                     OC_IF_LI, APPLICATION_LINK_FORMAT, 0,
+                                     OC_IF_LI | OC_IF_D, APPLICATION_LINK_FORMAT, 0,
                                      oc_core_fb_x_get_handler, 0, 0, 0, NULL,
                                      OC_SIZE_MANY(1), "urn:knx:fb.0");
 
@@ -255,7 +255,7 @@ oc_create_fb_x_resource(int resource_idx, size_t device)
   // note that this resource is listed in /.well-known/core so it should have
   // the full rt with urn:knx prefix
   oc_core_populate_resource(
-    resource_idx, device, "/f/*", OC_IF_LI, APPLICATION_LINK_FORMAT, 0,
+    resource_idx, device, "/f/*", OC_IF_LI | OC_IF_D, APPLICATION_LINK_FORMAT, 0,
     oc_core_fb_x_get_handler, 0, 0, 0, 1, "urn:knx:fb.0");
 }
 
@@ -560,7 +560,7 @@ oc_core_fb_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
   PRINT("oc_core_fb_get_handler - end\n");
 }
 
-OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_f, knx_f_x, 0, "/f", OC_IF_LI,
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_f, knx_f_x, 0, "/f", OC_IF_LI | OC_IF_D,
                                      APPLICATION_LINK_FORMAT, 0,
                                      oc_core_fb_get_handler, 0, 0, 0, NULL,
                                      OC_SIZE_MANY(1), "urn:knx:fb.0");
@@ -571,7 +571,7 @@ oc_create_fb_resource(int resource_idx, size_t device)
   OC_DBG("oc_create_fb_resource\n");
   // note that this resource is listed in /.well-known/core so it should have
   // the full rt with urn:knx prefix
-  oc_core_populate_resource(resource_idx, device, "/f", OC_IF_LI,
+  oc_core_populate_resource(resource_idx, device, "/f", OC_IF_LI | OC_IF_D,
                             APPLICATION_LINK_FORMAT, 0, oc_core_fb_get_handler,
                             0, 0, 0, 1, "urn:knx:fb.0");
 }

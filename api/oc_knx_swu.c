@@ -224,7 +224,7 @@ oc_knx_swu_maxdefer_put_handler(oc_request_t *request,
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_swu_maxdefer, knx_swu_method, 0,
-                                     "/swu/maxdefer", OC_IF_LI,
+                                     "/swu/maxdefer", OC_IF_LI | OC_IF_D,
                                      APPLICATION_CBOR, OC_DISCOVERABLE,
                                      oc_knx_swu_maxdefer_get_handler,
                                      oc_knx_swu_maxdefer_put_handler, 0, 0,
@@ -234,7 +234,7 @@ void
 oc_create_knx_swu_maxdefer_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_swu_maxdefer_resource\n");
-  oc_core_populate_resource(resource_idx, device, "/swu/maxdefer", OC_IF_LI,
+  oc_core_populate_resource(resource_idx, device, "/swu/maxdefer", OC_IF_LI | OC_IF_D,
                             APPLICATION_CBOR, OC_DISCOVERABLE,
                             oc_knx_swu_maxdefer_get_handler,
                             oc_knx_swu_maxdefer_put_handler, 0, 0, 0);
@@ -865,7 +865,7 @@ oc_core_knx_swu_get_handler(oc_request_t *request,
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_swu, sub, 0, "/swu",
-                                     OC_IF_SWU | OC_IF_LI,
+                                     OC_IF_SWU | OC_IF_LI | OC_IF_D,
                                      APPLICATION_LINK_FORMAT, OC_DISCOVERABLE,
                                      oc_core_knx_swu_get_handler, 0, 0, 0, NULL,
                                      OC_SIZE_MANY(1), "urn:knx:fb.swu");
@@ -876,7 +876,7 @@ oc_create_knx_swu_resource(int resource_idx, size_t device)
   OC_DBG("oc_create_knx_swu_resource\n");
   //
   oc_core_populate_resource(
-    resource_idx, device, "/swu", OC_IF_SWU | OC_IF_LI, APPLICATION_LINK_FORMAT,
+    resource_idx, device, "/swu", OC_IF_SWU | OC_IF_LI | OC_IF_D, APPLICATION_LINK_FORMAT,
     OC_DISCOVERABLE, oc_core_knx_swu_get_handler, 0, 0, 0, 1, "urn:knx:fb.swu");
 }
 
