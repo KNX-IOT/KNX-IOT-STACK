@@ -42,7 +42,7 @@ static struct oc_replay_record
   oc_string_t rx_kid_ctx; /// byte string holding the KID context of the client.
                           /// can be null
   oc_clock_time_t time;   /// time of last received packet
-  uint64_t window; /// bitfield indicating received SSNs through bit position
+  uint32_t window; /// bitfield indicating received SSNs through bit position
   bool in_use;     /// whether this structure is in use & has valid data
 } replay_records[OC_MAX_REPLAY_RECORDS] = { 0 };
 
@@ -189,13 +189,13 @@ oc_replay_check_client(uint64_t rx_ssn, oc_string_t rx_kid,
     }
 
     // received SSN is within the window - see if it has been received before
-    if (rec->window & ((uint64_t)1 << ssn_diff)) {
+    if (rec->window & ((uint32_t)1 << ssn_diff)) {
       // received before, so this is a replay
       PRINT("false reason 2: is replay\n");
       return false;
     } else {
       // not received before, so remember that this SSN has been seen before
-      rec->window |= (uint64_t)1 << ssn_diff;
+      rec->window |= (uint32_t)1 << ssn_diff;
       PRINT("true 1\n");
       return true;
     }
