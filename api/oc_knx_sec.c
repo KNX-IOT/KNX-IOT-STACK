@@ -670,6 +670,11 @@ oc_core_auth_at_post_handler(oc_request_t *request,
               char *if_str = oc_string_array_get_item(str_array, i);
               oc_interface_mask_t if_mask =
                 oc_ri_get_interface_mask(if_str, strlen(if_str));
+              if (if_mask == OC_IF_LI) {
+                PRINT("   if.ll is not a valid access scope!\n");
+                oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
+                return;
+              }
               interfaces = interfaces + if_mask;
             }
             g_at_entries[index].scope = interfaces;
