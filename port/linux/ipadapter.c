@@ -1116,6 +1116,14 @@ oc_send_discovery_request(oc_message_t *message)
     if ((message->endpoint.flags & IPV6) && iface->ifa_addr &&
         iface->ifa_addr->sa_family == AF_INET6) {
       struct sockaddr_in6 *addr = (struct sockaddr_in6 *)iface->ifa_addr;
+      // check for Thread mesh local prefix
+      bool is_thread_mesh = 
+        addr->sin6_addr.__in6_u.__u6_addr16[0] == 0xfdde
+        && addr->sin6_addr.__in6_u.__u6_addr16[1] == 0xad00
+        && addr->sin6_addr.__in6_u.__u6_addr16[2] == 0xbeef
+        && addr->sin6_addr.__in6_u.__u6_addr16[3] == 0x0000;
+      if (is_thread_mesh)
+        continue;
       memcpy(&message->endpoint.addr_local.ipv6.address, &addr->sin6_addr, 16);
       unsigned int mif = if_nametoindex(iface->ifa_name);
       if (setsockopt(dev->server_sock, IPPROTO_IPV6, IPV6_MULTICAST_IF, &mif,
