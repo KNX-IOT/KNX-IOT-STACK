@@ -1118,8 +1118,9 @@ oc_send_discovery_request(oc_message_t *message)
       struct sockaddr_in6 *addr = (struct sockaddr_in6 *)iface->ifa_addr;
       // check for Thread mesh local prefix
       memcpy(&message->endpoint.addr_local.ipv6.address, &addr->sin6_addr, 16);
-      uint8_t* epaddr = message->endpoint.addr_local.ipv6.address;
-      uint8_t thread_prefix[8] = {0xfd, 0xde, 0xad, 0x00, 0xbe, 0xef, 0x00, 0x00};
+      uint8_t *epaddr = message->endpoint.addr_local.ipv6.address;
+      uint8_t thread_prefix[8] = { 0xfd, 0xde, 0xad, 0x00,
+                                   0xbe, 0xef, 0x00, 0x00 };
       bool is_thread_mesh = memcmp(epaddr, thread_prefix, 8) == 0;
       if (is_thread_mesh)
         continue;
