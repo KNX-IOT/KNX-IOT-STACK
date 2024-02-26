@@ -1434,6 +1434,7 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
     // writing the empty values
     oc_storage_erase(KNX_STORAGE_IA);
     oc_storage_erase(KNX_STORAGE_IID);
+    oc_storage_erase(KNX_STORAGE_FID);
     oc_storage_erase(KNX_STORAGE_PM);
     uint32_t port = 5683;  // unicast communication
     uint32_t mport = 5683; // multicast communication
@@ -1445,6 +1446,7 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
     // set the other data to KNX defaults
     device->ia = ffff;
     device->iid = zero;
+    device->fid = zero;
     device->port = port;
     device->mport = mport;
     oc_free_string(&device->hostname);
