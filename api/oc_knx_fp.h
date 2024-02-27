@@ -159,7 +159,7 @@ typedef struct oc_group_object_table_t
  * | path     | 112           |
  * | url      | 10            |
  * | ga       | 7             |
- * | con      | -             |
+ * | non      | -             |
  *
  * The structure stores the information.
  * The structure will be used as an array.
@@ -183,9 +183,10 @@ typedef struct oc_group_rp_table_t
   oc_string_t url;  /**< contents of url */
   oc_string_t at;   /**< Access token id. Reference to the security credentials
                        for unicast subscription encryption. */
-  bool con;         /**< confirmed message, default = false*/
   uint32_t *ga;     /**< array of integers */
   int ga_len;       /**< length of the array of group addresses identifiers */
+  bool non;         /**< true = non-confirmable unicast request, default = false*/
+  int mt;           /**< The number of maximum retransmissions for CON & NON requests */
 } oc_group_rp_table_t;
 
 /**

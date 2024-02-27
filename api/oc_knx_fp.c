@@ -1425,6 +1425,12 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       while (object != NULL) {
         switch (object->type) {
 
+        case OC_REP_BOOL: {
+          if (oc_string_len(object->name) > 0 && strncmp(oc_string(object->name), "non", 3) == 0) {
+            g_grt[index].non = object->value.boolean;
+          }
+        } break;
+
         case OC_REP_INT: {
           if (object->iname == 0) {
             mandatory_items++;
@@ -1444,6 +1450,9 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
           }
           if (object->iname == 25) {
             g_grt[index].fid = object->value.integer;
+          }
+          if (oc_string_len(object->name) > 0 && strncmp(oc_string(object->name), "mt", 2) == 0) {
+            g_grt[index].mt = object->value.integer;
           }
         } break;
 
