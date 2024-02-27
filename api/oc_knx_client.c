@@ -394,8 +394,8 @@ discovery_ia_cb(const char *payload, int len, oc_endpoint_t *endpoint,
 }
 
 int
-oc_knx_client_do_broker_request(const char *resource_url, uint64_t iid, uint32_t ia,
-                                char *destination, char *rp)
+oc_knx_client_do_broker_request(const char *resource_url, uint64_t iid,
+                                uint32_t ia, char *destination, char *rp)
 {
   char query[20];
 

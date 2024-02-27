@@ -303,10 +303,10 @@ void
 oc_create_knx_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_resource\n");
-  oc_core_populate_resource(resource_idx, device, "/.well-known/knx",
-                            OC_IF_LI | OC_IF_SEC | OC_IF_D, APPLICATION_LINK_FORMAT,
-                            OC_DISCOVERABLE, oc_core_knx_get_handler, 0,
-                            oc_core_knx_post_handler, 0, 0);
+  oc_core_populate_resource(
+    resource_idx, device, "/.well-known/knx", OC_IF_LI | OC_IF_SEC | OC_IF_D,
+    APPLICATION_LINK_FORMAT, OC_DISCOVERABLE, oc_core_knx_get_handler, 0,
+    oc_core_knx_post_handler, 0, 0);
 }
 
 // ----------------------------------------------------------------------------
@@ -969,18 +969,19 @@ oc_core_knx_k_post_handler(oc_request_t *request,
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_k, knx_fingerprint, 0, "/k",
-                                     OC_IF_LI | OC_IF_G | OC_IF_D, APPLICATION_CBOR,
-                                     OC_DISCOVERABLE, oc_core_knx_k_get_handler,
-                                     0, oc_core_knx_k_post_handler, 0, NULL,
+                                     OC_IF_LI | OC_IF_G | OC_IF_D,
+                                     APPLICATION_CBOR, OC_DISCOVERABLE,
+                                     oc_core_knx_k_get_handler, 0,
+                                     oc_core_knx_k_post_handler, 0, NULL,
                                      OC_SIZE_MANY(1), "urn:knx:g.s");
 void
 oc_create_knx_k_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_k_resource (g)\n");
 
-  oc_core_populate_resource(resource_idx, device, "/k", OC_IF_LI | OC_IF_G | OC_IF_D,
-                            APPLICATION_CBOR, OC_DISCOVERABLE,
-                            oc_core_knx_k_get_handler, 0,
+  oc_core_populate_resource(resource_idx, device, "/k",
+                            OC_IF_LI | OC_IF_G | OC_IF_D, APPLICATION_CBOR,
+                            OC_DISCOVERABLE, oc_core_knx_k_get_handler, 0,
                             oc_core_knx_k_post_handler, 0, 1, "urn:knx:g.s");
 }
 

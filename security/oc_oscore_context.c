@@ -362,7 +362,8 @@ oc_oscore_add_context(size_t device, const char *senderid, int senderid_size,
     return NULL;
   }
 
-  if (mastersecret_size < OSCORE_KEY_LEN || mastersecret_size > OSCORE_MASTER_SECRET_LEN) {
+  if (mastersecret_size < OSCORE_KEY_LEN ||
+      mastersecret_size > OSCORE_MASTER_SECRET_LEN) {
     OC_ERR("master secret size is incorrect : %d", mastersecret_size);
     return NULL;
   }

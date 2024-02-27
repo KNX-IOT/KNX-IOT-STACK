@@ -313,8 +313,8 @@ oc_core_knx_auth_o_get_handler(oc_request_t *request,
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_auth_o, knx_auth_at, 0, "/auth/o",
-                                     OC_IF_LI | OC_IF_D, APPLICATION_LINK_FORMAT,
-                                     OC_DISCOVERABLE,
+                                     OC_IF_LI | OC_IF_D,
+                                     APPLICATION_LINK_FORMAT, OC_DISCOVERABLE,
                                      oc_core_knx_auth_o_get_handler, 0, 0, 0,
                                      NULL, OC_SIZE_ZERO());
 void
