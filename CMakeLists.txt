@@ -15,6 +15,9 @@ option(ENABLE_PROGRAMS "Build mbed TLS programs." OFF)
 option(ENABLE_TESTING "Build mbed TLS tests." OFF)
 option(BUILD_TESTING "Build KNX tests" OFF)
 
+option(OC_BUILD_PORT "Whether to build the ports for Windows & Linux" ON)
+mark_as_advanced(OC_BUILD_PORT)
+
 #set(OC_SECURITY_ENABLED ON CACHE BOOL "Enable security")
 
 set(OC_DNS_SD_ENABLED OFF CACHE BOOL "Enable DNS SD")
@@ -323,7 +326,9 @@ if (CMAKE_BUILD_TYPE STREQUAL "Coverage")
     SET(CMAKE_C_FLAGS "-g -O0 -fprofile-arcs -ftest-coverage")
 endif() #CMAKE_BUILD_TYPE STREQUAL "Coverage"
 
-add_subdirectory(port)
+if (OC_BUILD_PORT)
+    add_subdirectory(port)
+endif()
 add_subdirectory(apps)
 add_subdirectory(deps)
 
