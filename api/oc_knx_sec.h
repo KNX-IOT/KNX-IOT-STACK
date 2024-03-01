@@ -286,6 +286,13 @@ void oc_delete_at_table(size_t device_index);
 void oc_reset_at_table(size_t device_index, int erase_code);
 
 /**
+ * @brief delete entries created by SPAKE handshake
+ * will be used in restart of the device
+ * @param device_index the device index
+ */
+void oc_at_delete_temp_entries(size_t device_index);
+
+/**
  * @brief delete the /auth/at table entry
  *
  * @param device_index the device index
