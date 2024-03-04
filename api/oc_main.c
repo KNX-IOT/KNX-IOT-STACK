@@ -317,7 +317,6 @@ oc_main_init(const oc_handler_t *handler)
   for (size_t device = 0; device < oc_core_get_num_devices(); device++) {
     oc_knx_device_storage_read(device);
     oc_knx_load_state(device);
-    oc_at_delete_temp_entries(device);
     // add here more
   }
 

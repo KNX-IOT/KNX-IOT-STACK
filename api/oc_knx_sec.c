@@ -1669,19 +1669,6 @@ oc_reset_at_table(size_t device_index, int erase_code)
   }
 }
 
-void
-oc_at_delete_temp_entries(size_t device_index)
-{
-  PRINT("Deleting temporary AT entries from Persistent storage\n");
-  for (int i = 0; i < G_AT_MAX_ENTRIES; i++) {
-    oc_print_auth_at_entry(device_index, i);
-    if (g_at_entries[i].profile == OC_PROFILE_COAP_PASE) {
-      oc_at_delete_entry(device_index, i);
-      oc_print_auth_at_entry(device_index, i);
-    }
-  }
-}
-
 // ----------------------------------------------------------------------------
 
 void

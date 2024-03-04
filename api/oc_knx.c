@@ -175,7 +175,6 @@ int
 delayed_restart(void *context)
 {
   PRINT("restart device\n");
-  oc_at_delete_temp_entries(cached_device_index);
 
   // reset the programming mode
   oc_device_info_t *device = oc_core_get_device_info(cached_device_index);
