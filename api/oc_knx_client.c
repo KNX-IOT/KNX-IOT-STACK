@@ -397,9 +397,21 @@ int
 oc_knx_client_do_broker_request(const char *resource_url, uint64_t iid,
                                 uint32_t ia, char *destination, char *rp)
 {
-  char query[20];
+  char query[50] = "";
 
-  snprintf(query, 20, "ep=knx://ia.%llu.%lu", iid, ia);
+  char prefix[20];
+  snprintf(prefix, 13, "ep=knx://ia.");
+  strcat(query, prefix);
+
+  char iid_hex[20];
+  oc_conv_uint64_to_hex_string(iid_hex, iid);
+  strcat(query, iid_hex);
+
+  char ia_str[11];
+  snprintf(ia_str, 11, ".%x", ia);
+  strcat(query, ia_str);
+
+  PRINT("oc_knx_client_do_broker_request: query=%s\n", query);
 
   // not sure if we should use a malloc here, what would happen if there are no
   // devices found? because that causes a memory leak
