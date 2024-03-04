@@ -161,7 +161,7 @@ oc_add_resource_to_wk(const oc_resource_t *resource, oc_request_t *request,
 bool
 oc_filter_resource(const oc_resource_t *resource, oc_request_t *request,
                    size_t device_index, size_t *response_length, int *skipped,
-                   int first_entry)
+                   int first_entry, int truncate)
 {
   (void)device_index; /* variable not used */
 
@@ -182,7 +182,9 @@ oc_filter_resource(const oc_resource_t *resource, oc_request_t *request,
     return false;
   }
 
-  int truncate = oc_filter_resource_by_urn(resource, request);
+  if (!truncate) {
+    truncate = oc_filter_resource_by_urn(resource, request);
+  }
 
   return oc_add_resource_to_wk(resource, request, device_index, response_length,
                                truncate);
@@ -201,7 +203,7 @@ oc_process_resources(oc_request_t *request, size_t device_index,
       continue;
 
     if (oc_filter_resource(resource, request, device_index, response_length,
-                           skipped, first_entry)) {
+                           skipped, first_entry, 0)) {
       (*matches)++;
       if (first_entry + (*matches) >= last_entry) {
         return true;
@@ -221,7 +223,7 @@ oc_process_basic_resources(oc_request_t *request, size_t device_index,
        i++) {
     if (oc_filter_resource(
           oc_core_get_resource_by_index(basic_resources[i], device_index),
-          request, device_index, response_length, skipped, first_entry)) {
+          request, device_index, response_length, skipped, first_entry, 0)) {
       (*matches)++;
       if (first_entry + (*matches) >= last_entry) {
         return true;

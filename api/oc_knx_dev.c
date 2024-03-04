@@ -717,7 +717,7 @@ oc_core_dev_dev_get_handler(oc_request_t *request,
     const oc_resource_t *resource =
       oc_core_get_resource_by_index(i, device_index);
     if (oc_filter_resource(resource, request, device_index, &response_length,
-                           &i, i)) {
+                           &i, i, 1)) {
       matches++;
     }
   }
@@ -736,7 +736,7 @@ oc_core_dev_dev_get_handler(oc_request_t *request,
   PRINT("oc_core_dev_dev_get_handler - end\n");
 }
 
-OC_CORE_CREATE_CONST_RESOURCE_LINKED(dev, app, 0, "/dev", OC_IF_LI,
+OC_CORE_CREATE_CONST_RESOURCE_LINKED(dev, app, 0, "/dev", OC_IF_LI | OC_IF_D,
                                      APPLICATION_LINK_FORMAT, OC_DISCOVERABLE,
                                      oc_core_dev_dev_get_handler, 0, 0, 0, NULL,
                                      OC_SIZE_MANY(1), "urn:knx:fb.0");
@@ -748,7 +748,7 @@ oc_create_dev_dev_resource(int resource_idx, size_t device)
   // note that this resource is listed in /.well-known/core so it should have
   // the full rt with urn:knx prefix
   oc_core_populate_resource(
-    resource_idx, device, "/dev", OC_IF_LI, APPLICATION_LINK_FORMAT,
+    resource_idx, device, "/dev", OC_IF_LI | OC_IF_D, APPLICATION_LINK_FORMAT,
     OC_DISCOVERABLE, oc_core_dev_dev_get_handler, 0, 0, 0, 1, "urn:knx:fb.0");
 }
 
@@ -1266,7 +1266,7 @@ oc_core_ap_get_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
     const oc_resource_t *resource =
       oc_core_get_resource_by_index(i, device_index);
     if (oc_filter_resource(resource, request, device_index, &response_length,
-                           &i, i)) {
+                           &i, i, 1)) {
       matches++;
     }
   }
@@ -1434,6 +1434,7 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
     // writing the empty values
     oc_storage_erase(KNX_STORAGE_IA);
     oc_storage_erase(KNX_STORAGE_IID);
+    oc_storage_erase(KNX_STORAGE_FID);
     oc_storage_erase(KNX_STORAGE_PM);
     uint32_t port = 5683;  // unicast communication
     uint32_t mport = 5683; // multicast communication
@@ -1445,6 +1446,7 @@ oc_knx_device_storage_reset(size_t device_index, int reset_mode)
     // set the other data to KNX defaults
     device->ia = ffff;
     device->iid = zero;
+    device->fid = zero;
     device->port = port;
     device->mport = mport;
     oc_free_string(&device->hostname);

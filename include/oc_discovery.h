@@ -44,12 +44,13 @@ void oc_create_discovery_resource(int resource_idx, size_t device);
  * @param response_length the current response length
  * @param skipped number of entries already skipped
  * @param first_entry first entry to be included
+ * @param truncate whether to truncate the response payload
  * @return true resource added (as entry) to the response
  * @return false resource not added to the response
  */
 bool oc_filter_resource(const oc_resource_t *resource, oc_request_t *request,
                         size_t device_index, size_t *response_length,
-                        int *skipped, int first_entry);
+                        int *skipped, int first_entry, int truncate);
 /**
  * @brief add the resource to the response in application link format
  *

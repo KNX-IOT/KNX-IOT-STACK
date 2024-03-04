@@ -295,7 +295,7 @@ oc_core_knx_auth_o_get_handler(oc_request_t *request,
     const oc_resource_t *resource =
       oc_core_get_resource_by_index(i, device_index);
     if (oc_filter_resource(resource, request, device_index, &response_length,
-                           &i, i)) {
+                           &i, i, 1)) {
       matches++;
     }
   }
@@ -313,8 +313,8 @@ oc_core_knx_auth_o_get_handler(oc_request_t *request,
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_auth_o, knx_auth_at, 0, "/auth/o",
-                                     OC_IF_LI, APPLICATION_LINK_FORMAT,
-                                     OC_DISCOVERABLE,
+                                     OC_IF_LI | OC_IF_D,
+                                     APPLICATION_LINK_FORMAT, OC_DISCOVERABLE,
                                      oc_core_knx_auth_o_get_handler, 0, 0, 0,
                                      NULL, OC_SIZE_ZERO());
 void
@@ -323,7 +323,7 @@ oc_create_knx_auth_o_resource(int resource_idx, size_t device)
   OC_DBG("oc_create_knx_auth_o_resource\n");
   // TODO: what is resource type?
   // none for now
-  oc_core_populate_resource(resource_idx, device, "/auth/o", OC_IF_LI,
+  oc_core_populate_resource(resource_idx, device, "/auth/o", OC_IF_LI | OC_IF_D,
                             APPLICATION_LINK_FORMAT, OC_DISCOVERABLE,
                             oc_core_knx_auth_o_get_handler, 0, 0, 0, 0);
 }
@@ -670,6 +670,11 @@ oc_core_auth_at_post_handler(oc_request_t *request,
               char *if_str = oc_string_array_get_item(str_array, i);
               oc_interface_mask_t if_mask =
                 oc_ri_get_interface_mask(if_str, strlen(if_str));
+              if (if_mask == OC_IF_LI) {
+                OC_ERR("   if.ll is not a valid access scope!\n");
+                oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
+                return;
+              }
               interfaces = interfaces + if_mask;
             }
             g_at_entries[index].scope = interfaces;
@@ -867,7 +872,7 @@ oc_core_auth_at_delete_handler(oc_request_t *request,
 }
 
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_auth_at, knx_auth_at_x, 0, "/auth/at",
-                                     OC_IF_LI | OC_IF_B | OC_IF_SEC,
+                                     OC_IF_LI | OC_IF_D | OC_IF_B | OC_IF_SEC,
                                      APPLICATION_LINK_FORMAT, OC_DISCOVERABLE,
                                      oc_core_auth_at_get_handler, 0,
                                      oc_core_auth_at_post_handler,
@@ -878,7 +883,7 @@ void
 oc_create_auth_at_resource(int resource_idx, size_t device)
 {
   oc_core_populate_resource(
-    resource_idx, device, "/auth/at", OC_IF_LI | OC_IF_B | OC_IF_SEC,
+    resource_idx, device, "/auth/at", OC_IF_LI | OC_IF_D | OC_IF_B | OC_IF_SEC,
     APPLICATION_LINK_FORMAT, OC_DISCOVERABLE, oc_core_auth_at_get_handler, 0,
     oc_core_auth_at_post_handler, oc_core_auth_at_delete_handler, 1,
     "urn:knx:fb.at");
@@ -1139,7 +1144,7 @@ oc_core_knx_auth_get_handler(oc_request_t *request,
 
   PRINT("oc_core_knx_auth_get_handler\n");
 
-  /* check if the accept header is cbor-format */
+  /* check if the accept header is link-format */
   if (oc_check_accept_header(request, APPLICATION_LINK_FORMAT) == false) {
     request->response->response_buffer->code =
       oc_status_code(OC_STATUS_BAD_REQUEST);
@@ -1181,7 +1186,7 @@ oc_core_knx_auth_get_handler(oc_request_t *request,
     const oc_resource_t *resource =
       oc_core_get_resource_by_index(i, device_index);
     if (oc_filter_resource(resource, request, device_index, &response_length,
-                           &i, i)) {
+                           &i, i, 1)) {
       matches++;
     }
   }
@@ -1201,13 +1206,13 @@ oc_core_knx_auth_get_handler(oc_request_t *request,
 
 #ifdef OC_IOT_ROUTER
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_auth, knx_fp_gm, 0, "/auth",
-                                     OC_IF_B | OC_IF_SEC,
+                                     OC_IF_LI | OC_IF_D,
                                      APPLICATION_LINK_FORMAT, OC_DISCOVERABLE,
                                      oc_core_knx_auth_get_handler, 0, 0, 0,
                                      NULL, OC_SIZE_ZERO());
 #else
 OC_CORE_CREATE_CONST_RESOURCE_LINKED(knx_auth, well_known_core, 0, "/auth",
-                                     OC_IF_B | OC_IF_SEC,
+                                     OC_IF_LI | OC_IF_D,
                                      APPLICATION_LINK_FORMAT, OC_DISCOVERABLE,
                                      oc_core_knx_auth_get_handler, 0, 0, 0,
                                      NULL, OC_SIZE_ZERO());
@@ -1216,7 +1221,7 @@ void
 oc_create_knx_auth_resource(int resource_idx, size_t device)
 {
   OC_DBG("oc_create_knx_auth_resource\n");
-  oc_core_populate_resource(resource_idx, device, "/auth", OC_IF_LI,
+  oc_core_populate_resource(resource_idx, device, "/auth", OC_IF_LI | OC_IF_D,
                             APPLICATION_LINK_FORMAT, OC_DISCOVERABLE,
                             oc_core_knx_auth_get_handler, 0, 0, 0, 0);
 }
