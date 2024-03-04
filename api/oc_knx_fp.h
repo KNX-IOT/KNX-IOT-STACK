@@ -185,8 +185,8 @@ typedef struct oc_group_rp_table_t
                        for unicast subscription encryption. */
   uint32_t *ga;     /**< array of integers */
   int ga_len;       /**< length of the array of group addresses identifiers */
-  bool non;         /**< true = non-confirmable unicast request, default = false*/
-  int mt;           /**< The number of maximum retransmissions for CON & NON requests */
+  bool non; /**< true = non-confirmable unicast request, default = false*/
+  int mt;   /**< The number of maximum retransmissions for CON & NON requests */
 } oc_group_rp_table_t;
 
 /**
