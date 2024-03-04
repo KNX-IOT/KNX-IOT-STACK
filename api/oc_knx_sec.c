@@ -733,13 +733,6 @@ oc_core_auth_at_post_handler(oc_request_t *request,
           //                oc_string(object->value.string),
           //                oc_string_len(object->value.string));
           //}
-          if (object->iname == 5) {
-            // salt
-            oc_free_string(&(g_at_entries[index].osc_salt));
-            oc_new_string(&g_at_entries[index].osc_salt,
-                          oc_string(object->value.string),
-                          oc_string_len(object->value.string));
-          }
         } else if (object->type == OC_REP_INT) {
           id_only = false;
           if (object->iname == 38) {
@@ -815,6 +808,14 @@ oc_core_auth_at_post_handler(oc_request_t *request,
                                        oc_string(oscobject->value.string),
                                        oc_string_len(oscobject->value.string));
                     other_updated = true;
+                  }
+                  if (oscobject->iname == 0 && subobject_nr == 8 &&
+                      oscobject_nr == 4) {
+                    // cnf::osc::salt
+                    oc_free_string(&(g_at_entries[index].osc_salt));
+                    oc_new_byte_string(&g_at_entries[index].osc_salt,
+                                  oc_string(object->value.string),
+                                  oc_string_len(object->value.string));
                   }
                 } /* type */
 
