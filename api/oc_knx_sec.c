@@ -1335,6 +1335,14 @@ oc_at_delete_entry(size_t device_index, int index)
   oc_free_string(&g_at_entries[index].kid);
   oc_new_string(&g_at_entries[index].kid, "", 0);
 
+  if (g_at_entries[index].ga_len > 0) {
+    uint64_t *cur_arr = g_at_entries[index].ga;
+    if (cur_arr) {
+      free(cur_arr);
+    }
+    g_at_entries[index].ga_len = 0;
+  }
+
   char filename[20];
   snprintf(filename, 20, "%s_%d", AT_STORE, index);
   oc_storage_erase(filename);
@@ -1378,7 +1386,6 @@ oc_at_dump_entry(size_t device_index, int entry)
                            oc_byte_string_len(g_at_entries[entry].osc_id));
   oc_rep_i_set_text_string(root, 82, oc_string(g_at_entries[entry].sub));
   oc_rep_i_set_text_string(root, 81, oc_string(g_at_entries[entry].kid));
-
   oc_rep_i_set_int_array(root, 777, g_at_entries[entry].ga,
                          g_at_entries[entry].ga_len);
 
