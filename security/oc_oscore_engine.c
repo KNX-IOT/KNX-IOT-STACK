@@ -208,7 +208,8 @@ oc_oscore_recv_message(oc_message_t *message)
           oc_string(at_entry->osc_id), /* recipient id */
           oc_byte_string_len(at_entry->osc_id), /* recipient id len */
           0, "desc", oc_string(at_entry->osc_ms),
-          oc_byte_string_len(at_entry->osc_ms), oscore_pkt->kid_ctx,
+          oc_byte_string_len(at_entry->osc_ms), oc_string(at_entry->osc_salt),
+          oc_byte_string_len(at_entry->osc_salt), oscore_pkt->kid_ctx,
           oscore_pkt->kid_ctx_len, idx, false);
 
         // if context is null, free one & try adding again
@@ -221,7 +222,8 @@ oc_oscore_recv_message(oc_message_t *message)
             oc_string(at_entry->osc_id), /* recipient id */
             oc_byte_string_len(at_entry->osc_id), /* recipient id len */
             0, "desc", oc_string(at_entry->osc_ms),
-            oc_byte_string_len(at_entry->osc_ms), oscore_pkt->kid_ctx,
+            oc_byte_string_len(at_entry->osc_ms), oc_string(at_entry->osc_salt),
+          oc_byte_string_len(at_entry->osc_salt), oscore_pkt->kid_ctx,
             oscore_pkt->kid_ctx_len, idx, false);
           if (!oscore_ctx) {
             OC_ERR("***Could not create oscore recipient context!***");

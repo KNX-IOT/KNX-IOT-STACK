@@ -346,7 +346,8 @@ oc_oscore_context_t *
 oc_oscore_add_context(size_t device, const char *senderid, int senderid_size,
                       const char *recipientid, int recipientid_size,
                       uint64_t ssn, const char *desc, const char *mastersecret,
-                      int mastersecret_size, const char *osc_ctx,
+                      int mastersecret_size, const char *salt,
+                      int salt_size, const char *osc_ctx,
                       int osc_ctx_size, int auth_at_index, bool from_storage)
 {
   PRINT("-----oc_oscore_add_context--SID:");
@@ -397,6 +398,8 @@ oc_oscore_add_context(size_t device, const char *senderid, int senderid_size,
   oc_char_println_hex(osc_ctx, osc_ctx_size);
   PRINT("  ms size   : %d ", mastersecret_size);
   oc_char_println_hex(mastersecret, mastersecret_size);
+  PRINT("  salt size : %d ", salt_size);
+  oc_char_println_hex(salt, salt_size);
 
   /* To prevent SSN reuse, bump to higher value that could've been previously
    * used, accounting for any failed writes to nonvolatile storage.
@@ -455,7 +458,7 @@ oc_oscore_add_context(size_t device, const char *senderid, int senderid_size,
   OC_DBG_OSCORE("### \t\tderiving Sender key ###");
   if (oc_oscore_context_derive_param(
         ctx->sendid, ctx->sendid_len, ctx->idctx, ctx->idctx_len, "Key",
-        (uint8_t *)mastersecret, mastersecret_size, NULL, 0, ctx->sendkey,
+        (uint8_t *)mastersecret, mastersecret_size, salt, salt_size, ctx->sendkey,
         OSCORE_KEY_LEN) < 0) {
     OC_ERR("*** error deriving Sender key ###");
     goto add_oscore_context_error;
@@ -469,7 +472,7 @@ oc_oscore_add_context(size_t device, const char *senderid, int senderid_size,
   OC_DBG_OSCORE("### \t\tderiving Recipient key ###");
   if (oc_oscore_context_derive_param(
         ctx->recvid, ctx->recvid_len, ctx->idctx, ctx->idctx_len, "Key",
-        (uint8_t *)mastersecret, mastersecret_size, NULL, 0, ctx->recvkey,
+        (uint8_t *)mastersecret, mastersecret_size, salt, salt_size, ctx->recvkey,
         OSCORE_KEY_LEN) < 0) {
     OC_ERR("*** error deriving Recipient key ###");
     goto add_oscore_context_error;
@@ -483,7 +486,7 @@ oc_oscore_add_context(size_t device, const char *senderid, int senderid_size,
   OC_DBG_OSCORE("### \t\tderiving Common IV ###");
   if (oc_oscore_context_derive_param(
         NULL, 0, ctx->idctx, ctx->idctx_len, "IV", (uint8_t *)mastersecret,
-        mastersecret_size, NULL, 0, ctx->commoniv, OSCORE_COMMON_IV_LEN) < 0) {
+        mastersecret_size, salt, salt_size, ctx->commoniv, OSCORE_COMMON_IV_LEN) < 0) {
     OC_ERR("*** error deriving Common IV ###");
     goto add_oscore_context_error;
   }

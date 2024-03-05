@@ -151,6 +151,8 @@ void oc_oscore_free_contexts_at_id(int auth_at_index);
 
  * @param mastersecret the OSCORE master secret
  * @param mastersecret_size the length of the OSCORE master secret
+ * @param mastersecret the salt
+ * @param mastersecret_size the length of the salt
  * @param token_id the token
  * @param token_id_size the length of the token_id
  * @param auth_at_index index in the auth at table -1.
@@ -163,7 +165,8 @@ void oc_oscore_free_contexts_at_id(int auth_at_index);
 oc_oscore_context_t *oc_oscore_add_context(
   size_t device, const char *senderid, int senderid_size,
   const char *recipientid, int recipientid_size, uint64_t ssn, const char *desc,
-  const char *mastersecret, int mastersecret_size, const char *token_id,
+  const char *mastersecret, int mastersecret_size, const char *salt,
+                      int salt_size, const char *token_id,
   int token_id_size, int auth_at_index, bool from_storage);
 
 /**
