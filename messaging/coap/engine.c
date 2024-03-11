@@ -364,7 +364,8 @@ coap_receive(oc_message_t *msg)
         }
 #endif
 
-        coap_clear_transaction(transaction);
+        if (message->type == COAP_TYPE_CON)
+          coap_clear_transaction(transaction);
       } else {
         uint8_t echo_value[COAP_ECHO_LEN];
         size_t echo_len = coap_get_header_echo(message, echo_value);
