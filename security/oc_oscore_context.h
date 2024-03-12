@@ -166,8 +166,8 @@ oc_oscore_context_t *oc_oscore_add_context(
   size_t device, const char *senderid, int senderid_size,
   const char *recipientid, int recipientid_size, uint64_t ssn, const char *desc,
   const char *mastersecret, int mastersecret_size, const char *salt,
-                      int salt_size, const char *token_id,
-  int token_id_size, int auth_at_index, bool from_storage);
+  int salt_size, const char *token_id, int token_id_size, int auth_at_index,
+  bool from_storage);
 
 /**
  * @brief Free the least recently used recipient context

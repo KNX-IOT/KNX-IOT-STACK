@@ -814,8 +814,8 @@ oc_core_auth_at_post_handler(oc_request_t *request,
                     // cnf::osc::salt
                     oc_free_string(&(g_at_entries[index].osc_salt));
                     oc_new_byte_string(&g_at_entries[index].osc_salt,
-                                  oc_string(oscobject->value.string),
-                                  oc_string_len(oscobject->value.string));
+                                       oc_string(oscobject->value.string),
+                                       oc_string_len(oscobject->value.string));
                     other_updated = true;
                   }
                 } /* type */
