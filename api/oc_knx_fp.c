@@ -133,11 +133,7 @@ find_empty_slot_in_group_object_table(int id)
     /* should be a positive number */
     return index;
   }
-  index = oc_core_find_index_in_group_object_table_from_id(id);
-  if (index > -1) {
-    /* overwrite existing index */
-    return index;
-  }
+
   /* empty slot */
   for (int i = 0; i < GOT_MAX_ENTRIES; i++) {
     if (g_got[i].id == -1) {
@@ -562,12 +558,12 @@ oc_core_fp_g_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       } else {
         // no index, so we will create one
         return_status = OC_STATUS_CREATED;
-      }
-      index = find_empty_slot_in_group_object_table(id);
-      if (index == -1) {
-        OC_ERR("  ERROR index %d", index);
-        oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
-        return;
+        index = find_empty_slot_in_group_object_table(id);
+        if (index == -1) {
+          OC_ERR("  ERROR index %d", index);
+          oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
+          return;
+        }
       }
 
       bool id_only = true;
@@ -974,13 +970,13 @@ oc_core_fp_p_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       } else {
         // no index, so we will create one
         return_status = OC_STATUS_CREATED;
-      }
-      index = find_empty_slot_in_rp_table(id, g_gpt,
-                                          oc_core_get_publisher_table_size());
-      if (index == -1) {
-        PRINT("  ERROR index %d\n", index);
-        oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
-        return;
+        index = find_empty_slot_in_rp_table(id, g_gpt,
+                                            oc_core_get_publisher_table_size());
+        if (index == -1) {
+          PRINT("  ERROR index %d\n", index);
+          oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
+          return;
+        }
       }
       g_gpt[index].id = id;
 
@@ -1408,13 +1404,16 @@ oc_core_fp_r_post_handler(oc_request_t *request, oc_interface_mask_t iface_mask,
       } else {
         // no index, so we will create one
         return_status = OC_STATUS_CREATED;
-      }
-      index = find_empty_slot_in_rp_table(id, g_grt,
-                                          oc_core_get_recipient_table_size());
-      if (index == -1) {
-        OC_ERR("  ERROR index %d", index);
-        oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
-        return;
+        index = find_empty_slot_in_rp_table(id, g_grt,
+                                            oc_core_get_recipient_table_size());
+        if (index == -1) {
+          OC_ERR("  ERROR index %d", index);
+          oc_send_response_no_format(request, OC_STATUS_BAD_REQUEST);
+          return;
+        }
+        // Initialise non & mt for new entry
+        g_grt[index].non = false;
+        g_grt[index].mt = 4;
       }
       g_grt[index].id = id;
 
@@ -2316,11 +2315,6 @@ find_empty_slot_in_rp_table(int id, oc_group_rp_table_t *rp_table, int max_size)
   int index = -1;
   if (id < 0) {
     // should be a positive number
-    return index;
-  }
-  index = oc_core_find_index_in_rp_table_from_id(id, rp_table, max_size);
-  if (index > -1) {
-    // overwrite existing index
     return index;
   }
 
