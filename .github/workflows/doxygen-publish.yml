@@ -12,17 +12,17 @@ on:
 
 jobs:
   doxygen-publish:
+    if: (github.repository == 'KNX-IOT/KNX-IOT-STACK') && github.event.pull_request.merged
     runs-on: ubuntu-latest
-    if: ${{ github.event.pull_request.merged }}
     steps:
       - uses: actions/checkout@v3
         with:
           path: KNX-IOT-STACK
-      
+
       - uses: webfactory/ssh-agent@v0.5.3
         with:
           ssh-private-key: ${{ secrets.KNX_IOT_STACK_SSH_KEY }}
-        
+
       - name: doxygen_build_documentation
         run: |
           sudo apt-get update -y
@@ -30,7 +30,7 @@ jobs:
           doxygen --version
           cd ${{ github.workspace }}/KNX-IOT-STACK/tools
           ./build_doc.sh
-          
+
       - name: doxygen_copy-docs
         run: |
           cd ~/work
@@ -40,7 +40,7 @@ jobs:
           cp -r ${{ github.workspace }}/KNX-IOT-STACK/tools/html .
           #Rename to "docs"
           mv html docs
-          
+
       - name: doxygen_push-changes
         run: |
           cd ~/work//KNX-IOT-STACK-doxygen
