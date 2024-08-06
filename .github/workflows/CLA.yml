@@ -7,6 +7,7 @@ on:
 
 jobs:
   CLAssistant:
+    if: github.repository_owner == 'KNX-IOT'
     runs-on: ubuntu-latest
     steps:
       - name: "CLA Assistant"
